@@ -1,0 +1,40 @@
+project:
+  name: "Template Guard Policy"
+  root_marker: "pubspec.yaml"
+  language: "dart"
+  file_extension: ".dart"
+
+rule_files:
+  - coding_rules.yaml
+
+scopes:
+  all:
+    roots: ["lib"]
+    include: ["**/*.dart"]
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+
+families:
+  coding:
+    name: "Coding Conventions"
+
+profiles:
+  standard:
+    families: [coding]
+    max_cost: low
+
+exit_policy:
+  local:
+    fail_on: [error, critical]
+    max_warnings: -1
+  ci:
+    fail_on: [warning, error, critical]
+    max_warnings: 10
+
+versioning:
+  engine_version: "3.0.0"
+  policy_version: "1.0.0"
+  rule_schema_version: 1

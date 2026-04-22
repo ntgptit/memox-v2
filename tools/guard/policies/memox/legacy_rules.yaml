@@ -1,0 +1,16 @@
+family: legacy
+
+rules:
+  - id: riverpod_syntax
+    type: required_pattern
+    name: "Riverpod Syntax"
+    description: "Provider-owned source files should use Riverpod annotation syntax and generated parts."
+    message_code: riverpod_syntax
+    severity: error
+    impact: architecture
+    scope: provider_files
+    params:
+      patterns:
+        - "import 'package:riverpod_annotation/riverpod_annotation\\.dart';"
+        - "part '.*\\.g\\.dart';"
+        - "@(?:riverpod|Riverpod)"

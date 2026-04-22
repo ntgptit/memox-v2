@@ -1,0 +1,194 @@
+family: project
+
+rules:
+  - id: folder_structure
+    type: path_structure
+    name: "Folder Structure"
+    description: "The clean architecture roots for this Flutter app must exist."
+    severity: critical
+    impact: architecture
+    scope: all
+    params:
+      required_dirs:
+        - "lib/app/bootstrap"
+        - "lib/app/config"
+        - "lib/app/di"
+        - "lib/app/router"
+        - "lib/core/network"
+        - "lib/core/theme"
+        - "lib/data/datasources"
+        - "lib/data/repositories"
+        - "lib/domain/entities"
+        - "lib/domain/repositories"
+        - "lib/domain/services"
+        - "lib/domain/usecases"
+        - "lib/l10n/generated"
+        - "lib/presentation/features"
+        - "lib/presentation/shared"
+
+  - id: required_architecture_files
+    type: file_existence
+    name: "Required Architecture Files"
+    description: "The app-level routing, theme, and provider entry files must exist in their standardized locations."
+    severity: critical
+    impact: architecture
+    scope: all
+    params:
+      required_files:
+        - "lib/app/app.dart"
+        - "lib/app/bootstrap/app_bootstrap.dart"
+        - "lib/app/config/app_config.dart"
+        - "lib/app/config/env.dart"
+        - "lib/app/di/providers.dart"
+        - "lib/app/router/app_router.dart"
+        - "lib/app/router/route_guards.dart"
+        - "lib/app/router/route_names.dart"
+        - "lib/core/theme/app_theme.dart"
+
+  - id: required_theme_token_files
+    type: file_existence
+    name: "Required Theme Source Files"
+    description: "The theme source of truth must exist in the standardized MemoX theme structure."
+    severity: critical
+    impact: design_system
+    scope: all
+    params:
+      required_files:
+        - "lib/core/theme/app_colors.dart"
+        - "lib/core/theme/app_typography.dart"
+        - "lib/core/theme/app_spacing.dart"
+        - "lib/core/theme/app_icon_sizes.dart"
+        - "lib/core/theme/app_radius.dart"
+        - "lib/core/theme/app_elevation.dart"
+        - "lib/core/theme/app_motion.dart"
+        - "lib/core/theme/app_breakpoints.dart"
+
+  - id: required_l10n_files
+    type: file_existence
+    name: "Required L10n Files"
+    description: "The project must declare Flutter l10n configuration and at least one ARB source file."
+    severity: critical
+    impact: i18n
+    scope: all
+    params:
+      required_files:
+        - "l10n.yaml"
+        - "lib/l10n/app_en.arb"
+        - "lib/l10n/app_vi.arb"
+
+  - id: required_database_tests
+    type: file_existence
+    name: "Required Database Tests"
+    description: "Disabled until MemoX adopts a dedicated local database migration test contract."
+    severity: critical
+    impact: architecture
+    scope: all
+    enabled: false
+    params:
+      required_files: []
+
+  - id: pubspec_enables_l10n_generation
+    type: required_pattern
+    name: "Pubspec Enables L10n"
+    description: "`pubspec.yaml` must enable Flutter l10n code generation and include `flutter_localizations`."
+    message_code: missing_l10n_pubspec
+    severity: critical
+    impact: i18n
+    scope: project_root_files
+    targets:
+      - "pubspec.yaml"
+    params:
+      patterns:
+        - "flutter_localizations:"
+        - "generate:\\s*true"
+
+  - id: pubspec_has_monitoring_sdk
+    type: required_pattern
+    name: "Pubspec Has Monitoring SDK"
+    description: "`pubspec.yaml` must include `sentry_flutter` for production monitoring."
+    message_code: missing_monitoring_dependency
+    severity: critical
+    impact: architecture
+    scope: project_root_files
+    enabled: false
+    targets:
+      - "pubspec.yaml"
+    params:
+      patterns:
+        - "sentry_flutter:"
+
+  - id: main_app_uses_l10n
+    type: required_pattern
+    name: "Main App Uses L10n"
+    description: "`lib/main.dart` must bootstrap `AppLocalizations` in the app shell."
+    message_code: missing_l10n_bootstrap
+    severity: critical
+    impact: i18n
+    scope: app_bootstrap
+    params:
+      patterns:
+        - "(?:package:memox/l10n/generated/app_localizations\\.dart|l10n/generated/app_localizations\\.dart)"
+        - "AppLocalizations\\.localizationsDelegates"
+        - "AppLocalizations\\.supportedLocales"
+        - "AppLocalizations\\.of\\(context\\)\\.appName"
+
+  - id: main_bootstraps_app_logger
+    type: required_pattern
+    name: "Main Bootstraps AppLogger"
+    description: "Disabled until MemoX adopts a centralized `AppLogger` bootstrap."
+    message_code: missing_logging_bootstrap
+    severity: critical
+    impact: architecture
+    scope: app_bootstrap
+    enabled: false
+    params:
+      patterns:
+        - "\\bAppLogger\\b"
+        - "await\\s+AppLogger\\.bootstrap\\("
+
+  - id: main_bootstraps_provider_observer
+    type: required_pattern
+    name: "Main Bootstraps Provider Observer"
+    description: "Disabled until MemoX adopts a centralized Riverpod observer bootstrap."
+    message_code: missing_provider_observer_bootstrap
+    severity: critical
+    impact: architecture
+    scope: app_bootstrap
+    enabled: false
+    params:
+      patterns:
+        - "ProviderContainer\\s*\\("
+        - "observers\\s*:\\s*buildAppProviderObservers\\s*\\("
+
+  - id: app_provider_observer_contract
+    type: required_pattern
+    name: "App Provider Observer Contract"
+    description: "Disabled until MemoX adds a concrete provider observer contract."
+    message_code: missing_provider_observer_contract
+    severity: critical
+    impact: architecture
+    scope: all
+    enabled: false
+    params:
+      patterns:
+        - "String\\.fromEnvironment\\(\\s*'APP_ENV'"
+        - "'development'"
+        - "'staging'"
+        - "buildAppProviderObservers\\s*\\("
+        - "class\\s+AppProviderObserver\\s+extends\\s+ProviderObserver"
+
+  - id: app_logger_global_handlers
+    type: required_pattern
+    name: "App Logger Global Handlers"
+    description: "Disabled until MemoX adds a centralized app logger with global error handlers."
+    message_code: missing_app_logger_contract
+    severity: critical
+    impact: architecture
+    scope: all
+    enabled: false
+    params:
+      patterns:
+        - "FlutterError\\.onError\\s*="
+        - "PlatformDispatcher\\.instance\\.onError\\s*="
+        - "SentryFlutter\\.init\\("
+        - "sendDefaultPii\\s*=\\s*false"

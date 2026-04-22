@@ -1,0 +1,94 @@
+{
+  "@@locale": "en",
+  "appName": "MemoX",
+  "commonBack": "Back",
+  "commonOk": "OK",
+  "commonCancel": "Cancel",
+  "commonCreate": "Create",
+  "commonSearch": "Search",
+  "commonEdit": "Edit",
+  "commonDelete": "Delete",
+  "homeTitle": "Home",
+  "libraryTitle": "Library",
+  "progressTitle": "Progress",
+  "settingsTitle": "Settings",
+  "appShellHomePlaceholderDescription": "Home dashboard foundation is not wired yet.",
+  "appShellProgressPlaceholderDescription": "Progress foundation is not wired yet.",
+  "appShellSettingsPlaceholderDescription": "Settings foundation is not wired yet.",
+  "appRouterErrorTitle": "Navigation error",
+  "errorConfiguration": "The app configuration is invalid.",
+  "errorRequestTimedOut": "The request timed out.",
+  "errorInvalidData": "The received data is invalid.",
+  "errorUnsupportedAction": "This action is not supported right now.",
+  "errorNetwork": "A network problem occurred.",
+  "errorStorage": "A local storage problem occurred.",
+  "errorNotFound": "The requested resource could not be found.",
+  "errorUnexpected": "Something went wrong.",
+  "foldersNewSubfolderTooltip": "New subfolder",
+  "foldersNewDeckTooltip": "New deck",
+  "foldersNewSubfolderTitle": "New subfolder",
+  "foldersFolderNameLabel": "Folder name",
+  "foldersFolderNameHint": "e.g. Listening practice",
+  "foldersMoreActionsTooltip": "More actions",
+  "foldersActionsTitle": "Folder actions",
+  "foldersReorder": "Reorder",
+  "foldersStatusSubfolders": "Contains {subfolderCount} subfolders",
+  "@foldersStatusSubfolders": {
+    "placeholders": {
+      "subfolderCount": {
+        "type": "int"
+      }
+    }
+  },
+  "foldersStatusDecks": "Contains {deckCount} decks · {totalCardCount} cards",
+  "@foldersStatusDecks": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "totalCardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "foldersSegmentSubfolders": "Subfolders",
+  "foldersSegmentDecks": "Decks",
+  "foldersSubfolderDeckHint": "To add decks here, organize them in a subfolder.",
+  "foldersDeckCardProgress": "{cardCount} cards · {dueToday} due today",
+  "@foldersDeckCardProgress": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueToday": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryCreateFolderTooltip": "Create folder",
+  "libraryDueTodayPrefix": "You have ",
+  "libraryDueTodaySuffix": " items due today",
+  "libraryStudyNow": "Study now  \u2192",
+  "libraryFoldersSectionTitle": "FOLDERS",
+  "libraryFolderStats": "{deckCount} decks · {itemCount} items",
+  "@libraryFolderStats": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "itemCount": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryEmptyTitle": "No folders yet",
+  "libraryEmptyMessage": "Create your first folder to start building your library.",
+  "sharedErrorTitle": "Something went wrong",
+  "sharedTryAgain": "Try again",
+  "sharedShowDetails": "Show details",
+  "sharedHideDetails": "Hide details",
+  "sharedFullscreenTooltip": "Fullscreen",
+  "sharedStreakLabel": "Streak",
+  "sharedOfflineTitle": "You're offline",
+  "sharedOfflineMessage": "Check your internet connection and try again. Your local flashcards still work."
+}

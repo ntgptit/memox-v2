@@ -1,0 +1,596 @@
+locale: en
+
+messages:
+  no_else:
+    en: "Do not use `else` in app source. Prefer early return, guard clauses, or switch expressions."
+  naming_convention:
+    en: "File '{file_name}' should follow '{pattern}'."
+  guard_centralized_constants:
+    en: "Guard Python sources must not hardcode shared guard contract literals; define them once in `tools/guard/engine/constants.py` and import the constant instead."
+  widget_length:
+    en: "Widget build method exceeds {max_lines} lines."
+  layer_import_violation:
+    en: "Layer '{current_layer}' must not import '{imported_layer}'."
+  async_builder:
+    en: "Avoid raw `.when(...)` on AsyncValue in feature UI."
+  no_hardcoded_color:
+    en: "Avoid hardcoded colors in UI code."
+  no_hardcoded_font_size:
+    en: "Avoid literal font sizes in UI code."
+  no_hardcoded_string:
+    en: "Avoid hardcoded user-facing strings in UI; route them through l10n."
+  no_hardcoded_notification_text:
+    en: "Reminder notification title/body must come from l10n."
+  ui_error_stringify:
+    en: "UI surfaces must not call `error.toString()` directly; route errors through the normalized failure resolver."
+  ui_low_level_exception_surface:
+    en: "UI surfaces must not depend on low-level database or network exception types."
+  provider_low_level_exception_surface:
+    en: "Provider-owned files must not depend on low-level database or network exception types; map them at the repository boundary."
+  provider_ui_ref_types:
+    en: "Provider-owned files must not depend on UI-bound types such as `BuildContext` or `WidgetRef`; keep UI orchestration in widgets and use `Ref` inside providers."
+  provider_async_error_wrapper:
+    en: "Provider-owned files must not throw raw `AsyncError`; convert failures to `AppFailure` or `Result`."
+  provider_raw_async_error_state:
+    en: "Provider-owned files must not assign raw caught errors into `AsyncValue.error(...)`; map them to `AppFailure` first."
+  provider_raw_string_error_state:
+    en: "Provider-owned files must not publish raw string error states; use `AppFailure` instead."
+  core_service_map_state_return:
+    en: "Core service/provider state surfaces in `lib/core/services/**` must not return `Map<String, dynamic>` or `Map<String, bool>` from `build()` or state getter methods. Introduce an immutable typed state object instead."
+  core_service_map_state_key_access:
+    en: "Core service/provider state assembly must not use string-keyed bags such as `settings['flag']`, `status['timestamp']`, or `info['sdkVersion']`. Model those fields explicitly on a typed state object instead."
+  provider_no_unnamed_catch:
+    en: "Provider-owned files must not use `catch (_)`, because it hides the failure source that should be mapped explicitly."
+  provider_invalidate_self:
+    en: "Provider-owned files must not call `invalidateSelf()`; use an explicit retry method or targeted invalidation."
+  provider_ui_side_effects:
+    en: "Provider-owned files must stay UI-free; move snackbar, dialog, bottom-sheet, or navigation side effects into `ref.listen` near the screen."
+  provider_resource_lifecycle:
+    en: "Provider-owned files that create {resource} resources must register cleanup with `ref.onDispose(...)`; expected cleanup methods: {cleanup_methods}."
+  provider_retry_policy_review:
+    en: "Async provider action `{member_name}` must declare a retry review marker such as `// guard:retry-reviewed`, `@NoAutoRetry`, or `@RetryPolicy(...)` before relying on Riverpod's default retry behavior."
+  provider_mounted_after_await:
+    en: "Async provider logic awaited work on line {await_line} and then continued with state/provider operations without an `if (!ref.mounted) return;` guard."
+  provider_family_param_stability:
+    en: "Family provider `{provider_name}` uses unstable parameter `{param_name}: {param_type}`. Prefer primitives, enums, records, or immutable value objects with stable equality and hashCode."
+  business_layer_ui_ref_types:
+    en: "Repository, service, and use-case files must not depend on `BuildContext`; UI orchestration belongs in widgets or app layout code."
+  business_layer_ui_side_effects:
+    en: "Repository, service, and use-case files must stay UI-free; move dialog, bottom-sheet, snackbar, and navigation side effects back into the UI layer."
+  domain_material_import:
+    en: "Domain files must not import `package:flutter/material.dart`; the domain layer must stay UI-free."
+  domain_ui_ref_types:
+    en: "Domain files must not depend on `BuildContext`; keep UI context and navigation out of the domain layer."
+  core_di_ui_import:
+    en: "`lib/app/di/*` may not import presentation modules."
+  core_di_state_leak:
+    en: "`lib/app/di/*` should not define stateful Riverpod notifier classes."
+  missing_core_di_export:
+    en: "`lib/app/di/providers.dart` is missing required exports: {missing_patterns}."
+  app_provider_ui_import:
+    en: "`lib/app/di/*` should not import feature presentation code."
+  ui_direct_dependency_creation:
+    en: "Widget and app layout files must not instantiate infrastructure dependencies such as Dio, Client, Database, or SharedPreferences directly; inject them through providers."
+  notifier_direct_dependency_creation:
+    en: "Notifier and viewmodel files must not instantiate infrastructure dependencies directly; read injected dependencies from provider wiring instead."
+  feature_provider_direct_infrastructure_access:
+    en: "Feature provider/viewmodel files must not read raw repository or infrastructure providers directly. Route repository, storage, reminder, device-settings, daily-task-checker, and event-bus access through a use case or facade boundary."
+  use_case_direct_dependency_creation:
+    en: "Domain use cases must not instantiate infrastructure dependencies directly; receive contracts through constructor or provider injection instead."
+  missing_app_provider_export:
+    en: "`lib/app/di/providers.dart` is missing required exports: {missing_patterns}."
+  missing_router_contract:
+    en: "`lib/app/router/app_router.dart` is missing required router markers: {missing_patterns}."
+  theme_repetition_semantic_colors:
+    en: "`lib/core/theme/theme_extensions.dart` must map repetition colors through semantic roles such as `customColors.repetitionFirst` and `customColors.repetitionAdvanced`, not through a raw seed palette list."
+  feature_theme_token_imports:
+    en: "Feature-layer source must not import `{import_path}` directly. Read UI values through `Theme.of(context)`, semantic/context extensions, or shared widgets instead."
+  theme_semantic_palette_contract:
+    en: "Semantic palette contract breach: {detail}"
+  theme_domain_coupling:
+    en: "Theme layer must not couple directly to domain here. Keep `lib/core/theme/**` on UI semantic roles only, and move domain-to-role mapping into presentation adapters, presenters, or facades."
+  theme_typography_contract:
+    en: "Typography contract breach: {detail}"
+  screen_file_naming:
+    en: "Files inside feature `screens/` folders must end with `_screen.dart` or `_page.dart`."
+  screen_like_file_location:
+    en: "Files with a `_screen.dart` or `_page.dart` suffix must live in feature `screens/` folders or `lib/app/layouts/`."
+  route_like_file_location:
+    en: "Files named `*_route.dart`, `*_routes.dart`, or `*_router.dart` must live in `lib/app/router/` or a feature-local `routes/` folder."
+  provider_like_file_location:
+    en: "Files with provider-style suffixes must live in `lib/app/di/` or feature `providers/` or `viewmodels/` folders."
+  rogue_top_level_shared_utils_files:
+    en: "Do not add new source under `lib/shared/` or `lib/utils/`; move it into an owned layer such as `core`, `presentation/shared`, or a feature folder."
+  cross_feature_presentation_imports:
+    en: "Feature files must not import another feature's screen or widget code directly; move reusable UI to shared or depend on domain/app boundaries instead."
+  database_migration_contract:
+    en: "`lib/core/database/app_database.dart` must define explicit Drift `onCreate`, `onUpgrade`, and `beforeOpen` migration hooks."
+  database_migration_fail_fast:
+    en: "`app_database.dart` must fail fast with a migration exception when an upgrade path is missing."
+  progress_repository_transaction_contract:
+    en: "`local_progress_repository.dart` must keep multi-step writes inside the local transaction helper."
+  repetition_repository_transaction_contract:
+    en: "`local_repetition_repository.dart` must keep multi-step writes inside the local transaction helper."
+  repository_no_unnamed_catch:
+    en: "Repository code must not use `catch (_)`, because it hides the datasource failure that should be mapped explicitly."
+  repository_try_catch_boundary:
+    en: "Repository implementation files should not catch errors inline; use the repository support boundary and let it map failures consistently."
+  repository_low_level_exception_surface:
+    en: "Repository implementation files must not depend on low-level SQLite, Drift, Dio, or socket exception types directly."
+  local_repository_guard_contract:
+    en: "Each local repository implementation must use `guardLocalRepositoryCall` or `guardLocalRepositoryTransaction` at its entrypoints."
+  local_repository_support_contract:
+    en: "`local_repository_support.dart` must preserve the local datasource error-mapping boundary and mark failures with `repositorySource: local`."
+  theme_file_contains_provider:
+    en: "`lib/core/theme/app_theme.dart` should not declare Riverpod providers or generated notifier classes."
+  theme_wrapper_export:
+    en: "`lib/core/theme/**` must not use export-wrapper files; import the concrete source file directly."
+  shared_widget_file_naming:
+    en: "Widget-bearing shared file '{file_name}' must follow the `mx_*.dart` naming contract."
+  feature_widget_folder_contract:
+    en: "Feature widget file '{path}' must live under `widgets/<screen_slug>/...` or `widgets/common/...`."
+  shared_widget_public_type_prefix:
+    en: "Public types in widget-bearing shared files must start with `Mx`."
+  shared_widget_app_wiring:
+    en: "Shared widgets must stay render-only; remove provider or app wiring from this file."
+  shared_non_widget_dirs_removed:
+    en: "`lib/presentation/shared/**` is reserved for widget layers only; move this helper out of shared and keep only `primitives`, `composites`, or `layouts` here."
+  shared_layout_magic_numbers:
+    en: "Shared layout code must not hardcode raw numeric layout caps or variant widths inline. Extract the number into a named shared constant or `ResponsiveRules` contract first."
+  auth_viewmodel_contains_session_state:
+    en: "`auth_viewmodel.dart` should not carry app-wide session provider classes."
+  legacy_arch_path:
+    en: "Legacy architecture path detected: {forbidden}."
+  legacy_screen_refresh_registry:
+    en: "Legacy refresh registry usage detected. Do not use `ScreenRefreshManager` or `screenRefreshProvider`; refresh through notifier methods or targeted provider invalidation instead."
+  legacy_state_notifier:
+    en: "Non-legacy app source must not use `StateNotifier`; new state should use generated `Notifier` or `AsyncNotifier`."
+  change_notifier_provider_usage:
+    en: "`ChangeNotifierProvider` is not allowed in this codebase, including imports; use generated Riverpod notifiers instead."
+  state_notifier_provider_creation:
+    en: "Do not create `StateNotifierProvider` outside an explicit `legacy/` migration bucket; new state should use generated `Notifier` or `AsyncNotifier`."
+  manual_provider_constructor_usage:
+    en: "New provider code must use Riverpod code generation with `@riverpod` and `.g.dart`; manual constructors such as `Provider(...)`, `StateProvider(...)`, `FutureProvider`, or `NotifierProvider` are not allowed."
+  data_material_import:
+    en: "Data-layer files must not import `package:flutter/material.dart`; keep UI concerns out of repositories, datasources, and models."
+  data_ui_ref_types:
+    en: "Data-layer files must not depend on `BuildContext`; keep UI orchestration above the data boundary."
+  repository_material_import:
+    en: "Repository files must not import `package:flutter/material.dart`; keep UI dependencies out of the data layer."
+  service_material_import:
+    en: "Service files must not import `package:flutter/material.dart`; use non-UI Dart or Flutter foundation types only."
+  transaction_outside_data_layer:
+    en: "Do not call `transaction(...)` outside the data/database layer. Keep transactional write orchestration inside repositories or database infrastructure."
+  feature_bottom_sheet_entrypoint:
+    en: "Use a shared bottom-sheet entrypoint instead of raw `showModalBottomSheet(...)`."
+  app_bar_usage:
+    en: "Use shared toolbar primitives instead of raw Material `AppBar` widgets in feature code."
+  button_usage:
+    en: "Use shared button primitives instead of raw Material button widgets in feature code."
+  card_usage:
+    en: "Use shared card primitives instead of raw Material `Card` widgets in feature code."
+  dialog_usage:
+    en: "Use shared dialog primitives instead of raw Material dialog widgets in feature code."
+  divider_usage:
+    en: "Use shared divider primitives instead of raw Material dividers in feature code."
+  floating_action_button_usage:
+    en: "Use shared FAB primitives instead of raw Material floating action buttons in feature code."
+  input_usage:
+    en: "Use shared text-field primitives instead of raw Material text inputs in feature code."
+  chip_usage:
+    en: "Use shared chip primitives instead of raw Material chip widgets in feature code."
+  icon_button_usage:
+    en: "Use shared icon-button primitives instead of raw Material icon buttons in feature code."
+  select_usage:
+    en: "Use shared select primitives instead of raw Material dropdown widgets in feature code."
+  progress_usage:
+    en: "Use shared loading/progress primitives instead of raw Material progress indicators in feature code."
+  snackbar_usage:
+    en: "Use shared snackbar helpers instead of raw Material `SnackBar` widgets in feature code."
+  snackbar_messenger_usage:
+    en: "Feature UI should not call `ScaffoldMessenger.of(...)` directly; use shared snackbar helpers instead."
+  switch_usage:
+    en: "Use shared toggle primitives instead of raw Material switches in feature code."
+  feature_raw_flutter_widget_usage:
+    en: "Use shared primitives/composites or a feature-local wrapper instead of raw Flutter Material widgets in feature code."
+  dialog_entrypoint_usage:
+    en: "Feature UI should not call `showDialog(...)` directly; use shared dialog helpers instead."
+  missing_l10n_pubspec:
+    en: "`pubspec.yaml` must enable Flutter l10n generation and include `flutter_localizations`."
+  missing_l10n_bootstrap:
+    en: "`lib/main.dart` must wire `AppLocalizations` into the app shell."
+  missing_monitoring_dependency:
+    en: "`pubspec.yaml` must include `sentry_flutter` so production monitoring is available."
+  missing_logging_bootstrap:
+    en: "`lib/main.dart` must bootstrap app logging and monitoring through `AppLogger`."
+  missing_provider_observer_bootstrap:
+    en: "`lib/main.dart` must import the app Riverpod observer helper and pass `observers: buildAppProviderObservers()` into the root `ProviderContainer`."
+  missing_provider_observer_contract:
+    en: "`lib/core/logging/app_provider_observer.dart` must define a concrete `ProviderObserver` gated by `APP_ENV`, with development and staging included in the observer-enabled environments."
+  missing_app_logger_contract:
+    en: "`lib/core/logging/app_logger.dart` must initialize Sentry with `sendDefaultPii = false` and install both `FlutterError.onError` and `PlatformDispatcher.instance.onError`."
+  required_database_tests:
+    en: "The repo must include `test/core/database/app_database_test.dart` to verify local database creation and migration behavior."
+  raw_debug_logging:
+    en: "Use the repo's centralized logging utility instead of raw `print`, `debugPrint`, or `developer.log` calls."
+  raw_monitoring_call:
+    en: "Use the repo's centralized monitoring/logging utility instead of calling Sentry directly from app source."
+  sensitive_log_payload:
+    en: "Logging calls must not interpolate token, password, secret, cookie, session, or bearer values. Redact them first."
+  l10n_source:
+    en: "Presentation code should not read user-facing strings from `AppStrings`."
+  text_style:
+    en: "Use shared typography or theme text styles instead of raw `TextStyle(...)`."
+  presentation_raw_color_literals:
+    en: "Presentation code must not construct raw color literals such as `Color(0x...)`, `Color.fromARGB(...)`, or `Color.fromRGBO(...)`; read colors from theme semantics instead."
+  presentation_deprecated_with_opacity:
+    en: "Presentation code must not call `.withOpacity(...)`; route opacity through theme semantics or centralized opacity tokens instead."
+  screen_scaffold:
+    en: "Feature screens should use a shared screen shell instead of raw `Scaffold`."
+  screen_page_scaffold_contract:
+    en: "Screen and page entry files should render through a shared MemoX page shell so page-level layout ownership stays unified."
+  screen_state_surface:
+    en: "Feature screens should use shared MemoX loading, empty, and error state surfaces instead of ad hoc generic state widgets."
+  screen_async_value_render:
+    en: "Screen render code that watches async provider state must handle loading, error, and data through `.when`, `.maybeWhen`, a shared async render helper, or another exhaustive AsyncValue branch."
+  screen_custom_error_surface:
+    en: "Feature screens should not use bespoke generic error widgets; route generic states through shared MemoX state surfaces instead."
+  screen_error_message_passthrough:
+    en: "Feature screens should not pass resolved error strings into custom error widgets; route generic errors through a shared MemoX error surface instead."
+  provider_test_raw_container:
+    en: "Provider tests should use `ProviderContainer.test()` so teardown is handled consistently by the test framework."
+  widget_repository_impl_import:
+    en: "Widget files must not import repository implementation files directly."
+  route_literal_navigation_usage:
+    en: "Navigation calls must not hardcode route string literals such as `'/foo'`; use shared route names or route-builder helpers with the repo's navigation helper instead."
+  common_navigation_extension_usage:
+    en: "Navigation in UI, shared layout, app shell, and router surfaces must use the repo's shared navigation helper or extension; do not call raw `GoRouter` APIs or legacy `NavigationHelper` methods directly."
+  raw_navigator_push_usage:
+    en: "UI code should not use raw `Navigator` push APIs; route through `GoRouter` or a shared navigation helper with `RouteConstants`."
+  route_definition_outside_router:
+    en: "Declare `GoRoute(...)` entries only inside `lib/app/router/app_router.dart`."
+  widget_repository_provider_access:
+    en: "Widget files must not read or watch repository providers directly; route business logic through notifier, state, or use-case providers."
+  widget_callback_ref_watch_usage:
+    en: "UI callbacks must not call `ref.watch(...)`; use `ref.read(...)` for one-shot imperative actions triggered by taps, submits, or retries."
+  widget_database_layer_import:
+    en: "Widget files must not import DAO or database modules directly; keep database access behind datasource/repository/provider boundaries."
+  widget_database_query_usage:
+    en: "Widget files must not query Drift or call DAO objects directly; move the database interaction behind provider state or a notifier/use case."
+  widget_direct_stream_watch:
+    en: "Widget files must not subscribe to direct `.watch()` streams. Normalize DB streams through a provider and let widgets consume them via `ref.watch(...)` only."
+  widget_build_ref_read:
+    en: "Widget build methods must not use `ref.read(...)` for render state; use `ref.watch(...)` and keep `read` inside action callbacks only."
+  widget_build_navigation_side_effects:
+    en: "Widget build methods must not trigger navigation directly during render; move `context.go/push` and `GoRouter.of(context).go/push` into callbacks or listeners."
+  ui_context_after_await:
+    en: "UI async code awaited work on line {await_line} and then used `BuildContext` without an early mounted guard such as `if (!context.mounted) return;` or `if (!mounted) return;`."
+  ui_media_query_screen_percentage:
+    en: "Regular widget files must not size content layouts by multiplying `MediaQuery.of(context).size.width` or `.height`. Use tokens, `ScreenType`, `LayoutBuilder`, constraints, or `FractionallySizedBox`, and keep true exceptions inside dedicated dialog, bottom-sheet, overlay, or fullscreen-modal widget files. Keyboard inset or padding reads such as `viewInsets`/`viewPadding` remain allowed."
+  ui_font_size_media_query_scaling:
+    en: "This UI line scales `fontSize` from `MediaQuery`, raw screen dimensions, or per-widget text scaling math. Route font scaling through the shared theme and typography foundation instead of ad hoc widget-level math."
+  ui_text_style_copywith_typography_override:
+    en: "This UI line reshapes typography inline via `copyWith({property}: ...)` on a local text-style expression. Prefer a named semantic role in the theme layer, and keep inline `copyWith(...)` mostly for cosmetic overrides such as color."
+  ui_display_font_size_literals:
+    en: "This UI line uses a large or display-style raw `fontSize` literal `{value}`. It may be intentional for score, badge, or numeric display surfaces, but it should still migrate toward a shared display text style or a documented typography exception."
+  ui_raw_font_size_literals:
+    en: "This UI line uses a raw `fontSize` literal `{value}` in regular widget UI. Prefer shared typography styles, `theme.textTheme`, or app text-style extensions instead of hardcoded font sizes."
+  ui_raw_spacing_literals:
+    en: "This UI line uses a raw spacing literal `{value}` inside `EdgeInsets` or `SizedBox`. Prefer `SpacingTokens` or another shared spacing constant. Tiny fixes `<= 2` and explicitly documented divider, hairline, pixel-fix, animation-tweak, or workaround contexts remain allowed."
+  ui_raw_size_literals:
+    en: "This UI line uses a raw size literal `{value}` for width or height. Prefer a named shared size constant or parent/layout constraints instead of inline numeric dimensions."
+  raw_half_alpha_with_values:
+    en: "This line hardcodes `withValues(alpha: 0.5)`. Replace the literal with a shared opacity constant or theme helper so half-opacity stays centralized."
+  presentation_raw_alpha_with_values:
+    en: "Code in `lib/presentation/**` must not hardcode alpha literal `{value}` in `.withValues(...)`. Read opacity from theme-driven semantic color accessors instead."
+  ui_raw_radius_literals:
+    en: "This UI line uses a raw numeric radius literal inside `BorderRadius.circular(...)` or `Radius.circular(...)`. Prefer a named shared radius constant so corner treatment stays consistent across the app."
+  child_widget_media_query_layout:
+    en: "Child widget files must not read `MediaQuery.of(context).size` or `MediaQuery.sizeOf(context)` directly for layout. `MediaQuery.viewInsetsOf`, `MediaQuery.viewPaddingOf`, dialog or sheet sizing, and root shell layout remain allowed. Move screen-wide size decisions to the root page layout, app shell, dialog, sheet, or overlay, or use centralized responsive helpers such as `ScreenType`."
+  child_widget_screen_width_layout:
+    en: "Child widget files must not read `MediaQuery.of(context).size.width` or `MediaQuery.sizeOf(context).width` to compute local widths. Use local constraints, `LayoutBuilder`, `Wrap`, or shared responsive helpers instead. Root scaffolds, dialog containers, shared bottom-sheet containers, and fullscreen overlays are the only valid places for true screen-width ownership."
+  child_widget_responsive_threshold:
+    en: "Child widget files should not compare screen width against raw numeric thresholds such as `360`, `480`, or `600`. Prefer `ScreenType`, `Breakpoints.*`, or local `constraints.maxWidth` checks inside `LayoutBuilder` so responsive behavior stays centralized."
+  child_widget_local_responsive_constants:
+    en: "Child widget files should not declare local responsive sizing constants such as `_...MinWidth`, `_...MinHeight`, `_...Threshold`, or `_...Columns`. Move repeated layout sizing into `ResponsiveRules`, design tokens, or a parent-owned responsive contract so component density does not drift per widget."
+  child_widget_screen_type_direct_usage:
+    en: "Child widget files should not call `ScreenType.of(context)` directly. Keep direct screen-type branching inside `core/responsive/**`, shared layouts, or root screens, and let widgets consume `context.screenType`, parent-owned parameters, or local constraints instead."
+  child_widget_remaining_width_layout_signal:
+    en: "This child widget looks like it is splitting cards, rows, or grid items by available width without making the local width contract explicit. When a widget computes remaining-width layout, add `LayoutBuilder` and derive the branch from `constraints.maxWidth` instead of relying on implicit full-width assumptions."
+  large_layout_responsive_signal:
+    en: "Large page/layout file is missing an obvious responsive signal. Add at least one pattern such as `LayoutBuilder`, `screenType`, `constraints.maxWidth`, `Responsive`, `Wrap(...)`, or `SliverGridDelegateWithMaxCrossAxisExtent` so the layout contract is explicit."
+  widget_watch_select_opportunity:
+    en: "Widget render code watches `{provider_expr}` into a local value and then only reads `{field_name}` from it. Prefer `select(...)` so unrelated fields do not rebuild this widget."
+  widget_try_catch_overuse:
+    en: "Widget files must not accumulate multiple `try/catch` blocks; move business flow and error orchestration into notifiers or use cases."
+  widget_async_callback_awaits:
+    en: "UI callbacks should not perform multiple awaited steps inline; delegate the flow to a helper, notifier, or use case."
+  widget_build_collection_chain:
+    en: "Dense collection-transformation chains inside render methods should move to provider state, presenter helpers, or use cases."
+  widget_build_collection_processing_lines:
+    en: "Render methods should not spend many lines doing collection processing such as sort, group, filter, or fold; move the work into derived providers or presenter helpers."
+  widget_helper_method_length:
+    en: "Large private widget helper methods should be split or moved out of the widget to keep UI render-only."
+  no_app_dimens:
+    en: "Use the token files directly; `AppDimens` and `app_dimens.dart` are no longer allowed."
+  ui_direct_color_typography_tokens:
+    en: "UI code must consume colors and typography via context/theme extensions, not raw theme sources such as `AppColors` or `AppTypography`."
+  presentation_no_direct_material_colors:
+    en: "Code in `lib/presentation/**` must not use `Colors.*` directly. Read colors from the active theme instead."
+  riverpod_syntax:
+    en: "Provider-owned files must use Riverpod annotation syntax and generated parts."
+  provider_file_naming:
+    en: "Provider file '{file_name}' should use a clear suffix such as `_provider.dart`, `_providers.dart`, `_notifier.dart`, or `_viewmodel.dart`, and should avoid vague stems such as `common` or `main`."
+  provider_generated_pairing:
+    en: "A file that declares `@riverpod` providers must include `{expected_part}` and keep the generated sibling file `{expected_generated_file}`."
+  router_redirect_purity:
+    en: "GoRouter `redirect:` blocks must stay lightweight and pure; do not await, read repository providers, touch notifiers, or call network clients there."
+
+fix_hints:
+  remove_else_with_guard_clause:
+    text:
+      en: "Refactor the branch to an early return, guard clause, or switch expression so the control flow stays flat and `else` disappears."
+  keep_di_infrastructure_only:
+    text:
+      en: "Keep `app/di` limited to infrastructure providers and dependency wiring."
+  move_to_feature_or_app_provider:
+    text:
+      en: "Move stateful notifier logic into `presentation/features/<feature>/providers`, `presentation/features/<feature>/viewmodels`, or another app-owned state module instead of `app/di`."
+  keep_app_providers_app_level:
+    text:
+      en: "App-level providers may depend on core and domain, but should not import feature presentation code directly."
+  rename_screen_file_to_screen_or_page:
+    text:
+      en: "If the file represents a screen/page, rename it to `*_screen.dart` or `*_page.dart`. If it is only a widget, move it out of `screens/` or rename it to a non-screen suffix such as `_view.dart`."
+  move_screen_like_file_to_screen_bucket:
+    text:
+      en: "Keep `_screen.dart` and `_page.dart` files reserved for real screens under feature `screens/` or `lib/app/layouts/`. Rename widget-only files to another suffix such as `_view.dart`."
+  move_route_file_to_routes_bucket:
+    text:
+      en: "Move route-like files into `lib/app/router/` or `lib/presentation/features/<feature>/routes/` so navigation contracts stay discoverable and consistent."
+  move_provider_like_file_to_provider_bucket:
+    text:
+      en: "Move provider-like files into `lib/app/di/` or the owning feature's `providers/` or `viewmodels/` folder."
+  move_code_out_of_top_level_shared_utils:
+    text:
+      en: "Do not create top-level `lib/shared/` or `lib/utils/` buckets. Place the code in `lib/core/**`, `lib/presentation/shared/**`, or an owning feature directory instead."
+  move_shared_code_or_raise_boundary:
+    text:
+      en: "Do not couple feature screens/widgets directly. Move reusable UI into `presentation/shared`, share state through app/domain boundaries, or duplicate the small UI locally when reuse is not real."
+  inject_dependency_via_provider:
+    text:
+      en: "Move the concrete dependency construction into `app/di` or another app-owned dependency wiring module, expose it through provider wiring, and inject or read the dependency instead of constructing it inline."
+  use_usecase_or_facade_boundary:
+    text:
+      en: "Introduce or reuse a use-case/facade provider so the feature provider depends on a stable application/domain boundary instead of raw repository or infrastructure providers."
+  keep_ui_imports_out_of_domain:
+    text:
+      en: "Keep Flutter UI imports, `BuildContext`, navigation, and material widgets out of `lib/domain/**`; use pure Dart/domain contracts only."
+  move_theme_provider_to_app:
+    text:
+      en: "Keep only theme definitions in `core/theme/app_theme.dart`; place Riverpod providers in an app-owned wiring module such as `app/di`."
+  use_semantic_repetition_color_roles:
+    text:
+      en: "Map repetition colors through semantic theme roles such as `repetitionFirst`, `repetitionSecond`, `repetitionThird`, `repetitionAdvanced`, and `repetitionExpert`. Do not rotate raw `ColorTokens.seed*` values inside theme logic."
+  use_theme_accessors_in_features:
+    text:
+      en: "Remove the direct import of raw theme source files such as `core/theme/app_colors.dart`, `app_typography.dart`, or other `core/theme/app_*.dart` files from `lib/presentation/features/**`. Route spacing, radius, size, color, elevation, motion, and typography through `Theme.of(context)`, semantic/context extensions, or shared widgets that already wrap the theme contract."
+  use_shared_widget_in_features:
+    text:
+      en: "Replace the raw Flutter widget with an existing shared MemoX surface such as `MxPrimaryButton`, `MxSecondaryButton`, `MxCard`, `MxTextField`, `MxChip`, `MxIconButton`, `MxProgressIndicator`, `MxListTile`, `MxDialog`, `MxBottomSheet`, or `MxScaffold` when one exists. If the control is truly feature-specific, wrap the Material widget behind a small feature-local adapter so raw Flutter constructors do not become the direct screen/widget API."
+  derive_semantic_palette_from_scheme:
+    text:
+      en: "Separate seed colors from the semantic palette. Add a preset-aware semantic factory such as `fromColorScheme(ColorScheme scheme)`, wire `app_theme.dart` through that factory, and move preset-dependent roles like rating/status/mastery/repetition out of static theme tables so they derive from `ColorScheme` or a complete preset mapping."
+  move_domain_to_ui_role_mapper:
+    text:
+      en: "Keep theme APIs keyed by presentation/UI semantic roles only, such as `RepetitionUiColorRole` or `CycleUiColorRole`. Move mapping from domain enums/entities into a presentation mapper, presenter/facade, or widget adapter before the theme is called."
+  derive_app_text_styles_from_text_theme:
+    text:
+      en: "Keep `TextTheme` as the base Material typography system. Derive app typography helpers from that base theme instead of constructing a second independent font system, and avoid permanent global downshifts unless they are intentionally reviewed and re-encoded through the real type scale."
+  import_real_theme_source:
+    text:
+      en: "Remove the wrapper `export` and import the concrete file path directly from calling code."
+  prefix_shared_widget_public_types:
+    text:
+      en: "Rename the public shared widget type to use the `Mx*` prefix, or make it private if it is internal."
+  move_feature_widget_to_screen_bucket:
+    text:
+      en: "Move the file into `widgets/<screen_slug>/...` or `widgets/common/...`, and avoid generic buckets such as `main`, `components`, `modules`, or `grammars`."
+  keep_shared_widgets_render_only:
+    text:
+      en: "Move provider, router, or app-shell wiring out of `lib/presentation/shared/**` and keep only render-only shared widget APIs here."
+  move_shared_support_out_of_shared:
+    text:
+      en: "Move non-widget helpers into `lib/core/**` or the owning feature instead of `lib/presentation/shared/**`."
+  extract_shared_layout_constant:
+    text:
+      en: "Do not leave raw layout numbers such as `520`, `720`, `840`, `960`, or `1120` inline inside `lib/presentation/shared/layouts/**`. Promote the value into a named shared constant or a `ResponsiveRules`/preset entry so the width contract has explicit meaning at the definition site."
+  enable_flutter_l10n:
+    text:
+      en: "Add `l10n.yaml`, ARB sources, `flutter_localizations`, and wire `AppLocalizations` into `MaterialApp`."
+  bootstrap_provider_observer:
+    text:
+      en: "Define a shared Riverpod observer builder under `lib/core/logging/`, gate it with `APP_ENV`, and register it on the root `ProviderContainer` so development/staging builds always log provider lifecycle."
+  use_route_constants_for_navigation:
+    text:
+      en: "Replace raw route strings or raw `Navigator.push(...)` calls with shared route names/helpers from `lib/app/router/route_names.dart` or another centralized navigation helper."
+  use_common_navigation_extension:
+    text:
+      en: "Route UI navigation through the repo's shared navigation helper or extension instead of raw `GoRouter` or legacy `NavigationHelper` APIs."
+  move_navigation_out_of_build:
+    text:
+      en: "Keep render methods side-effect free. Move navigation into button/tap callbacks, `ref.listen(...)`, or another UI event boundary instead of calling `context.go/push` during build."
+  check_context_mounted_after_await:
+    text:
+      en: "After an awaited gap in UI code, add an early guard such as `if (!context.mounted) return;` or `if (!mounted) return;` before using `context` for navigation, dialogs, snackbars, theme, media query, or localized strings."
+  avoid_screen_percentage_in_regular_widgets:
+    text:
+      en: "Do not size regular widget content with `MediaQuery.width/height * ...`. Replace it with tokens, `ScreenType`, `LayoutBuilder`, constraints, or `FractionallySizedBox`. Only dedicated dialog, bottom-sheet, overlay, or fullscreen-modal files may keep this pattern. Keyboard inset or padding reads should use `viewInsets`/`viewPadding`, not `size.width/height * ...`."
+  route_font_scaling_through_theme:
+    text:
+      en: "Do not derive `fontSize` directly from `MediaQuery`, screen width, or ad hoc text-scaling math inside widgets. Keep responsive typography centralized in the theme foundation and consume it through `theme.textTheme` or shared app text styles."
+  use_display_text_style_or_document_exception:
+    text:
+      en: "For big score, badge, or numeric display surfaces, replace the raw `fontSize` with a shared display text style when available. If the large literal is intentionally temporary, document the exception and keep the case isolated to the display surface."
+  use_theme_text_style_instead_of_raw_font_size:
+    text:
+      en: "Replace raw `fontSize` literals in regular widget UI with `theme.textTheme`, `AppTextStyles`, or another shared typography surface so text sizing stays centralized."
+  promote_typography_override_to_semantic_style:
+    text:
+      en: "When a widget needs a repeated bold, italic, spacing, or line-height variant, promote that variant into `theme_extensions.dart`, `AppTextStyles`, or another named typography surface. Keep local `copyWith(...)` mostly for state tinting such as `color`, and document rare one-off exceptions with a nearby `// guard:typography-copywith-reviewed` comment."
+  use_spacing_tokens_or_document_exception:
+    text:
+      en: "Replace raw `EdgeInsets` or `SizedBox` spacing numbers with `SpacingTokens` or a shared spacing constant. If the inline number is a true divider, hairline, pixel-fix, animation tweak, or third-party workaround, document it nearby with a short comment such as `// guard:raw-spacing-reviewed divider hairline`."
+  use_size_tokens_or_constraints:
+    text:
+      en: "Replace raw width/height literals with a named shared size constant or parent-owned layout constraints such as `LayoutBuilder`, `constraints.maxWidth`, `Expanded`, `Flexible`, or `FractionallySizedBox`. If the number is a reviewed one-off, document it nearby with `// guard:raw-size-reviewed`."
+  use_opacity_tokens_half:
+    text:
+      en: "Replace raw `withValues(alpha: 0.5)` with a shared opacity constant or theme helper so the alpha value stays centralized."
+  use_theme_opacity_in_presentation:
+    text:
+      en: "Do not hardcode `.withOpacity(...)` or `.withValues(alpha: ...)` in `lib/presentation/**`. Replace the call with a theme-driven semantic color, a custom theme extension accessor, or another shared presentation color API that already encodes the intended opacity. If a reviewed exception truly remains, use a centralized shared opacity helper instead of a raw numeric alpha."
+  use_radius_tokens_for_border_radius:
+    text:
+      en: "Replace raw numeric radius literals with a named shared radius constant so rounded corners stay centralized and consistent across features."
+  move_media_query_layout_to_root_surface:
+    text:
+      en: "Do not read `MediaQuery.of(context).size` or `MediaQuery.sizeOf(context)` directly inside child widget files. Move screen-level size ownership to a root page layout, app shell, dialog, sheet, or overlay, or replace it with centralized responsive helpers such as `context.screenType`, constraints, or `LayoutBuilder`. `viewInsets` and `viewPadding` remain valid for keyboard/safe-area behavior."
+  move_width_calculation_to_local_constraints:
+    text:
+      en: "Do not pull `screen width` into a child widget and derive item widths from it. Compute width from local constraints with `LayoutBuilder`, `constraints.maxWidth`, `Wrap`, or another parent-owned responsive surface instead."
+  use_breakpoints_or_local_constraints:
+    text:
+      en: "Do not invent raw screen-width thresholds inside child widgets. Route app-wide thresholds through `ScreenType` or `Breakpoints.*`, or switch to a local `LayoutBuilder` and compare `constraints.maxWidth` when the layout decision truly belongs to the child."
+  move_responsive_constant_to_system_rule:
+    text:
+      en: "Do not let child widgets own responsive sizing constants such as min/max width, min/max height, thresholds, or column counts. Move repeated sizing into `ResponsiveRules`, shared tokens, or a parent-owned layout contract so the same component family stays consistent across screens."
+  prefer_context_screen_type_or_parent_constraint:
+    text:
+      en: "Do not call `ScreenType.of(context)` directly inside child widgets. Prefer `context.screenType` when a widget truly needs the app-wide screen classification, or better, pass the responsive decision from the parent or derive it from local constraints."
+  use_layout_builder_for_remaining_width_layout:
+    text:
+      en: "If this child widget is deciding columns, card widths, detail item widths, or row-versus-grid composition from the width it actually receives, wrap that branch in `LayoutBuilder` and compute from `constraints.maxWidth` so the contract stays local and reusable."
+  add_responsive_signal_to_large_layout:
+    text:
+      en: "Large page/layout files should make their responsive contract visible. Add a signal such as `LayoutBuilder`, `context.screenType`, a `constraints.maxWidth` branch, `Wrap(...)`, or a responsive grid delegate instead of relying on an implicit full-width mobile layout."
+  keep_redirect_pure:
+    text:
+      en: "Keep `redirect:` limited to fast state reads and route decisions. Move repository access, async work, and notifier interactions into providers or bootstrap flows outside the router."
+  use_app_logger:
+    text:
+      en: "Route logs and monitoring through a centralized app logging utility instead of raw print/debug or direct Sentry calls."
+  keep_route_definitions_in_router:
+    text:
+      en: "Declare concrete `GoRoute(...)` entries only in `lib/app/router/app_router.dart`; keep other files limited to route names, helpers, and navigation calls."
+  use_read_inside_callback:
+    text:
+      en: "Inside button/tap/retry callbacks, use `ref.read(...)` for one-shot work. Reserve `ref.watch(...)` for render paths that should rebuild."
+  redact_sensitive_logs:
+    text:
+      en: "Remove or redact the sensitive value from the log payload and keep only safe metadata such as source, status, or entity id."
+  move_session_provider_to_app:
+    text:
+      en: "Move app-wide auth/session providers into an app-owned wiring/state module such as `lib/app/di/`."
+  map_repository_error_explicitly:
+    text:
+      en: "Catch a named error only inside the repository support/helper layer, map it to an `AppException`, and let providers consume normalized failures."
+  use_repository_support_boundary:
+    text:
+      en: "Move datasource error handling into a repository support/helper boundary, map low-level local or remote errors there, and keep repository implementations free of inline catch blocks."
+  use_local_repository_guard:
+    text:
+      en: "Wrap the repository entrypoint with `guardLocalRepositoryCall(...)` or `guardLocalRepositoryTransaction(...)` so datasource failures are normalized at one boundary."
+  use_theme_colors_in_presentation:
+    text:
+      en: "Replace `Colors.*` with `Theme.of(context).colorScheme`, a custom theme extension such as `theme.customColors`, or another shared semantic color accessor so presentation code stays theme-driven."
+  use_provider_refresh_invalidation:
+    text:
+      en: "Replace the legacy refresh registry/counter call with an explicit notifier refresh method or a targeted `ref.invalidate(...)` at the owning provider boundary."
+  use_mx_page_shell:
+    text:
+      en: "Replace the screen/page root shell with the shared MemoX page shell, such as `MxScaffold` paired with `MxContentShell`, instead of a raw per-screen scaffold."
+  use_screen_state_surface:
+    text:
+      en: "Replace ad hoc generic screen state widgets with shared MemoX state surfaces such as `MxErrorState`, `MxEmptyState`, and `MxLoadingState`, or wrap the async flow in a shared async render helper."
+  use_async_value_render_surface:
+    text:
+      en: "Keep the watched `AsyncValue` intact in render code and handle it with `.when(...)`, `.maybeWhen(...)`, a shared async render helper, or an explicit loading/error/data branch instead of flattening `.value` or `.error` directly."
+  use_failure_message_resolver:
+    text:
+      en: "Map errors at the repository boundary and resolve user-facing messages through a shared MemoX failure/error surface instead of exposing raw exceptions."
+  use_provider_failure_boundary:
+    text:
+      en: "Catch and map failures through `ErrorHandler`, surface `AppFailure` or `Result`, and keep low-level exception types out of providers."
+  use_riverpod_annotation_provider:
+    text:
+      en: "Define the provider with `@riverpod`/`@Riverpod`, add the matching `part '<file>.g.dart';`, and use the generated provider/notifier instead of any manual provider constructor."
+  pair_provider_with_generated_file:
+    text:
+      en: "Keep the provider source and generated output paired: add the exact sibling directive `part '<file>.g.dart';` and run build_runner so the generated `.g.dart` file exists next to the source."
+  keep_ui_types_out_of_providers:
+    text:
+      en: "Move `BuildContext`/`WidgetRef`-dependent orchestration into widgets or listeners; provider files should use `Ref` only."
+  keep_ui_types_out_of_business_layer:
+    text:
+      en: "Keep `BuildContext`, navigation, dialog, and snackbar concerns in the UI layer. Business code should expose state, intents, or results only."
+  map_provider_error_before_asyncvalue:
+    text:
+      en: "Capture or map the caught error to an `AppFailure` before assigning `AsyncValue.error(...)`."
+  avoid_unnamed_provider_catch:
+    text:
+      en: "Use a named catch binding and map the failure through `ErrorHandler` or `Result` instead of `catch (_)`."
+  avoid_provider_retry_loops:
+    text:
+      en: "Expose an explicit retry or refresh API instead of `invalidateSelf()`, especially on error paths."
+  move_provider_side_effect_to_listener:
+    text:
+      en: "Emit typed state from the provider and handle snackbar, dialog, or navigation through `ref.listen` in the screen."
+  use_immutable_core_service_state:
+    text:
+      en: "Replace `Map<String, dynamic>` or `Map<String, bool>` state payloads in `lib/core/services/**` with immutable typed models, and let Riverpod providers expose those typed objects directly."
+  replace_map_state_bag_with_typed_fields:
+    text:
+      en: "Do not accumulate service or provider state into `settings[...]`, `status[...]`, or `info[...]` bags. Introduce a typed state class, assign fields by name, and only keep raw map parsing at narrow infrastructure boundaries such as JSON or platform-channel decoding."
+  cleanup_provider_resource_with_on_dispose:
+    text:
+      en: "Keep the created resource in a variable and register `ref.onDispose(() => resource.cancel()/dispose()/close())` so the provider lifecycle always releases it."
+  mark_provider_retry_policy_reviewed:
+    text:
+      en: "Add an explicit retry review marker to the provider block, for example `// guard:retry-reviewed no-auto-retry for auth/mutation flow`, or adopt a local annotation such as `@NoAutoRetry`/`@RetryPolicy(...)` before merging the async action."
+  check_ref_mounted_after_await:
+    text:
+      en: "After any awaited gap in provider logic, add `if (!ref.mounted) return;` before mutating `state`, invalidating providers, or reading more provider state if the flow needs to continue."
+  use_stable_family_param:
+    text:
+      en: "For Riverpod family params, prefer primitives, enums, records, or immutable value objects such as `@freezed` models or `@immutable` classes with explicit `==` and `hashCode`. Do not pass mutable `List/Map/Set` or unstable custom objects."
+  keep_ui_imports_out_of_business_layer:
+    text:
+      en: "Remove `material.dart` from repository/service code. If you only need primitives such as `VoidCallback`, depend on `flutter/foundation.dart` instead."
+  use_provider_container_test:
+    text:
+      en: "In provider tests, replace `ProviderContainer(...)` with `ProviderContainer.test(...)`."
+  use_notifier_or_use_case_from_ui:
+    text:
+      en: "Keep widgets on render orchestration only: call a notifier/use-case provider or pass prepared view data into the widget instead of importing repositories or reading repository providers directly."
+  route_database_access_through_provider:
+    text:
+      en: "Move DAO or Drift database access into datasource/repository/provider layers. Widgets should only watch prepared provider state or trigger notifier/use-case actions."
+  route_database_stream_through_provider:
+    text:
+      en: "Wrap the Drift or DAO stream inside a standardized provider first, then let widgets consume that provider with `ref.watch(...)` instead of calling `.watch()` directly in presentation code."
+  move_transaction_to_repository:
+    text:
+      en: "Move the transactional flow into `lib/data/**` or database infrastructure, expose it through a repository/use case boundary, and let presentation trigger only a thin action."
+  use_watch_for_render_state:
+    text:
+      en: "When a value influences rendered UI, read it with `ref.watch(...)` in the render path. Keep `ref.read(...)` for callbacks, refresh actions, and one-shot imperative work only."
+  prefer_select_for_single_field_watch:
+    text:
+      en: "If this widget only needs one field, prefer `ref.watch(provider.select((value) => value.field))` so unrelated changes on the same object do not rebuild the whole render path."
+  extract_widget_logic_to_provider:
+    text:
+      en: "Move the multi-step async flow, retry/error orchestration, or collection transformation into a notifier, presenter helper, or use case, then keep the widget callback thin."
+  split_widget_helper_method:
+    text:
+      en: "Split the helper into smaller UI-only methods, or move business/data transformation into a notifier, presenter, or use case."

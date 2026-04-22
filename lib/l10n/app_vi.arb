@@ -1,0 +1,94 @@
+{
+  "@@locale": "vi",
+  "appName": "MemoX",
+  "commonBack": "Quay lại",
+  "commonOk": "Đồng ý",
+  "commonCancel": "Hủy",
+  "commonCreate": "Tạo",
+  "commonSearch": "Tìm kiếm",
+  "commonEdit": "Chỉnh sửa",
+  "commonDelete": "Xóa",
+  "homeTitle": "Trang chủ",
+  "libraryTitle": "Thư viện",
+  "progressTitle": "Tiến độ",
+  "settingsTitle": "Cài đặt",
+  "appShellHomePlaceholderDescription": "Phần nền cho Trang chủ chưa được nối xong.",
+  "appShellProgressPlaceholderDescription": "Phần nền cho Tiến độ chưa được nối xong.",
+  "appShellSettingsPlaceholderDescription": "Phần nền cho Cài đặt chưa được nối xong.",
+  "appRouterErrorTitle": "Lỗi điều hướng",
+  "errorConfiguration": "Cấu hình ứng dụng không hợp lệ.",
+  "errorRequestTimedOut": "Yêu cầu đã hết thời gian chờ.",
+  "errorInvalidData": "Dữ liệu nhận được không hợp lệ.",
+  "errorUnsupportedAction": "Thao tác này hiện chưa được hỗ trợ.",
+  "errorNetwork": "Đã xảy ra sự cố kết nối mạng.",
+  "errorStorage": "Đã xảy ra sự cố lưu trữ cục bộ.",
+  "errorNotFound": "Không tìm thấy tài nguyên được yêu cầu.",
+  "errorUnexpected": "Đã xảy ra lỗi.",
+  "foldersNewSubfolderTooltip": "Thư mục con mới",
+  "foldersNewDeckTooltip": "Bộ thẻ mới",
+  "foldersNewSubfolderTitle": "Thư mục con mới",
+  "foldersFolderNameLabel": "Tên thư mục",
+  "foldersFolderNameHint": "ví dụ: Luyện nghe",
+  "foldersMoreActionsTooltip": "Thêm thao tác",
+  "foldersActionsTitle": "Thao tác thư mục",
+  "foldersReorder": "Sắp xếp lại",
+  "foldersStatusSubfolders": "Có {subfolderCount} thư mục con",
+  "@foldersStatusSubfolders": {
+    "placeholders": {
+      "subfolderCount": {
+        "type": "int"
+      }
+    }
+  },
+  "foldersStatusDecks": "Có {deckCount} bộ thẻ · {totalCardCount} thẻ",
+  "@foldersStatusDecks": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "totalCardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "foldersSegmentSubfolders": "Thư mục con",
+  "foldersSegmentDecks": "Bộ thẻ",
+  "foldersSubfolderDeckHint": "Để thêm bộ thẻ ở đây, hãy sắp xếp chúng trong một thư mục con.",
+  "foldersDeckCardProgress": "{cardCount} thẻ · {dueToday} thẻ đến hạn hôm nay",
+  "@foldersDeckCardProgress": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueToday": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryCreateFolderTooltip": "Tạo thư mục",
+  "libraryDueTodayPrefix": "Bạn có ",
+  "libraryDueTodaySuffix": " mục cần học hôm nay",
+  "libraryStudyNow": "Học ngay  \u2192",
+  "libraryFoldersSectionTitle": "THƯ MỤC",
+  "libraryFolderStats": "{deckCount} bộ thẻ · {itemCount} mục",
+  "@libraryFolderStats": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "itemCount": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryEmptyTitle": "Chưa có thư mục nào",
+  "libraryEmptyMessage": "Tạo thư mục đầu tiên để bắt đầu xây dựng thư viện của bạn.",
+  "sharedErrorTitle": "Đã xảy ra lỗi",
+  "sharedTryAgain": "Thử lại",
+  "sharedShowDetails": "Xem chi tiết",
+  "sharedHideDetails": "Ẩn chi tiết",
+  "sharedFullscreenTooltip": "Toàn màn hình",
+  "sharedStreakLabel": "Chuỗi",
+  "sharedOfflineTitle": "Bạn đang ngoại tuyến",
+  "sharedOfflineMessage": "Hãy kiểm tra kết nối internet và thử lại. Bộ flashcard cục bộ của bạn vẫn hoạt động."
+}

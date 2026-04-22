@@ -1,0 +1,14 @@
+family: coding
+
+rules:
+  - id: sample_rule
+    type: forbidden_token
+    name: "Sample Forbidden Token Rule"
+    description: "Replace this sample rule with repository-specific checks."
+    severity: warning
+    impact: style
+    scope: all
+    enabled: false
+    params:
+      forbidden:
+        - "TODO_REPLACE_ME"

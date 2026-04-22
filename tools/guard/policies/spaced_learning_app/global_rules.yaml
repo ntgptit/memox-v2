@@ -1,0 +1,154 @@
+family: global
+
+rules:
+  - id: no_else
+    type: ast_check
+    name: "No Else"
+    description: "Prefer early return, guard clauses, or switch expressions over `else`."
+    message_code: no_else
+    severity: error
+    impact: style
+    scope: non_legacy_app_source
+    fix_hint_code: remove_else_with_guard_clause
+    suggestion: "Refactor control flow to return early and flatten nesting."
+    params:
+      check_id: no_else_control_flow
+      else_pattern: "(?m)(?:^|[}\\s])else(?:\\s+if\\b|\\s*\\{|\\s*$)"
+
+  - id: naming_convention
+    type: naming_convention
+    name: "Snake Case File Names"
+    description: "Dart file names should follow snake_case."
+    message_code: naming_convention
+    severity: warning
+    impact: style
+    scope: all
+    params:
+      level: file
+      pattern: "^[a-z0-9_]+\\.dart$"
+
+  - id: widget_length
+    type: required_in_class
+    name: "Widget Build Length"
+    description: "Keep widget build methods short enough to stay readable."
+    message_code: widget_length
+    severity: warning
+    impact: style
+    scope: ui
+    enabled: false
+    params:
+      class_pattern: "class\\s+\\w+.*extends\\s+(?:ConsumerState<\\w+>|State<\\w+>|(?:Consumer)?(?:Stateful|Stateless)Widget)"
+      method_pattern: "Widget\\s+build\\s*\\("
+      max_lines: 80
+
+  - id: async_builder
+    type: forbidden_pattern
+    name: "Async Builder"
+    description: "Avoid raw `.when(...)` on AsyncValue; route async UI through a shared builder abstraction."
+    message_code: async_builder
+    severity: warning
+    impact: architecture
+    scope: features
+    enabled: false
+    params:
+      patterns:
+        - "\\.when\\s*\\("
+
+  - id: no_hardcoded_color
+    type: forbidden_pattern
+    name: "No Hardcoded Color"
+    description: "Avoid hardcoded colors in UI code; prefer theme or shared color helpers."
+    message_code: no_hardcoded_color
+    severity: warning
+    impact: design_system
+    scope: ui
+    enabled: false
+    params:
+      patterns:
+        - "\\bColor\\s*\\("
+        - "\\bColors\\."
+        - "\\.withOpacity\\s*\\("
+        - "fromARGB\\s*\\("
+        - "fromRGBO\\s*\\("
+
+  - id: no_hardcoded_font_size
+    type: forbidden_pattern
+    name: "No Hardcoded Font Size"
+    description: "Avoid literal `fontSize:` values in UI code; prefer typography helpers or shared dimensions."
+    message_code: no_hardcoded_font_size
+    severity: warning
+    impact: design_system
+    scope: ui
+    enabled: false
+    params:
+      patterns:
+        - "fontSize\\s*:\\s*\\d+(?:\\.\\d+)?"
+
+  - id: no_hardcoded_string
+    type: forbidden_pattern
+    name: "No Hardcoded UI String"
+    description: "Avoid user-facing hardcoded strings in feature render code."
+    message_code: no_hardcoded_string
+    severity: error
+    impact: i18n
+    scope: feature_ui
+    params:
+      patterns:
+        - "Text\\(\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "Text\\(\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+        - "(?:text|label|hint|tooltip|title|subtitle|message)\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "(?:text|label|hint|tooltip|title|subtitle|message)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+        - "\\b(?:vi|en)\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "\\b(?:vi|en)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+
+  - id: no_hardcoded_app_string
+    type: forbidden_pattern
+    name: "No Hardcoded App Layout String"
+    description: "Avoid user-facing hardcoded strings in app layout and shell code."
+    message_code: no_hardcoded_string
+    severity: error
+    impact: i18n
+    scope: app_ui
+    params:
+      patterns:
+        - "Text\\(\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "Text\\(\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+        - "(?:text|label|hint|tooltip|title|subtitle|message)\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "(?:text|label|hint|tooltip|title|subtitle|message)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+        - "\\b(?:vi|en)\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "\\b(?:vi|en)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+
+  - id: no_inline_locale_pair_strings
+    type: ast_check
+    name: "No Inline Locale Pair Strings"
+    description: "Avoid inline `vi:` / `en:` locale pair strings in UI code; move user-facing copy into generated l10n resources."
+    message_code: no_hardcoded_string
+    severity: error
+    impact: i18n
+    scope: ui_surfaces
+    params:
+      check_id: ui_inline_locale_pair_strings
+      locale_patterns:
+        - "\\b(?:vi|en)\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "\\b(?:vi|en)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+
+  - id: no_hardcoded_notification_text
+    type: forbidden_pattern
+    name: "No Hardcoded Notification Text"
+    description: "Notification title/body/channel text must read localized text from l10n, not inline literals."
+    message_code: no_hardcoded_notification_text
+    severity: error
+    impact: i18n
+    scope: reminder_notifications
+    params:
+      patterns:
+        - "(?:title|body)\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "(?:title|body)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+        - "(?:final\\s+)?(?:title|body)\\s*=\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "(?:final\\s+)?(?:title|body)\\s*=\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+        - "\\bdescription\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "\\bdescription\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+        - "(?:channelName|channelDescription)\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "(?:channelName|channelDescription)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+        - "AndroidNotification(?:Channel|Details)\\([\\s\\S]{0,160}?,\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
+        - "AndroidNotification(?:Channel|Details)\\([\\s\\S]{0,160}?,\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""

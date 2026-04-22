@@ -1,0 +1,43 @@
+family: coding
+
+rules:
+  - id: provider_file_naming
+    type: naming_convention
+    name: "Provider File Naming"
+    description: "Provider-owned files should use a clear suffix such as `*_provider.dart`, `*_providers.dart`, `*_notifier.dart`, or `*_viewmodel.dart`, and should avoid vague stems such as `common` or `main`."
+    message_code: provider_file_naming
+    severity: error
+    impact: style
+    scope: all
+    targets:
+      - "lib/app/di/*.dart"
+      - "lib/presentation/features/*/providers/*.dart"
+      - "lib/presentation/features/*/viewmodels/*.dart"
+    params:
+      level: file
+      pattern: "^(?!(?:common|main|shared|base|misc|helper|util|temp)(?:_|$))(?:[a-z0-9]+(?:_[a-z0-9]+)*)_(?:provider|providers|notifier|notifiers|viewmodel)\\.dart$|^(?:app_)?providers\\.dart$"
+
+  - id: guard_centralized_constants
+    type: forbidden_pattern
+    name: "Guard Centralized Constants"
+    description: "Guard Python sources must not hardcode shared guard contract literals; move them into `tools/guard/engine/constants.py` and import the constant instead."
+    message_code: guard_centralized_constants
+    severity: error
+    impact: architecture
+    scope: guard_python_non_constants
+    params:
+      patterns:
+        - "[\"']config\\.yaml[\"']"
+        - "[\"']messages\\.yaml[\"']"
+        - "[\"']suppressions\\.yaml[\"']"
+        - "[\"']baseline\\.json[\"']"
+        - "[\"']utf-8[\"']"
+        - "[\"']terminal[\"']"
+        - "[\"']json[\"']"
+        - "[\"']markdown[\"']"
+        - "[\"']PASS[\"']"
+        - "[\"']FAIL[\"']"
+        - "[\"']enabled[\"']"
+        - "[\"']disabled[\"']"
+        - "[\"']rules[\"']"
+        - "[\"']violations_preview[\"']"

@@ -1,0 +1,419 @@
+project:
+  name: "Spaced Learning App"
+  root_marker: "pubspec.yaml"
+  language: "dart"
+  file_extension: ".dart"
+
+rule_files:
+  - global_rules.yaml
+  - normalized_rules.yaml
+  - legacy_rules.yaml
+  - coding_rules.yaml
+  - architecture_rules.yaml
+  - project_contract.yaml
+
+scopes:
+  all:
+    roots: ["lib"]
+    include: ["**/*.dart"]
+    exclude: &generated
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+  non_legacy_app_source:
+    roots: ["lib"]
+    include: ["**/*.dart"]
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "**/legacy/**/*.dart"
+  provider_source_dirs:
+    roots: ["."]
+    include:
+      - "lib/app/providers/**/*.dart"
+      - "lib/core/di/**/*.dart"
+      - "lib/presentation/features/*/providers/**/*.dart"
+    exclude: *generated
+  non_data_layer_source:
+    roots: ["lib"]
+    include: ["**/*.dart"]
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "data/**/*.dart"
+      - "**/data/**/*.dart"
+      - "core/database/**/*.dart"
+      - "**/core/database/**/*.dart"
+  legacy_provider_files:
+    roots: ["lib"]
+    include: ["**/legacy/**/*.dart"]
+    exclude: *generated
+  core_di:
+    roots: ["lib/core/di"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  app_providers:
+    roots: ["lib/app/providers"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  router:
+    roots: ["lib/core/routes"]
+    include: ["**/router.dart"]
+    exclude: *generated
+  theme_file:
+    roots: ["lib/core/theme"]
+    include: ["**/app_theme.dart"]
+    exclude: *generated
+  theme_sources:
+    roots: ["lib/core/theme"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  project_root_files:
+    roots: ["."]
+    include:
+      - "pubspec.yaml"
+      - "l10n.yaml"
+    exclude: []
+  app_bootstrap:
+    roots: ["lib"]
+    include: ["lib/main.dart"]
+    exclude: *generated
+  app_logging_foundation:
+    roots: ["lib/core/logging"]
+    include: ["**/app_logger.dart"]
+    exclude: *generated
+  app_source_except_logger:
+    roots: ["lib"]
+    include: ["**/*.dart"]
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "core/logging/app_logger.dart"
+      - "**/core/logging/app_logger.dart"
+  shared_widget_dirs:
+    roots:
+      - "lib/presentation/shared/primitives"
+      - "lib/presentation/shared/composites"
+      - "lib/presentation/shared/layouts"
+    include: ["**/*.dart"]
+    exclude: *generated
+  shared_layout_files:
+    roots:
+      - "lib/presentation/shared/layouts"
+    include: ["**/*.dart"]
+    exclude: *generated
+  shared_non_widget_files:
+    roots:
+      - "lib/presentation/shared/controllers"
+      - "lib/presentation/shared/mixins"
+      - "lib/presentation/shared/presenters"
+    include: ["**/*.dart"]
+    exclude: *generated
+  feature_widget_files:
+    roots: ["lib/presentation/features"]
+    include: ["**/widgets/**/*.dart"]
+    exclude: *generated
+  feature_ui:
+    roots: ["lib/presentation/features"]
+    include:
+      - "**/screens/**/*.dart"
+      - "**/widgets/**/*.dart"
+    exclude: *generated
+  page_entry_files:
+    roots: ["."]
+    include:
+      - "lib/presentation/features/*/screens/*_screen.dart"
+      - "lib/presentation/features/*/screens/*_page.dart"
+      - "lib/app/layouts/*_screen.dart"
+      - "lib/app/layouts/*_page.dart"
+    exclude: *generated
+  widget_ui_files:
+    roots: ["."]
+    include:
+      - "lib/presentation/features/**/screens/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/*.dart"
+      - "lib/presentation/shared/**/*.dart"
+      - "lib/app/layouts/**/*.dart"
+    exclude: *generated
+  child_widget_layout_files:
+    roots: ["."]
+    include:
+      - "lib/presentation/shared/primitives/**/*.dart"
+      - "lib/presentation/shared/composites/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/*.dart"
+      - "lib/presentation/features/**/sections/**/*.dart"
+      - "lib/presentation/components/**/*.dart"
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "lib/presentation/features/**/widgets/**/dialogs/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/sheets/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/bottom_sheets/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/overlays/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/*_dialog.dart"
+      - "lib/presentation/features/**/widgets/**/*_bottom_sheet.dart"
+      - "lib/presentation/features/**/widgets/**/*_overlay.dart"
+      - "lib/presentation/features/**/widgets/**/*_fullscreen_modal.dart"
+      - "lib/presentation/features/**/widgets/**/*_image_preview.dart"
+  child_widget_screen_width_files:
+    roots: ["."]
+    include:
+      - "lib/presentation/shared/primitives/**/*.dart"
+      - "lib/presentation/shared/composites/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/*.dart"
+      - "lib/presentation/features/**/sections/**/*.dart"
+      - "lib/presentation/components/**/*.dart"
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "lib/presentation/shared/composites/sl_bottom_sheet.dart"
+      - "lib/presentation/features/**/widgets/**/dialogs/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/overlays/**/*.dart"
+      - "lib/presentation/features/**/widgets/**/*_dialog.dart"
+      - "lib/presentation/features/**/widgets/**/*_overlay.dart"
+      - "lib/presentation/features/**/widgets/**/*_fullscreen_modal.dart"
+  large_layout_candidate_files:
+    roots: ["lib"]
+    include:
+      - "**/*_screen.dart"
+      - "**/*_page.dart"
+      - "**/*_view.dart"
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "app/layouts/**/*.dart"
+      - "**/dialogs/**/*.dart"
+      - "**/overlays/**/*.dart"
+      - "**/sheets/**/*.dart"
+      - "**/bottom_sheets/**/*.dart"
+      - "**/*_dialog.dart"
+      - "**/*_overlay.dart"
+      - "**/*_bottom_sheet.dart"
+      - "**/*_fullscreen_modal.dart"
+      - "**/*_image_preview.dart"
+  app_ui:
+    roots: ["lib/app/layouts"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  reminder_notifications:
+    roots: ["lib/core/services/reminder", "lib/core/services"]
+    include:
+      - "**/reminder_notification_service.dart"
+      - "**/notification_channel_manager.dart"
+      - "**/cloud_reminder_service.dart"
+      - "**/daily_task_checker_service.dart"
+    exclude: *generated
+  auth_provider:
+    roots: ["lib/presentation/features/auth/providers"]
+    include: ["**/auth_viewmodel.dart"]
+    exclude: *generated
+  features:
+    roots: ["lib/presentation/features"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  screens:
+    roots: ["lib/presentation/features"]
+    include: ["**/screens/*.dart"]
+    exclude: *generated
+  screen_like_files:
+    roots: ["lib"]
+    include:
+      - "**/*_screen.dart"
+      - "**/*_page.dart"
+    exclude: *generated
+  route_like_files:
+    roots: ["lib"]
+    include:
+      - "**/*_route.dart"
+      - "**/*_routes.dart"
+      - "**/router.dart"
+    exclude: *generated
+  provider_like_files:
+    roots: ["lib"]
+    include:
+      - "**/*_provider.dart"
+      - "**/*_providers.dart"
+      - "**/*_notifier.dart"
+      - "**/*_notifiers.dart"
+      - "**/*_viewmodel.dart"
+    exclude: *generated
+  rogue_shared_utils_files:
+    roots: ["lib"]
+    include:
+      - "shared/**/*.dart"
+      - "utils/**/*.dart"
+    exclude: *generated
+  screens_non_auth:
+    roots: ["lib/presentation/features"]
+    include: ["**/screens/*.dart"]
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "auth/screens/*.dart"
+      - "**/auth/screens/*.dart"
+  ui:
+    roots: ["lib/presentation/features", "lib/presentation/shared"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  ui_surfaces:
+    roots:
+      - "lib/presentation/features"
+      - "lib/presentation/shared"
+      - "lib/app/layouts"
+    include: ["**/*.dart"]
+    exclude: *generated
+  navigation_surfaces:
+    roots: ["."]
+    include:
+      - "lib/presentation/features/**/*.dart"
+      - "lib/presentation/shared/**/*.dart"
+      - "lib/app/layouts/**/*.dart"
+      - "lib/core/routes/router.dart"
+    exclude: *generated
+  provider_files:
+    roots: ["lib/app/providers", "lib/core/di", "lib/presentation/features"]
+    include:
+      - "**/*_providers.dart"
+      - "**/*_viewmodel.dart"
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "**/app_providers.dart"
+  viewmodel_files:
+    roots: ["."]
+    include:
+      - "lib/presentation/features/*/providers/*_viewmodel.dart"
+    exclude: *generated
+  provider_tests:
+    roots: ["test"]
+    include:
+      - "**/providers/*_test.dart"
+    exclude: []
+  domain_usecases:
+    roots: ["lib/domain/usecases"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  service_files:
+    roots: ["lib/core/services"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  business_logic_files:
+    roots: ["."]
+    include:
+      - "lib/core/services/**/*.dart"
+      - "lib/data/repositories/**/*.dart"
+      - "lib/domain/usecases/**/*.dart"
+    exclude: *generated
+  repository_files:
+    roots: ["lib/data/repositories"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  repository_impl_files:
+    roots: ["lib/data/repositories"]
+    include: ["**/*.dart"]
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "**/*_support.dart"
+  domain_files:
+    roots: ["lib/domain"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  data_files:
+    roots: ["lib/data"]
+    include: ["**/*.dart"]
+    exclude: *generated
+  non_router_source:
+    roots: ["lib"]
+    include: ["**/*.dart"]
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "core/routes/router.dart"
+      - "**/core/routes/router.dart"
+  local_repository_impl_files:
+    roots: ["lib/data/repositories/local"]
+    include: ["**/local_*_repository.dart"]
+    exclude: *generated
+
+families:
+  global:
+    name: "Global Rules"
+  normalized:
+    name: "Local Normalized Rules"
+  legacy:
+    name: "Local Legacy Rules"
+  coding:
+    name: "Coding Conventions"
+  architecture:
+    name: "Architecture"
+  project:
+    name: "Project Structure"
+
+taxonomy:
+  - structure
+  - naming
+  - dependency
+  - state_management
+  - routing
+  - theming
+  - localization
+  - ui_contract
+  - riverpod
+
+profiles:
+  baseline:
+    families: [global, normalized, legacy, coding, architecture, project]
+    max_cost: low
+  standard:
+    families: [global, normalized, legacy, coding, architecture, project]
+    max_cost: medium
+  strict:
+    families: [global, normalized, legacy, coding, architecture, project]
+    max_cost: high
+  ci:
+    families: [global, normalized, legacy, coding, architecture, project]
+    max_cost: high
+
+exit_policy:
+  local:
+    fail_on: [error, critical]
+    max_warnings: -1
+  ci:
+    fail_on: [warning, error, critical]
+    max_warnings: 10
+  release:
+    fail_on: [info, warning, error, critical]
+    max_warnings: 0
+  required_rules:
+    - folder_structure
+    - required_architecture_files
+    - import_direction
+    - riverpod_syntax
+    - legacy_state_notifier
+
+versioning:
+  engine_version: "3.0.0"
+  policy_version: "1.0.0"
+  rule_schema_version: 1

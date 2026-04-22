@@ -1,0 +1,18 @@
+family: coding
+
+rules:
+  - id: provider_file_naming
+    type: naming_convention
+    name: "Provider File Naming"
+    description: "Provider-owned files should use a clear suffix such as `*_provider.dart`, `*_providers.dart`, `*_notifier.dart`, or `*_viewmodel.dart`, and should avoid vague stems such as `common` or `main`."
+    message_code: provider_file_naming
+    severity: error
+    impact: style
+    scope: all
+    targets:
+      - "lib/app/providers/*.dart"
+      - "lib/core/di/*.dart"
+      - "lib/presentation/features/*/providers/*.dart"
+    params:
+      level: file
+      pattern: "^(?!(?:common|main|shared|base|misc|helper|util|temp)(?:_|$))(?:[a-z0-9]+(?:_[a-z0-9]+)*)_(?:provider|providers|notifier|notifiers|viewmodel)\\.dart$|^(?:app_)?providers\\.dart$"

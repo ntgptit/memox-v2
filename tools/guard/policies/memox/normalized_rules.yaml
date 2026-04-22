@@ -1,0 +1,1597 @@
+family: normalized
+
+rules:
+  - id: legacy_state_notifier
+    type: forbidden_pattern
+    name: "Legacy StateNotifier"
+    description: "Do not use `StateNotifier` in non-legacy app source; new state should use `Notifier` or `AsyncNotifier`."
+    message_code: legacy_state_notifier
+    severity: error
+    impact: architecture
+    scope: non_legacy_app_source
+    suggestion: "Use Riverpod 3 annotation syntax with generated notifiers instead."
+    params:
+      patterns:
+        - "\\bStateNotifier\\b"
+
+  - id: change_notifier_provider_usage
+    type: forbidden_pattern
+    name: "ChangeNotifierProvider Usage"
+    description: "Do not import or use `ChangeNotifierProvider`; it is a migration bridge and is not allowed in this codebase."
+    message_code: change_notifier_provider_usage
+    severity: error
+    impact: architecture
+    scope: all
+    fix_hint_code: use_riverpod_annotation_provider
+    params:
+      patterns:
+        - "\\bChangeNotifierProvider\\b"
+
+  - id: state_notifier_provider_creation
+    type: forbidden_pattern
+    name: "StateNotifierProvider Creation"
+    description: "Do not create `StateNotifierProvider` in non-legacy app source; new state should use generated `Notifier` or `AsyncNotifier`."
+    message_code: state_notifier_provider_creation
+    severity: error
+    impact: architecture
+    scope: non_legacy_app_source
+    fix_hint_code: use_riverpod_annotation_provider
+    params:
+      patterns:
+        - "\\bStateNotifierProvider(?:\\.[A-Za-z]+)?\\s*(?:<[^>]+>)?\\s*\\("
+
+  - id: manual_provider_constructor_usage
+    type: forbidden_pattern
+    name: "Manual Provider Constructor Usage"
+    description: "App source should use Riverpod code generation instead of manual provider constructors."
+    message_code: manual_provider_constructor_usage
+    severity: error
+    impact: architecture
+    scope: all
+    fix_hint_code: use_riverpod_annotation_provider
+    params:
+      patterns:
+        - "\\bProvider(?:\\.[A-Za-z]+)?\\s*(?:<[^>]+>)?\\s*\\("
+        - "\\bStateProvider(?:\\.[A-Za-z]+)?\\s*(?:<[^>]+>)?\\s*\\("
+        - "\\bFutureProvider\\b"
+        - "\\bStreamProvider\\b"
+        - "\\bNotifierProvider\\b"
+        - "\\bAsyncNotifierProvider\\b"
+        - "\\bStreamNotifierProvider\\b"
+
+  - id: raw_debug_logging
+    type: forbidden_pattern
+    name: "Raw Debug Logging"
+    description: "App source must not use raw debug logging APIs directly."
+    message_code: raw_debug_logging
+    severity: error
+    impact: architecture
+    scope: app_source_except_logger
+    fix_hint_code: use_app_logger
+    params:
+      patterns:
+        - "\\bprint\\s*\\("
+        - "\\bdebugPrint\\s*\\("
+        - "\\bdeveloper\\.log\\s*\\("
+
+  - id: raw_monitoring_call
+    type: forbidden_pattern
+    name: "Raw Monitoring Call"
+    description: "App source must not call Sentry APIs directly; monitoring should flow through the repo's centralized logging or monitoring utility."
+    message_code: raw_monitoring_call
+    severity: error
+    impact: architecture
+    scope: app_source_except_logger
+    fix_hint_code: use_app_logger
+    params:
+      patterns:
+        - "\\bSentryFlutter\\.init\\s*\\("
+        - "\\bSentry\\.captureException\\s*\\("
+        - "\\bSentry\\.captureMessage\\s*\\("
+        - "\\bSentry\\.configureScope\\s*\\("
+
+  - id: sensitive_log_payload
+    type: forbidden_pattern
+    name: "Sensitive Log Payload"
+    description: "Logging calls must not interpolate sensitive values such as tokens, passwords, secrets, or session identifiers."
+    message_code: sensitive_log_payload
+    severity: error
+    impact: architecture
+    scope: app_source_except_logger
+    fix_hint_code: redact_sensitive_logs
+    params:
+      patterns:
+        - "(?:AppLogger\\.(?:debug|info|warning|error|fatal)|debugPrint|print|developer\\.log)\\s*\\([^\\n]*(?:token|password|secret|cookie|session|credential|api[ _-]?key)[^\\n:=]{0,32}[:=]"
+        - "(?:AppLogger\\.(?:debug|info|warning|error|fatal)|debugPrint|print|developer\\.log)\\s*\\([^\\n]*[Bb]earer\\s+[A-Za-z0-9\\-._~+/=]+"
+
+  - id: feature_bottom_sheet_entrypoint
+    type: forbidden_pattern
+    name: "Feature Bottom Sheet Entrypoint"
+    description: "Avoid raw `showModalBottomSheet(...)` in feature presentation code; route through a shared helper."
+    message_code: feature_bottom_sheet_entrypoint
+    severity: error
+    impact: architecture
+    scope: features
+    params:
+      patterns:
+        - "showModalBottomSheet\\s*\\("
+
+  - id: app_bar_usage
+    type: forbidden_pattern
+    name: "App Bar Usage"
+    description: "Avoid raw Material app bars in feature code; prefer shared toolbar primitives."
+    message_code: app_bar_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bAppBar\\s*\\("
+
+  - id: floating_action_button_usage
+    type: forbidden_pattern
+    name: "Floating Action Button Usage"
+    description: "Avoid raw Material floating action buttons in feature code; prefer shared FAB primitives."
+    message_code: floating_action_button_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bFloatingActionButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: button_usage
+    type: forbidden_pattern
+    name: "Button Usage"
+    description: "Avoid raw Material button widgets in feature code; prefer shared button primitives."
+    message_code: button_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bElevatedButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bFilledButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bOutlinedButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bTextButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: card_usage
+    type: forbidden_pattern
+    name: "Card Usage"
+    description: "Avoid raw Material card widgets in feature code; prefer shared card primitives."
+    message_code: card_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bCard(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: dialog_usage
+    type: forbidden_pattern
+    name: "Dialog Usage"
+    description: "Avoid raw Material dialog widgets in feature code; prefer shared dialog primitives."
+    message_code: dialog_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bAlertDialog(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSimpleDialog(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bAboutDialog(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bDialog(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: input_usage
+    type: forbidden_pattern
+    name: "Input Usage"
+    description: "Avoid raw Material text input widgets in feature code; prefer shared text-field primitives."
+    message_code: input_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bTextField(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bTextFormField(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSearchBar(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSearchAnchor(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: chip_usage
+    type: forbidden_pattern
+    name: "Chip Usage"
+    description: "Avoid raw Material chip widgets in feature code; prefer shared chip primitives."
+    message_code: chip_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bChoiceChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bFilterChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bActionChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bInputChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: icon_button_usage
+    type: forbidden_pattern
+    name: "Icon Button Usage"
+    description: "Avoid raw Material icon buttons in feature code; prefer shared icon-button primitives."
+    message_code: icon_button_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bIconButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: select_usage
+    type: forbidden_pattern
+    name: "Select Usage"
+    description: "Avoid raw Material dropdown widgets in feature code; prefer shared select-field primitives."
+    message_code: select_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bDropdownButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bDropdownButtonFormField(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bDropdownMenu(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: progress_usage
+    type: forbidden_pattern
+    name: "Progress Usage"
+    description: "Avoid raw Material progress indicators in feature code; prefer shared loading/progress primitives."
+    message_code: progress_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bCircularProgressIndicator(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bLinearProgressIndicator(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: divider_usage
+    type: forbidden_pattern
+    name: "Divider Usage"
+    description: "Avoid raw Material dividers in feature code; prefer shared divider primitives."
+    message_code: divider_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bDivider(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bVerticalDivider(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: switch_usage
+    type: forbidden_pattern
+    name: "Switch Usage"
+    description: "Avoid raw Material switches in feature code; prefer shared toggle primitives."
+    message_code: switch_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bSwitch(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSwitchListTile(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+
+  - id: feature_raw_flutter_widget_usage
+    type: forbidden_pattern
+    name: "Feature Raw Flutter Widget Usage"
+    description: "Avoid raw Flutter Material widgets in feature code, including basic surfaces such as `Scaffold`, `AppBar`, buttons, cards, text fields, chips, icon buttons, selects, progress indicators, dividers, and switches, plus higher-level controls such as menus, tiles, tabs, navigation widgets, sliders, and pickers."
+    message_code: feature_raw_flutter_widget_usage
+    severity: error
+    impact: design_system
+    scope: features
+    fix_hint_code: use_shared_widget_in_features
+    params:
+      patterns:
+        - "\\bScaffold\\s*\\("
+        - "\\bAppBar\\s*\\("
+        - "\\bFloatingActionButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bElevatedButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bFilledButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bOutlinedButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bTextButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bCard(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bAlertDialog(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSimpleDialog(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bAboutDialog(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bDialog(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bTextField(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bTextFormField(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSearchBar(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSearchAnchor(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bChoiceChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bFilterChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bActionChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bInputChip(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bIconButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bDropdownButton(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bDropdownButtonFormField(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bDropdownMenu(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bCircularProgressIndicator(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bLinearProgressIndicator(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bDivider(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bVerticalDivider(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSwitch(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bSwitchListTile(?:\\.[A-Za-z_][A-Za-z0-9_]*)?\\s*\\("
+        - "\\bCheckbox\\s*\\("
+        - "\\bCheckboxListTile\\s*\\("
+        - "\\bRadio\\s*\\("
+        - "\\bRadioListTile\\s*\\("
+        - "\\bSlider\\s*\\("
+        - "\\bRangeSlider\\s*\\("
+        - "\\bSegmentedButton(?:<[^>]+>)?\\s*\\("
+        - "\\bPopupMenuButton(?:<[^>]+>)?\\s*\\("
+        - "\\bMenuAnchor\\s*\\("
+        - "\\bMenuBar\\s*\\("
+        - "\\bSubmenuButton\\s*\\("
+        - "\\bListTile\\s*\\("
+        - "\\bExpansionTile\\s*\\("
+        - "\\bNavigationBar\\s*\\("
+        - "\\bBottomNavigationBar\\s*\\("
+        - "\\bNavigationRail\\s*\\("
+        - "\\bNavigationDrawer\\s*\\("
+        - "\\bTabBar\\s*\\("
+        - "\\bTabBarView\\s*\\("
+        - "\\bTabPageSelector\\s*\\("
+        - "\\bStepper\\s*\\("
+        - "\\bshowDatePicker\\s*\\("
+        - "\\bshowDateRangePicker\\s*\\("
+        - "\\bshowTimePicker\\s*\\("
+        - "\\bDatePickerDialog\\s*\\("
+        - "\\bTimePickerDialog\\s*\\("
+      skip_comments: true
+
+  - id: snackbar_usage
+    type: forbidden_pattern
+    name: "Snack Bar Usage"
+    description: "Avoid raw Material snack bars in feature code; prefer shared snackbar helpers."
+    message_code: snackbar_usage
+    severity: error
+    impact: design_system
+    scope: features
+    params:
+      patterns:
+        - "\\bSnackBar\\s*\\("
+
+  - id: snackbar_messenger_usage
+    type: forbidden_pattern
+    name: "Snack Bar Messenger Usage"
+    description: "Feature UI should not call `ScaffoldMessenger.of(...)` directly; route feedback through shared snackbar helpers."
+    message_code: snackbar_messenger_usage
+    severity: error
+    impact: architecture
+    scope: feature_ui
+    params:
+      patterns:
+        - "\\bScaffoldMessenger\\.of\\s*\\("
+
+  - id: dialog_entrypoint_usage
+    type: forbidden_pattern
+    name: "Dialog Entrypoint Usage"
+    description: "Feature UI should not call `showDialog(...)` directly; route dialog flows through shared dialog helpers."
+    message_code: dialog_entrypoint_usage
+    severity: error
+    impact: architecture
+    scope: feature_ui
+    params:
+      patterns:
+        - "\\bshowDialog\\s*\\("
+
+  - id: l10n_source
+    type: forbidden_token
+    name: "L10n Source"
+    description: "Presentation code should not pull user-facing strings from `AppStrings`."
+    message_code: l10n_source
+    severity: error
+    impact: i18n
+    scope: ui
+    params:
+      forbidden:
+        - "AppStrings"
+      skip_comments: true
+
+  - id: ui_error_stringify
+    type: forbidden_pattern
+    name: "UI Error Stringify"
+    description: "UI and app layout surfaces should not stringify raw errors directly."
+    message_code: ui_error_stringify
+    severity: error
+    impact: architecture
+    scope: ui_surfaces
+    fix_hint_code: use_failure_message_resolver
+    params:
+      patterns:
+        - "error\\.toString\\(\\)"
+
+  - id: ui_low_level_exception_surface
+    type: forbidden_pattern
+    name: "UI Low-level Exception Surface"
+    description: "UI and app layout surfaces must not depend on low-level network or database exception types."
+    message_code: ui_low_level_exception_surface
+    severity: error
+    impact: architecture
+    scope: ui_surfaces
+    fix_hint_code: use_failure_message_resolver
+    params:
+      patterns:
+        - "\\bSqliteException\\b"
+        - "\\bDriftWrappedException\\b"
+        - "\\bDioException\\b"
+        - "\\bSocketException\\b"
+
+  - id: provider_low_level_exception_surface
+    type: forbidden_pattern
+    name: "Provider Low-level Exception Surface"
+    description: "Provider-owned files must not depend on low-level database or network exception types."
+    message_code: provider_low_level_exception_surface
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: use_provider_failure_boundary
+    params:
+      patterns:
+        - "\\bSqliteException\\b"
+        - "\\bDriftWrappedException\\b"
+        - "\\bDioException\\b"
+        - "\\bSocketException\\b"
+
+  - id: provider_ui_ref_types
+    type: forbidden_pattern
+    name: "Provider UI Ref Types"
+    description: "Provider-owned files must not depend on UI-bound types such as BuildContext or WidgetRef."
+    message_code: provider_ui_ref_types
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: keep_ui_types_out_of_providers
+    params:
+      patterns:
+        - "\\bBuildContext\\b"
+        - "\\bWidgetRef\\b"
+
+  - id: provider_async_error_wrapper
+    type: forbidden_pattern
+    name: "Provider AsyncError Wrapper"
+    description: "Provider-owned files must not wrap errors with raw `AsyncError`; map them to `AppFailure`."
+    message_code: provider_async_error_wrapper
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: use_provider_failure_boundary
+    params:
+      patterns:
+        - "throw\\s+AsyncError\\s*\\("
+
+  - id: provider_raw_async_error_state
+    type: forbidden_pattern
+    name: "Provider Raw AsyncValue Error State"
+    description: "Provider-owned files must not assign raw caught errors into AsyncValue.error; map them to AppFailure first."
+    message_code: provider_raw_async_error_state
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: map_provider_error_before_asyncvalue
+    params:
+      patterns:
+        - "AsyncValue\\.error\\s*\\(\\s*error\\b"
+        - "AsyncValue\\.error\\s*\\(\\s*e\\b"
+        - "AsyncValue\\.error\\s*\\(\\s*exception\\b"
+
+  - id: provider_raw_string_error_state
+    type: forbidden_pattern
+    name: "Provider Raw String Error State"
+    description: "Provider-owned files must not publish raw string error states."
+    message_code: provider_raw_string_error_state
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: use_provider_failure_boundary
+    params:
+      patterns:
+        - "AsyncValue\\.error\\s*\\(\\s*'[^']+'"
+        - "AsyncValue\\.error\\s*\\(\\s*\"[^\"]+\""
+
+  - id: core_service_map_state_return
+    type: forbidden_pattern
+    name: "Core Service Map State Return"
+    description: "Core service/provider state surfaces must not return `Map<String, dynamic>` or `Map<String, bool>` from `build()` or state-style getter methods. Introduce immutable typed state objects instead."
+    message_code: core_service_map_state_return
+    severity: error
+    impact: architecture
+    scope: service_files
+    fix_hint_code: use_immutable_core_service_state
+    params:
+      patterns:
+        - "\\bFuture(?:Or)?<Map<String,\\s*(?:dynamic|bool)>>\\s+build\\s*\\("
+        - "\\bMap<String,\\s*(?:dynamic|bool)>\\s+build\\s*\\("
+        - "\\bFuture<Map<String,\\s*(?:dynamic|bool)>>\\s+get(?:DeviceInfo|State|Status|Settings|Permissions)\\s*\\("
+
+  - id: core_service_map_state_key_access
+    type: forbidden_pattern
+    name: "Core Service Map State Key Access"
+    description: "Core service/provider state assembly must not rely on string-keyed bags such as `settings['flag']` or `status['timestamp']`; model typed fields explicitly."
+    message_code: core_service_map_state_key_access
+    severity: error
+    impact: architecture
+    scope: service_files
+    fix_hint_code: replace_map_state_bag_with_typed_fields
+    params:
+      patterns:
+        - "\\b(?:state|settings|status|info)\\s*\\[\\s*['\"][A-Za-z0-9_]+['\"]\\s*\\]"
+
+  - id: provider_no_unnamed_catch
+    type: forbidden_pattern
+    name: "Provider No Unnamed Catch"
+    description: "Provider-owned files must not use unnamed catch bindings such as `catch (_)`, because they hide the real failure source."
+    message_code: provider_no_unnamed_catch
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: avoid_unnamed_provider_catch
+    params:
+      patterns:
+        - "\\bcatch\\s*\\(_\\)"
+
+  - id: provider_invalidate_self
+    type: forbidden_pattern
+    name: "Provider Invalidate Self"
+    description: "Provider-owned files must not use `invalidateSelf()`; explicit retry or invalidation boundaries are required."
+    message_code: provider_invalidate_self
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: avoid_provider_retry_loops
+    params:
+      patterns:
+        - "\\binvalidateSelf\\s*\\("
+
+  - id: provider_ui_side_effects
+    type: forbidden_pattern
+    name: "Provider UI Side Effects"
+    description: "Provider-owned files must not perform UI side effects directly."
+    message_code: provider_ui_side_effects
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: move_provider_side_effect_to_listener
+    params:
+      patterns:
+        - "\\bSnackBar\\s*\\("
+        - "\\bshowDialog\\s*\\("
+        - "\\bshowModalBottomSheet\\s*\\("
+        - "\\bScaffoldMessenger\\."
+        - "\\bNavigator\\."
+        - "\\bcontext\\.go\\s*\\("
+        - "\\bcontext\\.push\\s*\\("
+
+  - id: provider_resource_lifecycle
+    type: ast_check
+    name: "Provider Resource Lifecycle"
+    description: "Provider-owned files that create controllers, timers, subscriptions, sockets, or clients must register cleanup with `ref.onDispose(...)`."
+    message_code: provider_resource_lifecycle
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: cleanup_provider_resource_with_on_dispose
+    params:
+      check_id: provider_resource_cleanup
+      annotation_pattern: "^\\s*@(?:riverpod|Riverpod)\\b"
+      dispose_registration_pattern: "\\bref\\.onDispose\\s*\\("
+      resource_specs:
+        - kind: StreamController
+          cleanup_methods: [close]
+          patterns:
+            - "\\b(?:late\\s+)?(?:final|var)?\\s*(?:[A-Za-z_][A-Za-z0-9_<>,?]*\\s+)?(?P<var_name>[A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*StreamController(?:<[^>]+>)?(?:\\.broadcast)?\\s*\\("
+        - kind: TextEditingController
+          cleanup_methods: [dispose]
+          patterns:
+            - "\\b(?:late\\s+)?(?:final|var)?\\s*(?:[A-Za-z_][A-Za-z0-9_<>,?]*\\s+)?(?P<var_name>[A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*TextEditingController\\s*\\("
+        - kind: FocusNode
+          cleanup_methods: [dispose]
+          patterns:
+            - "\\b(?:late\\s+)?(?:final|var)?\\s*(?:[A-Za-z_][A-Za-z0-9_<>,?]*\\s+)?(?P<var_name>[A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*FocusNode\\s*\\("
+        - kind: Timer
+          cleanup_methods: [cancel]
+          patterns:
+            - "\\b(?:late\\s+)?(?:final|var)?\\s*(?:[A-Za-z_][A-Za-z0-9_<>,?]*\\s+)?(?P<var_name>[A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*Timer(?:\\.periodic)?\\s*\\("
+        - kind: StreamSubscription
+          cleanup_methods: [cancel]
+          patterns:
+            - "\\b(?:late\\s+)?(?:final|var)?\\s*(?:[A-Za-z_][A-Za-z0-9_<>,?]*\\s+)?(?P<var_name>[A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*(?!ref\\b)[^=\\n]+\\.listen\\s*\\("
+            - "\\b(?!ref\\b)[A-Za-z_][A-Za-z0-9_]*\\s*\\.listen\\s*\\("
+        - kind: Socket
+          cleanup_methods: [close, destroy]
+          patterns:
+            - "\\b(?:late\\s+)?(?:final|var)?\\s*(?:[A-Za-z_][A-Za-z0-9_<>,?]*\\s+)?(?P<var_name>[A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*(?:await\\s+)?(?:Socket|SecureSocket|WebSocket)\\.[A-Za-z_][A-Za-z0-9_]*\\s*\\("
+        - kind: Client
+          cleanup_methods: [close]
+          patterns:
+            - "\\b(?:late\\s+)?(?:final|var)?\\s*(?:[A-Za-z_][A-Za-z0-9_<>,?]*\\s+)?(?P<var_name>[A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*(?:http\\.)?Client\\s*\\("
+
+  - id: provider_retry_policy_review
+    type: ast_check
+    name: "Provider Retry Policy Review"
+    description: "Provider blocks with async auth, mutation, destructive, or other side-effectful actions must declare an explicit retry review marker such as `// guard:retry-reviewed`, `@NoAutoRetry`, or `@RetryPolicy(...)`."
+    message_code: provider_retry_policy_review
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: mark_provider_retry_policy_reviewed
+    params:
+      check_id: provider_retry_reviewed
+      annotation_pattern: "^\\s*@(?:riverpod|Riverpod)\\b"
+      review_marker_pattern: "guard:retry-reviewed|@NoAutoRetry\\b|@RetryPolicy\\b"
+      marker_lookbehind_lines: 3
+      risky_signature_pattern: "^\\s*Future(?:Or)?(?:<[^\\n]+>)?\\s+_?(?P<member_name>(?:login|register|logout|verify\\w*|requestOtp\\w*|sendOtp\\w*|refresh(?:Token|Session)\\w*|create\\w+|update\\w+|delete\\w+|remove\\w+|save\\w+|submit\\w+|sync\\w+|toggle\\w+|set[A-Z]\\w*|clear\\w+|disable\\w+|enable\\w+|export\\w+|payment\\w*|purchase\\w*|charge\\w*|refund\\w*))\\s*\\("
+
+  - id: provider_mounted_after_await
+    type: ast_check
+    name: "Provider Mounted Check After Await"
+    description: "Async provider logic must guard follow-up state changes or provider interactions with `if (!ref.mounted) return;` before continuing after an awaited gap."
+    message_code: provider_mounted_after_await
+    severity: error
+    impact: architecture
+    scope: provider_files
+    fix_hint_code: check_ref_mounted_after_await
+    params:
+      check_id: provider_mounted_after_await
+      annotation_pattern: "^\\s*@(?:riverpod|Riverpod)\\b"
+      async_block_start_pattern: "\\basync\\b[^\\n{]*\\{"
+      await_pattern: "\\bawait\\b"
+      mounted_check_pattern: "\\bif\\s*\\(\\s*!ref\\.mounted\\b"
+      sensitive_action_pattern: "\\bstate\\s*=|\\bref\\.(?:invalidate|invalidateSelf|refresh|read)\\s*\\("
+
+  - id: provider_family_param_stability
+    type: ast_check
+    name: "Provider Family Param Stability"
+    description: "Riverpod family parameters must be stable value types. Use primitives, enums, records, or immutable value objects with structural equality instead of mutable collections or unstable custom objects."
+    message_code: provider_family_param_stability
+    severity: error
+    impact: architecture
+    scope: non_legacy_app_source
+    fix_hint_code: use_stable_family_param
+    params:
+      check_id: provider_family_param_stability
+      annotation_pattern: "^\\s*@(?:riverpod|Riverpod)\\b"
+      stable_scalar_types:
+        - BigInt
+        - DateTime
+        - DateTimeRange
+        - Duration
+        - Locale
+        - String
+        - ThemeMode
+        - TimeOfDay
+        - Uri
+        - bool
+        - double
+        - int
+        - num
+      collection_base_types:
+        - Iterable
+        - List
+        - Map
+        - Queue
+        - Set
+
+  - id: provider_generated_pairing
+    type: ast_check
+    name: "Provider Generated Pairing"
+    description: "Files that declare `@riverpod` providers must use the exact sibling `part '<file>.g.dart';` directive and keep the generated `.g.dart` file alongside the source."
+    message_code: provider_generated_pairing
+    severity: error
+    impact: architecture
+    scope: non_legacy_app_source
+    fix_hint_code: pair_provider_with_generated_file
+    params:
+      check_id: provider_generated_pairing
+      annotation_pattern: "^\\s*@(?:riverpod|Riverpod)\\b"
+
+  - id: business_layer_ui_ref_types
+    type: forbidden_pattern
+    name: "Business Layer UI Ref Types"
+    description: "Repository, service, and use-case files must not depend on `BuildContext`."
+    message_code: business_layer_ui_ref_types
+    severity: error
+    impact: architecture
+    scope: business_logic_files
+    fix_hint_code: keep_ui_types_out_of_business_layer
+    params:
+      patterns:
+        - "\\bBuildContext\\b"
+
+  - id: business_layer_ui_side_effects
+    type: forbidden_pattern
+    name: "Business Layer UI Side Effects"
+    description: "Repository, service, and use-case files must stay UI-free and must not trigger UI side effects directly."
+    message_code: business_layer_ui_side_effects
+    severity: error
+    impact: architecture
+    scope: business_logic_files
+    fix_hint_code: move_provider_side_effect_to_listener
+    params:
+      patterns:
+        - "\\bSnackBar\\s*\\("
+        - "\\bshowDialog\\s*\\("
+        - "\\bshowModalBottomSheet\\s*\\("
+        - "\\bScaffoldMessenger\\."
+        - "\\bNavigator\\."
+        - "\\bcontext\\.go\\s*\\("
+        - "\\bcontext\\.push\\s*\\("
+
+  - id: domain_material_import
+    type: forbidden_pattern
+    name: "Domain Material Import"
+    description: "Domain files must not import `package:flutter/material.dart`."
+    message_code: domain_material_import
+    severity: error
+    impact: architecture
+    scope: domain_files
+    fix_hint_code: keep_ui_imports_out_of_domain
+    params:
+      patterns:
+        - "^import\\s+'package:flutter/material\\.dart';"
+
+  - id: domain_ui_ref_types
+    type: forbidden_pattern
+    name: "Domain UI Ref Types"
+    description: "Domain files must not depend on UI-bound types such as `BuildContext`."
+    message_code: domain_ui_ref_types
+    severity: error
+    impact: architecture
+    scope: domain_files
+    fix_hint_code: keep_ui_types_out_of_business_layer
+    params:
+      patterns:
+        - "\\bBuildContext\\b"
+
+  - id: data_material_import
+    type: forbidden_pattern
+    name: "Data Material Import"
+    description: "Data-layer files must not import `package:flutter/material.dart`."
+    message_code: data_material_import
+    severity: error
+    impact: architecture
+    scope: data_files
+    fix_hint_code: keep_ui_imports_out_of_business_layer
+    params:
+      patterns:
+        - "^import\\s+'package:flutter/material\\.dart';"
+
+  - id: data_ui_ref_types
+    type: forbidden_pattern
+    name: "Data UI Ref Types"
+    description: "Data-layer files must not depend on UI-bound types such as `BuildContext`."
+    message_code: data_ui_ref_types
+    severity: error
+    impact: architecture
+    scope: data_files
+    fix_hint_code: keep_ui_types_out_of_business_layer
+    params:
+      patterns:
+        - "\\bBuildContext\\b"
+
+  - id: repository_material_import
+    type: forbidden_pattern
+    name: "Repository Material Import"
+    description: "Repository files must not import `package:flutter/material.dart`."
+    message_code: repository_material_import
+    severity: error
+    impact: architecture
+    scope: repository_files
+    fix_hint_code: keep_ui_imports_out_of_business_layer
+    params:
+      patterns:
+        - "^import\\s+'package:flutter/material\\.dart';"
+
+  - id: service_material_import
+    type: forbidden_pattern
+    name: "Service Material Import"
+    description: "Service files must not import `package:flutter/material.dart`."
+    message_code: service_material_import
+    severity: error
+    impact: architecture
+    scope: service_files
+    fix_hint_code: keep_ui_imports_out_of_business_layer
+    params:
+      patterns:
+        - "^import\\s+'package:flutter/material\\.dart';"
+
+  - id: transaction_outside_data_layer
+    type: forbidden_pattern
+    name: "Transaction Outside Data Layer"
+    description: "Database transactions must stay in the data or database layer; do not call `transaction(...)` from UI, app providers, presentation notifiers, services, or use cases."
+    message_code: transaction_outside_data_layer
+    severity: error
+    impact: architecture
+    scope: non_data_layer_source
+    fix_hint_code: move_transaction_to_repository
+    params:
+      patterns:
+        - "\\btransaction\\s*\\("
+
+  - id: text_style
+    type: forbidden_pattern
+    name: "Text Style"
+    description: "Avoid raw `TextStyle(...)` in feature UI files; prefer theme text styles and shared typography."
+    message_code: text_style
+    severity: error
+    impact: design_system
+    scope: feature_ui
+    params:
+      patterns:
+        - "\\bTextStyle\\s*\\("
+
+  - id: no_app_dimens
+    type: forbidden_token
+    name: "No AppDimens"
+    description: "Use the token files directly; `AppDimens` and `app_dimens.dart` are removed."
+    message_code: no_app_dimens
+    severity: error
+    impact: design_system
+    scope: all
+    params:
+      forbidden:
+        - "AppDimens"
+        - "app_dimens.dart"
+      skip_comments: true
+
+  - id: ui_direct_color_typography_tokens
+    type: forbidden_pattern
+    name: "UI Uses Theme Accessors"
+    description: "UI code should access colors and typography through theme/context extensions, not directly from raw theme source files such as `app_colors.dart` or `app_typography.dart`."
+    message_code: ui_direct_color_typography_tokens
+    severity: error
+    impact: design_system
+    scope: ui
+    params:
+      patterns:
+        - "import\\s+'package:memox/core/theme/app_colors\\.dart';"
+        - "import\\s+'package:memox/core/theme/app_typography\\.dart';"
+        - "import\\s+'(?:\\.\\./)+core/theme/app_colors\\.dart';"
+        - "import\\s+'(?:\\.\\./)+core/theme/app_typography\\.dart';"
+        - "\\bAppColors\\."
+        - "\\bAppTypography\\."
+      skip_comments: true
+
+  - id: presentation_no_direct_material_colors
+    type: forbidden_pattern
+    name: "Presentation No Direct Material Colors"
+    description: "Code in `lib/presentation/**` must not use `Colors.*` directly. Read colors from `Theme.of(context)`, `colorScheme`, custom theme extensions, or shared semantic accessors instead."
+    message_code: presentation_no_direct_material_colors
+    severity: error
+    impact: design_system
+    scope: ui
+    fix_hint_code: use_theme_colors_in_presentation
+    params:
+      patterns:
+        - "\\bColors\\."
+      skip_comments: true
+
+  - id: presentation_raw_color_literals
+    type: forbidden_pattern
+    name: "Presentation Raw Color Literals"
+    description: "Feature presentation code must not construct raw color literals such as `Color(0x...)`, `Color.fromARGB(...)`, or `Color.fromRGBO(...)`. Route colors through `Theme.of(context)`, `colorScheme`, or shared semantic color accessors instead."
+    message_code: presentation_raw_color_literals
+    severity: error
+    impact: design_system
+    scope: feature_ui
+    fix_hint_code: use_theme_colors_in_presentation
+    params:
+      patterns:
+        - "\\bColor\\s*\\(\\s*0x[0-9A-Fa-f]+\\s*\\)"
+        - "\\bColor\\.(?:fromARGB|fromRGBO)\\s*\\("
+      skip_comments: true
+
+  - id: presentation_deprecated_with_opacity
+    type: forbidden_pattern
+    name: "Presentation Deprecated WithOpacity"
+    description: "Feature presentation code must not call `.withOpacity(...)`; route opacity through theme-driven semantic color APIs or centralized opacity tokens instead."
+    message_code: presentation_deprecated_with_opacity
+    severity: error
+    impact: design_system
+    scope: feature_ui
+    fix_hint_code: use_theme_opacity_in_presentation
+    params:
+      patterns:
+        - "\\.withOpacity\\s*\\("
+      skip_comments: true
+
+  - id: screen_scaffold
+    type: forbidden_pattern
+    name: "Screen Scaffold"
+    description: "Feature screens should migrate away from raw `Scaffold` toward a shared screen shell."
+    message_code: screen_scaffold
+    severity: error
+    impact: architecture
+    scope: screens
+    params:
+      patterns:
+        - "\\bScaffold\\s*\\("
+
+  - id: screen_page_scaffold_contract
+    type: required_pattern
+    name: "Screen Page Scaffold Contract"
+    description: "Screen and page entry files should render through a shared MemoX page shell when that contract is adopted."
+    message_code: screen_page_scaffold_contract
+    severity: error
+    impact: architecture
+    scope: page_entry_files
+    enabled: false
+    fix_hint_code: use_mx_page_shell
+    params:
+      patterns:
+        - "\\b(?:MxScaffold|MxContentShell|AppShellPage)(?:\\.[A-Za-z]+)?\\s*\\("
+
+  - id: screen_state_surface
+    type: forbidden_pattern
+    name: "Screen State Surface"
+    description: "Non-auth feature screens should route generic loading, empty, and error states through shared MemoX state surfaces when that contract is adopted."
+    message_code: screen_state_surface
+    severity: error
+    impact: architecture
+    scope: screens_non_auth
+    enabled: false
+    fix_hint_code: use_screen_state_surface
+    params:
+      patterns:
+        - "\\bMxErrorState\\s*\\("
+        - "\\bMxEmptyState\\s*\\("
+        - "\\bMxLoadingState\\s*\\("
+
+  - id: screen_async_value_render
+    type: ast_check
+    name: "Screen AsyncValue Render"
+    description: "Screen render code that watches async provider state must handle loading, error, and data through `.when`, `.maybeWhen`, a shared async render helper, or another equivalent exhaustive branch."
+    message_code: screen_async_value_render
+    severity: error
+    impact: architecture
+    scope: screens
+    fix_hint_code: use_async_value_render_surface
+    params:
+      check_id: screen_async_value_render
+      render_method_pattern: "\\b(?:Widget|PreferredSizeWidget)\\s+(?:_?build\\w*|build)\\s*\\("
+      async_name_pattern: "^\\w+Async$"
+      direct_flatten_pattern: "ref\\.watch\\([^)]*\\)\\.(?:value|valueOrNull|requireValue|hasValue|hasError|error)\\b"
+
+  - id: screen_custom_error_surface
+    type: forbidden_pattern
+    name: "Screen Custom Error Surface"
+    description: "Non-auth feature screens should not use bespoke generic error widgets when a shared MemoX error surface owns the generic state contract."
+    message_code: screen_custom_error_surface
+    severity: error
+    impact: architecture
+    scope: screens_non_auth
+    enabled: false
+    fix_hint_code: use_screen_state_surface
+    params:
+      patterns:
+        - "\\bHomeError\\s*\\("
+        - "\\bLearningErrorView\\s*\\("
+
+  - id: screen_error_message_passthrough
+    type: forbidden_pattern
+    name: "Screen Error Message Passthrough"
+    description: "Non-auth feature screens should not pass resolved error strings into custom error widgets when a shared MemoX error surface owns generic error rendering."
+    message_code: screen_error_message_passthrough
+    severity: error
+    impact: architecture
+    scope: screens_non_auth
+    enabled: false
+    fix_hint_code: use_screen_state_surface
+    params:
+      patterns:
+        - "errorMessage\\s*:\\s*AppFailureMessageResolver\\.resolve\\("
+
+  - id: widget_repository_impl_import
+    type: forbidden_pattern
+    name: "Widget Repository Implementation Import"
+    description: "Widget files must not import repository implementation files directly."
+    message_code: widget_repository_impl_import
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: use_notifier_or_use_case_from_ui
+    params:
+      patterns:
+        - "import\\s+'package:memox/data/repositories/[^']+\\.dart';"
+        - "import\\s+'(?:\\.\\./)+data/repositories/[^']+\\.dart';"
+
+  - id: route_literal_navigation_usage
+    type: forbidden_pattern
+    name: "Route Literal Navigation Usage"
+    description: "UI navigation calls must not hardcode route string literals; use shared route names or route helper builders instead."
+    message_code: route_literal_navigation_usage
+    severity: error
+    impact: architecture
+    scope: ui_surfaces
+    fix_hint_code: use_route_constants_for_navigation
+    params:
+      patterns:
+        - "\\bcontext\\.(?:go|push|pushReplacement|replace)\\s*\\(\\s*['\"]/[^'\"]*['\"]"
+        - "\\brouter\\.(?:go|push|pushReplacement|replace)\\s*\\(\\s*['\"]/[^'\"]*['\"]"
+        - "\\bGoRouter\\.of\\s*\\([^)]*\\)\\.(?:go|push|pushReplacement|replace)\\s*\\(\\s*['\"]/[^'\"]*['\"]"
+        - "\\b[A-Za-z_][A-Za-z0-9_]*\\.(?:goTo|pushTo|replaceWith|clearStackAndGo)\\s*\\(\\s*['\"]/[^'\"]*['\"]"
+
+  - id: common_navigation_extension_usage
+    type: forbidden_pattern
+    name: "Common Navigation Extension Usage"
+    description: "Navigation call sites in UI, shared layout, app shell, and router surfaces must use the shared BuildContext navigation extension instead of raw `GoRouter` APIs or legacy `NavigationHelper` wrappers."
+    message_code: common_navigation_extension_usage
+    severity: error
+    impact: architecture
+    scope: navigation_surfaces
+    fix_hint_code: use_common_navigation_extension
+    params:
+      patterns:
+        - "\\bGoRouter\\.of\\s*\\([^)]*\\)\\.(?:go|push|pushReplacement|replace|pop)\\s*\\("
+        - "\\bcontext\\.(?:go|push|pushReplacement|replace)\\s*\\("
+        - "\\bNavigationHelper\\.(?:popToRoot|clearStackAndGo|safeNavigate|pushWithResult|logout|loginSuccess)\\s*\\("
+
+  - id: raw_navigator_push_usage
+    type: forbidden_pattern
+    name: "Raw Navigator Push Usage"
+    description: "UI code should not use raw `Navigator` push APIs; route through `GoRouter` or shared navigation helpers with `RouteConstants`."
+    message_code: raw_navigator_push_usage
+    severity: error
+    impact: architecture
+    scope: ui_surfaces
+    fix_hint_code: use_route_constants_for_navigation
+    params:
+      patterns:
+        - "\\bNavigator\\.(?:push|pushNamed|pushReplacement|pushAndRemoveUntil|restorablePush)\\s*\\("
+        - "\\bNavigator\\.of\\s*\\([^)]*\\)\\.(?:push|pushNamed|pushReplacement|pushAndRemoveUntil|restorablePush)\\s*\\("
+
+  - id: route_definition_outside_router
+    type: forbidden_pattern
+    name: "Route Definition Outside Router"
+    description: "GoRouter route definitions must stay in `lib/app/router/app_router.dart`."
+    message_code: route_definition_outside_router
+    severity: error
+    impact: architecture
+    scope: non_router_source
+    fix_hint_code: keep_route_definitions_in_router
+    params:
+      patterns:
+        - "\\bGoRoute\\s*\\("
+
+  - id: widget_repository_provider_access
+    type: forbidden_pattern
+    name: "Widget Repository Provider Access"
+    description: "Widget files must not read or watch repository providers directly."
+    message_code: widget_repository_provider_access
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: use_notifier_or_use_case_from_ui
+    params:
+      patterns:
+        - "ref\\.(?:read|watch)\\s*\\(\\s*\\w*RepositoryProvider(?:\\b|\\s*[.)])"
+
+  - id: widget_callback_ref_watch_usage
+    type: forbidden_pattern
+    name: "Widget Callback Ref Watch Usage"
+    description: "UI callbacks must not call `ref.watch(...)`; callbacks should use `ref.read(...)` for one-shot imperative work."
+    message_code: widget_callback_ref_watch_usage
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: use_read_inside_callback
+    params:
+      patterns:
+        - "(?s)\\bon[A-Z][A-Za-z0-9_]*\\b\\s*:\\s*(?:\\([^)]*\\)\\s*=>\\s*ref\\.watch\\(|\\([^)]*\\)\\s*\\{.{0,240}?ref\\.watch\\()"
+
+  - id: widget_database_layer_import
+    type: forbidden_pattern
+    name: "Widget Database Layer Import"
+    description: "Widget files must not import DAO or database files directly."
+    message_code: widget_database_layer_import
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: route_database_access_through_provider
+    params:
+      patterns:
+        - "^import\\s+'package:memox/core/database/[^']+\\.dart';"
+        - "^import\\s+'package:memox/data/dao/[^']+\\.dart';"
+        - "^import\\s+'(?:\\.\\./)+[^']*/(?:dao|database)/[^']+\\.dart';"
+
+  - id: widget_database_query_usage
+    type: forbidden_pattern
+    name: "Widget Database Query Usage"
+    description: "Widget files must not query Drift or call DAO objects directly."
+    message_code: widget_database_query_usage
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: route_database_access_through_provider
+    params:
+      patterns:
+        - "\\b(?:_?database|db|appDatabase)\\s*\\.\\s*(?:select|into|customSelect|customSelectStream)\\s*\\("
+        - "\\b(?:_?[A-Za-z0-9]*Dao)\\s*\\.\\s*[A-Za-z_][A-Za-z0-9_]*\\s*\\("
+
+  - id: widget_direct_stream_watch
+    type: forbidden_pattern
+    name: "Widget Direct Stream Watch"
+    description: "Widget files must not subscribe to direct `.watch()` streams; stream data should be normalized behind a provider and the widget should only use `ref.watch(...)`."
+    message_code: widget_direct_stream_watch
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: route_database_stream_through_provider
+    params:
+      patterns:
+        - "(?<!ref)\\.watch\\s*\\("
+
+  - id: widget_build_ref_read
+    type: ast_check
+    name: "Widget Build Ref Read"
+    description: "Widget build methods must not use `ref.read(...)` for render state; use `ref.watch(...)` and keep `read` inside action callbacks only."
+    message_code: widget_build_ref_read
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: use_watch_for_render_state
+    params:
+      check_id: ui_build_ref_read
+      callback_lookahead_lines: 8
+      read_pattern: "\\bref\\.read\\s*\\("
+      allowed_callback_pattern: "\\bon[A-Z][A-Za-z0-9_]*\\b\\s*:"
+
+  - id: widget_build_navigation_side_effects
+    type: ast_check
+    name: "Widget Build Navigation Side Effects"
+    description: "Widget build methods must not trigger navigation directly during render; keep `context.go/push` or `GoRouter.of(context).go/push` inside callbacks or listeners only."
+    message_code: widget_build_navigation_side_effects
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: move_navigation_out_of_build
+    params:
+      check_id: ui_build_navigation_side_effects
+      render_method_pattern: "\\b(?:Widget|PreferredSizeWidget)\\s+(?:_?build\\w*|build)\\s*\\("
+      callback_lookahead_lines: 8
+      allowed_callback_pattern: "\\bon[A-Z][A-Za-z0-9_]*\\b\\s*:"
+      navigation_pattern: "\\b(?:context\\.(?:go|push|pushReplacement|replace)|GoRouter\\.of\\s*\\([^)]*\\)\\.(?:go|push|pushReplacement|replace))\\s*\\("
+
+  - id: ui_context_after_await
+    type: ast_check
+    name: "UI Context Mounted After Await"
+    description: "UI async code must not use `BuildContext` after an awaited gap without an early mounted guard such as `if (!context.mounted) return;` or `if (!mounted) return;`."
+    message_code: ui_context_after_await
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: check_context_mounted_after_await
+    params:
+      check_id: ui_context_after_await
+      async_block_start_pattern: "\\basync\\b[^\\n{]*\\{"
+      await_pattern: "\\bawait\\b"
+      mounted_check_pattern: "\\bif\\s*\\(\\s*!(?:context\\.)?mounted\\b"
+      context_usage_pattern: "\\bcontext\\b"
+
+  - id: ui_media_query_screen_percentage
+    type: ast_check
+    name: "UI MediaQuery Screen Percentage"
+    description: "Regular widget files must not size content layouts by multiplying `MediaQuery.of(context).size.width` or `.height`. Keep these patterns inside dedicated dialog, bottom-sheet, overlay, or fullscreen-modal widgets only."
+    message_code: ui_media_query_screen_percentage
+    severity: error
+    impact: design_system
+    scope: widget_ui_files
+    fix_hint_code: avoid_screen_percentage_in_regular_widgets
+    params:
+      check_id: ui_media_query_screen_percentage
+      percentage_pattern: "MediaQuery(?:\\.of\\([^)]*\\)\\.size|\\.sizeOf\\([^)]*\\))\\.(?:width|height)\\s*\\*"
+      allowed_path_pattern: "(?:^|/)(?:dialogs?|bottom_sheets?|overlays?|fullscreen_modals?)(?:/|$)|(?:^|/)[^/]*_(?:dialog|bottom_sheet|overlay|fullscreen_modal)\\.dart$"
+
+  - id: ui_font_size_media_query_scaling
+    type: forbidden_pattern
+    name: "UI Font Size MediaQuery Scaling"
+    description: "UI code must not scale `fontSize` directly from `MediaQuery`, raw screen dimensions, or per-widget text scaling math."
+    message_code: ui_font_size_media_query_scaling
+    severity: error
+    impact: design_system
+    scope: widget_ui_files
+    fix_hint_code: route_font_scaling_through_theme
+    params:
+      patterns:
+        - "\\bfontSize\\s*:\\s*[^,\\n)]*MediaQuery"
+        - "\\bfontSize\\s*:\\s*[^,\\n)]*screenWidth"
+        - "\\bfontSize\\s*:\\s*[^,\\n)]*screenHeight"
+        - "\\bfontSize\\s*:\\s*[^,\\n)]*textScaleFactor"
+        - "\\bfontSize\\s*:\\s*[^,\\n)]*textScaler"
+
+  - id: ui_text_style_copywith_typography_override
+    type: ast_check
+    name: "UI TextStyle CopyWith Typography Override"
+    description: "UI code should not reshape typography inline with `copyWith(...)` by overriding font weight, style, size, height, or letter spacing on local text-style expressions."
+    message_code: ui_text_style_copywith_typography_override
+    severity: warning
+    impact: design_system
+    scope: widget_ui_files
+    fix_hint_code: promote_typography_override_to_semantic_style
+    params:
+      check_id: ui_text_style_copywith_typography_override
+      receiver_pattern: "\\b(?:[A-Za-z_][A-Za-z0-9_]*\\.)*(?:textTheme\\.[A-Za-z_][A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*Style|titleTextStyle|subtitleTextStyle|labelStyle|subtitleStyle)\\??\\s*\\.\\s*copyWith\\s*\\("
+      typography_property_pattern: "\\b(?P<property>fontSize|fontWeight|height|letterSpacing|fontStyle)\\s*:"
+      allowed_context_pattern: "guard:typography-copywith-reviewed"
+      context_radius: 2
+
+  - id: ui_display_font_size_literals
+    type: ast_check
+    name: "UI Display Font Size Literals"
+    description: "Large numeric display surfaces may carry intentional raw `fontSize` literals for now, but they should still be reviewed and migrated toward shared typography semantics."
+    message_code: ui_display_font_size_literals
+    severity: warning
+    impact: design_system
+    scope: widget_ui_files
+    fix_hint_code: use_display_text_style_or_document_exception
+    params:
+      check_id: ui_display_font_size_literals
+      font_size_pattern: "\\bfontSize\\s*:\\s*(?P<value>\\d+(?:\\.\\d+)?)\\b"
+      display_context_pattern: "(?:score|badge|percent|percentage|number|count|counter|stat|display|hero|headline|current|completed|total)|%"
+      display_path_pattern: "(?:score|badge|stat)"
+      large_font_threshold: 32
+      context_radius: 12
+
+  - id: ui_raw_font_size_literals
+    type: ast_check
+    name: "UI Raw Font Size Literals"
+    description: "Regular feature widget UI should not hardcode raw `fontSize` literals; route sizing through shared typography styles instead."
+    message_code: ui_raw_font_size_literals
+    severity: error
+    impact: design_system
+    scope: feature_ui
+    fix_hint_code: use_theme_text_style_instead_of_raw_font_size
+    params:
+      check_id: ui_raw_font_size_literals
+      font_size_pattern: "\\bfontSize\\s*:\\s*(?P<value>\\d+(?:\\.\\d+)?)\\b"
+      display_context_pattern: "(?:score|badge|percent|percentage|number|count|counter|stat|display|hero|headline|current|completed|total)|%"
+      display_path_pattern: "(?:score|badge|stat)"
+      large_font_threshold: 32
+      context_radius: 12
+
+  - id: ui_raw_spacing_literals
+    type: ast_check
+    name: "UI Raw Spacing Literals"
+    description: "Feature UI code should prefer spacing tokens over raw spacing literals inside `EdgeInsets` and `SizedBox`. Tiny pixel fixes and explicitly documented workaround contexts may stay inline."
+    message_code: ui_raw_spacing_literals
+    severity: error
+    impact: design_system
+    scope: feature_ui
+    fix_hint_code: use_spacing_tokens_or_document_exception
+    params:
+      check_id: ui_raw_spacing_literals
+      max_allowed_literal: 2
+      context_radius: 1
+      allowed_context_pattern: "guard:raw-spacing-reviewed|hairline|divider|pixel|pixel-fix|workaround|third[- ]party|animation tweak|tweak"
+      literal_patterns:
+        - "\\bEdgeInsets\\.all\\(\\s*(?P<value>\\d+(?:\\.\\d+)?)\\s*\\)"
+        - "\\bEdgeInsets\\.symmetric\\([^)]*(?:horizontal|vertical)\\s*:\\s*(?P<value>\\d+(?:\\.\\d+)?)"
+        - "\\bEdgeInsets\\.only\\([^)]*(?:left|top|right|bottom)\\s*:\\s*(?P<value>\\d+(?:\\.\\d+)?)"
+        - "\\bSizedBox\\([^)]*(?:height|width)\\s*:\\s*(?P<value>\\d+(?:\\.\\d+)?)"
+
+  - id: ui_raw_size_literals
+    type: ast_check
+    name: "UI Raw Size Literals"
+    description: "UI code should prefer named shared size constants or parent/layout constraints over raw numeric width and height literals."
+    message_code: ui_raw_size_literals
+    severity: warning
+    impact: design_system
+    scope: widget_ui_files
+    fix_hint_code: use_size_tokens_or_constraints
+    params:
+      check_id: ui_raw_size_literals
+      max_allowed_literal: 2
+      context_radius: 1
+      allowed_context_pattern: "guard:raw-size-reviewed|hairline|divider|pixel|pixel-fix|workaround|third[- ]party|animation tweak|tweak"
+      literal_patterns:
+        - "\\b(?:width|height|minWidth|minHeight|maxWidth|maxHeight)\\s*:\\s*(?P<value>\\d+(?:\\.\\d+)?)"
+
+  - id: raw_half_alpha_with_values
+    type: ast_check
+    name: "Raw Half Alpha With Values"
+    description: "App source must not hardcode `withValues(alpha: 0.5)`; route half-opacity through a shared opacity constant or theme helper instead."
+    message_code: raw_half_alpha_with_values
+    severity: error
+    impact: design_system
+    scope: non_legacy_app_source
+    fix_hint_code: use_opacity_tokens_half
+    params:
+      check_id: ui_raw_half_alpha_with_values
+      half_alpha_pattern: "\\.withValues\\s*\\([^)]*\\balpha\\s*:\\s*0\\.5(?:0+)?\\b[^)]*\\)"
+
+  - id: presentation_raw_alpha_with_values
+    type: ast_check
+    name: "Presentation Raw Alpha With Values"
+    description: "Code in `lib/presentation/**` must not hardcode numeric alpha values in `.withValues(...)`; route opacity through theme-driven semantic color accessors instead."
+    message_code: presentation_raw_alpha_with_values
+    severity: error
+    impact: design_system
+    scope: ui
+    fix_hint_code: use_theme_opacity_in_presentation
+    params:
+      check_id: ui_raw_alpha_with_values
+      alpha_pattern: "\\.withValues\\s*\\([^)]*\\balpha\\s*:\\s*(?P<value>(?:0?\\.\\d+|1(?:\\.0+)?|0))\\b[^)]*\\)"
+
+  - id: ui_raw_radius_literals
+    type: forbidden_pattern
+    name: "UI Raw Radius Literals"
+    description: "Feature UI code should prefer named shared radius constants over raw numeric radius literals."
+    message_code: ui_raw_radius_literals
+    severity: error
+    impact: design_system
+    scope: feature_ui
+    fix_hint_code: use_radius_tokens_for_border_radius
+    params:
+      patterns:
+        - "\\bBorderRadius\\.circular\\(\\s*\\d+(?:\\.\\d+)?\\s*\\)"
+        - "\\bRadius\\.circular\\(\\s*\\d+(?:\\.\\d+)?\\s*\\)"
+
+  - id: child_widget_media_query_layout
+    type: forbidden_pattern
+    name: "Child Widget MediaQuery Layout"
+    description: "Child widgets must not read `MediaQuery.of(context).size` or `MediaQuery.sizeOf(context)` directly for layout decisions. Keep screen-wide size ownership in root page layouts, app shell, dialogs, sheets, or overlays."
+    message_code: child_widget_media_query_layout
+    severity: warning
+    impact: architecture
+    scope: child_widget_layout_files
+    fix_hint_code: move_media_query_layout_to_root_surface
+    params:
+      patterns:
+        - "\\bMediaQuery\\.of\\(context\\)\\.size\\b"
+        - "\\bMediaQuery\\.sizeOf\\(context\\)\\b"
+
+  - id: child_widget_screen_width_layout
+    type: forbidden_pattern
+    name: "Child Widget Screen Width Layout"
+    description: "Child widgets must not read `MediaQuery.of(context).size.width` or `MediaQuery.sizeOf(context).width` to derive local layout widths. Drive child layout from local constraints, `LayoutBuilder`, or responsive helpers instead."
+    message_code: child_widget_screen_width_layout
+    severity: error
+    impact: architecture
+    scope: child_widget_screen_width_files
+    fix_hint_code: move_width_calculation_to_local_constraints
+    params:
+      patterns:
+        - "\\bMediaQuery\\.of\\(context\\)\\.size\\.width\\b"
+        - "\\bMediaQuery\\.sizeOf\\(context\\)\\.width\\b"
+
+  - id: child_widget_responsive_threshold
+    type: ast_check
+    name: "Child Widget Responsive Threshold"
+    description: "Child widgets should not compare screen width against raw numeric thresholds such as 360, 480, or 600. Use `ScreenType`, `Breakpoints.*`, or local `constraints.maxWidth` checks inside `LayoutBuilder` instead."
+    message_code: child_widget_responsive_threshold
+    severity: warning
+    impact: architecture
+    scope: child_widget_layout_files
+    fix_hint_code: use_breakpoints_or_local_constraints
+    params:
+      check_id: ui_child_screen_width_threshold
+      numeric_threshold_pattern: "\\d+(?:\\.\\d+)?"
+      direct_width_expressions:
+        - "context.screenWidth"
+        - "MediaQuery.of(context).size.width"
+        - "MediaQuery.sizeOf(context).width"
+
+  - id: child_widget_local_responsive_constants
+    type: forbidden_pattern
+    name: "Child Widget Local Responsive Constants"
+    description: "Child widgets should not declare local responsive sizing constants such as min/max width, min/max height, thresholds, or column counts. Move shared layout sizing into `ResponsiveRules`, tokens, or a parent-owned responsive contract instead."
+    message_code: child_widget_local_responsive_constants
+    severity: warning
+    impact: architecture
+    scope: child_widget_layout_files
+    fix_hint_code: move_responsive_constant_to_system_rule
+    params:
+      patterns:
+        - "(?:^|\\s)(?:static\\s+)?const\\s+(?:double|int)\\s+_[A-Za-z0-9_]*(?:Threshold|MinWidth|MaxWidth|MinHeight|MaxHeight|Breakpoint|Columns)\\s*=\\s*\\d"
+
+  - id: child_widget_screen_type_direct_usage
+    type: forbidden_pattern
+    name: "Child Widget ScreenType Direct Usage"
+    description: "Child widgets should not call `ScreenType.of(context)` directly. Keep direct screen-type branching inside responsive core helpers, shared layouts, or root screens, and let widgets consume `context.screenType`, parent-owned parameters, or local constraints instead."
+    message_code: child_widget_screen_type_direct_usage
+    severity: warning
+    impact: architecture
+    scope: child_widget_layout_files
+    fix_hint_code: prefer_context_screen_type_or_parent_constraint
+    params:
+      patterns:
+        - "\\bScreenType\\.of\\(context\\)\\b"
+        - "\\bScreenType\\.of\\(this\\)\\b"
+
+  - id: child_widget_remaining_width_layout_signal
+    type: ast_check
+    name: "Child Widget Remaining Width Layout Signal"
+    description: "Child widgets that split columns, card groups, detail rows, or grid items by the remaining width should make that contract explicit with `LayoutBuilder` and `constraints.maxWidth`."
+    message_code: child_widget_remaining_width_layout_signal
+    severity: warning
+    impact: architecture
+    scope: child_widget_layout_files
+    fix_hint_code: use_layout_builder_for_remaining_width_layout
+    params:
+      check_id: ui_child_remaining_width_layout_signal
+      required_patterns:
+        - "\\bLayoutBuilder\\b"
+        - "\\bconstraints\\.maxWidth\\b"
+      structural_patterns:
+        - "\\bWrap\\s*\\("
+        - "\\bRow\\s*\\("
+        - "\\bGridView(?:\\.[A-Za-z]+)?\\s*\\("
+        - "\\bSliverGrid\\b"
+      width_signal_patterns:
+        - "\\bitemWidth\\b"
+        - "\\bcrossAxisCount\\b"
+        - "\\bchildAspectRatio\\b"
+        - "\\b(?:card|cell|column|detail|item|tile)[A-Za-z0-9_]*Width\\b"
+      parent_responsive_input_patterns:
+        - "\\bfinal\\s+bool\\s+(?:isSmallScreen|isCompact|isMedium|isExpanded)\\s*;"
+        - "\\bfinal\\s+ScreenType\\s+screenType\\s*;"
+      local_width_contract_patterns:
+        - "\\bitemWidth\\b"
+        - "\\b(?:card|cell|column|detail|item|tile)[A-Za-z0-9_]*Width\\b"
+      min_structural_matches: 1
+      min_width_signal_matches: 1
+
+  - id: large_layout_responsive_signal
+    type: ast_check
+    name: "Large Layout Responsive Signal"
+    description: "Large `*_screen.dart`, `*_page.dart`, or `*_view.dart` files should expose at least one clear responsive signal such as `LayoutBuilder`, `screenType`, `constraints.maxWidth`, `Responsive`, `Wrap(...)`, or `SliverGridDelegateWithMaxCrossAxisExtent`."
+    message_code: large_layout_responsive_signal
+    severity: info
+    impact: design_system
+    scope: large_layout_candidate_files
+    fix_hint_code: add_responsive_signal_to_large_layout
+    params:
+      check_id: large_layout_responsive_signal
+      min_significant_lines: 120
+      required_patterns:
+        - "\\bLayoutBuilder\\b"
+        - "\\bscreenType\\b"
+        - "\\bconstraints\\.maxWidth\\b"
+        - "\\bResponsive\\b"
+        - "\\bSliverGridDelegateWithMaxCrossAxisExtent\\b"
+        - "\\bWrap\\s*\\("
+
+  - id: widget_watch_select_opportunity
+    type: ast_check
+    name: "Widget Watch Select Opportunity"
+    description: "If widget render code watches an object and then only reads one field from that local value, prefer `select(...)` to reduce rebuild scope."
+    message_code: widget_watch_select_opportunity
+    severity: warning
+    impact: performance
+    scope: widget_ui_files
+    fix_hint_code: prefer_select_for_single_field_watch
+    params:
+      check_id: ui_watch_select_opportunity
+      render_method_pattern: "\\b(?:Widget|PreferredSizeWidget)\\s+(?:_?build\\w*|build)\\s*\\("
+      assignment_pattern: "\\b(?:final|var|const)\\s+(?P<var_name>[A-Za-z_][A-Za-z0-9_]*)\\s*=\\s*ref\\.watch\\(\\s*(?P<provider_expr>[^;]+?)\\s*\\)\\s*;"
+      ignored_provider_pattern: "\\.select\\s*\\(|\\.notifier\\b"
+
+  - id: widget_try_catch_overuse
+    type: ast_check
+    name: "Widget Try Catch Overuse"
+    description: "Widget files must not accumulate multiple try/catch blocks; move business flow and error orchestration into notifiers or use cases."
+    message_code: widget_try_catch_overuse
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: extract_widget_logic_to_provider
+    params:
+      check_id: ui_try_count
+      max_count: 1
+
+  - id: widget_async_callback_awaits
+    type: ast_check
+    name: "Widget Async Callback Awaits"
+    description: "UI callbacks should not perform multiple awaited steps inline; delegate the flow to a helper, notifier, or use case."
+    message_code: widget_async_callback_awaits
+    severity: warning
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: extract_widget_logic_to_provider
+    params:
+      check_id: ui_async_callback_await_count
+      max_awaits: 1
+      lookahead_lines: 4
+      callback_names:
+        - onPressed
+        - onTap
+        - onRefresh
+        - onRetry
+        - onAction
+        - onConfirm
+        - onDelete
+        - onSelected
+
+  - id: widget_build_collection_chain
+    type: ast_check
+    name: "Widget Build Collection Chain"
+    description: "Dense collection-transformation chains inside render methods should move to provider state, helper presenters, or use cases."
+    message_code: widget_build_collection_chain
+    severity: warning
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: extract_widget_logic_to_provider
+    params:
+      check_id: ui_build_collection_chain
+      max_operations: 3
+      max_span_chars: 120
+      operation_pattern: "\\.(?:map|where|fold|groupBy|expand|reduce|sort)\\s*\\("
+
+  - id: widget_build_collection_processing_lines
+    type: ast_check
+    name: "Widget Build Collection Processing Lines"
+    description: "Render methods should not spend many lines doing collection processing such as sort, group, filter, or fold; move the work into derived providers or presenter helpers."
+    message_code: widget_build_collection_processing_lines
+    severity: warning
+    impact: performance
+    scope: widget_ui_files
+    fix_hint_code: extract_widget_logic_to_provider
+    params:
+      check_id: ui_build_collection_processing_lines
+      render_method_pattern: "\\b(?:Widget|PreferredSizeWidget)\\s+(?:_?build\\w*|build)\\s*\\("
+      collection_line_pattern: "\\.(?:map|where|fold|groupBy|expand|reduce|sort)\\s*\\("
+      max_lines: 4
+
+  - id: stateful_widget_helper_method_length
+    type: required_in_class
+    name: "Stateful Widget Helper Method Length"
+    description: "Large private helper methods in stateful widgets usually indicate UI-owned business logic and should be split or moved out of the widget."
+    message_code: widget_helper_method_length
+    severity: info
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: split_widget_helper_method
+    params:
+      class_pattern: "class\\s+_\\w+State\\s+extends\\s+(?:ConsumerState<\\w+>|State<\\w+>)"
+      method_pattern: "^\\s*(?:Future(?:<[^>]+>)?|void|bool|int|double|String|Widget|PreferredSizeWidget|Result<[^>]+>|(?:List|Map|Set)<[^>]+>)\\s+_[A-Za-z0-9_]+\\s*\\("
+      max_lines: 140
+
+  - id: stateless_widget_helper_method_length
+    type: required_in_class
+    name: "Stateless Widget Helper Method Length"
+    description: "Large private helper methods in stateless widgets usually indicate UI-owned business logic and should be split or moved out of the widget."
+    message_code: widget_helper_method_length
+    severity: info
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: split_widget_helper_method
+    params:
+      class_pattern: "class\\s+\\w+\\s+extends\\s+(?:ConsumerWidget|StatelessWidget)"
+      method_pattern: "^\\s*(?:Future(?:<[^>]+>)?|void|bool|int|double|String|Widget|PreferredSizeWidget|Result<[^>]+>|(?:List|Map|Set)<[^>]+>)\\s+_[A-Za-z0-9_]+\\s*\\("
+      max_lines: 140
+
+  - id: provider_test_raw_container
+    type: forbidden_pattern
+    name: "Provider Test Raw Container"
+    description: "Provider tests should use ProviderContainer.test() so disposal is handled by the test framework."
+    message_code: provider_test_raw_container
+    severity: error
+    impact: testing
+    scope: provider_tests
+    fix_hint_code: use_provider_container_test
+    params:
+      patterns:
+        - "\\bProviderContainer\\s*\\("
+
+  - id: router_redirect_purity
+    type: ast_check
+    name: "Router Redirect Purity"
+    description: "GoRouter `redirect:` blocks must stay lightweight and pure; do not await, touch repository providers, read notifiers, or call network clients there."
+    message_code: router_redirect_purity
+    severity: error
+    impact: architecture
+    scope: router
+    fix_hint_code: keep_redirect_pure
+    params:
+      check_id: router_redirect_purity
+      redirect_pattern: "\\bredirect\\s*:\\s*\\([^)]*\\)\\s*\\{"
+      disallowed_pattern: "\\bawait\\b|\\.notifier\\b|\\w+RepositoryProvider\\b|\\brepo\\.[A-Za-z_][A-Za-z0-9_]*\\b|\\bdio\\.[A-Za-z_][A-Za-z0-9_]*\\b|\\bhttp\\.[A-Za-z_][A-Za-z0-9_]*\\b|\\bDio\\s*\\(|\\bClient\\s*\\("

@@ -1,0 +1,252 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../core/errors/error_mapper.dart';
+import '../../core/errors/failures.dart';
+import '../../presentation/features/folders/screens/folder_detail_screen.dart';
+import '../../presentation/features/folders/screens/library_overview_screen.dart';
+import '../app_shell.dart';
+import '../di/providers.dart';
+import 'route_guards.dart';
+import 'route_names.dart';
+
+part 'app_router.g.dart';
+
+@Riverpod(keepAlive: true)
+GoRouter appRouter(Ref ref) {
+  final config = ref.watch(appConfigProvider);
+  final guards = ref.watch(appRouteGuardsProvider);
+
+  return GoRouter(
+    initialLocation: guards.initialLocation,
+    debugLogDiagnostics: config.enableRouterDiagnostics,
+    routes: [
+      GoRoute(
+        path: '/',
+        redirect: guards.rootRedirect,
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return AppShell(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RoutePaths.home,
+                name: RouteNames.home,
+                pageBuilder: (context, state) {
+                  final l10n = AppLocalizations.of(context);
+                  return NoTransitionPage(
+                    child: _ShellPlaceholderView(
+                      title: l10n.homeTitle,
+                      description: l10n.appShellHomePlaceholderDescription,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RoutePaths.library,
+                name: RouteNames.library,
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: LibraryOverviewView(),
+                ),
+                routes: [
+                  GoRoute(
+                    path: RoutePaths.folderDetailSegment,
+                    name: RouteNames.folderDetail,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: FolderDetailScreen(
+                        folderId:
+                            state.pathParameters[RoutePaths.folderIdParam]!,
+                        key: ValueKey(
+                          state.pathParameters[RoutePaths.folderIdParam],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RoutePaths.progress,
+                name: RouteNames.progress,
+                pageBuilder: (context, state) {
+                  final l10n = AppLocalizations.of(context);
+                  return NoTransitionPage(
+                    child: _ShellPlaceholderView(
+                      title: l10n.progressTitle,
+                      description: l10n.appShellProgressPlaceholderDescription,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: RoutePaths.settings,
+                name: RouteNames.settings,
+                pageBuilder: (context, state) {
+                  final l10n = AppLocalizations.of(context);
+                  return NoTransitionPage(
+                    child: _ShellPlaceholderView(
+                      title: l10n.settingsTitle,
+                      description: l10n.appShellSettingsPlaceholderDescription,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+    errorBuilder: (context, state) {
+      final failure = ErrorMapper.map(state.error);
+      return _RouterErrorView(
+        failure: failure,
+        showTechnicalDetails: config.exposeInternalErrorDetails,
+      );
+    },
+  );
+}
+
+class _ShellPlaceholderView extends StatelessWidget {
+  const _ShellPlaceholderView({
+    required this.title,
+    required this.description,
+  });
+
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: textTheme.headlineSmall?.copyWith(
+                  color: scheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                description,
+                style: textTheme.bodyLarge?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RouterErrorView extends StatelessWidget {
+  const _RouterErrorView({
+    required this.failure,
+    required this.showTechnicalDetails,
+  });
+
+  final AppFailure failure;
+  final bool showTechnicalDetails;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final technicalDetail = failure.technicalDetails;
+    final message = _localizedMessage(l10n);
+
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 40,
+                  color: scheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.appRouterErrorTitle,
+                  style: textTheme.headlineSmall?.copyWith(
+                    color: scheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  message,
+                  style: textTheme.bodyLarge?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (showTechnicalDetails && technicalDetail != null) ...[
+                  const SizedBox(height: 16),
+                  SelectableText(
+                    technicalDetail,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _localizedMessage(AppLocalizations l10n) {
+    return switch (failure.code) {
+      FailureCodes.invalidAppEnvironment => l10n.errorConfiguration,
+      FailureCodes.requestTimedOut => l10n.errorRequestTimedOut,
+      FailureCodes.invalidData => l10n.errorInvalidData,
+      FailureCodes.unsupportedAction => l10n.errorUnsupportedAction,
+      FailureCodes.unknown => l10n.errorUnexpected,
+      _ => switch (failure.type) {
+          FailureType.configuration => l10n.errorConfiguration,
+          FailureType.validation => l10n.errorInvalidData,
+          FailureType.network => l10n.errorNetwork,
+          FailureType.storage => l10n.errorStorage,
+          FailureType.notFound => l10n.errorNotFound,
+          FailureType.unknown => l10n.errorUnexpected,
+        },
+    };
+  }
+}

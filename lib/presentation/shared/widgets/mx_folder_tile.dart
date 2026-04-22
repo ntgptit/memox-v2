@@ -1,0 +1,121 @@
+import 'package:flutter/material.dart';
+
+import '../../../core/theme/app_icon_sizes.dart';
+import '../../../core/theme/app_radius.dart';
+import '../../../core/theme/app_spacing.dart';
+import 'mx_progress_ring.dart';
+
+/// Calm, low-chrome folder row for library listings.
+///
+/// Layout: rounded-square tonal icon tile, title + caption, optional trailing
+/// mastery ring. No card, no shadow, no explicit border — relies on an
+/// indented divider between rows for separation.
+///
+/// Sizing tokens are intentional:
+/// - tile 48×48, icon 24 → readable on compact + expanded tiers.
+/// - vertical padding `md` (12) + min row height 64 → comfortable tap target
+///   and stops the mastery ring from crowding the caption.
+class MxFolderTile extends StatelessWidget {
+  const MxFolderTile({
+    required this.name,
+    required this.icon,
+    this.caption,
+    this.masteryPercent,
+    this.tileColor,
+    this.iconColor,
+    this.onTap,
+    super.key,
+  });
+
+  /// guard:raw-size-reviewed minimum row height keeps tap target ≥ 48 dp even
+  /// when caption is absent; not a theme token because it is row-geometry.
+  static const double _minRowHeight = 64;
+
+  final String name;
+  final IconData icon;
+
+  /// Single-line secondary line, e.g. `5 decks · 128 items`.
+  final String? caption;
+
+  /// Mastery in `[0, 100]`. `null` hides the trailing ring.
+  final int? masteryPercent;
+
+  /// Tonal container color. Defaults to `colorScheme.primaryContainer`.
+  final Color? tileColor;
+
+  /// Icon color. Defaults to `colorScheme.onPrimaryContainer`.
+  final Color? iconColor;
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final row = ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: _minRowHeight),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: AppIconSizes.xxxl,
+              height: AppIconSizes.xxxl,
+              decoration: BoxDecoration(
+                color: tileColor ?? scheme.primaryContainer,
+                borderRadius: AppRadius.borderMd,
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                icon,
+                size: AppIconSizes.lg,
+                color: iconColor ?? scheme.onPrimaryContainer,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    name,
+                    style: textTheme.titleSmall
+                        ?.copyWith(color: scheme.onSurface),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (caption != null) ...[
+                    const SizedBox(height: AppSpacing.xxs),
+                    Text(
+                      caption!,
+                      style: textTheme.bodySmall
+                          ?.copyWith(color: scheme.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (masteryPercent != null) ...[
+              const SizedBox(width: AppSpacing.md),
+              MxProgressRing(value: masteryPercent! / 100),
+            ],
+          ],
+        ),
+      ),
+    );
+
+    if (onTap == null) return row;
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(onTap: onTap, child: row),
+    );
+  }
+}

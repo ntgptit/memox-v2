@@ -1,0 +1,640 @@
+family: architecture
+
+rules:
+  - id: import_direction
+    type: import_direction
+    name: "Layer Import Direction"
+    description: "Keep layer dependencies flowing inward; presentation must not depend on data implementations, and domain must stay isolated from app, data, and presentation."
+    message_code: layer_import_violation
+    severity: critical
+    impact: architecture
+    scope: all
+    suggestion: "Depend on domain contracts or move the code to the owning layer."
+    params:
+      layer_detection_pattern: "lib/(data|domain|presentation)/"
+      forbidden_imports:
+        presentation: ["data"]
+        domain: ["app", "data", "presentation"]
+        data: ["app", "presentation"]
+
+  - id: core_di_no_ui_imports
+    type: forbidden_pattern
+    name: "Core DI No UI Imports"
+    description: "`lib/core/di/*` should wire infrastructure only and must not depend on app-level or presentation modules."
+    message_code: core_di_ui_import
+    severity: error
+    impact: architecture
+    scope: core_di
+    fix_hint_code: keep_di_infrastructure_only
+    params:
+      patterns:
+        - "import\\s+'package:memox/(app|presentation)/"
+
+  - id: core_di_no_state_notifiers
+    type: forbidden_pattern
+    name: "Core DI No Stateful Notifiers"
+    description: "`lib/core/di/*` must not define feature state or generated Riverpod notifier classes."
+    message_code: core_di_state_leak
+    severity: error
+    impact: architecture
+    scope: core_di
+    fix_hint_code: move_to_feature_or_app_provider
+    params:
+      patterns:
+        - "class\\s+\\w+\\s+extends\\s+_\\$\\w+"
+
+  - id: core_di_barrel_exports
+    type: required_pattern
+    name: "Core DI Barrel Exports"
+    description: "`lib/core/di/providers.dart` should remain a DI barrel for core, repository, and service providers."
+    message_code: missing_core_di_export
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/core/di/providers.dart"
+    params:
+      patterns:
+        - "export 'core_providers\\.dart';"
+        - "export 'repository_providers\\.dart';"
+        - "export 'service_providers\\.dart';"
+
+  - id: app_providers_no_presentation_imports
+    type: forbidden_pattern
+    name: "App Providers No Presentation Imports"
+    description: "`lib/app/providers/*` must stay at app-bootstrap level and not depend directly on feature presentation code."
+    message_code: app_provider_ui_import
+    severity: error
+    impact: architecture
+    scope: app_providers
+    fix_hint_code: keep_app_providers_app_level
+    params:
+      patterns:
+        - "import\\s+'package:memox/presentation/"
+
+  - id: ui_direct_dependency_creation
+    type: forbidden_pattern
+    name: "UI Direct Dependency Creation"
+    description: "Widget and app layout files must not instantiate infrastructure dependencies directly; wire them through provider injection."
+    message_code: ui_direct_dependency_creation
+    severity: error
+    impact: architecture
+    scope: widget_ui_files
+    fix_hint_code: inject_dependency_via_provider
+    params:
+      patterns:
+        - "\\bDio\\s*\\("
+        - "\\b(?:http\\.)?Client\\s*\\("
+        - "\\b[A-Z]\\w*RepositoryImpl\\s*\\("
+        - "\\b[A-Z]\\w*Database\\s*\\("
+        - "SharedPreferences\\.getInstance\\s*\\("
+
+  - id: notifier_direct_dependency_creation
+    type: forbidden_pattern
+    name: "Notifier Direct Dependency Creation"
+    description: "Feature notifier and viewmodel files must not instantiate infrastructure dependencies directly; read injected dependencies from providers instead."
+    message_code: notifier_direct_dependency_creation
+    severity: error
+    impact: architecture
+    scope: viewmodel_files
+    fix_hint_code: inject_dependency_via_provider
+    params:
+      patterns:
+        - "\\bDio\\s*\\("
+        - "\\b(?:http\\.)?Client\\s*\\("
+        - "\\b[A-Z]\\w*RepositoryImpl\\s*\\("
+        - "\\b[A-Z]\\w*Database\\s*\\("
+        - "SharedPreferences\\.getInstance\\s*\\("
+
+  - id: feature_provider_direct_infrastructure_access
+    type: forbidden_pattern
+    name: "Feature Provider Direct Infrastructure Access"
+    description: "Feature provider/viewmodel files must not talk directly to repository, storage, reminder, device-settings, daily-task-checker, or event-bus providers. Route those dependencies through a use case or facade boundary."
+    message_code: feature_provider_direct_infrastructure_access
+    severity: error
+    impact: architecture
+    scope: viewmodel_files
+    fix_hint_code: use_usecase_or_facade_boundary
+    params:
+      patterns:
+        - "ref\\.(?:read|watch)\\s*\\(\\s*\\w+RepositoryProvider\\b"
+        - "ref\\.(?:read|watch)\\s*\\(\\s*(?:storageServiceProvider|reminderServiceProvider|deviceSettingsServiceProvider|dailyTaskCheckerProvider|eventBusProvider)\\b"
+
+  - id: use_case_direct_dependency_creation
+    type: forbidden_pattern
+    name: "Use Case Direct Dependency Creation"
+    description: "Domain use cases must not instantiate infrastructure dependencies directly; they should receive contracts through constructor or provider injection."
+    message_code: use_case_direct_dependency_creation
+    severity: error
+    impact: architecture
+    scope: domain_usecases
+    fix_hint_code: inject_dependency_via_provider
+    params:
+      patterns:
+        - "\\bDio\\s*\\("
+        - "\\b(?:http\\.)?Client\\s*\\("
+        - "\\b[A-Z]\\w*RepositoryImpl\\s*\\("
+        - "\\b[A-Z]\\w*Database\\s*\\("
+        - "SharedPreferences\\.getInstance\\s*\\("
+
+  - id: app_providers_barrel_exports
+    type: required_pattern
+    name: "App Providers Barrel Exports"
+    description: "`lib/app/providers/app_providers.dart` should export session and theme app-level providers."
+    message_code: missing_app_provider_export
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/app/providers/app_providers.dart"
+    params:
+      patterns:
+        - "export 'session_providers\\.dart';"
+        - "export 'theme_providers\\.dart';"
+
+  - id: router_provider_contract
+    type: required_pattern
+    name: "Router Provider Contract"
+    description: "`lib/core/routes/router.dart` must remain the app router provider entrypoint."
+    message_code: missing_router_contract
+    severity: critical
+    impact: architecture
+    scope: router
+    params:
+      patterns:
+        - "@riverpod"
+        - "GoRouter\\s+router\\s*\\(Ref\\s+ref\\)"
+
+  - id: theme_repetition_semantic_colors
+    type: required_pattern
+    name: "Theme Repetition Semantic Colors"
+    description: "`theme_extensions.dart` must map repetition colors through semantic custom-color roles instead of rotating a raw seed palette list."
+    message_code: theme_repetition_semantic_colors
+    severity: error
+    impact: design_system
+    scope: all
+    targets:
+      - "lib/core/theme/theme_extensions.dart"
+    fix_hint_code: use_semantic_repetition_color_roles
+    params:
+      patterns:
+        - "Color\\s+getRepetitionColor\\(\\s*RepetitionOrder\\s+repetitionOrder"
+        - "enum\\s+RepetitionColorRole"
+        - "repetitionOrder\\.repetitionColorRole"
+        - "customColors\\.repetitionColor\\("
+
+  - id: feature_theme_token_imports
+    type: structural_check
+    name: "Feature Theme Token Imports"
+    description: "Feature-layer source must not import `theme_tokens.dart` or any raw file under `core/theme/tokens/`; consume UI values through theme/context accessors or shared widgets instead."
+    message_code: feature_theme_token_imports
+    severity: error
+    impact: design_system
+    scope: features
+    fix_hint_code: use_theme_accessors_in_features
+    params:
+      check_id: forbidden_import_paths
+      forbidden_import_paths:
+        - "core/theme/theme_tokens.dart"
+        - "core/theme/tokens/"
+
+  - id: theme_semantic_palette_contract
+    type: ast_check
+    name: "Theme Semantic Palette Contract"
+    description: "Preset-aware semantic colors must derive from the active `ColorScheme` or a complete preset palette, not from fixed semantic token constants or static light/dark tables."
+    message_code: theme_semantic_palette_contract
+    severity: error
+    impact: design_system
+    scope: theme_sources
+    fix_hint_code: derive_semantic_palette_from_scheme
+    targets:
+      - "lib/core/theme/app_theme.dart"
+      - "lib/core/theme/color_schemes/custom_colors.dart"
+      - "lib/core/theme/tokens/color_tokens.dart"
+    params:
+      check_id: theme_semantic_palette_contract
+      semantic_roles:
+        - "statusNew"
+        - "statusLearning"
+        - "statusReviewing"
+        - "statusMastered"
+        - "ratingAgain"
+        - "ratingHard"
+        - "ratingGood"
+        - "ratingEasy"
+        - "selfMissed"
+        - "selfPartial"
+        - "selfGotIt"
+        - "masteryLow"
+        - "masteryMid"
+        - "masteryHigh"
+        - "repetitionFirst"
+        - "repetitionSecond"
+        - "repetitionThird"
+        - "repetitionAdvanced"
+        - "repetitionExpert"
+
+  - id: theme_domain_coupling
+    type: forbidden_pattern
+    name: "Theme Domain Coupling"
+    description: "`lib/core/theme/**` must stay design-system-only. Do not import domain or make theme APIs depend directly on domain entities/enums; map domain state to presentation UI roles before calling theme."
+    message_code: theme_domain_coupling
+    severity: error
+    impact: architecture
+    scope: theme_sources
+    fix_hint_code: move_domain_to_ui_role_mapper
+    params:
+      patterns:
+        - "import\\s+'package:memox/domain/"
+        - "\\bRepetitionOrder\\b"
+        - "\\bCycleStudied\\b"
+      skip_comments: true
+
+  - id: theme_typography_contract
+    type: ast_check
+    name: "Theme Typography Contract"
+    description: "Keep `TextTheme` as the typography foundation. `AppTextStyles` must derive from `TextTheme` instead of constructing a second independent font system, and token-layer global downshifts must stay off by default."
+    message_code: theme_typography_contract
+    severity: error
+    impact: design_system
+    scope: theme_sources
+    fix_hint_code: derive_app_text_styles_from_text_theme
+    targets:
+      - "lib/core/theme/app_theme.dart"
+      - "lib/core/theme/text_themes/custom_text_styles.dart"
+      - "lib/core/theme/tokens/typography_tokens.dart"
+    params:
+      check_id: theme_typography_contract
+      max_global_step_reduction: 0
+
+  - id: screen_file_naming
+    type: naming_convention
+    name: "Screen File Naming"
+    description: "Files inside feature `screens/` folders must use the `_screen.dart` or `_page.dart` suffix."
+    message_code: screen_file_naming
+    severity: error
+    impact: architecture
+    scope: screens
+    fix_hint_code: rename_screen_file_to_screen_or_page
+    params:
+      level: file
+      pattern: "^[a-z0-9_]+_(?:screen|page)\\.dart$"
+
+  - id: screen_like_file_location
+    type: naming_convention
+    name: "Screen-like File Location"
+    description: "Files with a `_screen.dart` or `_page.dart` suffix must live in feature `screens/` folders or `lib/app/layouts/`."
+    message_code: screen_like_file_location
+    severity: error
+    impact: architecture
+    scope: screen_like_files
+    fix_hint_code: move_screen_like_file_to_screen_bucket
+    params:
+      level: path
+      pattern: "^lib/(?:(?:presentation/features/[^/]+/screens)|(?:app/layouts))/[a-z0-9_]+_(?:screen|page)\\.dart$"
+
+  - id: route_like_file_location
+    type: naming_convention
+    name: "Route-like File Location"
+    description: "Files named `*_route.dart`, `*_routes.dart`, or `router.dart` must live in `lib/core/routes/` or a feature-local `routes/` folder."
+    message_code: route_like_file_location
+    severity: error
+    impact: architecture
+    scope: route_like_files
+    fix_hint_code: move_route_file_to_routes_bucket
+    params:
+      level: path
+      pattern: "^lib/(?:(?:core/routes/(?:router|[a-z0-9_]+_(?:route|routes))\\.dart)|(?:presentation/features/[^/]+/routes/[a-z0-9_]+_(?:route|routes)\\.dart))$"
+
+  - id: provider_like_file_location
+    type: naming_convention
+    name: "Provider-like File Location"
+    description: "Files with provider-style suffixes must live in `app/providers`, `core/di`, or feature `providers/` folders."
+    message_code: provider_like_file_location
+    severity: error
+    impact: architecture
+    scope: provider_like_files
+    fix_hint_code: move_provider_like_file_to_provider_bucket
+    params:
+      level: path
+      pattern: "^lib/(?:(?:app/providers)|(?:core/di)|(?:presentation/features/[^/]+/providers))/[a-z0-9_]+_(?:provider|providers|notifier|notifiers|viewmodel)\\.dart$"
+
+  - id: rogue_top_level_shared_utils_files
+    type: naming_convention
+    name: "Rogue Top-level Shared Utils Files"
+    description: "Do not add new source under `lib/shared/` or `lib/utils/`; move the code into an owned layer such as `core`, `presentation/shared`, or a feature folder."
+    message_code: rogue_top_level_shared_utils_files
+    severity: error
+    impact: architecture
+    scope: rogue_shared_utils_files
+    fix_hint_code: move_code_out_of_top_level_shared_utils
+    params:
+      level: path
+      pattern: "^$"
+
+  - id: theme_file_no_riverpod
+    type: forbidden_pattern
+    name: "Theme File Has No Providers"
+    description: "`lib/core/theme/app_theme.dart` should contain theme definitions only, not Riverpod providers or notifier classes."
+    message_code: theme_file_contains_provider
+    severity: error
+    impact: architecture
+    scope: theme_file
+    fix_hint_code: move_theme_provider_to_app
+    params:
+      patterns:
+        - "@riverpod"
+        - "@Riverpod"
+        - "class\\s+\\w+\\s+extends\\s+_\\$\\w+"
+
+  - id: no_theme_export_wrappers
+    type: forbidden_pattern
+    name: "No Theme Export Wrappers"
+    description: "`lib/core/theme/**` should not use export-wrapper files; import the real theme source file directly."
+    message_code: theme_wrapper_export
+    severity: error
+    impact: architecture
+    scope: theme_sources
+    fix_hint_code: import_real_theme_source
+    params:
+      patterns:
+        - "^export\\s+"
+
+  - id: shared_widget_file_naming
+    type: naming_convention
+    name: "Shared Widget File Naming"
+    description: "Widget-bearing shared files must use the `sl_*.dart` naming contract."
+    message_code: shared_widget_file_naming
+    severity: error
+    impact: architecture
+    scope: shared_widget_dirs
+    params:
+      level: file
+      pattern: "^sl_[a-z0-9_]+\\.dart$"
+
+  - id: shared_widget_public_type_prefix
+    type: forbidden_pattern
+    name: "Shared Widget Public Type Prefix"
+    description: "Public types in widget-bearing shared files must use the `SL*` prefix."
+    message_code: shared_widget_public_type_prefix
+    severity: error
+    impact: architecture
+    scope: shared_widget_dirs
+    fix_hint_code: prefix_shared_widget_public_types
+    params:
+      patterns:
+        - "^\\s*(?:abstract\\s+final\\s+class|abstract\\s+class|class)\\s+(?!SL|_)[A-Z]\\w*"
+        - "^\\s*enum\\s+(?!SL|_)[A-Z]\\w*"
+        - "^\\s*typedef\\s+(?!SL|_)[A-Z]\\w*"
+
+  - id: shared_widget_no_app_wiring
+    type: forbidden_pattern
+    name: "Shared Widget No App Wiring"
+    description: "Shared widgets must remain provider-free and app-wiring-free."
+    message_code: shared_widget_app_wiring
+    severity: error
+    impact: architecture
+    scope: shared_widget_dirs
+    fix_hint_code: keep_shared_widgets_render_only
+    params:
+      patterns:
+        - "import\\s+'package:flutter_riverpod/flutter_riverpod\\.dart';"
+        - "\\bConsumerWidget\\b"
+        - "\\bConsumerStatefulWidget\\b"
+        - "\\bConsumerState\\b"
+        - "\\bWidgetRef\\b"
+        - "import\\s+'package:memox/app/"
+        - "import\\s+'package:memox/core/routes/"
+        - "import\\s+'package:memox/domain/"
+        - "import\\s+'package:memox/presentation/features/"
+        - "import\\s+'package:go_router/go_router\\.dart';"
+
+  - id: shared_non_widget_dirs_removed
+    type: naming_convention
+    name: "Shared Non-Widget Dirs Removed"
+    description: "`lib/presentation/shared/**` should only contain widget-bearing primitives, composites, and layouts."
+    message_code: shared_non_widget_dirs_removed
+    severity: error
+    impact: architecture
+    scope: shared_non_widget_files
+    fix_hint_code: move_shared_support_out_of_shared
+    params:
+      level: path
+      pattern: "^$"
+
+  - id: shared_layout_magic_numbers
+    type: forbidden_pattern
+    name: "Shared Layout Magic Numbers"
+    description: "Shared layout contracts must not embed raw numeric width caps or variant-specific layout numbers inline. Define a named constant or route the value through `ResponsiveRules`/a preset instead."
+    message_code: shared_layout_magic_numbers
+    severity: error
+    impact: architecture
+    scope: shared_layout_files
+    fix_hint_code: extract_shared_layout_constant
+    params:
+      patterns:
+        - "=>\\s*\\d+(?:\\.\\d+)?\\b"
+        - "\\?\\s*\\d+(?:\\.\\d+)?\\s*:"
+        - "\\?\\s*null\\s*:\\s*\\d+(?:\\.\\d+)?\\b"
+      skip_comments: true
+
+  - id: feature_widget_folder_contract
+    type: naming_convention
+    name: "Feature Widget Folder Contract"
+    description: "Feature widget files must follow the screen-first folder contract under `widgets/<screen_slug>/...` or `widgets/common/...`."
+    message_code: feature_widget_folder_contract
+    severity: error
+    impact: architecture
+    scope: feature_widget_files
+    fix_hint_code: move_feature_widget_to_screen_bucket
+    params:
+      level: path
+      pattern: "^lib/presentation/features/[^/]+/widgets/(?:(?:common|(?!main/|components/|modules/|grammars/)[a-z0-9_]+)(?:/[a-z0-9_]+)*/[a-z0-9_]+\\.dart)$"
+
+  - id: auth_viewmodel_no_session_state
+    type: forbidden_pattern
+    name: "Auth ViewModel No Session State"
+    description: "`auth_viewmodel.dart` should only keep feature-specific presentation state, not app-wide auth/session providers."
+    message_code: auth_viewmodel_contains_session_state
+    severity: error
+    impact: architecture
+    scope: auth_provider
+    fix_hint_code: move_session_provider_to_app
+    params:
+      patterns:
+        - "class\\s+AuthState\\b"
+        - "class\\s+CurrentUser\\b"
+
+  - id: cross_feature_presentation_imports
+    type: structural_check
+    name: "Cross-feature Presentation Imports"
+    description: "Feature source files must not import another feature's screen or widget code directly."
+    message_code: cross_feature_presentation_imports
+    severity: error
+    impact: architecture
+    scope: features
+    fix_hint_code: move_shared_code_or_raise_boundary
+    params:
+      check_id: cross_feature_presentation_imports
+      current_feature_pattern: "^lib/presentation/features/(?P<feature>[a-z0-9_]+)/"
+      import_pattern: "^import\\s+'package:memox/presentation/features/(?P<feature>[a-z0-9_]+)/(?:screens|widgets)/"
+
+  - id: no_legacy_arch_paths
+    type: forbidden_token
+    name: "No Legacy Architecture Paths"
+    description: "Legacy architecture paths should not appear in live code."
+    message_code: legacy_arch_path
+    severity: warning
+    impact: architecture
+    scope: all
+    params:
+      forbidden:
+        - "core/navigation/"
+        - "presentation/viewmodels/"
+      skip_comments: true
+
+  - id: legacy_screen_refresh_registry
+    type: forbidden_pattern
+    name: "Legacy Screen Refresh Registry"
+    description: "Do not reintroduce ScreenRefreshManager or screenRefreshProvider; use explicit notifier refresh methods or targeted provider invalidation instead of callback registries or counter maps."
+    message_code: legacy_screen_refresh_registry
+    severity: error
+    impact: architecture
+    scope: non_legacy_app_source
+    fix_hint_code: use_provider_refresh_invalidation
+    params:
+      patterns:
+        - "\\bScreenRefreshManager\\b"
+        - "\\bscreenRefreshProvider\\b"
+
+  - id: database_migration_contract
+    type: required_pattern
+    name: "Database Migration Contract"
+    description: "`lib/core/database/app_database.dart` must declare an explicit Drift migration strategy with create, upgrade, and open hooks."
+    message_code: database_migration_contract
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/core/database/app_database.dart"
+    params:
+      patterns:
+        - "MigrationStrategy\\s+get\\s+migration\\s*=>\\s*MigrationStrategy\\("
+        - "onCreate:"
+        - "onUpgrade:"
+        - "beforeOpen:"
+
+  - id: database_migration_fail_fast
+    type: required_pattern
+    name: "Database Migration Fail Fast"
+    description: "`app_database.dart` must fail fast when a schema upgrade path is not implemented."
+    message_code: database_migration_fail_fast
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/core/database/app_database.dart"
+    params:
+      patterns:
+        - "AppDatabaseMigrationGuard"
+        - "DatabaseMigrationException"
+
+  - id: progress_repository_transaction_contract
+    type: required_pattern
+    name: "Progress Repository Transaction Contract"
+    description: "Multi-step local progress writes must run through the transaction helper."
+    message_code: progress_repository_transaction_contract
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/data/repositories/local/local_progress_repository.dart"
+    params:
+      patterns:
+        - "guardLocalRepositoryTransaction<"
+
+  - id: repetition_repository_transaction_contract
+    type: required_pattern
+    name: "Repetition Repository Transaction Contract"
+    description: "Multi-step local repetition writes must run through the transaction helper."
+    message_code: repetition_repository_transaction_contract
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/data/repositories/local/local_repetition_repository.dart"
+    params:
+      patterns:
+        - "guardLocalRepositoryTransaction<"
+
+  - id: repository_no_unnamed_catch
+    type: forbidden_pattern
+    name: "Repository No Unnamed Catch"
+    description: "Repository code must not use unnamed catch bindings such as `catch (_)`, because they hide the real failure source."
+    message_code: repository_no_unnamed_catch
+    severity: error
+    impact: architecture
+    scope: repository_files
+    fix_hint_code: map_repository_error_explicitly
+    params:
+      patterns:
+        - "\\bcatch\\s*\\(_\\)"
+
+  - id: repository_try_catch_boundary
+    type: forbidden_pattern
+    name: "Repository Try Catch Boundary"
+    description: "Repository implementations should not handle errors inline; route datasource failures through the shared repository support boundary."
+    message_code: repository_try_catch_boundary
+    severity: error
+    impact: architecture
+    scope: repository_impl_files
+    fix_hint_code: use_repository_support_boundary
+    params:
+      patterns:
+        - "\\bcatch\\s*\\("
+
+  - id: repository_low_level_exception_surface
+    type: forbidden_pattern
+    name: "Repository Low-level Exception Surface"
+    description: "Repository implementations must not depend on low-level local or remote exception types directly."
+    message_code: repository_low_level_exception_surface
+    severity: error
+    impact: architecture
+    scope: repository_impl_files
+    fix_hint_code: use_repository_support_boundary
+    params:
+      patterns:
+        - "\\bSqliteException\\b"
+        - "\\bDriftWrappedException\\b"
+        - "\\bDioException\\b"
+        - "\\bSocketException\\b"
+
+  - id: local_repository_guard_contract
+    type: required_any_token
+    name: "Local Repository Guard Contract"
+    description: "Local repository implementations must enter through the local repository guard helper so datasource failures are normalized consistently."
+    message_code: local_repository_guard_contract
+    severity: error
+    impact: architecture
+    scope: local_repository_impl_files
+    fix_hint_code: use_local_repository_guard
+    params:
+      required_any:
+        - "guardLocalRepositoryCall<"
+        - "guardLocalRepositoryTransaction<"
+
+  - id: local_repository_support_contract
+    type: required_pattern
+    name: "Local Repository Support Contract"
+    description: "`local_repository_support.dart` must keep the local datasource mapping boundary and tag failures as local repository errors."
+    message_code: local_repository_support_contract
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/data/repositories/local/local_repository_support.dart"
+    params:
+      patterns:
+        - "mapLocalRepositoryError"
+        - "LocalDataSourceException"
+        - "'repositorySource': 'local'"
