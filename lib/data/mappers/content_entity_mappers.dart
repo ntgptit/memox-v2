@@ -1,7 +1,7 @@
-import '../../domain\entities\deck_entity.dart';
-import '../../domain\entities\flashcard_entity.dart';
-import '../../domain\entities\folder_entity.dart';
-import '../../domain\value_objects\content_read_models.dart';
+import '../../domain/entities/deck_entity.dart';
+import '../../domain/entities/flashcard_entity.dart';
+import '../../domain/entities/folder_entity.dart';
+import '../../domain/value_objects/content_read_models.dart';
 import '../datasources/local/app_database.dart';
 import 'database_enum_codecs.dart';
 

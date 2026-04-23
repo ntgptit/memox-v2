@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_opacity.dart';
+import '../app_typography.dart';
 import 'focus_theme.dart';
 
 /// Form-control surfaces: switch, checkbox, radio, slider.
@@ -67,8 +68,9 @@ abstract final class ToggleThemeBuilder {
       overlayColor:
           scheme.primary.withValues(alpha: AppFocus.focusOpacity),
       valueIndicatorColor: scheme.inverseSurface,
-      valueIndicatorTextStyle:
-          TextStyle(color: scheme.onInverseSurface, fontSize: 12),
+      valueIndicatorTextStyle: AppTypography.bodySmall.copyWith(
+        color: scheme.onInverseSurface,
+      ),
       trackHeight: 4,
     );
   }

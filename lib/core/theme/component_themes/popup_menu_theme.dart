@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_radius.dart';
+import '../app_typography.dart';
 
 abstract final class PopupMenuThemeBuilder {
   static PopupMenuThemeData build(ColorScheme scheme) {
@@ -9,7 +10,7 @@ abstract final class PopupMenuThemeBuilder {
       surfaceTintColor: Colors.transparent,
       elevation: 2,
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
-      textStyle: TextStyle(color: scheme.onSurface),
+      textStyle: AppTypography.bodyMedium.copyWith(color: scheme.onSurface),
     );
   }
 

@@ -360,6 +360,20 @@ rules:
       patterns:
         - "\\bSnackBar\\s*\\("
 
+  - id: popup_menu_button_child_forbidden
+    type: forbidden_pattern
+    name: "PopupMenuButton Child Trigger Forbidden"
+    description: "Do not use `PopupMenuButton(child: ...)` on UI surfaces because its internal overlay may not match the child's rounded shape."
+    message_code: popup_menu_button_child_forbidden
+    severity: error
+    impact: design_system
+    scope: ui
+    fix_hint_code: use_menu_anchor_shaped_trigger
+    params:
+      patterns:
+        - "(?s)\\bPopupMenuButton(?:<[^>]+>)?\\s*\\(.*?\\bchild\\s*:"
+      skip_comments: true
+
   - id: snackbar_messenger_usage
     type: forbidden_pattern
     name: "Snack Bar Messenger Usage"

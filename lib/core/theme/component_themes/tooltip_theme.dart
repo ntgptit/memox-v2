@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app_radius.dart';
 import '../app_spacing.dart';
+import '../app_typography.dart';
 
 abstract final class TooltipThemeBuilder {
   static TooltipThemeData build(ColorScheme scheme) {
@@ -10,9 +11,8 @@ abstract final class TooltipThemeBuilder {
         color: scheme.inverseSurface.withValues(alpha: 0.92),
         borderRadius: AppRadius.borderSm,
       ),
-      textStyle: TextStyle(
+      textStyle: AppTypography.bodySmall.copyWith(
         color: scheme.onInverseSurface,
-        fontSize: 12,
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,

@@ -5,9 +5,34 @@
   "commonOk": "Đồng ý",
   "commonCancel": "Hủy",
   "commonCreate": "Tạo",
-  "commonSearch": "Tìm kiếm",
   "commonEdit": "Chỉnh sửa",
   "commonDelete": "Xóa",
+  "commonSort": "Sắp xếp",
+  "commonSave": "Lưu",
+  "commonImport": "Nhập",
+  "commonExport": "Xuất",
+  "commonMove": "Di chuyển",
+  "commonClear": "Xóa chọn",
+  "commonSelectAll": "Chọn tất cả",
+  "commonSaveOrder": "Lưu thứ tự",
+  "commonOverview": "Tổng quan",
+  "commonNever": "Chưa từng",
+  "commonReorder": "Sắp xếp lại",
+  "commonNoValidDestinationFound": "Không có đích hợp lệ.",
+  "commonDefaultOrderUpdated": "Đã cập nhật thứ tự mặc định.",
+  "commonPercentValue": "{value}%",
+  "@commonPercentValue": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "commonSearch": "Tìm kiếm",
+  "sortManual": "Thủ công",
+  "sortName": "Tên",
+  "sortNewest": "Mới nhất",
+  "sortLastStudied": "Học gần nhất",
   "homeTitle": "Trang chủ",
   "libraryTitle": "Thư viện",
   "progressTitle": "Tiến độ",
@@ -32,6 +57,7 @@
   "foldersMoreActionsTooltip": "Thêm thao tác",
   "foldersActionsTitle": "Thao tác thư mục",
   "foldersReorder": "Sắp xếp lại",
+  "foldersReorderManualOnlyHint": "Hãy chuyển sắp xếp về chế độ thủ công để sắp xếp lại.",
   "foldersStatusSubfolders": "Có {subfolderCount} thư mục con",
   "@foldersStatusSubfolders": {
     "placeholders": {
@@ -65,12 +91,38 @@
       }
     }
   },
+  "foldersSubfolderCreatedMessage": "Đã tạo thư mục con.",
+  "foldersRenameTitle": "Đổi tên thư mục",
+  "foldersUpdatedMessage": "Đã cập nhật thư mục.",
+  "foldersMoveTitle": "Di chuyển thư mục",
+  "foldersMoveRootTitle": "Gốc thư viện",
+  "foldersMoveRootSubtitle": "Di chuyển thư mục này về gốc",
+  "foldersMovedMessage": "Đã di chuyển thư mục.",
+  "foldersDeleteTitle": "Xóa thư mục",
+  "foldersDeleteMessage": "Thao tác này sẽ xóa toàn bộ cây con, bao gồm cả bộ thẻ và flashcard.",
+  "foldersDeletedMessage": "Đã xóa thư mục.",
+  "foldersManualReorderWarning": "Chỉ có thể sắp xếp thủ công khi đang ở chế độ sắp xếp thủ công.",
+  "foldersSummaryUnlocked": "Thư mục này đang trống và có thể chứa thư mục con hoặc bộ thẻ.",
+  "foldersEmptyTitle": "Thư mục này đang trống",
+  "foldersEmptyMessage": "Hãy chọn một hướng trước. Một thư mục chỉ có thể chứa thư mục con hoặc bộ thẻ, không thể chứa cả hai.",
   "libraryCreateFolderTooltip": "Tạo thư mục",
+  "libraryCreateFolderDialogTitle": "Tạo thư mục",
+  "libraryFolderCreatedMessage": "Đã tạo thư mục.",
   "libraryDueTodayPrefix": "Bạn có ",
   "libraryDueTodaySuffix": " mục cần học hôm nay",
-  "libraryStudyNow": "Học ngay  \u2192",
-  "libraryFoldersSectionTitle": "THƯ MỤC",
-  "libraryFolderStats": "{deckCount} bộ thẻ · {itemCount} mục",
+  "libraryStudyNow": "Học ngay  →",
+  "libraryFoldersSectionTitle": "Thư mục",
+  "libraryManageFoldersSubtitle": "Quản lý cây thư mục của bạn",
+  "librarySearchResultsSubtitle": "Kết quả tìm kiếm",
+  "libraryHeroDueToday": "Đến hạn hôm nay: {count}",
+  "@libraryHeroDueToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryFolderStats": "{deckCount} bộ thẻ · {itemCount} thẻ",
   "@libraryFolderStats": {
     "placeholders": {
       "deckCount": {
@@ -83,6 +135,128 @@
   },
   "libraryEmptyTitle": "Chưa có thư mục nào",
   "libraryEmptyMessage": "Tạo thư mục đầu tiên để bắt đầu xây dựng thư viện của bạn.",
+  "decksCreateTitle": "Tạo bộ thẻ",
+  "decksNameLabel": "Tên bộ thẻ",
+  "decksNameHint": "ví dụ: Từ vựng cốt lõi",
+  "decksCreatedMessage": "Đã tạo bộ thẻ.",
+  "decksMoreActionsTooltip": "Thêm thao tác",
+  "decksActionsTitle": "Thao tác bộ thẻ",
+  "decksDuplicateAction": "Nhân bản bộ thẻ",
+  "decksExportCsvAction": "Xuất CSV",
+  "decksOverviewSubtitle": "{cardCount} thẻ · {dueToday} thẻ đến hạn hôm nay · {masteryPercent}% thành thạo",
+  "@decksOverviewSubtitle": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueToday": {
+        "type": "int"
+      },
+      "masteryPercent": {
+        "type": "int"
+      }
+    }
+  },
+  "decksLastStudiedLabel": "Học gần nhất: {date}",
+  "@decksLastStudiedLabel": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "decksManageContentTitle": "Quản lý nội dung",
+  "decksManageContentSubtitle": "Mở flashcard, nhập dữ liệu vào bộ thẻ này, hoặc tiếp tục chỉnh sửa nội dung.",
+  "decksRenameTitle": "Đổi tên bộ thẻ",
+  "decksUpdatedMessage": "Đã cập nhật bộ thẻ.",
+  "decksMoveTitle": "Di chuyển bộ thẻ",
+  "decksMovedMessage": "Đã di chuyển bộ thẻ.",
+  "decksDuplicateTitle": "Nhân bản bộ thẻ",
+  "decksCurrentFolderTitle": "Thư mục hiện tại",
+  "decksDuplicatedMessage": "Đã nhân bản bộ thẻ.",
+  "decksDeleteTitle": "Xóa bộ thẻ",
+  "decksDeleteMessage": "Thao tác này sẽ xóa toàn bộ bộ thẻ và tất cả flashcard bên trong.",
+  "decksDeletedMessage": "Đã xóa bộ thẻ.",
+  "flashcardsOpenListAction": "Mở danh sách flashcard",
+  "flashcardsAddAction": "Thêm flashcard",
+  "flashcardsAddTooltip": "Thêm flashcard",
+  "flashcardsSearchHint": "Tìm flashcard",
+  "flashcardsBulkSelected": "Đã chọn {count}",
+  "@flashcardsBulkSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsBulkSubtitle": "Di chuyển, xuất, hoặc xóa các flashcard đã chọn.",
+  "flashcardsEmptyTitle": "Chưa có flashcard nào",
+  "flashcardsEmptyMessage": "Hãy thêm thẻ thủ công hoặc nhập chúng vào bộ thẻ này.",
+  "flashcardsMoveTitle": "Di chuyển flashcard",
+  "flashcardsMovedMessage": "Đã di chuyển flashcard.",
+  "flashcardsDeleteTitle": "Xóa flashcard",
+  "flashcardsDeleteMessage": "Thao tác này sẽ xóa vĩnh viễn các flashcard đã chọn.",
+  "flashcardsDeletedMessage": "Đã xóa flashcard.",
+  "flashcardsEditTitle": "Chỉnh sửa flashcard",
+  "flashcardsNewTitle": "Flashcard mới",
+  "flashcardsFieldTitleLabel": "Tiêu đề",
+  "flashcardsFieldTitleHint": "Tiêu đề hiển thị tùy chọn",
+  "flashcardsFieldFrontLabel": "Mặt trước",
+  "flashcardsFieldFrontHint": "Prompt hoặc câu hỏi",
+  "flashcardsFieldBackLabel": "Mặt sau",
+  "flashcardsFieldBackHint": "Đáp án hoặc định nghĩa",
+  "flashcardsFieldNoteLabel": "Ghi chú",
+  "flashcardsFieldNoteHint": "Ghi chú bổ sung tùy chọn",
+  "flashcardsSaveAndAddNext": "Lưu và thêm tiếp",
+  "flashcardsSavedMessage": "Đã lưu flashcard.",
+  "flashcardsSaveChanges": "Lưu thay đổi",
+  "flashcardsSaveAction": "Lưu flashcard",
+  "flashcardsUpdatedMessage": "Đã cập nhật flashcard.",
+  "flashcardsCreatedMessage": "Đã tạo flashcard.",
+  "flashcardsImportTitle": "Nhập flashcard",
+  "importSourceTitle": "Nguồn dữ liệu",
+  "importSourceSubtitle": "Luồng import luôn preview trước và ghi atomically. Chỉ cần một dòng lỗi là chặn toàn bộ lần ghi.",
+  "importCsvLabel": "CSV",
+  "importTextFormatLabel": "Định dạng text",
+  "importLoadFile": "Tải file",
+  "importCsvContentLabel": "Nội dung CSV",
+  "importTextContentLabel": "Text có cấu trúc",
+  "importCsvHint": "title,front,back,note",
+  "importTextHint": "Front: ...\nBack: ...\nNote: ...",
+  "importPreviewAction": "Xem trước",
+  "importSuccessMessage": "Đã nhập {count} flashcard.",
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importLoadedFileMessage": "Đã tải {fileName}.",
+  "@importLoadedFileMessage": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "importValidationIssuesTitle": "Lỗi xác thực",
+  "importValidationIssuesSubtitle": "Hãy sửa toàn bộ lỗi trước khi nhập.",
+  "importValidationIssueLine": "Dòng {line}",
+  "@importValidationIssueLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "importPreviewTitle": "Xem trước",
+  "importPreviewSubtitle": "{count} flashcard sẵn sàng được tạo",
+  "@importPreviewSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importNothingTitle": "Không có dữ liệu để nhập",
+  "importNothingMessage": "Không có dòng hoặc block hợp lệ nào được tạo từ nguồn dữ liệu.",
   "sharedErrorTitle": "Đã xảy ra lỗi",
   "sharedTryAgain": "Thử lại",
   "sharedShowDetails": "Xem chi tiết",

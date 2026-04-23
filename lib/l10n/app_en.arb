@@ -5,9 +5,34 @@
   "commonOk": "OK",
   "commonCancel": "Cancel",
   "commonCreate": "Create",
-  "commonSearch": "Search",
   "commonEdit": "Edit",
   "commonDelete": "Delete",
+  "commonSort": "Sort",
+  "commonSave": "Save",
+  "commonImport": "Import",
+  "commonExport": "Export",
+  "commonMove": "Move",
+  "commonClear": "Clear",
+  "commonSelectAll": "Select all",
+  "commonSaveOrder": "Save order",
+  "commonOverview": "Overview",
+  "commonNever": "Never",
+  "commonReorder": "Reorder",
+  "commonNoValidDestinationFound": "No valid destination found.",
+  "commonDefaultOrderUpdated": "Default order updated.",
+  "commonPercentValue": "{value}%",
+  "@commonPercentValue": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "commonSearch": "Search",
+  "sortManual": "Manual",
+  "sortName": "Name",
+  "sortNewest": "Newest",
+  "sortLastStudied": "Last studied",
   "homeTitle": "Home",
   "libraryTitle": "Library",
   "progressTitle": "Progress",
@@ -32,6 +57,7 @@
   "foldersMoreActionsTooltip": "More actions",
   "foldersActionsTitle": "Folder actions",
   "foldersReorder": "Reorder",
+  "foldersReorderManualOnlyHint": "Switch sort back to manual to reorder.",
   "foldersStatusSubfolders": "Contains {subfolderCount} subfolders",
   "@foldersStatusSubfolders": {
     "placeholders": {
@@ -65,12 +91,38 @@
       }
     }
   },
+  "foldersSubfolderCreatedMessage": "Subfolder created.",
+  "foldersRenameTitle": "Rename folder",
+  "foldersUpdatedMessage": "Folder updated.",
+  "foldersMoveTitle": "Move folder",
+  "foldersMoveRootTitle": "Library root",
+  "foldersMoveRootSubtitle": "Move this folder to root",
+  "foldersMovedMessage": "Folder moved.",
+  "foldersDeleteTitle": "Delete folder",
+  "foldersDeleteMessage": "This will delete the full subtree, including decks and flashcards.",
+  "foldersDeletedMessage": "Folder deleted.",
+  "foldersManualReorderWarning": "Manual reorder is only available in manual sort.",
+  "foldersSummaryUnlocked": "This folder is empty and can hold subfolders or decks.",
+  "foldersEmptyTitle": "This folder is empty",
+  "foldersEmptyMessage": "Choose a direction first. A folder can contain subfolders or decks, not both.",
   "libraryCreateFolderTooltip": "Create folder",
+  "libraryCreateFolderDialogTitle": "Create folder",
+  "libraryFolderCreatedMessage": "Folder created.",
   "libraryDueTodayPrefix": "You have ",
   "libraryDueTodaySuffix": " items due today",
-  "libraryStudyNow": "Study now  \u2192",
-  "libraryFoldersSectionTitle": "FOLDERS",
-  "libraryFolderStats": "{deckCount} decks · {itemCount} items",
+  "libraryStudyNow": "Study now  →",
+  "libraryFoldersSectionTitle": "Folders",
+  "libraryManageFoldersSubtitle": "Manage your folder tree",
+  "librarySearchResultsSubtitle": "Search results",
+  "libraryHeroDueToday": "Due today: {count}",
+  "@libraryHeroDueToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryFolderStats": "{deckCount} decks · {itemCount} cards",
   "@libraryFolderStats": {
     "placeholders": {
       "deckCount": {
@@ -83,6 +135,128 @@
   },
   "libraryEmptyTitle": "No folders yet",
   "libraryEmptyMessage": "Create your first folder to start building your library.",
+  "decksCreateTitle": "Create deck",
+  "decksNameLabel": "Deck name",
+  "decksNameHint": "e.g. Core vocabulary",
+  "decksCreatedMessage": "Deck created.",
+  "decksMoreActionsTooltip": "More actions",
+  "decksActionsTitle": "Deck actions",
+  "decksDuplicateAction": "Duplicate deck",
+  "decksExportCsvAction": "Export CSV",
+  "decksOverviewSubtitle": "{cardCount} cards · {dueToday} due today · {masteryPercent}% mastery",
+  "@decksOverviewSubtitle": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueToday": {
+        "type": "int"
+      },
+      "masteryPercent": {
+        "type": "int"
+      }
+    }
+  },
+  "decksLastStudiedLabel": "Last studied: {date}",
+  "@decksLastStudiedLabel": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "decksManageContentTitle": "Manage content",
+  "decksManageContentSubtitle": "Open flashcards, import into this deck, or continue editing content.",
+  "decksRenameTitle": "Rename deck",
+  "decksUpdatedMessage": "Deck updated.",
+  "decksMoveTitle": "Move deck",
+  "decksMovedMessage": "Deck moved.",
+  "decksDuplicateTitle": "Duplicate deck",
+  "decksCurrentFolderTitle": "Current folder",
+  "decksDuplicatedMessage": "Deck duplicated.",
+  "decksDeleteTitle": "Delete deck",
+  "decksDeleteMessage": "This will delete the entire deck and all flashcards inside it.",
+  "decksDeletedMessage": "Deck deleted.",
+  "flashcardsOpenListAction": "Open flashcards",
+  "flashcardsAddAction": "Add flashcard",
+  "flashcardsAddTooltip": "Add flashcard",
+  "flashcardsSearchHint": "Search flashcards",
+  "flashcardsBulkSelected": "{count} selected",
+  "@flashcardsBulkSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsBulkSubtitle": "Move, export, or delete the selected flashcards.",
+  "flashcardsEmptyTitle": "No flashcards yet",
+  "flashcardsEmptyMessage": "Add cards manually or import them into this deck.",
+  "flashcardsMoveTitle": "Move flashcards",
+  "flashcardsMovedMessage": "Flashcards moved.",
+  "flashcardsDeleteTitle": "Delete flashcards",
+  "flashcardsDeleteMessage": "This will permanently delete the selected flashcards.",
+  "flashcardsDeletedMessage": "Flashcards deleted.",
+  "flashcardsEditTitle": "Edit flashcard",
+  "flashcardsNewTitle": "New flashcard",
+  "flashcardsFieldTitleLabel": "Title",
+  "flashcardsFieldTitleHint": "Optional display title",
+  "flashcardsFieldFrontLabel": "Front",
+  "flashcardsFieldFrontHint": "Prompt or question",
+  "flashcardsFieldBackLabel": "Back",
+  "flashcardsFieldBackHint": "Answer or definition",
+  "flashcardsFieldNoteLabel": "Note",
+  "flashcardsFieldNoteHint": "Optional extra note",
+  "flashcardsSaveAndAddNext": "Save & add next",
+  "flashcardsSavedMessage": "Flashcard saved.",
+  "flashcardsSaveChanges": "Save changes",
+  "flashcardsSaveAction": "Save flashcard",
+  "flashcardsUpdatedMessage": "Flashcard updated.",
+  "flashcardsCreatedMessage": "Flashcard created.",
+  "flashcardsImportTitle": "Import flashcards",
+  "importSourceTitle": "Source",
+  "importSourceSubtitle": "Import is preview-first and atomic. Any invalid line blocks the entire write.",
+  "importCsvLabel": "CSV",
+  "importTextFormatLabel": "Text format",
+  "importLoadFile": "Load file",
+  "importCsvContentLabel": "CSV content",
+  "importTextContentLabel": "Structured text",
+  "importCsvHint": "title,front,back,note",
+  "importTextHint": "Front: ...\nBack: ...\nNote: ...",
+  "importPreviewAction": "Preview",
+  "importSuccessMessage": "Imported {count} flashcards.",
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importLoadedFileMessage": "Loaded {fileName}.",
+  "@importLoadedFileMessage": {
+    "placeholders": {
+      "fileName": {}
+    }
+  },
+  "importValidationIssuesTitle": "Validation issues",
+  "importValidationIssuesSubtitle": "Fix every issue before importing.",
+  "importValidationIssueLine": "Line {line}",
+  "@importValidationIssueLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "importPreviewTitle": "Preview",
+  "importPreviewSubtitle": "{count} flashcards ready to create",
+  "@importPreviewSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importNothingTitle": "Nothing to import",
+  "importNothingMessage": "No valid rows or blocks were produced from the source.",
   "sharedErrorTitle": "Something went wrong",
   "sharedTryAgain": "Try again",
   "sharedShowDetails": "Show details",

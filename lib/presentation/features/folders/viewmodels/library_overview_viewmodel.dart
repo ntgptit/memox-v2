@@ -1,118 +1,134 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../app/di/content_providers.dart';
+import '../../../../core/errors/failures.dart';
+import '../../../../core/services/clock.dart';
+import '../../../../domain/enums/content_sort_mode.dart';
+import '../../../../domain/enums/folder_content_mode.dart';
+import '../../../../domain/value_objects/content_queries.dart';
 import '../models/library_folder.dart';
 
 part 'library_overview_viewmodel.g.dart';
 
-/// Static greeting values used by the library overview until an account /
-/// schedule use case is wired in. Grouped as an immutable class so the
-/// viewmodel returns a single value object rather than multiple providers.
 @immutable
 class LibraryOverviewGreeting {
   const LibraryOverviewGreeting({
     required this.salutation,
     required this.userName,
-    required this.dueToday,
   });
 
   final String salutation;
   final String userName;
-  final int dueToday;
 }
 
-/// UI state for the library overview screen.
 @immutable
 class LibraryOverviewState {
   const LibraryOverviewState({
     required this.greeting,
+    required this.dueToday,
     required this.folders,
   });
 
   final LibraryOverviewGreeting greeting;
+  final int dueToday;
   final List<LibraryFolder> folders;
 
   bool get isEmpty => folders.isEmpty;
 }
 
-/// Library-overview viewmodel.
-///
-/// Exposes a synchronous [LibraryOverviewState]. Sample data lives here
-/// (previously inline in the screen) so the widget stays render-only.
-/// When the folder repository lands, swap the sync `build()` for an
-/// `AsyncNotifier` that watches a repository provider.
 @riverpod
-class LibraryOverviewViewModel extends _$LibraryOverviewViewModel {
+class LibraryToolbarState extends _$LibraryToolbarState {
   @override
-  LibraryOverviewState build() {
-    return const LibraryOverviewState(
-      greeting: LibraryOverviewGreeting(
-        salutation: 'Good morning',
-        userName: 'Alex',
-        dueToday: 12,
-      ),
-      folders: _sampleFolders,
-    );
+  ContentQuery build() => const ContentQuery();
+
+  void setSearchTerm(String value) {
+    final next = value.trim();
+    if (next == state.searchTerm) {
+      return;
+    }
+    state = ContentQuery(searchTerm: next, sortMode: state.sortMode);
   }
 
-  /// Placeholder for the "create folder" FAB action. Kept here so the FAB
-  /// handler in the screen stays a one-liner.
-  void createFolder() {
-    // TODO(folders): wire to CreateFolderUseCase once the domain exists.
-  }
-
-  /// Placeholder for the tile tap handler.
-  void openFolder(String folderId) {
-    // TODO(folders): push the folder-detail route once it exists.
+  void setSortMode(ContentSortMode sortMode) {
+    if (sortMode == state.sortMode) {
+      return;
+    }
+    state = ContentQuery(searchTerm: state.searchTerm, sortMode: sortMode);
   }
 }
 
-// -----------------------------------------------------------------------------
-// Sample data
-//
-// TODO(folders): replace with a derived provider that maps from the domain
-// folder entity list once the folder repository lands. The view contract
-// (`List<LibraryFolder>`) stays stable across this swap.
-// -----------------------------------------------------------------------------
-const List<LibraryFolder> _sampleFolders = [
-  LibraryFolder(
-    id: 'n5',
-    name: 'Japanese N5',
-    icon: Icons.language_outlined,
-    deckCount: 5,
-    itemCount: 128,
-    masteryPercent: 72,
-  ),
-  LibraryFolder(
-    id: 'daily',
-    name: 'Daily Vocabulary',
-    icon: Icons.auto_stories_outlined,
-    deckCount: 3,
-    itemCount: 86,
-    masteryPercent: 45,
-  ),
-  LibraryFolder(
-    id: 'grammar',
-    name: 'Grammar Basics',
-    icon: Icons.menu_book_outlined,
-    deckCount: 4,
-    itemCount: 102,
-    masteryPercent: 58,
-  ),
-  LibraryFolder(
-    id: 'kanji',
-    name: 'Kanji Practice',
-    icon: Icons.draw_outlined,
-    deckCount: 6,
-    itemCount: 240,
-    masteryPercent: 31,
-  ),
-  LibraryFolder(
-    id: 'phrases',
-    name: 'Conversation Phrases',
-    icon: Icons.chat_bubble_outline,
-    deckCount: 2,
-    itemCount: 54,
-    masteryPercent: 88,
-  ),
-];
+@Riverpod(keepAlive: true)
+Future<LibraryOverviewState> libraryOverviewQuery(Ref ref) async {
+  final query = ref.watch(libraryToolbarStateProvider);
+  final useCase = ref.watch(watchLibraryOverviewUseCaseProvider);
+  final clock = ref.watch(clockProvider);
+  ref.watch(contentDataRevisionProvider);
+
+  final data = await useCase.execute(query);
+  return LibraryOverviewState(
+    greeting: _buildGreeting(clock),
+    dueToday: data.dueTodayCount,
+    folders: data.folders
+        .map(
+          (item) => LibraryFolder(
+            id: item.folder.id,
+            name: item.folder.name,
+            icon: _resolveFolderIcon(item.folder.contentMode),
+            deckCount: item.deckCount,
+            itemCount: item.itemCount,
+            masteryPercent: item.masteryPercent,
+          ),
+        )
+        .toList(growable: false),
+  );
+}
+
+@riverpod
+class LibraryOverviewActionController
+    extends _$LibraryOverviewActionController {
+  @override
+  FutureOr<void> build() {}
+
+  Future<bool> createFolder(String name) async {
+    // guard:retry-reviewed
+    state = const AsyncLoading<void>();
+    final result = await ref.read(createFolderUseCaseProvider).createRoot(name);
+    if (!ref.mounted) {
+      return false;
+    }
+    final failure = result.failureOrNull;
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    state = const AsyncData<void>(null);
+    return true;
+  }
+}
+
+LibraryOverviewGreeting _buildGreeting(Clock clock) {
+  final localNow = clock.nowUtc().toLocal();
+  final salutation = switch (localNow.hour) {
+    >= 5 && < 12 => 'Good morning',
+    >= 12 && < 18 => 'Good afternoon',
+    _ => 'Good evening',
+  };
+
+  return LibraryOverviewGreeting(salutation: salutation, userName: 'Learner');
+}
+
+IconData _resolveFolderIcon(FolderContentMode mode) {
+  return switch (mode) {
+    FolderContentMode.unlocked => Icons.create_new_folder_outlined,
+    FolderContentMode.subfolders => Icons.folder_copy_outlined,
+    FolderContentMode.decks => Icons.style_outlined,
+  };
+}
+
+AppFailure? libraryOverviewActionError(AsyncValue<void> actionState) =>
+    actionState.whenOrNull(
+      error: (error, _) => error is AppFailure ? error : null,
+    );

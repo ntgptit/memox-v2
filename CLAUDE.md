@@ -148,6 +148,12 @@ Dark mode targets a **deep-navy + indigo accent** aesthetic, not flat grey:
 
 All reusable UI lives in `lib/presentation/shared/`. Features MUST reach for a shared widget first; only drop to raw Material widgets when the shared catalogue is a mismatch, and in that case consider promoting the new pattern into `shared/` for the next feature.
 
+**Interaction shape rules**:
+- Ink, hover, focus, and splash overlays MUST match the rendered shape of the widget they decorate.
+- Do not use `PopupMenuButton(child: ...)` for rounded, pill, or stadium triggers. Its internal overlay does not reliably inherit the child shape. Prefer `MenuAnchor` with a trigger widget that owns its own interaction shape, such as `MxChip(onTap: ...)` or `MxIconButton`.
+- Any `InkWell` / `InkResponse` wrapping a rounded trigger must set `customBorder` or `borderRadius` to match the visual shape.
+- If a tappable surface is built from `Material` plus gesture handling, keep `Material.shape` or `borderRadius` aligned with the painted widget shape.
+
 ### Layouts (`presentation/shared/layouts/`)
 
 | Widget | Use when |

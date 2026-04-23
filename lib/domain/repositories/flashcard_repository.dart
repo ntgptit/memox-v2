@@ -5,6 +5,8 @@ import '../value_objects/content_queries.dart';
 import '../value_objects/content_read_models.dart';
 
 abstract interface class FlashcardRepository {
+  Future<FlashcardEntity> getFlashcard(String flashcardId);
+
   Future<FlashcardListReadModel> getFlashcards(
     String deckId,
     ContentQuery query,

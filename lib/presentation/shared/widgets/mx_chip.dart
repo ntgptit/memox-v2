@@ -13,6 +13,7 @@ class MxChip extends StatelessWidget {
     this.onTap,
     this.onDeleted,
     this.selected = false,
+    this.showCheckmark = false,
     this.tone = MxChipTone.neutral,
     super.key,
   });
@@ -22,6 +23,7 @@ class MxChip extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDeleted;
   final bool selected;
+  final bool showCheckmark;
   final MxChipTone tone;
 
   @override
@@ -31,10 +33,14 @@ class MxChip extends StatelessWidget {
     final mx = context.mxColors;
 
     final (Color bg, Color fg) = switch (tone) {
-      MxChipTone.neutral => selected
-          ? (scheme.secondaryContainer, scheme.onSecondaryContainer)
-          : (scheme.surfaceContainerHighest, scheme.onSurface),
-      MxChipTone.primary => (scheme.primaryContainer, scheme.onPrimaryContainer),
+      MxChipTone.neutral =>
+        selected
+            ? (scheme.secondaryContainer, scheme.onSecondaryContainer)
+            : (scheme.surfaceContainerHighest, scheme.onSurface),
+      MxChipTone.primary => (
+        scheme.primaryContainer,
+        scheme.onPrimaryContainer,
+      ),
       MxChipTone.success => (mx.successContainer, mx.onSuccessContainer),
       MxChipTone.warning => (mx.warningContainer, mx.onWarningContainer),
       MxChipTone.error => (scheme.errorContainer, scheme.onErrorContainer),
@@ -61,21 +67,25 @@ class MxChip extends StatelessWidget {
     if (onTap != null) {
       return FilterChip(
         label: Text(label),
-        avatar: icon != null ? Icon(icon, size: AppIconSizes.sm, color: fg) : null,
+        avatar: icon != null
+            ? Icon(icon, size: AppIconSizes.sm, color: fg)
+            : null,
         selected: selected,
         onSelected: (_) => onTap!.call(),
         backgroundColor: bg,
         selectedColor: bg,
         labelStyle: labelStyle,
         side: BorderSide.none,
-        showCheckmark: selected,
+        showCheckmark: showCheckmark,
         checkmarkColor: fg,
       );
     }
 
     return Chip(
       label: Text(label),
-      avatar: icon != null ? Icon(icon, size: AppIconSizes.sm, color: fg) : null,
+      avatar: icon != null
+          ? Icon(icon, size: AppIconSizes.sm, color: fg)
+          : null,
       backgroundColor: bg,
       labelStyle: labelStyle,
       side: BorderSide.none,

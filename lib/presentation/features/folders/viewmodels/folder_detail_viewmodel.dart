@@ -1,23 +1,30 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../app/di/content_providers.dart';
+import '../../../../core/errors/app_exception.dart';
+import '../../../../core/errors/failures.dart';
+import '../../../../domain/enums/content_sort_mode.dart';
+import '../../../../domain/enums/folder_content_mode.dart';
+import '../../../../domain/value_objects/content_actions.dart';
+import '../../../../domain/value_objects/content_queries.dart';
+import '../../../../domain/value_objects/content_read_models.dart';
+
 part 'folder_detail_viewmodel.g.dart';
 
-/// Which mode the folder-detail screen is rendering.
-///
-/// A folder may contain *either* subfolders or decks, never both — the
-/// business rule "only the deepest folder level can contain decks". The
-/// [FolderDetailMode] toggle is demo-only scaffolding: in production the mode
-/// is derived from the folder entity and is not user-selectable.
-enum FolderDetailMode { subfolders, decks }
+enum FolderDetailMode { unlocked, subfolders, decks }
 
 @immutable
 class FolderDetailHeader {
   const FolderDetailHeader({
+    required this.id,
     required this.name,
     required this.breadcrumb,
   });
 
+  final String id;
   final String name;
   final List<String> breadcrumb;
 }
@@ -28,13 +35,11 @@ class FolderSubfolderItem {
     required this.id,
     required this.name,
     required this.icon,
-    required this.caption,
   });
 
   final String id;
   final String name;
   final IconData icon;
-  final String caption;
 }
 
 @immutable
@@ -45,17 +50,15 @@ class FolderDeckItem {
     required this.cardCount,
     required this.dueToday,
     required this.masteryPercent,
-    required this.tags,
+    required this.lastStudiedAt,
   });
 
   final String id;
   final String name;
   final int cardCount;
   final int dueToday;
-
-  /// Mastery in `[0, 100]`.
   final int masteryPercent;
-  final List<String> tags;
+  final int? lastStudiedAt;
 }
 
 @immutable
@@ -63,188 +66,252 @@ class FolderDetailState {
   const FolderDetailState({
     required this.header,
     required this.mode,
+    required this.sortMode,
+    required this.searchTerm,
     required this.subfolders,
     required this.decks,
   });
 
   final FolderDetailHeader header;
   final FolderDetailMode mode;
+  final ContentSortMode sortMode;
+  final String searchTerm;
   final List<FolderSubfolderItem> subfolders;
   final List<FolderDeckItem> decks;
 
+  bool get isUnlocked => mode == FolderDetailMode.unlocked;
   bool get isSubfolderMode => mode == FolderDetailMode.subfolders;
   bool get isDeckMode => mode == FolderDetailMode.decks;
-
-  int get subfolderCount => subfolders.length;
-  int get deckCount => decks.length;
-  int get totalCardCount =>
-      decks.fold(0, (sum, deck) => sum + deck.cardCount);
-
-  FolderDetailState copyWith({FolderDetailMode? mode}) {
-    return FolderDetailState(
-      header: header,
-      mode: mode ?? this.mode,
-      subfolders: subfolders,
-      decks: decks,
-    );
-  }
+  bool get canManualReorder => sortMode.allowsManualReorder;
 }
 
-/// Demo-only viewmodel for the folder-detail screen.
-///
-/// Exposes a synchronous [FolderDetailState] with mock data so the screen
-/// can render both "contains subfolders" and "contains decks" variants via
-/// a demo toggle. Swap for an `AsyncNotifier` backed by the folder
-/// repository when the domain lands.
 @riverpod
-class FolderDetailViewModel extends _$FolderDetailViewModel {
+class FolderChildrenToolbarState extends _$FolderChildrenToolbarState {
   @override
-  FolderDetailState build(String folderId) {
-    return _sampleFolderDetails[folderId] ?? _fallbackFolderDetail(folderId);
+  ContentQuery build(String folderId) => const ContentQuery();
+
+  void setSearchTerm(String value) {
+    final next = value.trim();
+    if (next == state.searchTerm) {
+      return;
+    }
+    state = ContentQuery(searchTerm: next, sortMode: state.sortMode);
   }
 
-  void setMode(FolderDetailMode mode) {
-    if (state.mode == mode) return;
-    state = state.copyWith(mode: mode);
-  }
-
-  void createSubfolder(String name) {
-    // TODO(folders): wire to CreateSubfolderUseCase when the domain lands.
-  }
-
-  void createDeck() {
-    // TODO(folders): push a create-deck flow when it exists.
-  }
-
-  void openDeck(String id) {
-    // TODO(decks): push deck-detail route.
-  }
-
-  void editFolder() {
-    // TODO(folders): open edit-folder flow.
-  }
-
-  void deleteFolder() {
-    // TODO(folders): confirm + delete.
-  }
-
-  void reorderChildren() {
-    // TODO(folders): enter reorder mode.
+  void setSortMode(ContentSortMode sortMode) {
+    if (sortMode == state.sortMode) {
+      return;
+    }
+    state = ContentQuery(searchTerm: state.searchTerm, sortMode: sortMode);
   }
 }
 
-const List<FolderSubfolderItem> _sampleJapaneseN5Subfolders = [
-  FolderSubfolderItem(
-    id: 'vocab',
-    name: 'Vocabulary',
-    icon: Icons.auto_stories_outlined,
-    caption: '4 decks · 180 cards',
-  ),
-  FolderSubfolderItem(
-    id: 'grammar',
-    name: 'Grammar',
-    icon: Icons.menu_book_outlined,
-    caption: '3 decks · 96 cards',
-  ),
-  FolderSubfolderItem(
-    id: 'kanji',
-    name: 'Kanji',
-    icon: Icons.draw_outlined,
-    caption: '5 decks · 220 cards',
-  ),
-];
+@Riverpod(keepAlive: true)
+Future<FolderDetailState> folderDetailQuery(Ref ref, String folderId) async {
+  final query = ref.watch(folderChildrenToolbarStateProvider(folderId));
+  final useCase = ref.watch(watchFolderDetailUseCaseProvider);
+  ref.watch(contentDataRevisionProvider);
 
-const List<FolderDeckItem> _sampleVocabularyDecks = [
-  FolderDeckItem(
-    id: 'n5-core',
-    name: 'N5 Core Vocabulary',
-    cardCount: 42,
-    dueToday: 8,
-    masteryPercent: 72,
-    tags: ['core', 'beginner'],
-  ),
-  FolderDeckItem(
-    id: 'katakana',
-    name: 'Katakana Loanwords',
-    cardCount: 68,
-    dueToday: 12,
-    masteryPercent: 54,
-    tags: ['katakana'],
-  ),
-  FolderDeckItem(
-    id: 'verbs',
-    name: 'Common Verbs',
-    cardCount: 56,
-    dueToday: 5,
-    masteryPercent: 31,
-    tags: ['verbs', 'grammar'],
-  ),
-  FolderDeckItem(
-    id: 'adjectives',
-    name: 'i-Adjectives',
-    cardCount: 34,
-    dueToday: 0,
-    masteryPercent: 88,
-    tags: ['adjectives'],
-  ),
-];
+  final data = await useCase.execute(folderId, query);
+  return _mapFolderDetailState(data, query);
+}
 
-const Map<String, FolderDetailState> _sampleFolderDetails = {
-  'n5': FolderDetailState(
-    header: FolderDetailHeader(
-      name: 'Japanese N5',
-      breadcrumb: ['My Folders', 'Japanese N5'],
-    ),
-    mode: FolderDetailMode.subfolders,
-    subfolders: _sampleJapaneseN5Subfolders,
-    decks: _sampleVocabularyDecks,
-  ),
-  'vocab': FolderDetailState(
-    header: FolderDetailHeader(
-      name: 'Vocabulary',
-      breadcrumb: ['My Folders', 'Japanese N5', 'Vocabulary'],
-    ),
-    mode: FolderDetailMode.decks,
-    subfolders: [],
-    decks: _sampleVocabularyDecks,
-  ),
-  'grammar': FolderDetailState(
-    header: FolderDetailHeader(
-      name: 'Grammar',
-      breadcrumb: ['My Folders', 'Japanese N5', 'Grammar'],
-    ),
-    mode: FolderDetailMode.decks,
-    subfolders: [],
-    decks: _sampleVocabularyDecks,
-  ),
-  'kanji': FolderDetailState(
-    header: FolderDetailHeader(
-      name: 'Kanji',
-      breadcrumb: ['My Folders', 'Japanese N5', 'Kanji'],
-    ),
-    mode: FolderDetailMode.decks,
-    subfolders: [],
-    decks: _sampleVocabularyDecks,
-  ),
-  'daily': FolderDetailState(
-    header: FolderDetailHeader(
-      name: 'Daily Vocabulary',
-      breadcrumb: ['My Folders', 'Daily Vocabulary'],
-    ),
-    mode: FolderDetailMode.decks,
-    subfolders: [],
-    decks: _sampleVocabularyDecks,
-  ),
-};
+@riverpod
+Future<List<FolderMoveTarget>> folderMovePicker(Ref ref, String folderId) {
+  return ref.watch(getFolderMoveTargetsUseCaseProvider).execute(folderId);
+}
 
-FolderDetailState _fallbackFolderDetail(String folderId) {
+@riverpod
+class FolderActionController extends _$FolderActionController {
+  @override
+  FutureOr<void> build(String folderId) {}
+
+  Future<bool> createSubfolder(String name) async {
+    // guard:retry-reviewed
+    state = const AsyncLoading<void>();
+    final result = await ref
+        .read(createFolderUseCaseProvider)
+        .createSubfolder(parentFolderId: folderId, name: name);
+    if (!ref.mounted) {
+      return false;
+    }
+    final failure = result.failureOrNull;
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    state = const AsyncData<void>(null);
+    return true;
+  }
+
+  Future<bool> createDeck(String name) async {
+    state = const AsyncLoading<void>();
+    final result = await ref
+        .read(createDeckUseCaseProvider)
+        .execute(folderId: folderId, name: name);
+    if (!ref.mounted) {
+      return false;
+    }
+    final failure = result.failureOrNull;
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    state = const AsyncData<void>(null);
+    return true;
+  }
+
+  Future<bool> updateFolder(String name) async {
+    state = const AsyncLoading<void>();
+    final result = await ref
+        .read(updateFolderUseCaseProvider)
+        .execute(folderId: folderId, name: name);
+    if (!ref.mounted) {
+      return false;
+    }
+    final failure = result.failureOrNull;
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    state = const AsyncData<void>(null);
+    return true;
+  }
+
+  Future<bool> deleteFolder() async {
+    state = const AsyncLoading<void>();
+    final result = await ref
+        .read(deleteFolderUseCaseProvider)
+        .execute(folderId);
+    if (!ref.mounted) {
+      return false;
+    }
+    final failure = result.failureOrNull;
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    state = const AsyncData<void>(null);
+    return true;
+  }
+
+  Future<bool> moveFolder(String? targetParentId) async {
+    state = const AsyncLoading<void>();
+    final result = await ref
+        .read(moveFolderUseCaseProvider)
+        .execute(folderId: folderId, targetParentId: targetParentId);
+    if (!ref.mounted) {
+      return false;
+    }
+    final failure = result.failureOrNull;
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    state = const AsyncData<void>(null);
+    return true;
+  }
+
+  Future<bool> reorderSubfolders(List<String> orderedFolderIds) async {
+    state = const AsyncLoading<void>();
+    final result = await ref
+        .read(reorderFoldersUseCaseProvider)
+        .execute(parentFolderId: folderId, orderedFolderIds: orderedFolderIds);
+    if (!ref.mounted) {
+      return false;
+    }
+    final failure = result.failureOrNull;
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    state = const AsyncData<void>(null);
+    return true;
+  }
+
+  Future<bool> reorderDecks(List<String> orderedDeckIds) async {
+    state = const AsyncLoading<void>();
+    final result = await ref
+        .read(reorderDecksUseCaseProvider)
+        .execute(folderId: folderId, orderedDeckIds: orderedDeckIds);
+    if (!ref.mounted) {
+      return false;
+    }
+    final failure = result.failureOrNull;
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    state = const AsyncData<void>(null);
+    return true;
+  }
+}
+
+FolderDetailState _mapFolderDetailState(
+  FolderDetailReadModel readModel,
+  ContentQuery query,
+) {
   return FolderDetailState(
     header: FolderDetailHeader(
-      name: folderId,
-      breadcrumb: ['My Folders', folderId],
+      id: readModel.folder.id,
+      name: readModel.folder.name,
+      breadcrumb: readModel.breadcrumb,
     ),
-    mode: FolderDetailMode.decks,
-    subfolders: const [],
-    decks: _sampleVocabularyDecks,
+    mode: _toDetailMode(readModel.effectiveContentMode),
+    sortMode: query.sortMode,
+    searchTerm: query.searchTerm,
+    subfolders: readModel.subfolders
+        .map(
+          (item) => FolderSubfolderItem(
+            id: item.id,
+            name: item.name,
+            icon: _resolveFolderIcon(item.contentMode),
+          ),
+        )
+        .toList(growable: false),
+    decks: readModel.decks
+        .map(
+          (item) => FolderDeckItem(
+            id: item.deck.id,
+            name: item.deck.name,
+            cardCount: item.cardCount,
+            dueToday: item.dueTodayCount,
+            masteryPercent: item.masteryPercent,
+            lastStudiedAt: item.lastStudiedAt,
+          ),
+        )
+        .toList(growable: false),
   );
+}
+
+FolderDetailMode _toDetailMode(FolderContentMode mode) {
+  return switch (mode) {
+    FolderContentMode.unlocked => FolderDetailMode.unlocked,
+    FolderContentMode.subfolders => FolderDetailMode.subfolders,
+    FolderContentMode.decks => FolderDetailMode.decks,
+  };
+}
+
+IconData _resolveFolderIcon(FolderContentMode mode) {
+  return switch (mode) {
+    FolderContentMode.unlocked => Icons.create_new_folder_outlined,
+    FolderContentMode.subfolders => Icons.folder_copy_outlined,
+    FolderContentMode.decks => Icons.style_outlined,
+  };
+}
+
+AppFailure? folderActionError(AsyncValue<void> actionState) {
+  return actionState.whenOrNull(
+    error: (error, _) => error is AppFailure ? error : null,
+  );
+}
+
+String folderActionErrorMessage(AppFailure? failure) {
+  if (failure == null) {
+    return '';
+  }
+  if (failure.cause case final ValidationException cause) {
+    return cause.message;
+  }
+  return failure.message;
 }

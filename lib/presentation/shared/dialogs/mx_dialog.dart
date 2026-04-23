@@ -48,7 +48,21 @@ class MxDialog extends StatelessWidget {
     final contentStyle =
         dialogTheme.contentTextStyle ??
         textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant) ??
-        const TextStyle();
+        DefaultTextStyle.of(
+          context,
+        ).style.copyWith(color: scheme.onSurfaceVariant);
+    final titleWidget = icon != null
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Icon(icon, size: AppIconSizes.xl, color: scheme.primary),
+              ),
+              const MxGap(AppSpacing.lg),
+              Text(title, style: titleStyle, textAlign: TextAlign.center),
+            ],
+          )
+        : Text(title, style: titleStyle);
 
     return Dialog(
       clipBehavior: Clip.antiAlias,
@@ -60,11 +74,7 @@ class MxDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (icon != null) ...[
-                Icon(icon, size: AppIconSizes.xl, color: scheme.primary),
-                const MxGap(AppSpacing.lg),
-              ],
-              Text(title, style: titleStyle),
+              titleWidget,
               const MxGap(AppSpacing.md),
               Flexible(
                 child: SingleChildScrollView(

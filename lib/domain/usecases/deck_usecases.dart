@@ -29,6 +29,22 @@ final class UpdateDeckUseCase {
   }
 }
 
+final class GetDeckMoveTargetsUseCase {
+  const GetDeckMoveTargetsUseCase(this._repository);
+
+  final DeckRepository _repository;
+
+  Future<List<DeckMoveTarget>> execute({
+    required String deckId,
+    String? excludingFolderId,
+  }) {
+    return _repository.getDeckMoveTargets(
+      deckId: deckId,
+      excludingFolderId: excludingFolderId,
+    );
+  }
+}
+
 final class DeleteDeckUseCase {
   const DeleteDeckUseCase(this._repository);
 

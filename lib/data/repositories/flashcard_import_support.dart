@@ -174,9 +174,9 @@ final class FlashcardImportSupport {
         if (inQuotes && index + 1 < line.length && line[index + 1] == '"') {
           current.write('"');
           index += 1;
-        } else {
-          inQuotes = !inQuotes;
+          continue;
         }
+        inQuotes = !inQuotes;
         continue;
       }
       if (char == ',' && !inQuotes) {

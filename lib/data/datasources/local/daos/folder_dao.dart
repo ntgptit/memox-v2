@@ -1,7 +1,8 @@
 import 'package:drift/drift.dart';
 
-import '../../../domain/enums/folder_content_mode.dart';
-import '../../../domain/value_objects/content_queries.dart';
+import '../../../../domain/enums/content_sort_mode.dart';
+import '../../../../domain/enums/folder_content_mode.dart';
+import '../../../../domain/value_objects/content_queries.dart';
 import '../app_database.dart';
 
 final class FolderDao {
@@ -45,9 +46,12 @@ final class FolderDao {
       ..addColumns([_database.folders.sortOrder.max()]);
     if (parentFolderId == null) {
       query.where(_database.folders.parentId.isNull());
-    } else {
-      query.where(_database.folders.parentId.equals(parentFolderId));
+      final row = await query.getSingleOrNull();
+      final currentMax = row?.read(_database.folders.sortOrder.max()) ?? -1;
+      return currentMax + 1;
     }
+
+    query.where(_database.folders.parentId.equals(parentFolderId));
     final row = await query.getSingleOrNull();
     final currentMax = row?.read(_database.folders.sortOrder.max()) ?? -1;
     return currentMax + 1;
@@ -296,15 +300,13 @@ final class FolderDao {
     ContentQuery query,
   ) {
     switch (query.sortMode) {
-      case ContentQuery().sortMode:
       case ContentSortMode.manual:
+      case ContentSortMode.lastStudied:
         statement.orderBy([(table) => OrderingTerm.asc(table.sortOrder)]);
       case ContentSortMode.name:
         statement.orderBy([(table) => OrderingTerm.asc(table.name.lower())]);
       case ContentSortMode.newest:
         statement.orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
-      case ContentSortMode.lastStudied:
-        statement.orderBy([(table) => OrderingTerm.asc(table.sortOrder)]);
     }
   }
 

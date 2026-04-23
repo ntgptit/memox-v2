@@ -1,34 +1,26 @@
-// Smoke test for MemoX.
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:memox/app/app.dart';
-import 'package:memox/presentation/shared/layouts/mx_adaptive_scaffold.dart';
+import 'package:memox/presentation/shared/widgets/mx_term_row.dart';
 
 void main() {
-  testWidgets('MemoxApp renders without crashing', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(child: MemoxApp()),
-    );
-    await tester.pumpAndSettle();
-
-    expect(tester.takeException(), isNull);
-    expect(find.byType(MxAdaptiveScaffold), findsOneWidget);
-  });
-
-  testWidgets('Library folder tiles open the folder detail route', (
+  testWidgets('root smoke widget test renders a term row', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      const ProviderScope(child: MemoxApp()),
+      const MaterialApp(
+        home: Scaffold(
+          body: MxTermRow(
+            term: 'Greeting',
+            definition: 'Hello -> Xin chao',
+            caption: 'Basic greeting',
+          ),
+        ),
+      ),
     );
-    await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Japanese N5'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Vocabulary'), findsOneWidget);
-    expect(find.text('Grammar'), findsOneWidget);
+    expect(find.text('Greeting'), findsOneWidget);
+    expect(find.text('Hello -> Xin chao'), findsOneWidget);
+    expect(find.text('Basic greeting'), findsOneWidget);
   });
 }

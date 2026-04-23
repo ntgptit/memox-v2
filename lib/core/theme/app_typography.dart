@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'app_breakpoints.dart';
 
 /// MemoX typography — Material 3 type scale, tuned for readable flashcards.
 ///
-/// Uses Plus Jakarta Sans as the single app-wide sans family. The package
-/// dependency is resolved centrally here so feature code keeps consuming
+/// Uses Plus Jakarta Sans as the single app-wide sans family. The bundled
+/// asset is resolved centrally here so feature code keeps consuming
 /// `Theme.of(context).textTheme.*` without local font overrides.
 abstract final class AppTypography {
   static const String fontFamily = 'Plus Jakarta Sans';
@@ -152,8 +151,7 @@ abstract final class AppTypography {
     labelSmall: labelSmall,
   );
 
-  static TextTheme get textTheme =>
-      GoogleFonts.plusJakartaSansTextTheme(_baseTextTheme);
+  static TextTheme get textTheme => _baseTextTheme;
 
   // ---------------------------------------------------------------------------
   // Responsive scaling

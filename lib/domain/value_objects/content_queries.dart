@@ -1,4 +1,4 @@
-import '../enums\content_sort_mode.dart';
+import '../enums/content_sort_mode.dart';
 
 final class ContentQuery {
   const ContentQuery({

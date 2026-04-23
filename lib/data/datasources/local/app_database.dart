@@ -56,6 +56,10 @@ class AppDatabase extends _$AppDatabase {
           database.execute('PRAGMA journal_mode = WAL');
         },
       ),
+      web: DriftWebOptions(
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.dart.js'),
+      ),
     );
   }
 

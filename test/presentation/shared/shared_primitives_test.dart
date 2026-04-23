@@ -133,6 +133,12 @@ void main() {
     await tester.pump();
 
     expect(searchQuery, 'kanji');
+    expect(find.byType(MenuAnchor), findsOneWidget);
+    expect(find.byType(FilterChip), findsOneWidget);
+    expect(
+      find.byWidgetPredicate((widget) => widget is PopupMenuButton),
+      findsNothing,
+    );
 
     await tester.tap(find.text('Sort'));
     await tester.pumpAndSettle();
@@ -142,6 +148,34 @@ void main() {
 
     expect(sortValue, 'recent');
   });
+
+  testWidgets(
+    'MxSearchSortToolbar keeps selected sort icon without checkmark',
+    (tester) async {
+      await tester.pumpWidget(
+        _TestApp(
+          child: MxSearchSortToolbar<String>(
+            sortLabel: 'Sort',
+            selectedSort: 'recent',
+            sortOptions: const [
+              MxSortOption<String>(
+                value: 'recent',
+                label: 'Newest',
+                icon: Icons.schedule_rounded,
+              ),
+            ],
+            onSortSelected: (_) {},
+          ),
+        ),
+      );
+
+      final chip = tester.widget<FilterChip>(find.byType(FilterChip));
+
+      expect(chip.selected, isTrue);
+      expect(chip.showCheckmark, isFalse);
+      expect(chip.avatar, isA<Icon>());
+    },
+  );
 
   testWidgets('MxBulkActionBar renders labels and action buttons', (
     tester,

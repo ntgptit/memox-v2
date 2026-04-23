@@ -4,15 +4,18 @@ import '../../core/services/clock.dart';
 import '../../core/services/id_generator.dart';
 import '../../domain/entities/folder_entity.dart';
 import '../../domain/enums/content_sort_mode.dart';
+import '../../domain/enums/folder_content_mode.dart';
 import '../../domain/repositories/folder_repository.dart';
 import '../../domain/services/folder_structure_service.dart';
 import '../../domain/value_objects/content_actions.dart';
 import '../../domain/value_objects/content_queries.dart';
 import '../../domain/value_objects/content_read_models.dart';
+import '../datasources/local/app_database.dart';
 import '../datasources/local/daos/deck_dao.dart';
 import '../datasources/local/daos/folder_dao.dart';
 import '../datasources/local/local_transaction_runner.dart';
 import '../mappers/content_entity_mappers.dart';
+import '../mappers/database_enum_codecs.dart';
 import 'repository_support.dart';
 
 final class FolderRepositoryImpl implements FolderRepository {
@@ -67,22 +70,7 @@ final class FolderRepositoryImpl implements FolderRepository {
         ),
       );
     }
-    if (query.sortMode == ContentSortMode.lastStudied) {
-      folderItems.sort((a, b) {
-        final left = a.lastStudiedAt;
-        final right = b.lastStudiedAt;
-        if (left == null && right == null) {
-          return a.folder.sortOrder.compareTo(b.folder.sortOrder);
-        }
-        if (left == null) {
-          return 1;
-        }
-        if (right == null) {
-          return -1;
-        }
-        return right.compareTo(left);
-      });
-    }
+    _sortLibraryFolders(folderItems, query.sortMode);
 
     return LibraryOverviewReadModel(
       dueTodayCount: await _folderDao.countDueToday(
@@ -108,15 +96,18 @@ final class FolderRepositoryImpl implements FolderRepository {
       deckItems.add(await _buildFolderDeckReadModel(deck));
     }
 
-    final subfolderEntities = subfolders.map((item) => item.toDomain()).toList();
-    if (query.sortMode == ContentSortMode.lastStudied) {
+    final subfolderEntities = subfolders
+        .map((item) => item.toDomain())
+        .toList(growable: false);
+    switch (query.sortMode) {
+      case ContentSortMode.lastStudied:
       final lastStudiedMap = <String, int?>{};
       for (final subfolder in subfolders) {
         lastStudiedMap[subfolder.id] = await _folderDao.getLastStudiedAtInSubtree(
           subfolder.id,
         );
       }
-      subfolderEntities.sort((a, b) {
+      subfolderEntities.sort((FolderEntity a, FolderEntity b) {
         final left = lastStudiedMap[a.id];
         final right = lastStudiedMap[b.id];
         if (left == null && right == null) {
@@ -130,20 +121,16 @@ final class FolderRepositoryImpl implements FolderRepository {
         }
         return right.compareTo(left);
       });
-      deckItems.sort((a, b) {
-        final left = a.lastStudiedAt;
-        final right = b.lastStudiedAt;
-        if (left == null && right == null) {
-          return a.deck.sortOrder.compareTo(b.deck.sortOrder);
-        }
-        if (left == null) {
-          return 1;
-        }
-        if (right == null) {
-          return -1;
-        }
-        return right.compareTo(left);
-      });
+      _sortFolderDeckItems(deckItems, query.sortMode);
+      case ContentSortMode.name:
+        subfolderEntities.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        _sortFolderDeckItems(deckItems, query.sortMode);
+      case ContentSortMode.newest:
+        subfolderEntities.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        _sortFolderDeckItems(deckItems, query.sortMode);
+      case ContentSortMode.manual:
+        subfolderEntities.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+        _sortFolderDeckItems(deckItems, query.sortMode);
     }
 
     return FolderDetailReadModel(
@@ -413,5 +400,67 @@ final class FolderRepositoryImpl implements FolderRepository {
       throw const ValidationException(message: 'The name is required.');
     }
     return trimmed;
+  }
+
+  void _sortLibraryFolders(
+    List<LibraryFolderReadModel> folders,
+    ContentSortMode sortMode,
+  ) {
+    switch (sortMode) {
+      case ContentSortMode.manual:
+        folders.sort((a, b) => a.folder.sortOrder.compareTo(b.folder.sortOrder));
+      case ContentSortMode.name:
+        folders.sort(
+          (a, b) => a.folder.name.toLowerCase().compareTo(b.folder.name.toLowerCase()),
+        );
+      case ContentSortMode.newest:
+        folders.sort((a, b) => b.folder.createdAt.compareTo(a.folder.createdAt));
+      case ContentSortMode.lastStudied:
+        folders.sort((a, b) {
+          final left = a.lastStudiedAt;
+          final right = b.lastStudiedAt;
+          if (left == null && right == null) {
+            return a.folder.sortOrder.compareTo(b.folder.sortOrder);
+          }
+          if (left == null) {
+            return 1;
+          }
+          if (right == null) {
+            return -1;
+          }
+          return right.compareTo(left);
+        });
+    }
+  }
+
+  void _sortFolderDeckItems(
+    List<FolderDeckReadModel> decks,
+    ContentSortMode sortMode,
+  ) {
+    switch (sortMode) {
+      case ContentSortMode.manual:
+        decks.sort((a, b) => a.deck.sortOrder.compareTo(b.deck.sortOrder));
+      case ContentSortMode.name:
+        decks.sort(
+          (a, b) => a.deck.name.toLowerCase().compareTo(b.deck.name.toLowerCase()),
+        );
+      case ContentSortMode.newest:
+        decks.sort((a, b) => b.deck.createdAt.compareTo(a.deck.createdAt));
+      case ContentSortMode.lastStudied:
+        decks.sort((a, b) {
+          final left = a.lastStudiedAt;
+          final right = b.lastStudiedAt;
+          if (left == null && right == null) {
+            return a.deck.sortOrder.compareTo(b.deck.sortOrder);
+          }
+          if (left == null) {
+            return 1;
+          }
+          if (right == null) {
+            return -1;
+          }
+          return right.compareTo(left);
+        });
+    }
   }
 }

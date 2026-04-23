@@ -16,6 +16,32 @@ final class CreateFlashcardUseCase {
   }
 }
 
+final class GetFlashcardUseCase {
+  const GetFlashcardUseCase(this._repository);
+
+  final FlashcardRepository _repository;
+
+  Future<FlashcardEntity> execute(String flashcardId) {
+    return _repository.getFlashcard(flashcardId);
+  }
+}
+
+final class GetFlashcardMoveTargetsUseCase {
+  const GetFlashcardMoveTargetsUseCase(this._repository);
+
+  final FlashcardRepository _repository;
+
+  Future<List<DeckMoveTarget>> execute({
+    required String deckId,
+    required List<String> flashcardIds,
+  }) {
+    return _repository.getFlashcardMoveTargets(
+      deckId: deckId,
+      flashcardIds: flashcardIds,
+    );
+  }
+}
+
 final class UpdateFlashcardUseCase {
   const UpdateFlashcardUseCase(this._repository);
 

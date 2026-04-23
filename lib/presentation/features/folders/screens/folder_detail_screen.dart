@@ -5,165 +5,411 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/app_layout.dart';
 import '../../../../core/theme/mx_gap.dart';
-import '../../../../core/theme/mx_tokens.dart';
-import '../../../../core/theme/theme_extensions.dart';
+import '../../../../domain/enums/content_sort_mode.dart';
+import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
-import '../../../shared/dialogs/mx_dialog.dart';
+import '../../../shared/dialogs/mx_confirmation_dialog.dart';
+import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
+import '../../../shared/dialogs/mx_name_dialog.dart';
+import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
+import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
+import '../../../shared/layouts/mx_section.dart';
+import '../../../shared/options/content_sort_options.dart';
+import '../../../shared/states/mx_empty_state.dart';
+import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_breadcrumb_bar.dart';
-import '../../../shared/widgets/mx_card.dart';
-import '../../../shared/widgets/mx_chip.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_folder_tile.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
-import '../../../shared/widgets/mx_progress_indicator.dart';
+import '../../../shared/widgets/mx_reorderable_list.dart';
+import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
-import '../../../shared/widgets/mx_segmented_control.dart';
-import '../../../shared/widgets/mx_text_field.dart';
+import '../../../shared/widgets/mx_study_set_tile.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 
-enum _FolderMenuAction { edit, reorder, delete }
+enum _FolderAction { edit, move, reorder, delete }
 
-/// Folder-detail leaf screen.
-///
-/// Renders either a quiet subfolder list or a calm deck list depending on
-/// the viewmodel mode. The demo toggle at the top is scaffolding so both
-/// states can be seen in one implementation; in production the mode is
-/// dictated by the folder entity.
-class FolderDetailScreen extends ConsumerWidget {
+class FolderDetailScreen extends ConsumerStatefulWidget {
   const FolderDetailScreen({required this.folderId, super.key});
 
   final String folderId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(folderDetailViewModelProvider(folderId));
-    final l10n = AppLocalizations.of(context);
-
-    return MxScaffold(
-      body: SafeArea(
-        child: MxContentShell(
-          width: MxContentWidth.wide,
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: MxSpace.xxxxl),
-            children: [
-              const MxGap(MxSpace.sm),
-              _Header(folderId: folderId),
-              const MxGap(MxSpace.md),
-              _StatusIndicator(state: state),
-              const MxGap(MxSpace.lg),
-              _ModeToggle(folderId: folderId, mode: state.mode),
-              const MxGap(MxSpace.lg),
-              AnimatedSwitcher(
-                duration: MxDurations.md,
-                switchInCurve: MxCurves.standardDecelerate,
-                switchOutCurve: MxCurves.standardAccelerate,
-                transitionBuilder: _fadeSlide,
-                child: state.isSubfolderMode
-                    ? _SubfolderList(
-                        key: const ValueKey('subfolders'),
-                        items: state.subfolders,
-                      )
-                    : _DeckList(
-                        key: const ValueKey('decks'),
-                        folderId: folderId,
-                        items: state.decks,
-                      ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: MxFab(
-        icon: Icons.add,
-        tooltip: state.isSubfolderMode
-            ? l10n.foldersNewSubfolderTooltip
-            : l10n.foldersNewDeckTooltip,
-        onPressed: () =>
-            _handleFabTap(context, ref, folderId, state.isSubfolderMode),
-      ),
-    );
-  }
-
-  static Widget _fadeSlide(Widget child, Animation<double> animation) {
-    final offset = Tween<Offset>(
-      begin: const Offset(0, 0.02),
-      end: Offset.zero,
-    ).animate(animation);
-    return FadeTransition(
-      opacity: animation,
-      child: SlideTransition(position: offset, child: child),
-    );
-  }
-
-  Future<void> _handleFabTap(
-    BuildContext context,
-    WidgetRef ref,
-    String folderId,
-    bool isSubfolderMode,
-  ) async {
-    final notifier = ref.read(folderDetailViewModelProvider(folderId).notifier);
-    if (!isSubfolderMode) {
-      notifier.createDeck();
-      return;
-    }
-    final name = await _showCreateSubfolderDialog(context);
-    if (name == null || name.trim().isEmpty) return;
-    notifier.createSubfolder(name);
-  }
+  ConsumerState<FolderDetailScreen> createState() => _FolderDetailScreenState();
 }
 
-Future<String?> _showCreateSubfolderDialog(BuildContext context) {
-  final controller = TextEditingController();
-  final l10n = AppLocalizations.of(context);
-  return MxDialog.show<String>(
-    context: context,
-    title: l10n.foldersNewSubfolderTitle,
-    icon: Icons.create_new_folder_outlined,
-    child: _CreateSubfolderForm(controller: controller),
-    actions: [
-      MxSecondaryButton(
-        label: l10n.commonCancel,
-        variant: MxSecondaryVariant.text,
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      MxPrimaryButton(
-        label: l10n.commonCreate,
-        onPressed: () => Navigator.of(context).pop(controller.text),
-      ),
-    ],
-  );
-}
-
-class _CreateSubfolderForm extends StatelessWidget {
-  const _CreateSubfolderForm({required this.controller});
-
-  final TextEditingController controller;
+class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
+  bool _isReorderMode = false;
+  List<String> _orderedIds = <String>[];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return MxTextField(
+    final sortOptions = buildContentSortOptions(l10n);
+    ref.listen<AsyncValue<void>>(
+      folderActionControllerProvider(widget.folderId),
+      (_, next) {
+        final failure = folderActionError(next);
+        if (failure != null) {
+          MxSnackbar.error(context, folderActionErrorMessage(failure));
+        }
+      },
+    );
+
+    final queryState = ref.watch(folderDetailQueryProvider(widget.folderId));
+    final queryData = queryState.value;
+    final toolbarState = ref.watch(
+      folderChildrenToolbarStateProvider(widget.folderId),
+    );
+    final toolbarNotifier = ref.read(
+      folderChildrenToolbarStateProvider(widget.folderId).notifier,
+    );
+
+    return MxScaffold(
+      floatingActionButton: queryData == null
+          ? null
+          : queryData.isUnlocked
+          ? null
+          : MxFab(
+              icon: queryData.isSubfolderMode
+                  ? Icons.create_new_folder_outlined
+                  : Icons.style_outlined,
+              tooltip: queryData.isSubfolderMode
+                  ? l10n.foldersNewSubfolderTooltip
+                  : l10n.foldersNewDeckTooltip,
+              onPressed: _isReorderMode
+                  ? null
+                  : () => queryData.isSubfolderMode
+                        ? _createSubfolder()
+                        : _createDeck(),
+            ),
+      body: SafeArea(
+        child: MxContentShell(
+          width: MxContentWidth.wide,
+          child: MxRetainedAsyncState<FolderDetailState>(
+            data: queryState.value,
+            isLoading: queryState.isLoading,
+            error: queryState.hasError ? queryState.error : null,
+            stackTrace: queryState.hasError ? queryState.stackTrace : null,
+            skeletonBuilder: (_) => const _FolderDetailSkeleton(),
+            onRetry: () =>
+                ref.invalidate(folderDetailQueryProvider(widget.folderId)),
+            dataBuilder: (context, state) {
+              final content = switch ((state.isUnlocked, _isReorderMode)) {
+                (true, _) => _UnlockedFolderState(
+                  onCreateSubfolder: _createSubfolder,
+                  onCreateDeck: _createDeck,
+                ),
+                (_, true) => _ReorderContent(
+                  state: state,
+                  orderedIds: _orderedIds,
+                  onReorder: _handleReorder,
+                ),
+                _ => _FolderBody(state: state, onOpenSubfolder: _openSubfolder),
+              };
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  MxFeatureSpacing.lg,
+                  MxFeatureSpacing.lg,
+                  MxFeatureSpacing.lg,
+                  MxFeatureSpacing.xxxl,
+                ),
+                children: [
+                  _FolderHeader(
+                    state: state,
+                    onOpenActions: () => _openActions(state),
+                  ),
+                  const MxGap(MxFeatureSpacing.xl),
+                  MxSearchSortToolbar<ContentSortMode>(
+                    searchHintText: l10n.commonSearch,
+                    onSearchChanged: toolbarNotifier.setSearchTerm,
+                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                    sortOptions: sortOptions,
+                    selectedSort: toolbarState.sortMode,
+                    sortLabel: l10n.commonSort,
+                    onSortSelected: toolbarNotifier.setSortMode,
+                    trailing: _isReorderMode
+                        ? <Widget>[
+                            MxSecondaryButton(
+                              label: l10n.commonCancel,
+                              variant: MxSecondaryVariant.text,
+                              onPressed: _cancelReorder,
+                            ),
+                            MxPrimaryButton(
+                              label: l10n.commonSaveOrder,
+                              onPressed: () => _saveReorder(state),
+                            ),
+                          ]
+                        : const <Widget>[],
+                  ),
+                  const MxGap(MxFeatureSpacing.xl),
+                  _FolderSummary(state: state),
+                  const MxGap(MxFeatureSpacing.xl),
+                  content,
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _createSubfolder() async {
+    final l10n = AppLocalizations.of(context);
+    final name = await MxNameDialog.show(
+      context: context,
+      title: l10n.foldersNewSubfolderTitle,
       label: l10n.foldersFolderNameLabel,
-      controller: controller,
-      autofocus: true,
       hintText: l10n.foldersFolderNameHint,
-      textInputAction: TextInputAction.done,
+      confirmLabel: l10n.commonCreate,
+    );
+    if (!mounted || name == null) {
+      return;
+    }
+    final success = await ref
+        .read(folderActionControllerProvider(widget.folderId).notifier)
+        .createSubfolder(name);
+    if (!mounted || !success) {
+      return;
+    }
+    MxSnackbar.success(context, l10n.foldersSubfolderCreatedMessage);
+  }
+
+  Future<void> _createDeck() async {
+    final l10n = AppLocalizations.of(context);
+    final name = await MxNameDialog.show(
+      context: context,
+      title: l10n.decksCreateTitle,
+      label: l10n.decksNameLabel,
+      hintText: l10n.decksNameHint,
+      confirmLabel: l10n.commonCreate,
+    );
+    if (!mounted || name == null) {
+      return;
+    }
+    final success = await ref
+        .read(folderActionControllerProvider(widget.folderId).notifier)
+        .createDeck(name);
+    if (!mounted || !success) {
+      return;
+    }
+    MxSnackbar.success(context, l10n.decksCreatedMessage);
+  }
+
+  Future<void> _openActions(FolderDetailState state) async {
+    final l10n = AppLocalizations.of(context);
+    final action = await MxBottomSheet.show<_FolderAction>(
+      context: context,
+      title: l10n.foldersActionsTitle,
+      child: MxActionSheetList<_FolderAction>(
+        items: [
+          MxActionSheetItem(
+            value: _FolderAction.edit,
+            label: l10n.commonEdit,
+            icon: Icons.edit_outlined,
+          ),
+          MxActionSheetItem(
+            value: _FolderAction.move,
+            label: l10n.commonMove,
+            icon: Icons.drive_file_move_outline,
+          ),
+          MxActionSheetItem(
+            value: _FolderAction.reorder,
+            label: l10n.foldersReorder,
+            icon: Icons.reorder_rounded,
+            enabled: state.canManualReorder && !state.isUnlocked,
+            subtitle: state.canManualReorder
+                ? null
+                : l10n.foldersReorderManualOnlyHint,
+          ),
+          MxActionSheetItem(
+            value: _FolderAction.delete,
+            label: l10n.commonDelete,
+            icon: Icons.delete_outline,
+            tone: MxActionSheetItemTone.destructive,
+          ),
+        ],
+      ),
+    );
+    if (!mounted || action == null) {
+      return;
+    }
+
+    switch (action) {
+      case _FolderAction.edit:
+        await _renameFolder(state);
+      case _FolderAction.move:
+        await _moveFolder();
+      case _FolderAction.reorder:
+        _enterReorderMode(state);
+      case _FolderAction.delete:
+        await _deleteFolder();
+    }
+  }
+
+  Future<void> _renameFolder(FolderDetailState state) async {
+    final l10n = AppLocalizations.of(context);
+    final name = await MxNameDialog.show(
+      context: context,
+      title: l10n.foldersRenameTitle,
+      label: l10n.foldersFolderNameLabel,
+      hintText: l10n.foldersFolderNameHint,
+      confirmLabel: l10n.commonSave,
+      initialValue: state.header.name,
+    );
+    if (!mounted || name == null) {
+      return;
+    }
+
+    final success = await ref
+        .read(folderActionControllerProvider(widget.folderId).notifier)
+        .updateFolder(name);
+    if (!mounted || !success) {
+      return;
+    }
+    MxSnackbar.success(context, l10n.foldersUpdatedMessage);
+  }
+
+  Future<void> _moveFolder() async {
+    final l10n = AppLocalizations.of(context);
+    final targets = await ref.read(
+      folderMovePickerProvider(widget.folderId).future,
+    );
+    if (!mounted) {
+      return;
+    }
+
+    final destination = await MxDestinationPickerSheet.show<String?>(
+      context: context,
+      title: l10n.foldersMoveTitle,
+      destinations: [
+        for (final target in targets)
+          MxDestinationOption<String?>(
+            value: target.id,
+            title: target.isRoot ? l10n.foldersMoveRootTitle : target.name,
+            subtitle: target.isRoot
+                ? l10n.foldersMoveRootSubtitle
+                : target.breadcrumb.join(' / '),
+            icon: target.isRoot
+                ? Icons.home_outlined
+                : Icons.folder_open_outlined,
+            searchTerms: target.breadcrumb,
+          ),
+      ],
+      emptyLabel: l10n.commonNoValidDestinationFound,
+    );
+    if (!mounted ||
+        destination == null && !targets.any((item) => item.id == null)) {
+      return;
+    }
+
+    final success = await ref
+        .read(folderActionControllerProvider(widget.folderId).notifier)
+        .moveFolder(destination);
+    if (!mounted || !success) {
+      return;
+    }
+    MxSnackbar.success(context, l10n.foldersMovedMessage);
+  }
+
+  Future<void> _deleteFolder() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await MxConfirmationDialog.show(
+      context: context,
+      title: l10n.foldersDeleteTitle,
+      message: l10n.foldersDeleteMessage,
+      confirmLabel: l10n.commonDelete,
+      tone: MxConfirmationTone.danger,
+      icon: Icons.delete_outline,
+    );
+    if (!mounted || !confirmed) {
+      return;
+    }
+
+    final success = await ref
+        .read(folderActionControllerProvider(widget.folderId).notifier)
+        .deleteFolder();
+    if (!mounted || !success) {
+      return;
+    }
+    MxSnackbar.success(context, l10n.foldersDeletedMessage);
+    await context.popRoute(fallback: context.goLibrary);
+  }
+
+  void _enterReorderMode(FolderDetailState state) {
+    final l10n = AppLocalizations.of(context);
+    if (!state.canManualReorder || state.isUnlocked) {
+      MxSnackbar.warning(context, l10n.foldersManualReorderWarning);
+      return;
+    }
+
+    setState(() {
+      _isReorderMode = true;
+      _orderedIds = state.isSubfolderMode
+          ? state.subfolders.map((item) => item.id).toList(growable: true)
+          : state.decks.map((item) => item.id).toList(growable: true);
+    });
+  }
+
+  void _cancelReorder() {
+    setState(() {
+      _isReorderMode = false;
+      _orderedIds = <String>[];
+    });
+  }
+
+  void _handleReorder(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final item = _orderedIds.removeAt(oldIndex);
+      _orderedIds.insert(newIndex, item);
+    });
+  }
+
+  void _openSubfolder(String folderId) {
+    ref.read(folderDetailQueryProvider(folderId));
+    context.pushFolderDetail(folderId);
+  }
+
+  Future<void> _saveReorder(FolderDetailState state) async {
+    final controller = ref.read(
+      folderActionControllerProvider(widget.folderId).notifier,
+    );
+
+    final success = state.isSubfolderMode
+        ? await controller.reorderSubfolders(_orderedIds)
+        : await controller.reorderDecks(_orderedIds);
+    if (!mounted || !success) {
+      return;
+    }
+
+    setState(() {
+      _isReorderMode = false;
+      _orderedIds = <String>[];
+    });
+    MxSnackbar.success(
+      context,
+      AppLocalizations.of(context).commonDefaultOrderUpdated,
     );
   }
 }
 
-class _Header extends ConsumerWidget {
-  const _Header({required this.folderId});
+class _FolderHeader extends StatelessWidget {
+  const _FolderHeader({required this.state, required this.onOpenActions});
 
-  final String folderId;
+  final FolderDetailState state;
+  final VoidCallback onOpenActions;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(folderDetailViewModelProvider(folderId));
+  Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
@@ -176,345 +422,356 @@ class _Header extends ConsumerWidget {
             MxIconButton(
               icon: Icons.arrow_back,
               tooltip: l10n.commonBack,
-              onPressed: context.popRoute,
+              onPressed: () => context.popRoute(fallback: context.goLibrary),
             ),
+            const MxGap.h(MxFeatureSpacing.sm),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: MxSpace.xs),
-                child: Text(
-                  state.header.name,
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: scheme.onSurface,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              child: Text(
+                state.header.name,
+                style: textTheme.headlineSmall?.copyWith(
+                  color: scheme.onSurface,
                 ),
               ),
             ),
             MxIconButton(
-              icon: Icons.more_vert,
+              icon: Icons.more_horiz_rounded,
               tooltip: l10n.foldersMoreActionsTooltip,
-              onPressed: () => _openOverflowMenu(context, ref, folderId),
+              onPressed: onOpenActions,
             ),
           ],
         ),
-        const MxGap(MxSpace.xs),
-        Padding(
-          padding: const EdgeInsets.only(left: MxSpace.xs),
-          child: MxBreadcrumbBar(
-            items: [
-              for (final label in state.header.breadcrumb)
-                MxBreadcrumb(
-                  label: label,
-                  onTap: label == state.header.breadcrumb.last ? null : () {},
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-Future<void> _openOverflowMenu(
-  BuildContext context,
-  WidgetRef ref,
-  String folderId,
-) async {
-  final l10n = AppLocalizations.of(context);
-  final action = await MxBottomSheet.show<_FolderMenuAction>(
-    context: context,
-    title: l10n.foldersActionsTitle,
-    child: _OverflowMenuBody(l10n: l10n),
-  );
-  if (action == null) return;
-  final notifier = ref.read(folderDetailViewModelProvider(folderId).notifier);
-  switch (action) {
-    case _FolderMenuAction.edit:
-      notifier.editFolder();
-    case _FolderMenuAction.reorder:
-      notifier.reorderChildren();
-    case _FolderMenuAction.delete:
-      notifier.deleteFolder();
-  }
-}
-
-class _OverflowMenuBody extends StatelessWidget {
-  const _OverflowMenuBody({required this.l10n});
-
-  final AppLocalizations l10n;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _OverflowMenuItem(
-          icon: Icons.edit_outlined,
-          label: l10n.commonEdit,
-          action: _FolderMenuAction.edit,
-        ),
-        _OverflowMenuItem(
-          icon: Icons.reorder,
-          label: l10n.foldersReorder,
-          action: _FolderMenuAction.reorder,
-        ),
-        _OverflowMenuItem(
-          icon: Icons.delete_outline,
-          label: l10n.commonDelete,
-          action: _FolderMenuAction.delete,
-        ),
-      ],
-    );
-  }
-}
-
-class _OverflowMenuItem extends StatelessWidget {
-  const _OverflowMenuItem({
-    required this.icon,
-    required this.label,
-    required this.action,
-  });
-
-  final IconData icon;
-  final String label;
-  final _FolderMenuAction action;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isDestructive = action == _FolderMenuAction.delete;
-    final fg = isDestructive ? scheme.error : scheme.onSurface;
-
-    return InkWell(
-      onTap: () => Navigator.of(context).pop(action),
-      borderRadius: MxRadii.borderMd,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: MxSpace.md,
-          vertical: MxSpace.md,
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: MxIconSize.md, color: fg),
-            const MxGap.h(MxSpace.md),
-            Expanded(
-              child: Text(
-                label,
-                style: textTheme.bodyLarge?.copyWith(color: fg),
+        const MxGap(MxFeatureSpacing.sm),
+        MxBreadcrumbBar(
+          items: [
+            for (var index = 0; index < state.header.breadcrumb.length; index++)
+              MxBreadcrumb(
+                label: state.header.breadcrumb[index],
+                onTap: index == state.header.breadcrumb.length - 1
+                    ? null
+                    : () {},
               ),
-            ),
           ],
         ),
-      ),
+      ],
     );
   }
 }
 
-class _StatusIndicator extends StatelessWidget {
-  const _StatusIndicator({required this.state});
+class _FolderSummary extends StatelessWidget {
+  const _FolderSummary({required this.state});
 
   final FolderDetailState state;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
+    final subtitle = switch (state.mode) {
+      FolderDetailMode.unlocked => l10n.foldersSummaryUnlocked,
+      FolderDetailMode.subfolders => l10n.foldersStatusSubfolders(
+        state.subfolders.length,
+      ),
+      FolderDetailMode.decks => l10n.foldersStatusDecks(
+        state.decks.length,
+        state.decks.fold<int>(0, (sum, item) => sum + item.cardCount),
+      ),
+    };
 
-    final (IconData icon, String message) = state.isSubfolderMode
-        ? (
-            Icons.folder_outlined,
-            l10n.foldersStatusSubfolders(state.subfolderCount),
-          )
-        : (
-            Icons.style_outlined,
-            l10n.foldersStatusDecks(state.deckCount, state.totalCardCount),
-          );
-
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerLow,
-        borderRadius: MxRadii.borderMd,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: MxSpace.md,
-        vertical: MxSpace.sm,
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: MxIconSize.sm, color: scheme.onSurfaceVariant),
-          const MxGap.h(MxSpace.sm),
-          Expanded(
-            child: Text(
-              message,
-              style: textTheme.bodyMedium?.copyWith(
-                color: scheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return MxSection(
+      title: state.header.name,
+      subtitle: subtitle,
+      child: const SizedBox.shrink(),
     );
   }
 }
 
-class _ModeToggle extends ConsumerWidget {
-  const _ModeToggle({required this.folderId, required this.mode});
+class _UnlockedFolderState extends StatelessWidget {
+  const _UnlockedFolderState({
+    required this.onCreateSubfolder,
+    required this.onCreateDeck,
+  });
 
-  final String folderId;
-  final FolderDetailMode mode;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: MxSegmentedControl<FolderDetailMode>(
-        segments: [
-          MxSegment(
-            value: FolderDetailMode.subfolders,
-            label: l10n.foldersSegmentSubfolders,
-            icon: Icons.folder_outlined,
-          ),
-          MxSegment(
-            value: FolderDetailMode.decks,
-            label: l10n.foldersSegmentDecks,
-            icon: Icons.style_outlined,
-          ),
-        ],
-        selected: {mode},
-        onChanged: (set) => ref
-            .read(folderDetailViewModelProvider(folderId).notifier)
-            .setMode(set.first),
-      ),
-    );
-  }
-}
-
-class _SubfolderList extends StatelessWidget {
-  const _SubfolderList({super.key, required this.items});
-
-  final List<FolderSubfolderItem> items;
+  final VoidCallback onCreateSubfolder;
+  final VoidCallback onCreateDeck;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
-
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (var i = 0; i < items.length; i++) ...[
-          MxFolderTile(
-            name: items[i].name,
-            icon: items[i].icon,
-            caption: items[i].caption,
-            onTap: () => context.pushFolderDetail(items[i].id),
-          ),
-          if (i < items.length - 1) const MxDivider(),
-        ],
-        const MxGap(MxSpace.lg),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: MxSpace.md),
-          child: Text(
-            l10n.foldersSubfolderDeckHint,
-            style: textTheme.bodySmall?.copyWith(
-              color: scheme.onSurfaceVariant,
+        MxEmptyState(
+          title: l10n.foldersEmptyTitle,
+          message: l10n.foldersEmptyMessage,
+          icon: Icons.folder_open_outlined,
+        ),
+        const MxGap(MxFeatureSpacing.lg),
+        Wrap(
+          spacing: MxFeatureSpacing.sm,
+          runSpacing: MxFeatureSpacing.sm,
+          alignment: WrapAlignment.center,
+          children: [
+            MxPrimaryButton(
+              label: l10n.foldersNewSubfolderTooltip,
+              leadingIcon: Icons.create_new_folder_outlined,
+              onPressed: onCreateSubfolder,
             ),
-          ),
+            MxSecondaryButton(
+              label: l10n.foldersNewDeckTooltip,
+              leadingIcon: Icons.style_outlined,
+              variant: MxSecondaryVariant.outlined,
+              onPressed: onCreateDeck,
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class _DeckList extends ConsumerWidget {
-  const _DeckList({super.key, required this.folderId, required this.items});
+class _FolderBody extends StatelessWidget {
+  const _FolderBody({required this.state, required this.onOpenSubfolder});
 
-  final String folderId;
-  final List<FolderDeckItem> items;
+  final FolderDetailState state;
+  final ValueChanged<String> onOpenSubfolder;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    if (state.isSubfolderMode) {
+      return Column(
+        children: [
+          for (var index = 0; index < state.subfolders.length; index++) ...[
+            MxFolderTile(
+              name: state.subfolders[index].name,
+              icon: state.subfolders[index].icon,
+              onTap: () => onOpenSubfolder(state.subfolders[index].id),
+            ),
+            if (index < state.subfolders.length - 1) const MxDivider(),
+          ],
+        ],
+      );
+    }
+
     return Column(
       children: [
-        for (final deck in items) ...[
-          _DeckCard(
-            deck: deck,
-            onTap: () => ref
-                .read(folderDetailViewModelProvider(folderId).notifier)
-                .openDeck(deck.id),
+        for (var index = 0; index < state.decks.length; index++) ...[
+          MxStudySetTile(
+            title: state.decks[index].name,
+            icon: Icons.style_outlined,
+            metaLine: AppLocalizations.of(context).foldersDeckCardProgress(
+              state.decks[index].cardCount,
+              state.decks[index].dueToday,
+            ),
+            onTap: () => context.pushDeckDetail(state.decks[index].id),
+            trailing: Text(
+              AppLocalizations.of(
+                context,
+              ).commonPercentValue(state.decks[index].masteryPercent),
+            ),
           ),
-          const MxGap(MxSpace.sm),
+          if (index < state.decks.length - 1) const MxDivider(),
         ],
       ],
     );
   }
 }
 
-class _DeckCard extends StatelessWidget {
-  const _DeckCard({required this.deck, required this.onTap});
+class _ReorderContent extends StatelessWidget {
+  const _ReorderContent({
+    required this.state,
+    required this.orderedIds,
+    required this.onReorder,
+  });
 
-  final FolderDeckItem deck;
-  final VoidCallback onTap;
+  final FolderDetailState state;
+  final List<String> orderedIds;
+  final ReorderCallback onReorder;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final mx = context.mxColors;
-    final l10n = AppLocalizations.of(context);
+    if (state.isSubfolderMode) {
+      final orderedItems = [
+        for (final id in orderedIds)
+          state.subfolders.firstWhere((item) => item.id == id),
+      ];
+      return SizedBox(
+        height: MxFeatureSizes.reorderPanelHeight,
+        child: MxReorderableList.builder(
+          itemCount: orderedItems.length,
+          buildDefaultDragHandles: true,
+          onReorder: onReorder,
+          itemBuilder: (context, index) {
+            final item = orderedItems[index];
+            return KeyedSubtree(
+              key: ValueKey(item.id),
+              child: MxFolderTile(name: item.name, icon: item.icon),
+            );
+          },
+        ),
+      );
+    }
 
-    return MxCard(
-      variant: MxCardVariant.outlined,
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  deck.name,
-                  style: textTheme.titleMedium?.copyWith(
-                    color: scheme.onSurface,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
+    final orderedItems = [
+      for (final id in orderedIds)
+        state.decks.firstWhere((item) => item.id == id),
+    ];
+    return SizedBox(
+      height: MxFeatureSizes.reorderPanelHeight,
+      child: MxReorderableList.builder(
+        itemCount: orderedItems.length,
+        buildDefaultDragHandles: true,
+        onReorder: onReorder,
+        itemBuilder: (context, index) {
+          final item = orderedItems[index];
+          return KeyedSubtree(
+            key: ValueKey(item.id),
+            child: MxStudySetTile(
+              title: item.name,
+              icon: Icons.style_outlined,
+              metaLine: AppLocalizations.of(
+                context,
+              ).foldersDeckCardProgress(item.cardCount, item.dueToday),
+              trailing: Text(
+                AppLocalizations.of(
+                  context,
+                ).commonPercentValue(item.masteryPercent),
               ),
-              Icon(
-                Icons.chevron_right,
-                size: MxIconSize.md,
-                color: scheme.onSurfaceVariant,
-              ),
-            ],
-          ),
-          const MxGap(MxSpace.xxs),
-          Text(
-            l10n.foldersDeckCardProgress(deck.cardCount, deck.dueToday),
-            style: textTheme.bodySmall?.copyWith(
-              color: scheme.onSurfaceVariant,
             ),
-          ),
-          const MxGap(MxSpace.md),
-          MxLinearProgress(
-            value: deck.masteryPercent / 100,
-            color: mx.masteryProgress(deck.masteryPercent / 100),
-          ),
-          if (deck.tags.isNotEmpty) ...[
-            const MxGap(MxSpace.md),
-            Wrap(
-              spacing: MxSpace.xs,
-              runSpacing: MxSpace.xs,
-              children: [for (final tag in deck.tags) MxChip(label: tag)],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _FolderDetailSkeleton extends StatelessWidget {
+  const _FolderDetailSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      key: const ValueKey('folder_detail_skeleton'),
+      padding: const EdgeInsets.fromLTRB(
+        MxFeatureSpacing.lg,
+        MxFeatureSpacing.lg,
+        MxFeatureSpacing.lg,
+        MxFeatureSpacing.xxxl,
+      ),
+      children: const [
+        _FolderHeaderSkeleton(),
+        MxGap(MxFeatureSpacing.xl),
+        _ToolbarSkeleton(),
+        MxGap(MxFeatureSpacing.xl),
+        _SectionSkeleton(titleWidth: 160, subtitleWidth: 220, bodyHeight: 0),
+        MxGap(MxFeatureSpacing.xl),
+        _FolderTileSkeleton(),
+        MxDivider(),
+        _FolderTileSkeleton(),
+        MxDivider(),
+        _FolderTileSkeleton(),
+      ],
+    );
+  }
+}
+
+class _FolderHeaderSkeleton extends StatelessWidget {
+  const _FolderHeaderSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Row(
+          children: [
+            MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
+            MxGap.h(MxFeatureSpacing.sm),
+            Expanded(child: MxSkeleton(height: 28, width: 220)),
+            MxGap.h(MxFeatureSpacing.sm),
+            MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
+          ],
+        ),
+        MxGap(MxFeatureSpacing.sm),
+        MxSkeleton(height: 14, width: 180),
+      ],
+    );
+  }
+}
+
+class _ToolbarSkeleton extends StatelessWidget {
+  const _ToolbarSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        MxSkeleton(height: 48, borderRadius: MxFeatureRadii.full),
+        MxGap(MxFeatureSpacing.sm),
+        Row(
+          children: [
+            MxSkeleton(
+              height: 32,
+              width: 120,
+              borderRadius: MxFeatureRadii.full,
             ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class _SectionSkeleton extends StatelessWidget {
+  const _SectionSkeleton({
+    required this.titleWidth,
+    required this.subtitleWidth,
+    this.bodyHeight = 16,
+  });
+
+  final double titleWidth;
+  final double subtitleWidth;
+  final double bodyHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxSkeleton(height: 18, width: titleWidth),
+        const MxGap(MxFeatureSpacing.xs),
+        MxSkeleton(height: 14, width: subtitleWidth),
+        if (bodyHeight > 0) ...[
+          const MxGap(MxFeatureSpacing.md),
+          MxSkeleton(height: bodyHeight),
+        ],
+      ],
+    );
+  }
+}
+
+class _FolderTileSkeleton extends StatelessWidget {
+  const _FolderTileSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: MxFeatureSpacing.lg,
+        vertical: MxFeatureSpacing.md,
+      ),
+      child: Row(
+        children: [
+          MxSkeleton(width: 48, height: 48, borderRadius: MxFeatureRadii.md),
+          MxGap.h(MxFeatureSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MxSkeleton(height: 18, width: 180),
+                MxGap(MxFeatureSpacing.xs),
+                MxSkeleton(height: 14, width: 120),
+              ],
+            ),
+          ),
         ],
       ),
     );

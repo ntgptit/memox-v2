@@ -5,6 +5,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/errors/error_mapper.dart';
 import '../../core/errors/failures.dart';
+import '../../presentation/features/decks/screens/deck_detail_screen.dart';
+import '../../presentation/features/flashcards/screens/deck_import_screen.dart';
+import '../../presentation/features/flashcards/screens/flashcard_editor_screen.dart';
+import '../../presentation/features/flashcards/screens/flashcard_list_screen.dart';
 import '../../presentation/features/folders/screens/folder_detail_screen.dart';
 import '../../presentation/features/folders/screens/library_overview_screen.dart';
 import '../app_shell.dart';
@@ -23,12 +27,9 @@ GoRouter appRouter(Ref ref) {
     initialLocation: guards.initialLocation,
     debugLogDiagnostics: config.enableRouterDiagnostics,
     routes: [
-      GoRoute(
-        path: '/',
-        redirect: guards.rootRedirect,
-      ),
+      GoRoute(path: '/', redirect: guards.rootRedirect),
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
+        builder: (context, _, navigationShell) {
           return AppShell(navigationShell: navigationShell);
         },
         branches: [
@@ -54,10 +55,65 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: RoutePaths.library,
                 name: RouteNames.library,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: LibraryOverviewView(),
-                ),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: LibraryOverviewView()),
                 routes: [
+                  GoRoute(
+                    path: RoutePaths.flashcardCreateSegment,
+                    name: RouteNames.flashcardCreate,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: FlashcardEditorScreen(
+                        deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+                        key: ValueKey(
+                          'create-${state.pathParameters[RoutePaths.deckIdParam]}',
+                        ),
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.flashcardEditSegment,
+                    name: RouteNames.flashcardEdit,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: FlashcardEditorScreen(
+                        deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+                        flashcardId:
+                            state.pathParameters[RoutePaths.flashcardIdParam]!,
+                        key: ValueKey(
+                          'edit-${state.pathParameters[RoutePaths.flashcardIdParam]}',
+                        ),
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.flashcardListSegment,
+                    name: RouteNames.flashcardList,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: FlashcardListScreen(
+                        deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.deckImportSegment,
+                    name: RouteNames.deckImport,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: DeckImportScreen(
+                        deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+                        key: ValueKey(
+                          'import-${state.pathParameters[RoutePaths.deckIdParam]}',
+                        ),
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.deckDetailSegment,
+                    name: RouteNames.deckDetail,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: DeckDetailScreen(
+                        deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+                      ),
+                    ),
+                  ),
                   GoRoute(
                     path: RoutePaths.folderDetailSegment,
                     name: RouteNames.folderDetail,
@@ -65,9 +121,6 @@ GoRouter appRouter(Ref ref) {
                       child: FolderDetailScreen(
                         folderId:
                             state.pathParameters[RoutePaths.folderIdParam]!,
-                        key: ValueKey(
-                          state.pathParameters[RoutePaths.folderIdParam],
-                        ),
                       ),
                     ),
                   ),
@@ -123,10 +176,7 @@ GoRouter appRouter(Ref ref) {
 }
 
 class _ShellPlaceholderView extends StatelessWidget {
-  const _ShellPlaceholderView({
-    required this.title,
-    required this.description,
-  });
+  const _ShellPlaceholderView({required this.title, required this.description});
 
   final String title;
   final String description;
@@ -193,11 +243,7 @@ class _RouterErrorView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 40,
-                  color: scheme.error,
-                ),
+                Icon(Icons.error_outline, size: 40, color: scheme.error),
                 const SizedBox(height: 16),
                 Text(
                   l10n.appRouterErrorTitle,
@@ -240,13 +286,13 @@ class _RouterErrorView extends StatelessWidget {
       FailureCodes.unsupportedAction => l10n.errorUnsupportedAction,
       FailureCodes.unknown => l10n.errorUnexpected,
       _ => switch (failure.type) {
-          FailureType.configuration => l10n.errorConfiguration,
-          FailureType.validation => l10n.errorInvalidData,
-          FailureType.network => l10n.errorNetwork,
-          FailureType.storage => l10n.errorStorage,
-          FailureType.notFound => l10n.errorNotFound,
-          FailureType.unknown => l10n.errorUnexpected,
-        },
+        FailureType.configuration => l10n.errorConfiguration,
+        FailureType.validation => l10n.errorInvalidData,
+        FailureType.network => l10n.errorNetwork,
+        FailureType.storage => l10n.errorStorage,
+        FailureType.notFound => l10n.errorNotFound,
+        FailureType.unknown => l10n.errorUnexpected,
+      },
     };
   }
 }

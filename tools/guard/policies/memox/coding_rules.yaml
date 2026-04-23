@@ -41,3 +41,78 @@ rules:
         - "[\"']disabled[\"']"
         - "[\"']rules[\"']"
         - "[\"']violations_preview[\"']"
+
+  - id: async_refetch_blanks_screen
+    type: forbidden_pattern
+    name: "AsyncValue Refetch Must Preserve Previous Data"
+    description: >
+      Screen-level widgets must not blank the whole UI every time a watched
+      provider refetches because of search, sort, or revision-driven query
+      changes. Do not use `AsyncValue.when(loading: () => MxLoadingState...)`
+      directly on these screen surfaces. Preserve previous data during refetch
+      and reserve `MxLoadingState` for first-load only.
+    message_code: async_refetch_blanks_screen
+    severity: error
+    impact: performance
+    scope: screen_like_files
+    params:
+      patterns:
+        - "loading:\\s*\\(\\)\\s*=>\\s*const\\s+MxLoadingState"
+        - "loading:\\s*\\(\\)\\s*=>\\s*MxLoadingState\\("
+
+  - id: feature_query_provider_keep_alive
+    type: forbidden_pattern
+    name: "Feature Query Provider Must Declare Lifecycle"
+    description: >
+      Feature read-model query providers that return `Future<...State>`,
+      `Future<...ReadModel>`, `Future<...Query>`, or the stream equivalents
+      must opt into a deliberate lifecycle with `@Riverpod(keepAlive: true)`
+      or an explicit `ref.keepAlive()` strategy. Plain `@riverpod` autoDispose
+      on these providers causes push/pop refetch flicker on screen mount.
+    message_code: feature_query_provider_keep_alive
+    severity: error
+    impact: performance
+    scope: viewmodel_files
+    targets:
+      - "lib/presentation/features/**/viewmodels/*_viewmodel.dart"
+    params:
+      patterns:
+        - "@riverpod\\s*(?:\\r?\\n)+Future<\\w+(?:ReadModel|State|Query)>"
+        - "@riverpod\\s*(?:\\r?\\n)+Stream<\\w+(?:ReadModel|State|Query)>"
+
+  - id: shell_fab_no_route_state_coupling
+    type: forbidden_pattern
+    name: "Shell FAB Must Not Couple To Route Path"
+    description: >
+      App-shell floating action buttons must not toggle directly from
+      `state.uri.path` checks. That coupling makes the shell rebuild and swap
+      FAB presence across sub-routes, which shows up as navigation flicker.
+      Keep the FAB inside the owning screen or animate visibility locally.
+    message_code: shell_fab_no_route_state_coupling
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/app/app_shell.dart"
+    params:
+      patterns:
+        - "state\\.uri\\.path\\s*==\\s*RoutePaths\\."
+
+  - id: retained_async_state_requires_skeleton
+    type: forbidden_pattern
+    name: "First-load Must Provide Layout Skeleton"
+    description: >
+      Push-from-list detail screens that use `MxRetainedAsyncState` must supply
+      a `skeletonBuilder` for the first load. Falling back to `MxLoadingState`
+      on these screens creates a high-contrast flash on the first route frame.
+    message_code: retained_async_state_requires_skeleton
+    severity: warning
+    impact: performance
+    scope: screen_like_files
+    targets:
+      - "lib/presentation/features/folders/screens/folder_detail_screen.dart"
+      - "lib/presentation/features/decks/screens/deck_detail_screen.dart"
+      - "lib/presentation/features/flashcards/screens/flashcard_list_screen.dart"
+    params:
+      patterns:
+        - "(?s)MxRetainedAsyncState<[^>]+>\\((?:(?!skeletonBuilder).)*?\\)"

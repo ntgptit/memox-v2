@@ -193,6 +193,8 @@ messages:
     en: "Use shared toggle primitives instead of raw Material switches in feature code."
   feature_raw_flutter_widget_usage:
     en: "Use shared primitives/composites or a feature-local wrapper instead of raw Flutter Material widgets in feature code."
+  popup_menu_button_child_forbidden:
+    en: "Do not use `PopupMenuButton(child: ...)` on UI surfaces; its overlay often ignores the rounded shape of the trigger."
   dialog_entrypoint_usage:
     en: "Feature UI should not call `showDialog(...)` directly; use shared dialog helpers instead."
   missing_l10n_pubspec:
@@ -233,6 +235,14 @@ messages:
     en: "Feature screens should use shared MemoX loading, empty, and error state surfaces instead of ad hoc generic state widgets."
   screen_async_value_render:
     en: "Screen render code that watches async provider state must handle loading, error, and data through `.when`, `.maybeWhen`, a shared async render helper, or another exhaustive AsyncValue branch."
+  async_refetch_blanks_screen:
+    en: "Do not blank the entire screen with `MxLoadingState` on async refetch. Preserve previous data during refresh and reserve full-screen loading for first load only."
+  feature_query_provider_keep_alive:
+    en: "Feature query providers that return read-model state must declare a stable lifecycle. Replace plain `@riverpod` with `@Riverpod(keepAlive: true)` or add an explicit `ref.keepAlive()` strategy so push/pop does not refetch into a first-frame loading flash."
+  shell_fab_no_route_state_coupling:
+    en: "Do not toggle app-shell FAB visibility from `state.uri.path`. Move the FAB into the owning screen or handle visibility locally so route changes do not flash the shell chrome."
+  retained_async_state_requires_skeleton:
+    en: "Push-from-list detail screens must pass `skeletonBuilder` into `MxRetainedAsyncState` so first load preserves layout shape instead of showing a full-area loading spinner."
   screen_custom_error_surface:
     en: "Feature screens should not use bespoke generic error widgets; route generic states through shared MemoX state surfaces instead."
   screen_error_message_passthrough:
@@ -378,6 +388,9 @@ fix_hints:
   use_shared_widget_in_features:
     text:
       en: "Replace the raw Flutter widget with an existing shared MemoX surface such as `MxPrimaryButton`, `MxSecondaryButton`, `MxCard`, `MxTextField`, `MxChip`, `MxIconButton`, `MxProgressIndicator`, `MxListTile`, `MxDialog`, `MxBottomSheet`, or `MxScaffold` when one exists. If the control is truly feature-specific, wrap the Material widget behind a small feature-local adapter so raw Flutter constructors do not become the direct screen/widget API."
+  use_menu_anchor_shaped_trigger:
+    text:
+      en: "Replace `PopupMenuButton(child: ...)` with `MenuAnchor` and a trigger widget that owns its own interaction shape, such as `MxChip(onTap: ...)` or `MxIconButton`."
   derive_semantic_palette_from_scheme:
     text:
       en: "Separate seed colors from the semantic palette. Add a preset-aware semantic factory such as `fromColorScheme(ColorScheme scheme)`, wire `app_theme.dart` through that factory, and move preset-dependent roles like rating/status/mastery/repetition out of static theme tables so they derive from `ColorScheme` or a complete preset mapping."

@@ -3,16 +3,19 @@ import '../../core/errors/result.dart';
 import '../../core/services/clock.dart';
 import '../../core/services/id_generator.dart';
 import '../../domain/entities/deck_entity.dart';
-import '../../domain.repositories/deck_repository.dart';
-import '../../domain.services/folder_structure_service.dart';
+import '../../domain/enums/content_sort_mode.dart';
+import '../../domain/repositories/deck_repository.dart';
+import '../../domain/services/folder_structure_service.dart';
 import '../../domain/value_objects/content_actions.dart';
 import '../../domain/value_objects/content_queries.dart';
 import '../../domain/value_objects/content_read_models.dart';
+import '../datasources/local/app_database.dart';
 import '../datasources/local/daos/deck_dao.dart';
 import '../datasources/local/daos/flashcard_dao.dart';
 import '../datasources/local/daos/folder_dao.dart';
 import '../datasources/local/local_transaction_runner.dart';
 import '../mappers/content_entity_mappers.dart';
+import '../mappers/database_enum_codecs.dart';
 import 'repository_support.dart';
 
 final class DeckRepositoryImpl implements DeckRepository {
@@ -82,22 +85,7 @@ final class DeckRepositoryImpl implements DeckRepository {
         ),
       );
     }
-    if (query.sortMode == ContentSortMode.lastStudied) {
-      items.sort((a, b) {
-        final left = a.lastStudiedAt;
-        final right = b.lastStudiedAt;
-        if (left == null && right == null) {
-          return a.deck.sortOrder.compareTo(b.deck.sortOrder);
-        }
-        if (left == null) {
-          return 1;
-        }
-        if (right == null) {
-          return -1;
-        }
-        return right.compareTo(left);
-      });
-    }
+    _sortDeckReadModels(items, query.sortMode);
     return items;
   }
 
@@ -120,7 +108,7 @@ final class DeckRepositoryImpl implements DeckRepository {
       }
       targets.add(
         DeckMoveTarget(
-          folderId: folder.id,
+          id: folder.id,
           name: folder.name,
           breadcrumb: await _folderDao.getBreadcrumbNames(folder.id),
         ),
@@ -371,5 +359,36 @@ final class DeckRepositoryImpl implements DeckRepository {
       throw const ValidationException(message: 'The name is required.');
     }
     return trimmed;
+  }
+
+  void _sortDeckReadModels(
+    List<FolderDeckReadModel> items,
+    ContentSortMode sortMode,
+  ) {
+    switch (sortMode) {
+      case ContentSortMode.manual:
+        items.sort((a, b) => a.deck.sortOrder.compareTo(b.deck.sortOrder));
+      case ContentSortMode.name:
+        items.sort(
+          (a, b) => a.deck.name.toLowerCase().compareTo(b.deck.name.toLowerCase()),
+        );
+      case ContentSortMode.newest:
+        items.sort((a, b) => b.deck.createdAt.compareTo(a.deck.createdAt));
+      case ContentSortMode.lastStudied:
+        items.sort((a, b) {
+          final left = a.lastStudiedAt;
+          final right = b.lastStudiedAt;
+          if (left == null && right == null) {
+            return a.deck.sortOrder.compareTo(b.deck.sortOrder);
+          }
+          if (left == null) {
+            return 1;
+          }
+          if (right == null) {
+            return -1;
+          }
+          return right.compareTo(left);
+        });
+    }
   }
 }

@@ -14,12 +14,12 @@ final class FolderMoveTarget {
 
 final class DeckMoveTarget {
   const DeckMoveTarget({
-    required this.folderId,
+    required this.id,
     required this.name,
     required this.breadcrumb,
   });
 
-  final String folderId;
+  final String id;
   final String name;
   final List<String> breadcrumb;
 }

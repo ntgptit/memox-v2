@@ -57,9 +57,19 @@ class MemoxApp extends ConsumerWidget {
       builder: (context, child) {
         final size = context.windowSize;
         final theme = Theme.of(context);
-        final scaled = AppTypography.scaledTextTheme(theme.textTheme, size);
+        final scaledTextTheme = AppTypography.scaledTextTheme(
+          theme.textTheme,
+          size,
+        );
+        final scaledPrimaryTextTheme = AppTypography.scaledTextTheme(
+          theme.primaryTextTheme,
+          size,
+        );
         return Theme(
-          data: theme.copyWith(textTheme: scaled),
+          data: theme.copyWith(
+            textTheme: scaledTextTheme,
+            primaryTextTheme: scaledPrimaryTextTheme,
+          ),
           child: child ?? const SizedBox.shrink(),
         );
       },

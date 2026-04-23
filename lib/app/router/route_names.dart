@@ -15,6 +15,11 @@ abstract final class RouteNames {
 
   // --- Nested routes under /library ---
   static const String folderDetail = 'folder-detail';
+  static const String deckDetail = 'deck-detail';
+  static const String flashcardList = 'flashcard-list';
+  static const String flashcardCreate = 'flashcard-create';
+  static const String flashcardEdit = 'flashcard-edit';
+  static const String deckImport = 'deck-import';
 }
 
 /// Path layout mirroring [RouteNames]. Kept separate so the router tree can
@@ -30,9 +35,17 @@ abstract final class RoutePaths {
   /// Relative segment registered under `/library`. Keep the `:id` placeholder
   /// in sync with [folderIdParam].
   static const String folderDetailSegment = 'folder/:id';
+  static const String deckDetailSegment = 'deck/:deckId';
+  static const String flashcardListSegment = 'deck/:deckId/flashcards';
+  static const String flashcardCreateSegment = 'deck/:deckId/flashcards/new';
+  static const String flashcardEditSegment =
+      'deck/:deckId/flashcards/:flashcardId/edit';
+  static const String deckImportSegment = 'deck/:deckId/import';
 
   /// Path-parameter key used by the folder-detail route.
   static const String folderIdParam = 'id';
+  static const String deckIdParam = 'deckId';
+  static const String flashcardIdParam = 'flashcardId';
 }
 
 /// Router-owned defaults shared by config/bootstrap layers.

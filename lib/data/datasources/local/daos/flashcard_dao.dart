@@ -1,7 +1,8 @@
 import 'package:drift/drift.dart';
 
-import '../../../domain/value_objects/content_actions.dart';
-import '../../../domain/value_objects/content_queries.dart';
+import '../../../../domain/enums/content_sort_mode.dart';
+import '../../../../domain/value_objects/content_actions.dart';
+import '../../../../domain/value_objects/content_queries.dart';
 import '../app_database.dart';
 
 final class FlashcardDao {
@@ -27,7 +28,7 @@ final class FlashcardDao {
         (table) =>
             table.front.lower().like(pattern) |
             table.back.lower().like(pattern) |
-            table.title.lower().like(pattern),
+            table.title.lower().isNotNull() & table.title.lower().like(pattern),
       );
     }
     switch (query.sortMode) {
@@ -35,11 +36,7 @@ final class FlashcardDao {
       case ContentSortMode.lastStudied:
         statement.orderBy([(table) => OrderingTerm.asc(table.sortOrder)]);
       case ContentSortMode.name:
-        statement.orderBy([
-          (table) => OrderingTerm.asc(
-            table.title.lower().coalesce(table.front.lower()),
-          ),
-        ]);
+        statement.orderBy([(table) => OrderingTerm.asc(table.sortOrder)]);
       case ContentSortMode.newest:
         statement.orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
     }

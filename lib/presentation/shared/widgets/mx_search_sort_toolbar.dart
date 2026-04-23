@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_icon_sizes.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/mx_gap.dart';
 import 'mx_chip.dart';
@@ -113,32 +114,27 @@ class MxSearchSortToolbar<T> extends StatelessWidget {
     final selectedOption = _selectedOption;
     if (sortOptions.isNotEmpty) {
       widgets.add(
-        PopupMenuButton<T>(
-          initialValue: selectedSort,
-          onSelected: onSortSelected,
-          itemBuilder: (context) => [
-            for (final option in sortOptions)
-              PopupMenuItem<T>(
-                value: option.value,
-                child: Row(
-                  children: [
-                    if (option.icon != null) ...[
-                      Icon(option.icon, size: 18),
-                      const MxGap.h(AppSpacing.sm),
-                    ],
-                    Text(option.label),
-                  ],
-                ),
-              ),
-          ],
-          child: MxChip(
+        MenuAnchor(
+          builder: (context, controller, _) => MxChip(
             label: selectedOption?.label ?? sortLabel!,
             icon: selectedOption?.icon ?? Icons.swap_vert_rounded,
             selected: selectedOption != null,
             tone: selectedOption != null
                 ? MxChipTone.primary
                 : MxChipTone.neutral,
+            onTap: () =>
+                controller.isOpen ? controller.close() : controller.open(),
           ),
+          menuChildren: [
+            for (final option in sortOptions)
+              MenuItemButton(
+                leadingIcon: option.icon != null
+                    ? Icon(option.icon, size: AppIconSizes.sm)
+                    : null,
+                onPressed: () => onSortSelected?.call(option.value),
+                child: Text(option.label),
+              ),
+          ],
         ),
       );
     }

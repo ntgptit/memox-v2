@@ -1,6 +1,7 @@
 import '../../core/errors/result.dart';
 import '../entities/folder_entity.dart';
 import '../repositories/folder_repository.dart';
+import '../value_objects/content_actions.dart';
 
 final class CreateFolderUseCase {
   const CreateFolderUseCase(this._repository);
@@ -32,6 +33,16 @@ final class UpdateFolderUseCase {
     required String name,
   }) {
     return _repository.updateFolder(folderId: folderId, name: name);
+  }
+}
+
+final class GetFolderMoveTargetsUseCase {
+  const GetFolderMoveTargetsUseCase(this._repository);
+
+  final FolderRepository _repository;
+
+  Future<List<FolderMoveTarget>> execute(String folderId) {
+    return _repository.getFolderMoveTargets(folderId);
   }
 }
 
