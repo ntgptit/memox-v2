@@ -146,6 +146,18 @@ scopes:
       - "lib/presentation/shared/**/*.dart"
       - "lib/app/app.dart"
     exclude: *generated
+  ui_size_literal_files:
+    roots: ["."]
+    include:
+      - "lib/main.dart"
+      - "lib/presentation/features/**/screens/*.dart"
+      - "lib/presentation/features/**/screens/**/*.dart"
+      - "lib/presentation/features/**/widgets/*.dart"
+      - "lib/presentation/features/**/widgets/**/*.dart"
+      - "lib/presentation/shared/*.dart"
+      - "lib/presentation/shared/**/*.dart"
+      - "lib/app/app.dart"
+    exclude: *generated
   child_widget_layout_files:
     roots: ["."]
     include:

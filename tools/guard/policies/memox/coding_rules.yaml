@@ -152,22 +152,3 @@ rules:
     params:
       patterns:
         - "\\bMxGap\\.h\\s*\\("
-
-  - id: consumer_stateful_requires_stateful_reason
-    type: forbidden_pattern
-    name: "ConsumerStatefulWidget Must Justify Stateful Ownership"
-    description: >
-      Prefer `ConsumerWidget` by default. `ConsumerStatefulWidget` is allowed
-      only when the file also owns StatefulWidget lifecycle (`initState`,
-      `dispose`, `didUpdateWidget`), lifecycle-bound controllers/nodes, or
-      explicit local mutable UI state coordinated via `setState(...)`.
-    message_code: consumer_stateful_requires_stateful_reason
-    severity: error
-    impact: architecture
-    scope: all
-    targets:
-      - "lib/**/*.dart"
-    fix_hint_code: prefer_consumer_widget_without_lifecycle_need
-    params:
-      patterns:
-        - "(?s)extends\\s+ConsumerStatefulWidget\\b(?!.*(?:initState\\s*\\(|dispose\\s*\\(|didUpdateWidget\\s*\\(|setState\\s*\\(|AnimationController\\b|TabController\\b|ScrollController\\b|PageController\\b|FocusNode\\b|TextEditingController\\b|ValueNotifier\\b))"

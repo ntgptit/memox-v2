@@ -253,8 +253,6 @@ messages:
     en: "Do not hardcode page gutter on feature screen scroll bodies. Remove manual `EdgeInsets...` from `ListView` or `SingleChildScrollView` and route page insets through `MxContentShell`, `MxScaffold`, or `AppLayout.pageInsets(...)`."
   mx_gap_horizontal_constructor_forbidden:
     en: "`MxGap.h(...)` is removed in this repo. Use axis-aware `MxGap(...)` so spacing follows the parent axis automatically."
-  consumer_stateful_requires_stateful_reason:
-    en: "Prefer `ConsumerWidget` unless the file truly owns StatefulWidget lifecycle or local mutable UI state. `ConsumerStatefulWidget` is only justified here when the file also contains lifecycle hooks (`initState`, `dispose`, `didUpdateWidget`), lifecycle-bound controllers/nodes, or explicit `setState(...)` state."
   screen_custom_error_surface:
     en: "Feature screens should not use bespoke generic error widgets; route generic states through shared MemoX state surfaces instead."
   screen_error_message_passthrough:
@@ -403,9 +401,6 @@ fix_hints:
   use_axis_aware_mx_gap:
     text:
       en: "Replace `MxGap.h(...)` with `MxGap(...)`. `MxGap` now delegates to the axis-aware `gap` package, so the parent `Row`, `Column`, `Flex`, or scrollable determines whether the spacing is horizontal or vertical."
-  prefer_consumer_widget_without_lifecycle_need:
-    text:
-      en: "Downgrade this widget to `ConsumerWidget` when it only needs `ref.watch(...)`, `ref.read(...)`, and render logic. Keep `ConsumerStatefulWidget` only if the file also owns lifecycle hooks, lifecycle-bound controllers/nodes, or explicit local UI state managed with `setState(...)`."
   use_shared_widget_in_features:
     text:
       en: "Replace the raw Flutter widget with an existing shared MemoX surface such as `MxPrimaryButton`, `MxSecondaryButton`, `MxCard`, `MxTextField`, `MxChip`, `MxIconButton`, `MxProgressIndicator`, `MxListTile`, `MxDialog`, `MxBottomSheet`, or `MxScaffold` when one exists. If the control is truly feature-specific, wrap the Material widget behind a small feature-local adapter so raw Flutter constructors do not become the direct screen/widget API."

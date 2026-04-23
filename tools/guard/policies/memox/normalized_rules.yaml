@@ -1299,7 +1299,7 @@ rules:
     message_code: ui_raw_size_literals
     severity: warning
     impact: design_system
-    scope: widget_ui_files
+    scope: ui_size_literal_files
     fix_hint_code: use_size_tokens_or_constraints
     params:
       check_id: ui_raw_size_literals
