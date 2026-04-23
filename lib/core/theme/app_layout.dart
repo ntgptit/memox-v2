@@ -55,6 +55,25 @@ abstract final class AppLayout {
     }
   }
 
+  /// Top padding for a top-level page body.
+  static double pageTopPadding(WindowSize size) =>
+      size.index >= WindowSize.expanded.index ? AppSpacing.xl : AppSpacing.lg;
+
+  /// Bottom padding for a top-level page body.
+  static double pageBottomPadding(WindowSize size, {bool hasFab = false}) =>
+      hasFab ? AppSpacing.xxxl : AppSpacing.xl;
+
+  /// Full page insets for a scrollable body.
+  static EdgeInsets pageInsets(WindowSize size, {bool hasFab = false}) {
+    final horizontal = pagePadding(size);
+    return EdgeInsets.fromLTRB(
+      horizontal.left,
+      pageTopPadding(size),
+      horizontal.right,
+      pageBottomPadding(size, hasFab: hasFab),
+    );
+  }
+
   // --- Content width --------------------------------------------------------
 
   /// Max width for a centered content column at [role] on [size].
@@ -76,9 +95,7 @@ abstract final class AppLayout {
 
   /// Vertical gap between top-level sections on a page.
   static double sectionGap(WindowSize size) =>
-      size.index >= WindowSize.expanded.index
-          ? AppSpacing.xxl
-          : AppSpacing.lg;
+      size.index >= WindowSize.expanded.index ? AppSpacing.xxl : AppSpacing.lg;
 
   // --- Grid columns ---------------------------------------------------------
 
@@ -111,6 +128,11 @@ abstract final class AppLayout {
 /// doesn't keep re-deriving the window size.
 extension LayoutContext on BuildContext {
   EdgeInsets get pagePadding => AppLayout.pagePadding(windowSize);
+  double get pageTopPadding => AppLayout.pageTopPadding(windowSize);
+  double pageBottomPadding({bool hasFab = false}) =>
+      AppLayout.pageBottomPadding(windowSize, hasFab: hasFab);
+  EdgeInsets pageInsets({bool hasFab = false}) =>
+      AppLayout.pageInsets(windowSize, hasFab: hasFab);
   double contentMaxWidth(MxContentWidth role) =>
       AppLayout.contentMaxWidth(role, windowSize);
   double get sectionGap => AppLayout.sectionGap(windowSize);

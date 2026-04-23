@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_queries.dart';
+import '../../../../domain/value_objects/content_read_models.dart';
 import '../app_database.dart';
 
 final class FolderDao {
@@ -66,17 +67,19 @@ final class FolderDao {
     required int createdAt,
     required int updatedAt,
   }) {
-    return _database.into(_database.folders).insert(
-      FoldersCompanion.insert(
-        id: id,
-        parentId: Value(parentId),
-        name: name,
-        contentMode: contentMode.storageValue,
-        sortOrder: sortOrder,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-      ),
-    );
+    return _database
+        .into(_database.folders)
+        .insert(
+          FoldersCompanion.insert(
+            id: id,
+            parentId: Value(parentId),
+            name: name,
+            contentMode: contentMode.storageValue,
+            sortOrder: sortOrder,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+          ),
+        );
   }
 
   Future<void> updateFolderName({
@@ -84,12 +87,10 @@ final class FolderDao {
     required String name,
     required int updatedAt,
   }) {
-    return (_database.update(_database.folders)
-      ..where((table) => table.id.equals(folderId))).write(
-      FoldersCompanion(
-        name: Value(name),
-        updatedAt: Value(updatedAt),
-      ),
+    return (_database.update(
+      _database.folders,
+    )..where((table) => table.id.equals(folderId))).write(
+      FoldersCompanion(name: Value(name), updatedAt: Value(updatedAt)),
     );
   }
 
@@ -99,8 +100,9 @@ final class FolderDao {
     required int sortOrder,
     required int updatedAt,
   }) {
-    return (_database.update(_database.folders)
-      ..where((table) => table.id.equals(folderId))).write(
+    return (_database.update(
+      _database.folders,
+    )..where((table) => table.id.equals(folderId))).write(
       FoldersCompanion(
         parentId: Value(parentId),
         sortOrder: Value(sortOrder),
@@ -114,8 +116,9 @@ final class FolderDao {
     required FolderContentMode contentMode,
     required int updatedAt,
   }) {
-    return (_database.update(_database.folders)
-      ..where((table) => table.id.equals(folderId))).write(
+    return (_database.update(
+      _database.folders,
+    )..where((table) => table.id.equals(folderId))).write(
       FoldersCompanion(
         contentMode: Value(contentMode.storageValue),
         updatedAt: Value(updatedAt),
@@ -135,38 +138,43 @@ final class FolderDao {
     required int updatedAt,
   }) async {
     for (var index = 0; index < orderedFolderIds.length; index++) {
-      await (_database.update(_database.folders)
-        ..where((table) {
-          final matchesParent = parentFolderId == null
-              ? table.parentId.isNull()
-              : table.parentId.equals(parentFolderId);
-          return matchesParent & table.id.equals(orderedFolderIds[index]);
-        })).write(
-        FoldersCompanion(
-          sortOrder: Value(index),
-          updatedAt: Value(updatedAt),
-        ),
-      );
+      await (_database.update(_database.folders)..where((table) {
+            final matchesParent = parentFolderId == null
+                ? table.parentId.isNull()
+                : table.parentId.equals(parentFolderId);
+            return matchesParent & table.id.equals(orderedFolderIds[index]);
+          }))
+          .write(
+            FoldersCompanion(
+              sortOrder: Value(index),
+              updatedAt: Value(updatedAt),
+            ),
+          );
     }
   }
 
   Future<bool> hasSubfolders(String folderId) async {
-    final row = await (_database.selectOnly(_database.folders)
-      ..addColumns([_database.folders.id.count()])
-      ..where(_database.folders.parentId.equals(folderId))).getSingle();
+    final row =
+        await (_database.selectOnly(_database.folders)
+              ..addColumns([_database.folders.id.count()])
+              ..where(_database.folders.parentId.equals(folderId)))
+            .getSingle();
     return (row.read(_database.folders.id.count()) ?? 0) > 0;
   }
 
   Future<bool> hasDecks(String folderId) async {
-    final row = await (_database.selectOnly(_database.decks)
-      ..addColumns([_database.decks.id.count()])
-      ..where(_database.decks.folderId.equals(folderId))).getSingle();
+    final row =
+        await (_database.selectOnly(_database.decks)
+              ..addColumns([_database.decks.id.count()])
+              ..where(_database.decks.folderId.equals(folderId)))
+            .getSingle();
     return (row.read(_database.decks.id.count()) ?? 0) > 0;
   }
 
   Future<List<String>> getSubtreeIds(String folderId) async {
-    final result = await _database.customSelect(
-      '''
+    final result = await _database
+        .customSelect(
+          '''
       WITH RECURSIVE subtree(id) AS (
         SELECT id FROM folders WHERE id = ?1
         UNION ALL
@@ -176,9 +184,10 @@ final class FolderDao {
       )
       SELECT id FROM subtree
       ''',
-      variables: [Variable<String>(folderId)],
-      readsFrom: {_database.folders},
-    ).get();
+          variables: [Variable<String>(folderId)],
+          readsFrom: {_database.folders},
+        )
+        .get();
     return result.map((row) => row.read<String>('id')).toList(growable: false);
   }
 
@@ -188,8 +197,16 @@ final class FolderDao {
   }
 
   Future<List<String>> getBreadcrumbNames(String folderId) async {
-    final result = await _database.customSelect(
-      '''
+    final items = await getBreadcrumbSegments(folderId);
+    return items.map((item) => item.label).toList(growable: false);
+  }
+
+  Future<List<BreadcrumbSegmentReadModel>> getBreadcrumbSegments(
+    String folderId,
+  ) async {
+    final result = await _database
+        .customSelect(
+          '''
       WITH RECURSIVE breadcrumb(id, parent_id, name, depth) AS (
         SELECT id, parent_id, name, 0 FROM folders WHERE id = ?1
         UNION ALL
@@ -197,12 +214,20 @@ final class FolderDao {
         FROM folders parent
         INNER JOIN breadcrumb child ON child.parent_id = parent.id
       )
-      SELECT name FROM breadcrumb ORDER BY depth DESC
+      SELECT id, name FROM breadcrumb ORDER BY depth DESC
       ''',
-      variables: [Variable<String>(folderId)],
-      readsFrom: {_database.folders},
-    ).get();
-    return result.map((row) => row.read<String>('name')).toList(growable: false);
+          variables: [Variable<String>(folderId)],
+          readsFrom: {_database.folders},
+        )
+        .get();
+    return result
+        .map(
+          (row) => BreadcrumbSegmentReadModel(
+            label: row.read<String>('name'),
+            folderId: row.read<String>('id'),
+          ),
+        )
+        .toList(growable: false);
   }
 
   Future<int> countDecksInSubtree(String folderId) async {
@@ -210,9 +235,11 @@ final class FolderDao {
     if (subtreeIds.isEmpty) {
       return 0;
     }
-    final row = await (_database.selectOnly(_database.decks)
-      ..addColumns([_database.decks.id.count()])
-      ..where(_database.decks.folderId.isIn(subtreeIds))).getSingle();
+    final row =
+        await (_database.selectOnly(_database.decks)
+              ..addColumns([_database.decks.id.count()])
+              ..where(_database.decks.folderId.isIn(subtreeIds)))
+            .getSingle();
     return row.read(_database.decks.id.count()) ?? 0;
   }
 
@@ -221,16 +248,18 @@ final class FolderDao {
     if (subtreeIds.isEmpty) {
       return 0;
     }
-    final row = await _database.customSelect(
-      '''
+    final row = await _database
+        .customSelect(
+          '''
       SELECT COUNT(f.id) AS item_count
       FROM flashcards f
       INNER JOIN decks d ON d.id = f.deck_id
       WHERE d.folder_id IN (${_placeholders(subtreeIds.length)})
       ''',
-      variables: subtreeIds.map(Variable<String>.new).toList(),
-      readsFrom: {_database.decks, _database.flashcards},
-    ).getSingle();
+          variables: subtreeIds.map(Variable<String>.new).toList(),
+          readsFrom: {_database.decks, _database.flashcards},
+        )
+        .getSingle();
     return row.read<int>('item_count');
   }
 
@@ -239,17 +268,23 @@ final class FolderDao {
     if (subtreeIds.isEmpty) {
       return null;
     }
-    final row = await _database.customSelect(
-      '''
+    final row = await _database
+        .customSelect(
+          '''
       SELECT MAX(p.last_studied_at) AS last_studied_at
       FROM flashcard_progress p
       INNER JOIN flashcards f ON f.id = p.flashcard_id
       INNER JOIN decks d ON d.id = f.deck_id
       WHERE d.folder_id IN (${_placeholders(subtreeIds.length)})
       ''',
-      variables: subtreeIds.map(Variable<String>.new).toList(),
-      readsFrom: {_database.decks, _database.flashcards, _database.flashcardProgress},
-    ).getSingle();
+          variables: subtreeIds.map(Variable<String>.new).toList(),
+          readsFrom: {
+            _database.decks,
+            _database.flashcards,
+            _database.flashcardProgress,
+          },
+        )
+        .getSingle();
     return row.read<int?>('last_studied_at');
   }
 
@@ -258,28 +293,38 @@ final class FolderDao {
     if (subtreeIds.isEmpty) {
       return const <int>[];
     }
-    final rows = await _database.customSelect(
-      '''
+    final rows = await _database
+        .customSelect(
+          '''
       SELECT p.current_box
       FROM flashcard_progress p
       INNER JOIN flashcards f ON f.id = p.flashcard_id
       INNER JOIN decks d ON d.id = f.deck_id
       WHERE d.folder_id IN (${_placeholders(subtreeIds.length)})
       ''',
-      variables: subtreeIds.map(Variable<String>.new).toList(),
-      readsFrom: {_database.decks, _database.flashcards, _database.flashcardProgress},
-    ).get();
-    return rows.map((row) => row.read<int>('current_box')).toList(growable: false);
+          variables: subtreeIds.map(Variable<String>.new).toList(),
+          readsFrom: {
+            _database.decks,
+            _database.flashcards,
+            _database.flashcardProgress,
+          },
+        )
+        .get();
+    return rows
+        .map((row) => row.read<int>('current_box'))
+        .toList(growable: false);
   }
 
   Future<int> countDueToday(int endOfTodayEpochMillis) async {
-    final row = await (_database.selectOnly(_database.flashcardProgress)
-      ..addColumns([_database.flashcardProgress.flashcardId.count()])
-      ..where(
-        _database.flashcardProgress.dueAt.isSmallerOrEqualValue(
-          endOfTodayEpochMillis,
-        ),
-      )).getSingle();
+    final row =
+        await (_database.selectOnly(_database.flashcardProgress)
+              ..addColumns([_database.flashcardProgress.flashcardId.count()])
+              ..where(
+                _database.flashcardProgress.dueAt.isSmallerOrEqualValue(
+                  endOfTodayEpochMillis,
+                ),
+              ))
+            .getSingle();
     return row.read(_database.flashcardProgress.flashcardId.count()) ?? 0;
   }
 

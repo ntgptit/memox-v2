@@ -11,8 +11,8 @@ import '../../../../core/theme/mx_gap.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
-import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
+import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/states/mx_error_state.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
@@ -20,6 +20,7 @@ import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
 import '../../../shared/widgets/mx_term_row.dart';
+import '../../../shared/widgets/mx_text.dart';
 import '../../../shared/widgets/mx_text_field.dart';
 import '../viewmodels/flashcard_import_viewmodel.dart';
 
@@ -46,15 +47,15 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    ref.listen<AsyncValue<void>>(flashcardImportControllerProvider(widget.deckId), (
-      _,
-      next,
-    ) {
-      final failure = flashcardImportError(next);
-      if (failure != null) {
-        MxSnackbar.error(context, flashcardImportErrorMessage(failure));
-      }
-    });
+    ref.listen<AsyncValue<void>>(
+      flashcardImportControllerProvider(widget.deckId),
+      (_, next) {
+        final failure = flashcardImportError(next);
+        if (failure != null) {
+          MxSnackbar.error(context, flashcardImportErrorMessage(failure));
+        }
+      },
+    );
 
     final draft = ref.watch(flashcardImportDraftProvider(widget.deckId));
     final draftNotifier = ref.read(
@@ -72,115 +73,108 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     }
 
     return MxScaffold(
-      body: SafeArea(
-        child: MxContentShell(
-          width: MxContentWidth.wide,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              MxFeatureSpacing.lg,
-              MxFeatureSpacing.lg,
-              MxFeatureSpacing.lg,
-              MxFeatureSpacing.xxxl,
-            ),
-            children: [
-              _ImportHeader(deckId: widget.deckId),
-              const MxGap(MxFeatureSpacing.xl),
-              MxSection(
-                title: l10n.importSourceTitle,
-                subtitle: l10n.importSourceSubtitle,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MxSegmentedControl<ImportSourceFormat>(
-                      segments: [
-                        MxSegment(
-                          value: ImportSourceFormat.csv,
-                          label: l10n.importCsvLabel,
-                          icon: Icons.table_chart_outlined,
-                        ),
-                        MxSegment(
-                          value: ImportSourceFormat.structuredText,
-                          label: l10n.importTextFormatLabel,
-                          icon: Icons.notes_outlined,
-                        ),
-                      ],
-                      selected: <ImportSourceFormat>{draft.format},
-                      onChanged: (selection) =>
-                          draftNotifier.setFormat(selection.first),
-                    ),
-                    const MxGap(MxFeatureSpacing.lg),
-                    Wrap(
-                      spacing: MxFeatureSpacing.sm,
-                      runSpacing: MxFeatureSpacing.sm,
-                      children: [
-                        MxSecondaryButton(
-                          label: l10n.importLoadFile,
-                          leadingIcon: Icons.file_open_outlined,
-                          variant: MxSecondaryVariant.outlined,
-                          onPressed: () => _pickFile(context, draftNotifier),
-                        ),
-                        MxSecondaryButton(
-                          label: l10n.commonClear,
-                          variant: MxSecondaryVariant.text,
-                          onPressed: draftNotifier.reset,
-                        ),
-                      ],
-                    ),
-                    const MxGap(MxFeatureSpacing.lg),
-                    MxTextField(
-                      controller: _rawContentController,
-                      label: draft.format == ImportSourceFormat.csv
-                          ? l10n.importCsvContentLabel
-                          : l10n.importTextContentLabel,
-                      hintText: draft.format == ImportSourceFormat.csv
-                          ? l10n.importCsvHint
-                          : l10n.importTextHint,
-                      minLines: 10,
-                      maxLines: 18,
-                      onChanged: draftNotifier.setRawContent,
-                    ),
-                    const MxGap(MxFeatureSpacing.lg),
-                    Wrap(
-                      spacing: MxFeatureSpacing.sm,
-                      runSpacing: MxFeatureSpacing.sm,
-                      children: [
-                        MxSecondaryButton(
-                          label: l10n.importPreviewAction,
-                          leadingIcon: Icons.preview_outlined,
-                          variant: MxSecondaryVariant.outlined,
-                          onPressed: controller.preparePreview,
-                        ),
-                        MxPrimaryButton(
-                          label: l10n.commonImport,
-                          leadingIcon: Icons.file_upload_outlined,
-                          onPressed: draft.preparation?.canCommit == true
-                              ? () async {
-                                  final count = await controller.commitImport();
-                                  if (!context.mounted || count == null) {
-                                    return;
-                                  }
-                                  MxSnackbar.success(
-                                    context,
-                                    l10n.importSuccessMessage(count),
-                                  );
-                                  await context.popRoute(
-                                    fallback: () =>
-                                        context.goDeckDetail(widget.deckId),
-                                  );
+      body: MxContentShell(
+        width: MxContentWidth.wide,
+        applyVerticalPadding: true,
+        child: ListView(
+          children: [
+            _ImportHeader(deckId: widget.deckId),
+            const MxGap(MxSpace.xl),
+            MxSection(
+              title: l10n.importSourceTitle,
+              subtitle: l10n.importSourceSubtitle,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  MxSegmentedControl<ImportSourceFormat>(
+                    segments: [
+                      MxSegment(
+                        value: ImportSourceFormat.csv,
+                        label: l10n.importCsvLabel,
+                        icon: Icons.table_chart_outlined,
+                      ),
+                      MxSegment(
+                        value: ImportSourceFormat.structuredText,
+                        label: l10n.importTextFormatLabel,
+                        icon: Icons.notes_outlined,
+                      ),
+                    ],
+                    selected: <ImportSourceFormat>{draft.format},
+                    onChanged: (selection) =>
+                        draftNotifier.setFormat(selection.first),
+                  ),
+                  const MxGap(MxSpace.lg),
+                  Wrap(
+                    spacing: MxSpace.sm,
+                    runSpacing: MxSpace.sm,
+                    children: [
+                      MxSecondaryButton(
+                        label: l10n.importLoadFile,
+                        leadingIcon: Icons.file_open_outlined,
+                        variant: MxSecondaryVariant.outlined,
+                        onPressed: () => _pickFile(context, draftNotifier),
+                      ),
+                      MxSecondaryButton(
+                        label: l10n.commonClear,
+                        variant: MxSecondaryVariant.text,
+                        onPressed: draftNotifier.reset,
+                      ),
+                    ],
+                  ),
+                  const MxGap(MxSpace.lg),
+                  MxTextField(
+                    controller: _rawContentController,
+                    label: draft.format == ImportSourceFormat.csv
+                        ? l10n.importCsvContentLabel
+                        : l10n.importTextContentLabel,
+                    hintText: draft.format == ImportSourceFormat.csv
+                        ? l10n.importCsvHint
+                        : l10n.importTextHint,
+                    minLines: 10,
+                    maxLines: 18,
+                    onChanged: draftNotifier.setRawContent,
+                  ),
+                  const MxGap(MxSpace.lg),
+                  Wrap(
+                    spacing: MxSpace.sm,
+                    runSpacing: MxSpace.sm,
+                    children: [
+                      MxSecondaryButton(
+                        label: l10n.importPreviewAction,
+                        leadingIcon: Icons.preview_outlined,
+                        variant: MxSecondaryVariant.outlined,
+                        onPressed: controller.preparePreview,
+                      ),
+                      MxPrimaryButton(
+                        label: l10n.commonImport,
+                        leadingIcon: Icons.file_upload_outlined,
+                        onPressed: draft.preparation?.canCommit == true
+                            ? () async {
+                                final count = await controller.commitImport();
+                                if (!context.mounted || count == null) {
+                                  return;
                                 }
-                              : null,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                                MxSnackbar.success(
+                                  context,
+                                  l10n.importSuccessMessage(count),
+                                );
+                                await context.popRoute(
+                                  fallback: () =>
+                                      context.goDeckDetail(widget.deckId),
+                                );
+                              }
+                            : null,
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              if (draft.preparation != null) ...[
-                const MxGap(MxFeatureSpacing.xl),
-                _ImportPreviewSection(preparation: draft.preparation!),
-              ],
+            ),
+            if (draft.preparation != null) ...[
+              const MxGap(MxSpace.xl),
+              _ImportPreviewSection(preparation: draft.preparation!),
             ],
-          ),
+          ],
         ),
       ),
     );
@@ -220,8 +214,6 @@ class _ImportHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Row(
       children: [
@@ -231,12 +223,9 @@ class _ImportHeader extends StatelessWidget {
           onPressed: () =>
               context.popRoute(fallback: () => context.goDeckDetail(deckId)),
         ),
-        const MxGap.h(MxFeatureSpacing.sm),
+        const MxGap(MxSpace.sm),
         Expanded(
-          child: Text(
-            l10n.flashcardsImportTitle,
-            style: textTheme.headlineSmall?.copyWith(color: scheme.onSurface),
-          ),
+          child: MxText(l10n.flashcardsImportTitle, role: MxTextRole.pageTitle),
         ),
       ],
     );
@@ -261,7 +250,11 @@ class _ImportPreviewSection extends StatelessWidget {
             subtitle: l10n.importValidationIssuesSubtitle,
             child: Column(
               children: [
-                for (var index = 0; index < preparation.issues.length; index++) ...[
+                for (
+                  var index = 0;
+                  index < preparation.issues.length;
+                  index++
+                ) ...[
                   MxTermRow(
                     term: l10n.importValidationIssueLine(
                       preparation.issues[index].lineNumber,
@@ -269,17 +262,15 @@ class _ImportPreviewSection extends StatelessWidget {
                     definition: preparation.issues[index].message,
                   ),
                   if (index < preparation.issues.length - 1)
-                    const MxGap(MxFeatureSpacing.sm),
+                    const MxGap(MxSpace.sm),
                 ],
               ],
             ),
           ),
-        const MxGap(MxFeatureSpacing.xl),
+        const MxGap(MxSpace.xl),
         MxSection(
           title: l10n.importPreviewTitle,
-          subtitle: l10n.importPreviewSubtitle(
-            preparation.previewItems.length,
-          ),
+          subtitle: l10n.importPreviewSubtitle(preparation.previewItems.length),
           child: preparation.previewItems.isEmpty
               ? MxErrorState(
                   title: l10n.importNothingTitle,
@@ -287,14 +278,14 @@ class _ImportPreviewSection extends StatelessWidget {
                 )
               : Column(
                   children: [
-                    for (var index = 0;
-                        index < preparation.previewItems.length;
-                        index++) ...[
+                    for (
+                      var index = 0;
+                      index < preparation.previewItems.length;
+                      index++
+                    ) ...[
                       MxTermRow(
-                        term: preparation
-                                    .previewItems[index]
-                                    .draft
-                                    .title
+                        term:
+                            preparation.previewItems[index].draft.title
                                     ?.trim()
                                     .isNotEmpty ==
                                 true
@@ -304,7 +295,7 @@ class _ImportPreviewSection extends StatelessWidget {
                         caption: preparation.previewItems[index].sourceLabel,
                       ),
                       if (index < preparation.previewItems.length - 1)
-                        const MxGap(MxFeatureSpacing.sm),
+                        const MxGap(MxSpace.sm),
                     ],
                   ],
                 ),

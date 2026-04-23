@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/mx_gap.dart';
+import 'mx_text.dart';
 
 /// Row-level section header: big title on the left, optional action link on
 /// the right. Matches patterns like "Thành tựu – Xem tất cả".
@@ -21,9 +22,6 @@ class MxSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,26 +29,16 @@ class MxSectionHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: textTheme.titleMedium?.copyWith(color: scheme.onSurface),
-              ),
+              MxText(title, role: MxTextRole.sectionTitle),
               if (subtitle != null) ...[
                 const MxGap(AppSpacing.xxs),
-                Text(
-                  subtitle!,
-                  style: textTheme.bodySmall
-                      ?.copyWith(color: scheme.onSurfaceVariant),
-                ),
+                MxText(subtitle!, role: MxTextRole.sectionSubtitle),
               ],
             ],
           ),
         ),
         if (actionLabel != null && onAction != null)
-          TextButton(
-            onPressed: onAction,
-            child: Text(actionLabel!),
-          ),
+          TextButton(onPressed: onAction, child: Text(actionLabel!)),
       ],
     );
   }

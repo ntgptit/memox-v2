@@ -109,6 +109,7 @@ ThemeData buildLightTheme() {
     sliderTheme: ToggleThemeBuilder.slider(scheme),
     popupMenuTheme: PopupMenuThemeBuilder.build(scheme),
     menuTheme: PopupMenuThemeBuilder.menu(scheme),
+    menuButtonTheme: PopupMenuThemeBuilder.menuButton(scheme),
     textSelectionTheme: TextSelectionThemeBuilder.build(scheme),
     extensions: const [MxColorsExtension.light],
   );

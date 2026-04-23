@@ -4,6 +4,8 @@ import '../../../core/theme/app_icon_sizes.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/mx_gap.dart';
+import 'mx_text.dart';
+import 'mx_tappable.dart';
 
 class MxBreadcrumb {
   const MxBreadcrumb({required this.label, this.onTap, this.icon});
@@ -17,11 +19,7 @@ class MxBreadcrumb {
 /// The last crumb is rendered as the current page (non-tappable, stronger
 /// weight); previous crumbs are tappable text buttons.
 class MxBreadcrumbBar extends StatelessWidget {
-  const MxBreadcrumbBar({
-    required this.items,
-    this.maxCrumbs = 4,
-    super.key,
-  });
+  const MxBreadcrumbBar({required this.items, this.maxCrumbs = 4, super.key});
 
   final List<MxBreadcrumb> items;
   final int maxCrumbs;
@@ -57,27 +55,32 @@ class MxBreadcrumbBar extends StatelessWidget {
 
   Widget _crumb(BuildContext context, MxBreadcrumb b, {required bool isLast}) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final baseStyle = textTheme.labelLarge;
-    final style = isLast
-        ? baseStyle?.copyWith(color: scheme.onSurface)
-        : baseStyle?.copyWith(color: scheme.onSurfaceVariant);
+    final labelColor = isLast ? scheme.onSurface : null;
+    final iconColor =
+        labelColor ??
+        MxTextStyles.resolve(context, MxTextRole.breadcrumb).color;
 
     final content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         if (b.icon != null) ...[
-          Icon(b.icon, size: AppIconSizes.sm, color: style?.color),
-          const MxGap.h(AppSpacing.xs),
+          Icon(b.icon, size: AppIconSizes.sm, color: iconColor),
+          const MxGap(AppSpacing.xs),
         ],
-        Text(b.label, style: style, maxLines: 1, overflow: TextOverflow.ellipsis),
+        MxText(
+          b.label,
+          role: MxTextRole.breadcrumb,
+          color: labelColor,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
 
     if (isLast || b.onTap == null) return content;
 
-    return InkWell(
-      borderRadius: AppRadius.borderSm,
+    return MxTappable(
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
       onTap: b.onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(

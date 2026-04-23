@@ -4,6 +4,7 @@ import '../../../core/theme/app_icon_sizes.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/mx_gap.dart';
 import 'mx_card.dart';
+import 'mx_text.dart';
 
 /// Reusable term / definition row for flashcard and deck content lists.
 class MxTermRow extends StatelessWidget {
@@ -37,7 +38,6 @@ class MxTermRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final effectiveTrailing =
         trailing ??
         (selected
@@ -56,36 +56,30 @@ class MxTermRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (leading != null) ...[leading!, const MxGap.h(AppSpacing.md)],
+          if (leading != null) ...[leading!, const MxGap(AppSpacing.md)],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                MxText(
                   term,
-                  style: textTheme.titleSmall?.copyWith(
-                    color: scheme.onSurface,
-                  ),
+                  role: MxTextRole.tileTitle,
                   maxLines: termMaxLines,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const MxGap(AppSpacing.xxs),
-                Text(
+                MxText(
                   definition,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
+                  role: MxTextRole.contentBody,
                   maxLines: definitionMaxLines,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (caption != null) ...[
                   const MxGap(AppSpacing.sm),
-                  Text(
+                  MxText(
                     caption!,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
+                    role: MxTextRole.tileMeta,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -94,7 +88,7 @@ class MxTermRow extends StatelessWidget {
             ),
           ),
           if (effectiveTrailing != null) ...[
-            const MxGap.h(AppSpacing.md),
+            const MxGap(AppSpacing.md),
             effectiveTrailing,
           ],
         ],

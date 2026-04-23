@@ -5,6 +5,7 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/theme_extensions.dart';
 import '../../../core/theme/mx_gap.dart';
+import 'mx_text.dart';
 
 enum MxBadgeTone { primary, neutral, success, warning, error, info }
 
@@ -15,25 +16,20 @@ class MxBadge extends StatelessWidget {
     this.tone = MxBadgeTone.primary,
     this.icon,
     super.key,
-  })  : _isDot = false,
-        _count = null;
+  }) : _isDot = false,
+       _count = null;
 
-  const MxBadge.count(
-    int count, {
-    this.tone = MxBadgeTone.primary,
-    super.key,
-  })  : label = null,
-        icon = null,
-        _isDot = false,
-        _count = count;
+  const MxBadge.count(int count, {this.tone = MxBadgeTone.primary, super.key})
+    : label = null,
+      icon = null,
+      _isDot = false,
+      _count = count;
 
-  const MxBadge.dot({
-    this.tone = MxBadgeTone.error,
-    super.key,
-  })  : label = null,
-        icon = null,
-        _isDot = true,
-        _count = null;
+  const MxBadge.dot({this.tone = MxBadgeTone.error, super.key})
+    : label = null,
+      icon = null,
+      _isDot = true,
+      _count = null;
 
   final String? label;
   final int? _count;
@@ -44,7 +40,6 @@ class MxBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final mx = context.mxColors;
 
     final (Color bg, Color fg) = switch (tone) {
@@ -85,12 +80,9 @@ class MxBadge extends StatelessWidget {
         children: [
           if (icon != null) ...[
             Icon(icon, size: AppIconSizes.xs, color: fg),
-            const MxGap.h(AppSpacing.xs),
+            const MxGap(AppSpacing.xs),
           ],
-          Text(
-            text,
-            style: textTheme.labelSmall?.copyWith(color: fg),
-          ),
+          MxText(text, role: MxTextRole.badge, color: fg),
         ],
       ),
     );

@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_icon_sizes.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/mx_gap.dart';
 import 'mx_progress_ring.dart';
+import 'mx_text.dart';
+import 'mx_tappable.dart';
 
 /// Calm, low-chrome folder row for library listings.
 ///
@@ -30,7 +33,6 @@ class MxFolderTile extends StatelessWidget {
   /// guard:raw-size-reviewed minimum row height keeps tap target ≥ 48 dp even
   /// when caption is absent; not a theme token because it is row-geometry.
   static const double _minRowHeight = 64;
-
   final String name;
   final IconData icon;
 
@@ -51,7 +53,6 @@ class MxFolderTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final row = ConstrainedBox(
       constraints: const BoxConstraints(minHeight: _minRowHeight),
@@ -83,19 +84,17 @@ class MxFolderTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  MxText(
                     name,
-                    style: textTheme.titleSmall
-                        ?.copyWith(color: scheme.onSurface),
+                    role: MxTextRole.tileTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (caption != null) ...[
-                    const SizedBox(height: AppSpacing.xxs),
-                    Text(
+                    const MxGap(AppSpacing.xxs),
+                    MxText(
                       caption!,
-                      style: textTheme.bodySmall
-                          ?.copyWith(color: scheme.onSurfaceVariant),
+                      role: MxTextRole.tileMeta,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -113,9 +112,10 @@ class MxFolderTile extends StatelessWidget {
     );
 
     if (onTap == null) return row;
-    return Material(
-      type: MaterialType.transparency,
-      child: InkWell(onTap: onTap, child: row),
+    return MxTappable(
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+      onTap: onTap,
+      child: row,
     );
   }
 }

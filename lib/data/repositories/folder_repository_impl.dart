@@ -41,7 +41,9 @@ final class FolderRepositoryImpl implements FolderRepository {
   final IdGenerator _idGenerator;
 
   @override
-  Future<LibraryOverviewReadModel> getLibraryOverview(ContentQuery query) async {
+  Future<LibraryOverviewReadModel> getLibraryOverview(
+    ContentQuery query,
+  ) async {
     final folders = query.hasSearchTerm
         ? (await _folderDao.listAllFolders())
               .where(
@@ -55,7 +57,9 @@ final class FolderRepositoryImpl implements FolderRepository {
     for (final folder in folders) {
       final deckCount = await _folderDao.countDecksInSubtree(folder.id);
       final itemCount = await _folderDao.countFlashcardsInSubtree(folder.id);
-      final lastStudiedAt = await _folderDao.getLastStudiedAtInSubtree(folder.id);
+      final lastStudiedAt = await _folderDao.getLastStudiedAtInSubtree(
+        folder.id,
+      );
       final masteryPercent = computeMasteryPercent(
         await _folderDao.getCurrentBoxesInSubtree(folder.id),
       );
@@ -90,7 +94,10 @@ final class FolderRepositoryImpl implements FolderRepository {
       parentFolderId: folderId,
       query: query,
     );
-    final decks = await _deckDao.listDecksInFolder(folderId: folderId, query: query);
+    final decks = await _deckDao.listDecksInFolder(
+      folderId: folderId,
+      query: query,
+    );
     final deckItems = <FolderDeckReadModel>[];
     for (final deck in decks) {
       deckItems.add(await _buildFolderDeckReadModel(deck));
@@ -101,29 +108,30 @@ final class FolderRepositoryImpl implements FolderRepository {
         .toList(growable: false);
     switch (query.sortMode) {
       case ContentSortMode.lastStudied:
-      final lastStudiedMap = <String, int?>{};
-      for (final subfolder in subfolders) {
-        lastStudiedMap[subfolder.id] = await _folderDao.getLastStudiedAtInSubtree(
-          subfolder.id,
-        );
-      }
-      subfolderEntities.sort((FolderEntity a, FolderEntity b) {
-        final left = lastStudiedMap[a.id];
-        final right = lastStudiedMap[b.id];
-        if (left == null && right == null) {
-          return a.sortOrder.compareTo(b.sortOrder);
+        final lastStudiedMap = <String, int?>{};
+        for (final subfolder in subfolders) {
+          lastStudiedMap[subfolder.id] = await _folderDao
+              .getLastStudiedAtInSubtree(subfolder.id);
         }
-        if (left == null) {
-          return 1;
-        }
-        if (right == null) {
-          return -1;
-        }
-        return right.compareTo(left);
-      });
-      _sortFolderDeckItems(deckItems, query.sortMode);
+        subfolderEntities.sort((FolderEntity a, FolderEntity b) {
+          final left = lastStudiedMap[a.id];
+          final right = lastStudiedMap[b.id];
+          if (left == null && right == null) {
+            return a.sortOrder.compareTo(b.sortOrder);
+          }
+          if (left == null) {
+            return 1;
+          }
+          if (right == null) {
+            return -1;
+          }
+          return right.compareTo(left);
+        });
+        _sortFolderDeckItems(deckItems, query.sortMode);
       case ContentSortMode.name:
-        subfolderEntities.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        subfolderEntities.sort(
+          (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+        );
         _sortFolderDeckItems(deckItems, query.sortMode);
       case ContentSortMode.newest:
         subfolderEntities.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -133,10 +141,21 @@ final class FolderRepositoryImpl implements FolderRepository {
         _sortFolderDeckItems(deckItems, query.sortMode);
     }
 
+    final subfolderItems = <FolderSubfolderReadModel>[];
+    for (final subfolder in subfolderEntities) {
+      subfolderItems.add(
+        FolderSubfolderReadModel(
+          folder: subfolder,
+          deckCount: await _folderDao.countDecksInSubtree(subfolder.id),
+          itemCount: await _folderDao.countFlashcardsInSubtree(subfolder.id),
+        ),
+      );
+    }
+
     return FolderDetailReadModel(
       folder: folder.toDomain(),
-      breadcrumb: await _folderDao.getBreadcrumbNames(folderId),
-      subfolders: subfolderEntities,
+      breadcrumb: await _folderDao.getBreadcrumbSegments(folderId),
+      subfolders: subfolderItems,
       decks: deckItems,
     );
   }
@@ -408,13 +427,19 @@ final class FolderRepositoryImpl implements FolderRepository {
   ) {
     switch (sortMode) {
       case ContentSortMode.manual:
-        folders.sort((a, b) => a.folder.sortOrder.compareTo(b.folder.sortOrder));
+        folders.sort(
+          (a, b) => a.folder.sortOrder.compareTo(b.folder.sortOrder),
+        );
       case ContentSortMode.name:
         folders.sort(
-          (a, b) => a.folder.name.toLowerCase().compareTo(b.folder.name.toLowerCase()),
+          (a, b) => a.folder.name.toLowerCase().compareTo(
+            b.folder.name.toLowerCase(),
+          ),
         );
       case ContentSortMode.newest:
-        folders.sort((a, b) => b.folder.createdAt.compareTo(a.folder.createdAt));
+        folders.sort(
+          (a, b) => b.folder.createdAt.compareTo(a.folder.createdAt),
+        );
       case ContentSortMode.lastStudied:
         folders.sort((a, b) {
           final left = a.lastStudiedAt;
@@ -442,7 +467,8 @@ final class FolderRepositoryImpl implements FolderRepository {
         decks.sort((a, b) => a.deck.sortOrder.compareTo(b.deck.sortOrder));
       case ContentSortMode.name:
         decks.sort(
-          (a, b) => a.deck.name.toLowerCase().compareTo(b.deck.name.toLowerCase()),
+          (a, b) =>
+              a.deck.name.toLowerCase().compareTo(b.deck.name.toLowerCase()),
         );
       case ContentSortMode.newest:
         decks.sort((a, b) => b.deck.createdAt.compareTo(a.deck.createdAt));

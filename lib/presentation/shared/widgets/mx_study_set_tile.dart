@@ -5,6 +5,8 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import 'mx_avatar.dart';
 import '../../../core/theme/mx_gap.dart';
+import 'mx_text.dart';
+import 'mx_tappable.dart';
 
 /// List tile for a study set / folder / class entry in library listings.
 /// Layout: colored icon tile on the left, title + meta rows on the right.
@@ -23,6 +25,8 @@ class MxStudySetTile extends StatelessWidget {
     this.iconColor,
     super.key,
   });
+
+  static const double _contentGap = AppSpacing.lg;
 
   final String title;
   final IconData icon;
@@ -43,7 +47,6 @@ class MxStudySetTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     final tile = Padding(
       padding: const EdgeInsets.symmetric(
@@ -67,23 +70,22 @@ class MxStudySetTile extends StatelessWidget {
               color: iconColor ?? scheme.onPrimaryContainer,
             ),
           ),
-          const MxGap(AppSpacing.md),
+          const MxGap(_contentGap),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                MxText(
                   title,
-                  style: textTheme.titleSmall?.copyWith(color: scheme.onSurface),
+                  role: MxTextRole.tileTitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (metaLine != null) ...[
                   const MxGap(AppSpacing.xxs),
-                  Text(
+                  MxText(
                     metaLine!,
-                    style: textTheme.bodySmall
-                        ?.copyWith(color: scheme.onSurfaceVariant),
+                    role: MxTextRole.tileMeta,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -99,11 +101,7 @@ class MxStudySetTile extends StatelessWidget {
                       ),
                       if (ownerBadge == null) ...[
                         const MxGap(AppSpacing.sm),
-                        Text(
-                          ownerLabel!,
-                          style: textTheme.labelMedium
-                              ?.copyWith(color: scheme.onSurfaceVariant),
-                        ),
+                        MxText(ownerLabel!, role: MxTextRole.tileMeta),
                       ],
                     ],
                   ),
@@ -111,22 +109,16 @@ class MxStudySetTile extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) ...[
-            const MxGap(AppSpacing.sm),
-            trailing!,
-          ],
+          if (trailing != null) ...[const MxGap(AppSpacing.sm), trailing!],
         ],
       ),
     );
 
     if (onTap == null) return tile;
-    return Material(
-      type: MaterialType.transparency,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AppRadius.borderMd,
-        child: tile,
-      ),
+    return MxTappable(
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+      onTap: onTap,
+      child: tile,
     );
   }
 }

@@ -5,6 +5,7 @@ import '../../../core/theme/app_opacity.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/mx_gap.dart';
+import '../widgets/mx_tappable.dart';
 
 enum MxActionSheetItemTone { neutral, destructive }
 
@@ -117,63 +118,58 @@ class _MxActionSheetTile<T> extends StatelessWidget {
 
     return Opacity(
       opacity: item.enabled ? AppOpacity.full : AppOpacity.disabled,
-      child: Material(
-        color: backgroundColor,
-        borderRadius: AppRadius.borderMd,
-        child: InkWell(
-          onTap: item.enabled ? () => _handleTap(context) : null,
-          borderRadius: AppRadius.borderMd,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.md,
-            ),
-            child: Row(
-              crossAxisAlignment: item.subtitle == null
-                  ? CrossAxisAlignment.center
-                  : CrossAxisAlignment.start,
-              children: [
-                if (item.icon != null) ...[
-                  Icon(
-                    item.icon,
-                    size: AppIconSizes.md,
-                    color: foregroundColor,
-                  ),
-                  const MxGap.h(AppSpacing.md),
-                ],
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
+      child: MxTappable(
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+        onTap: () => _handleTap(context),
+        enabled: item.enabled,
+        backgroundColor: backgroundColor,
+        overlayBaseColor: foregroundColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
+          ),
+          child: Row(
+            crossAxisAlignment: item.subtitle == null
+                ? CrossAxisAlignment.center
+                : CrossAxisAlignment.start,
+            children: [
+              if (item.icon != null) ...[
+                Icon(item.icon, size: AppIconSizes.md, color: foregroundColor),
+                const MxGap(AppSpacing.md),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      item.label,
+                      style: textTheme.bodyLarge?.copyWith(
+                        color: foregroundColor,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (item.subtitle != null) ...[
+                      const MxGap(AppSpacing.xxs),
                       Text(
-                        item.label,
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: foregroundColor,
+                        item.subtitle!,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: subtitleColor,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (item.subtitle != null) ...[
-                        const MxGap(AppSpacing.xxs),
-                        Text(
-                          item.subtitle!,
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: subtitleColor,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
                     ],
-                  ),
+                  ],
                 ),
-                if (effectiveTrailing != null) ...[
-                  const MxGap.h(AppSpacing.sm),
-                  effectiveTrailing,
-                ],
+              ),
+              if (effectiveTrailing != null) ...[
+                const MxGap(AppSpacing.sm),
+                effectiveTrailing,
               ],
-            ),
+            ],
           ),
         ),
       ),

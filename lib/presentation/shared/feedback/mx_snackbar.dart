@@ -43,7 +43,7 @@ abstract final class MxSnackbar {
         content: Row(
           children: [
             Icon(icon ?? defaultIcon, color: fg, size: AppIconSizes.md),
-            const MxGap.h(AppSpacing.md),
+        const MxGap(AppSpacing.md),
             Expanded(
               child: Text(
                 message,

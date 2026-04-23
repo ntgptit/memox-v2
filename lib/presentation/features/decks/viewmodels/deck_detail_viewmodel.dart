@@ -7,6 +7,7 @@ import '../../../../app/di/content_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../domain/value_objects/content_actions.dart';
+import '../../../../domain/value_objects/content_read_models.dart';
 
 part 'deck_detail_viewmodel.g.dart';
 
@@ -26,7 +27,7 @@ class DeckDetailState {
   final String id;
   final String folderId;
   final String name;
-  final List<String> breadcrumb;
+  final List<BreadcrumbSegmentReadModel> breadcrumb;
   final int cardCount;
   final int dueTodayCount;
   final int masteryPercent;

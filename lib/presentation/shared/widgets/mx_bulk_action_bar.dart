@@ -58,7 +58,7 @@ class MxBulkActionBar extends StatelessWidget {
             children: [
               Expanded(child: info),
               if (actionWrap != null) ...[
-                const MxGap.h(AppSpacing.md),
+            const MxGap(AppSpacing.md),
                 Flexible(
                   child: Align(
                     alignment: Alignment.topRight,
@@ -93,7 +93,7 @@ class _InfoBlock extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (leading != null) ...[leading!, const MxGap.h(AppSpacing.md)],
+        if (leading != null) ...[leading!, const MxGap(AppSpacing.md)],
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

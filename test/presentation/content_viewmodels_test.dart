@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:memox/app/di/content_providers.dart';
 import 'package:memox/app/di/providers.dart';
+import 'package:memox/domain/value_objects/content_actions.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_editor_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_import_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
@@ -25,7 +26,10 @@ void main() {
         fireImmediately: true,
       );
 
-      expect((await container.read(libraryOverviewQueryProvider.future)).folders, isEmpty);
+      expect(
+        (await container.read(libraryOverviewQueryProvider.future)).folders,
+        isEmpty,
+      );
 
       final success = await container
           .read(libraryOverviewActionControllerProvider.notifier)
@@ -46,8 +50,9 @@ void main() {
       addTearDown(container.dispose);
       addTearDown(harness.dispose);
 
-      final root = (await harness.folderRepository.createRootFolder('Japanese N5'))
-          .valueOrNull!;
+      final root = (await harness.folderRepository.createRootFolder(
+        'Japanese N5',
+      )).valueOrNull!;
 
       final subscription = container.listen(
         folderDetailQueryProvider(root.id),
@@ -56,7 +61,9 @@ void main() {
       );
 
       expect(
-        (await container.read(folderDetailQueryProvider(root.id).future)).isUnlocked,
+        (await container.read(
+          folderDetailQueryProvider(root.id).future,
+        )).isUnlocked,
         isTrue,
       );
 
@@ -72,117 +79,181 @@ void main() {
       expect(state.subfolders.map((item) => item.name), contains('Vocabulary'));
     });
 
-    test('flashcard editor save-and-add-next refreshes the list and clears draft', () async {
-      final harness = ContentRepositoryHarness.create(
-        ids: ['folder-root', 'deck-root', 'flashcard-001'],
-      );
-      final container = _createContainer(harness);
-      addTearDown(container.dispose);
-      addTearDown(harness.dispose);
+    test(
+      'folder detail query exposes subtree deck and card stats for subfolders',
+      () async {
+        final harness = ContentRepositoryHarness.create(
+          ids: [
+            'folder-root',
+            'folder-child',
+            'deck-child',
+            'flashcard-001',
+            'flashcard-002',
+          ],
+        );
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
 
-      final root = (await harness.folderRepository.createRootFolder('Japanese N5'))
-          .valueOrNull!;
-      final deck = (await harness.deckRepository.createDeck(
-        folderId: root.id,
-        name: 'Core vocabulary',
-      )).valueOrNull!;
+        final root = (await harness.folderRepository.createRootFolder(
+          'Korean',
+        )).valueOrNull!;
+        final child = (await harness.folderRepository.createSubfolder(
+          parentFolderId: root.id,
+          name: 'Topik I',
+        )).valueOrNull!;
+        final deck = (await harness.deckRepository.createDeck(
+          folderId: child.id,
+          name: 'Vitamin B1',
+        )).valueOrNull!;
 
-      final args = FlashcardEditorArgs(deckId: deck.id);
-      final listSubscription = container.listen(
-        flashcardListQueryProvider(deck.id),
-        (_, _) {},
-        fireImmediately: true,
-      );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: deck.id,
+          draft: const FlashcardDraft(front: 'A', back: 'a'),
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: deck.id,
+          draft: const FlashcardDraft(front: 'B', back: 'b'),
+        );
 
-      expect(
-        (await container.read(flashcardListQueryProvider(deck.id).future)).items,
-        isEmpty,
-      );
-      await container.read(flashcardEditorDraftProvider(args).future);
+        final state = await container.read(
+          folderDetailQueryProvider(root.id).future,
+        );
+        final subfolder = state.subfolders.singleWhere(
+          (item) => item.id == child.id,
+        );
 
-      final draftNotifier = container.read(
-        flashcardEditorDraftProvider(args).notifier,
-      );
-      draftNotifier.setTitle('Greeting');
-      draftNotifier.setFront('Hello');
-      draftNotifier.setBack('Xin chao');
-      draftNotifier.setNote('Basic greeting');
+        expect(state.isSubfolderMode, isTrue);
+        expect(subfolder.deckCount, 1);
+        expect(subfolder.itemCount, 2);
+      },
+    );
 
-      final success = await container
-          .read(flashcardEditorControllerProvider(args).notifier)
-          .save(keepCreating: true);
+    test(
+      'flashcard editor save-and-add-next refreshes the list and clears draft',
+      () async {
+        final harness = ContentRepositoryHarness.create(
+          ids: ['folder-root', 'deck-root', 'flashcard-001'],
+        );
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
 
-      expect(success, isTrue);
-      await _flush(container);
+        final root = (await harness.folderRepository.createRootFolder(
+          'Japanese N5',
+        )).valueOrNull!;
+        final deck = (await harness.deckRepository.createDeck(
+          folderId: root.id,
+          name: 'Core vocabulary',
+        )).valueOrNull!;
 
-      expect(listSubscription.read().requireValue.items, hasLength(1));
-      expect(listSubscription.read().requireValue.items.first.title, 'Greeting');
+        final args = FlashcardEditorArgs(deckId: deck.id);
+        final listSubscription = container.listen(
+          flashcardListQueryProvider(deck.id),
+          (_, _) {},
+          fireImmediately: true,
+        );
 
-      final clearedDraft = await container.read(flashcardEditorDraftProvider(args).future);
-      expect(clearedDraft.title, isEmpty);
-      expect(clearedDraft.front, isEmpty);
-      expect(clearedDraft.back, isEmpty);
-      expect(clearedDraft.note, isEmpty);
-    });
+        expect(
+          (await container.read(
+            flashcardListQueryProvider(deck.id).future,
+          )).items,
+          isEmpty,
+        );
+        await container.read(flashcardEditorDraftProvider(args).future);
 
-    test('flashcard import preview surfaces issues, commit resets draft, and list refreshes', () async {
-      final harness = ContentRepositoryHarness.create(
-        ids: ['folder-root', 'deck-root', 'flashcard-001'],
-      );
-      final container = _createContainer(harness);
-      addTearDown(container.dispose);
-      addTearDown(harness.dispose);
+        final draftNotifier = container.read(
+          flashcardEditorDraftProvider(args).notifier,
+        );
+        draftNotifier.setTitle('Greeting');
+        draftNotifier.setFront('Hello');
+        draftNotifier.setBack('Xin chao');
+        draftNotifier.setNote('Basic greeting');
 
-      final root = (await harness.folderRepository.createRootFolder('Japanese N5'))
-          .valueOrNull!;
-      final deck = (await harness.deckRepository.createDeck(
-        folderId: root.id,
-        name: 'Core vocabulary',
-      )).valueOrNull!;
+        final success = await container
+            .read(flashcardEditorControllerProvider(args).notifier)
+            .save(keepCreating: true);
 
-      container.listen(
-        flashcardListQueryProvider(deck.id),
-        (_, _) {},
-        fireImmediately: true,
-      );
-      final draftNotifier = container.read(
-        flashcardImportDraftProvider(deck.id).notifier,
-      );
-      final controller = container.read(
-        flashcardImportControllerProvider(deck.id).notifier,
-      );
+        expect(success, isTrue);
+        await _flush(container);
 
-      draftNotifier.setRawContent('front,back\nHello,');
-      final invalidPreparation = await controller.preparePreview();
+        expect(listSubscription.read().requireValue.items, hasLength(1));
+        expect(
+          listSubscription.read().requireValue.items.first.title,
+          'Greeting',
+        );
 
-      expect(invalidPreparation, isNotNull);
-      expect(invalidPreparation!.issues, hasLength(1));
-      expect(invalidPreparation.canCommit, isFalse);
+        final clearedDraft = await container.read(
+          flashcardEditorDraftProvider(args).future,
+        );
+        expect(clearedDraft.title, isEmpty);
+        expect(clearedDraft.front, isEmpty);
+        expect(clearedDraft.back, isEmpty);
+        expect(clearedDraft.note, isEmpty);
+      },
+    );
 
-      draftNotifier.setRawContent('front,back\nHello,Xin chao');
-      final validPreparation = await controller.preparePreview();
+    test(
+      'flashcard import preview surfaces issues, commit resets draft, and list refreshes',
+      () async {
+        final harness = ContentRepositoryHarness.create(
+          ids: ['folder-root', 'deck-root', 'flashcard-001'],
+        );
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
 
-      expect(validPreparation, isNotNull);
-      expect(validPreparation!.canCommit, isTrue);
+        final root = (await harness.folderRepository.createRootFolder(
+          'Japanese N5',
+        )).valueOrNull!;
+        final deck = (await harness.deckRepository.createDeck(
+          folderId: root.id,
+          name: 'Core vocabulary',
+        )).valueOrNull!;
 
-      final count = await controller.commitImport();
+        container.listen(
+          flashcardListQueryProvider(deck.id),
+          (_, _) {},
+          fireImmediately: true,
+        );
+        final draftNotifier = container.read(
+          flashcardImportDraftProvider(deck.id).notifier,
+        );
+        final controller = container.read(
+          flashcardImportControllerProvider(deck.id).notifier,
+        );
 
-      expect(count, 1);
-      await _flush(container);
-      final refreshedList = await container.read(
-        flashcardListQueryProvider(deck.id).future,
-      );
+        draftNotifier.setRawContent('front,back\nHello,');
+        final invalidPreparation = await controller.preparePreview();
 
-      expect(refreshedList.items, hasLength(1));
-      expect(
-        refreshedList.items.first.front,
-        'Hello',
-      );
+        expect(invalidPreparation, isNotNull);
+        expect(invalidPreparation!.issues, hasLength(1));
+        expect(invalidPreparation.canCommit, isFalse);
 
-      final resetDraft = container.read(flashcardImportDraftProvider(deck.id));
-      expect(resetDraft.rawContent, isEmpty);
-      expect(resetDraft.preparation, isNull);
-    });
+        draftNotifier.setRawContent('front,back\nHello,Xin chao');
+        final validPreparation = await controller.preparePreview();
+
+        expect(validPreparation, isNotNull);
+        expect(validPreparation!.canCommit, isTrue);
+
+        final count = await controller.commitImport();
+
+        expect(count, 1);
+        await _flush(container);
+        final refreshedList = await container.read(
+          flashcardListQueryProvider(deck.id).future,
+        );
+
+        expect(refreshedList.items, hasLength(1));
+        expect(refreshedList.items.first.front, 'Hello');
+
+        final resetDraft = container.read(
+          flashcardImportDraftProvider(deck.id),
+        );
+        expect(resetDraft.rawContent, isEmpty);
+        expect(resetDraft.preparation, isNull);
+      },
+    );
   });
 }
 

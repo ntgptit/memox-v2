@@ -11,6 +11,7 @@ import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
+import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/options/content_sort_options.dart';
 import '../../../shared/states/mx_empty_state.dart';
@@ -19,6 +20,7 @@ import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_folder_tile.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
+import '../../../shared/widgets/mx_text.dart';
 import '../models/library_folder.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 import '../viewmodels/library_overview_viewmodel.dart';
@@ -56,55 +58,49 @@ class LibraryOverviewView extends ConsumerWidget {
 
     return MxScaffold(
       floatingActionButton: buildLibraryOverviewFab(context, ref),
-      body: SafeArea(
-        child: MxContentShell(
-          width: MxContentWidth.wide,
-          child: MxRetainedAsyncState<LibraryOverviewState>(
-            data: queryState.value,
-            isLoading: queryState.isLoading,
-            error: queryState.hasError ? queryState.error : null,
-            stackTrace: queryState.hasError ? queryState.stackTrace : null,
-            dataBuilder: (context, state) {
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.xxxl,
+      body: MxContentShell(
+        width: MxContentWidth.wide,
+        applyVerticalPadding: true,
+        hasFab: true,
+        child: MxRetainedAsyncState<LibraryOverviewState>(
+          data: queryState.value,
+          isLoading: queryState.isLoading,
+          error: queryState.hasError ? queryState.error : null,
+          stackTrace: queryState.hasError ? queryState.stackTrace : null,
+          dataBuilder: (context, state) {
+            return ListView(
+              children: [
+                _LibraryHero(state: state),
+                const MxGap(MxSpace.xl),
+                MxSearchSortToolbar<ContentSortMode>(
+                  searchHintText: l10n.commonSearch,
+                  onSearchChanged: toolbarNotifier.setSearchTerm,
+                  onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                  sortOptions: sortOptions,
+                  selectedSort: toolbarState.sortMode,
+                  sortLabel: l10n.commonSort,
+                  onSortSelected: toolbarNotifier.setSortMode,
                 ),
-                children: [
-                  _LibraryHero(state: state),
-                  const MxGap(MxFeatureSpacing.xl),
-                  MxSearchSortToolbar<ContentSortMode>(
-                    searchHintText: l10n.commonSearch,
-                    onSearchChanged: toolbarNotifier.setSearchTerm,
-                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                    sortOptions: sortOptions,
-                    selectedSort: toolbarState.sortMode,
-                    sortLabel: l10n.commonSort,
-                    onSortSelected: toolbarNotifier.setSortMode,
-                  ),
-                  const MxGap(MxFeatureSpacing.xl),
-                  MxSection(
-                    title: l10n.libraryFoldersSectionTitle,
-                    subtitle: toolbarState.searchTerm.trim().isEmpty
-                        ? l10n.libraryManageFoldersSubtitle
-                        : l10n.librarySearchResultsSubtitle,
-                    child: state.isEmpty
-                        ? _EmptyLibrary(
-                            onCreateFolder: () =>
-                                _handleCreateFolder(context, ref),
-                          )
-                        : _FolderList(
-                            folders: state.folders,
-                            onOpenFolder: (folderId) =>
-                                _openFolder(context, ref, folderId),
-                          ),
-                  ),
-                ],
-              );
-            },
-          ),
+                const MxGap(MxSpace.xl),
+                MxSection(
+                  title: l10n.libraryFoldersSectionTitle,
+                  subtitle: toolbarState.searchTerm.trim().isEmpty
+                      ? l10n.libraryManageFoldersSubtitle
+                      : l10n.librarySearchResultsSubtitle,
+                  child: state.isEmpty
+                      ? _EmptyLibrary(
+                          onCreateFolder: () =>
+                              _handleCreateFolder(context, ref),
+                        )
+                      : _FolderList(
+                          folders: state.folders,
+                          onOpenFolder: (folderId) =>
+                              _openFolder(context, ref, folderId),
+                        ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -119,11 +115,10 @@ class _LibraryHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(MxFeatureSpacing.xl),
+      padding: const EdgeInsets.all(MxSpace.xl),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLow,
         borderRadius: MxFeatureRadii.heroPanel,
@@ -131,21 +126,16 @@ class _LibraryHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          MxText(
             '${state.greeting.salutation}, ${state.greeting.userName}',
-            style: textTheme.bodyLarge?.copyWith(
-              color: scheme.onSurfaceVariant,
-            ),
+            role: MxTextRole.pageGreeting,
           ),
-          const MxGap(MxFeatureSpacing.xs),
-          Text(
-            l10n.libraryTitle,
-            style: textTheme.headlineMedium?.copyWith(color: scheme.onSurface),
-          ),
-          const MxGap(MxFeatureSpacing.md),
-          Text(
+          const MxGap(MxSpace.xs),
+          MxText(l10n.libraryTitle, role: MxTextRole.pageTitle),
+          const MxGap(MxSpace.md),
+          MxText(
             l10n.libraryHeroDueToday(state.dueToday),
-            style: textTheme.titleMedium?.copyWith(color: scheme.primary),
+            role: MxTextRole.heroAccent,
           ),
         ],
       ),

@@ -85,6 +85,8 @@ messages:
     en: "`lib/core/theme/theme_extensions.dart` must map repetition colors through semantic roles such as `customColors.repetitionFirst` and `customColors.repetitionAdvanced`, not through a raw seed palette list."
   feature_theme_token_imports:
     en: "Feature-layer source must not import `{import_path}` directly. Read UI values through `Theme.of(context)`, semantic/context extensions, or shared widgets instead."
+  features_no_direct_text_theme:
+    en: "Feature code must not choose `textTheme` roles directly. Use `MxText(role: MxTextRole.*)` so page titles, hero copy, tile text, and state copy stay semantically consistent across screens."
   theme_semantic_palette_contract:
     en: "Semantic palette contract breach: {detail}"
   theme_domain_coupling:
@@ -133,6 +135,10 @@ messages:
     en: "Public types in widget-bearing shared files must start with `Mx`."
   shared_widget_app_wiring:
     en: "Shared widgets must stay render-only; remove provider or app wiring from this file."
+  no_raw_ink_surface:
+    en: "Do not hand-roll `InkWell`, `InkResponse`, or tap-only `GestureDetector` on UI surfaces. Route shaped interaction overlays through `MxTappable` or a Material component that already owns its shape."
+  ink_must_have_shape:
+    en: "Raw `InkWell` usage must pass `customBorder:` or `borderRadius:` so hover, focus, and splash overlays match the visible shape."
   shared_non_widget_dirs_removed:
     en: "`lib/presentation/shared/**` is reserved for widget layers only; move this helper out of shared and keep only `primitives`, `composites`, or `layouts` here."
   shared_layout_magic_numbers:
@@ -243,6 +249,10 @@ messages:
     en: "Do not toggle app-shell FAB visibility from `state.uri.path`. Move the FAB into the owning screen or handle visibility locally so route changes do not flash the shell chrome."
   retained_async_state_requires_skeleton:
     en: "Push-from-list detail screens must pass `skeletonBuilder` into `MxRetainedAsyncState` so first load preserves layout shape instead of showing a full-area loading spinner."
+  feature_screen_no_manual_page_gutter:
+    en: "Do not hardcode page gutter on feature screen scroll bodies. Remove manual `EdgeInsets...` from `ListView` or `SingleChildScrollView` and route page insets through `MxContentShell`, `MxScaffold`, or `AppLayout.pageInsets(...)`."
+  mx_gap_horizontal_constructor_forbidden:
+    en: "`MxGap.h(...)` is removed in this repo. Use axis-aware `MxGap(...)` so spacing follows the parent axis automatically."
   screen_custom_error_surface:
     en: "Feature screens should not use bespoke generic error widgets; route generic states through shared MemoX state surfaces instead."
   screen_error_message_passthrough:
@@ -385,6 +395,12 @@ fix_hints:
   use_theme_accessors_in_features:
     text:
       en: "Remove the direct import of raw theme source files such as `core/theme/app_colors.dart`, `app_typography.dart`, or other `core/theme/app_*.dart` files from `lib/presentation/features/**`. Route spacing, radius, size, color, elevation, motion, and typography through `Theme.of(context)`, semantic/context extensions, or shared widgets that already wrap the theme contract."
+  use_mx_text_role_in_features:
+    text:
+      en: "Replace direct `Theme.of(context).textTheme.*` usage in feature code with `MxText(role: MxTextRole.*)` or another shared widget that already owns the semantic text role. If the typography intent is genuinely new and repeats, add a new `MxTextRole` instead of picking a Material role ad hoc at the call site."
+  use_axis_aware_mx_gap:
+    text:
+      en: "Replace `MxGap.h(...)` with `MxGap(...)`. `MxGap` now delegates to the axis-aware `gap` package, so the parent `Row`, `Column`, `Flex`, or scrollable determines whether the spacing is horizontal or vertical."
   use_shared_widget_in_features:
     text:
       en: "Replace the raw Flutter widget with an existing shared MemoX surface such as `MxPrimaryButton`, `MxSecondaryButton`, `MxCard`, `MxTextField`, `MxChip`, `MxIconButton`, `MxProgressIndicator`, `MxListTile`, `MxDialog`, `MxBottomSheet`, or `MxScaffold` when one exists. If the control is truly feature-specific, wrap the Material widget behind a small feature-local adapter so raw Flutter constructors do not become the direct screen/widget API."

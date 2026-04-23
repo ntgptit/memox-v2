@@ -208,6 +208,20 @@ rules:
         - "core/theme/app_breakpoints.dart"
         - "core/theme/app_icon_sizes.dart"
 
+  - id: features_no_direct_text_theme
+    type: forbidden_pattern
+    name: "Features Must Use MxText Roles"
+    description: "Feature code must not choose Material text-theme roles directly. Route semantic typography through `MxText(role: ...)` so the same UI intent resolves to the same scale across screens."
+    message_code: features_no_direct_text_theme
+    severity: error
+    impact: design_system
+    scope: features
+    fix_hint_code: use_mx_text_role_in_features
+    params:
+      patterns:
+        - "Theme\\.of\\(context\\)\\.textTheme\\."
+        - "\\.textTheme\\.(?:display|headline|title|body|label)"
+
   - id: theme_typography_contract
     type: ast_check
     name: "Theme Typography Contract"
@@ -365,6 +379,34 @@ rules:
         - "import\\s+'package:memox/domain/"
         - "import\\s+'package:memox/presentation/features/"
         - "import\\s+'package:go_router/go_router\\.dart';"
+
+  - id: no_raw_ink_surface
+    type: forbidden_pattern
+    name: "No Raw Ink Surface"
+    description: "Interactive UI surfaces must route hover, focus, and pressed overlays through a shared shaped tap primitive instead of hand-rolled `InkWell`, `InkResponse`, or tap-only `GestureDetector` usage."
+    message_code: no_raw_ink_surface
+    severity: error
+    impact: design_system
+    scope: ui
+    params:
+      patterns:
+        - "\\bInkWell\\s*\\("
+        - "\\bInkResponse\\s*\\("
+        - "(?s)GestureDetector\\s*\\((?:(?!\\)).)*?\\bonTap\\s*:"
+      skip_comments: true
+
+  - id: ink_must_have_shape
+    type: forbidden_pattern
+    name: "InkWell Must Carry Shape"
+    description: "If a shared widget keeps a raw `InkWell`, it must pass `customBorder:` or `borderRadius:` so the interaction overlay matches the visual shape."
+    message_code: ink_must_have_shape
+    severity: error
+    impact: design_system
+    scope: shared_widget_dirs
+    params:
+      patterns:
+        - "(?s)InkWell\\s*\\((?:(?!customBorder\\s*:|borderRadius\\s*:).)*?\\)"
+      skip_comments: true
 
   - id: shared_non_widget_dirs_removed
     type: naming_convention

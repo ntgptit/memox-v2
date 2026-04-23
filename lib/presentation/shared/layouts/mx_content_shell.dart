@@ -13,6 +13,8 @@ class MxContentShell extends StatelessWidget {
     required this.child,
     this.width = MxContentWidth.wide,
     this.padding,
+    this.applyVerticalPadding = false,
+    this.hasFab = false,
     super.key,
   });
 
@@ -22,13 +24,24 @@ class MxContentShell extends StatelessWidget {
   final MxContentWidth width;
 
   /// Override the horizontal gutter. Defaults to
-  /// `AppLayout.pagePadding(windowSize)` so padding scales with window size.
+  /// `AppLayout.pagePadding(windowSize)` or `AppLayout.pageInsets(...)` when
+  /// [applyVerticalPadding] is true.
   final EdgeInsetsGeometry? padding;
+
+  /// When true, apply the full page insets instead of horizontal gutter only.
+  final bool applyVerticalPadding;
+
+  /// Whether the page should reserve extra bottom clearance for a FAB.
+  final bool hasFab;
 
   @override
   Widget build(BuildContext context) {
     final maxWidth = context.contentMaxWidth(width);
-    final gutter = padding ?? context.pagePadding;
+    final gutter =
+        padding ??
+        (applyVerticalPadding
+            ? context.pageInsets(hasFab: hasFab)
+            : context.pagePadding);
 
     return Align(
       alignment: Alignment.topCenter,

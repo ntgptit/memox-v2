@@ -4,6 +4,7 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../widgets/mx_progress_indicator.dart';
 import '../../../core/theme/mx_gap.dart';
+import '../widgets/mx_text.dart';
 
 /// Full-area loading placeholder with optional label.
 class MxLoadingState extends StatelessWidget {
@@ -18,8 +19,6 @@ class MxLoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -27,11 +26,7 @@ class MxLoadingState extends StatelessWidget {
           MxCircularProgress(size: progressSize),
           if (message != null) ...[
             const MxGap(AppSpacing.lg),
-            Text(
-              message!,
-              style: textTheme.bodyMedium
-                  ?.copyWith(color: scheme.onSurfaceVariant),
-            ),
+            MxText(message!, role: MxTextRole.stateMessage),
           ],
         ],
       ),

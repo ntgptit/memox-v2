@@ -116,3 +116,39 @@ rules:
     params:
       patterns:
         - "(?s)MxRetainedAsyncState<[^>]+>\\((?:(?!skeletonBuilder).)*?\\)"
+
+  - id: feature_screen_no_manual_page_gutter
+    type: forbidden_pattern
+    name: "Feature Screens Must Not Hardcode Page Gutter"
+    description: >
+      Page gutter must come from `MxContentShell`, `MxScaffold`, or
+      `AppLayout.pageInsets(...)`. Feature screens must not hardcode
+      `ListView` or `SingleChildScrollView` body padding with `EdgeInsets...`,
+      because that recreates double-gutter and bypasses tier-aware layout.
+    message_code: feature_screen_no_manual_page_gutter
+    severity: error
+    impact: architecture
+    scope: screens
+    params:
+      patterns:
+        - "(?s)ListView\\s*\\((?:(?!\\)).)*?padding:\\s*(?:const\\s+)?EdgeInsets\\."
+        - "(?s)SingleChildScrollView\\s*\\((?:(?!\\)).)*?padding:\\s*(?:const\\s+)?EdgeInsets\\."
+
+  - id: mx_gap_horizontal_constructor_forbidden
+    type: forbidden_pattern
+    name: "MxGap.h Is Forbidden"
+    description: >
+      `MxGap.h(...)` was removed when MemoX migrated to the axis-aware `gap`
+      wrapper. Use `MxGap(...)` everywhere so spacing follows the parent axis
+      automatically.
+    message_code: mx_gap_horizontal_constructor_forbidden
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/**/*.dart"
+      - "test/**/*.dart"
+    fix_hint_code: use_axis_aware_mx_gap
+    params:
+      patterns:
+        - "\\bMxGap\\.h\\s*\\("

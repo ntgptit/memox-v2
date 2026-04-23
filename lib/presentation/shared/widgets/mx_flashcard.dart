@@ -6,6 +6,7 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import 'mx_card.dart';
 import 'mx_icon_button.dart';
+import 'mx_text.dart';
 
 enum MxFlashcardFace { front, back }
 
@@ -40,7 +41,6 @@ class MxFlashcard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
 
     return AspectRatio(
@@ -55,19 +55,16 @@ class MxFlashcard extends StatelessWidget {
             if (language != null)
               Align(
                 alignment: Alignment.topLeft,
-                child: Text(
+                child: MxText(
                   language!,
-                  style: textTheme.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
+                  role: MxTextRole.badge,
+                  color: scheme.onSurfaceVariant,
                 ),
               ),
             Center(
-              child: Text(
+              child: MxText(
                 content,
-                style: textTheme.displaySmall?.copyWith(
-                  color: scheme.onSurface,
-                ),
+                role: MxTextRole.displayLarge,
                 textAlign: TextAlign.center,
                 maxLines: 6,
                 overflow: TextOverflow.ellipsis,

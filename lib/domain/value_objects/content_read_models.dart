@@ -3,6 +3,13 @@ import '../entities/flashcard_entity.dart';
 import '../entities/folder_entity.dart';
 import '../enums/folder_content_mode.dart';
 
+final class BreadcrumbSegmentReadModel {
+  const BreadcrumbSegmentReadModel({required this.label, this.folderId});
+
+  final String label;
+  final String? folderId;
+}
+
 final class LibraryFolderReadModel {
   const LibraryFolderReadModel({
     required this.folder,
@@ -47,6 +54,18 @@ final class FolderDeckReadModel {
   final int? lastStudiedAt;
 }
 
+final class FolderSubfolderReadModel {
+  const FolderSubfolderReadModel({
+    required this.folder,
+    required this.deckCount,
+    required this.itemCount,
+  });
+
+  final FolderEntity folder;
+  final int deckCount;
+  final int itemCount;
+}
+
 final class FolderDetailReadModel {
   const FolderDetailReadModel({
     required this.folder,
@@ -56,9 +75,9 @@ final class FolderDetailReadModel {
   });
 
   final FolderEntity folder;
-  final List<FolderEntity> subfolders;
+  final List<FolderSubfolderReadModel> subfolders;
   final List<FolderDeckReadModel> decks;
-  final List<String> breadcrumb;
+  final List<BreadcrumbSegmentReadModel> breadcrumb;
 
   FolderContentMode get effectiveContentMode {
     if (folder.contentMode != FolderContentMode.unlocked) {
@@ -85,7 +104,7 @@ final class DeckDetailReadModel {
   });
 
   final DeckEntity deck;
-  final List<String> breadcrumb;
+  final List<BreadcrumbSegmentReadModel> breadcrumb;
   final int cardCount;
   final int dueTodayCount;
   final int masteryPercent;
@@ -110,6 +129,6 @@ final class FlashcardListReadModel {
   });
 
   final DeckEntity deck;
-  final List<String> breadcrumb;
+  final List<BreadcrumbSegmentReadModel> breadcrumb;
   final List<FlashcardListItemReadModel> items;
 }

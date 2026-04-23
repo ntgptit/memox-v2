@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:memox/core/theme/app_theme.dart';
@@ -29,6 +30,16 @@ void main() {
       expect(
         theme.popupMenuTheme.textStyle?.fontFamily,
         AppTypography.fontFamily,
+      );
+      expect(
+        theme.menuButtonTheme.style?.textStyle
+            ?.resolve(<WidgetState>{})
+            ?.fontFamily,
+        AppTypography.fontFamily,
+      );
+      expect(
+        theme.menuButtonTheme.style?.shape?.resolve(<WidgetState>{}),
+        isA<RoundedRectangleBorder>(),
       );
       expect(
         theme.tooltipTheme.textStyle?.fontFamily,
@@ -64,6 +75,16 @@ void main() {
       expect(
         theme.popupMenuTheme.textStyle?.fontFamily,
         AppTypography.fontFamily,
+      );
+      expect(
+        theme.menuButtonTheme.style?.textStyle
+            ?.resolve(<WidgetState>{})
+            ?.fontFamily,
+        AppTypography.fontFamily,
+      );
+      expect(
+        theme.menuButtonTheme.style?.shape?.resolve(<WidgetState>{}),
+        isA<RoundedRectangleBorder>(),
       );
       expect(
         theme.tooltipTheme.textStyle?.fontFamily,

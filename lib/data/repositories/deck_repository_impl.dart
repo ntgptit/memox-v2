@@ -46,10 +46,15 @@ final class DeckRepositoryImpl implements DeckRepository {
   @override
   Future<DeckDetailReadModel> getDeckDetail(String deckId) async {
     final deck = await _requireDeck(deckId);
-    final folderBreadcrumb = await _folderDao.getBreadcrumbNames(deck.folderId);
+    final folderBreadcrumb = await _folderDao.getBreadcrumbSegments(
+      deck.folderId,
+    );
     return DeckDetailReadModel(
       deck: deck.toDomain(),
-      breadcrumb: [...folderBreadcrumb, deck.name],
+      breadcrumb: [
+        ...folderBreadcrumb,
+        BreadcrumbSegmentReadModel(label: deck.name),
+      ],
       cardCount: await _deckDao.countFlashcardsInDeck(deck.id),
       dueTodayCount: await _deckDao.countDueTodayInDeck(
         deckId: deck.id,
@@ -67,7 +72,10 @@ final class DeckRepositoryImpl implements DeckRepository {
     String folderId,
     ContentQuery query,
   ) async {
-    final decks = await _deckDao.listDecksInFolder(folderId: folderId, query: query);
+    final decks = await _deckDao.listDecksInFolder(
+      folderId: folderId,
+      query: query,
+    );
     final items = <FolderDeckReadModel>[];
     for (final deck in decks) {
       items.add(
@@ -126,7 +134,9 @@ final class DeckRepositoryImpl implements DeckRepository {
       final trimmedName = _normalizeName(name);
       final parentFolder = await _requireFolder(folderId);
       final targetMode = _structureService.resolveModeAfterAddingDeck(
-        DatabaseEnumCodecs.folderContentModeFromStorage(parentFolder.contentMode),
+        DatabaseEnumCodecs.folderContentModeFromStorage(
+          parentFolder.contentMode,
+        ),
       );
       final now = _clock.nowEpochMillis();
       final id = _idGenerator.nextId();
@@ -209,7 +219,9 @@ final class DeckRepositoryImpl implements DeckRepository {
       final now = _clock.nowEpochMillis();
       final targetSortOrder = await _deckDao.nextSortOrder(targetFolderId);
       await _transactionRunner.write((_) async {
-        final nextMode = _structureService.resolveModeAfterAddingDeck(targetMode);
+        final nextMode = _structureService.resolveModeAfterAddingDeck(
+          targetMode,
+        );
         await _folderDao.updateFolderMode(
           folderId: targetFolderId,
           contentMode: nextMode,
@@ -258,7 +270,9 @@ final class DeckRepositoryImpl implements DeckRepository {
       final sortOrder = await _deckDao.nextSortOrder(targetFolderId);
       final sourceFlashcards = await _deckDao.listDeckFlashcards(deckId);
       await _transactionRunner.write((_) async {
-        final nextMode = _structureService.resolveModeAfterAddingDeck(targetMode);
+        final nextMode = _structureService.resolveModeAfterAddingDeck(
+          targetMode,
+        );
         await _folderDao.updateFolderMode(
           folderId: targetFolderId,
           contentMode: nextMode,
@@ -370,7 +384,8 @@ final class DeckRepositoryImpl implements DeckRepository {
         items.sort((a, b) => a.deck.sortOrder.compareTo(b.deck.sortOrder));
       case ContentSortMode.name:
         items.sort(
-          (a, b) => a.deck.name.toLowerCase().compareTo(b.deck.name.toLowerCase()),
+          (a, b) =>
+              a.deck.name.toLowerCase().compareTo(b.deck.name.toLowerCase()),
         );
       case ContentSortMode.newest:
         items.sort((a, b) => b.deck.createdAt.compareTo(a.deck.createdAt));

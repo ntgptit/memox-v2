@@ -1,1 +1,6 @@
-suppressions: []
+suppressions:
+  - rule_id: no_raw_ink_surface
+    files:
+      - "lib/presentation/shared/widgets/mx_tappable.dart"
+    reason: "MxTappable is the single shared primitive allowed to own a raw InkWell."
+    author: "codex"

@@ -50,7 +50,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     ContentQuery query,
   ) async {
     final deck = await _requireDeck(deckId);
-    final folderBreadcrumb = await _folderDao.getBreadcrumbNames(deck.folderId);
+    final folderBreadcrumb = await _folderDao.getBreadcrumbSegments(
+      deck.folderId,
+    );
     final flashcards = await _flashcardDao.listFlashcardsInDeck(
       deckId: deckId,
       query: query,
@@ -69,7 +71,10 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     _sortFlashcardItems(items, query.sortMode);
     return FlashcardListReadModel(
       deck: deck.toDomain(),
-      breadcrumb: [...folderBreadcrumb, deck.name],
+      breadcrumb: [
+        ...folderBreadcrumb,
+        BreadcrumbSegmentReadModel(label: deck.name),
+      ],
       items: items,
     );
   }
@@ -212,7 +217,10 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     required String rawContent,
   }) {
     return runRepositoryAction(() async {
-      return FlashcardImportSupport.parse(format: format, rawContent: rawContent);
+      return FlashcardImportSupport.parse(
+        format: format,
+        rawContent: rawContent,
+      );
     });
   }
 
@@ -289,9 +297,7 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     final front = draft.front.trim();
     final back = draft.back.trim();
     if (front.isEmpty || back.isEmpty) {
-      throw const ValidationException(
-        message: 'front and back are required.',
-      );
+      throw const ValidationException(message: 'front and back are required.');
     }
     return FlashcardDraft(
       title: draft.title?.trim(),
@@ -312,9 +318,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
         );
       case ContentSortMode.name:
         items.sort(
-          (a, b) => a.flashcard.displayName
-              .toLowerCase()
-              .compareTo(b.flashcard.displayName.toLowerCase()),
+          (a, b) => a.flashcard.displayName.toLowerCase().compareTo(
+            b.flashcard.displayName.toLowerCase(),
+          ),
         );
       case ContentSortMode.newest:
         items.sort(

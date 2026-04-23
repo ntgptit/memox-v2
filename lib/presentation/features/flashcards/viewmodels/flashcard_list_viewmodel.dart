@@ -9,6 +9,7 @@ import '../../../../core/errors/failures.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
+import '../../../../domain/value_objects/content_read_models.dart';
 
 part 'flashcard_list_viewmodel.g.dart';
 
@@ -44,7 +45,7 @@ class FlashcardListState {
 
   final String deckId;
   final String deckName;
-  final List<String> breadcrumb;
+  final List<BreadcrumbSegmentReadModel> breadcrumb;
   final ContentSortMode sortMode;
   final String searchTerm;
   final List<FlashcardListItemState> items;

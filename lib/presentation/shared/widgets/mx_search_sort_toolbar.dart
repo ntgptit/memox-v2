@@ -98,7 +98,7 @@ class MxSearchSortToolbar<T> extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(child: searchField),
-            const MxGap.h(AppSpacing.md),
+            const MxGap(AppSpacing.md),
             Flexible(
               child: Align(alignment: Alignment.topRight, child: actions),
             ),

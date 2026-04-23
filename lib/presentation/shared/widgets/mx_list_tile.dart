@@ -4,6 +4,7 @@ import '../../../core/theme/app_icon_sizes.dart';
 import '../../../core/theme/app_opacity.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
+import 'mx_text.dart';
 
 /// Opinionated list tile with stronger title weight, optional leading tile
 /// icon, trailing chevron or custom widget, and consistent paddings.
@@ -70,22 +71,18 @@ class MxListTile extends StatelessWidget {
 
     return ListTile(
       leading: effectiveLeading,
-      title: Text(
+      title: MxText(
         title,
-        style:
-            (dense ? theme.textTheme.titleSmall : theme.textTheme.titleMedium)
-                ?.copyWith(color: scheme.onSurface),
+        role: dense ? MxTextRole.tileTitle : MxTextRole.listTitle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: subtitle != null
           ? Padding(
               padding: const EdgeInsets.only(top: AppSpacing.xxs),
-              child: Text(
+              child: MxText(
                 subtitle!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
+                role: MxTextRole.listSubtitle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

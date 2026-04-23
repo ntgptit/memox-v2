@@ -5,6 +5,7 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../widgets/mx_primary_button.dart';
 import '../../../core/theme/mx_gap.dart';
+import '../widgets/mx_text.dart';
 
 /// Standardized empty-state placeholder with illustration slot, title, body,
 /// and an optional call-to-action.
@@ -29,7 +30,6 @@ class MxEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Center(
       child: ConstrainedBox(
@@ -56,17 +56,16 @@ class MxEmptyState extends StatelessWidget {
                 ),
               ),
               const MxGap(AppSpacing.xl),
-              Text(
+              MxText(
                 title,
-                style: textTheme.titleLarge?.copyWith(color: scheme.onSurface),
+                role: MxTextRole.stateTitle,
                 textAlign: TextAlign.center,
               ),
               if (message != null) ...[
                 const MxGap(AppSpacing.sm),
-                Text(
+                MxText(
                   message!,
-                  style: textTheme.bodyMedium
-                      ?.copyWith(color: scheme.onSurfaceVariant),
+                  role: MxTextRole.stateMessage,
                   textAlign: TextAlign.center,
                 ),
               ],

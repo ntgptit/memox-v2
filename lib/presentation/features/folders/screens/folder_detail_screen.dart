@@ -15,6 +15,7 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
+import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/options/content_sort_options.dart';
 import '../../../shared/states/mx_empty_state.dart';
@@ -30,6 +31,7 @@ import '../../../shared/widgets/mx_reorderable_list.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_study_set_tile.dart';
+import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 
 enum _FolderAction { edit, move, reorder, delete }
@@ -88,73 +90,69 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                         ? _createSubfolder()
                         : _createDeck(),
             ),
-      body: SafeArea(
-        child: MxContentShell(
-          width: MxContentWidth.wide,
-          child: MxRetainedAsyncState<FolderDetailState>(
-            data: queryState.value,
-            isLoading: queryState.isLoading,
-            error: queryState.hasError ? queryState.error : null,
-            stackTrace: queryState.hasError ? queryState.stackTrace : null,
-            skeletonBuilder: (_) => const _FolderDetailSkeleton(),
-            onRetry: () =>
-                ref.invalidate(folderDetailQueryProvider(widget.folderId)),
-            dataBuilder: (context, state) {
-              final content = switch ((state.isUnlocked, _isReorderMode)) {
-                (true, _) => _UnlockedFolderState(
-                  onCreateSubfolder: _createSubfolder,
-                  onCreateDeck: _createDeck,
-                ),
-                (_, true) => _ReorderContent(
+      body: MxContentShell(
+        width: MxContentWidth.wide,
+        applyVerticalPadding: true,
+        hasFab: queryData != null && !queryData.isUnlocked && !_isReorderMode,
+        child: MxRetainedAsyncState<FolderDetailState>(
+          data: queryState.value,
+          isLoading: queryState.isLoading,
+          error: queryState.hasError ? queryState.error : null,
+          stackTrace: queryState.hasError ? queryState.stackTrace : null,
+          skeletonBuilder: (_) => const _FolderDetailSkeleton(),
+          onRetry: () =>
+              ref.invalidate(folderDetailQueryProvider(widget.folderId)),
+          dataBuilder: (context, state) {
+            final content = switch ((state.isUnlocked, _isReorderMode)) {
+              (true, _) => _UnlockedFolderState(
+                onCreateSubfolder: _createSubfolder,
+                onCreateDeck: _createDeck,
+              ),
+              (_, true) => _ReorderContent(
+                state: state,
+                orderedIds: _orderedIds,
+                onReorder: _handleReorder,
+              ),
+              _ => _FolderBody(state: state, onOpenSubfolder: _openSubfolder),
+            };
+            return ListView(
+              children: [
+                _FolderHeader(
                   state: state,
-                  orderedIds: _orderedIds,
-                  onReorder: _handleReorder,
+                  onOpenActions: () => _openActions(state),
+                  onOpenBreadcrumb: (folderId) =>
+                      context.goFolderDetail(folderId),
                 ),
-                _ => _FolderBody(state: state, onOpenSubfolder: _openSubfolder),
-              };
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.xxxl,
+                const MxGap(MxSpace.xl),
+                MxSearchSortToolbar<ContentSortMode>(
+                  searchHintText: l10n.commonSearch,
+                  onSearchChanged: toolbarNotifier.setSearchTerm,
+                  onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                  sortOptions: sortOptions,
+                  selectedSort: toolbarState.sortMode,
+                  sortLabel: l10n.commonSort,
+                  onSortSelected: toolbarNotifier.setSortMode,
+                  trailing: _isReorderMode
+                      ? <Widget>[
+                          MxSecondaryButton(
+                            label: l10n.commonCancel,
+                            variant: MxSecondaryVariant.text,
+                            onPressed: _cancelReorder,
+                          ),
+                          MxPrimaryButton(
+                            label: l10n.commonSaveOrder,
+                            onPressed: () => _saveReorder(state),
+                          ),
+                        ]
+                      : const <Widget>[],
                 ),
-                children: [
-                  _FolderHeader(
-                    state: state,
-                    onOpenActions: () => _openActions(state),
-                  ),
-                  const MxGap(MxFeatureSpacing.xl),
-                  MxSearchSortToolbar<ContentSortMode>(
-                    searchHintText: l10n.commonSearch,
-                    onSearchChanged: toolbarNotifier.setSearchTerm,
-                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                    sortOptions: sortOptions,
-                    selectedSort: toolbarState.sortMode,
-                    sortLabel: l10n.commonSort,
-                    onSortSelected: toolbarNotifier.setSortMode,
-                    trailing: _isReorderMode
-                        ? <Widget>[
-                            MxSecondaryButton(
-                              label: l10n.commonCancel,
-                              variant: MxSecondaryVariant.text,
-                              onPressed: _cancelReorder,
-                            ),
-                            MxPrimaryButton(
-                              label: l10n.commonSaveOrder,
-                              onPressed: () => _saveReorder(state),
-                            ),
-                          ]
-                        : const <Widget>[],
-                  ),
-                  const MxGap(MxFeatureSpacing.xl),
-                  _FolderSummary(state: state),
-                  const MxGap(MxFeatureSpacing.xl),
-                  content,
-                ],
-              );
-            },
-          ),
+                const MxGap(MxSpace.xl),
+                _FolderSummary(state: state),
+                const MxGap(MxSpace.xl),
+                content,
+              ],
+            );
+          },
         ),
       ),
     );
@@ -403,15 +401,18 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
 }
 
 class _FolderHeader extends StatelessWidget {
-  const _FolderHeader({required this.state, required this.onOpenActions});
+  const _FolderHeader({
+    required this.state,
+    required this.onOpenActions,
+    required this.onOpenBreadcrumb,
+  });
 
   final FolderDetailState state;
   final VoidCallback onOpenActions;
+  final ValueChanged<String> onOpenBreadcrumb;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
 
     return Column(
@@ -424,14 +425,9 @@ class _FolderHeader extends StatelessWidget {
               tooltip: l10n.commonBack,
               onPressed: () => context.popRoute(fallback: context.goLibrary),
             ),
-            const MxGap.h(MxFeatureSpacing.sm),
+            const MxGap(MxSpace.sm),
             Expanded(
-              child: Text(
-                state.header.name,
-                style: textTheme.headlineSmall?.copyWith(
-                  color: scheme.onSurface,
-                ),
-              ),
+              child: MxText(state.header.name, role: MxTextRole.pageTitle),
             ),
             MxIconButton(
               icon: Icons.more_horiz_rounded,
@@ -440,15 +436,19 @@ class _FolderHeader extends StatelessWidget {
             ),
           ],
         ),
-        const MxGap(MxFeatureSpacing.sm),
+        const MxGap(MxSpace.sm),
         MxBreadcrumbBar(
           items: [
             for (var index = 0; index < state.header.breadcrumb.length; index++)
               MxBreadcrumb(
-                label: state.header.breadcrumb[index],
-                onTap: index == state.header.breadcrumb.length - 1
+                label: state.header.breadcrumb[index].label,
+                onTap:
+                    index == state.header.breadcrumb.length - 1 ||
+                        state.header.breadcrumb[index].folderId == null
                     ? null
-                    : () {},
+                    : () => onOpenBreadcrumb(
+                        state.header.breadcrumb[index].folderId!,
+                      ),
               ),
           ],
         ),
@@ -503,10 +503,10 @@ class _UnlockedFolderState extends StatelessWidget {
           message: l10n.foldersEmptyMessage,
           icon: Icons.folder_open_outlined,
         ),
-        const MxGap(MxFeatureSpacing.lg),
+        const MxGap(MxSpace.lg),
         Wrap(
-          spacing: MxFeatureSpacing.sm,
-          runSpacing: MxFeatureSpacing.sm,
+          spacing: MxSpace.sm,
+          runSpacing: MxSpace.sm,
           alignment: WrapAlignment.center,
           children: [
             MxPrimaryButton(
@@ -536,12 +536,17 @@ class _FolderBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (state.isSubfolderMode) {
+      final l10n = AppLocalizations.of(context);
       return Column(
         children: [
           for (var index = 0; index < state.subfolders.length; index++) ...[
             MxFolderTile(
               name: state.subfolders[index].name,
               icon: state.subfolders[index].icon,
+              caption: l10n.libraryFolderStats(
+                state.subfolders[index].deckCount,
+                state.subfolders[index].itemCount,
+              ),
               onTap: () => onOpenSubfolder(state.subfolders[index].id),
             ),
             if (index < state.subfolders.length - 1) const MxDivider(),
@@ -561,10 +566,11 @@ class _FolderBody extends StatelessWidget {
               state.decks[index].dueToday,
             ),
             onTap: () => context.pushDeckDetail(state.decks[index].id),
-            trailing: Text(
+            trailing: MxText(
               AppLocalizations.of(
                 context,
               ).commonPercentValue(state.decks[index].masteryPercent),
+              role: MxTextRole.tileTrailing,
             ),
           ),
           if (index < state.decks.length - 1) const MxDivider(),
@@ -629,10 +635,11 @@ class _ReorderContent extends StatelessWidget {
               metaLine: AppLocalizations.of(
                 context,
               ).foldersDeckCardProgress(item.cardCount, item.dueToday),
-              trailing: Text(
+              trailing: MxText(
                 AppLocalizations.of(
                   context,
                 ).commonPercentValue(item.masteryPercent),
+                role: MxTextRole.tileTrailing,
               ),
             ),
           );
@@ -649,19 +656,13 @@ class _FolderDetailSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       key: const ValueKey('folder_detail_skeleton'),
-      padding: const EdgeInsets.fromLTRB(
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.xxxl,
-      ),
       children: const [
         _FolderHeaderSkeleton(),
-        MxGap(MxFeatureSpacing.xl),
+        MxGap(MxSpace.xl),
         _ToolbarSkeleton(),
-        MxGap(MxFeatureSpacing.xl),
+        MxGap(MxSpace.xl),
         _SectionSkeleton(titleWidth: 160, subtitleWidth: 220, bodyHeight: 0),
-        MxGap(MxFeatureSpacing.xl),
+        MxGap(MxSpace.xl),
         _FolderTileSkeleton(),
         MxDivider(),
         _FolderTileSkeleton(),
@@ -683,13 +684,13 @@ class _FolderHeaderSkeleton extends StatelessWidget {
         Row(
           children: [
             MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
-            MxGap.h(MxFeatureSpacing.sm),
+            MxGap(MxSpace.sm),
             Expanded(child: MxSkeleton(height: 28, width: 220)),
-            MxGap.h(MxFeatureSpacing.sm),
+            MxGap(MxSpace.sm),
             MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
           ],
         ),
-        MxGap(MxFeatureSpacing.sm),
+        MxGap(MxSpace.sm),
         MxSkeleton(height: 14, width: 180),
       ],
     );
@@ -705,7 +706,7 @@ class _ToolbarSkeleton extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: const [
         MxSkeleton(height: 48, borderRadius: MxFeatureRadii.full),
-        MxGap(MxFeatureSpacing.sm),
+        MxGap(MxSpace.sm),
         Row(
           children: [
             MxSkeleton(
@@ -737,10 +738,10 @@ class _SectionSkeleton extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxSkeleton(height: 18, width: titleWidth),
-        const MxGap(MxFeatureSpacing.xs),
+        const MxGap(MxSpace.xs),
         MxSkeleton(height: 14, width: subtitleWidth),
         if (bodyHeight > 0) ...[
-          const MxGap(MxFeatureSpacing.md),
+          const MxGap(MxSpace.md),
           MxSkeleton(height: bodyHeight),
         ],
       ],
@@ -755,19 +756,19 @@ class _FolderTileSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: MxFeatureSpacing.lg,
-        vertical: MxFeatureSpacing.md,
+        horizontal: MxSpace.lg,
+        vertical: MxSpace.md,
       ),
       child: Row(
         children: [
           MxSkeleton(width: 48, height: 48, borderRadius: MxFeatureRadii.md),
-          MxGap.h(MxFeatureSpacing.md),
+          MxGap(MxSpace.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 MxSkeleton(height: 18, width: 180),
-                MxGap(MxFeatureSpacing.xs),
+                MxGap(MxSpace.xs),
                 MxSkeleton(height: 14, width: 120),
               ],
             ),

@@ -6,6 +6,7 @@ import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../widgets/mx_secondary_button.dart';
 import '../../../core/theme/mx_gap.dart';
+import '../widgets/mx_text.dart';
 
 /// Error state with optional "Retry" action and collapsible detail.
 class MxErrorState extends StatefulWidget {
@@ -36,7 +37,6 @@ class _MxErrorStateState extends State<MxErrorState> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
 
     return Center(
@@ -64,18 +64,16 @@ class _MxErrorStateState extends State<MxErrorState> {
                 ),
               ),
               const MxGap(AppSpacing.xl),
-              Text(
+              MxText(
                 widget.title ?? l10n.sharedErrorTitle,
-                style: textTheme.titleLarge?.copyWith(color: scheme.onSurface),
+                role: MxTextRole.stateTitle,
                 textAlign: TextAlign.center,
               ),
               if (widget.message != null) ...[
                 const MxGap(AppSpacing.sm),
-                Text(
+                MxText(
                   widget.message!,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
+                  role: MxTextRole.stateMessage,
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -110,12 +108,7 @@ class _MxErrorStateState extends State<MxErrorState> {
                     color: scheme.surfaceContainerHighest,
                     borderRadius: AppRadius.borderSm,
                   ),
-                  child: Text(
-                    widget.details!,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
+                  child: MxText(widget.details!, role: MxTextRole.formHelper),
                 ),
               ],
             ],

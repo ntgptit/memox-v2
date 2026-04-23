@@ -16,6 +16,7 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
+import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/options/content_sort_options.dart';
 import '../../../shared/states/mx_empty_state.dart';
 import '../../../shared/states/mx_loading_state.dart';
@@ -29,6 +30,7 @@ import '../../../shared/widgets/mx_reorderable_list.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_term_row.dart';
+import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
 
 class FlashcardListScreen extends ConsumerStatefulWidget {
@@ -80,136 +82,132 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
               tooltip: l10n.flashcardsAddTooltip,
               onPressed: () => context.pushFlashcardCreate(widget.deckId),
             ),
-      body: SafeArea(
-        child: MxContentShell(
-          width: MxContentWidth.wide,
-          child: MxRetainedAsyncState<FlashcardListState>(
-            data: queryState.value,
-            isLoading: queryState.isLoading,
-            error: queryState.hasError ? queryState.error : null,
-            stackTrace: queryState.hasError ? queryState.stackTrace : null,
-            skeletonBuilder: (_) => const _FlashcardListSkeleton(),
-            onRetry: () =>
-                ref.invalidate(flashcardListQueryProvider(widget.deckId)),
-            dataBuilder: (context, state) {
-              Widget content = _FlashcardItems(
+      body: MxContentShell(
+        width: MxContentWidth.wide,
+        applyVerticalPadding: true,
+        hasFab: !_isReorderMode,
+        child: MxRetainedAsyncState<FlashcardListState>(
+          data: queryState.value,
+          isLoading: queryState.isLoading,
+          error: queryState.hasError ? queryState.error : null,
+          stackTrace: queryState.hasError ? queryState.stackTrace : null,
+          skeletonBuilder: (_) => const _FlashcardListSkeleton(),
+          onRetry: () =>
+              ref.invalidate(flashcardListQueryProvider(widget.deckId)),
+          dataBuilder: (context, state) {
+            Widget content = _FlashcardItems(
+              state: state,
+              deckId: widget.deckId,
+              selection: selection,
+              onToggleSelection: selectionNotifier.toggle,
+            );
+            if (state.items.isEmpty) {
+              content = _FlashcardEmptyState(deckId: widget.deckId);
+            }
+            if (_isReorderMode) {
+              content = _FlashcardReorderList(
                 state: state,
-                deckId: widget.deckId,
-                selection: selection,
-                onToggleSelection: selectionNotifier.toggle,
+                orderedIds: _orderedIds,
+                onReorder: _handleReorder,
               );
-              if (state.items.isEmpty) {
-                content = _FlashcardEmptyState(deckId: widget.deckId);
-              }
-              if (_isReorderMode) {
-                content = _FlashcardReorderList(
-                  state: state,
-                  orderedIds: _orderedIds,
-                  onReorder: _handleReorder,
-                );
-              }
+            }
 
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.xxxl,
+            return ListView(
+              children: [
+                _FlashcardHeader(
+                  state: state,
+                  onBack: () => context.popRoute(
+                    fallback: () => context.goDeckDetail(state.deckId),
+                  ),
+                  onOpenBreadcrumb: (folderId) =>
+                      context.goFolderDetail(folderId),
                 ),
-                children: [
-                  _FlashcardHeader(
-                    state: state,
-                    onBack: () => context.popRoute(
-                      fallback: () => context.goDeckDetail(state.deckId),
-                    ),
+                const MxGap(MxSpace.xl),
+                MxSearchSortToolbar<ContentSortMode>(
+                  searchHintText: l10n.flashcardsSearchHint,
+                  onSearchChanged: toolbarNotifier.setSearchTerm,
+                  onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                  sortOptions: sortOptions,
+                  selectedSort: toolbarState.sortMode,
+                  sortLabel: l10n.commonSort,
+                  onSortSelected: toolbarNotifier.setSortMode,
+                  trailing: _isReorderMode
+                      ? <Widget>[
+                          MxSecondaryButton(
+                            label: l10n.commonCancel,
+                            variant: MxSecondaryVariant.text,
+                            onPressed: _cancelReorder,
+                          ),
+                          MxPrimaryButton(
+                            label: l10n.commonSaveOrder,
+                            onPressed: _saveReorder,
+                          ),
+                        ]
+                      : <Widget>[
+                          MxSecondaryButton(
+                            label: l10n.commonImport,
+                            leadingIcon: Icons.file_upload_outlined,
+                            variant: MxSecondaryVariant.outlined,
+                            onPressed: () =>
+                                context.pushDeckImport(widget.deckId),
+                          ),
+                          MxSecondaryButton(
+                            label: l10n.commonReorder,
+                            leadingIcon: Icons.reorder_rounded,
+                            variant: MxSecondaryVariant.outlined,
+                            onPressed: state.canManualReorder
+                                ? () => _enterReorderMode(state)
+                                : null,
+                          ),
+                        ],
+                ),
+                if (selection.isNotEmpty) ...[
+                  const MxGap(MxSpace.lg),
+                  MxBulkActionBar(
+                    label: l10n.flashcardsBulkSelected(selection.length),
+                    subtitle: l10n.flashcardsBulkSubtitle,
+                    actions: [
+                      MxSecondaryButton(
+                        label: selection.length == state.items.length
+                            ? l10n.commonClear
+                            : l10n.commonSelectAll,
+                        variant: MxSecondaryVariant.text,
+                        onPressed: () {
+                          if (selection.length == state.items.length) {
+                            selectionNotifier.clear();
+                            return;
+                          }
+                          selectionNotifier.setAll(
+                            state.items.map((item) => item.id),
+                          );
+                        },
+                      ),
+                      MxSecondaryButton(
+                        label: l10n.commonMove,
+                        leadingIcon: Icons.drive_file_move_outline,
+                        variant: MxSecondaryVariant.outlined,
+                        onPressed: () => _moveSelected(selection.toList()),
+                      ),
+                      MxSecondaryButton(
+                        label: l10n.commonExport,
+                        leadingIcon: Icons.file_download_outlined,
+                        variant: MxSecondaryVariant.outlined,
+                        onPressed: () => _exportSelected(selection.toList()),
+                      ),
+                      MxPrimaryButton(
+                        label: l10n.commonDelete,
+                        leadingIcon: Icons.delete_outline,
+                        tone: MxPrimaryButtonTone.danger,
+                        onPressed: () => _deleteSelected(selection.toList()),
+                      ),
+                    ],
                   ),
-                  const MxGap(MxFeatureSpacing.xl),
-                  MxSearchSortToolbar<ContentSortMode>(
-                    searchHintText: l10n.flashcardsSearchHint,
-                    onSearchChanged: toolbarNotifier.setSearchTerm,
-                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                    sortOptions: sortOptions,
-                    selectedSort: toolbarState.sortMode,
-                    sortLabel: l10n.commonSort,
-                    onSortSelected: toolbarNotifier.setSortMode,
-                    trailing: _isReorderMode
-                        ? <Widget>[
-                            MxSecondaryButton(
-                              label: l10n.commonCancel,
-                              variant: MxSecondaryVariant.text,
-                              onPressed: _cancelReorder,
-                            ),
-                            MxPrimaryButton(
-                              label: l10n.commonSaveOrder,
-                              onPressed: _saveReorder,
-                            ),
-                          ]
-                        : <Widget>[
-                            MxSecondaryButton(
-                              label: l10n.commonImport,
-                              leadingIcon: Icons.file_upload_outlined,
-                              variant: MxSecondaryVariant.outlined,
-                              onPressed: () =>
-                                  context.pushDeckImport(widget.deckId),
-                            ),
-                            MxSecondaryButton(
-                              label: l10n.commonReorder,
-                              leadingIcon: Icons.reorder_rounded,
-                              variant: MxSecondaryVariant.outlined,
-                              onPressed: state.canManualReorder
-                                  ? () => _enterReorderMode(state)
-                                  : null,
-                            ),
-                          ],
-                  ),
-                  if (selection.isNotEmpty) ...[
-                    const MxGap(MxFeatureSpacing.lg),
-                    MxBulkActionBar(
-                      label: l10n.flashcardsBulkSelected(selection.length),
-                      subtitle: l10n.flashcardsBulkSubtitle,
-                      actions: [
-                        MxSecondaryButton(
-                          label: selection.length == state.items.length
-                              ? l10n.commonClear
-                              : l10n.commonSelectAll,
-                          variant: MxSecondaryVariant.text,
-                          onPressed: () {
-                            if (selection.length == state.items.length) {
-                              selectionNotifier.clear();
-                              return;
-                            }
-                            selectionNotifier.setAll(
-                              state.items.map((item) => item.id),
-                            );
-                          },
-                        ),
-                        MxSecondaryButton(
-                          label: l10n.commonMove,
-                          leadingIcon: Icons.drive_file_move_outline,
-                          variant: MxSecondaryVariant.outlined,
-                          onPressed: () => _moveSelected(selection.toList()),
-                        ),
-                        MxSecondaryButton(
-                          label: l10n.commonExport,
-                          leadingIcon: Icons.file_download_outlined,
-                          variant: MxSecondaryVariant.outlined,
-                          onPressed: () => _exportSelected(selection.toList()),
-                        ),
-                        MxPrimaryButton(
-                          label: l10n.commonDelete,
-                          leadingIcon: Icons.delete_outline,
-                          tone: MxPrimaryButtonTone.danger,
-                          onPressed: () => _deleteSelected(selection.toList()),
-                        ),
-                      ],
-                    ),
-                  ],
-                  const MxGap(MxFeatureSpacing.xl),
-                  content,
                 ],
-              );
-            },
-          ),
+                const MxGap(MxSpace.xl),
+                content,
+              ],
+            );
+          },
         ),
       ),
     );
@@ -336,15 +334,18 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
 }
 
 class _FlashcardHeader extends StatelessWidget {
-  const _FlashcardHeader({required this.state, required this.onBack});
+  const _FlashcardHeader({
+    required this.state,
+    required this.onBack,
+    required this.onOpenBreadcrumb,
+  });
 
   final FlashcardListState state;
   final VoidCallback onBack;
+  final ValueChanged<String> onOpenBreadcrumb;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
 
     return Column(
@@ -357,24 +358,21 @@ class _FlashcardHeader extends StatelessWidget {
               tooltip: l10n.commonBack,
               onPressed: onBack,
             ),
-            const MxGap.h(MxFeatureSpacing.sm),
-            Expanded(
-              child: Text(
-                state.deckName,
-                style: textTheme.headlineSmall?.copyWith(
-                  color: scheme.onSurface,
-                ),
-              ),
-            ),
+            const MxGap(MxSpace.sm),
+            Expanded(child: MxText(state.deckName, role: MxTextRole.pageTitle)),
           ],
         ),
-        const MxGap(MxFeatureSpacing.sm),
+        const MxGap(MxSpace.sm),
         MxBreadcrumbBar(
           items: [
             for (var index = 0; index < state.breadcrumb.length; index++)
               MxBreadcrumb(
-                label: state.breadcrumb[index],
-                onTap: index == state.breadcrumb.length - 1 ? null : () {},
+                label: state.breadcrumb[index].label,
+                onTap:
+                    index == state.breadcrumb.length - 1 ||
+                        state.breadcrumb[index].folderId == null
+                    ? null
+                    : () => onOpenBreadcrumb(state.breadcrumb[index].folderId!),
               ),
           ],
         ),
@@ -437,7 +435,7 @@ class _FlashcardItems extends StatelessWidget {
             },
             onLongPress: () => onToggleSelection(state.items[index].id),
           ),
-          if (index < state.items.length - 1) const MxGap(MxFeatureSpacing.sm),
+          if (index < state.items.length - 1) const MxGap(MxSpace.sm),
         ],
       ],
     );
@@ -488,21 +486,15 @@ class _FlashcardListSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       key: const ValueKey('flashcard_list_skeleton'),
-      padding: const EdgeInsets.fromLTRB(
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.xxxl,
-      ),
       children: const [
         _FlashcardHeaderSkeleton(),
-        MxGap(MxFeatureSpacing.xl),
+        MxGap(MxSpace.xl),
         _FlashcardToolbarSkeleton(),
-        MxGap(MxFeatureSpacing.xl),
+        MxGap(MxSpace.xl),
         _TermRowSkeleton(),
-        MxGap(MxFeatureSpacing.sm),
+        MxGap(MxSpace.sm),
         _TermRowSkeleton(),
-        MxGap(MxFeatureSpacing.sm),
+        MxGap(MxSpace.sm),
         _TermRowSkeleton(),
       ],
     );
@@ -520,11 +512,11 @@ class _FlashcardHeaderSkeleton extends StatelessWidget {
         Row(
           children: [
             MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
-            MxGap.h(MxFeatureSpacing.sm),
+            MxGap(MxSpace.sm),
             Expanded(child: MxSkeleton(height: 28, width: 220)),
           ],
         ),
-        MxGap(MxFeatureSpacing.sm),
+        MxGap(MxSpace.sm),
         MxSkeleton(height: 14, width: 180),
       ],
     );
@@ -540,10 +532,10 @@ class _FlashcardToolbarSkeleton extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: const [
         MxSkeleton(height: 48, borderRadius: MxFeatureRadii.full),
-        MxGap(MxFeatureSpacing.sm),
+        MxGap(MxSpace.sm),
         Wrap(
-          spacing: MxFeatureSpacing.sm,
-          runSpacing: MxFeatureSpacing.sm,
+          spacing: MxSpace.sm,
+          runSpacing: MxSpace.sm,
           children: [
             MxSkeleton(
               height: 32,
@@ -573,14 +565,14 @@ class _TermRowSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: EdgeInsets.all(MxFeatureSpacing.md),
+      padding: EdgeInsets.all(MxSpace.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           MxSkeleton(height: 18, width: 180),
-          MxGap(MxFeatureSpacing.xs),
+          MxGap(MxSpace.xs),
           MxSkeleton(height: 16, width: 240),
-          MxGap(MxFeatureSpacing.sm),
+          MxGap(MxSpace.sm),
           MxSkeleton(height: 14, width: 132),
         ],
       ),

@@ -19,6 +19,7 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
+import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/states/mx_loading_state.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
@@ -27,6 +28,7 @@ import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_study_set_tile.dart';
+import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/deck_detail_viewmodel.dart';
 
 enum _DeckAction { edit, move, duplicate, export, delete }
@@ -52,81 +54,75 @@ class DeckDetailScreen extends ConsumerWidget {
     final queryState = ref.watch(deckDetailQueryProvider(deckId));
 
     return MxScaffold(
-      body: SafeArea(
-        child: MxContentShell(
-          width: MxContentWidth.wide,
-          child: MxRetainedAsyncState<DeckDetailState>(
-            data: queryState.value,
-            isLoading: queryState.isLoading,
-            error: queryState.hasError ? queryState.error : null,
-            stackTrace: queryState.hasError ? queryState.stackTrace : null,
-            skeletonBuilder: (_) => const _DeckDetailSkeleton(),
-            onRetry: () => ref.invalidate(deckDetailQueryProvider(deckId)),
-            dataBuilder: (context, state) {
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.lg,
-                  MxFeatureSpacing.xxxl,
+      body: MxContentShell(
+        width: MxContentWidth.wide,
+        applyVerticalPadding: true,
+        child: MxRetainedAsyncState<DeckDetailState>(
+          data: queryState.value,
+          isLoading: queryState.isLoading,
+          error: queryState.hasError ? queryState.error : null,
+          stackTrace: queryState.hasError ? queryState.stackTrace : null,
+          skeletonBuilder: (_) => const _DeckDetailSkeleton(),
+          onRetry: () => ref.invalidate(deckDetailQueryProvider(deckId)),
+          dataBuilder: (context, state) {
+            return ListView(
+              children: [
+                _DeckHeader(
+                  state: state,
+                  onOpenActions: () => _openDeckActions(context, ref, state),
+                  onBack: () => context.popRoute(
+                    fallback: () => context.goFolderDetail(state.folderId),
+                  ),
+                  onOpenBreadcrumb: (folderId) =>
+                      context.goFolderDetail(folderId),
                 ),
-                children: [
-                  _DeckHeader(
-                    state: state,
-                    onOpenActions: () => _openDeckActions(context, ref, state),
-                    onBack: () => context.popRoute(
-                      fallback: () => context.goFolderDetail(state.folderId),
+                const MxGap(MxSpace.xl),
+                MxSection(
+                  title: l10n.commonOverview,
+                  subtitle: l10n.decksOverviewSubtitle(
+                    state.cardCount,
+                    state.dueTodayCount,
+                    state.masteryPercent,
+                  ),
+                  child: MxStudySetTile(
+                    title: state.name,
+                    icon: Icons.style_outlined,
+                    metaLine: l10n.decksLastStudiedLabel(
+                      _formatLastStudied(context, state.lastStudiedAt),
                     ),
                   ),
-                  const MxGap(MxFeatureSpacing.xl),
-                  MxSection(
-                    title: l10n.commonOverview,
-                    subtitle: l10n.decksOverviewSubtitle(
-                      state.cardCount,
-                      state.dueTodayCount,
-                      state.masteryPercent,
-                    ),
-                    child: MxStudySetTile(
-                      title: state.name,
-                      icon: Icons.style_outlined,
-                      metaLine: l10n.decksLastStudiedLabel(
-                        _formatLastStudied(context, state.lastStudiedAt),
+                ),
+                const MxGap(MxSpace.xl),
+                MxSection(
+                  title: l10n.decksManageContentTitle,
+                  subtitle: l10n.decksManageContentSubtitle,
+                  child: Wrap(
+                    spacing: MxSpace.sm,
+                    runSpacing: MxSpace.sm,
+                    children: [
+                      MxPrimaryButton(
+                        label: l10n.flashcardsOpenListAction,
+                        leadingIcon: Icons.view_list_outlined,
+                        onPressed: () => context.pushFlashcardList(state.id),
                       ),
-                    ),
+                      MxSecondaryButton(
+                        label: l10n.flashcardsAddAction,
+                        leadingIcon: Icons.add,
+                        variant: MxSecondaryVariant.outlined,
+                        onPressed: () => context.pushFlashcardCreate(state.id),
+                      ),
+                      MxSecondaryButton(
+                        label: l10n.commonImport,
+                        leadingIcon: Icons.file_upload_outlined,
+                        variant: MxSecondaryVariant.outlined,
+                        onPressed: () => context.pushDeckImport(state.id),
+                      ),
+                    ],
                   ),
-                  const MxGap(MxFeatureSpacing.xl),
-                  MxSection(
-                    title: l10n.decksManageContentTitle,
-                    subtitle: l10n.decksManageContentSubtitle,
-                    child: Wrap(
-                      spacing: MxFeatureSpacing.sm,
-                      runSpacing: MxFeatureSpacing.sm,
-                      children: [
-                        MxPrimaryButton(
-                          label: l10n.flashcardsOpenListAction,
-                          leadingIcon: Icons.view_list_outlined,
-                          onPressed: () => context.pushFlashcardList(state.id),
-                        ),
-                        MxSecondaryButton(
-                          label: l10n.flashcardsAddAction,
-                          leadingIcon: Icons.add,
-                          variant: MxSecondaryVariant.outlined,
-                          onPressed: () =>
-                              context.pushFlashcardCreate(state.id),
-                        ),
-                        MxSecondaryButton(
-                          label: l10n.commonImport,
-                          leadingIcon: Icons.file_upload_outlined,
-                          variant: MxSecondaryVariant.outlined,
-                          onPressed: () => context.pushDeckImport(state.id),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -138,16 +134,16 @@ class _DeckHeader extends StatelessWidget {
     required this.state,
     required this.onOpenActions,
     required this.onBack,
+    required this.onOpenBreadcrumb,
   });
 
   final DeckDetailState state;
   final VoidCallback onOpenActions;
   final VoidCallback onBack;
+  final ValueChanged<String> onOpenBreadcrumb;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
 
     return Column(
@@ -160,15 +156,8 @@ class _DeckHeader extends StatelessWidget {
               tooltip: l10n.commonBack,
               onPressed: onBack,
             ),
-            const MxGap.h(MxFeatureSpacing.sm),
-            Expanded(
-              child: Text(
-                state.name,
-                style: textTheme.headlineSmall?.copyWith(
-                  color: scheme.onSurface,
-                ),
-              ),
-            ),
+            const MxGap(MxSpace.sm),
+            Expanded(child: MxText(state.name, role: MxTextRole.pageTitle)),
             MxIconButton(
               icon: Icons.more_horiz_rounded,
               tooltip: l10n.decksMoreActionsTooltip,
@@ -176,13 +165,17 @@ class _DeckHeader extends StatelessWidget {
             ),
           ],
         ),
-        const MxGap(MxFeatureSpacing.sm),
+        const MxGap(MxSpace.sm),
         MxBreadcrumbBar(
           items: [
             for (var index = 0; index < state.breadcrumb.length; index++)
               MxBreadcrumb(
-                label: state.breadcrumb[index],
-                onTap: index == state.breadcrumb.length - 1 ? null : () {},
+                label: state.breadcrumb[index].label,
+                onTap:
+                    index == state.breadcrumb.length - 1 ||
+                        state.breadcrumb[index].folderId == null
+                    ? null
+                    : () => onOpenBreadcrumb(state.breadcrumb[index].folderId!),
               ),
           ],
         ),
@@ -335,6 +328,7 @@ Future<void> _duplicateDeck(
         title: l10n.decksCurrentFolderTitle,
         subtitle: state.breadcrumb
             .take(state.breadcrumb.length - 1)
+            .map((item) => item.label)
             .join(' / '),
         icon: Icons.folder_special_outlined,
       ),
@@ -438,21 +432,15 @@ class _DeckDetailSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       key: const ValueKey('deck_detail_skeleton'),
-      padding: const EdgeInsets.fromLTRB(
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.lg,
-        MxFeatureSpacing.xxxl,
-      ),
       children: const [
         _DeckHeaderSkeleton(),
-        MxGap(MxFeatureSpacing.xl),
+        MxGap(MxSpace.xl),
         _DeckSectionSkeleton(
           titleWidth: 140,
           subtitleWidth: 240,
           body: _StudySetTileSkeleton(),
         ),
-        MxGap(MxFeatureSpacing.xl),
+        MxGap(MxSpace.xl),
         _DeckSectionSkeleton(
           titleWidth: 180,
           subtitleWidth: 260,
@@ -474,13 +462,13 @@ class _DeckHeaderSkeleton extends StatelessWidget {
         Row(
           children: [
             MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
-            MxGap.h(MxFeatureSpacing.sm),
+            MxGap(MxSpace.sm),
             Expanded(child: MxSkeleton(height: 28, width: 220)),
-            MxGap.h(MxFeatureSpacing.sm),
+            MxGap(MxSpace.sm),
             MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
           ],
         ),
-        MxGap(MxFeatureSpacing.sm),
+        MxGap(MxSpace.sm),
         MxSkeleton(height: 14, width: 180),
       ],
     );
@@ -504,9 +492,9 @@ class _DeckSectionSkeleton extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxSkeleton(height: 18, width: titleWidth),
-        const MxGap(MxFeatureSpacing.xs),
+        const MxGap(MxSpace.xs),
         MxSkeleton(height: 14, width: subtitleWidth),
-        const MxGap(MxFeatureSpacing.md),
+        const MxGap(MxSpace.md),
         body,
       ],
     );
@@ -520,20 +508,20 @@ class _StudySetTileSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: MxFeatureSpacing.lg,
-        vertical: MxFeatureSpacing.md,
+        horizontal: MxSpace.lg,
+        vertical: MxSpace.md,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
-          MxGap.h(MxFeatureSpacing.md),
+          MxGap(MxSpace.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 MxSkeleton(height: 18, width: 180),
-                MxGap(MxFeatureSpacing.xs),
+                MxGap(MxSpace.xs),
                 MxSkeleton(height: 14, width: 140),
               ],
             ),
@@ -550,8 +538,8 @@ class _DeckActionSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Wrap(
-      spacing: MxFeatureSpacing.sm,
-      runSpacing: MxFeatureSpacing.sm,
+      spacing: MxSpace.sm,
+      runSpacing: MxSpace.sm,
       children: [
         MxSkeleton(height: 40, width: 132, borderRadius: MxFeatureRadii.full),
         MxSkeleton(height: 40, width: 136, borderRadius: MxFeatureRadii.full),

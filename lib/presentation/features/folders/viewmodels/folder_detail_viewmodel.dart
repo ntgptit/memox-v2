@@ -26,7 +26,7 @@ class FolderDetailHeader {
 
   final String id;
   final String name;
-  final List<String> breadcrumb;
+  final List<BreadcrumbSegmentReadModel> breadcrumb;
 }
 
 @immutable
@@ -35,11 +35,15 @@ class FolderSubfolderItem {
     required this.id,
     required this.name,
     required this.icon,
+    required this.deckCount,
+    required this.itemCount,
   });
 
   final String id;
   final String name;
   final IconData icon;
+  final int deckCount;
+  final int itemCount;
 }
 
 @immutable
@@ -263,9 +267,11 @@ FolderDetailState _mapFolderDetailState(
     subfolders: readModel.subfolders
         .map(
           (item) => FolderSubfolderItem(
-            id: item.id,
-            name: item.name,
-            icon: _resolveFolderIcon(item.contentMode),
+            id: item.folder.id,
+            name: item.folder.name,
+            icon: _resolveFolderIcon(item.folder.contentMode),
+            deckCount: item.deckCount,
+            itemCount: item.itemCount,
           ),
         )
         .toList(growable: false),

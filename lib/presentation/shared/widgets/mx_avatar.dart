@@ -4,6 +4,8 @@ import '../../../core/theme/app_icon_sizes.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/mx_gap.dart';
+import 'mx_text.dart';
+import 'mx_tappable.dart';
 
 enum MxAvatarSize { sm, md, lg, xl }
 
@@ -29,40 +31,38 @@ class MxAvatar extends StatelessWidget {
   final VoidCallback? onTap;
 
   double get _diameter => switch (size) {
-        MxAvatarSize.sm => AppIconSizes.lg,
-        MxAvatarSize.md => AppIconSizes.xl,
-        MxAvatarSize.lg => AppIconSizes.xxl,
-        MxAvatarSize.xl => AppIconSizes.xxxl,
-      };
+    MxAvatarSize.sm => AppIconSizes.lg,
+    MxAvatarSize.md => AppIconSizes.xl,
+    MxAvatarSize.lg => AppIconSizes.xxl,
+    MxAvatarSize.xl => AppIconSizes.xxxl,
+  };
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
-    final avatar = ClipOval(
-      child: Container(
-        width: _diameter,
-        height: _diameter,
-        color: scheme.surfaceContainerHigh,
-        alignment: Alignment.center,
-        child: imageUrl != null
-            ? Image.network(imageUrl!, fit: BoxFit.cover)
-            : Text(
-                _resolvedInitials,
-                style: textTheme.labelMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-      ),
+    final avatarContent = SizedBox(
+      width: _diameter,
+      height: _diameter,
+      child: imageUrl != null
+          ? Image.network(imageUrl!, fit: BoxFit.cover)
+          : Center(
+              child: MxText(_resolvedInitials, role: MxTextRole.avatarInitials),
+            ),
     );
 
     final tappable = onTap == null
-        ? avatar
-        : InkWell(
+        ? ClipOval(
+            child: ColoredBox(
+              color: scheme.surfaceContainerHigh,
+              child: avatarContent,
+            ),
+          )
+        : MxTappable(
+            shape: const CircleBorder(),
             onTap: onTap,
-            customBorder: const CircleBorder(),
-            child: avatar,
+            backgroundColor: scheme.surfaceContainerHigh,
+            child: avatarContent,
           );
 
     if (badgeLabel == null) return tappable;
@@ -81,10 +81,7 @@ class MxAvatar extends StatelessWidget {
             borderRadius: AppRadius.borderFull,
             border: Border.all(color: scheme.outlineVariant),
           ),
-          child: Text(
-            badgeLabel!,
-            style: textTheme.labelSmall?.copyWith(color: scheme.onSurface),
-          ),
+          child: MxText(badgeLabel!, role: MxTextRole.badge),
         ),
       ],
     );
@@ -93,6 +90,8 @@ class MxAvatar extends StatelessWidget {
   String get _resolvedInitials {
     final value = (initials ?? '').trim();
     if (value.isEmpty) return '?';
-    return value.length <= 2 ? value.toUpperCase() : value.substring(0, 2).toUpperCase();
+    return value.length <= 2
+        ? value.toUpperCase()
+        : value.substring(0, 2).toUpperCase();
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_layout.dart';
+import 'mx_content_shell.dart';
+
 /// Thin wrapper over [Scaffold] that sets MemoX defaults:
 /// - Themed app bar title
 /// - Optional search/filter row under the app bar
@@ -22,6 +25,7 @@ class MxScaffold extends StatelessWidget {
     this.backgroundColor,
     this.extendBody = false,
     this.extendBodyBehindAppBar = false,
+    this.bodyInsets = true,
     super.key,
   });
 
@@ -41,11 +45,21 @@ class MxScaffold extends StatelessWidget {
   final Color? backgroundColor;
   final bool extendBody;
   final bool extendBodyBehindAppBar;
+  final bool bodyInsets;
 
-  bool get _hasAppBar => title != null || titleWidget != null || actions != null;
+  bool get _hasAppBar =>
+      title != null || titleWidget != null || actions != null;
 
   @override
   Widget build(BuildContext context) {
+    final shouldApplyBodyInsets = bodyInsets && body is! MxContentShell;
+    final scaffoldBody = shouldApplyBodyInsets
+        ? Padding(
+            padding: context.pageInsets(hasFab: floatingActionButton != null),
+            child: body,
+          )
+        : body;
+
     return Scaffold(
       backgroundColor: backgroundColor,
       extendBody: extendBody,
@@ -55,9 +69,14 @@ class MxScaffold extends StatelessWidget {
           ? AppBar(
               leading: leading,
               automaticallyImplyLeading: automaticallyImplyLeading,
-              title: titleWidget ??
+              title:
+                  titleWidget ??
                   (title != null
-                      ? Text(title!, maxLines: 1, overflow: TextOverflow.ellipsis)
+                      ? Text(
+                          title!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
                       : null),
               actions: actions,
               bottom: bottom,
@@ -66,7 +85,7 @@ class MxScaffold extends StatelessWidget {
       body: SafeArea(
         top: !_hasAppBar,
         bottom: bottomNavigationBar == null,
-        child: body,
+        child: scaffoldBody,
       ),
       floatingActionButton: floatingActionButton,
       floatingActionButtonLocation: floatingActionButtonLocation,

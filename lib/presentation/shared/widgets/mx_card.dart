@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_elevation.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
+import 'mx_tappable.dart';
 
 enum MxCardVariant { filled, elevated, outlined }
 
@@ -36,42 +37,39 @@ class MxCard extends StatelessWidget {
     final resolvedBorderRadius = _resolvedBorderRadius(cardTheme);
     final resolvedClipBehavior =
         clipBehavior ?? cardTheme.clipBehavior ?? Clip.antiAlias;
+    final cardColor = _backgroundColor(cardTheme, scheme);
+    final cardShape = RoundedRectangleBorder(
+      borderRadius: resolvedBorderRadius,
+      side: variant == MxCardVariant.outlined
+          ? BorderSide(color: scheme.outlineVariant)
+          : BorderSide.none,
+    );
 
     final content = Card(
-      color: _backgroundColor(cardTheme, scheme),
+      color: cardColor,
       elevation: _elevation(cardTheme),
       shadowColor: cardTheme.shadowColor,
       surfaceTintColor: cardTheme.surfaceTintColor,
       margin: cardTheme.margin ?? EdgeInsets.zero,
       clipBehavior: resolvedClipBehavior,
-      shape: RoundedRectangleBorder(
-        borderRadius: resolvedBorderRadius,
-        side: variant == MxCardVariant.outlined
-            ? BorderSide(color: scheme.outlineVariant)
-            : BorderSide.none,
-      ),
+      shape: cardShape,
       child: Padding(padding: padding, child: child),
     );
 
     if (onTap == null && onLongPress == null) return content;
 
     return Card(
-      color: _backgroundColor(cardTheme, scheme),
+      color: cardColor,
       elevation: _elevation(cardTheme),
       shadowColor: cardTheme.shadowColor,
       surfaceTintColor: cardTheme.surfaceTintColor,
       margin: cardTheme.margin ?? EdgeInsets.zero,
       clipBehavior: resolvedClipBehavior,
-      shape: RoundedRectangleBorder(
-        borderRadius: resolvedBorderRadius,
-        side: variant == MxCardVariant.outlined
-            ? BorderSide(color: scheme.outlineVariant)
-            : BorderSide.none,
-      ),
-      child: InkWell(
+      shape: cardShape,
+      child: MxTappable(
+        shape: cardShape,
         onTap: onTap,
         onLongPress: onLongPress,
-        borderRadius: resolvedBorderRadius,
         child: Padding(padding: padding, child: child),
       ),
     );
