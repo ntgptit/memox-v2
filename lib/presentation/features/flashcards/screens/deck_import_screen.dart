@@ -14,14 +14,12 @@ import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
-import '../../../shared/states/mx_error_state.dart';
-import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
-import '../../../shared/widgets/mx_term_row.dart';
-import '../../../shared/widgets/mx_text.dart';
 import '../../../shared/widgets/mx_text_field.dart';
+import '../widgets/deck_import_header_section.dart';
+import '../widgets/deck_import_preview_section.dart';
 import '../viewmodels/flashcard_import_viewmodel.dart';
 
 class DeckImportScreen extends ConsumerStatefulWidget {
@@ -78,7 +76,7 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
         applyVerticalPadding: true,
         child: ListView(
           children: [
-            _ImportHeader(deckId: widget.deckId),
+            DeckImportHeaderSection(deckId: widget.deckId),
             const MxGap(MxSpace.xl),
             MxSection(
               title: l10n.importSourceTitle,
@@ -172,7 +170,7 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
             ),
             if (draft.preparation != null) ...[
               const MxGap(MxSpace.xl),
-              _ImportPreviewSection(preparation: draft.preparation!),
+              DeckImportPreviewSection(preparation: draft.preparation!),
             ],
           ],
         ),
@@ -203,104 +201,5 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     }
     draftNotifier.setRawContent(content);
     MxSnackbar.success(context, l10n.importLoadedFileMessage(file.name));
-  }
-}
-
-class _ImportHeader extends StatelessWidget {
-  const _ImportHeader({required this.deckId});
-
-  final String deckId;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return Row(
-      children: [
-        MxIconButton(
-          icon: Icons.arrow_back,
-          tooltip: l10n.commonBack,
-          onPressed: () =>
-              context.popRoute(fallback: () => context.goDeckDetail(deckId)),
-        ),
-        const MxGap(MxSpace.sm),
-        Expanded(
-          child: MxText(l10n.flashcardsImportTitle, role: MxTextRole.pageTitle),
-        ),
-      ],
-    );
-  }
-}
-
-class _ImportPreviewSection extends StatelessWidget {
-  const _ImportPreviewSection({required this.preparation});
-
-  final FlashcardImportPreparation preparation;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (preparation.issues.isNotEmpty)
-          MxSection(
-            title: l10n.importValidationIssuesTitle,
-            subtitle: l10n.importValidationIssuesSubtitle,
-            child: Column(
-              children: [
-                for (
-                  var index = 0;
-                  index < preparation.issues.length;
-                  index++
-                ) ...[
-                  MxTermRow(
-                    term: l10n.importValidationIssueLine(
-                      preparation.issues[index].lineNumber,
-                    ),
-                    definition: preparation.issues[index].message,
-                  ),
-                  if (index < preparation.issues.length - 1)
-                    const MxGap(MxSpace.sm),
-                ],
-              ],
-            ),
-          ),
-        const MxGap(MxSpace.xl),
-        MxSection(
-          title: l10n.importPreviewTitle,
-          subtitle: l10n.importPreviewSubtitle(preparation.previewItems.length),
-          child: preparation.previewItems.isEmpty
-              ? MxErrorState(
-                  title: l10n.importNothingTitle,
-                  message: l10n.importNothingMessage,
-                )
-              : Column(
-                  children: [
-                    for (
-                      var index = 0;
-                      index < preparation.previewItems.length;
-                      index++
-                    ) ...[
-                      MxTermRow(
-                        term:
-                            preparation.previewItems[index].draft.title
-                                    ?.trim()
-                                    .isNotEmpty ==
-                                true
-                            ? preparation.previewItems[index].draft.title!
-                            : preparation.previewItems[index].draft.front,
-                        definition: preparation.previewItems[index].draft.back,
-                        caption: preparation.previewItems[index].sourceLabel,
-                      ),
-                      if (index < preparation.previewItems.length - 1)
-                        const MxGap(MxSpace.sm),
-                    ],
-                  ],
-                ),
-        ),
-      ],
-    );
   }
 }

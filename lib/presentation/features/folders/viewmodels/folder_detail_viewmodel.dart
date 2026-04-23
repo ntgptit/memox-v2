@@ -35,15 +35,19 @@ class FolderSubfolderItem {
     required this.id,
     required this.name,
     required this.icon,
-    required this.deckCount,
-    required this.itemCount,
-  });
+    required int deckCount,
+    required int itemCount,
+  }) : _deckCount = deckCount,
+       _itemCount = itemCount;
 
   final String id;
   final String name;
   final IconData icon;
-  final int deckCount;
-  final int itemCount;
+  final int? _deckCount;
+  final int? _itemCount;
+
+  int get deckCount => _deckCount ?? 0;
+  int get itemCount => _itemCount ?? 0;
 }
 
 @immutable

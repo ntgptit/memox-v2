@@ -91,7 +91,16 @@ void main() {
             'flashcard-002',
           ],
         );
-        final container = _createContainer(harness);
+        final container = ProviderContainer(
+          overrides: [
+            appDatabaseProvider.overrideWithValue(harness.database),
+            clockProvider.overrideWithValue(harness.clock),
+            idGeneratorProvider.overrideWithValue(harness.idGenerator),
+            contentDataRevisionProvider.overrideWith(
+              (ref) => Stream<int>.value(0),
+            ),
+          ],
+        );
         addTearDown(container.dispose);
         addTearDown(harness.dispose);
 

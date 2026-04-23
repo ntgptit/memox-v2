@@ -1,0 +1,50 @@
+import 'package:flutter/material.dart';
+
+import '../../../../app/router/app_navigation.dart';
+import '../../../../core/theme/mx_gap.dart';
+import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_term_row.dart';
+import '../viewmodels/flashcard_list_viewmodel.dart';
+
+class FlashcardItemsSection extends StatelessWidget {
+  const FlashcardItemsSection({
+    required this.state,
+    required this.deckId,
+    required this.selection,
+    required this.onToggleSelection,
+    super.key,
+  });
+
+  final FlashcardListState state;
+  final String deckId;
+  final Set<String> selection;
+  final ValueChanged<String> onToggleSelection;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var index = 0; index < state.items.length; index++) ...[
+          MxTermRow(
+            term: state.items[index].title,
+            definition: state.items[index].back,
+            caption: state.items[index].front,
+            selected: selection.contains(state.items[index].id),
+            onTap: () {
+              if (selection.isNotEmpty) {
+                onToggleSelection(state.items[index].id);
+                return;
+              }
+              context.pushFlashcardEdit(
+                deckId: deckId,
+                flashcardId: state.items[index].id,
+              );
+            },
+            onLongPress: () => onToggleSelection(state.items[index].id),
+          ),
+          if (index < state.items.length - 1) const MxGap(MxSpace.sm),
+        ],
+      ],
+    );
+  }
+}

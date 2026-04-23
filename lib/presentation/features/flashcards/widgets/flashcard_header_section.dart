@@ -6,20 +6,18 @@ import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_breadcrumb_bar.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_text.dart';
-import '../viewmodels/folder_detail_viewmodel.dart';
+import '../viewmodels/flashcard_list_viewmodel.dart';
 
-class FolderHeaderSection extends StatelessWidget {
-  const FolderHeaderSection({
+class FlashcardHeaderSection extends StatelessWidget {
+  const FlashcardHeaderSection({
     required this.state,
     required this.onBack,
-    required this.onOpenActions,
     required this.onOpenBreadcrumb,
     super.key,
   });
 
-  final FolderDetailState state;
+  final FlashcardListState state;
   final VoidCallback onBack;
-  final VoidCallback onOpenActions;
   final ValueChanged<String> onOpenBreadcrumb;
 
   @override
@@ -37,29 +35,20 @@ class FolderHeaderSection extends StatelessWidget {
               onPressed: onBack,
             ),
             const MxGap(MxSpace.sm),
-            Expanded(
-              child: MxText(state.header.name, role: MxTextRole.pageTitle),
-            ),
-            MxIconButton(
-              icon: Icons.more_horiz_rounded,
-              tooltip: l10n.foldersMoreActionsTooltip,
-              onPressed: onOpenActions,
-            ),
+            Expanded(child: MxText(state.deckName, role: MxTextRole.pageTitle)),
           ],
         ),
         const MxGap(MxSpace.sm),
         MxBreadcrumbBar(
           items: [
-            for (var index = 0; index < state.header.breadcrumb.length; index++)
+            for (var index = 0; index < state.breadcrumb.length; index++)
               MxBreadcrumb(
-                label: state.header.breadcrumb[index].label,
+                label: state.breadcrumb[index].label,
                 onTap:
-                    index == state.header.breadcrumb.length - 1 ||
-                        state.header.breadcrumb[index].folderId == null
+                    index == state.breadcrumb.length - 1 ||
+                        state.breadcrumb[index].folderId == null
                     ? null
-                    : () => onOpenBreadcrumb(
-                        state.header.breadcrumb[index].folderId!,
-                      ),
+                    : () => onOpenBreadcrumb(state.breadcrumb[index].folderId!),
               ),
           ],
         ),

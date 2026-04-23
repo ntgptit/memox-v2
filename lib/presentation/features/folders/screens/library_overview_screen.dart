@@ -9,19 +9,16 @@ import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
-import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/options/content_sort_options.dart';
-import '../../../shared/states/mx_empty_state.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
-import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_fab.dart';
-import '../../../shared/widgets/mx_folder_tile.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
-import '../../../shared/widgets/mx_text.dart';
-import '../models/library_folder.dart';
+import '../widgets/library_empty_state_section.dart';
+import '../widgets/library_folder_list.dart';
+import '../widgets/library_hero_section.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 import '../viewmodels/library_overview_viewmodel.dart';
 
@@ -70,7 +67,7 @@ class LibraryOverviewView extends ConsumerWidget {
           dataBuilder: (context, state) {
             return ListView(
               children: [
-                _LibraryHero(state: state),
+                LibraryHeroSection(state: state),
                 const MxGap(MxSpace.xl),
                 MxSearchSortToolbar<ContentSortMode>(
                   searchHintText: l10n.commonSearch,
@@ -88,11 +85,11 @@ class LibraryOverviewView extends ConsumerWidget {
                       ? l10n.libraryManageFoldersSubtitle
                       : l10n.librarySearchResultsSubtitle,
                   child: state.isEmpty
-                      ? _EmptyLibrary(
+                      ? LibraryEmptyStateSection(
                           onCreateFolder: () =>
                               _handleCreateFolder(context, ref),
                         )
-                      : _FolderList(
+                      : LibraryFolderList(
                           folders: state.folders,
                           onOpenFolder: (folderId) =>
                               _openFolder(context, ref, folderId),
@@ -107,92 +104,9 @@ class LibraryOverviewView extends ConsumerWidget {
   }
 }
 
-class _LibraryHero extends StatelessWidget {
-  const _LibraryHero({required this.state});
-
-  final LibraryOverviewState state;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(MxSpace.xl),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerLow,
-        borderRadius: MxFeatureRadii.heroPanel,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MxText(
-            '${state.greeting.salutation}, ${state.greeting.userName}',
-            role: MxTextRole.pageGreeting,
-          ),
-          const MxGap(MxSpace.xs),
-          MxText(l10n.libraryTitle, role: MxTextRole.pageTitle),
-          const MxGap(MxSpace.md),
-          MxText(
-            l10n.libraryHeroDueToday(state.dueToday),
-            role: MxTextRole.heroAccent,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FolderList extends StatelessWidget {
-  const _FolderList({required this.folders, required this.onOpenFolder});
-
-  final List<LibraryFolder> folders;
-  final ValueChanged<String> onOpenFolder;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var index = 0; index < folders.length; index++) ...[
-          MxFolderTile(
-            name: folders[index].name,
-            icon: folders[index].icon,
-            caption: AppLocalizations.of(context).libraryFolderStats(
-              folders[index].deckCount,
-              folders[index].itemCount,
-            ),
-            masteryPercent: folders[index].masteryPercent,
-            onTap: () => onOpenFolder(folders[index].id),
-          ),
-          if (index < folders.length - 1) const MxDivider(),
-        ],
-      ],
-    );
-  }
-}
-
 void _openFolder(BuildContext context, WidgetRef ref, String folderId) {
   ref.read(folderDetailQueryProvider(folderId));
   context.pushFolderDetail(folderId);
-}
-
-class _EmptyLibrary extends StatelessWidget {
-  const _EmptyLibrary({required this.onCreateFolder});
-
-  final VoidCallback onCreateFolder;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return MxEmptyState(
-      icon: Icons.folder_open_outlined,
-      title: l10n.libraryEmptyTitle,
-      message: l10n.libraryEmptyMessage,
-      actionLabel: l10n.libraryCreateFolderTooltip,
-      actionLeadingIcon: Icons.add,
-      onAction: onCreateFolder,
-    );
-  }
 }
 
 Future<void> _handleCreateFolder(BuildContext context, WidgetRef ref) async {

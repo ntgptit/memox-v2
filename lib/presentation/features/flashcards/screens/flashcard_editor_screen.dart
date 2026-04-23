@@ -10,11 +10,8 @@ import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
-import '../../../shared/widgets/mx_icon_button.dart';
-import '../../../shared/widgets/mx_primary_button.dart';
-import '../../../shared/widgets/mx_secondary_button.dart';
-import '../../../shared/widgets/mx_text.dart';
-import '../../../shared/widgets/mx_text_field.dart';
+import '../widgets/flashcard_editor_form.dart';
+import '../widgets/flashcard_editor_header_section.dart';
 import '../viewmodels/flashcard_editor_viewmodel.dart';
 
 class FlashcardEditorScreen extends ConsumerStatefulWidget {
@@ -92,7 +89,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
 
             return ListView(
               children: [
-                _EditorHeader(
+                FlashcardEditorHeaderSection(
                   title: draft.isEditing
                       ? l10n.flashcardsEditTitle
                       : l10n.flashcardsNewTitle,
@@ -101,122 +98,55 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
                   ),
                 ),
                 const MxGap(MxSpace.xl),
-                MxTextField(
-                  controller: _titleController,
-                  label: l10n.flashcardsFieldTitleLabel,
-                  hintText: l10n.flashcardsFieldTitleHint,
-                  onChanged: draftNotifier.setTitle,
-                ),
-                const MxGap(MxSpace.lg),
-                MxTextField(
-                  controller: _frontController,
-                  label: l10n.flashcardsFieldFrontLabel,
-                  hintText: l10n.flashcardsFieldFrontHint,
-                  minLines: 3,
-                  maxLines: 6,
-                  onChanged: draftNotifier.setFront,
-                ),
-                const MxGap(MxSpace.lg),
-                MxTextField(
-                  controller: _backController,
-                  label: l10n.flashcardsFieldBackLabel,
-                  hintText: l10n.flashcardsFieldBackHint,
-                  minLines: 3,
-                  maxLines: 6,
-                  onChanged: draftNotifier.setBack,
-                ),
-                const MxGap(MxSpace.lg),
-                MxTextField(
-                  controller: _noteController,
-                  label: l10n.flashcardsFieldNoteLabel,
-                  hintText: l10n.flashcardsFieldNoteHint,
-                  minLines: 2,
-                  maxLines: 4,
-                  onChanged: draftNotifier.setNote,
-                ),
-                const MxGap(MxSpace.xl),
-                Wrap(
-                  spacing: MxSpace.sm,
-                  runSpacing: MxSpace.sm,
-                  children: [
-                    if (!draft.isEditing)
-                      MxSecondaryButton(
-                        label: l10n.flashcardsSaveAndAddNext,
-                        leadingIcon: Icons.playlist_add_outlined,
-                        variant: MxSecondaryVariant.outlined,
-                        onPressed: () async {
-                          final success = await actionController.save(
-                            keepCreating: true,
-                          );
-                          if (!mounted || !success) {
-                            return;
-                          }
-                          _didSeedControllers = false;
-                          _titleController.clear();
-                          _frontController.clear();
-                          _backController.clear();
-                          _noteController.clear();
-                          MxSnackbar.success(
-                            this.context,
-                            l10n.flashcardsSavedMessage,
-                          );
-                        },
-                      ),
-                    MxPrimaryButton(
-                      label: draft.isEditing
-                          ? l10n.flashcardsSaveChanges
-                          : l10n.flashcardsSaveAction,
-                      leadingIcon: draft.isEditing
-                          ? Icons.save_outlined
-                          : Icons.add,
-                      onPressed: () async {
-                        final success = await actionController.save();
-                        if (!mounted || !success) {
-                          return;
-                        }
-                        MxSnackbar.success(
-                          this.context,
-                          draft.isEditing
-                              ? l10n.flashcardsUpdatedMessage
-                              : l10n.flashcardsCreatedMessage,
-                        );
-                        await this.context.popRoute(
-                          fallback: () =>
-                              this.context.goFlashcardList(widget.deckId),
-                        );
-                      },
-                    ),
-                  ],
+                FlashcardEditorForm(
+                  draft: draft,
+                  titleController: _titleController,
+                  frontController: _frontController,
+                  backController: _backController,
+                  noteController: _noteController,
+                  onTitleChanged: draftNotifier.setTitle,
+                  onFrontChanged: draftNotifier.setFront,
+                  onBackChanged: draftNotifier.setBack,
+                  onNoteChanged: draftNotifier.setNote,
+                  onSaveAndAddNext: () async {
+                    final success = await actionController.save(
+                      keepCreating: true,
+                    );
+                    if (!mounted || !success) {
+                      return;
+                    }
+                    _didSeedControllers = false;
+                    _titleController.clear();
+                    _frontController.clear();
+                    _backController.clear();
+                    _noteController.clear();
+                    MxSnackbar.success(
+                      this.context,
+                      l10n.flashcardsSavedMessage,
+                    );
+                  },
+                  onSave: () async {
+                    final success = await actionController.save();
+                    if (!mounted || !success) {
+                      return;
+                    }
+                    MxSnackbar.success(
+                      this.context,
+                      draft.isEditing
+                          ? l10n.flashcardsUpdatedMessage
+                          : l10n.flashcardsCreatedMessage,
+                    );
+                    await this.context.popRoute(
+                      fallback: () =>
+                          this.context.goFlashcardList(widget.deckId),
+                    );
+                  },
                 ),
               ],
             );
           },
         ),
       ),
-    );
-  }
-}
-
-class _EditorHeader extends StatelessWidget {
-  const _EditorHeader({required this.title, required this.onBack});
-
-  final String title;
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return Row(
-      children: [
-        MxIconButton(
-          icon: Icons.arrow_back,
-          tooltip: l10n.commonBack,
-          onPressed: onBack,
-        ),
-        const MxGap(MxSpace.sm),
-        Expanded(child: MxText(title, role: MxTextRole.pageTitle)),
-      ],
     );
   }
 }

@@ -52,6 +52,16 @@ lib/
 - Do not add new source under `lib/shared/` or `lib/utils/` — use `core/`, `presentation/shared/`, or a feature folder.
 - Feature files must not import another feature's screen or widget directly. Promote to `presentation/shared` or depend on domain/app boundaries.
 
+### Consumer widget ownership
+
+- Prefer `ConsumerWidget` when the widget only needs `ref.watch(...)`, `ref.read(...)`, and render logic.
+- Use `ConsumerStatefulWidget` only when the widget also owns StatefulWidget lifecycle or local mutable UI state.
+- Valid reasons for `ConsumerStatefulWidget` in this repo:
+  - `initState`, `dispose`, or `didUpdateWidget`
+  - `AnimationController`, `TabController`, `ScrollController`, `FocusNode`, `TextEditingController`, or similar lifecycle-bound controllers
+  - explicit local UI state coordinated via `setState(...)`
+- Do not upgrade a widget to `ConsumerStatefulWidget` only to call `ref.listen(...)` or to keep build helpers nearby. If there is no lifecycle-bound resource or local mutable UI state, stay on `ConsumerWidget`.
+
 ---
 
 ## Theme layer (design system)

@@ -17,18 +17,13 @@ import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
-import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/layouts/mx_section.dart';
-import '../../../shared/states/mx_loading_state.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
-import '../../../shared/widgets/mx_breadcrumb_bar.dart';
-import '../../../shared/widgets/mx_icon_button.dart';
-import '../../../shared/widgets/mx_primary_button.dart';
-import '../../../shared/widgets/mx_secondary_button.dart';
-import '../../../shared/widgets/mx_study_set_tile.dart';
-import '../../../shared/widgets/mx_text.dart';
+import '../widgets/deck_detail_skeleton.dart';
+import '../widgets/deck_header_section.dart';
+import '../widgets/deck_stats_section.dart';
+import '../widgets/deck_study_action_section.dart';
 import '../viewmodels/deck_detail_viewmodel.dart';
 
 enum _DeckAction { edit, move, duplicate, export, delete }
@@ -62,124 +57,39 @@ class DeckDetailScreen extends ConsumerWidget {
           isLoading: queryState.isLoading,
           error: queryState.hasError ? queryState.error : null,
           stackTrace: queryState.hasError ? queryState.stackTrace : null,
-          skeletonBuilder: (_) => const _DeckDetailSkeleton(),
+          skeletonBuilder: (_) => const DeckDetailSkeleton(),
           onRetry: () => ref.invalidate(deckDetailQueryProvider(deckId)),
           dataBuilder: (context, state) {
+            final lastStudiedLabel = l10n.decksLastStudiedLabel(
+              _formatLastStudied(context, state.lastStudiedAt),
+            );
             return ListView(
               children: [
-                _DeckHeader(
+                DeckHeaderSection(
                   state: state,
-                  onOpenActions: () => _openDeckActions(context, ref, state),
                   onBack: () => context.popRoute(
                     fallback: () => context.goFolderDetail(state.folderId),
                   ),
+                  onOpenActions: () => _openDeckActions(context, ref, state),
                   onOpenBreadcrumb: (folderId) =>
                       context.goFolderDetail(folderId),
                 ),
                 const MxGap(MxSpace.xl),
-                MxSection(
-                  title: l10n.commonOverview,
-                  subtitle: l10n.decksOverviewSubtitle(
-                    state.cardCount,
-                    state.dueTodayCount,
-                    state.masteryPercent,
-                  ),
-                  child: MxStudySetTile(
-                    title: state.name,
-                    icon: Icons.style_outlined,
-                    metaLine: l10n.decksLastStudiedLabel(
-                      _formatLastStudied(context, state.lastStudiedAt),
-                    ),
-                  ),
+                DeckStatsSection(
+                  state: state,
+                  lastStudiedLabel: lastStudiedLabel,
                 ),
                 const MxGap(MxSpace.xl),
-                MxSection(
-                  title: l10n.decksManageContentTitle,
-                  subtitle: l10n.decksManageContentSubtitle,
-                  child: Wrap(
-                    spacing: MxSpace.sm,
-                    runSpacing: MxSpace.sm,
-                    children: [
-                      MxPrimaryButton(
-                        label: l10n.flashcardsOpenListAction,
-                        leadingIcon: Icons.view_list_outlined,
-                        onPressed: () => context.pushFlashcardList(state.id),
-                      ),
-                      MxSecondaryButton(
-                        label: l10n.flashcardsAddAction,
-                        leadingIcon: Icons.add,
-                        variant: MxSecondaryVariant.outlined,
-                        onPressed: () => context.pushFlashcardCreate(state.id),
-                      ),
-                      MxSecondaryButton(
-                        label: l10n.commonImport,
-                        leadingIcon: Icons.file_upload_outlined,
-                        variant: MxSecondaryVariant.outlined,
-                        onPressed: () => context.pushDeckImport(state.id),
-                      ),
-                    ],
-                  ),
+                DeckStudyActionSection(
+                  onOpenFlashcards: () => context.pushFlashcardList(state.id),
+                  onAddFlashcard: () => context.pushFlashcardCreate(state.id),
+                  onImport: () => context.pushDeckImport(state.id),
                 ),
               ],
             );
           },
         ),
       ),
-    );
-  }
-}
-
-class _DeckHeader extends StatelessWidget {
-  const _DeckHeader({
-    required this.state,
-    required this.onOpenActions,
-    required this.onBack,
-    required this.onOpenBreadcrumb,
-  });
-
-  final DeckDetailState state;
-  final VoidCallback onOpenActions;
-  final VoidCallback onBack;
-  final ValueChanged<String> onOpenBreadcrumb;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            MxIconButton(
-              icon: Icons.arrow_back,
-              tooltip: l10n.commonBack,
-              onPressed: onBack,
-            ),
-            const MxGap(MxSpace.sm),
-            Expanded(child: MxText(state.name, role: MxTextRole.pageTitle)),
-            MxIconButton(
-              icon: Icons.more_horiz_rounded,
-              tooltip: l10n.decksMoreActionsTooltip,
-              onPressed: onOpenActions,
-            ),
-          ],
-        ),
-        const MxGap(MxSpace.sm),
-        MxBreadcrumbBar(
-          items: [
-            for (var index = 0; index < state.breadcrumb.length; index++)
-              MxBreadcrumb(
-                label: state.breadcrumb[index].label,
-                onTap:
-                    index == state.breadcrumb.length - 1 ||
-                        state.breadcrumb[index].folderId == null
-                    ? null
-                    : () => onOpenBreadcrumb(state.breadcrumb[index].folderId!),
-              ),
-          ],
-        ),
-      ],
     );
   }
 }
@@ -423,128 +333,4 @@ String _formatLastStudied(BuildContext context, int? value) {
   return DateFormat.yMMMd(
     Localizations.localeOf(context).toLanguageTag(),
   ).format(date);
-}
-
-class _DeckDetailSkeleton extends StatelessWidget {
-  const _DeckDetailSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      key: const ValueKey('deck_detail_skeleton'),
-      children: const [
-        _DeckHeaderSkeleton(),
-        MxGap(MxSpace.xl),
-        _DeckSectionSkeleton(
-          titleWidth: 140,
-          subtitleWidth: 240,
-          body: _StudySetTileSkeleton(),
-        ),
-        MxGap(MxSpace.xl),
-        _DeckSectionSkeleton(
-          titleWidth: 180,
-          subtitleWidth: 260,
-          body: _DeckActionSkeleton(),
-        ),
-      ],
-    );
-  }
-}
-
-class _DeckHeaderSkeleton extends StatelessWidget {
-  const _DeckHeaderSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Row(
-          children: [
-            MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
-            MxGap(MxSpace.sm),
-            Expanded(child: MxSkeleton(height: 28, width: 220)),
-            MxGap(MxSpace.sm),
-            MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
-          ],
-        ),
-        MxGap(MxSpace.sm),
-        MxSkeleton(height: 14, width: 180),
-      ],
-    );
-  }
-}
-
-class _DeckSectionSkeleton extends StatelessWidget {
-  const _DeckSectionSkeleton({
-    required this.titleWidth,
-    required this.subtitleWidth,
-    required this.body,
-  });
-
-  final double titleWidth;
-  final double subtitleWidth;
-  final Widget body;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxSkeleton(height: 18, width: titleWidth),
-        const MxGap(MxSpace.xs),
-        MxSkeleton(height: 14, width: subtitleWidth),
-        const MxGap(MxSpace.md),
-        body,
-      ],
-    );
-  }
-}
-
-class _StudySetTileSkeleton extends StatelessWidget {
-  const _StudySetTileSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: MxSpace.lg,
-        vertical: MxSpace.md,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MxSkeleton(width: 40, height: 40, borderRadius: MxFeatureRadii.md),
-          MxGap(MxSpace.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MxSkeleton(height: 18, width: 180),
-                MxGap(MxSpace.xs),
-                MxSkeleton(height: 14, width: 140),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckActionSkeleton extends StatelessWidget {
-  const _DeckActionSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Wrap(
-      spacing: MxSpace.sm,
-      runSpacing: MxSpace.sm,
-      children: [
-        MxSkeleton(height: 40, width: 132, borderRadius: MxFeatureRadii.full),
-        MxSkeleton(height: 40, width: 136, borderRadius: MxFeatureRadii.full),
-        MxSkeleton(height: 40, width: 128, borderRadius: MxFeatureRadii.full),
-      ],
-    );
-  }
 }
