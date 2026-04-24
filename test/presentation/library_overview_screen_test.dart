@@ -1,9 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
+import 'package:memox/presentation/features/folders/screens/library_overview_screen.dart';
 
 import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';
 
 void main() {
+  testWidgets('library add FAB uses the generic add icon', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Consumer(
+              builder: (context, ref, _) =>
+                  buildLibraryOverviewFab(context, ref),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.add), findsOneWidget);
+    expect(find.byIcon(Icons.create_new_folder_outlined), findsNothing);
+  });
+
   testWidgets('dialog action using dialog context closes only the dialog', (
     WidgetTester tester,
   ) async {

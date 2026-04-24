@@ -21,9 +21,11 @@ abstract final class AppColors {
   static const Color lightPrimary90 = Color(0xFFE1E6F7);
   static const Color lightPrimary100 = Color(0xFFFFFFFF);
 
-  static const Color lightSecondary20 = Color(0xFF6E4A0B);
-  static const Color lightSecondary50 = Color(0xFFFFB74D);
-  static const Color lightSecondary95 = Color(0xFFFFF3DE);
+  // Muted indigo secondary — stays in the primary family so dark mode
+  // reads calm. Distinct from primary by being deeper / less saturated.
+  static const Color lightSecondary20 = Color(0xFF312E81);
+  static const Color lightSecondary50 = Color(0xFF6366F1);
+  static const Color lightSecondary95 = Color(0xFFEEF2FF);
 
   static const Color lightTertiary20 = Color(0xFF1D5F58);
   static const Color lightTertiary40 = Color(0xFF4DB6AC);
@@ -53,9 +55,11 @@ abstract final class AppColors {
   static const Color lightSuccess60 = lightTertiary40;
   static const Color lightSuccess95 = lightTertiary90;
 
-  static const Color lightWarning30 = lightSecondary20;
-  static const Color lightWarning50 = lightSecondary50;
-  static const Color lightWarning95 = lightSecondary95;
+  // Warning keeps the conventional amber semantic, decoupled from the
+  // rose secondary palette.
+  static const Color lightWarning30 = Color(0xFF78350F);
+  static const Color lightWarning50 = Color(0xFFF59E0B);
+  static const Color lightWarning95 = Color(0xFFFEF3C7);
 
   static const Color lightInfo30 = lightPrimary10;
   static const Color lightInfo50 = lightPrimary40;
@@ -79,10 +83,12 @@ abstract final class AppColors {
   static const Color primary70 = Color(0xFFA5B4FC);
   static const Color primary90 = Color(0xFFE0E7FF);
 
-  static const Color secondary20 = Color(0xFF78350F);
-  static const Color secondary30 = Color(0xFF92400E);
-  static const Color secondary70 = Color(0xFFFBBF24);
-  static const Color secondary90 = Color(0xFFFDE68A);
+  // Muted indigo secondary for dark mode — same family as primary so the
+  // surface reads calm. Lighter than primary70 to stay distinguishable.
+  static const Color secondary20 = Color(0xFF1E1B4B);
+  static const Color secondary30 = Color(0xFF312E81);
+  static const Color secondary70 = Color(0xFFC7D2FE);
+  static const Color secondary90 = Color(0xFFEEF2FF);
 
   static const Color tertiary20 = Color(0xFF115E59);
   static const Color tertiary30 = Color(0xFF0F766E);

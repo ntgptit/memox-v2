@@ -7,7 +7,6 @@ import '../../../../app/di/content_providers.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/services/clock.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
-import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../models/library_folder.dart';
 
@@ -76,7 +75,7 @@ Future<LibraryOverviewState> libraryOverviewQuery(Ref ref) async {
           (item) => LibraryFolder(
             id: item.folder.id,
             name: item.folder.name,
-            icon: _resolveFolderIcon(item.folder.contentMode),
+            icon: Icons.folder_outlined,
             deckCount: item.deckCount,
             itemCount: item.itemCount,
             masteryPercent: item.masteryPercent,
@@ -118,14 +117,6 @@ LibraryOverviewGreeting _buildGreeting(Clock clock) {
   };
 
   return LibraryOverviewGreeting(salutation: salutation, userName: 'Learner');
-}
-
-IconData _resolveFolderIcon(FolderContentMode mode) {
-  return switch (mode) {
-    FolderContentMode.unlocked => Icons.create_new_folder_outlined,
-    FolderContentMode.subfolders => Icons.folder_copy_outlined,
-    FolderContentMode.decks => Icons.style_outlined,
-  };
 }
 
 AppFailure? libraryOverviewActionError(AsyncValue<void> actionState) =>

@@ -73,9 +73,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
           : queryData.isUnlocked
           ? null
           : MxFab(
-              icon: queryData.isSubfolderMode
-                  ? Icons.create_new_folder_outlined
-                  : Icons.style_outlined,
+              icon: Icons.add,
               tooltip: queryData.isSubfolderMode
                   ? l10n.foldersNewSubfolderTooltip
                   : l10n.foldersNewDeckTooltip,

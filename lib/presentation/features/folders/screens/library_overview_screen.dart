@@ -26,7 +26,7 @@ Widget buildLibraryOverviewFab(BuildContext context, WidgetRef ref) {
   final l10n = AppLocalizations.of(context);
 
   return MxFab(
-    icon: Icons.create_new_folder_outlined,
+    icon: Icons.add,
     tooltip: l10n.libraryCreateFolderTooltip,
     onPressed: () => _handleCreateFolder(context, ref),
   );

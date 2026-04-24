@@ -273,7 +273,7 @@ FolderDetailState _mapFolderDetailState(
           (item) => FolderSubfolderItem(
             id: item.folder.id,
             name: item.folder.name,
-            icon: _resolveFolderIcon(item.folder.contentMode),
+            icon: Icons.folder_copy_outlined,
             deckCount: item.deckCount,
             itemCount: item.itemCount,
           ),
@@ -299,14 +299,6 @@ FolderDetailMode _toDetailMode(FolderContentMode mode) {
     FolderContentMode.unlocked => FolderDetailMode.unlocked,
     FolderContentMode.subfolders => FolderDetailMode.subfolders,
     FolderContentMode.decks => FolderDetailMode.decks,
-  };
-}
-
-IconData _resolveFolderIcon(FolderContentMode mode) {
-  return switch (mode) {
-    FolderContentMode.unlocked => Icons.create_new_folder_outlined,
-    FolderContentMode.subfolders => Icons.folder_copy_outlined,
-    FolderContentMode.decks => Icons.style_outlined,
   };
 }
 

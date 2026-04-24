@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:memox/app/di/content_providers.dart';
@@ -44,6 +45,10 @@ void main() {
         subscription.read().requireValue.folders.map((item) => item.name),
         contains('Japanese N5'),
       );
+      expect(
+        subscription.read().requireValue.folders.single.icon,
+        Icons.folder_outlined,
+      );
     });
 
     test('folder detail query refreshes after creating a subfolder', () async {
@@ -79,6 +84,7 @@ void main() {
       final state = subscription.read().requireValue;
       expect(state.isSubfolderMode, isTrue);
       expect(state.subfolders.map((item) => item.name), contains('Vocabulary'));
+      expect(state.subfolders.single.icon, Icons.folder_copy_outlined);
     });
 
     test(

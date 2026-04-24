@@ -72,6 +72,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(FloatingActionButton), findsOneWidget);
+    expect(find.byIcon(Icons.add), findsOneWidget);
     expect(
       find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
       findsNothing,
@@ -82,6 +83,7 @@ void main() {
     await tester.pump();
 
     expect(find.byType(FloatingActionButton), findsOneWidget);
+    expect(find.byIcon(Icons.add), findsOneWidget);
     expect(
       find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
       findsOneWidget,
