@@ -19,10 +19,7 @@ enum FailureType {
   notFound,
 }
 
-enum FailureSeverity {
-  recoverable,
-  critical,
-}
+enum FailureSeverity { recoverable, critical }
 
 @immutable
 class AppFailure {

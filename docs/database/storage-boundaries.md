@@ -23,11 +23,9 @@ SQLite là source of truth cho:
 | Key | Ý nghĩa |
 | --- | --- |
 | `settings.study.default_new_batch_size` | batch mặc định cho học mới |
-| `settings.study.default_due_batch_size` | batch mặc định cho due |
-| `settings.study.default_mixed_batch_size` | batch mặc định cho mixed |
+| `settings.study.default_review_batch_size` | batch mặc định cho SRS Review |
 | `settings.study.shuffle_flashcards` | mặc định có trộn thẻ hay không |
 | `settings.study.shuffle_answers` | mặc định có trộn đáp án hay không |
-| `settings.study.default_pool_rule` | `new`, `due`, `mixed` |
 | `settings.study.prioritize_overdue` | mặc định ưu tiên overdue |
 
 ## 3. Không persist dài hạn
@@ -66,5 +64,14 @@ Lý do:
 
 ## 6. Session resume boundary
 - Queue hiện tại và log trả lời phải persist trong SQLite để app có thể resume sau khi đóng app
-- Chỉ lưu session `in_progress` gần nhất cho mỗi entry point trong logic service
+- Study type, study flow, mode hiện tại, retry round hiện tại và các item chưa pass phải persist trong SQLite
+- Với New Study, danh sách flashcard đã pass trong mode, chưa pass trong mode và các mode đã pass có thể derive từ `study_session_items` + `study_attempts`
+- Với SRS Review, retry batch, các flashcard đã pass Fill và chưa pass Fill có thể derive từ `study_session_items` + `study_attempts`
+- Session resume được phép khi `study_sessions.status` thuộc (`in_progress`, `ready_to_finalize`, `failed_to_finalize`)
+- Session `draft` chưa bắt đầu học thì không coi là resume, chỉ là start session lần đầu
+- Session `completed` hoặc `cancelled` không resume, chỉ phục vụ history
+- Box và due date chính thức không được commit khi session ở `draft`, `in_progress`, `ready_to_finalize`, `failed_to_finalize`, hoặc `cancelled`
+- Commit SRS chỉ được chạy trong transaction chuyển `status` từ `ready_to_finalize` sang `completed`
+- Nếu transaction commit lỗi, rollback toàn bộ cập nhật SRS và chuyển session sang `failed_to_finalize`; user có thể retry finalize hoặc resume
+- Với mỗi entry point, chỉ lưu session resume-eligible gần nhất (status in `in_progress`, `ready_to_finalize`, `failed_to_finalize`) trong logic service
 - Default setting của session nằm ở `SharedPreferences`, nhưng snapshot khi session được tạo phải copy vào `study_sessions`

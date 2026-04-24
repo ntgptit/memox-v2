@@ -13,8 +13,12 @@ abstract final class DialogThemeBuilder {
       elevation: AppElevation.dialog,
       alignment: Alignment.center,
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.dialog),
-      titleTextStyle: AppTypography.headlineSmall.copyWith(color: scheme.onSurface),
-      contentTextStyle: AppTypography.bodyMedium.copyWith(color: scheme.onSurfaceVariant),
+      titleTextStyle: AppTypography.headlineSmall.copyWith(
+        color: scheme.onSurface,
+      ),
+      contentTextStyle: AppTypography.bodyMedium.copyWith(
+        color: scheme.onSurfaceVariant,
+      ),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
     );
   }
@@ -39,8 +43,9 @@ abstract final class DialogThemeBuilder {
     return SnackBarThemeData(
       backgroundColor: scheme.inverseSurface,
       actionTextColor: scheme.inversePrimary,
-      contentTextStyle:
-          AppTypography.bodyMedium.copyWith(color: scheme.onInverseSurface),
+      contentTextStyle: AppTypography.bodyMedium.copyWith(
+        color: scheme.onInverseSurface,
+      ),
       behavior: SnackBarBehavior.floating,
       elevation: AppElevation.snackbar,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

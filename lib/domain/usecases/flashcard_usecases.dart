@@ -119,10 +119,7 @@ final class CommitFlashcardImportUseCase {
     required String deckId,
     required FlashcardImportPreparation preparation,
   }) {
-    return _repository.commitImport(
-      deckId: deckId,
-      preparation: preparation,
-    );
+    return _repository.commitImport(deckId: deckId, preparation: preparation);
   }
 }
 

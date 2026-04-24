@@ -20,6 +20,10 @@ abstract final class RouteNames {
   static const String flashcardCreate = 'flashcard-create';
   static const String flashcardEdit = 'flashcard-edit';
   static const String deckImport = 'deck-import';
+  static const String studyEntry = 'study-entry';
+  static const String studyToday = 'study-today';
+  static const String studySession = 'study-session';
+  static const String studyResult = 'study-result';
 }
 
 /// Path layout mirroring [RouteNames]. Kept separate so the router tree can
@@ -41,11 +45,18 @@ abstract final class RoutePaths {
   static const String flashcardEditSegment =
       'deck/:deckId/flashcards/:flashcardId/edit';
   static const String deckImportSegment = 'deck/:deckId/import';
+  static const String studyEntrySegment = 'study/:entryType/:entryRefId';
+  static const String studyTodaySegment = 'study/today';
+  static const String studySessionSegment = 'study/session/:sessionId';
+  static const String studyResultSegment = 'study/session/:sessionId/result';
 
   /// Path-parameter key used by the folder-detail route.
   static const String folderIdParam = 'id';
   static const String deckIdParam = 'deckId';
   static const String flashcardIdParam = 'flashcardId';
+  static const String studyEntryTypeParam = 'entryType';
+  static const String studyEntryRefIdParam = 'entryRefId';
+  static const String studySessionIdParam = 'sessionId';
 }
 
 /// Router-owned defaults shared by config/bootstrap layers.

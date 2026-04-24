@@ -15,8 +15,9 @@ abstract final class ListTileThemeBuilder {
       ),
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
       selectedColor: scheme.onSecondaryContainer,
-      selectedTileColor:
-          scheme.secondaryContainer.withValues(alpha: AppOpacity.half),
+      selectedTileColor: scheme.secondaryContainer.withValues(
+        alpha: AppOpacity.half,
+      ),
       tileColor: Colors.transparent,
       horizontalTitleGap: AppSpacing.md,
       minVerticalPadding: AppSpacing.xs,

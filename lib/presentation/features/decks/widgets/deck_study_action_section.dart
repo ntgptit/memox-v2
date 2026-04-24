@@ -11,12 +11,14 @@ class DeckStudyActionSection extends StatelessWidget {
     required this.onOpenFlashcards,
     required this.onAddFlashcard,
     required this.onImport,
+    required this.onStartStudy,
     super.key,
   });
 
   final VoidCallback onOpenFlashcards;
   final VoidCallback onAddFlashcard;
   final VoidCallback onImport;
+  final VoidCallback onStartStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +32,14 @@ class DeckStudyActionSection extends StatelessWidget {
         runSpacing: MxSpace.sm,
         children: [
           MxPrimaryButton(
+            label: l10n.studyStartAction,
+            leadingIcon: Icons.play_arrow_rounded,
+            onPressed: onStartStudy,
+          ),
+          MxSecondaryButton(
             label: l10n.flashcardsOpenListAction,
             leadingIcon: Icons.view_list_outlined,
+            variant: MxSecondaryVariant.outlined,
             onPressed: onOpenFlashcards,
           ),
           MxSecondaryButton(

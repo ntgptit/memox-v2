@@ -20,13 +20,20 @@ class StudySessionItems extends Table {
       .named('flashcard_id')
       .references(Flashcards, #id, onDelete: KeyAction.cascade)();
 
+  TextColumn get studyMode => text()
+      .named('study_mode')
+      .check(studyMode.isIn(DatabaseEnumValues.studyModes))();
+
+  IntColumn get modeOrder =>
+      integer().named('mode_order').check(modeOrder.isBiggerOrEqualValue(1))();
+
   IntColumn get roundIndex => integer()
       .named('round_index')
       .check(roundIndex.isBiggerOrEqualValue(1))();
 
   IntColumn get queuePosition => integer()
       .named('queue_position')
-      .check(queuePosition.isBiggerOrEqualValue(0))();
+      .check(queuePosition.isBiggerOrEqualValue(1))();
 
   TextColumn get sourcePool => text()
       .named('source_pool')

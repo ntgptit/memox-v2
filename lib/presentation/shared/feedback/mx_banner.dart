@@ -68,7 +68,7 @@ class MxBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon ?? defaultIcon, color: fg, size: AppIconSizes.lg),
-            const MxGap(AppSpacing.md),
+          const MxGap(AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

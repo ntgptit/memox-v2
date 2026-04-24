@@ -76,15 +76,18 @@ class MxLinearProgress extends StatelessWidget {
                 Expanded(
                   child: Text(
                     label!,
-                    style: textTheme.labelMedium
-                        ?.copyWith(color: scheme.onSurfaceVariant),
+                    style: textTheme.labelMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               if (showPercentage)
                 Text(
                   '$pct%',
-                  style: textTheme.labelMedium?.copyWith(color: scheme.onSurface),
+                  style: textTheme.labelMedium?.copyWith(
+                    color: scheme.onSurface,
+                  ),
                 ),
             ],
           ),

@@ -81,10 +81,9 @@ class FlashcardImportController extends _$FlashcardImportController {
     // guard:retry-reviewed
     final draft = ref.read(flashcardImportDraftProvider(deckId));
     state = const AsyncLoading<void>();
-    final result = await ref.read(prepareFlashcardImportUseCaseProvider).execute(
-      format: draft.format,
-      rawContent: draft.rawContent,
-    );
+    final result = await ref
+        .read(prepareFlashcardImportUseCaseProvider)
+        .execute(format: draft.format, rawContent: draft.rawContent);
     if (!ref.mounted) {
       return null;
     }
@@ -94,9 +93,9 @@ class FlashcardImportController extends _$FlashcardImportController {
       return null;
     }
     final preparation = result.valueOrNull!;
-    ref.read(flashcardImportDraftProvider(deckId).notifier).setPreparation(
-      preparation,
-    );
+    ref
+        .read(flashcardImportDraftProvider(deckId).notifier)
+        .setPreparation(preparation);
     state = const AsyncData<void>(null);
     return preparation;
   }
@@ -109,10 +108,9 @@ class FlashcardImportController extends _$FlashcardImportController {
     }
 
     state = const AsyncLoading<void>();
-    final result = await ref.read(commitFlashcardImportUseCaseProvider).execute(
-      deckId: deckId,
-      preparation: preparation,
-    );
+    final result = await ref
+        .read(commitFlashcardImportUseCaseProvider)
+        .execute(deckId: deckId, preparation: preparation);
     if (!ref.mounted) {
       return null;
     }

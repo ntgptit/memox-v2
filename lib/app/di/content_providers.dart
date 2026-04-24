@@ -213,9 +213,7 @@ GetFlashcardUseCase getFlashcardUseCase(Ref ref) {
 
 @Riverpod(keepAlive: true)
 GetFlashcardMoveTargetsUseCase getFlashcardMoveTargetsUseCase(Ref ref) {
-  return GetFlashcardMoveTargetsUseCase(
-    ref.watch(flashcardRepositoryProvider),
-  );
+  return GetFlashcardMoveTargetsUseCase(ref.watch(flashcardRepositoryProvider));
 }
 
 @Riverpod(keepAlive: true)

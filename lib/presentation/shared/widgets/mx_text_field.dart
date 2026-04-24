@@ -82,8 +82,9 @@ class MxTextField extends StatelessWidget {
         hintText: hintText,
         helperText: helperText,
         errorText: errorText,
-        prefixIcon:
-            prefixIcon != null ? Icon(prefixIcon, size: AppIconSizes.md) : null,
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, size: AppIconSizes.md)
+            : null,
         suffixIcon: suffixIcon,
       ),
     );

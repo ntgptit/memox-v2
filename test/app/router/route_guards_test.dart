@@ -16,10 +16,7 @@ void main() {
     });
 
     test('does not redirect non-root paths', () {
-      expect(
-        guards.redirectLocationFor(Uri.parse(RoutePaths.library)),
-        isNull,
-      );
+      expect(guards.redirectLocationFor(Uri.parse(RoutePaths.library)), isNull);
     });
   });
 }

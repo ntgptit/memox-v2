@@ -28,8 +28,7 @@ class FlashcardProgress extends Table {
       .named('last_result')
       .nullable()
       .check(
-        lastResult.isNull() |
-            lastResult.isIn(DatabaseEnumValues.rawStudyResults),
+        lastResult.isNull() | lastResult.isIn(DatabaseEnumValues.reviewResults),
       )();
 
   IntColumn get lastStudiedAt =>

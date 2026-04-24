@@ -11,9 +11,7 @@ part 'route_guards.g.dart';
 /// There is no auth or entitlement logic yet, but wiring this boundary now
 /// keeps route policy out of `app_router.dart` once those concerns arrive.
 final class AppRouteGuards {
-  const AppRouteGuards({
-    required this.initialLocation,
-  });
+  const AppRouteGuards({required this.initialLocation});
 
   final String initialLocation;
 

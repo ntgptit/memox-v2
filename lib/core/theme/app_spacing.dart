@@ -20,13 +20,16 @@ abstract final class AppSpacing {
   static const double xxxxl = 40;
 
   // --- Semantic paddings ---
-  static const EdgeInsets screenHorizontal =
-      EdgeInsets.symmetric(horizontal: lg);
+  static const EdgeInsets screenHorizontal = EdgeInsets.symmetric(
+    horizontal: lg,
+  );
   static const EdgeInsets screenVertical = EdgeInsets.symmetric(vertical: lg);
   static const EdgeInsets screen = EdgeInsets.all(lg);
   static const EdgeInsets card = EdgeInsets.all(lg);
-  static const EdgeInsets listItem =
-      EdgeInsets.symmetric(horizontal: lg, vertical: md);
+  static const EdgeInsets listItem = EdgeInsets.symmetric(
+    horizontal: lg,
+    vertical: md,
+  );
   static const EdgeInsets dialog = EdgeInsets.all(xxl);
   static const EdgeInsets sheet = EdgeInsets.fromLTRB(lg, md, lg, xxl);
 }

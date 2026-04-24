@@ -48,17 +48,20 @@ final class FlashcardDao {
       return const <String, int?>{};
     }
 
-    final rows = await (_database.select(_database.flashcardProgress)
-      ..where((table) => table.flashcardId.isIn(flashcardIds))).get();
+    final rows = await (_database.select(
+      _database.flashcardProgress,
+    )..where((table) => table.flashcardId.isIn(flashcardIds))).get();
     return <String, int?>{
       for (final row in rows) row.flashcardId: row.lastStudiedAt,
     };
   }
 
   Future<int> nextSortOrder(String deckId) async {
-    final row = await (_database.selectOnly(_database.flashcards)
-      ..addColumns([_database.flashcards.sortOrder.max()])
-      ..where(_database.flashcards.deckId.equals(deckId))).getSingleOrNull();
+    final row =
+        await (_database.selectOnly(_database.flashcards)
+              ..addColumns([_database.flashcards.sortOrder.max()])
+              ..where(_database.flashcards.deckId.equals(deckId)))
+            .getSingleOrNull();
     final currentMax = row?.read(_database.flashcards.sortOrder.max()) ?? -1;
     return currentMax + 1;
   }
@@ -71,29 +74,37 @@ final class FlashcardDao {
     required int createdAt,
     required int updatedAt,
   }) async {
-    await _database.into(_database.flashcards).insert(
-      FlashcardsCompanion.insert(
-        id: id,
-        deckId: deckId,
-        title: Value(draft.title?.trim().isEmpty ?? true ? null : draft.title?.trim()),
-        front: draft.front.trim(),
-        back: draft.back.trim(),
-        note: Value(draft.note?.trim().isEmpty ?? true ? null : draft.note?.trim()),
-        sortOrder: sortOrder,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-      ),
-    );
-    await _database.into(_database.flashcardProgress).insert(
-      FlashcardProgressCompanion.insert(
-        flashcardId: id,
-        currentBox: 1,
-        reviewCount: 0,
-        lapseCount: 0,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-      ),
-    );
+    await _database
+        .into(_database.flashcards)
+        .insert(
+          FlashcardsCompanion.insert(
+            id: id,
+            deckId: deckId,
+            title: Value(
+              draft.title?.trim().isEmpty ?? true ? null : draft.title?.trim(),
+            ),
+            front: draft.front.trim(),
+            back: draft.back.trim(),
+            note: Value(
+              draft.note?.trim().isEmpty ?? true ? null : draft.note?.trim(),
+            ),
+            sortOrder: sortOrder,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+          ),
+        );
+    await _database
+        .into(_database.flashcardProgress)
+        .insert(
+          FlashcardProgressCompanion.insert(
+            flashcardId: id,
+            currentBox: 1,
+            reviewCount: 0,
+            lapseCount: 0,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+          ),
+        );
   }
 
   Future<void> updateFlashcard({
@@ -101,13 +112,18 @@ final class FlashcardDao {
     required FlashcardDraft draft,
     required int updatedAt,
   }) {
-    return (_database.update(_database.flashcards)
-      ..where((table) => table.id.equals(flashcardId))).write(
+    return (_database.update(
+      _database.flashcards,
+    )..where((table) => table.id.equals(flashcardId))).write(
       FlashcardsCompanion(
-        title: Value(draft.title?.trim().isEmpty ?? true ? null : draft.title?.trim()),
+        title: Value(
+          draft.title?.trim().isEmpty ?? true ? null : draft.title?.trim(),
+        ),
         front: Value(draft.front.trim()),
         back: Value(draft.back.trim()),
-        note: Value(draft.note?.trim().isEmpty ?? true ? null : draft.note?.trim()),
+        note: Value(
+          draft.note?.trim().isEmpty ?? true ? null : draft.note?.trim(),
+        ),
         updatedAt: Value(updatedAt),
       ),
     );
@@ -126,8 +142,9 @@ final class FlashcardDao {
     required int updatedAt,
   }) async {
     for (var index = 0; index < flashcardIds.length; index++) {
-      await (_database.update(_database.flashcards)
-        ..where((table) => table.id.equals(flashcardIds[index]))).write(
+      await (_database.update(
+        _database.flashcards,
+      )..where((table) => table.id.equals(flashcardIds[index]))).write(
         FlashcardsCompanion(
           deckId: Value(targetDeckId),
           sortOrder: Value(startingSortOrder + index),
@@ -143,23 +160,24 @@ final class FlashcardDao {
     required int updatedAt,
   }) async {
     for (var index = 0; index < orderedFlashcardIds.length; index++) {
-      await (_database.update(_database.flashcards)
-        ..where(
-          (table) =>
-              table.deckId.equals(deckId) &
-              table.id.equals(orderedFlashcardIds[index]),
-        )).write(
-        FlashcardsCompanion(
-          sortOrder: Value(index),
-          updatedAt: Value(updatedAt),
-        ),
-      );
+      await (_database.update(_database.flashcards)..where(
+            (table) =>
+                table.deckId.equals(deckId) &
+                table.id.equals(orderedFlashcardIds[index]),
+          ))
+          .write(
+            FlashcardsCompanion(
+              sortOrder: Value(index),
+              updatedAt: Value(updatedAt),
+            ),
+          );
     }
   }
 
   Future<List<Flashcard>> listFlashcardsByIds(List<String> flashcardIds) {
     return (_database.select(_database.flashcards)
-      ..where((table) => table.id.isIn(flashcardIds))
-      ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)])).get();
+          ..where((table) => table.id.isIn(flashcardIds))
+          ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+        .get();
   }
 }

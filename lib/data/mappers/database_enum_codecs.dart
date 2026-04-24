@@ -17,18 +17,33 @@ abstract final class DatabaseEnumCodecs {
   static StudyType studyTypeFromStorage(String raw) {
     return StudyType.values.firstWhere(
       (value) => value.storageValue == raw,
+      orElse: () =>
+          throw ValidationException(message: 'Unsupported study type: $raw'),
+    );
+  }
+
+  static StudyEntryType studyEntryTypeFromStorage(String raw) {
+    return StudyEntryType.values.firstWhere(
+      (value) => value.storageValue == raw,
       orElse: () => throw ValidationException(
-        message: 'Unsupported study type: $raw',
+        message: 'Unsupported study entry type: $raw',
       ),
+    );
+  }
+
+  static StudyFlow studyFlowFromStorage(String raw) {
+    return StudyFlow.values.firstWhere(
+      (value) => value.storageValue == raw,
+      orElse: () =>
+          throw ValidationException(message: 'Unsupported study flow: $raw'),
     );
   }
 
   static StudyMode studyModeFromStorage(String raw) {
     return StudyMode.values.firstWhere(
       (value) => value.storageValue == raw,
-      orElse: () => throw ValidationException(
-        message: 'Unsupported study mode: $raw',
-      ),
+      orElse: () =>
+          throw ValidationException(message: 'Unsupported study mode: $raw'),
     );
   }
 
@@ -65,6 +80,22 @@ abstract final class DatabaseEnumCodecs {
       orElse: () => throw ValidationException(
         message: 'Unsupported raw study result: $raw',
       ),
+    );
+  }
+
+  static AttemptGrade attemptGradeFromStorage(String raw) {
+    return AttemptGrade.values.firstWhere(
+      (value) => value.storageValue == raw,
+      orElse: () =>
+          throw ValidationException(message: 'Unsupported attempt grade: $raw'),
+    );
+  }
+
+  static ReviewResult reviewResultFromStorage(String raw) {
+    return ReviewResult.values.firstWhere(
+      (value) => value.storageValue == raw,
+      orElse: () =>
+          throw ValidationException(message: 'Unsupported review result: $raw'),
     );
   }
 }

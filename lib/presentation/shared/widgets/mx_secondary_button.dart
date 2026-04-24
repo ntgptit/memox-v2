@@ -80,13 +80,13 @@ class MxSecondaryButton extends StatelessWidget {
       children: [
         if (leadingIcon != null) ...[
           Icon(leadingIcon, size: AppIconSizes.md),
-              const MxGap(AppSpacing.sm),
+          const MxGap(AppSpacing.sm),
         ],
         Flexible(
           child: Text(label, overflow: TextOverflow.ellipsis, maxLines: 1),
         ),
         if (trailingIcon != null) ...[
-            const MxGap(AppSpacing.sm),
+          const MxGap(AppSpacing.sm),
           Icon(trailingIcon, size: AppIconSizes.md),
         ],
       ],

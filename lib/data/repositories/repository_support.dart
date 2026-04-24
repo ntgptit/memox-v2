@@ -2,9 +2,7 @@ import '../../core/errors/error_mapper.dart';
 import '../../core/errors/result.dart';
 import '../../core/services/clock.dart';
 
-Future<Result<T>> runRepositoryAction<T>(
-  Future<T> Function() action,
-) async {
+Future<Result<T>> runRepositoryAction<T>(Future<T> Function() action) async {
   try {
     return Success<T>(await action());
   } catch (error, stackTrace) {

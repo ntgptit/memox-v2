@@ -12,10 +12,7 @@ void main() {
     });
 
     test('throws a configuration exception for unsupported values', () {
-      expect(
-        () => AppEnv.parse('qa'),
-        throwsA(isA<ConfigurationException>()),
-      );
+      expect(() => AppEnv.parse('qa'), throwsA(isA<ConfigurationException>()));
     });
   });
 }

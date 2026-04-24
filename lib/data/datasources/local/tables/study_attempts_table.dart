@@ -25,6 +25,10 @@ class StudyAttempts extends Table {
       .named('flashcard_id')
       .references(Flashcards, #id, onDelete: KeyAction.cascade)();
 
+  IntColumn get attemptNumber => integer()
+      .named('attempt_number')
+      .check(attemptNumber.isBiggerOrEqualValue(1))();
+
   TextColumn get result =>
       text().check(result.isIn(DatabaseEnumValues.rawStudyResults))();
 

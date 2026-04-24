@@ -24,13 +24,25 @@ abstract final class MxSnackbar {
 
     final (Color bg, Color fg, IconData defaultIcon) = switch (tone) {
       MxSnackbarTone.neutral => (
-          scheme.inverseSurface,
-          scheme.onInverseSurface,
-          Icons.info_outline,
-        ),
-      MxSnackbarTone.success => (mx.success, mx.onSuccess, Icons.check_circle_outline),
-      MxSnackbarTone.warning => (mx.warning, mx.onWarning, Icons.warning_amber_outlined),
-      MxSnackbarTone.error => (scheme.error, scheme.onError, Icons.error_outline),
+        scheme.inverseSurface,
+        scheme.onInverseSurface,
+        Icons.info_outline,
+      ),
+      MxSnackbarTone.success => (
+        mx.success,
+        mx.onSuccess,
+        Icons.check_circle_outline,
+      ),
+      MxSnackbarTone.warning => (
+        mx.warning,
+        mx.onWarning,
+        Icons.warning_amber_outlined,
+      ),
+      MxSnackbarTone.error => (
+        scheme.error,
+        scheme.onError,
+        Icons.error_outline,
+      ),
     };
 
     final messenger = ScaffoldMessenger.of(context);
@@ -43,7 +55,7 @@ abstract final class MxSnackbar {
         content: Row(
           children: [
             Icon(icon ?? defaultIcon, color: fg, size: AppIconSizes.md),
-        const MxGap(AppSpacing.md),
+            const MxGap(AppSpacing.md),
             Expanded(
               child: Text(
                 message,

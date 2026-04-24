@@ -44,9 +44,11 @@ final class DeckDao {
   }
 
   Future<int> nextSortOrder(String folderId) async {
-    final row = await (_database.selectOnly(_database.decks)
-      ..addColumns([_database.decks.sortOrder.max()])
-      ..where(_database.decks.folderId.equals(folderId))).getSingleOrNull();
+    final row =
+        await (_database.selectOnly(_database.decks)
+              ..addColumns([_database.decks.sortOrder.max()])
+              ..where(_database.decks.folderId.equals(folderId)))
+            .getSingleOrNull();
     final currentMax = row?.read(_database.decks.sortOrder.max()) ?? -1;
     return currentMax + 1;
   }
@@ -59,16 +61,18 @@ final class DeckDao {
     required int createdAt,
     required int updatedAt,
   }) {
-    return _database.into(_database.decks).insert(
-      DecksCompanion.insert(
-        id: id,
-        folderId: folderId,
-        name: name,
-        sortOrder: sortOrder,
-        createdAt: createdAt,
-        updatedAt: updatedAt,
-      ),
-    );
+    return _database
+        .into(_database.decks)
+        .insert(
+          DecksCompanion.insert(
+            id: id,
+            folderId: folderId,
+            name: name,
+            sortOrder: sortOrder,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+          ),
+        );
   }
 
   Future<void> updateDeckName({
@@ -77,12 +81,8 @@ final class DeckDao {
     required int updatedAt,
   }) {
     return (_database.update(_database.decks)
-      ..where((table) => table.id.equals(deckId))).write(
-      DecksCompanion(
-        name: Value(name),
-        updatedAt: Value(updatedAt),
-      ),
-    );
+          ..where((table) => table.id.equals(deckId)))
+        .write(DecksCompanion(name: Value(name), updatedAt: Value(updatedAt)));
   }
 
   Future<void> updateDeckFolder({
@@ -91,8 +91,9 @@ final class DeckDao {
     required int sortOrder,
     required int updatedAt,
   }) {
-    return (_database.update(_database.decks)
-      ..where((table) => table.id.equals(deckId))).write(
+    return (_database.update(
+      _database.decks,
+    )..where((table) => table.id.equals(deckId))).write(
       DecksCompanion(
         folderId: Value(folderId),
         sortOrder: Value(sortOrder),
@@ -113,24 +114,26 @@ final class DeckDao {
     required int updatedAt,
   }) async {
     for (var index = 0; index < orderedDeckIds.length; index++) {
-      await (_database.update(_database.decks)
-        ..where(
-          (table) =>
-              table.folderId.equals(folderId) &
-              table.id.equals(orderedDeckIds[index]),
-        )).write(
-        DecksCompanion(
-          sortOrder: Value(index),
-          updatedAt: Value(updatedAt),
-        ),
-      );
+      await (_database.update(_database.decks)..where(
+            (table) =>
+                table.folderId.equals(folderId) &
+                table.id.equals(orderedDeckIds[index]),
+          ))
+          .write(
+            DecksCompanion(
+              sortOrder: Value(index),
+              updatedAt: Value(updatedAt),
+            ),
+          );
     }
   }
 
   Future<int> countFlashcardsInDeck(String deckId) async {
-    final row = await (_database.selectOnly(_database.flashcards)
-      ..addColumns([_database.flashcards.id.count()])
-      ..where(_database.flashcards.deckId.equals(deckId))).getSingle();
+    final row =
+        await (_database.selectOnly(_database.flashcards)
+              ..addColumns([_database.flashcards.id.count()])
+              ..where(_database.flashcards.deckId.equals(deckId)))
+            .getSingle();
     return row.read(_database.flashcards.id.count()) ?? 0;
   }
 
@@ -138,53 +141,62 @@ final class DeckDao {
     required String deckId,
     required int endOfTodayEpochMillis,
   }) async {
-    final row = await _database.customSelect(
-      '''
+    final row = await _database
+        .customSelect(
+          '''
       SELECT COUNT(f.id) AS due_today
       FROM flashcards f
       INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
       WHERE f.deck_id = ?1 AND p.due_at IS NOT NULL AND p.due_at <= ?2
       ''',
-      variables: [
-        Variable<String>(deckId),
-        Variable<int>(endOfTodayEpochMillis),
-      ],
-      readsFrom: {_database.flashcards, _database.flashcardProgress},
-    ).getSingle();
+          variables: [
+            Variable<String>(deckId),
+            Variable<int>(endOfTodayEpochMillis),
+          ],
+          readsFrom: {_database.flashcards, _database.flashcardProgress},
+        )
+        .getSingle();
     return row.read<int>('due_today');
   }
 
   Future<int?> getLastStudiedAtInDeck(String deckId) async {
-    final row = await _database.customSelect(
-      '''
+    final row = await _database
+        .customSelect(
+          '''
       SELECT MAX(p.last_studied_at) AS last_studied_at
       FROM flashcard_progress p
       INNER JOIN flashcards f ON f.id = p.flashcard_id
       WHERE f.deck_id = ?1
       ''',
-      variables: [Variable<String>(deckId)],
-      readsFrom: {_database.flashcards, _database.flashcardProgress},
-    ).getSingle();
+          variables: [Variable<String>(deckId)],
+          readsFrom: {_database.flashcards, _database.flashcardProgress},
+        )
+        .getSingle();
     return row.read<int?>('last_studied_at');
   }
 
   Future<List<int>> getCurrentBoxesInDeck(String deckId) async {
-    final rows = await _database.customSelect(
-      '''
+    final rows = await _database
+        .customSelect(
+          '''
       SELECT p.current_box
       FROM flashcard_progress p
       INNER JOIN flashcards f ON f.id = p.flashcard_id
       WHERE f.deck_id = ?1
       ''',
-      variables: [Variable<String>(deckId)],
-      readsFrom: {_database.flashcards, _database.flashcardProgress},
-    ).get();
-    return rows.map((row) => row.read<int>('current_box')).toList(growable: false);
+          variables: [Variable<String>(deckId)],
+          readsFrom: {_database.flashcards, _database.flashcardProgress},
+        )
+        .get();
+    return rows
+        .map((row) => row.read<int>('current_box'))
+        .toList(growable: false);
   }
 
   Future<List<Flashcard>> listDeckFlashcards(String deckId) {
     return (_database.select(_database.flashcards)
-      ..where((table) => table.deckId.equals(deckId))
-      ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)])).get();
+          ..where((table) => table.deckId.equals(deckId))
+          ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+        .get();
   }
 }

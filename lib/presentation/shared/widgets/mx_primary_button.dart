@@ -58,7 +58,7 @@ class MxPrimaryButton extends StatelessWidget {
             children: [
               if (leadingIcon != null) ...[
                 Icon(leadingIcon, size: AppIconSizes.md),
-            const MxGap(AppSpacing.sm),
+                const MxGap(AppSpacing.sm),
               ],
               Flexible(
                 child: Text(
@@ -68,7 +68,7 @@ class MxPrimaryButton extends StatelessWidget {
                 ),
               ),
               if (trailingIcon != null) ...[
-            const MxGap(AppSpacing.sm),
+                const MxGap(AppSpacing.sm),
                 Icon(trailingIcon, size: AppIconSizes.md),
               ],
             ],

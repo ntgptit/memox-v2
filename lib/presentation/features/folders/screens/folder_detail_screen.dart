@@ -146,7 +146,13 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                       : const <Widget>[],
                 ),
                 const MxGap(MxSpace.xl),
-                FolderSummarySection(state: state),
+                FolderSummarySection(
+                  state: state,
+                  onStartStudy: () => context.goStudyEntry(
+                    entryType: 'folder',
+                    entryRefId: state.header.id,
+                  ),
+                ),
                 const MxGap(MxSpace.xl),
                 content,
               ],

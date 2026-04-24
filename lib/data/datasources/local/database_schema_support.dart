@@ -13,20 +13,28 @@ abstract final class DatabaseEnumValues {
     'today',
   ];
 
-  static const List<String> studyTypes = <String>['new', 'due', 'mixed'];
+  static const List<String> studyTypes = <String>['new', 'srs_review'];
+
+  static const List<String> studyFlows = <String>[
+    'new_full_cycle',
+    'srs_fill_review',
+  ];
 
   static const List<String> studyModes = <String>[
     'review',
     'match',
     'guess',
     'recall',
+    'fill',
   ];
 
   static const List<String> sessionStatuses = <String>[
+    'draft',
     'in_progress',
+    'ready_to_finalize',
     'completed',
-    'ended_early',
-    'restarted',
+    'failed_to_finalize',
+    'cancelled',
   ];
 
   static const List<String> sessionItemSourcePools = <String>[
@@ -46,6 +54,12 @@ abstract final class DatabaseEnumValues {
     'correct',
     'incorrect',
     'remembered',
+    'forgot',
+  ];
+
+  static const List<String> reviewResults = <String>[
+    'perfect',
+    'recovered',
     'forgot',
   ];
 }

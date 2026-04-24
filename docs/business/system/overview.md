@@ -17,11 +17,12 @@ MemoX là hệ thống học tập cá nhân dùng flashcard và spaced repetiti
 - Import flashcard từ CSV hoặc text theo format
 - Preview và validate dữ liệu trước khi import
 - Export deck và export flashcard
-- Hỗ trợ học mới, due (`Review` trên UI) và học hỗn hợp
-- Cho phép chọn mode học trước khi vào session
+- Hỗ trợ New Study và SRS Review
+- New Study yêu cầu pass đủ 5 mode học, bao gồm `Fill`
+- SRS Review chỉ dùng Fill mode và retry cho tới khi batch review pass
 - Resume session dang dở hoặc restart session
-- Bỏ qua thẻ, học lại thẻ sai và kết thúc sớm session
-- Điều khiển session bằng batch size, shuffle và rule chọn pool học
+- Bỏ qua thẻ, học lại thẻ sai trong mode hiện tại và kết thúc sớm session
+- Điều khiển session bằng study type, batch size, shuffle và ưu tiên thẻ quá hạn
 - Lưu session history để theo dõi kết quả học
 - Tìm kiếm folder, deck, flashcard
 - Sắp xếp theo tên, mới nhất, học gần nhất
@@ -36,5 +37,6 @@ MemoX là hệ thống học tập cá nhân dùng flashcard và spaced repetiti
 - [Folder Overview](../folder/folder-overview.md)
 - [Deck Overview](../deck/deck-overview.md)
 - [Flashcard Overview](../flashcard/flashcard-overview.md)
+- [Study Index](../study/study-index.md)
 - [Study Entry](../study/study-entry.md)
 - [SRS Overview](../srs/srs-overview.md)

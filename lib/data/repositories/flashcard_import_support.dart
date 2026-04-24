@@ -90,7 +90,9 @@ final class FlashcardImportSupport {
   }
 
   static FlashcardImportPreparation _parseStructuredText(String rawContent) {
-    final normalized = rawContent.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    final normalized = rawContent
+        .replaceAll('\r\n', '\n')
+        .replaceAll('\r', '\n');
     final blocks = normalized.split(RegExp(r'\n\s*\n'));
     final previewItems = <FlashcardImportPreviewItem>[];
     final issues = <ImportValidationIssue>[];
@@ -197,7 +199,9 @@ final class FlashcardImportSupport {
     return cells[index].trim();
   }
 
-  static String ensureImportableContent(FlashcardImportPreparation preparation) {
+  static String ensureImportableContent(
+    FlashcardImportPreparation preparation,
+  ) {
     if (!preparation.canCommit) {
       throw const ValidationException(
         message: 'Import preparation is not ready to commit.',

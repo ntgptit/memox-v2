@@ -38,10 +38,20 @@ abstract final class NavigationBarThemeBuilder {
     return NavigationRailThemeData(
       backgroundColor: scheme.surface,
       indicatorColor: scheme.primaryContainer,
-      selectedIconTheme: IconThemeData(color: scheme.onPrimaryContainer, size: 24),
-      unselectedIconTheme: IconThemeData(color: scheme.onSurfaceVariant, size: 24),
-      selectedLabelTextStyle: AppTypography.labelMedium.copyWith(color: scheme.onSurface),
-      unselectedLabelTextStyle: AppTypography.labelMedium.copyWith(color: scheme.onSurfaceVariant),
+      selectedIconTheme: IconThemeData(
+        color: scheme.onPrimaryContainer,
+        size: 24,
+      ),
+      unselectedIconTheme: IconThemeData(
+        color: scheme.onSurfaceVariant,
+        size: 24,
+      ),
+      selectedLabelTextStyle: AppTypography.labelMedium.copyWith(
+        color: scheme.onSurface,
+      ),
+      unselectedLabelTextStyle: AppTypography.labelMedium.copyWith(
+        color: scheme.onSurfaceVariant,
+      ),
       useIndicator: true,
       labelType: NavigationRailLabelType.all,
     );

@@ -11,6 +11,9 @@ import '../../presentation/features/flashcards/screens/flashcard_editor_screen.d
 import '../../presentation/features/flashcards/screens/flashcard_list_screen.dart';
 import '../../presentation/features/folders/screens/folder_detail_screen.dart';
 import '../../presentation/features/folders/screens/library_overview_screen.dart';
+import '../../presentation/features/study/screens/study_entry_screen.dart';
+import '../../presentation/features/study/screens/study_result_screen.dart';
+import '../../presentation/features/study/screens/study_session_screen.dart';
 import '../app_shell.dart';
 import '../di/providers.dart';
 import 'route_guards.dart';
@@ -102,6 +105,48 @@ GoRouter appRouter(Ref ref) {
                         key: ValueKey(
                           'import-${state.pathParameters[RoutePaths.deckIdParam]}',
                         ),
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.studyTodaySegment,
+                    name: RouteNames.studyToday,
+                    pageBuilder: (_, _) => const NoTransitionPage(
+                      child: StudyEntryScreen(
+                        entryType: 'today',
+                        entryRefId: null,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.studyEntrySegment,
+                    name: RouteNames.studyEntry,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: StudyEntryScreen(
+                        entryType: state
+                            .pathParameters[RoutePaths.studyEntryTypeParam]!,
+                        entryRefId: state
+                            .pathParameters[RoutePaths.studyEntryRefIdParam],
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.studySessionSegment,
+                    name: RouteNames.studySession,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: StudySessionScreen(
+                        sessionId: state
+                            .pathParameters[RoutePaths.studySessionIdParam]!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.studyResultSegment,
+                    name: RouteNames.studyResult,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: StudyResultScreen(
+                        sessionId: state
+                            .pathParameters[RoutePaths.studySessionIdParam]!,
                       ),
                     ),
                   ),

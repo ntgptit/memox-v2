@@ -17,9 +17,8 @@ void main() {
             return Scaffold(
               body: Center(
                 child: TextButton(
-                  onPressed: () => context.popRoute(
-                    fallback: () => context.go('/fallback'),
-                  ),
+                  onPressed: () =>
+                      context.popRoute(fallback: () => context.go('/fallback')),
                   child: const Text('Close'),
                 ),
               ),
@@ -28,9 +27,8 @@ void main() {
         ),
         GoRoute(
           path: '/fallback',
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Fallback')),
-          ),
+          builder: (context, state) =>
+              const Scaffold(body: Center(child: Text('Fallback'))),
         ),
       ],
     );
@@ -69,9 +67,8 @@ void main() {
             return Scaffold(
               body: Center(
                 child: TextButton(
-                  onPressed: () => context.popRoute(
-                    fallback: () => context.go('/fallback'),
-                  ),
+                  onPressed: () =>
+                      context.popRoute(fallback: () => context.go('/fallback')),
                   child: const Text('Close'),
                 ),
               ),
@@ -80,9 +77,8 @@ void main() {
         ),
         GoRoute(
           path: '/fallback',
-          builder: (context, state) => const Scaffold(
-            body: Center(child: Text('Fallback')),
-          ),
+          builder: (context, state) =>
+              const Scaffold(body: Center(child: Text('Fallback'))),
         ),
       ],
     );

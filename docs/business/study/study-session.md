@@ -1,100 +1,140 @@
 # Study Session
 
-## Phiên học
-Một phiên học gồm:
-- xác định entry point
-- xác định study type
-- gom flashcard
-- lọc flashcard hợp lệ
-- áp dụng session control
-- chọn mode học
-- học từng thẻ
-- ghi nhận kết quả
-- cập nhật SRS
+> Rule tạo session / pass mode / retry / finalize đã nằm ở [New Study Flow](./new-study-flow.md), [SRS Review Flow](./srs-review-flow.md), và [Retry Loop](./retry-loop.md).
+> File này bổ sung rule resume, restart, bỏ qua thẻ, huỷ sớm, commit boundary, history.
 
-## Trạng thái session
-- Session có thể ở trạng thái dang dở
-- Session dang dở là session đã tạo nhưng chưa hoàn thành và chưa kết thúc sớm
-- Session hoàn thành khi không còn thẻ nào cần học trong session hiện tại
-- Session có thể kết thúc sớm theo chủ động của user
-- Session cũ có thể ở trạng thái đã restart nếu user tạo session mới từ thao tác restart
+## Session status
 
-## Thứ tự xử lý
-- Xác định phạm vi học
-- Gom flashcard
-- Lọc theo study type
-- Ưu tiên thẻ quá hạn nếu session bật rule này
-- Cắt batch theo settings
-- Shuffle flashcard nếu session bật rule này
-- Tạo session
+Session status theo đúng 6 trạng thái ở [Study Concepts — Session Status](./study-concepts.md#session-status):
+
+- `Draft` — đã tạo, chưa bắt đầu
+- `In Progress` — user đang học
+- `Ready To Finalize` — đã pass đủ điều kiện học, chờ finalize
+- `Completed` — finalize thành công
+- `Failed To Finalize` — học xong nhưng finalize lỗi, có thể retry
+- `Cancelled` — user hủy session
+
+Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rule restart) — không phải session status, mà là metadata của session cũ.
 
 ## Rule resume session dang dở
-- User có thể resume session dang dở gần nhất
-- Resume phải giữ nguyên:
-  - tập thẻ còn lại
-  - kết quả đã ghi trước đó
-  - mode học đã chọn
-  - session control đã dùng khi tạo session
-- Resume không gom lại pool mới từ đầu
+
+- User có thể resume session ở trạng thái `In Progress`, `Ready To Finalize`, hoặc `Failed To Finalize`
+- Resume không gom lại pool mới từ đầu, không random lại batch
+- Resume tiếp tục ghi vào cùng session history
+
+### Resume New Study phải giữ nguyên
+- tập thẻ còn lại
+- kết quả đã ghi trước đó
+- mode hiện tại
+- retry round hiện tại trong mode hiện tại
+- danh sách flashcard đã pass trong mode hiện tại
+- danh sách flashcard chưa pass trong mode hiện tại
+- các mode đã pass
+- session control đã dùng khi tạo session
+
+### Resume SRS Review phải giữ nguyên
+- Fill queue hiện tại
+- retry batch hiện tại
+- các flashcard đã trả lời
+- các flashcard chưa trả lời
+- các flashcard đã pass Fill
+- các flashcard chưa pass Fill
+- kết quả review đã stage trước đó
+- session control đã dùng khi tạo session
 
 ## Rule restart session
-- Restart session tạo ra 1 session mới từ cùng entry point
+
+- Restart tạo ra 1 session mới từ cùng entry point
 - Session mới được tạo lại từ dữ liệu hiện tại tại thời điểm restart
 - Session cũ chuyển sang trạng thái đã restart và không tiếp tục dùng để resume
-- Restart không rollback kết quả đã ghi và không rollback cập nhật SRS đã phát sinh trước đó
+- Restart không rollback kết quả đã ghi và không rollback cập nhật SRS chính thức đã phát sinh trước đó
 
 ## Rule bỏ qua thẻ
+
 - User có thể bỏ qua thẻ hiện tại mà không chấm điểm
 - Thẻ bị bỏ qua không được cập nhật SRS ở lần bỏ qua đó
+- Trong New Study, thẻ bị bỏ qua không được xem là pass mode hiện tại
 - Thẻ bị bỏ qua được đưa về cuối queue của session hiện tại
 
-## Rule học lại thẻ sai
-- Session có thể mở vòng học lại cho các thẻ bị chấm sai hoặc quên trong session hiện tại
-- Tập thẻ học lại chỉ gồm các thẻ đã bị chấm sai hoặc quên trong chính session đó
-- Học lại thẻ sai là phần tiếp theo của cùng session, không phải 1 deck hay 1 pool mới
-- Mỗi lượt trả lời trong vòng học lại vẫn được ghi vào session history
-- Sau khi hoàn thành queue hiện tại, nếu có thẻ sai hoặc quên:
-  - hệ thống hiển thị lựa chọn học lại
-- Chỉ mở retry round khi user xác nhận học lại
+## Rule huỷ sớm session
 
-## Rule kết thúc sớm session
-- User có thể kết thúc sớm session trước khi học hết queue
-- Khi kết thúc sớm, session được lưu với trạng thái kết thúc sớm
-- Các kết quả đã ghi trước thời điểm kết thúc sớm vẫn được giữ nguyên
-- Các thẻ chưa học trong session đó không được tự động chấm hay tự động cập nhật SRS
+- User có thể chuyển session sang `Cancelled` trước khi học hết queue
+- Khi `Cancelled`, session giữ nguyên các kết quả đã ghi trước đó
+- Trong New Study, các thẻ chưa pass đủ 5 mode không được tự động chấm hay tự động cập nhật SRS chính thức
+- Trong SRS Review, các thẻ chưa pass Fill không được tự động chấm hay tự động cập nhật SRS
 - Các item còn `pending` trong session đó chuyển sang trạng thái bỏ dở
+- Không commit box / due date cho các flashcard chưa hoàn thành theo rule của flow
 
-## Sau mỗi thẻ cần ghi nhận
+## Rule commit SRS cuối session
+
+- Commit SRS chỉ được phép khi session chuyển sang `Completed`
+- Không được tăng box, giảm box hoặc cập nhật due date chính thức khi session ở bất kỳ trạng thái nào khác
+- Commit SRS cuối session phải đồng bộ toàn bộ flashcard đủ điều kiện trong một transaction nghiệp vụ
+- Nếu commit SRS lỗi với bất kỳ flashcard nào:
+  - toàn bộ transaction rollback
+  - session chuyển sang `Failed To Finalize` (không phải `Completed`)
+  - user có thể retry finalize
+
+### New Study commit
+- box cũ
+- box mới
+- ngày ôn tiếp theo chính thức
+- thời điểm hoàn thành New Study của flashcard
+
+### SRS Review commit
+- box cũ
+- box mới
+- ngày ôn tiếp theo chính thức
+- review result: `perfect` hoặc `recovered`
+- flashcard có từng sai trong mode hay không
+
+## Sau mỗi lượt trả lời cần ghi nhận
+
 - trạng thái hoàn thành
 - mức độ đúng / sai / nhớ / quên
 - thời điểm hoàn thành
-- box cũ
-- box mới
-- ngày ôn tiếp theo
+- mode hiện tại
+- mode order
+- round index
+- attempt number
+- trạng thái pass hoặc chưa pass trong mode hiện tại nếu là New Study
+
+Cấu trúc attempt chi tiết: xem [Study Concepts — Attempt](./study-concepts.md#attempt).
 
 ## Cuối phiên học
+
 Hiển thị:
 - số thẻ đã học
 - số đúng / sai
 - số tăng box / giảm box
-- số còn lại
+- số flashcard đã pass đủ 5 mode nếu là New Study
+- số flashcard review đã pass Fill nếu là SRS Review
+- số flashcard còn lại nếu session chưa hoàn thành
 
 ## Rule lưu session history
+
 - Mỗi session phải lưu history của chính session đó
 - Session history phải lưu tối thiểu:
   - entry point
-  - study type
-  - mode học
+  - study flow
   - session control đã áp dụng
   - thời điểm bắt đầu
   - thời điểm kết thúc
-  - trạng thái session
+  - session status
   - tổng kết kết quả
   - log kết quả theo từng lượt trả lời
+  - mode, mode order và round index của từng lượt trả lời
+  - các mode đã pass nếu là New Study
 - Resume tiếp tục ghi thêm vào cùng session history
 - Restart tạo session history mới, không ghi đè history của session cũ
 
 ## Tài liệu liên quan
+
+- [Study Index](./study-index.md)
+- [Study Concepts](./study-concepts.md)
+- [New Study Flow](./new-study-flow.md)
+- [SRS Review Flow](./srs-review-flow.md)
+- [Retry Loop](./retry-loop.md)
 - [Study Entry](./study-entry.md)
 - [Study Modes](./study-modes.md)
 - [Study Settings](./study-settings.md)

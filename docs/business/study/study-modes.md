@@ -1,19 +1,24 @@
 # Study Modes
 
+> Rule flow thuộc về [New Study Flow](./new-study-flow.md) / [SRS Review Flow](./srs-review-flow.md). Rule retry chung: [Retry Loop](./retry-loop.md).
+> File này chỉ bổ sung chi tiết tương tác và rule phụ của từng mode.
+
 ## Danh sách mode hỗ trợ ở v1
+
 - Review
 - Match
 - Guess
 - Recall
-
-## Mode planned sau v1
 - Fill
 
-## Vai trò từng mode
+Mode nào dùng ở flow nào: xem [New Study Flow — Mode bắt buộc](./new-study-flow.md#mode-bắt-buộc) và [SRS Review Flow — Mode bắt buộc](./srs-review-flow.md#mode-bắt-buộc).
+
+## Vai trò và chi tiết tương tác
 
 ### Review
 - xem term và meaning trực tiếp
 - có thể vuốt để đổi thẻ
+- user vẫn phải tự chấm `remembered` hoặc `forgot` để xác định pass mode
 
 ### Match
 - ghép cặp đúng
@@ -27,23 +32,29 @@
 - tự nhớ trước khi xem đáp án
 
 ### Fill
-- planned sau v1
-- cần data contract cloze riêng
-- chưa nằm trong schema database v1
+- là mode bắt buộc trong New Study (mode cuối cùng trong chuỗi 5 mode)
+- là mode duy nhất của SRS Review
+- user nhập đáp án cho mặt còn lại của flashcard
+- Fill v1 dùng dữ liệu `front` và `back` hiện có của flashcard
+- cloze nâng cao là phạm vi sau v1 và cần data contract riêng nếu được bổ sung
 
-## Rule chung
-- `Review` ở đây là tên mode tương tác
-- `Review` mode khác với study type due
-- User chọn 1 mode học trước khi bắt đầu session
-- Resume session phải giữ mode học đã chọn từ trước
-- Restart session có thể dùng lại mode cũ hoặc chọn mode mới nếu UI cho phép
-- Các mode chỉ khác cách tương tác
-- Không tự có rule SRS riêng
-- Kết quả cuối cùng phải đi qua cùng một cơ chế chấm
+## Rule chung cho mode
+
+- mode chỉ quyết định cách tương tác
+- mode không tự cập nhật SRS
+- mode không tự quyết định finalize session
+- kết quả mode được ghi nhận qua attempt và session progress
+- SRS chỉ cập nhật tại finalize boundary của session
+- `Review` ở đây là tên mode tương tác, khác với study flow `SRS Review`
 - Shuffle đáp án chỉ áp dụng cho mode có danh sách đáp án hoặc vị trí đáp án cần tráo
 - Shuffle đáp án không làm thay đổi thứ tự flashcard trong session
 
 ## Tài liệu liên quan
+
+- [Study Index](./study-index.md)
+- [New Study Flow](./new-study-flow.md)
+- [SRS Review Flow](./srs-review-flow.md)
+- [Retry Loop](./retry-loop.md)
 - [Study Session](./study-session.md)
 - [Study Settings](./study-settings.md)
 - [SRS Rules](../srs/srs-rules.md)

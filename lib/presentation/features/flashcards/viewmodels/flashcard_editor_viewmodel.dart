@@ -12,10 +12,7 @@ part 'flashcard_editor_viewmodel.g.dart';
 
 @immutable
 class FlashcardEditorArgs {
-  const FlashcardEditorArgs({
-    required this.deckId,
-    this.flashcardId,
-  });
+  const FlashcardEditorArgs({required this.deckId, this.flashcardId});
 
   final String deckId;
   final String? flashcardId;
@@ -54,12 +51,7 @@ class FlashcardEditorDraftState {
   bool get isEditing => flashcardId != null;
 
   FlashcardDraft toDraft() {
-    return FlashcardDraft(
-      title: title,
-      front: front,
-      back: back,
-      note: note,
-    );
+    return FlashcardDraft(title: title, front: front, back: back, note: note);
   }
 
   FlashcardEditorDraftState copyWith({
@@ -164,17 +156,18 @@ class FlashcardEditorController extends _$FlashcardEditorController {
 
   Future<bool> save({bool keepCreating = false}) async {
     // guard:retry-reviewed
-    final draftState = _currentDraft(ref.read(flashcardEditorDraftProvider(args)));
+    final draftState = _currentDraft(
+      ref.read(flashcardEditorDraftProvider(args)),
+    );
     if (draftState == null) {
       return false;
     }
 
     state = const AsyncLoading<void>();
     if (args.isEditing) {
-      final result = await ref.read(updateFlashcardUseCaseProvider).execute(
-        flashcardId: args.flashcardId!,
-        draft: draftState.toDraft(),
-      );
+      final result = await ref
+          .read(updateFlashcardUseCaseProvider)
+          .execute(flashcardId: args.flashcardId!, draft: draftState.toDraft());
       if (!ref.mounted) {
         return false;
       }
@@ -187,10 +180,9 @@ class FlashcardEditorController extends _$FlashcardEditorController {
       return true;
     }
 
-    final result = await ref.read(createFlashcardUseCaseProvider).execute(
-      deckId: args.deckId,
-      draft: draftState.toDraft(),
-    );
+    final result = await ref
+        .read(createFlashcardUseCaseProvider)
+        .execute(deckId: args.deckId, draft: draftState.toDraft());
     if (!ref.mounted) {
       return false;
     }

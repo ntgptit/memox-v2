@@ -21,7 +21,9 @@ abstract final class AppBarThemeBuilder {
         color: scheme.onSurface,
         fontWeight: FontWeight.w600,
       ),
-      toolbarTextStyle: AppTypography.bodyMedium.copyWith(color: scheme.onSurface),
+      toolbarTextStyle: AppTypography.bodyMedium.copyWith(
+        color: scheme.onSurface,
+      ),
       systemOverlayStyle: null,
     );
   }

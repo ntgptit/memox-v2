@@ -11,7 +11,9 @@ final class RandomIdGenerator implements IdGenerator {
 
   @override
   String nextId() {
-    final timestamp = DateTime.now().toUtc().microsecondsSinceEpoch
+    final timestamp = DateTime.now()
+        .toUtc()
+        .microsecondsSinceEpoch
         .toRadixString(36);
     final entropy = List<int>.generate(
       6,

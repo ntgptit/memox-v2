@@ -16,8 +16,9 @@ abstract final class ChipThemeBuilder {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       labelPadding: const EdgeInsets.symmetric(horizontal: 4),
       labelStyle: AppTypography.labelLarge.copyWith(color: scheme.onSurface),
-      secondaryLabelStyle:
-          AppTypography.labelLarge.copyWith(color: scheme.onSecondaryContainer),
+      secondaryLabelStyle: AppTypography.labelLarge.copyWith(
+        color: scheme.onSecondaryContainer,
+      ),
       brightness: scheme.brightness,
       shape: const StadiumBorder(),
       showCheckmark: true,

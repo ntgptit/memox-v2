@@ -36,7 +36,8 @@ class MxBottomSheet extends StatelessWidget {
       useRootNavigator: useRootNavigator,
       isScrollControlled: isScrollControlled,
       useSafeArea: true,
-      builder: (_) => MxBottomSheet(title: title, trailing: trailing, child: child),
+      builder: (_) =>
+          MxBottomSheet(title: title, trailing: trailing, child: child),
     );
   }
 

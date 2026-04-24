@@ -36,10 +36,7 @@ final class ExportData {
   final String content;
 }
 
-enum ImportSourceFormat {
-  csv,
-  structuredText,
-}
+enum ImportSourceFormat { csv, structuredText }
 
 final class FlashcardDraft {
   const FlashcardDraft({

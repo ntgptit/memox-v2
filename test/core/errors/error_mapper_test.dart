@@ -8,9 +8,7 @@ import 'package:memox/core/errors/failures.dart';
 void main() {
   group('ErrorMapper.map', () {
     test('maps timeout exceptions to retryable network failures', () {
-      final failure = ErrorMapper.map(
-        TimeoutException('request timed out'),
-      );
+      final failure = ErrorMapper.map(TimeoutException('request timed out'));
 
       expect(failure.type, FailureType.network);
       expect(failure.code, FailureCodes.requestTimedOut);

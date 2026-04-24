@@ -64,10 +64,7 @@ final class MoveDeckUseCase {
     required String deckId,
     required String targetFolderId,
   }) {
-    return _repository.moveDeck(
-      deckId: deckId,
-      targetFolderId: targetFolderId,
-    );
+    return _repository.moveDeck(deckId: deckId, targetFolderId: targetFolderId);
   }
 }
 

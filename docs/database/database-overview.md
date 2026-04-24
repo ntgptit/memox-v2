@@ -40,12 +40,17 @@ DB v1 cần bao phủ:
 - `move` chỉ đổi quan hệ cha con, không làm mất progress
 - `duplicate deck` và `import` tạo content mới với progress mới
 - `delete` là hard delete theo rule business hiện tại
+- `study_sessions.status` theo mô hình 6 trạng thái: `draft`, `in_progress`, `ready_to_finalize`, `completed`, `failed_to_finalize`, `cancelled`
+- New Study và SRS Review chỉ commit `flashcard_progress` trong transaction chuyển `status` từ `ready_to_finalize` sang `completed`
+- Nếu commit lỗi, session chuyển `failed_to_finalize` và toàn bộ cập nhật SRS bị rollback; user có thể retry finalize
+- Trong lúc session đang chạy, thay đổi box và due date chỉ được stage qua session history
 
 ## Giả định chốt cho v1
 - Khi folder trở thành rỗng hoàn toàn, `contentMode` được reset về `unlocked` để user có thể chọn lại hướng chứa
 - `title` của flashcard là optional; nếu không có thì sort và search ưu tiên `front`
 - `masteryPercent` là derived metric do query/service tính, chưa freeze công thức ở mức schema
-- `Fill` mode chưa thuộc schema v1 vì chưa có cloze payload riêng
+- `Fill` là mode bắt buộc trong New Study và là mode duy nhất của SRS Review
+- Cloze payload nâng cao cho `Fill` chưa thuộc schema v1
 
 ## Hướng gắn vào app hiện tại
 Repo đã có sẵn khung:

@@ -54,26 +54,32 @@
   - duyệt đệ quy toàn bộ cây con
   - gom tất cả flashcard trong các deck bên dưới
 - User có thể học từ danh sách hôm nay dùng daily pool toàn cục
-- User có thể tạo session học mới, due hoặc hỗn hợp mới và due
-- Trước khi vào session, user chọn 1 mode học
+- User có thể tạo New Study hoặc SRS Review session
+- New Study phải pass đủ 5 mode học theo thứ tự `Review`, `Match`, `Guess`, `Recall`, `Fill`
+- SRS Review chỉ dùng Fill mode và bắt retry cho tới khi retry batch rỗng
+- Không hỗ trợ học hỗn hợp mới và due như một study type chính
+- Không hỗ trợ Single Mode Study làm luồng học chính
+- `Fill` là mode bắt buộc trong New Study và là mode duy nhất của SRS Review
 - Study settings chỉ là default; lựa chọn tại entry point sẽ override cho session hiện tại
 - Session có thể resume nếu còn dang dở
-- Restart session tạo session mới và không rollback SRS đã cập nhật trước đó
-- User có thể bỏ qua thẻ, học lại thẻ sai hoặc kết thúc sớm session
+- Restart session tạo session mới và không rollback SRS chính thức đã cập nhật trước đó
+- User có thể bỏ qua thẻ, học lại thẻ sai trong mode hiện tại hoặc kết thúc sớm session
 - Session luôn chạy trên tập flashcard đã gom
 
 ## Rule session control
 - Session hỗ trợ giới hạn batch size
 - Session hỗ trợ shuffle flashcard
 - Session hỗ trợ shuffle đáp án nếu mode học có đáp án để tráo
-- Mỗi session áp dụng đúng 1 rule pool học: chỉ học thẻ mới, chỉ học thẻ due hoặc trộn thẻ mới và thẻ due
+- Mỗi session áp dụng đúng 1 study type: New Study hoặc SRS Review
 - Session có thể ưu tiên thẻ quá hạn khi chọn pool due
 - Session phải lưu history để theo dõi quá trình và kết quả học
 
 ## Rule SRS
 - SRS chạy ở cấp flashcard
 - Mỗi flashcard chỉ có 1 box hiện tại
-- Chấm xong phải cập nhật box ngay
+- New Study chỉ commit box và due date chính thức khi New Study session hoàn thành
+- SRS Review chỉ commit box và due date chính thức khi SRS Review session hoàn thành
+- Không được tăng box, giảm box hoặc cập nhật due date chính thức khi session còn đang chạy
 
 ## Rule thiết kế hệ thống
 - Folder là đơn vị tổ chức

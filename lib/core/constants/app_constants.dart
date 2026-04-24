@@ -10,7 +10,20 @@ abstract final class AppConstants {
 
   static const String sharedPrefsThemeModeKey = 'settings.theme_mode';
   static const String sharedPrefsLocaleKey = 'settings.locale';
+  static const String sharedPrefsDefaultNewBatchSizeKey =
+      'settings.study.default_new_batch_size';
+  static const String sharedPrefsDefaultReviewBatchSizeKey =
+      'settings.study.default_review_batch_size';
+  static const String sharedPrefsShuffleFlashcardsKey =
+      'settings.study.shuffle_flashcards';
+  static const String sharedPrefsShuffleAnswersKey =
+      'settings.study.shuffle_answers';
+  static const String sharedPrefsPrioritizeOverdueKey =
+      'settings.study.prioritize_overdue';
   static const String localDatabaseName = 'memox';
 
   static const Duration connectivityDebounce = Duration(milliseconds: 250);
+
+  static const int defaultNewStudyBatchSize = 10;
+  static const int defaultReviewBatchSize = 20;
 }

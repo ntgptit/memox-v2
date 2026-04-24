@@ -31,11 +31,13 @@ class MxSegmentedControl<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return SegmentedButton<T>(
       segments: segments
-          .map((s) => ButtonSegment<T>(
-                value: s.value,
-                label: Text(s.label),
-                icon: s.icon != null ? Icon(s.icon) : null,
-              ))
+          .map(
+            (s) => ButtonSegment<T>(
+              value: s.value,
+              label: Text(s.label),
+              icon: s.icon != null ? Icon(s.icon) : null,
+            ),
+          )
           .toList(growable: false),
       selected: selected,
       onSelectionChanged: onChanged,

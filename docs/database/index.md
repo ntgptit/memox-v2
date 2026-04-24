@@ -11,7 +11,7 @@
 - [Folder Rules](../business/folder/folder-rules.md)
 - [Deck Rules](../business/deck/deck-rules.md)
 - [Flashcard Rules](../business/flashcard/flashcard-rules.md)
+- [Study Index](../business/study/study-index.md)
 - [Study Session](../business/study/study-session.md)
 - [Study Settings](../business/study/study-settings.md)
 - [SRS Rules](../business/srs/srs-rules.md)
-

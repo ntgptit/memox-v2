@@ -17,9 +17,9 @@ class ConnectivityService implements NetworkInfo {
     NetworkStatus initialStatus = NetworkStatus.unknown,
     NetworkStatusProbe? probe,
     Duration debounce = AppConstants.connectivityDebounce,
-  })  : _currentStatus = initialStatus,
-        _probe = probe,
-        _debounce = debounce {
+  }) : _currentStatus = initialStatus,
+       _probe = probe,
+       _debounce = debounce {
     _controller = StreamController<NetworkStatus>.broadcast(
       onListen: _emitCurrentStatus,
     );

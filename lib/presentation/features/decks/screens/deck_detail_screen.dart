@@ -84,6 +84,10 @@ class DeckDetailScreen extends ConsumerWidget {
                   onOpenFlashcards: () => context.pushFlashcardList(state.id),
                   onAddFlashcard: () => context.pushFlashcardCreate(state.id),
                   onImport: () => context.pushDeckImport(state.id),
+                  onStartStudy: () => context.goStudyEntry(
+                    entryType: 'deck',
+                    entryRefId: state.id,
+                  ),
                 ),
               ],
             );

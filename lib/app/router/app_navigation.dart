@@ -95,6 +95,34 @@ extension AppNavigation on BuildContext {
     );
   }
 
+  void goStudyEntry({required String entryType, required String entryRefId}) {
+    goNamed(
+      RouteNames.studyEntry,
+      pathParameters: {
+        RoutePaths.studyEntryTypeParam: entryType,
+        RoutePaths.studyEntryRefIdParam: entryRefId,
+      },
+    );
+  }
+
+  void goStudyToday() {
+    goNamed(RouteNames.studyToday);
+  }
+
+  void goStudySession(String sessionId) {
+    goNamed(
+      RouteNames.studySession,
+      pathParameters: {RoutePaths.studySessionIdParam: sessionId},
+    );
+  }
+
+  void goStudyResult(String sessionId) {
+    goNamed(
+      RouteNames.studyResult,
+      pathParameters: {RoutePaths.studySessionIdParam: sessionId},
+    );
+  }
+
   // --- Back navigation -------------------------------------------------------
 
   /// Pops the current route if possible; otherwise runs [fallback].

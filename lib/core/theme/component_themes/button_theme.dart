@@ -7,16 +7,22 @@ import 'focus_theme.dart';
 
 abstract final class ButtonThemeBuilder {
   static const double _minHeight = 44;
-  static const EdgeInsetsGeometry _padding =
-      EdgeInsets.symmetric(horizontal: 20, vertical: 12);
+  static const EdgeInsetsGeometry _padding = EdgeInsets.symmetric(
+    horizontal: 20,
+    vertical: 12,
+  );
 
   static ElevatedButtonThemeData filled(ColorScheme scheme) {
     return ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: scheme.primary,
         foregroundColor: scheme.onPrimary,
-        disabledBackgroundColor: scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface),
-        disabledForegroundColor: scheme.onSurface.withValues(alpha: AppOpacity.disabled),
+        disabledBackgroundColor: scheme.onSurface.withValues(
+          alpha: AppOpacity.disabledSurface,
+        ),
+        disabledForegroundColor: scheme.onSurface.withValues(
+          alpha: AppOpacity.disabled,
+        ),
         elevation: 0,
         shadowColor: Colors.transparent,
         minimumSize: const Size(0, _minHeight),
@@ -33,8 +39,12 @@ abstract final class ButtonThemeBuilder {
       style: FilledButton.styleFrom(
         backgroundColor: scheme.secondaryContainer,
         foregroundColor: scheme.onSecondaryContainer,
-        disabledBackgroundColor: scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface),
-        disabledForegroundColor: scheme.onSurface.withValues(alpha: AppOpacity.disabled),
+        disabledBackgroundColor: scheme.onSurface.withValues(
+          alpha: AppOpacity.disabledSurface,
+        ),
+        disabledForegroundColor: scheme.onSurface.withValues(
+          alpha: AppOpacity.disabled,
+        ),
         minimumSize: const Size(0, _minHeight),
         padding: _padding,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
@@ -47,7 +57,9 @@ abstract final class ButtonThemeBuilder {
     return OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: scheme.primary,
-        disabledForegroundColor: scheme.onSurface.withValues(alpha: AppOpacity.disabled),
+        disabledForegroundColor: scheme.onSurface.withValues(
+          alpha: AppOpacity.disabled,
+        ),
         minimumSize: const Size(0, _minHeight),
         padding: _padding,
         side: BorderSide(color: scheme.outline),
@@ -61,7 +73,9 @@ abstract final class ButtonThemeBuilder {
     return TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: scheme.primary,
-        disabledForegroundColor: scheme.onSurface.withValues(alpha: AppOpacity.disabled),
+        disabledForegroundColor: scheme.onSurface.withValues(
+          alpha: AppOpacity.disabled,
+        ),
         minimumSize: const Size(0, _minHeight),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
@@ -74,14 +88,16 @@ abstract final class ButtonThemeBuilder {
     return IconButtonThemeData(
       style: IconButton.styleFrom(
         foregroundColor: scheme.onSurfaceVariant,
-        disabledForegroundColor: scheme.onSurface.withValues(alpha: AppOpacity.disabled),
+        disabledForegroundColor: scheme.onSurface.withValues(
+          alpha: AppOpacity.disabled,
+        ),
         minimumSize: const Size(40, 40),
         fixedSize: const Size(40, 40),
         iconSize: 20,
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.buttonSmall),
-      ).copyWith(
-        overlayColor: AppFocus.overlayProperty(scheme.onSurface),
-      ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppRadius.buttonSmall,
+        ),
+      ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onSurface)),
     );
   }
 

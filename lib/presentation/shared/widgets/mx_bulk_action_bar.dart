@@ -58,7 +58,7 @@ class MxBulkActionBar extends StatelessWidget {
             children: [
               Expanded(child: info),
               if (actionWrap != null) ...[
-            const MxGap(AppSpacing.md),
+                const MxGap(AppSpacing.md),
                 Flexible(
                   child: Align(
                     alignment: Alignment.topRight,

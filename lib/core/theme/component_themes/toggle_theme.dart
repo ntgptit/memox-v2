@@ -62,11 +62,11 @@ abstract final class ToggleThemeBuilder {
   static SliderThemeData slider(ColorScheme scheme) {
     return SliderThemeData(
       activeTrackColor: scheme.primary,
-      inactiveTrackColor:
-          scheme.primary.withValues(alpha: AppOpacity.disabledSurface),
+      inactiveTrackColor: scheme.primary.withValues(
+        alpha: AppOpacity.disabledSurface,
+      ),
       thumbColor: scheme.primary,
-      overlayColor:
-          scheme.primary.withValues(alpha: AppFocus.focusOpacity),
+      overlayColor: scheme.primary.withValues(alpha: AppFocus.focusOpacity),
       valueIndicatorColor: scheme.inverseSurface,
       valueIndicatorTextStyle: AppTypography.bodySmall.copyWith(
         color: scheme.onInverseSurface,

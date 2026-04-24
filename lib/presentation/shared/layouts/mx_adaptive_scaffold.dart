@@ -76,34 +76,63 @@ class MxAdaptiveScaffold extends StatelessWidget {
 
     return switch (context.windowSize) {
       WindowSize.compact => Scaffold(
-          appBar: appBar,
-          body: SafeArea(child: wrappedBody),
-          floatingActionButton: floatingActionButton,
-          floatingActionButtonLocation: floatingActionButtonLocation,
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: selectedIndex,
-            onDestinationSelected: onDestinationSelected,
-            destinations: [
-              for (final d in destinations)
-                NavigationDestination(
-                  icon: d.icon,
-                  selectedIcon: d.selectedIcon,
-                  label: d.label,
-                ),
+        appBar: appBar,
+        body: SafeArea(child: wrappedBody),
+        floatingActionButton: floatingActionButton,
+        floatingActionButtonLocation: floatingActionButtonLocation,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: selectedIndex,
+          onDestinationSelected: onDestinationSelected,
+          destinations: [
+            for (final d in destinations)
+              NavigationDestination(
+                icon: d.icon,
+                selectedIcon: d.selectedIcon,
+                label: d.label,
+              ),
+          ],
+        ),
+      ),
+      WindowSize.medium || WindowSize.expanded => Scaffold(
+        appBar: appBar,
+        floatingActionButton: floatingActionButton,
+        floatingActionButtonLocation: floatingActionButtonLocation,
+        body: SafeArea(
+          child: Row(
+            children: [
+              NavigationRail(
+                selectedIndex: selectedIndex,
+                onDestinationSelected: onDestinationSelected,
+                labelType: NavigationRailLabelType.all,
+                destinations: [
+                  for (final d in destinations)
+                    NavigationRailDestination(
+                      icon: d.icon,
+                      selectedIcon: d.selectedIcon,
+                      label: Text(d.label),
+                    ),
+                ],
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(child: wrappedBody),
             ],
           ),
         ),
-      WindowSize.medium || WindowSize.expanded => Scaffold(
-          appBar: appBar,
-          floatingActionButton: floatingActionButton,
-          floatingActionButtonLocation: floatingActionButtonLocation,
-          body: SafeArea(
-            child: Row(
-              children: [
-                NavigationRail(
+      ),
+      WindowSize.large || WindowSize.extraLarge => Scaffold(
+        appBar: appBar,
+        floatingActionButton: floatingActionButton,
+        floatingActionButtonLocation: floatingActionButtonLocation,
+        body: SafeArea(
+          child: Row(
+            children: [
+              SizedBox(
+                width: AppLayout.railWidth,
+                child: NavigationRail(
+                  extended: true,
                   selectedIndex: selectedIndex,
                   onDestinationSelected: onDestinationSelected,
-                  labelType: NavigationRailLabelType.all,
+                  minExtendedWidth: AppLayout.railWidth,
                   destinations: [
                     for (final d in destinations)
                       NavigationRailDestination(
@@ -113,42 +142,13 @@ class MxAdaptiveScaffold extends StatelessWidget {
                       ),
                   ],
                 ),
-                const VerticalDivider(width: 1),
-                Expanded(child: wrappedBody),
-              ],
-            ),
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(child: wrappedBody),
+            ],
           ),
         ),
-      WindowSize.large || WindowSize.extraLarge => Scaffold(
-          appBar: appBar,
-          floatingActionButton: floatingActionButton,
-          floatingActionButtonLocation: floatingActionButtonLocation,
-          body: SafeArea(
-            child: Row(
-              children: [
-                SizedBox(
-                  width: AppLayout.railWidth,
-                  child: NavigationRail(
-                    extended: true,
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: onDestinationSelected,
-                    minExtendedWidth: AppLayout.railWidth,
-                    destinations: [
-                      for (final d in destinations)
-                        NavigationRailDestination(
-                          icon: d.icon,
-                          selectedIcon: d.selectedIcon,
-                          label: Text(d.label),
-                        ),
-                    ],
-                  ),
-                ),
-                const VerticalDivider(width: 1),
-                Expanded(child: wrappedBody),
-              ],
-            ),
-          ),
-        ),
+      ),
     };
   }
 }
