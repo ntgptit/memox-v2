@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/di/study_providers.dart';
+import '../../../../core/errors/app_exception.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
 
@@ -20,6 +21,18 @@ final class StudyEntryState {
   final StudySettingsSnapshot newStudyDefaults;
   final StudySettingsSnapshot reviewDefaults;
   final StudySessionSnapshot? resumeCandidate;
+}
+
+final class StudyEntryStartResult {
+  const StudyEntryStartResult._({this.sessionId, this.error});
+
+  const StudyEntryStartResult.started(String sessionId)
+    : this._(sessionId: sessionId);
+
+  const StudyEntryStartResult.rejected(Object error) : this._(error: error);
+
+  final String? sessionId;
+  final Object? error;
 }
 
 @Riverpod(keepAlive: true)
@@ -56,7 +69,7 @@ class StudyEntryActionController extends _$StudyEntryActionController {
   @override
   FutureOr<void> build(String entryType, String? entryRefId) {}
 
-  Future<String?> start({
+  Future<StudyEntryStartResult?> start({
     required StudyType studyType,
     required StudySettingsSnapshot settings,
     String? restartedFromSessionId,
@@ -79,7 +92,13 @@ class StudyEntryActionController extends _$StudyEntryActionController {
       }
       ref.invalidate(studyEntryStateProvider(entryType, entryRefId));
       state = const AsyncData<void>(null);
-      return snapshot.session.id;
+      return StudyEntryStartResult.started(snapshot.session.id);
+    } on ValidationException catch (error) {
+      if (!ref.mounted) {
+        return null;
+      }
+      state = const AsyncData<void>(null);
+      return StudyEntryStartResult.rejected(error);
     } catch (error, stackTrace) {
       if (!ref.mounted) {
         return null;

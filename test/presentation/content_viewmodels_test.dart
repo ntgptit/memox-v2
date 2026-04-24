@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/content_providers.dart';
 import 'package:memox/app/di/providers.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
+import 'package:memox/domain/value_objects/content_queries.dart';
+import 'package:memox/presentation/features/decks/viewmodels/deck_detail_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_editor_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_import_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
@@ -139,6 +141,39 @@ void main() {
     );
 
     test(
+      'deck action controller updates deck without provider error',
+      () async {
+        final harness = ContentRepositoryHarness.create(
+          ids: ['folder-root', 'deck-root'],
+        );
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
+
+        final root = (await harness.folderRepository.createRootFolder(
+          'Japanese N5',
+        )).valueOrNull!;
+        final deck = (await harness.deckRepository.createDeck(
+          folderId: root.id,
+          name: 'Core vocabulary',
+        )).valueOrNull!;
+
+        final success = await container
+            .read(deckActionControllerProvider(deck.id).notifier)
+            .updateDeck('Core vocabulary updated');
+
+        expect(success, isTrue);
+        expect(
+          container.read(deckActionControllerProvider(deck.id)).hasError,
+          isFalse,
+        );
+
+        final updated = await harness.deckRepository.getDeckDetail(deck.id);
+        expect(updated.deck.name, 'Core vocabulary updated');
+      },
+    );
+
+    test(
       'flashcard editor save-and-add-next refreshes the list and clears draft',
       () async {
         final harness = ContentRepositoryHarness.create(
@@ -199,6 +234,46 @@ void main() {
         expect(clearedDraft.front, isEmpty);
         expect(clearedDraft.back, isEmpty);
         expect(clearedDraft.note, isEmpty);
+      },
+    );
+
+    test(
+      'flashcard action controller deletes cards without provider error',
+      () async {
+        final harness = ContentRepositoryHarness.create(
+          ids: ['folder-root', 'deck-root', 'flashcard-001'],
+        );
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
+
+        final root = (await harness.folderRepository.createRootFolder(
+          'Japanese N5',
+        )).valueOrNull!;
+        final deck = (await harness.deckRepository.createDeck(
+          folderId: root.id,
+          name: 'Core vocabulary',
+        )).valueOrNull!;
+        final flashcard = (await harness.flashcardRepository.createFlashcard(
+          deckId: deck.id,
+          draft: const FlashcardDraft(front: 'Hello', back: 'Xin chao'),
+        )).valueOrNull!;
+
+        final success = await container
+            .read(flashcardActionControllerProvider(deck.id).notifier)
+            .deleteFlashcards([flashcard.id]);
+
+        expect(success, isTrue);
+        expect(
+          container.read(flashcardActionControllerProvider(deck.id)).hasError,
+          isFalse,
+        );
+
+        final list = await harness.flashcardRepository.getFlashcards(
+          deck.id,
+          const ContentQuery(),
+        );
+        expect(list.items, isEmpty);
       },
     );
 

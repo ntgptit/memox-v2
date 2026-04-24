@@ -156,7 +156,7 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
   }
 
   Future<void> _start(StudyEntryState state) async {
-    final sessionId = await ref
+    final result = await ref
         .read(
           studyEntryActionControllerProvider(
             widget.entryType,
@@ -168,7 +168,16 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
           settings: _effectiveSettings(state),
           restartedFromSessionId: state.resumeCandidate?.session.id,
         );
-    if (!mounted || sessionId == null) {
+    if (!mounted || result == null) {
+      return;
+    }
+    final error = result.error;
+    if (error != null) {
+      MxSnackbar.error(context, studyErrorMessage(error));
+      return;
+    }
+    final sessionId = result.sessionId;
+    if (sessionId == null) {
       return;
     }
     context.goStudySession(sessionId);

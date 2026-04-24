@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/bootstrap/app_bootstrap.dart';
+import 'app/config/app_config.dart';
+import 'app/config/env.dart';
 import 'app/di/providers.dart';
+import 'app/logging/app_talker.dart';
 import 'app/router/app_router.dart';
 import 'core/theme/app_breakpoints.dart';
 import 'core/theme/app_theme.dart';
@@ -12,12 +15,30 @@ import 'presentation/features/settings/providers/locale_notifier.dart';
 import 'presentation/features/settings/providers/theme_mode_notifier.dart';
 
 Future<void> main() async {
-  final container = ProviderContainer();
+  final talker = createAppTalker();
+  late ProviderContainer container;
 
   await AppBootstrap.bootstrap(
+    reportError: (error, stackTrace) {
+      reportAppErrorToTalker(talker, error, stackTrace);
+    },
     beforeRun: () async {
+      final env = AppEnv.fromEnvironment();
+      final config = AppConfig.fromEnv(env);
+      configureAppTalker(talker, config);
+
+      container = ProviderContainer(
+        overrides: [
+          appEnvProvider.overrideWithValue(env),
+          appConfigProvider.overrideWithValue(config),
+          talkerProvider.overrideWithValue(talker),
+        ],
+        observers: createAppProviderObservers(talker: talker, config: config),
+      );
+
       final database = container.read(appDatabaseProvider);
       await database.ensureOpen();
+      talker.info('MemoX bootstrap completed');
     },
     builder: () => UncontrolledProviderScope(
       container: container,

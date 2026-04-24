@@ -52,6 +52,8 @@ dependencies:
   stack_trace: ^1.12.1
   flutter_localizations:
     sdk: flutter
+  talker_flutter: ^5.1.16
+  talker_riverpod_logger: ^5.1.16
 
 dev_dependencies:
   flutter_test:

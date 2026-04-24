@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/network/connectivity_service.dart';
@@ -8,6 +9,7 @@ import '../../core/network/network_info.dart';
 import '../../data/datasources/local/app_database.dart';
 import '../config/app_config.dart';
 import '../config/env.dart';
+import '../logging/app_talker.dart';
 
 part 'providers.g.dart';
 
@@ -20,6 +22,12 @@ AppEnv appEnv(Ref ref) {
 AppConfig appConfig(Ref ref) {
   final env = ref.watch(appEnvProvider);
   return AppConfig.fromEnv(env);
+}
+
+@Riverpod(keepAlive: true)
+Talker talker(Ref ref) {
+  final config = ref.watch(appConfigProvider);
+  return createAppTalker(config);
 }
 
 @Riverpod(keepAlive: true)

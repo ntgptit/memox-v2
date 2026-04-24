@@ -1596,6 +1596,24 @@ rules:
       patterns:
         - "\\bProviderContainer\\s*\\("
 
+  - id: presentation_action_controller_test_coverage
+    type: project_check
+    name: "Presentation Action Controller Test Coverage"
+    description: "Presentation action controllers must have a direct provider-level test before merge."
+    message_code: presentation_action_controller_test_coverage
+    severity: error
+    impact: testing
+    scope: all
+    fix_hint_code: add_action_controller_provider_test
+    meta:
+      requires_project_scan: true
+      cost: medium
+    params:
+      check_id: presentation_action_controller_tests
+      source_scope: provider_files
+      test_roots:
+        - "test"
+
   - id: router_redirect_purity
     type: ast_check
     name: "Router Redirect Purity"

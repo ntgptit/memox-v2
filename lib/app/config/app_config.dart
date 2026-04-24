@@ -14,6 +14,9 @@ class AppConfig {
     required this.initialLocation,
     required this.showDebugBanner,
     required this.enableRouterDiagnostics,
+    required this.enableTalkerConsoleLogs,
+    required this.enableTalkerRouteLogging,
+    required this.enableRiverpodDiagnostics,
     required this.exposeInternalErrorDetails,
   });
 
@@ -21,15 +24,22 @@ class AppConfig {
   final String initialLocation;
   final bool showDebugBanner;
   final bool enableRouterDiagnostics;
+  final bool enableTalkerConsoleLogs;
+  final bool enableTalkerRouteLogging;
+  final bool enableRiverpodDiagnostics;
   final bool exposeInternalErrorDetails;
 
   factory AppConfig.fromEnv(AppEnv env) {
+    final enableLocalDiagnostics = env.isLocalLike;
     return AppConfig(
       env: env,
       initialLocation: RouteDefaults.initialLocation,
       showDebugBanner: false,
-      enableRouterDiagnostics: env.isLocalLike,
-      exposeInternalErrorDetails: env.isLocalLike,
+      enableRouterDiagnostics: enableLocalDiagnostics,
+      enableTalkerConsoleLogs: enableLocalDiagnostics,
+      enableTalkerRouteLogging: enableLocalDiagnostics,
+      enableRiverpodDiagnostics: enableLocalDiagnostics,
+      exposeInternalErrorDetails: enableLocalDiagnostics,
     );
   }
 }

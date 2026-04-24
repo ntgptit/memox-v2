@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../core/errors/error_mapper.dart';
 import '../../core/errors/failures.dart';
@@ -25,10 +26,14 @@ part 'app_router.g.dart';
 GoRouter appRouter(Ref ref) {
   final config = ref.watch(appConfigProvider);
   final guards = ref.watch(appRouteGuardsProvider);
+  final talker = ref.watch(talkerProvider);
 
   return GoRouter(
     initialLocation: guards.initialLocation,
     debugLogDiagnostics: config.enableRouterDiagnostics,
+    observers: config.enableTalkerRouteLogging
+        ? [TalkerRouteObserver(talker)]
+        : const <NavigatorObserver>[],
     routes: [
       GoRoute(path: '/', redirect: guards.rootRedirect),
       StatefulShellRoute.indexedStack(

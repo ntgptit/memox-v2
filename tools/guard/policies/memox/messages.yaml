@@ -35,6 +35,8 @@ messages:
     en: "Provider-owned files must not assign raw caught errors into `AsyncValue.error(...)`; map them to `AppFailure` first."
   provider_raw_string_error_state:
     en: "Provider-owned files must not publish raw string error states; use `AppFailure` instead."
+  presentation_action_controller_test_coverage:
+    en: "Action controller `{controller_class}` must have a provider-level test that references `{provider_name}`."
   core_service_map_state_return:
     en: "Core service/provider state surfaces in `lib/core/services/**` must not return `Map<String, dynamic>` or `Map<String, bool>` from `build()` or state getter methods. Introduce an immutable typed state object instead."
   core_service_map_state_key_access:
@@ -599,6 +601,9 @@ fix_hints:
   use_provider_container_test:
     text:
       en: "In provider tests, replace `ProviderContainer(...)` with `ProviderContainer.test(...)`."
+  add_action_controller_provider_test:
+    text:
+      en: "Add a targeted provider test under `test/presentation/**` that reads the generated action-controller provider and covers at least one success or validation/error state transition."
   use_notifier_or_use_case_from_ui:
     text:
       en: "Keep widgets on render orchestration only: call a notifier/use-case provider or pass prepared view data into the widget instead of importing repositories or reading repository providers directly."

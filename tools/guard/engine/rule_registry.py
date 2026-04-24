@@ -12,6 +12,7 @@ from .constants import RULE_TYPE_FORBIDDEN_TOKEN
 from .constants import RULE_TYPE_IMPORT_DIRECTION
 from .constants import RULE_TYPE_NAMING_CONVENTION
 from .constants import RULE_TYPE_PATH_STRUCTURE
+from .constants import RULE_TYPE_PROJECT_CHECK
 from .constants import RULE_TYPE_REQUIRED_ANY_TOKEN
 from .constants import RULE_TYPE_REQUIRED_IN_CLASS
 from .constants import RULE_TYPE_REQUIRED_PATTERN
@@ -83,6 +84,10 @@ RULE_HANDLERS: dict[str, RuleHandlerSpec] = {
     RULE_TYPE_FILE_EXISTENCE: RuleHandlerSpec(
         mode=HANDLER_MODE_PROJECT,
         handler=ProjectMatcher.check_file_existence,
+    ),
+    RULE_TYPE_PROJECT_CHECK: RuleHandlerSpec(
+        mode=HANDLER_MODE_PROJECT,
+        handler=ProjectMatcher.check,
     ),
 }
 
