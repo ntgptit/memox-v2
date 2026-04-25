@@ -104,6 +104,15 @@ Ngoại lệ Review mode trong New Study:
 - sau batch submit, Review mode pass và session chuyển sang mode tiếp theo hoặc `Ready To Finalize` nếu đó là mode cuối
 - nếu màn hình bị dispose trước khi batch submit, không ghi attempt và không đổi session progress
 
+Ngoại lệ Match mode trong New Study:
+
+- chọn sai cặp chỉ là UI staging tạm thời, không ghi attempt và không đổi trạng thái item ngay lúc mismatch
+- khi toàn bộ board ghép xong, app ghi một batch attempt cho toàn bộ pending Match item trong cùng transaction
+- mỗi pending Match item nhận đúng một attempt: `incorrect` nếu item từng mismatch trong board, ngược lại `correct`
+- toàn bộ pending Match item trong round được chuyển sang `completed` cùng một completed timestamp
+- nếu có item `incorrect`, app tạo Match retry round kế tiếp chỉ gồm các flashcard sai
+- nếu toàn bộ item `correct`, session chuyển sang mode tiếp theo hoặc `Ready To Finalize` nếu đó là mode cuối
+
 Với các lượt trả lời thông thường cần ghi nhận:
 
 - trạng thái hoàn thành

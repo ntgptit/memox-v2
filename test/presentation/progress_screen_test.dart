@@ -193,6 +193,15 @@ final class _ProgressScreenStudyRepo implements StudyRepo {
   }
 
   @override
+  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+    required String sessionId,
+    required Map<String, AttemptGrade> itemGrades,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
     throw UnimplementedError();
   }

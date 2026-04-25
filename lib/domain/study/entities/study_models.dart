@@ -148,6 +148,7 @@ final class StudySessionSnapshot {
   const StudySessionSnapshot({
     required this.session,
     required this.currentItem,
+    this.currentRoundItems = const <StudySessionItem>[],
     required this.sessionFlashcards,
     required this.summary,
     required this.canFinalize,
@@ -155,6 +156,7 @@ final class StudySessionSnapshot {
 
   final StudySession session;
   final StudySessionItem? currentItem;
+  final List<StudySessionItem> currentRoundItems;
   final List<StudyFlashcardRef> sessionFlashcards;
   final StudySummary summary;
   final bool canFinalize;

@@ -174,6 +174,30 @@ final class AnswerCurrentModeBatchUseCase {
   }
 }
 
+final class AnswerCurrentMatchModeBatchUseCase {
+  const AnswerCurrentMatchModeBatchUseCase({
+    required StudyRepo repository,
+    required StudyStrategyFactory strategyFactory,
+  }) : _repository = repository,
+       _strategyFactory = strategyFactory;
+
+  final StudyRepo _repository;
+  final StudyStrategyFactory _strategyFactory;
+
+  Future<StudySessionSnapshot> execute({
+    required String sessionId,
+    required StudyType studyType,
+    required Map<String, AttemptGrade> itemGrades,
+  }) {
+    final strategy = _strategyFactory.of(studyType);
+    return _repository.answerCurrentMatchModeBatch(
+      sessionId: sessionId,
+      itemGrades: itemGrades,
+      modes: strategy.modes,
+    );
+  }
+}
+
 final class SkipFlashcardUseCase {
   const SkipFlashcardUseCase(this._repository);
 

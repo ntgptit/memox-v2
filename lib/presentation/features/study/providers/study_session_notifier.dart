@@ -11,6 +11,16 @@ import '../../../../domain/study/entities/study_models.dart';
 part 'study_session_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
+class StudySessionDataRevision extends _$StudySessionDataRevision {
+  @override
+  int build() => 0;
+
+  void bump() {
+    state += 1;
+  }
+}
+
+@Riverpod(keepAlive: true)
 Future<StudySessionSnapshot> studySessionState(Ref ref, String sessionId) {
   return ref.watch(resumeStudySessionUseCaseProvider).execute(sessionId);
 }
@@ -25,6 +35,9 @@ class StudySessionActionController extends _$StudySessionActionController {
     final snapshot = await ref.read(
       studySessionStateProvider(sessionId).future,
     );
+    if (!ref.mounted) {
+      return false;
+    }
     try {
       await ref
           .read(answerFlashcardUseCaseProvider)
@@ -36,7 +49,7 @@ class StudySessionActionController extends _$StudySessionActionController {
       if (!ref.mounted) {
         return false;
       }
-      ref.invalidate(studySessionStateProvider(sessionId));
+      _refreshStudySessionReadModels();
       state = const AsyncData<void>(null);
       return true;
     } catch (error, stackTrace) {
@@ -53,6 +66,9 @@ class StudySessionActionController extends _$StudySessionActionController {
     final snapshot = await ref.read(
       studySessionStateProvider(sessionId).future,
     );
+    if (!ref.mounted) {
+      return false;
+    }
     try {
       await ref
           .read(answerCurrentModeBatchUseCaseProvider)
@@ -64,7 +80,40 @@ class StudySessionActionController extends _$StudySessionActionController {
       if (!ref.mounted) {
         return false;
       }
-      ref.invalidate(studySessionStateProvider(sessionId));
+      _refreshStudySessionReadModels();
+      state = const AsyncData<void>(null);
+      return true;
+    } catch (error, stackTrace) {
+      if (!ref.mounted) {
+        return false;
+      }
+      state = AsyncError<void>(error, stackTrace);
+      return false;
+    }
+  }
+
+  Future<bool> answerCurrentMatchModeBatch(
+    Map<String, AttemptGrade> itemGrades,
+  ) async {
+    state = const AsyncLoading<void>();
+    final snapshot = await ref.read(
+      studySessionStateProvider(sessionId).future,
+    );
+    if (!ref.mounted) {
+      return false;
+    }
+    try {
+      await ref
+          .read(answerCurrentMatchModeBatchUseCaseProvider)
+          .execute(
+            sessionId: sessionId,
+            studyType: snapshot.session.studyType,
+            itemGrades: itemGrades,
+          );
+      if (!ref.mounted) {
+        return false;
+      }
+      _refreshStudySessionReadModels();
       state = const AsyncData<void>(null);
       return true;
     } catch (error, stackTrace) {
@@ -78,12 +127,16 @@ class StudySessionActionController extends _$StudySessionActionController {
 
   Future<bool> skip() async {
     state = const AsyncLoading<void>();
+    await ref.read(studySessionStateProvider(sessionId).future);
+    if (!ref.mounted) {
+      return false;
+    }
     try {
       await ref.read(skipFlashcardUseCaseProvider).execute(sessionId);
       if (!ref.mounted) {
         return false;
       }
-      ref.invalidate(studySessionStateProvider(sessionId));
+      _refreshStudySessionReadModels();
       state = const AsyncData<void>(null);
       return true;
     } catch (error, stackTrace) {
@@ -97,12 +150,16 @@ class StudySessionActionController extends _$StudySessionActionController {
 
   Future<bool> cancel() async {
     state = const AsyncLoading<void>();
+    await ref.read(studySessionStateProvider(sessionId).future);
+    if (!ref.mounted) {
+      return false;
+    }
     try {
       await ref.read(cancelStudySessionUseCaseProvider).execute(sessionId);
       if (!ref.mounted) {
         return false;
       }
-      ref.invalidate(studySessionStateProvider(sessionId));
+      _refreshStudySessionReadModels();
       state = const AsyncData<void>(null);
       return true;
     } catch (error, stackTrace) {
@@ -119,6 +176,9 @@ class StudySessionActionController extends _$StudySessionActionController {
     final snapshot = await ref.read(
       studySessionStateProvider(sessionId).future,
     );
+    if (!ref.mounted) {
+      return false;
+    }
     try {
       await ref
           .read(finalizeStudySessionUseCaseProvider)
@@ -126,7 +186,7 @@ class StudySessionActionController extends _$StudySessionActionController {
       if (!ref.mounted) {
         return false;
       }
-      ref.invalidate(studySessionStateProvider(sessionId));
+      _refreshStudySessionReadModels();
       state = const AsyncData<void>(null);
       return true;
     } catch (error, stackTrace) {
@@ -136,6 +196,11 @@ class StudySessionActionController extends _$StudySessionActionController {
       state = AsyncError<void>(error, stackTrace);
       return false;
     }
+  }
+
+  void _refreshStudySessionReadModels() {
+    ref.invalidate(studySessionStateProvider(sessionId));
+    ref.read(studySessionDataRevisionProvider.notifier).bump();
   }
 }
 

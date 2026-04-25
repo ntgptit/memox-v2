@@ -299,31 +299,13 @@ class _SessionActions extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (canRetryFinalize)
-          MxPrimaryButton(
-            label: l10n.studyRetryFinalizeAction,
-            leadingIcon: Icons.refresh,
-            isLoading: isActionLoading,
-            onPressed: isActionLoading
-                ? null
-                : () => _retryFinalize(context, ref),
-          )
-        else if (canFinalize)
-          MxPrimaryButton(
-            label: l10n.studyFinalizeAction,
-            leadingIcon: Icons.flag_outlined,
-            isLoading: isActionLoading,
-            onPressed: isActionLoading ? null : () => _finalize(context, ref),
-          )
-        else
-          MxPrimaryButton(
-            label: l10n.studyResumeAction,
-            leadingIcon: Icons.play_arrow_rounded,
-            isLoading: isActionLoading,
-            onPressed: isActionLoading
-                ? null
-                : () => context.goStudySession(snapshot.session.id),
-          ),
+        _primaryAction(
+          context: context,
+          ref: ref,
+          l10n: l10n,
+          canRetryFinalize: canRetryFinalize,
+          canFinalize: canFinalize,
+        ),
         if (canFinalize || canRetryFinalize) ...[
           const MxGap(MxSpace.sm),
           MxSecondaryButton(
@@ -346,6 +328,39 @@ class _SessionActions extends ConsumerWidget {
           fullWidth: true,
         ),
       ],
+    );
+  }
+
+  Widget _primaryAction({
+    required BuildContext context,
+    required WidgetRef ref,
+    required AppLocalizations l10n,
+    required bool canRetryFinalize,
+    required bool canFinalize,
+  }) {
+    if (canRetryFinalize) {
+      return MxPrimaryButton(
+        label: l10n.studyRetryFinalizeAction,
+        leadingIcon: Icons.refresh,
+        isLoading: isActionLoading,
+        onPressed: isActionLoading ? null : () => _retryFinalize(context, ref),
+      );
+    }
+    if (canFinalize) {
+      return MxPrimaryButton(
+        label: l10n.studyFinalizeAction,
+        leadingIcon: Icons.flag_outlined,
+        isLoading: isActionLoading,
+        onPressed: isActionLoading ? null : () => _finalize(context, ref),
+      );
+    }
+    return MxPrimaryButton(
+      label: l10n.studyResumeAction,
+      leadingIcon: Icons.play_arrow_rounded,
+      isLoading: isActionLoading,
+      onPressed: isActionLoading
+          ? null
+          : () => context.goStudySession(snapshot.session.id),
     );
   }
 

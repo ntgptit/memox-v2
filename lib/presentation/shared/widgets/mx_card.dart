@@ -18,6 +18,8 @@ class MxCard extends StatelessWidget {
     this.onLongPress,
     this.clipBehavior,
     this.borderRadius,
+    this.backgroundColor,
+    this.borderColor,
     super.key,
   });
 
@@ -28,6 +30,8 @@ class MxCard extends StatelessWidget {
   final VoidCallback? onLongPress;
   final Clip? clipBehavior;
   final BorderRadius? borderRadius;
+  final Color? backgroundColor;
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +41,11 @@ class MxCard extends StatelessWidget {
     final resolvedBorderRadius = _resolvedBorderRadius(cardTheme);
     final resolvedClipBehavior =
         clipBehavior ?? cardTheme.clipBehavior ?? Clip.antiAlias;
-    final cardColor = _backgroundColor(cardTheme, scheme);
+    final cardColor = backgroundColor ?? _backgroundColor(cardTheme, scheme);
     final cardShape = RoundedRectangleBorder(
       borderRadius: resolvedBorderRadius,
-      side: variant == MxCardVariant.outlined
-          ? BorderSide(color: scheme.outlineVariant)
+      side: variant == MxCardVariant.outlined || borderColor != null
+          ? BorderSide(color: borderColor ?? scheme.outlineVariant)
           : BorderSide.none,
     );
 

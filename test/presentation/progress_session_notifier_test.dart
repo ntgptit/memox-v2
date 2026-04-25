@@ -5,6 +5,8 @@ import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
 import 'package:memox/presentation/features/progress/providers/progress_session_notifier.dart';
+import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   test(
@@ -88,6 +90,35 @@ void main() {
       );
     },
   );
+
+  test(
+    'DT4 onUpdate: terminal Progress mutation invalidates cached Study Entry resume state',
+    () async {
+      SharedPreferences.setMockInitialValues(const <String, Object>{});
+      final repo = _ProgressStudyRepo(activeSessions: [_snapshot()]);
+      final container = ProviderContainer(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      final initial = await container.read(
+        studyEntryStateProvider('deck', 'deck-1').future,
+      );
+      expect(initial.resumeCandidate?.session.id, 'session-1');
+      expect(repo.resumeCandidateLoadCount, 1);
+
+      final success = await container
+          .read(progressSessionActionControllerProvider.notifier)
+          .finalize(_snapshot(status: SessionStatus.readyToFinalize));
+      final refreshed = await container.read(
+        studyEntryStateProvider('deck', 'deck-1').future,
+      );
+
+      expect(success, isTrue);
+      expect(repo.resumeCandidateLoadCount, 2);
+      expect(refreshed.resumeCandidate, isNull);
+    },
+  );
 }
 
 final class _ProgressStudyRepo implements StudyRepo {
@@ -97,6 +128,8 @@ final class _ProgressStudyRepo implements StudyRepo {
   int cancelCount = 0;
   int finalizeCount = 0;
   int retryFinalizeCount = 0;
+  int resumeCandidateLoadCount = 0;
+  bool hasResumeCandidate = true;
   StudyType? lastFinalizedStudyType;
   StudyType? lastRetriedStudyType;
 
@@ -108,6 +141,7 @@ final class _ProgressStudyRepo implements StudyRepo {
   @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
     cancelCount += 1;
+    hasResumeCandidate = false;
     return _snapshot(status: SessionStatus.cancelled);
   }
 
@@ -117,6 +151,7 @@ final class _ProgressStudyRepo implements StudyRepo {
     required StudyType studyType,
   }) async {
     finalizeCount += 1;
+    hasResumeCandidate = false;
     lastFinalizedStudyType = studyType;
     return _snapshot(status: SessionStatus.completed);
   }
@@ -127,6 +162,7 @@ final class _ProgressStudyRepo implements StudyRepo {
     required StudyType studyType,
   }) async {
     retryFinalizeCount += 1;
+    hasResumeCandidate = false;
     lastRetriedStudyType = studyType;
     return _snapshot(status: SessionStatus.completed);
   }
@@ -142,8 +178,14 @@ final class _ProgressStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context) {
-    throw UnimplementedError();
+  Future<StudySessionSnapshot?> findResumeCandidate(
+    StudyContext context,
+  ) async {
+    resumeCandidateLoadCount += 1;
+    if (!hasResumeCandidate) {
+      return null;
+    }
+    return _snapshot();
   }
 
   @override
@@ -174,6 +216,15 @@ final class _ProgressStudyRepo implements StudyRepo {
   Future<StudySessionSnapshot> answerCurrentModeBatch({
     required String sessionId,
     required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+    required String sessionId,
+    required Map<String, AttemptGrade> itemGrades,
     required List<StudyMode> modes,
   }) {
     throw UnimplementedError();

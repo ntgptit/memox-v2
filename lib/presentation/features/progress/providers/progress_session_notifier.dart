@@ -2,11 +2,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/di/study_providers.dart';
 import '../../../../domain/study/entities/study_models.dart';
+import '../../study/providers/study_session_notifier.dart';
 
 part 'progress_session_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 Future<List<StudySessionSnapshot>> progressStudySessions(Ref ref) {
+  ref.watch(studySessionDataRevisionProvider);
   return ref.watch(resumeStudySessionUseCaseProvider).listActiveSessions();
 }
 
@@ -84,6 +86,6 @@ class ProgressSessionActionController
   }
 
   void _refresh() {
-    ref.invalidate(progressStudySessionsProvider);
+    ref.read(studySessionDataRevisionProvider.notifier).bump();
   }
 }

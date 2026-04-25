@@ -234,6 +234,347 @@ void main() {
     );
 
     test(
+      'DT1 onInsert: starting New Study saves full session and initial queue rows',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: true,
+              prioritizeOverdue: false,
+            ),
+          ),
+        );
+
+        expect(snapshot.session.id, 'id-0000');
+        await _expectSessionRow(
+          harness,
+          id: 'id-0000',
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.newStudy,
+          studyFlow: StudyFlow.newFullCycle,
+          batchSize: 2,
+          shuffleFlashcards: false,
+          shuffleAnswers: true,
+          prioritizeOverdue: false,
+          status: SessionStatus.inProgress,
+          startedAt: _studyNow,
+          endedAt: null,
+          restartedFromSessionId: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0001',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.review,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.pending,
+          completedAt: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0002',
+          sessionId: 'id-0000',
+          flashcardId: 'card-2',
+          studyMode: StudyMode.review,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 2,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.pending,
+          completedAt: null,
+        );
+        await _expectAttemptCount(harness, 0);
+        await _expectProgressRow(
+          harness,
+          flashcardId: 'card-1',
+          currentBox: 1,
+          reviewCount: 0,
+          lapseCount: 0,
+          lastResult: null,
+          lastStudiedAt: null,
+          dueAt: null,
+          createdAt: _studyNow,
+          updatedAt: _studyNow,
+        );
+      },
+    );
+
+    test(
+      'DT2 onInsert: batch Review submit saves attempts item updates and Match queue rows',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+
+        await _expectSessionRow(
+          harness,
+          id: 'id-0000',
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.newStudy,
+          studyFlow: StudyFlow.newFullCycle,
+          batchSize: 2,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+          status: SessionStatus.inProgress,
+          startedAt: _studyNow,
+          endedAt: null,
+          restartedFromSessionId: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0001',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.review,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.completed,
+          completedAt: _studyNow,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0002',
+          sessionId: 'id-0000',
+          flashcardId: 'card-2',
+          studyMode: StudyMode.review,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 2,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.completed,
+          completedAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0003',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0001',
+          flashcardId: 'card-1',
+          attemptNumber: 1,
+          result: AttemptGrade.remembered,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0004',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0002',
+          flashcardId: 'card-2',
+          attemptNumber: 1,
+          result: AttemptGrade.remembered,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0005',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.match,
+          modeOrder: 2,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.pending,
+          completedAt: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0006',
+          sessionId: 'id-0000',
+          flashcardId: 'card-2',
+          studyMode: StudyMode.match,
+          modeOrder: 2,
+          roundIndex: 1,
+          queuePosition: 2,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.pending,
+          completedAt: null,
+        );
+        await _expectProgressRow(
+          harness,
+          flashcardId: 'card-1',
+          currentBox: 1,
+          reviewCount: 0,
+          lapseCount: 0,
+          lastResult: null,
+          lastStudiedAt: null,
+          dueAt: null,
+          createdAt: _studyNow,
+          updatedAt: _studyNow,
+        );
+      },
+    );
+
+    test(
+      'DT3 onInsert: batch Match submit saves item grades and failed retry rows',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+
+        await harness.answerMatchBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0005': AttemptGrade.incorrect,
+            'id-0006': AttemptGrade.correct,
+          },
+        );
+
+        await _expectSessionRow(
+          harness,
+          id: 'id-0000',
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.newStudy,
+          studyFlow: StudyFlow.newFullCycle,
+          batchSize: 2,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+          status: SessionStatus.inProgress,
+          startedAt: _studyNow,
+          endedAt: null,
+          restartedFromSessionId: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0005',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.match,
+          modeOrder: 2,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.completed,
+          completedAt: _studyNow,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0006',
+          sessionId: 'id-0000',
+          flashcardId: 'card-2',
+          studyMode: StudyMode.match,
+          modeOrder: 2,
+          roundIndex: 1,
+          queuePosition: 2,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.completed,
+          completedAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0007',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0005',
+          flashcardId: 'card-1',
+          attemptNumber: 2,
+          result: AttemptGrade.incorrect,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0008',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0006',
+          flashcardId: 'card-2',
+          attemptNumber: 2,
+          result: AttemptGrade.correct,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0009',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.match,
+          modeOrder: 2,
+          roundIndex: 2,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.retry,
+          status: SessionItemStatus.pending,
+          completedAt: null,
+        );
+        await _expectProgressRow(
+          harness,
+          flashcardId: 'card-1',
+          currentBox: 1,
+          reviewCount: 0,
+          lapseCount: 0,
+          lastResult: null,
+          lastStudiedAt: null,
+          dueAt: null,
+          createdAt: _studyNow,
+          updatedAt: _studyNow,
+        );
+      },
+    );
+
+    test(
       'DT1 repositoryFlow: skip requeues without passing the item',
       () async {
         await harness.seedDeckWithCards(cardCount: 1);
@@ -468,6 +809,209 @@ void main() {
     );
 
     test(
+      'DT8 repositoryFlow: all-correct Match batch advances to Guess',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+
+        final answered = await harness.answerMatchBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0005': AttemptGrade.correct,
+            'id-0006': AttemptGrade.correct,
+          },
+        );
+
+        expect(answered.session.status, SessionStatus.inProgress);
+        expect(answered.currentItem?.studyMode, StudyMode.guess);
+        expect(answered.currentItem?.modeOrder, 3);
+        expect(answered.currentItem?.roundIndex, 1);
+      },
+    );
+
+    test(
+      'DT9 repositoryFlow: mixed Match batch creates retry for incorrect item only',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+
+        final answered = await harness.answerMatchBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0005': AttemptGrade.incorrect,
+            'id-0006': AttemptGrade.correct,
+          },
+        );
+
+        expect(answered.currentItem?.studyMode, StudyMode.match);
+        expect(answered.currentItem?.roundIndex, 2);
+        expect(answered.currentRoundItems.map((item) => item.flashcard.id), [
+          'card-1',
+        ]);
+      },
+    );
+
+    test(
+      'DT10 repositoryFlow: Match batch fails fast outside Match mode',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        await expectLater(
+          () => harness.answerMatchBatch.execute(
+            sessionId: started.session.id,
+            studyType: started.session.studyType,
+            itemGrades: const <String, AttemptGrade>{
+              'id-0001': AttemptGrade.correct,
+              'id-0002': AttemptGrade.correct,
+            },
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+        await _expectAttemptCount(harness, 0);
+      },
+    );
+
+    test('DT11 repositoryFlow: Match batch rejects extra item ids', () async {
+      await harness.seedDeckWithCards(cardCount: 2);
+
+      final started = await harness.start.execute(
+        const StudyContext(
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.newStudy,
+          settings: StudySettingsSnapshot(
+            batchSize: 2,
+            shuffleFlashcards: false,
+            shuffleAnswers: false,
+            prioritizeOverdue: true,
+          ),
+        ),
+      );
+      await harness.answerBatch.execute(
+        sessionId: started.session.id,
+        studyType: started.session.studyType,
+        grade: AttemptGrade.remembered,
+      );
+
+      await expectLater(
+        () => harness.answerMatchBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0005': AttemptGrade.correct,
+            'extra-item': AttemptGrade.correct,
+          },
+        ),
+        throwsA(isA<ValidationException>()),
+      );
+      await _expectItemRow(
+        harness,
+        id: 'id-0005',
+        sessionId: 'id-0000',
+        flashcardId: 'card-1',
+        studyMode: StudyMode.match,
+        modeOrder: 2,
+        roundIndex: 1,
+        queuePosition: 1,
+        sourcePool: SessionItemSourcePool.newCards,
+        status: SessionItemStatus.pending,
+        completedAt: null,
+      );
+      await _expectAttemptCount(harness, 2);
+    });
+
+    test(
+      'DT12 repositoryFlow: Match batch rejects unsupported grades',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+
+        await expectLater(
+          () => harness.answerMatchBatch.execute(
+            sessionId: started.session.id,
+            studyType: started.session.studyType,
+            itemGrades: const <String, AttemptGrade>{
+              'id-0005': AttemptGrade.remembered,
+              'id-0006': AttemptGrade.correct,
+            },
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+        await _expectAttemptCount(harness, 2);
+      },
+    );
+
+    test(
       'DT1 listActiveSessions: returns only active sessions ordered newest first',
       () async {
         await harness.seedDeckWithCards(cardCount: 1);
@@ -695,6 +1239,64 @@ void main() {
         expect(previous.status, SessionStatus.cancelled.storageValue);
         expect(restarted.session.status, SessionStatus.inProgress);
         expect(restarted.session.restartedFromSessionId, first.session.id);
+        await _expectSessionRow(
+          harness,
+          id: 'id-0000',
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.newStudy,
+          studyFlow: StudyFlow.newFullCycle,
+          batchSize: 1,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+          status: SessionStatus.cancelled,
+          startedAt: _studyNow,
+          endedAt: _studyNow,
+          restartedFromSessionId: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0001',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.review,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.abandoned,
+          completedAt: null,
+        );
+        await _expectSessionRow(
+          harness,
+          id: 'id-0002',
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.newStudy,
+          studyFlow: StudyFlow.newFullCycle,
+          batchSize: 1,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+          status: SessionStatus.inProgress,
+          startedAt: _studyNow,
+          endedAt: null,
+          restartedFromSessionId: 'id-0000',
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0003',
+          sessionId: 'id-0002',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.review,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.pending,
+          completedAt: null,
+        );
       },
     );
 
@@ -741,6 +1343,60 @@ void main() {
         expect(progress.currentBox, 5);
         expect(progress.lastResult, ReviewResult.perfect.storageValue);
         expect(progress.dueAt, expectedDueAt);
+        await _expectSessionRow(
+          harness,
+          id: 'id-0000',
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.srsReview,
+          studyFlow: StudyFlow.srsFillReview,
+          batchSize: 1,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+          status: SessionStatus.completed,
+          startedAt: _studyNow,
+          endedAt: _studyNow,
+          restartedFromSessionId: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0001',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.fill,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.overdue,
+          status: SessionItemStatus.completed,
+          completedAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0002',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0001',
+          flashcardId: 'card-1',
+          attemptNumber: 1,
+          result: AttemptGrade.correct,
+          oldBox: 4,
+          newBox: 5,
+          nextDueAt: expectedDueAt,
+          answeredAt: _studyNow,
+        );
+        await _expectProgressRow(
+          harness,
+          flashcardId: 'card-1',
+          currentBox: 5,
+          reviewCount: 1,
+          lapseCount: 0,
+          lastResult: ReviewResult.perfect,
+          lastStudiedAt: _studyNow,
+          dueAt: expectedDueAt,
+          createdAt: _studyNow,
+          updatedAt: _studyNow,
+        );
       },
     );
 
@@ -812,6 +1468,48 @@ void main() {
         expect(cancelled.session.status, SessionStatus.cancelled);
         expect(cancelled.currentItem, isNull);
         expect(items.map((item) => item.status), everyElement('abandoned'));
+        await _expectSessionRow(
+          harness,
+          id: 'id-0000',
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.newStudy,
+          studyFlow: StudyFlow.newFullCycle,
+          batchSize: 2,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+          status: SessionStatus.cancelled,
+          startedAt: _studyNow,
+          endedAt: _studyNow,
+          restartedFromSessionId: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0001',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.review,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.abandoned,
+          completedAt: null,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0002',
+          sessionId: 'id-0000',
+          flashcardId: 'card-2',
+          studyMode: StudyMode.review,
+          modeOrder: 1,
+          roundIndex: 1,
+          queuePosition: 2,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.abandoned,
+          completedAt: null,
+        );
       },
     );
 
@@ -920,6 +1618,135 @@ void main() {
   });
 }
 
+final _studyNow = DateTime.utc(2026, 4, 24, 9).millisecondsSinceEpoch;
+
+Future<void> _expectSessionRow(
+  _StudyHarness harness, {
+  required String id,
+  required StudyEntryType entryType,
+  required String? entryRefId,
+  required StudyType studyType,
+  required StudyFlow studyFlow,
+  required int batchSize,
+  required bool shuffleFlashcards,
+  required bool shuffleAnswers,
+  required bool prioritizeOverdue,
+  required SessionStatus status,
+  required int startedAt,
+  required int? endedAt,
+  required String? restartedFromSessionId,
+}) async {
+  final row = await (harness.database.select(
+    harness.database.studySessions,
+  )..where((table) => table.id.equals(id))).getSingle();
+
+  expect(row.id, id);
+  expect(row.entryType, entryType.storageValue);
+  expect(row.entryRefId, entryRefId);
+  expect(row.studyType, studyType.storageValue);
+  expect(row.studyFlow, studyFlow.storageValue);
+  expect(row.batchSize, batchSize);
+  expect(row.shuffleFlashcards, shuffleFlashcards ? 1 : 0);
+  expect(row.shuffleAnswers, shuffleAnswers ? 1 : 0);
+  expect(row.prioritizeOverdue, prioritizeOverdue ? 1 : 0);
+  expect(row.status, status.storageValue);
+  expect(row.startedAt, startedAt);
+  expect(row.endedAt, endedAt);
+  expect(row.restartedFromSessionId, restartedFromSessionId);
+}
+
+Future<void> _expectItemRow(
+  _StudyHarness harness, {
+  required String id,
+  required String sessionId,
+  required String flashcardId,
+  required StudyMode studyMode,
+  required int modeOrder,
+  required int roundIndex,
+  required int queuePosition,
+  required SessionItemSourcePool sourcePool,
+  required SessionItemStatus status,
+  required int? completedAt,
+}) async {
+  final row = await (harness.database.select(
+    harness.database.studySessionItems,
+  )..where((table) => table.id.equals(id))).getSingle();
+
+  expect(row.id, id);
+  expect(row.sessionId, sessionId);
+  expect(row.flashcardId, flashcardId);
+  expect(row.studyMode, studyMode.storageValue);
+  expect(row.modeOrder, modeOrder);
+  expect(row.roundIndex, roundIndex);
+  expect(row.queuePosition, queuePosition);
+  expect(row.sourcePool, sourcePool.storageValue);
+  expect(row.status, status.storageValue);
+  expect(row.completedAt, completedAt);
+}
+
+Future<void> _expectAttemptRow(
+  _StudyHarness harness, {
+  required String id,
+  required String sessionId,
+  required String sessionItemId,
+  required String flashcardId,
+  required int attemptNumber,
+  required AttemptGrade result,
+  required int? oldBox,
+  required int? newBox,
+  required int? nextDueAt,
+  required int answeredAt,
+}) async {
+  final row = await (harness.database.select(
+    harness.database.studyAttempts,
+  )..where((table) => table.id.equals(id))).getSingle();
+
+  expect(row.id, id);
+  expect(row.sessionId, sessionId);
+  expect(row.sessionItemId, sessionItemId);
+  expect(row.flashcardId, flashcardId);
+  expect(row.attemptNumber, attemptNumber);
+  expect(row.result, result.storageValue);
+  expect(row.oldBox, oldBox);
+  expect(row.newBox, newBox);
+  expect(row.nextDueAt, nextDueAt);
+  expect(row.answeredAt, answeredAt);
+}
+
+Future<void> _expectProgressRow(
+  _StudyHarness harness, {
+  required String flashcardId,
+  required int currentBox,
+  required int reviewCount,
+  required int lapseCount,
+  required ReviewResult? lastResult,
+  required int? lastStudiedAt,
+  required int? dueAt,
+  required int createdAt,
+  required int updatedAt,
+}) async {
+  final row = await (harness.database.select(
+    harness.database.flashcardProgress,
+  )..where((table) => table.flashcardId.equals(flashcardId))).getSingle();
+
+  expect(row.flashcardId, flashcardId);
+  expect(row.currentBox, currentBox);
+  expect(row.reviewCount, reviewCount);
+  expect(row.lapseCount, lapseCount);
+  expect(row.lastResult, lastResult?.storageValue);
+  expect(row.lastStudiedAt, lastStudiedAt);
+  expect(row.dueAt, dueAt);
+  expect(row.createdAt, createdAt);
+  expect(row.updatedAt, updatedAt);
+}
+
+Future<void> _expectAttemptCount(_StudyHarness harness, int expected) async {
+  final rows = await harness.database
+      .select(harness.database.studyAttempts)
+      .get();
+  expect(rows, hasLength(expected));
+}
+
 final class _StudyHarness {
   _StudyHarness._({
     required this.database,
@@ -928,6 +1755,7 @@ final class _StudyHarness {
     required this.resume,
     required this.answer,
     required this.answerBatch,
+    required this.answerMatchBatch,
     required this.skip,
     required this.cancel,
     required this.restart,
@@ -969,6 +1797,10 @@ final class _StudyHarness {
         repository: repo,
         strategyFactory: factory,
       ),
+      answerMatchBatch: AnswerCurrentMatchModeBatchUseCase(
+        repository: repo,
+        strategyFactory: factory,
+      ),
       skip: SkipFlashcardUseCase(repo),
       cancel: CancelStudySessionUseCase(repo),
       restart: RestartStudySessionUseCase(
@@ -988,6 +1820,7 @@ final class _StudyHarness {
   final ResumeStudySessionUseCase resume;
   final AnswerFlashcardUseCase answer;
   final AnswerCurrentModeBatchUseCase answerBatch;
+  final AnswerCurrentMatchModeBatchUseCase answerMatchBatch;
   final SkipFlashcardUseCase skip;
   final CancelStudySessionUseCase cancel;
   final RestartStudySessionUseCase restart;

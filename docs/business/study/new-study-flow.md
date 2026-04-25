@@ -61,7 +61,17 @@ Riêng Review mode:
 - Review mode không tạo retry batch vì không còn input `forgot` trong UI Review
 - nếu user rời màn hình trước khi auto-submit chạy, không có attempt nào được ghi và session resume lại Review mode như cũ
 
-Với các mode còn lại:
+Riêng Match mode:
+
+- user ghép toàn bộ cặp trong current Match round trên UI board
+- mismatch chỉ hiển thị feedback tạm thời và stage flashcard đó là `incorrect`
+- không ghi attempt, không complete item, và không tạo retry tại thời điểm mismatch
+- khi toàn bộ board được ghép xong, app flush một batch attempt cho toàn bộ pending Match item trong cùng transaction
+- flashcard từng mismatch trong board ghi `incorrect`; flashcard không từng mismatch ghi `correct`
+- nếu batch có item `incorrect`, chỉ các flashcard sai được đưa vào retry Match round kế tiếp
+- nếu toàn bộ item `correct`, Match mode pass và chuyển mode tiếp theo
+
+Với các mode Guess / Recall / Fill:
 
 Khi user trả lời đúng:
 

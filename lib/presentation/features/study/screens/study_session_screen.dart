@@ -1,23 +1,19 @@
-import 'dart:async';
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/responsive/app_layout.dart';
-import '../../../../domain/study/entities/study_models.dart';
-import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/study_enums.dart';
+import '../../../../domain/study/entities/study_models.dart';
 import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/states/mx_error_state.dart';
 import '../../../shared/states/mx_loading_state.dart';
-import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_progress_indicator.dart';
@@ -25,10 +21,9 @@ import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/study_session_notifier.dart';
 import '../study_labels.dart';
+import '../widgets/study_session/match/match_mode_session_view.dart';
+import '../widgets/study_session/review/review_mode_session_view.dart';
 import '../widgets/study_session/study_mode_panel.dart';
-
-const _reviewPointerScrollThreshold = 20.0;
-const _reviewPageTurnDuration = Duration(milliseconds: 250);
 
 class StudySessionScreen extends ConsumerStatefulWidget {
   const StudySessionScreen({required this.sessionId, super.key});
@@ -90,99 +85,123 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
               ref.invalidate(studySessionStateProvider(widget.sessionId)),
         ),
       ),
-      data: (snapshot) {
-        if (snapshot.session.status == SessionStatus.completed ||
-            snapshot.session.status == SessionStatus.cancelled) {
-          return _buildStandardScaffold(
-            context: context,
-            canCancel: false,
-            actionState: actionState,
-            child: _SessionTerminalView(sessionId: widget.sessionId),
-          );
-        }
+      data: (snapshot) => _buildSessionView(
+        context: context,
+        snapshot: snapshot,
+        actionState: actionState,
+        canCancel: canCancel,
+      ),
+    );
+  }
 
-        final currentItem = snapshot.currentItem;
-        if (currentItem != null &&
-            currentItem.studyMode == StudyMode.review &&
-            snapshot.session.status == SessionStatus.inProgress) {
-          return _ReviewModeSessionView(
-            snapshot: snapshot,
-            isSubmitting: actionState.isLoading,
-            onSubmit: () => ref
-                .read(
-                  studySessionActionControllerProvider(
-                    widget.sessionId,
-                  ).notifier,
-                )
-                .answerCurrentReviewModeAsRemembered(),
-          );
-        }
+  Widget _buildSessionView({
+    required BuildContext context,
+    required StudySessionSnapshot snapshot,
+    required AsyncValue<void> actionState,
+    required bool canCancel,
+  }) {
+    if (snapshot.session.status == SessionStatus.completed ||
+        snapshot.session.status == SessionStatus.cancelled) {
+      return _buildStandardScaffold(
+        context: context,
+        canCancel: false,
+        actionState: actionState,
+        child: _SessionTerminalView(sessionId: widget.sessionId),
+      );
+    }
 
-        final currentItemId = snapshot.currentItem?.id;
-        final feedback = _feedback?.itemId == currentItemId ? _feedback : null;
-        return _buildStandardScaffold(
-          context: context,
-          canCancel: canCancel,
-          actionState: actionState,
-          child: ListView(
-            children: [
-              MxText(
-                studyProgressLabel(l10n, snapshot),
-                role: MxTextRole.pageGreeting,
-              ),
-              const MxGap(MxSpace.sm),
-              MxLinearProgress(value: _sessionProgress(snapshot)),
-              const MxGap(MxSpace.md),
-              StudyModePanel(
-                snapshot: snapshot,
-                answerOptions: studyAnswerOptions(snapshot),
-                isSubmitting: actionState.isLoading,
-                feedback: feedback,
-                onAnswer: (submission) => _recordFeedback(snapshot, submission),
-                onContinue: feedback == null
-                    ? null
-                    : () => _continueAfterFeedback(feedback),
-                onMarkCorrect: _markFeedbackCorrect,
-              ),
-              const MxGap(MxSpace.xl),
-              if (snapshot.canFinalize)
-                MxPrimaryButton(
-                  label: l10n.studyFinalizeAction,
-                  leadingIcon: Icons.done_all_rounded,
-                  isLoading: actionState.isLoading,
-                  fullWidth: true,
-                  onPressed: () async {
-                    final success = await ref
-                        .read(
-                          studySessionActionControllerProvider(
-                            widget.sessionId,
-                          ).notifier,
-                        )
-                        .finalizeSession();
-                    if (!context.mounted || !success) {
-                      return;
-                    }
-                    context.goStudyResult(widget.sessionId);
-                  },
-                ),
-              if (!snapshot.canFinalize && feedback == null)
-                MxSecondaryButton(
-                  label: l10n.studySkipAction,
-                  leadingIcon: Icons.skip_next_rounded,
-                  isLoading: actionState.isLoading,
-                  fullWidth: true,
-                  onPressed: () => ref
-                      .read(
-                        studySessionActionControllerProvider(
-                          widget.sessionId,
-                        ).notifier,
-                      )
-                      .skip(),
-                ),
-            ],
+    final currentItem = snapshot.currentItem;
+    if (currentItem != null &&
+        currentItem.studyMode == StudyMode.review &&
+        snapshot.session.status == SessionStatus.inProgress) {
+      return ReviewModeSessionView(
+        snapshot: snapshot,
+        isSubmitting: actionState.isLoading,
+        onSubmit: () => ref
+            .read(
+              studySessionActionControllerProvider(widget.sessionId).notifier,
+            )
+            .answerCurrentReviewModeAsRemembered(),
+      );
+    }
+    if (currentItem != null &&
+        currentItem.studyMode == StudyMode.match &&
+        snapshot.session.status == SessionStatus.inProgress) {
+      return MatchModeSessionView(
+        snapshot: snapshot,
+        isSubmitting: actionState.isLoading,
+        onSubmit: (itemGrades) => ref
+            .read(
+              studySessionActionControllerProvider(widget.sessionId).notifier,
+            )
+            .answerCurrentMatchModeBatch(itemGrades),
+      );
+    }
+
+    final currentItemId = snapshot.currentItem?.id;
+    final feedback = _feedback?.itemId == currentItemId ? _feedback : null;
+    final l10n = AppLocalizations.of(context);
+    return _buildStandardScaffold(
+      context: context,
+      canCancel: canCancel,
+      actionState: actionState,
+      child: ListView(
+        children: [
+          MxText(
+            studyProgressLabel(l10n, snapshot),
+            role: MxTextRole.pageGreeting,
           ),
-        );
-      },
+          const MxGap(MxSpace.sm),
+          MxLinearProgress(value: _sessionProgress(snapshot)),
+          const MxGap(MxSpace.md),
+          StudyModePanel(
+            snapshot: snapshot,
+            answerOptions: studyAnswerOptions(snapshot),
+            isSubmitting: actionState.isLoading,
+            feedback: feedback,
+            onAnswer: (submission) => _recordFeedback(snapshot, submission),
+            onContinue: feedback == null
+                ? null
+                : () => _continueAfterFeedback(feedback),
+            onMarkCorrect: _markFeedbackCorrect,
+          ),
+          const MxGap(MxSpace.xl),
+          if (snapshot.canFinalize)
+            MxPrimaryButton(
+              label: l10n.studyFinalizeAction,
+              leadingIcon: Icons.done_all_rounded,
+              isLoading: actionState.isLoading,
+              fullWidth: true,
+              onPressed: () async {
+                final success = await ref
+                    .read(
+                      studySessionActionControllerProvider(
+                        widget.sessionId,
+                      ).notifier,
+                    )
+                    .finalizeSession();
+                if (!context.mounted || !success) {
+                  return;
+                }
+                context.goStudyResult(widget.sessionId);
+              },
+            ),
+          if (!snapshot.canFinalize && feedback == null)
+            MxSecondaryButton(
+              label: l10n.studySkipAction,
+              leadingIcon: Icons.skip_next_rounded,
+              isLoading: actionState.isLoading,
+              fullWidth: true,
+              onPressed: () => ref
+                  .read(
+                    studySessionActionControllerProvider(
+                      widget.sessionId,
+                    ).notifier,
+                  )
+                  .skip(),
+            ),
+        ],
+      ),
     );
   }
 
@@ -308,329 +327,6 @@ class _StudySessionLoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MxLoadingState();
-  }
-}
-
-class _ReviewModeSessionView extends StatefulWidget {
-  const _ReviewModeSessionView({
-    required this.snapshot,
-    required this.isSubmitting,
-    required this.onSubmit,
-  });
-
-  final StudySessionSnapshot snapshot;
-  final bool isSubmitting;
-  final Future<bool> Function() onSubmit;
-
-  @override
-  State<_ReviewModeSessionView> createState() => _ReviewModeSessionViewState();
-}
-
-class _ReviewModeSessionViewState extends State<_ReviewModeSessionView> {
-  late PageController _pageController;
-  late int _pageIndex;
-  Timer? _autoSubmitTimer;
-  bool _hasSubmitted = false;
-  bool _isPagingFromPointerSignal = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageIndex = _initialPageIndex(widget.snapshot);
-    _pageController = PageController(initialPage: _pageIndex);
-    _scheduleAutoSubmitIfNeeded();
-  }
-
-  @override
-  void didUpdateWidget(covariant _ReviewModeSessionView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (_shouldResetPages(oldWidget.snapshot, widget.snapshot)) {
-      _autoSubmitTimer?.cancel();
-      _hasSubmitted = false;
-      _pageController.dispose();
-      _pageIndex = _initialPageIndex(widget.snapshot);
-      _pageController = PageController(initialPage: _pageIndex);
-    }
-    _scheduleAutoSubmitIfNeeded();
-  }
-
-  @override
-  void dispose() {
-    _autoSubmitTimer?.cancel();
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final cards = _reviewCards;
-    final progress = _reviewProgress(cards.length);
-    final percent = (progress * 100).round();
-
-    return MxScaffold(
-      title: l10n.studyModeReview,
-      leading: MxIconButton(
-        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        icon: Icons.arrow_back,
-        onPressed: () => context.popRoute(fallback: context.goLibrary),
-      ),
-      actions: [
-        MxIconButton(
-          tooltip: l10n.studyReviewTextSettingsTooltip,
-          icon: Icons.text_fields,
-          onPressed: null,
-        ),
-        MxIconButton(
-          tooltip: l10n.studyReviewAudioTooltip,
-          icon: Icons.volume_up_outlined,
-          onPressed: null,
-        ),
-        MxIconButton(
-          tooltip: l10n.studyReviewMoreActionsTooltip,
-          icon: Icons.more_vert,
-          onPressed: null,
-        ),
-      ],
-      body: MxContentShell(
-        width: MxContentWidth.reading,
-        applyVerticalPadding: true,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: MxLinearProgress(
-                    value: progress,
-                    size: MxProgressSize.large,
-                  ),
-                ),
-                const MxGap(MxSpace.sm),
-                MxText(
-                  l10n.studyReviewProgressPercent(percent),
-                  role: MxTextRole.reviewProgress,
-                ),
-              ],
-            ),
-            const MxGap(MxSpace.md),
-            Expanded(
-              child: Listener(
-                onPointerSignal: _handlePointerSignal,
-                child: ScrollConfiguration(
-                  behavior: const _ReviewPageScrollBehavior(),
-                  child: PageView.builder(
-                    controller: _pageController,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: cards.length,
-                    onPageChanged: _handlePageChanged,
-                    itemBuilder: (context, index) {
-                      final card = cards[index];
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: _ReviewModeCard(
-                              tooltip: l10n.studyReviewEditCardTooltip,
-                              actionIcon: Icons.mode_edit_outline,
-                              text: card.front,
-                              role: MxTextRole.reviewFront,
-                            ),
-                          ),
-                          const MxGap(MxSpace.md),
-                          Expanded(
-                            flex: 1,
-                            child: _ReviewModeCard(
-                              tooltip: l10n.studyReviewCardAudioTooltip,
-                              actionIcon: Icons.volume_up_outlined,
-                              text: card.back,
-                              role: MxTextRole.reviewBack,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _handlePointerSignal(PointerSignalEvent event) {
-    if (event is! PointerScrollEvent) {
-      return;
-    }
-    final scrollDelta = _primaryScrollDelta(event);
-    if (scrollDelta.abs() < _reviewPointerScrollThreshold) {
-      return;
-    }
-    if (scrollDelta > 0) {
-      unawaited(_turnPage(_pageIndex + 1));
-      return;
-    }
-    unawaited(_turnPage(_pageIndex - 1));
-  }
-
-  double _primaryScrollDelta(PointerScrollEvent event) {
-    final delta = event.scrollDelta;
-    if (delta.dx.abs() > delta.dy.abs()) {
-      return delta.dx;
-    }
-    return delta.dy;
-  }
-
-  Future<void> _turnPage(int targetIndex) async {
-    if (_isPagingFromPointerSignal ||
-        targetIndex < 0 ||
-        targetIndex >= _reviewCards.length ||
-        !_pageController.hasClients) {
-      return;
-    }
-    _isPagingFromPointerSignal = true;
-    try {
-      await _pageController.animateToPage(
-        targetIndex,
-        duration: _reviewPageTurnDuration,
-        curve: Curves.easeOutCubic,
-      );
-    } finally {
-      if (mounted) {
-        _isPagingFromPointerSignal = false;
-      }
-    }
-  }
-
-  List<StudyFlashcardRef> get _reviewCards {
-    final cards = widget.snapshot.sessionFlashcards;
-    if (cards.isNotEmpty) {
-      return cards;
-    }
-    final current = widget.snapshot.currentItem?.flashcard;
-    return current == null ? const <StudyFlashcardRef>[] : [current];
-  }
-
-  bool get _isAtLastPage => _pageIndex == _reviewCards.length - 1;
-
-  int _initialPageIndex(StudySessionSnapshot snapshot) {
-    final cards = snapshot.sessionFlashcards;
-    final currentCardId = snapshot.currentItem?.flashcard.id;
-    if (cards.isEmpty || currentCardId == null) {
-      return 0;
-    }
-    final index = cards.indexWhere((card) => card.id == currentCardId);
-    return index < 0 ? 0 : index;
-  }
-
-  bool _shouldResetPages(
-    StudySessionSnapshot oldSnapshot,
-    StudySessionSnapshot newSnapshot,
-  ) {
-    return oldSnapshot.session.id != newSnapshot.session.id ||
-        oldSnapshot.currentItem?.id != newSnapshot.currentItem?.id ||
-        oldSnapshot.sessionFlashcards.length !=
-            newSnapshot.sessionFlashcards.length;
-  }
-
-  double _reviewProgress(int cardCount) {
-    final lastPage = cardCount - 1;
-    if (lastPage <= 0) {
-      return 0;
-    }
-    return _pageIndex / lastPage;
-  }
-
-  void _handlePageChanged(int index) {
-    setState(() {
-      _pageIndex = index;
-    });
-    _scheduleAutoSubmitIfNeeded();
-  }
-
-  void _scheduleAutoSubmitIfNeeded() {
-    if (!_isAtLastPage || widget.isSubmitting || _hasSubmitted) {
-      _autoSubmitTimer?.cancel();
-      _autoSubmitTimer = null;
-      return;
-    }
-    if (_autoSubmitTimer != null) {
-      return;
-    }
-    _autoSubmitTimer = Timer(const Duration(seconds: 2), _submitBatch);
-  }
-
-  Future<void> _submitBatch() async {
-    if (!mounted || widget.isSubmitting || _hasSubmitted) {
-      return;
-    }
-    _hasSubmitted = true;
-    _autoSubmitTimer?.cancel();
-    _autoSubmitTimer = null;
-    await widget.onSubmit();
-  }
-}
-
-class _ReviewPageScrollBehavior extends MaterialScrollBehavior {
-  const _ReviewPageScrollBehavior();
-
-  @override
-  Set<PointerDeviceKind> get dragDevices => const <PointerDeviceKind>{
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-    PointerDeviceKind.stylus,
-    PointerDeviceKind.invertedStylus,
-  };
-}
-
-class _ReviewModeCard extends StatelessWidget {
-  const _ReviewModeCard({
-    required this.tooltip,
-    required this.actionIcon,
-    required this.text,
-    required this.role,
-  });
-
-  final String tooltip;
-  final IconData actionIcon;
-  final String text;
-  final MxTextRole role;
-
-  @override
-  Widget build(BuildContext context) {
-    return MxCard(
-      variant: MxCardVariant.outlined,
-      child: Stack(
-        children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: MxIconButton(
-              tooltip: tooltip,
-              icon: actionIcon,
-              onPressed: null,
-            ),
-          ),
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.only(top: MxSpace.xxl),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: MxText(
-                    text,
-                    role: role,
-                    textAlign: TextAlign.center,
-                    softWrap: true,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 

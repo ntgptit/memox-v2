@@ -13,6 +13,7 @@ enum MxTextRole {
   listTitle,
   listSubtitle,
   badge,
+  studyProgress,
   reviewProgress,
   stateTitle,
   stateMessage,
@@ -66,6 +67,10 @@ abstract final class MxTextStyles {
       ),
       MxTextRole.badge => textTheme.labelSmall!.copyWith(
         color: scheme.onSurface,
+      ),
+      MxTextRole.studyProgress => textTheme.labelLarge!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w600,
       ),
       MxTextRole.reviewProgress => textTheme.labelLarge!.copyWith(
         color: scheme.onSurface,

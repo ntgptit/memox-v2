@@ -6,11 +6,14 @@ import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
+import 'package:memox/presentation/features/progress/providers/progress_session_notifier.dart';
+import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/study_mode_panel.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   test(
@@ -89,6 +92,93 @@ void main() {
             .hasError,
         isFalse,
       );
+    },
+  );
+
+  test(
+    'DT14 onUpdate: match batch controller forwards exact item grade map',
+    () async {
+      final repo = _MatchBatchStudyRepo();
+      final container = ProviderContainer(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      final itemGrades = <String, AttemptGrade>{
+        'item-1': AttemptGrade.correct,
+        'item-2': AttemptGrade.incorrect,
+      };
+      final success = await container
+          .read(studySessionActionControllerProvider('session-1').notifier)
+          .answerCurrentMatchModeBatch(itemGrades);
+
+      expect(success, isTrue);
+      expect(repo.matchBatchAnswerCount, 1);
+      expect(repo.lastItemGrades, itemGrades);
+      expect(repo.lastModes, <StudyMode>[
+        StudyMode.review,
+        StudyMode.match,
+        StudyMode.guess,
+        StudyMode.recall,
+        StudyMode.fill,
+      ]);
+      expect(
+        container
+            .read(studySessionActionControllerProvider('session-1'))
+            .hasError,
+        isFalse,
+      );
+    },
+  );
+
+  test(
+    'DT12 onUpdate: study session mutation invalidates cached Progress sessions',
+    () async {
+      final repo = _ReviewBatchStudyRepo();
+      final container = ProviderContainer(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(progressStudySessionsProvider.future);
+      expect(repo.activeSessionLoadCount, 1);
+
+      final success = await container
+          .read(studySessionActionControllerProvider('session-1').notifier)
+          .answerCurrentReviewModeAsRemembered();
+      await container.read(progressStudySessionsProvider.future);
+
+      expect(success, isTrue);
+      expect(repo.activeSessionLoadCount, 2);
+    },
+  );
+
+  test(
+    'DT13 onUpdate: terminal study session mutation invalidates cached Study Entry resume state',
+    () async {
+      SharedPreferences.setMockInitialValues(const <String, Object>{});
+      final repo = _ResumeCandidateStudyRepo();
+      final container = ProviderContainer(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      final initial = await container.read(
+        studyEntryStateProvider('deck', 'deck-1').future,
+      );
+      expect(initial.resumeCandidate?.session.id, 'session-1');
+      expect(repo.resumeCandidateLoadCount, 1);
+
+      final success = await container
+          .read(studySessionActionControllerProvider('session-1').notifier)
+          .cancel();
+      final refreshed = await container.read(
+        studyEntryStateProvider('deck', 'deck-1').future,
+      );
+
+      expect(success, isTrue);
+      expect(repo.resumeCandidateLoadCount, 2);
+      expect(refreshed.resumeCandidate, isNull);
     },
   );
 
@@ -441,6 +531,15 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   }
 
   @override
+  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+    required String sessionId,
+    required Map<String, AttemptGrade> itemGrades,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
     throw UnimplementedError();
   }
@@ -462,8 +561,127 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   }
 }
 
+final class _ResumeCandidateStudyRepo implements StudyRepo {
+  int cancelCount = 0;
+  int resumeCandidateLoadCount = 0;
+  bool hasResumeCandidate = true;
+
+  @override
+  Future<StudySessionSnapshot?> findResumeCandidate(
+    StudyContext context,
+  ) async {
+    resumeCandidateLoadCount += 1;
+    if (!hasResumeCandidate) {
+      return null;
+    }
+    return _activeSnapshot();
+  }
+
+  @override
+  Future<StudySessionSnapshot> loadSession(String sessionId) async {
+    return _activeSnapshot();
+  }
+
+  @override
+  Future<StudySessionSnapshot> cancelSession(String sessionId) async {
+    cancelCount += 1;
+    hasResumeCandidate = false;
+    return _snapshot(
+      mode: StudyMode.fill,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+      status: SessionStatus.cancelled,
+    );
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudySessionSnapshot>> listActiveSessions() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> startSession({
+    required StudyContext context,
+    required StudyFlow flow,
+    required List<StudyMode> modes,
+    required List<StudyFlashcardRef> batch,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentItem({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentModeBatch({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+    required String sessionId,
+    required Map<String, AttemptGrade> itemGrades,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> finalizeSession({
+    required String sessionId,
+    required StudyType studyType,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> retryFinalize({
+    required String sessionId,
+    required StudyType studyType,
+  }) {
+    throw UnimplementedError();
+  }
+
+  StudySessionSnapshot _activeSnapshot() {
+    return _snapshot(
+      mode: StudyMode.fill,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+      status: SessionStatus.inProgress,
+    );
+  }
+}
+
 final class _ReviewBatchStudyRepo implements StudyRepo {
   int batchAnswerCount = 0;
+  int activeSessionLoadCount = 0;
   AttemptGrade? lastGrade;
   List<StudyMode>? lastModes;
 
@@ -491,6 +709,130 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
       mode: StudyMode.match,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
       cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+      studyType: StudyType.newStudy,
+    );
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+    required String sessionId,
+    required Map<String, AttemptGrade> itemGrades,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudySessionSnapshot>> listActiveSessions() async {
+    activeSessionLoadCount += 1;
+    return [
+      _snapshot(
+        mode: StudyMode.review,
+        currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+        cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+        shuffleAnswers: false,
+        studyType: StudyType.newStudy,
+      ),
+    ];
+  }
+
+  @override
+  Future<StudySessionSnapshot> startSession({
+    required StudyContext context,
+    required StudyFlow flow,
+    required List<StudyMode> modes,
+    required List<StudyFlashcardRef> batch,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentItem({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> cancelSession(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> finalizeSession({
+    required String sessionId,
+    required StudyType studyType,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> retryFinalize({
+    required String sessionId,
+    required StudyType studyType,
+  }) {
+    throw UnimplementedError();
+  }
+}
+
+final class _MatchBatchStudyRepo implements StudyRepo {
+  int matchBatchAnswerCount = 0;
+  Map<String, AttemptGrade>? lastItemGrades;
+  List<StudyMode>? lastModes;
+
+  @override
+  Future<StudySessionSnapshot> loadSession(String sessionId) async {
+    return _snapshot(
+      mode: StudyMode.match,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [
+        _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+        _card(id: 'card-2', front: 'front 2', back: 'back 2'),
+      ],
+      shuffleAnswers: false,
+      studyType: StudyType.newStudy,
+    );
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+    required String sessionId,
+    required Map<String, AttemptGrade> itemGrades,
+    required List<StudyMode> modes,
+  }) async {
+    matchBatchAnswerCount += 1;
+    lastItemGrades = itemGrades;
+    lastModes = modes;
+    return _snapshot(
+      mode: StudyMode.guess,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [
+        _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+        _card(id: 'card-2', front: 'front 2', back: 'back 2'),
+      ],
       shuffleAnswers: false,
       studyType: StudyType.newStudy,
     );
@@ -528,6 +870,15 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentModeBatch({
     required String sessionId,
     required AttemptGrade grade,
     required List<StudyMode> modes,
@@ -650,6 +1001,7 @@ StudySessionSnapshot _snapshot({
   required bool shuffleAnswers,
   String itemId = 'item-1',
   StudyType studyType = StudyType.srsReview,
+  SessionStatus status = SessionStatus.inProgress,
 }) {
   return StudySessionSnapshot(
     session: StudySession(
@@ -666,7 +1018,7 @@ StudySessionSnapshot _snapshot({
         shuffleAnswers: shuffleAnswers,
         prioritizeOverdue: true,
       ),
-      status: SessionStatus.inProgress,
+      status: status,
       startedAt: 0,
       endedAt: null,
       restartedFromSessionId: null,

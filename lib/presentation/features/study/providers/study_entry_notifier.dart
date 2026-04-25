@@ -4,6 +4,7 @@ import '../../../../app/di/study_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
+import 'study_session_notifier.dart';
 
 part 'study_entry_notifier.g.dart';
 
@@ -41,6 +42,7 @@ Future<StudyEntryState> studyEntryState(
   String entryType,
   String? entryRefId,
 ) async {
+  ref.watch(studySessionDataRevisionProvider);
   final parsedEntryType = _parseEntryType(entryType);
   final store = await ref.watch(studySettingsStoreProvider.future);
   final newDefaults = store.loadNewStudyDefaults();
@@ -91,6 +93,7 @@ class StudyEntryActionController extends _$StudyEntryActionController {
         return null;
       }
       ref.invalidate(studyEntryStateProvider(entryType, entryRefId));
+      ref.read(studySessionDataRevisionProvider.notifier).bump();
       state = const AsyncData<void>(null);
       return StudyEntryStartResult.started(snapshot.session.id);
     } on ValidationException catch (error) {
