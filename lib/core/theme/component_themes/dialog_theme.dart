@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../tokens/app_elevation.dart';
+import '../tokens/app_opacity.dart';
 import '../tokens/app_radius.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class DialogThemeBuilder {
   static DialogThemeData dialog(ColorScheme scheme) {
     return DialogThemeData(
-      backgroundColor: scheme.surfaceContainerHigh,
-      surfaceTintColor: scheme.surfaceTint,
+      backgroundColor: scheme.surfaceContainerLow,
+      surfaceTintColor: scheme.surfaceTint.withValues(
+        alpha: AppOpacity.transparent,
+      ),
       shadowColor: scheme.shadow,
       elevation: AppElevation.dialog,
       alignment: Alignment.center,
@@ -27,7 +30,9 @@ abstract final class DialogThemeBuilder {
     return BottomSheetThemeData(
       backgroundColor: scheme.surfaceContainerLow,
       modalBackgroundColor: scheme.surfaceContainerLow,
-      surfaceTintColor: scheme.surfaceTint,
+      surfaceTintColor: scheme.surfaceTint.withValues(
+        alpha: AppOpacity.transparent,
+      ),
       shadowColor: scheme.shadow,
       modalElevation: AppElevation.bottomSheet,
       elevation: AppElevation.bottomSheet,

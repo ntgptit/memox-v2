@@ -6,7 +6,7 @@ import 'package:memox/core/theme/tokens/app_typography.dart';
 import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';
 
 void main() {
-  testWidgets('MxDialog content inherits Plus Jakarta Sans typography', (
+  testWidgets('DT1 onDisplay: MxDialog content inherits Plus Jakarta Sans typography', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -46,7 +46,7 @@ void main() {
     expect(find.text('Dialog body'), findsOneWidget);
   });
 
-  testWidgets('MxDialog centers the title when an icon is provided', (
+  testWidgets('DT1 onBehavior: MxDialog centers the title when an icon is provided', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(

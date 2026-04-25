@@ -7,13 +7,11 @@ import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/decks/screens/deck_detail_screen.dart';
 import 'package:memox/presentation/features/decks/viewmodels/deck_detail_viewmodel.dart';
-import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 
 void main() {
   testWidgets(
-    'shows layout skeleton instead of full loading state on first load',
+    'DT1 onOpen: shows layout skeleton instead of full loading state on first load',
     (WidgetTester tester) async {
       const deckId = 'deck-001';
       final container = ProviderContainer(
@@ -41,7 +39,7 @@ void main() {
     },
   );
 
-  testWidgets('zero-card deck makes add flashcard primary and disables study', (
+  testWidgets('DT1 onDisplay: renders deck title and zero-card metrics', (
     WidgetTester tester,
   ) async {
     const deckId = 'deck-001';
@@ -62,28 +60,16 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.text(
-        'Study is available after this deck has at least one flashcard.',
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.widgetWithText(MxPrimaryButton, 'Add flashcard'),
-      findsOneWidget,
-    );
-    expect(find.widgetWithText(MxPrimaryButton, 'Study now'), findsNothing);
-
-    final studyButtonFinder = find.widgetWithText(
-      MxSecondaryButton,
-      'Study now',
-    );
-    expect(studyButtonFinder, findsOneWidget);
-    final studyButton = tester.widget<MxSecondaryButton>(studyButtonFinder);
-    expect(studyButton.onPressed, isNull);
+    expect(find.text('Empty deck'), findsWidgets);
+    expect(find.text('0 cards · 0 due today · 0% mastery'), findsOneWidget);
+    expect(find.text('Manage content'), findsNothing);
+    expect(find.text('Study now'), findsNothing);
+    expect(find.text('Open flashcards'), findsNothing);
+    expect(find.text('Add flashcard'), findsNothing);
+    expect(find.text('Import'), findsNothing);
   });
 
-  testWidgets('header more action still opens deck actions', (
+  testWidgets('DT1 onNavigate: header more action still opens deck actions', (
     WidgetTester tester,
   ) async {
     const deckId = 'deck-001';

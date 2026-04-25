@@ -8,7 +8,7 @@ abstract final class InputThemeBuilder {
   static InputDecorationTheme build(ColorScheme scheme) {
     return InputDecorationTheme(
       filled: true,
-      fillColor: scheme.surfaceContainerHighest,
+      fillColor: scheme.surfaceContainerLow,
       isDense: false,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       hintStyle: AppTypography.bodyMedium.copyWith(
@@ -19,11 +19,16 @@ abstract final class InputThemeBuilder {
       ),
       floatingLabelStyle: AppTypography.bodySmall.copyWith(
         color: scheme.primary,
+        fontWeight: FontWeight.w700,
       ),
       helperStyle: AppTypography.bodySmall.copyWith(
         color: scheme.onSurfaceVariant,
+        fontWeight: FontWeight.w600,
       ),
-      errorStyle: AppTypography.bodySmall.copyWith(color: scheme.error),
+      errorStyle: AppTypography.bodySmall.copyWith(
+        color: scheme.error,
+        fontWeight: FontWeight.w600,
+      ),
       prefixIconColor: scheme.onSurfaceVariant,
       suffixIconColor: scheme.onSurfaceVariant,
       iconColor: scheme.onSurfaceVariant,

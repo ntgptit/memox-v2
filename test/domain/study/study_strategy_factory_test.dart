@@ -5,7 +5,7 @@ import 'package:memox/domain/study/strategy/study_strategy_factory.dart';
 
 void main() {
   group('StudyStrategyFactory', () {
-    test('dispatches strategies by study type', () {
+    test('DT1 onNavigate: dispatches strategies by study type', () {
       final factory = StudyStrategyFactory(const <StudyStrategy>[
         NewStudyStrategy(),
         SrsReviewStrategy(),
@@ -25,7 +25,7 @@ void main() {
       ]);
     });
 
-    test('throws on duplicate strategy registration', () {
+    test('DT1 selectStrategy: throws on duplicate strategy registration', () {
       expect(
         () => StudyStrategyFactory(const <StudyStrategy>[
           NewStudyStrategy(),

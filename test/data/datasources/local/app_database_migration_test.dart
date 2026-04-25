@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/data/datasources/local/app_database.dart';
 
 void main() {
-  test('repairs pre-release study schema during v2 migration', () async {
+  test('DT1 onNavigate: repairs pre-release study schema during v2 migration', () async {
     final database = AppDatabase(
       executor: NativeDatabase.memory(setup: _createLegacyPreReleaseSchema),
     );

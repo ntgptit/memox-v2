@@ -9,7 +9,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 final _sampleProvider = Provider<int>((ref) => 1);
 
 void main() {
-  test('creates a Talker-backed Riverpod observer for local diagnostics', () {
+  test('DT1 onInsert: creates a Talker-backed Riverpod observer for local diagnostics', () {
     final config = _testConfig(
       env: AppEnv.local,
       enableRiverpodDiagnostics: true,
@@ -28,7 +28,7 @@ void main() {
     );
   });
 
-  test('does not attach Riverpod diagnostics outside local-like envs', () {
+  test('DT1 logEvent: does not attach Riverpod diagnostics outside local-like envs', () {
     final config = _testConfig(
       env: AppEnv.production,
       enableRiverpodDiagnostics: false,

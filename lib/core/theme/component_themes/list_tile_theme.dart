@@ -14,11 +14,11 @@ abstract final class ListTileThemeBuilder {
         vertical: AppSpacing.xs,
       ),
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
-      selectedColor: scheme.onSecondaryContainer,
-      selectedTileColor: scheme.secondaryContainer.withValues(
+      selectedColor: scheme.primary,
+      selectedTileColor: scheme.primaryContainer.withValues(
         alpha: AppOpacity.half,
       ),
-      tileColor: Colors.transparent,
+      tileColor: scheme.surface.withValues(alpha: AppOpacity.transparent),
       horizontalTitleGap: AppSpacing.md,
       minVerticalPadding: AppSpacing.xs,
       visualDensity: VisualDensity.standard,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../tokens/app_opacity.dart';
 import '../tokens/app_radius.dart';
 import '../tokens/app_typography.dart';
 import 'focus_theme.dart';
@@ -7,8 +8,10 @@ import 'focus_theme.dart';
 abstract final class PopupMenuThemeBuilder {
   static PopupMenuThemeData build(ColorScheme scheme) {
     return PopupMenuThemeData(
-      color: scheme.surfaceContainerHigh,
-      surfaceTintColor: Colors.transparent,
+      color: scheme.surfaceContainerLow,
+      surfaceTintColor: scheme.surfaceTint.withValues(
+        alpha: AppOpacity.transparent,
+      ),
       elevation: 2,
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
       textStyle: AppTypography.bodyMedium.copyWith(color: scheme.onSurface),
@@ -19,7 +22,10 @@ abstract final class PopupMenuThemeBuilder {
     return MenuThemeData(
       style: MenuStyle(
         backgroundColor: WidgetStatePropertyAll(scheme.surfaceContainerHigh),
-        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        shadowColor: WidgetStatePropertyAll(scheme.shadow),
+        surfaceTintColor: WidgetStatePropertyAll(
+          scheme.surfaceTint.withValues(alpha: AppOpacity.transparent),
+        ),
         elevation: const WidgetStatePropertyAll(2),
         shape: const WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: AppRadius.card),

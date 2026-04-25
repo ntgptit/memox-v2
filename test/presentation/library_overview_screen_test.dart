@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,12 +10,57 @@ import 'package:memox/presentation/features/folders/models/library_folder.dart';
 import 'package:memox/presentation/features/folders/screens/library_overview_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/library_overview_viewmodel.dart';
 import 'package:memox/presentation/features/folders/widgets/library_folder_list.dart';
+import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
 
 import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';
 
 void main() {
-  testWidgets('library add FAB uses the generic add icon', (
+  testWidgets('DT1 onOpen: shows loading state while library folders load', (
+    WidgetTester tester,
+  ) async {
+    final completer = Completer<LibraryOverviewState>();
+    addTearDown(() {
+      if (!completer.isCompleted) {
+        completer.complete(_sampleLibraryState);
+      }
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith((ref) => completer.future),
+        ],
+        child: const _TestApp(child: LibraryOverviewView()),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(MxLoadingState), findsOneWidget);
+  });
+
+  testWidgets('DT1 onDisplay: renders greeting search toolbar and root folders', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith(
+            (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+          ),
+        ],
+        child: const _TestApp(child: LibraryOverviewView()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Good morning, Lan'), findsOneWidget);
+    expect(find.text('Folders'), findsOneWidget);
+    expect(find.text('Korean1'), findsOneWidget);
+    expect(find.text('17'), findsOneWidget);
+  });
+
+  testWidgets('DT1 onInsert: library add FAB uses the generic add icon', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -35,7 +82,7 @@ void main() {
     expect(find.byIcon(Icons.create_new_folder_outlined), findsNothing);
   });
 
-  testWidgets('root folder cards expose recursive study action', (
+  testWidgets('DT1 onNavigate: root folder cards expose recursive study action', (
     WidgetTester tester,
   ) async {
     const folderId = 'folder-root-001';
@@ -100,7 +147,7 @@ void main() {
     );
   });
 
-  testWidgets('root folder long press opens direct folder actions', (
+  testWidgets('DT1 onSelect: root folder long press opens direct folder actions', (
     WidgetTester tester,
   ) async {
     final router = GoRouter(
@@ -140,7 +187,7 @@ void main() {
     expect(find.text('Delete'), findsOneWidget);
   });
 
-  testWidgets('root folder tap still calls open-folder callback', (
+  testWidgets('DT2 onNavigate: root folder tap still calls open-folder callback', (
     WidgetTester tester,
   ) async {
     String? openedFolderId;
@@ -170,7 +217,7 @@ void main() {
     expect(openedFolderId, 'folder-root-001');
   });
 
-  testWidgets('dialog action using dialog context closes only the dialog', (
+  testWidgets('DT1 onDispose: dialog action using dialog context closes only the dialog', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -235,3 +282,18 @@ const _sampleLibraryState = LibraryOverviewState(
     ),
   ],
 );
+
+class _TestApp extends StatelessWidget {
+  const _TestApp({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: child,
+    );
+  }
+}

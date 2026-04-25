@@ -9,7 +9,7 @@ import 'package:memox/presentation/features/study/providers/study_entry_notifier
 
 void main() {
   test(
-    'empty eligible batch returns validation without provider failure',
+    'DT1 onExternalChange: empty eligible batch returns validation without provider failure',
     () async {
       final container = ProviderContainer(
         overrides: [

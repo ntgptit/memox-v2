@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/presentation/shared/dialogs/mx_name_dialog.dart';
 
 void main() {
-  testWidgets('confirm button stays disabled for blank input', (
+  testWidgets('DT1 onBehavior: confirm button stays disabled for blank input', (
     WidgetTester tester,
   ) async {
     String? result;
@@ -49,7 +49,7 @@ void main() {
     expect(result, isNull);
   });
 
-  testWidgets('confirm returns trimmed value', (WidgetTester tester) async {
+  testWidgets('DT2 onBehavior: confirm returns trimmed value', (WidgetTester tester) async {
     String? result;
 
     await tester.pumpWidget(
@@ -86,7 +86,7 @@ void main() {
     expect(find.byType(Dialog), findsNothing);
   });
 
-  testWidgets('done action submits using the same logic as confirm', (
+  testWidgets('DT3 onBehavior: done action submits using the same logic as confirm', (
     WidgetTester tester,
   ) async {
     String? result;
@@ -124,7 +124,7 @@ void main() {
     expect(find.byType(Dialog), findsNothing);
   });
 
-  testWidgets('rename dialog places the cursor at the end of initial value', (
+  testWidgets('DT1 onUpdate: rename dialog places the cursor at the end of initial value', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -160,7 +160,7 @@ void main() {
     expect(controller.selection.extentOffset, 'Existing folder'.length);
   });
 
-  testWidgets('dialog does not dismiss when tapping outside', (
+  testWidgets('DT1 onNavigate: dialog does not dismiss when tapping outside', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(

@@ -98,7 +98,7 @@ class _MxActionSheetTile<T> extends StatelessWidget {
 
     final backgroundColor = switch ((isSelected, isDestructive)) {
       (true, true) => scheme.errorContainer,
-      (true, false) => scheme.secondaryContainer,
+      (true, false) => scheme.primaryContainer,
       (false, _) => scheme.surface.withValues(alpha: AppOpacity.transparent),
     };
 
@@ -119,7 +119,7 @@ class _MxActionSheetTile<T> extends StatelessWidget {
     return Opacity(
       opacity: item.enabled ? AppOpacity.full : AppOpacity.disabled,
       child: MxTappable(
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
         onTap: () => _handleTap(context),
         enabled: item.enabled,
         backgroundColor: backgroundColor,

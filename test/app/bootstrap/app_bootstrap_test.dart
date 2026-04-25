@@ -5,7 +5,7 @@ import 'package:memox/app/bootstrap/app_bootstrap.dart';
 import 'package:stack_trace/stack_trace.dart' as stack_trace;
 
 void main() {
-  testWidgets('bootstrap demangles package stack_trace chains', (
+  testWidgets('DT1 onOpen: bootstrap demangles package stack_trace chains', (
     WidgetTester tester,
   ) async {
     final originalFlutterOnError = FlutterError.onError;

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:memox/app/router/app_navigation.dart';
 
 void main() {
-  testWidgets('popRoute falls back when the current route cannot pop', (
+  testWidgets('DT1 onNavigate: popRoute falls back when the current route cannot pop', (
     WidgetTester tester,
   ) async {
     final router = GoRouter(
@@ -42,7 +42,7 @@ void main() {
     expect(find.text('Fallback'), findsOneWidget);
   });
 
-  testWidgets('popRoute pops the current page when a previous route exists', (
+  testWidgets('DT2 onNavigate: popRoute pops the current page when a previous route exists', (
     WidgetTester tester,
   ) async {
     final router = GoRouter(

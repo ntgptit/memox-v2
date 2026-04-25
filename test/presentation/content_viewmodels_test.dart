@@ -17,7 +17,7 @@ import '../support/content_repository_harness.dart';
 
 void main() {
   group('content viewmodels', () {
-    test('library overview query refreshes after creating a folder', () async {
+    test('DT1 onSearchFilterSort: library overview query refreshes after creating a folder', () async {
       final harness = ContentRepositoryHarness.create(ids: ['folder-root']);
       final container = _createContainer(harness);
       addTearDown(container.dispose);
@@ -51,7 +51,7 @@ void main() {
       );
     });
 
-    test('folder detail query refreshes after creating a subfolder', () async {
+    test('DT2 onSearchFilterSort: folder detail query refreshes after creating a subfolder', () async {
       final harness = ContentRepositoryHarness.create(ids: ['folder-root']);
       final container = _createContainer(harness);
       addTearDown(container.dispose);
@@ -88,7 +88,7 @@ void main() {
     });
 
     test(
-      'folder detail query exposes subtree deck and card stats for subfolders',
+      'DT3 onSearchFilterSort: folder detail query exposes subtree deck and card stats for subfolders',
       () async {
         final harness = ContentRepositoryHarness.create(
           ids: [
@@ -147,7 +147,7 @@ void main() {
     );
 
     test(
-      'deck action controller updates deck without provider error',
+      'DT1 onUpdate: deck action controller updates deck without provider error',
       () async {
         final harness = ContentRepositoryHarness.create(
           ids: ['folder-root', 'deck-root'],
@@ -180,7 +180,7 @@ void main() {
     );
 
     test(
-      'flashcard editor save-and-add-next refreshes the list and clears draft',
+      'DT1 onRefreshRetry: flashcard editor save-and-add-next refreshes the list and clears draft',
       () async {
         final harness = ContentRepositoryHarness.create(
           ids: ['folder-root', 'deck-root', 'flashcard-001'],
@@ -239,7 +239,7 @@ void main() {
     );
 
     test(
-      'flashcard action controller deletes cards without provider error',
+      'DT1 onDelete: flashcard action controller deletes cards without provider error',
       () async {
         final harness = ContentRepositoryHarness.create(
           ids: ['folder-root', 'deck-root', 'flashcard-001'],
@@ -279,7 +279,7 @@ void main() {
     );
 
     test(
-      'flashcard import preview surfaces issues, commit resets draft, and list refreshes',
+      'DT2 onRefreshRetry: flashcard import preview surfaces issues, commit resets draft, and list refreshes',
       () async {
         final harness = ContentRepositoryHarness.create(
           ids: ['folder-root', 'deck-root', 'flashcard-001'],

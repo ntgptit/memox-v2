@@ -79,138 +79,148 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
       body: MxContentShell(
         width: MxContentWidth.wide,
         applyVerticalPadding: true,
-        child: ListView(
+        child: CustomScrollView(
           key: const ValueKey('deck_import_content'),
-          children: [
-            DeckImportHeaderSection(deckId: widget.deckId),
-            const MxGap(MxSpace.xl),
-            MxSection(
-              title: l10n.importSourceTitle,
-              subtitle: l10n.importSourceSubtitle,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Semantics(
-                    enabled: !isImportBusy,
-                    child: IgnorePointer(
-                      ignoring: isImportBusy,
-                      child: MxSegmentedControl<ImportSourceFormat>(
-                        segments: [
-                          MxSegment(
-                            value: ImportSourceFormat.csv,
-                            label: l10n.importCsvLabel,
-                            icon: Icons.table_chart_outlined,
-                          ),
-                          MxSegment(
-                            value: ImportSourceFormat.structuredText,
-                            label: l10n.importTextFormatLabel,
-                            icon: Icons.notes_outlined,
-                          ),
-                        ],
-                        selected: <ImportSourceFormat>{draft.format},
-                        onChanged: (selection) => ref
-                            .read(
-                              flashcardImportDraftProvider(
-                                widget.deckId,
-                              ).notifier,
-                            )
-                            .setFormat(selection.first),
-                      ),
-                    ),
-                  ),
-                  if (draft.format == ImportSourceFormat.structuredText) ...[
-                    const MxGap(MxSpace.lg),
-                    MxText(
-                      l10n.importSeparatorLabel,
-                      role: MxTextRole.formLabel,
-                    ),
-                    const MxGap(MxSpace.xs),
-                    _ImportSeparatorSelector(
-                      value: draft.structuredTextSeparator,
+          slivers: [
+            SliverToBoxAdapter(
+              child: DeckImportHeaderSection(deckId: widget.deckId),
+            ),
+            const MxSliverGap(MxSpace.xl),
+            SliverToBoxAdapter(
+              child: MxSection(
+                title: l10n.importSourceTitle,
+                subtitle: l10n.importSourceSubtitle,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Semantics(
                       enabled: !isImportBusy,
-                      onTap: () => _chooseStructuredTextSeparator(
-                        draft.structuredTextSeparator,
+                      child: IgnorePointer(
+                        ignoring: isImportBusy,
+                        child: MxSegmentedControl<ImportSourceFormat>(
+                          segments: [
+                            MxSegment(
+                              value: ImportSourceFormat.csv,
+                              label: l10n.importCsvLabel,
+                              icon: Icons.table_chart_outlined,
+                            ),
+                            MxSegment(
+                              value: ImportSourceFormat.structuredText,
+                              label: l10n.importTextFormatLabel,
+                              icon: Icons.notes_outlined,
+                            ),
+                          ],
+                          selected: <ImportSourceFormat>{draft.format},
+                          onChanged: (selection) => ref
+                              .read(
+                                flashcardImportDraftProvider(
+                                  widget.deckId,
+                                ).notifier,
+                              )
+                              .setFormat(selection.first),
+                        ),
                       ),
+                    ),
+                    if (draft.format == ImportSourceFormat.structuredText) ...[
+                      const MxGap(MxSpace.lg),
+                      MxText(
+                        l10n.importSeparatorLabel,
+                        role: MxTextRole.formLabel,
+                      ),
+                      const MxGap(MxSpace.xs),
+                      _ImportSeparatorSelector(
+                        value: draft.structuredTextSeparator,
+                        enabled: !isImportBusy,
+                        onTap: () => _chooseStructuredTextSeparator(
+                          draft.structuredTextSeparator,
+                        ),
+                      ),
+                    ],
+                    const MxGap(MxSpace.lg),
+                    Wrap(
+                      spacing: MxSpace.sm,
+                      runSpacing: MxSpace.sm,
+                      children: [
+                        MxSecondaryButton(
+                          label: l10n.importLoadFile,
+                          leadingIcon: Icons.file_open_outlined,
+                          variant: MxSecondaryVariant.outlined,
+                          onPressed: isImportBusy
+                              ? null
+                              : () => _pickFile(context),
+                        ),
+                        MxSecondaryButton(
+                          label: l10n.commonClear,
+                          variant: MxSecondaryVariant.text,
+                          onPressed: isImportBusy
+                              ? null
+                              : () => ref
+                                    .read(
+                                      flashcardImportDraftProvider(
+                                        widget.deckId,
+                                      ).notifier,
+                                    )
+                                    .reset(),
+                        ),
+                      ],
+                    ),
+                    const MxGap(MxSpace.lg),
+                    MxTextField(
+                      controller: _rawContentController,
+                      label: draft.format == ImportSourceFormat.csv
+                          ? l10n.importCsvContentLabel
+                          : l10n.importTextContentLabel,
+                      hintText: draft.format == ImportSourceFormat.csv
+                          ? l10n.importCsvHint
+                          : l10n.importTextHint,
+                      minLines: 10,
+                      maxLines: 18,
+                      onChanged: (value) => ref
+                          .read(
+                            flashcardImportDraftProvider(
+                              widget.deckId,
+                            ).notifier,
+                          )
+                          .setRawContent(value),
+                    ),
+                    const MxGap(MxSpace.lg),
+                    Wrap(
+                      spacing: MxSpace.sm,
+                      runSpacing: MxSpace.sm,
+                      children: [
+                        MxSecondaryButton(
+                          label: l10n.importPreviewAction,
+                          leadingIcon: Icons.preview_outlined,
+                          variant: MxSecondaryVariant.outlined,
+                          isLoading:
+                              _pendingAction == _ImportPendingAction.preview,
+                          onPressed: isImportBusy
+                              ? null
+                              : () => _preparePreview(),
+                        ),
+                        MxPrimaryButton(
+                          label: l10n.commonImport,
+                          leadingIcon: Icons.file_upload_outlined,
+                          isLoading:
+                              _pendingAction == _ImportPendingAction.commit,
+                          onPressed:
+                              isImportBusy ||
+                                  draft.preparation?.canCommit != true
+                              ? null
+                              : () => _commitImport(context),
+                        ),
+                      ],
                     ),
                   ],
-                  const MxGap(MxSpace.lg),
-                  Wrap(
-                    spacing: MxSpace.sm,
-                    runSpacing: MxSpace.sm,
-                    children: [
-                      MxSecondaryButton(
-                        label: l10n.importLoadFile,
-                        leadingIcon: Icons.file_open_outlined,
-                        variant: MxSecondaryVariant.outlined,
-                        onPressed: isImportBusy
-                            ? null
-                            : () => _pickFile(context),
-                      ),
-                      MxSecondaryButton(
-                        label: l10n.commonClear,
-                        variant: MxSecondaryVariant.text,
-                        onPressed: isImportBusy
-                            ? null
-                            : () => ref
-                                  .read(
-                                    flashcardImportDraftProvider(
-                                      widget.deckId,
-                                    ).notifier,
-                                  )
-                                  .reset(),
-                      ),
-                    ],
-                  ),
-                  const MxGap(MxSpace.lg),
-                  MxTextField(
-                    controller: _rawContentController,
-                    label: draft.format == ImportSourceFormat.csv
-                        ? l10n.importCsvContentLabel
-                        : l10n.importTextContentLabel,
-                    hintText: draft.format == ImportSourceFormat.csv
-                        ? l10n.importCsvHint
-                        : l10n.importTextHint,
-                    minLines: 10,
-                    maxLines: 18,
-                    onChanged: (value) => ref
-                        .read(
-                          flashcardImportDraftProvider(widget.deckId).notifier,
-                        )
-                        .setRawContent(value),
-                  ),
-                  const MxGap(MxSpace.lg),
-                  Wrap(
-                    spacing: MxSpace.sm,
-                    runSpacing: MxSpace.sm,
-                    children: [
-                      MxSecondaryButton(
-                        label: l10n.importPreviewAction,
-                        leadingIcon: Icons.preview_outlined,
-                        variant: MxSecondaryVariant.outlined,
-                        isLoading:
-                            _pendingAction == _ImportPendingAction.preview,
-                        onPressed: isImportBusy
-                            ? null
-                            : () => _preparePreview(),
-                      ),
-                      MxPrimaryButton(
-                        label: l10n.commonImport,
-                        leadingIcon: Icons.file_upload_outlined,
-                        isLoading:
-                            _pendingAction == _ImportPendingAction.commit,
-                        onPressed:
-                            isImportBusy || draft.preparation?.canCommit != true
-                            ? null
-                            : () => _commitImport(context),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
             if (draft.preparation != null) ...[
-              const MxGap(MxSpace.xl),
-              DeckImportPreviewSection(preparation: draft.preparation!),
+              const MxSliverGap(MxSpace.xl),
+              ...buildDeckImportPreviewSlivers(
+                context: context,
+                preparation: draft.preparation!,
+              ),
             ],
           ],
         ),

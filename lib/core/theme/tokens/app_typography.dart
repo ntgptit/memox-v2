@@ -13,74 +13,74 @@ abstract final class AppTypography {
 
   static const TextStyle displayLarge = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 57,
-    fontWeight: FontWeight.w400,
-    height: 64 / 57,
-    letterSpacing: -0.25,
+    fontSize: 48,
+    fontWeight: FontWeight.w700,
+    height: 56 / 48,
+    letterSpacing: 0,
   );
 
   static const TextStyle displayMedium = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 45,
-    fontWeight: FontWeight.w400,
-    height: 52 / 45,
+    fontSize: 40,
+    fontWeight: FontWeight.w700,
+    height: 48 / 40,
     letterSpacing: 0,
   );
 
   static const TextStyle displaySmall = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 36,
-    fontWeight: FontWeight.w400,
-    height: 44 / 36,
+    fontSize: 34,
+    fontWeight: FontWeight.w700,
+    height: 42 / 34,
     letterSpacing: 0,
   );
 
   static const TextStyle headlineLarge = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 32,
-    fontWeight: FontWeight.w600,
-    height: 40 / 32,
+    fontSize: 30,
+    fontWeight: FontWeight.w700,
+    height: 38 / 30,
     letterSpacing: 0,
   );
 
   static const TextStyle headlineMedium = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 28,
-    fontWeight: FontWeight.w600,
-    height: 36 / 28,
+    fontSize: 26,
+    fontWeight: FontWeight.w700,
+    height: 34 / 26,
     letterSpacing: 0,
   );
 
   static const TextStyle headlineSmall = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 24,
-    fontWeight: FontWeight.w600,
-    height: 32 / 24,
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+    height: 30 / 22,
     letterSpacing: 0,
   );
 
   static const TextStyle titleLarge = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 22,
-    fontWeight: FontWeight.w600,
-    height: 28 / 22,
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    height: 28 / 20,
     letterSpacing: 0,
   );
 
   static const TextStyle titleMedium = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w700,
     height: 24 / 16,
-    letterSpacing: 0.15,
+    letterSpacing: 0,
   );
 
   static const TextStyle titleSmall = TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w700,
     height: 20 / 14,
-    letterSpacing: 0.1,
+    letterSpacing: 0,
   );
 
   static const TextStyle bodyLarge = TextStyle(
@@ -88,7 +88,7 @@ abstract final class AppTypography {
     fontSize: 16,
     fontWeight: FontWeight.w400,
     height: 24 / 16,
-    letterSpacing: 0.15,
+    letterSpacing: 0,
   );
 
   static const TextStyle bodyMedium = TextStyle(
@@ -96,7 +96,7 @@ abstract final class AppTypography {
     fontSize: 14,
     fontWeight: FontWeight.w400,
     height: 20 / 14,
-    letterSpacing: 0.25,
+    letterSpacing: 0,
   );
 
   static const TextStyle bodySmall = TextStyle(
@@ -104,7 +104,7 @@ abstract final class AppTypography {
     fontSize: 12,
     fontWeight: FontWeight.w400,
     height: 16 / 12,
-    letterSpacing: 0.4,
+    letterSpacing: 0,
   );
 
   static const TextStyle labelLarge = TextStyle(
@@ -112,7 +112,7 @@ abstract final class AppTypography {
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 20 / 14,
-    letterSpacing: 0.1,
+    letterSpacing: 0,
   );
 
   static const TextStyle labelMedium = TextStyle(
@@ -120,7 +120,7 @@ abstract final class AppTypography {
     fontSize: 12,
     fontWeight: FontWeight.w600,
     height: 16 / 12,
-    letterSpacing: 0.5,
+    letterSpacing: 0,
   );
 
   static const TextStyle labelSmall = TextStyle(
@@ -128,7 +128,7 @@ abstract final class AppTypography {
     fontSize: 11,
     fontWeight: FontWeight.w600,
     height: 16 / 11,
-    letterSpacing: 0.5,
+    letterSpacing: 0,
   );
 
   /// The full [TextTheme] used to build [ThemeData.textTheme]. Mobile-first

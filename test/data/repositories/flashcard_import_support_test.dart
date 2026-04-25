@@ -3,7 +3,7 @@ import 'package:memox/data/repositories/flashcard_import_support.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
 
 void main() {
-  test('auto detects slash separated vocabulary lines before colon text', () {
+  test('DT1 parseRows: auto detects slash separated vocabulary lines before colon text', () {
     final preparation = FlashcardImportSupport.parse(
       format: ImportSourceFormat.structuredText,
       rawContent: '''
@@ -26,7 +26,7 @@ void main() {
     );
   });
 
-  test('explicit tab separator parses one card per line', () {
+  test('DT2 parseRows: explicit tab separator parses one card per line', () {
     final preparation = FlashcardImportSupport.parse(
       format: ImportSourceFormat.structuredText,
       structuredTextSeparator: ImportStructuredTextSeparator.tab,
@@ -44,7 +44,7 @@ void main() {
     ]);
   });
 
-  test('explicit colon separator preserves later colons in the answer', () {
+  test('DT1 onUpdate: explicit colon separator preserves later colons in the answer', () {
     final preparation = FlashcardImportSupport.parse(
       format: ImportSourceFormat.structuredText,
       structuredTextSeparator: ImportStructuredTextSeparator.colon,
@@ -59,7 +59,7 @@ void main() {
     );
   });
 
-  test('auto keeps existing Front Back block format compatible', () {
+  test('DT1 onNavigate: auto keeps existing Front Back block format compatible', () {
     final preparation = FlashcardImportSupport.parse(
       format: ImportSourceFormat.structuredText,
       rawContent: 'Front: hello\nBack: xin chao\nNote: greeting',

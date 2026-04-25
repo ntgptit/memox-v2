@@ -12,10 +12,11 @@ import 'package:memox/app/router/route_names.dart';
 import 'package:memox/presentation/features/folders/screens/folder_detail_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
 
 void main() {
   testWidgets(
-    'shows layout skeleton instead of full loading state on first load',
+    'DT1 onOpen: shows layout skeleton instead of full loading state on first load',
     (WidgetTester tester) async {
       const folderId = 'folder-001';
       final container = ProviderContainer(
@@ -43,134 +44,137 @@ void main() {
     },
   );
 
-  testWidgets('keeps floating action button during query refresh', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-001';
-    final controller = _FutureController<FolderDetailState>(
-      Future<FolderDetailState>.value(_sampleFolderState),
-    );
-    final currentFutureProvider =
-        ChangeNotifierProvider<_FutureController<FolderDetailState>>(
-          (ref) => controller,
-        );
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(
-          folderId,
-        ).overrideWith((ref) => ref.watch(currentFutureProvider).future),
-      ],
-    );
-    addTearDown(container.dispose);
+  testWidgets(
+    'DT1 onSearchFilterSort: keeps floating action button during query refresh',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final controller = _FutureController<FolderDetailState>(
+        Future<FolderDetailState>.value(_sampleFolderState),
+      );
+      final currentFutureProvider =
+          ChangeNotifierProvider<_FutureController<FolderDetailState>>(
+            (ref) => controller,
+          );
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(
+            folderId,
+          ).overrideWith((ref) => ref.watch(currentFutureProvider).future),
+        ],
+      );
+      addTearDown(container.dispose);
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.byType(FloatingActionButton), findsOneWidget);
-    expect(find.byIcon(Icons.add), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
-      findsNothing,
-    );
-
-    final refreshCompleter = Completer<FolderDetailState>();
-    controller.future = refreshCompleter.future;
-    await tester.pump();
-
-    expect(find.byType(FloatingActionButton), findsOneWidget);
-    expect(find.byIcon(Icons.add), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets('tapping ancestor breadcrumb navigates to that folder detail', (
-    WidgetTester tester,
-  ) async {
-    const childFolderId = 'folder-001';
-    const parentFolderId = 'folder-000';
-
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(childFolderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
         ),
-        folderDetailQueryProvider(parentFolderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_parentFolderState),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    final router = GoRouter(
-      initialLocation: '/folder/$childFolderId',
-      routes: [
-        GoRoute(
-          path: '/folder/:${RoutePaths.folderIdParam}',
-          name: RouteNames.folderDetail,
-          builder: (context, state) => FolderDetailScreen(
-            folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
+        findsNothing,
+      );
+
+      final refreshCompleter = Completer<FolderDetailState>();
+      controller.future = refreshCompleter.future;
+      await tester.pump();
+
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'DT1 onNavigate: tapping ancestor breadcrumb navigates to that folder detail',
+    (WidgetTester tester) async {
+      const childFolderId = 'folder-001';
+      const parentFolderId = 'folder-000';
+
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(childFolderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+          ),
+          folderDetailQueryProvider(parentFolderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_parentFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final router = GoRouter(
+        initialLocation: '/folder/$childFolderId',
+        routes: [
+          GoRoute(
+            path: '/folder/:${RoutePaths.folderIdParam}',
+            name: RouteNames.folderDetail,
+            builder: (context, state) => FolderDetailScreen(
+              folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
           ),
         ),
-      ],
-    );
-    addTearDown(router.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: MaterialApp.router(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: router,
+      expect(find.text('Japanese N5'), findsAtLeastNWidgets(1));
+
+      await tester.tap(find.text('Japanese').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Japanese'), findsAtLeastNWidgets(1));
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/folder/$parentFolderId',
+      );
+    },
+  );
+
+  testWidgets(
+    'DT1 onDisplay: renders subtree deck and card stats for subfolders',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Japanese N5'), findsAtLeastNWidgets(1));
+      expect(find.text('1 decks · 2 cards'), findsOneWidget);
+    },
+  );
 
-    await tester.tap(find.text('Japanese').first);
-    await tester.pumpAndSettle();
-
-    expect(find.text('Japanese'), findsAtLeastNWidgets(1));
-    expect(
-      router.routeInformationProvider.value.uri.path,
-      '/folder/$parentFolderId',
-    );
-  });
-
-  testWidgets('renders subtree deck and card stats for subfolders', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-001';
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_sampleFolderState),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
-
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('1 decks · 2 cards'), findsOneWidget);
-  });
-
-  testWidgets('unlocked folder renders both create choices', (
+  testWidgets('DT1 onInsert: unlocked folder renders both create choices', (
     WidgetTester tester,
   ) async {
     const folderId = 'folder-001';
@@ -196,33 +200,34 @@ void main() {
     expect(find.text('New deck'), findsOneWidget);
   });
 
-  testWidgets('empty subfolder mode renders only subfolder CTA', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-001';
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_emptySubfolderState),
+  testWidgets(
+    'DT2 onDisplay: empty subfolder mode renders only subfolder CTA',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_emptySubfolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
         ),
-      ],
-    );
-    addTearDown(container.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
-      ),
-    );
-    await tester.pumpAndSettle();
+      expect(find.text('No subfolders yet'), findsOneWidget);
+      expect(find.text('New subfolder'), findsOneWidget);
+      expect(find.text('New deck'), findsNothing);
+    },
+  );
 
-    expect(find.text('No subfolders yet'), findsOneWidget);
-    expect(find.text('New subfolder'), findsOneWidget);
-    expect(find.text('New deck'), findsNothing);
-  });
-
-  testWidgets('empty deck mode renders only deck CTA', (
+  testWidgets('DT3 onDisplay: empty deck mode renders only deck CTA', (
     WidgetTester tester,
   ) async {
     const folderId = 'folder-001';
@@ -248,131 +253,200 @@ void main() {
     expect(find.text('New subfolder'), findsNothing);
   });
 
-  testWidgets('search with no results renders clear search action', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-001';
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_searchNoResultState),
+  testWidgets(
+    'DT2 onSearchFilterSort: search with no results renders clear search action',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_searchNoResultState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
         ),
-      ],
-    );
-    addTearDown(container.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
-      ),
-    );
-    await tester.pumpAndSettle();
+      expect(find.text('No matching items'), findsOneWidget);
+      expect(find.text('Clear search'), findsOneWidget);
+      expect(find.text('New deck'), findsNothing);
+      expect(find.byType(FloatingActionButton), findsNothing);
+    },
+  );
 
-    expect(find.text('No matching items'), findsOneWidget);
-    expect(find.text('Clear search'), findsOneWidget);
-    expect(find.text('New deck'), findsNothing);
-    expect(find.byType(FloatingActionButton), findsNothing);
-  });
+  testWidgets(
+    'DT2 onNavigate: falls back to zero progress for legacy subfolder data',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_legacyFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-  testWidgets('falls back to zero progress for legacy subfolder data', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-001';
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_legacyFolderState),
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
         ),
-      ],
-    );
-    addTearDown(container.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
-      ),
-    );
-    await tester.pumpAndSettle();
+      expect(find.text('Legacy'), findsOneWidget);
+      expect(find.text('0%'), findsOneWidget);
+    },
+  );
 
-    expect(find.text('Legacy'), findsOneWidget);
-    expect(find.text('0%'), findsOneWidget);
-  });
+  testWidgets(
+    'DT3 onNavigate: opens recursive folder study from the subfolder card icon',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      const subfolderId = 'folder-002';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-  testWidgets('opens recursive folder study from the subfolder card icon', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-001';
-    const subfolderId = 'folder-002';
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_sampleFolderState),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
+      final router = GoRouter(
+        initialLocation: '/folder/$folderId',
+        routes: [
+          GoRoute(
+            path: '/${RoutePaths.folderDetailSegment}',
+            name: RouteNames.folderDetail,
+            builder: (context, state) => FolderDetailScreen(
+              folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+            ),
+          ),
+          GoRoute(
+            path: '/${RoutePaths.studyEntrySegment}',
+            name: RouteNames.studyEntry,
+            builder: (context, state) => const SizedBox.shrink(),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
 
-    final router = GoRouter(
-      initialLocation: '/folder/$folderId',
-      routes: [
-        GoRoute(
-          path: '/${RoutePaths.folderDetailSegment}',
-          name: RouteNames.folderDetail,
-          builder: (context, state) => FolderDetailScreen(
-            folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
           ),
         ),
-        GoRoute(
-          path: '/${RoutePaths.studyEntrySegment}',
-          name: RouteNames.studyEntry,
-          builder: (context, state) => const SizedBox.shrink(),
+      );
+      await tester.pumpAndSettle();
+
+      final studyButton = find.byKey(
+        const ValueKey('folder_recursive_study_$subfolderId'),
+      );
+
+      expect(find.text('Study now'), findsNothing);
+      expect(studyButton, findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+      expect(find.text('19%'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(
+        tester.getCenter(studyButton).dy,
+        closeTo(tester.getCenter(find.text('Vocabulary')).dy, 16),
+      );
+
+      await tester.tap(studyButton);
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/study/folder/$subfolderId',
+      );
+    },
+  );
+
+  testWidgets(
+    'DT4 onNavigate: opens deck study from the deck card progress action',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_deckFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final router = GoRouter(
+        initialLocation: '/folder/$folderId',
+        routes: [
+          GoRoute(
+            path: '/${RoutePaths.folderDetailSegment}',
+            name: RouteNames.folderDetail,
+            builder: (context, state) => FolderDetailScreen(
+              folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+            ),
+          ),
+          GoRoute(
+            path: '/${RoutePaths.deckDetailSegment}',
+            name: RouteNames.deckDetail,
+            builder: (context, state) => const SizedBox.shrink(),
+          ),
+          GoRoute(
+            path: '/${RoutePaths.studyEntrySegment}',
+            name: RouteNames.studyEntry,
+            builder: (context, state) => const SizedBox.shrink(),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
         ),
-      ],
-    );
-    addTearDown(router.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: MaterialApp.router(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: router,
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      final studyButton = find.byKey(const ValueKey('deck_study_$deckId'));
 
-    final studyButton = find.byKey(
-      const ValueKey('folder_recursive_study_$subfolderId'),
-    );
+      expect(find.text('Vitamin B1'), findsOneWidget);
+      expect(studyButton, findsOneWidget);
+      expect(find.text('42%'), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
 
-    expect(find.text('Study now'), findsNothing);
-    expect(studyButton, findsOneWidget);
-    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
-    expect(find.text('19%'), findsOneWidget);
-    expect(find.text('2'), findsOneWidget);
-    expect(
-      tester.getCenter(studyButton).dy,
-      closeTo(tester.getCenter(find.text('Vocabulary')).dy, 16),
-    );
+      await tester.tap(studyButton);
+      await tester.pumpAndSettle();
 
-    await tester.tap(studyButton);
-    await tester.pumpAndSettle();
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/study/deck/$deckId',
+      );
+    },
+  );
 
-    expect(
-      router.routeInformationProvider.value.uri.path,
-      '/study/folder/$subfolderId',
-    );
-  });
-
-  testWidgets('opens deck study from the deck card progress action', (
+  testWidgets('DT5 onNavigate: tapping a deck row opens flashcard management', (
     WidgetTester tester,
   ) async {
     const folderId = 'folder-001';
-    const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
         folderDetailQueryProvider(folderId).overrideWith(
@@ -393,14 +467,10 @@ void main() {
           ),
         ),
         GoRoute(
-          path: '/${RoutePaths.deckDetailSegment}',
-          name: RouteNames.deckDetail,
-          builder: (context, state) => const SizedBox.shrink(),
-        ),
-        GoRoute(
-          path: '/${RoutePaths.studyEntrySegment}',
-          name: RouteNames.studyEntry,
-          builder: (context, state) => const SizedBox.shrink(),
+          path: '/${RoutePaths.flashcardListSegment}',
+          name: RouteNames.flashcardList,
+          builder: (context, state) =>
+              const SizedBox(key: ValueKey('flashcard_list_destination')),
         ),
       ],
     );
@@ -418,53 +488,50 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final studyButton = find.byKey(const ValueKey('deck_study_$deckId'));
+    final deckTile = find.widgetWithText(MxStudySetTile, 'Vitamin B1');
 
-    expect(find.text('Vitamin B1'), findsOneWidget);
-    expect(studyButton, findsOneWidget);
-    expect(find.text('42%'), findsOneWidget);
-    expect(find.text('1'), findsOneWidget);
-
-    await tester.tap(studyButton);
+    await tester.ensureVisible(deckTile);
+    await tester.tap(deckTile);
     await tester.pumpAndSettle();
 
     expect(
-      router.routeInformationProvider.value.uri.path,
-      '/study/deck/$deckId',
+      find.byKey(const ValueKey('flashcard_list_destination')),
+      findsOneWidget,
     );
   });
 
-  testWidgets('long pressing a subfolder opens direct folder actions', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-001';
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+  testWidgets(
+    'DT1 onDelete: long pressing a subfolder opens direct folder actions',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
         ),
-      ],
-    );
-    addTearDown(container.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.longPress(find.text('Vocabulary'));
+      await tester.pumpAndSettle();
 
-    await tester.longPress(find.text('Vocabulary'));
-    await tester.pumpAndSettle();
+      expect(find.text('Folder actions'), findsOneWidget);
+      expect(find.text('Edit'), findsOneWidget);
+      expect(find.text('Move'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+    },
+  );
 
-    expect(find.text('Folder actions'), findsOneWidget);
-    expect(find.text('Edit'), findsOneWidget);
-    expect(find.text('Move'), findsOneWidget);
-    expect(find.text('Delete'), findsOneWidget);
-  });
-
-  testWidgets('long pressing a deck opens direct deck actions', (
+  testWidgets('DT2 onDelete: long pressing a deck opens direct deck actions', (
     WidgetTester tester,
   ) async {
     const folderId = 'folder-001';

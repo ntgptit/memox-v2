@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../tokens/app_elevation.dart';
 import '../tokens/app_opacity.dart';
 import '../tokens/app_radius.dart';
 import '../tokens/app_typography.dart';
@@ -23,8 +24,8 @@ abstract final class ButtonThemeBuilder {
         disabledForegroundColor: scheme.onSurface.withValues(
           alpha: AppOpacity.disabled,
         ),
-        elevation: 0,
-        shadowColor: Colors.transparent,
+        elevation: AppElevation.button,
+        shadowColor: scheme.primary,
         minimumSize: const Size(0, _minHeight),
         padding: _padding,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
@@ -37,8 +38,8 @@ abstract final class ButtonThemeBuilder {
   static FilledButtonThemeData tonal(ColorScheme scheme) {
     return FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: scheme.secondaryContainer,
-        foregroundColor: scheme.onSecondaryContainer,
+        backgroundColor: scheme.primaryContainer,
+        foregroundColor: scheme.onPrimaryContainer,
         disabledBackgroundColor: scheme.onSurface.withValues(
           alpha: AppOpacity.disabledSurface,
         ),
@@ -49,6 +50,7 @@ abstract final class ButtonThemeBuilder {
         padding: _padding,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
         textStyle: AppTypography.labelLarge,
+        side: BorderSide(color: scheme.outlineVariant),
       ),
     );
   }
@@ -56,13 +58,14 @@ abstract final class ButtonThemeBuilder {
   static OutlinedButtonThemeData outlined(ColorScheme scheme) {
     return OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
+        backgroundColor: scheme.surfaceContainerLow,
         foregroundColor: scheme.primary,
         disabledForegroundColor: scheme.onSurface.withValues(
           alpha: AppOpacity.disabled,
         ),
         minimumSize: const Size(0, _minHeight),
         padding: _padding,
-        side: BorderSide(color: scheme.outline),
+        side: BorderSide(color: scheme.outlineVariant),
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
         textStyle: AppTypography.labelLarge,
       ),
@@ -94,9 +97,8 @@ abstract final class ButtonThemeBuilder {
         minimumSize: const Size(40, 40),
         fixedSize: const Size(40, 40),
         iconSize: 20,
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppRadius.buttonSmall,
-        ),
+        backgroundColor: scheme.surfaceContainerLow,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
       ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onSurface)),
     );
   }
@@ -105,11 +107,11 @@ abstract final class ButtonThemeBuilder {
     return FloatingActionButtonThemeData(
       backgroundColor: scheme.primaryContainer,
       foregroundColor: scheme.onPrimaryContainer,
-      elevation: 3,
-      focusElevation: 4,
-      hoverElevation: 4,
-      highlightElevation: 6,
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderLg),
+      elevation: 4,
+      focusElevation: 6,
+      hoverElevation: 6,
+      highlightElevation: 8,
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSemi),
     );
   }
 }

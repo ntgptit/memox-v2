@@ -10,7 +10,7 @@ import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 import 'package:memox/presentation/shared/states/mx_retained_async_state.dart';
 
 void main() {
-  testWidgets('shows full loading state on first load', (
+  testWidgets('DT1 onOpen: shows full loading state on first load', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -26,7 +26,7 @@ void main() {
     expect(find.text('Loaded value'), findsNothing);
   });
 
-  testWidgets('uses skeleton builder on first load when provided', (
+  testWidgets('DT2 onOpen: uses skeleton builder on first load when provided', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -43,7 +43,7 @@ void main() {
     expect(find.byType(MxLoadingState), findsNothing);
   });
 
-  testWidgets('keeps previous content and shows refresh bar while refetching', (
+  testWidgets('DT1 onRefreshRetry: keeps previous content and shows refresh bar while refetching', (
     WidgetTester tester,
   ) async {
     final controller = _FutureController<String>(
@@ -95,7 +95,7 @@ void main() {
     );
   });
 
-  testWidgets('keeps previous content and shows snackbar when refresh fails', (
+  testWidgets('DT2 onRefreshRetry: keeps previous content and shows snackbar when refresh fails', (
     WidgetTester tester,
   ) async {
     final controller = _FutureController<String>(
@@ -144,7 +144,7 @@ void main() {
     expect(find.text('Something went wrong.'), findsOneWidget);
   });
 
-  testWidgets('shows error state when first load fails', (
+  testWidgets('DT3 onOpen: shows error state when first load fails', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(

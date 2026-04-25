@@ -12,11 +12,13 @@ class FlashcardToolbarSection extends StatelessWidget {
     required this.selectedSort,
     required this.isReorderMode,
     required this.canManualReorder,
+    required this.canStartStudy,
     required this.onSearchChanged,
     required this.onSearchClear,
     required this.onSortSelected,
     required this.onCancelReorder,
     required this.onSaveReorder,
+    required this.onStartStudy,
     required this.onImport,
     required this.onStartReorder,
     super.key,
@@ -25,11 +27,13 @@ class FlashcardToolbarSection extends StatelessWidget {
   final ContentSortMode selectedSort;
   final bool isReorderMode;
   final bool canManualReorder;
+  final bool canStartStudy;
   final ValueChanged<String> onSearchChanged;
   final VoidCallback onSearchClear;
   final ValueChanged<ContentSortMode> onSortSelected;
   final VoidCallback onCancelReorder;
   final VoidCallback onSaveReorder;
+  final VoidCallback onStartStudy;
   final VoidCallback onImport;
   final VoidCallback onStartReorder;
 
@@ -59,6 +63,11 @@ class FlashcardToolbarSection extends StatelessWidget {
               ),
             ]
           : <Widget>[
+              MxPrimaryButton(
+                label: l10n.studyStartAction,
+                leadingIcon: Icons.play_arrow_rounded,
+                onPressed: canStartStudy ? onStartStudy : null,
+              ),
               MxSecondaryButton(
                 label: l10n.commonImport,
                 leadingIcon: Icons.file_upload_outlined,

@@ -24,35 +24,57 @@ class FlashcardItemsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var index = 0; index < state.items.length; index++) ...[
-          MxTermRow(
-            term: state.items[index].front,
-            definition: state.items[index].back,
-            caption: state.items[index].note,
-            selected: selection.contains(state.items[index].id),
-            onTap: () {
-              if (selection.isNotEmpty) {
-                onToggleSelection(state.items[index].id);
-                return;
-              }
-              context.pushFlashcardEdit(
-                deckId: deckId,
-                flashcardId: state.items[index].id,
-              );
-            },
-            onLongPress: () {
-              if (selection.isNotEmpty) {
-                onToggleSelection(state.items[index].id);
-                return;
-              }
-              onOpenActions(state.items[index]);
-            },
-          ),
-          if (index < state.items.length - 1) const MxGap(MxSpace.sm),
-        ],
-      ],
+    return SliverList.separated(
+      key: const ValueKey('flashcard_lazy_items'),
+      itemCount: state.items.length,
+      itemBuilder: (context, index) => _FlashcardItemRow(
+        item: state.items[index],
+        deckId: deckId,
+        selection: selection,
+        onToggleSelection: onToggleSelection,
+        onOpenActions: onOpenActions,
+      ),
+      separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
+    );
+  }
+}
+
+class _FlashcardItemRow extends StatelessWidget {
+  const _FlashcardItemRow({
+    required this.item,
+    required this.deckId,
+    required this.selection,
+    required this.onToggleSelection,
+    required this.onOpenActions,
+  });
+
+  final FlashcardListItemState item;
+  final String deckId;
+  final Set<String> selection;
+  final ValueChanged<String> onToggleSelection;
+  final ValueChanged<FlashcardListItemState> onOpenActions;
+
+  @override
+  Widget build(BuildContext context) {
+    return MxTermRow(
+      term: item.front,
+      definition: item.back,
+      caption: item.note,
+      selected: selection.contains(item.id),
+      onTap: () {
+        if (selection.isNotEmpty) {
+          onToggleSelection(item.id);
+          return;
+        }
+        context.pushFlashcardEdit(deckId: deckId, flashcardId: item.id);
+      },
+      onLongPress: () {
+        if (selection.isNotEmpty) {
+          onToggleSelection(item.id);
+          return;
+        }
+        onOpenActions(item);
+      },
     );
   }
 }

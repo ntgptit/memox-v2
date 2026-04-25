@@ -13,12 +13,14 @@ class FlashcardHeaderSection extends StatelessWidget {
     required this.state,
     required this.onBack,
     required this.onOpenBreadcrumb,
+    this.onOpenActions,
     super.key,
   });
 
   final FlashcardListState state;
   final VoidCallback onBack;
   final ValueChanged<String> onOpenBreadcrumb;
+  final VoidCallback? onOpenActions;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,14 @@ class FlashcardHeaderSection extends StatelessWidget {
             ),
             const MxGap(MxSpace.sm),
             Expanded(child: MxText(state.deckName, role: MxTextRole.pageTitle)),
+            if (onOpenActions != null) ...[
+              const MxGap(MxSpace.sm),
+              MxIconButton(
+                icon: Icons.more_horiz_rounded,
+                tooltip: l10n.decksMoreActionsTooltip,
+                onPressed: onOpenActions,
+              ),
+            ],
           ],
         ),
         const MxGap(MxSpace.sm),

@@ -35,7 +35,7 @@ void main() {
     });
 
     test(
-      'creating a subfolder in an unlocked folder locks it to subfolders',
+      'DT1 onInsert: creating a subfolder in an unlocked folder locks it to subfolders',
       () async {
         final root = await harness.folderRepository.createRootFolder(
           'Languages',
@@ -56,7 +56,7 @@ void main() {
       },
     );
 
-    test('creating a deck in an unlocked folder locks it to decks', () async {
+    test('DT2 onInsert: creating a deck in an unlocked folder locks it to decks', () async {
       final root = await harness.folderRepository.createRootFolder('Languages');
       final rootId = root.valueOrNull!.id;
 
@@ -74,7 +74,7 @@ void main() {
     });
 
     test(
-      'deleting the last subfolder resets parent folder mode to unlocked',
+      'DT1 onDelete: deleting the last subfolder resets parent folder mode to unlocked',
       () async {
         final root = await harness.folderRepository.createRootFolder(
           'Languages',
@@ -98,7 +98,7 @@ void main() {
       },
     );
 
-    test('moving a folder into its descendant is rejected', () async {
+    test('DT1 repositoryFlow: moving a folder into its descendant is rejected', () async {
       final root = await harness.folderRepository.createRootFolder('Languages');
       final rootId = root.valueOrNull!.id;
       final child = await harness.folderRepository.createSubfolder(
@@ -115,7 +115,7 @@ void main() {
     });
 
     test(
-      'moving the last deck resets source folder and preserves flashcard progress',
+      'DT2 repositoryFlow: moving the last deck resets source folder and preserves flashcard progress',
       () async {
         final sourceFolder = await harness.folderRepository.createRootFolder(
           'Source',
@@ -178,7 +178,7 @@ void main() {
       },
     );
 
-    test('duplicating a deck copies content and resets progress', () async {
+    test('DT3 repositoryFlow: duplicating a deck copies content and resets progress', () async {
       final folder = await harness.folderRepository.createRootFolder(
         'Languages',
       );
@@ -241,7 +241,7 @@ void main() {
     });
 
     test(
-      'sort by last studied pushes never-studied flashcards to the end',
+      'DT1 onSearchFilterSort: sort by last studied pushes never-studied flashcards to the end',
       () async {
         final folder = await harness.folderRepository.createRootFolder(
           'Languages',
@@ -294,7 +294,7 @@ void main() {
     );
 
     test(
-      'import with mixed valid and invalid lines does not write any flashcards',
+      'DT3 onInsert: import with mixed valid and invalid lines does not write any flashcards',
       () async {
         final folder = await harness.folderRepository.createRootFolder(
           'Languages',
@@ -328,7 +328,7 @@ void main() {
     );
 
     test(
-      'bulk move 200 flashcards stays transaction-safe and preserves progress',
+      'DT1 onMove: bulk move 200 flashcards stays transaction-safe and preserves progress',
       () async {
         final sourceFolder = await harness.folderRepository.createRootFolder(
           'Source',

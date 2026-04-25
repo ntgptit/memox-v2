@@ -13,7 +13,7 @@ import 'package:memox/presentation/shared/states/mx_error_state.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 
 void main() {
-  testWidgets('shows loading state while dashboard data loads', (tester) async {
+  testWidgets('DT1 onOpen: shows loading state while dashboard data loads', (tester) async {
     final completer = Completer<LibraryOverviewState>();
     addTearDown(() {
       if (!completer.isCompleted) {
@@ -34,7 +34,7 @@ void main() {
     expect(find.byType(MxLoadingState), findsOneWidget);
   });
 
-  testWidgets('shows retryable error state when dashboard query fails', (
+  testWidgets('DT1 onSearchFilterSort: shows retryable error state when dashboard query fails', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -55,7 +55,27 @@ void main() {
     expect(find.byType(MxErrorState), findsOneWidget);
   });
 
-  testWidgets('renders dashboard metrics and study CTA for due cards', (
+  testWidgets('DT1 onDisplay: renders greeting library progress and due count', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith(
+            (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+          ),
+        ],
+        child: const _TestApp(child: DashboardScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Today\'s study focus'), findsOneWidget);
+    expect(find.text('1 folders · 12 cards'), findsOneWidget);
+    expect(find.text('30%'), findsOneWidget);
+  });
+
+  testWidgets('DT1 onNavigate: renders dashboard metrics and study CTA for due cards', (
     tester,
   ) async {
     final router = GoRouter(
@@ -117,7 +137,7 @@ void main() {
     expect(router.routeInformationProvider.value.uri.path, '/study/today');
   });
 
-  testWidgets('no-due primary CTA opens library and remains enabled', (
+  testWidgets('DT2 onNavigate: no-due primary CTA opens library and remains enabled', (
     tester,
   ) async {
     final router = GoRouter(

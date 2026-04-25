@@ -15,7 +15,6 @@ import '../actions/deck_quick_actions.dart';
 import '../widgets/deck_detail_skeleton.dart';
 import '../widgets/deck_header_section.dart';
 import '../widgets/deck_stats_section.dart';
-import '../widgets/deck_study_action_section.dart';
 import '../viewmodels/deck_detail_viewmodel.dart';
 
 class DeckDetailScreen extends ConsumerWidget {
@@ -79,18 +78,6 @@ class DeckDetailScreen extends ConsumerWidget {
                 DeckStatsSection(
                   state: state,
                   lastStudiedLabel: lastStudiedLabel,
-                ),
-                const MxGap(MxSpace.xl),
-                DeckStudyActionSection(
-                  cardCount: state.cardCount,
-                  dueTodayCount: state.dueTodayCount,
-                  onOpenFlashcards: () => context.pushFlashcardList(state.id),
-                  onAddFlashcard: () => context.pushFlashcardCreate(state.id),
-                  onImport: () => context.pushDeckImport(state.id),
-                  onStartStudy: () => context.goStudyEntry(
-                    entryType: 'deck',
-                    entryRefId: state.id,
-                  ),
                 ),
               ],
             );

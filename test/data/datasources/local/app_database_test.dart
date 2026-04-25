@@ -14,7 +14,7 @@ void main() {
       await database.close();
     });
 
-    test('creates the full schema v1', () async {
+    test('DT1 onInsert: creates the full schema v1', () async {
       final tableNames = await database
           .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
           .map((row) => row.read<String>('name'))
@@ -34,7 +34,7 @@ void main() {
       );
     });
 
-    test('resets pre-release study tables during v2 migration', () async {
+    test('DT1 onNavigate: resets pre-release study tables during v2 migration', () async {
       await database.close();
       database = AppDatabase(
         executor: NativeDatabase.memory(
@@ -82,7 +82,7 @@ void main() {
       expect(indexRows, hasLength(1));
     });
 
-    test('deleting a deck cascades to flashcards and progress', () async {
+    test('DT1 onDelete: deleting a deck cascades to flashcards and progress', () async {
       final now = DateTime.utc(2026, 4, 22).millisecondsSinceEpoch;
 
       await database

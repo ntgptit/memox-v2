@@ -7,7 +7,7 @@ import 'package:memox/core/errors/failures.dart';
 
 void main() {
   group('ErrorMapper.map', () {
-    test('maps timeout exceptions to retryable network failures', () {
+    test('DT1 onRefreshRetry: maps timeout exceptions to retryable network failures', () {
       final failure = ErrorMapper.map(TimeoutException('request timed out'));
 
       expect(failure.type, FailureType.network);
@@ -15,7 +15,7 @@ void main() {
       expect(failure.isRetryable, isTrue);
     });
 
-    test('preserves configuration exception metadata', () {
+    test('DT1 mapError: preserves configuration exception metadata', () {
       final failure = ErrorMapper.map(
         const ConfigurationException(
           message: 'Invalid env',

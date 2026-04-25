@@ -5,7 +5,7 @@ import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
 
 void main() {
-  testWidgets('MxText resolves pageTitle from the active theme', (
+  testWidgets('DT1 onUpdate: MxText resolves pageTitle from the active theme', (
     tester,
   ) async {
     late TextStyle expectedStyle;
@@ -33,7 +33,7 @@ void main() {
     expect(text.style?.color, expectedStyle.color);
   });
 
-  testWidgets('MxText applies semantic role color override', (tester) async {
+  testWidgets('DT1 onDisplay: MxText applies semantic role color override', (tester) async {
     const overrideColor = Colors.deepOrange;
 
     await tester.pumpWidget(
@@ -53,7 +53,7 @@ void main() {
     expect(text.style?.color, overrideColor);
   });
 
-  testWidgets('MxSection renders semantic title and subtitle roles', (
+  testWidgets('DT2 onDisplay: MxSection renders semantic title and subtitle roles', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -88,7 +88,7 @@ void main() {
     );
   });
 
-  testWidgets('MxStudySetTile renders title and meta with semantic roles', (
+  testWidgets('DT1 onNavigate: MxStudySetTile renders title and meta with semantic roles', (
     tester,
   ) async {
     await tester.pumpWidget(

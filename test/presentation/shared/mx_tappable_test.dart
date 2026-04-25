@@ -11,7 +11,7 @@ import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 
 void main() {
-  testWidgets('MxTappable wires Material clipping and InkWell shape', (
+  testWidgets('DT1 onDisplay: MxTappable wires Material clipping and InkWell shape', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -42,7 +42,7 @@ void main() {
     expect(inkWell.customBorder, isA<StadiumBorder>());
   });
 
-  testWidgets('MxFolderTile routes tap handling through MxTappable', (
+  testWidgets('DT1 onNavigate: MxFolderTile routes tap handling through MxTappable', (
     tester,
   ) async {
     var tapped = false;
@@ -65,7 +65,7 @@ void main() {
     expect(tapped, isTrue);
   });
 
-  testWidgets('MxStudySetTile keeps the widened gap between icon and content', (
+  testWidgets('DT2 onNavigate: MxStudySetTile keeps the widened gap between icon and content', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -89,7 +89,7 @@ void main() {
     );
   });
 
-  testWidgets('MxAvatar keeps spacing between avatar and badge', (
+  testWidgets('DT1 onBehavior: MxAvatar keeps spacing between avatar and badge', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -109,7 +109,7 @@ void main() {
     );
   });
 
-  testWidgets('MxPageDots uses shaped tap surfaces for dot taps', (
+  testWidgets('DT3 onNavigate: MxPageDots uses shaped tap surfaces for dot taps', (
     tester,
   ) async {
     int? tappedIndex;
@@ -140,7 +140,7 @@ void main() {
     expect(tappedIndex, 2);
   });
 
-  testWidgets('MxPageDots exposes page position and selected semantics', (
+  testWidgets('DT1 onSelect: MxPageDots exposes page position and selected semantics', (
     tester,
   ) async {
     final semanticsHandle = tester.ensureSemantics();
@@ -171,7 +171,7 @@ void main() {
     }
   });
 
-  testWidgets('MxPageDots marks tappable dots as semantic buttons', (
+  testWidgets('DT1 onUpdate: MxPageDots marks tappable dots as semantic buttons', (
     tester,
   ) async {
     final semanticsHandle = tester.ensureSemantics();

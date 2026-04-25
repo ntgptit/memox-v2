@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 
 /// Centralized color tokens used by the MemoX themes.
 ///
-/// Naming split:
-/// - `light*` tokens apply to the light theme only
-/// - unprefixed tokens belong to the dark theme
-///
-/// Tone numbers are consistent within each brightness so dev can
-/// predict the palette without checking: light role palettes use
-/// `{10, 40, 90}` (+ `100` = white on primary); dark role palettes use
-/// `{20, 30, 80, 90}`. Neutral and `darkNavy*` scales are independent
-/// by design.
+/// Palette direction: Tokyo Admin inspired, adapted for MemoX learning flows.
+/// Light mode follows Tokyo Pure Light: cool blue text, white paper, soft
+/// blue-gray page background. Dark mode follows Tokyo Nebula: deep navy page,
+/// indigo paper, muted outlines, and a violet primary accent.
 ///
 /// Every token declared here must have at least one active consumer
 /// (theme scheme builder or `MxColorsExtension`). When adding a new
@@ -20,117 +15,117 @@ import 'package:flutter/material.dart';
 /// edit.
 abstract final class AppColors {
   // ---------------------------------------------------------------------------
-  // Light-theme palette — role tones: {10, 40, 90, 100}
+  // Light-theme palette — Tokyo Pure Light adapted.
   // ---------------------------------------------------------------------------
 
-  static const Color lightPrimary10 = Color(0xFF121C52);
-  static const Color lightPrimary40 = Color(0xFF24389C);
-  static const Color lightPrimary80 = Color(0xFF9EACE0);
-  static const Color lightPrimary90 = Color(0xFFE1E6F7);
+  static const Color lightPrimary10 = Color(0xFF000C57);
+  static const Color lightPrimary40 = Color(0xFF5569FF);
+  static const Color lightPrimary80 = Color(0xFFAAB5FF);
+  static const Color lightPrimary90 = Color(0xFFEFF2FF);
   static const Color lightPrimary100 = Color(0xFFFFFFFF);
 
-  static const Color lightSecondary10 = Color(0xFF312E81);
-  static const Color lightSecondary40 = Color(0xFF6366F1);
-  static const Color lightSecondary90 = Color(0xFFEEF2FF);
+  static const Color lightSecondary10 = Color(0xFF242E6F);
+  static const Color lightSecondary40 = Color(0xFF6E759F);
+  static const Color lightSecondary90 = Color(0xFFF1F3FA);
 
-  static const Color lightTertiary10 = Color(0xFF1D5F58);
-  static const Color lightTertiary40 = Color(0xFF4DB6AC);
-  static const Color lightTertiary90 = Color(0xFFD8F2EF);
+  static const Color lightTertiary10 = Color(0xFF00364A);
+  static const Color lightTertiary40 = Color(0xFF33C2FF);
+  static const Color lightTertiary90 = Color(0xFFE3F7FF);
 
-  static const Color lightError10 = Color(0xFF410002);
-  static const Color lightError40 = Color(0xFFBA1A1A);
-  static const Color lightError90 = Color(0xFFFFDAD6);
+  static const Color lightError10 = Color(0xFF5B0011);
+  static const Color lightError40 = Color(0xFFFF1943);
+  static const Color lightError90 = Color(0xFFFFE6EB);
 
-  static const Color lightSurface = Color(0xFFF7F9FB);
-  static const Color lightSurfaceBright = Color(0xFFF7F9FB);
-  static const Color lightSurfaceDim = Color(0xFFE0E3E5);
+  static const Color lightSurface = Color(0xFFF2F5F9);
+  static const Color lightSurfaceBright = Color(0xFFFFFFFF);
+  static const Color lightSurfaceDim = Color(0xFFE7ECF3);
   static const Color lightSurfaceContainerLowest = Color(0xFFFFFFFF);
-  static const Color lightSurfaceContainerLow = Color(0xFFF2F4F6);
-  static const Color lightSurfaceContainer = Color(0xFFECEEF0);
-  static const Color lightSurfaceContainerHigh = Color(0xFFE6E8EA);
-  static const Color lightSurfaceContainerHighest = Color(0xFFE0E3E5);
+  static const Color lightSurfaceContainerLow = Color(0xFFFFFFFF);
+  static const Color lightSurfaceContainer = Color(0xFFF9FAFD);
+  static const Color lightSurfaceContainerHigh = Color(0xFFF5F7FB);
+  static const Color lightSurfaceContainerHighest = Color(0xFFEAF0F7);
 
-  static const Color lightNeutral10 = Color(0xFF191C1E);
-  static const Color lightNeutral20 = Color(0xFF2E3133);
-  static const Color lightNeutral40 = Color(0xFF454652);
-  static const Color lightNeutralVariant60 = Color(0xFF757684);
-  static const Color lightNeutralVariant90 = Color(0xFFC5C5D4);
+  static const Color lightNeutral10 = Color(0xFF223354);
+  static const Color lightNeutral20 = Color(0xFF2D3F63);
+  static const Color lightNeutral40 = Color(0xFF6E759F);
+  static const Color lightNeutralVariant60 = Color(0xFF9FA2BF);
+  static const Color lightNeutralVariant90 = Color(0xFFD8DEEB);
 
   // Semantic light tokens (each has its own hex — not aliased, so future
   // divergence from tertiary/primary is a one-line edit).
-  static const Color lightSuccess10 = Color(0xFF1D5F58);
-  static const Color lightSuccess40 = Color(0xFF4DB6AC);
-  static const Color lightSuccess90 = Color(0xFFD8F2EF);
+  static const Color lightSuccess10 = Color(0xFF174A05);
+  static const Color lightSuccess40 = Color(0xFF57CA22);
+  static const Color lightSuccess90 = Color(0xFFE7F9DE);
 
-  static const Color lightWarning10 = Color(0xFF78350F);
-  static const Color lightWarning40 = Color(0xFFF59E0B);
-  static const Color lightWarning90 = Color(0xFFFEF3C7);
+  static const Color lightWarning10 = Color(0xFF5C3600);
+  static const Color lightWarning40 = Color(0xFFFFA319);
+  static const Color lightWarning90 = Color(0xFFFFF1D9);
 
-  static const Color lightInfo10 = Color(0xFF121C52);
-  static const Color lightInfo40 = Color(0xFF24389C);
-  static const Color lightInfo90 = Color(0xFFE1E6F7);
+  static const Color lightInfo10 = Color(0xFF00364A);
+  static const Color lightInfo40 = Color(0xFF33C2FF);
+  static const Color lightInfo90 = Color(0xFFE3F7FF);
 
-  static const Color lightMastery = Color(0xFF004E1A);
-  static const Color lightStreak = Color(0xFFF97316);
+  static const Color lightMastery = Color(0xFF57CA22);
+  static const Color lightStreak = Color(0xFFFFA319);
 
-  static const Color lightRatingAgain = Color(0xFFE57373);
-  static const Color lightRatingGood = Color(0xFF4DB6AC);
-  static const Color lightRatingEasy = Color(0xFF004E1A);
+  static const Color lightRatingAgain = Color(0xFFFF1943);
+  static const Color lightRatingGood = Color(0xFF33C2FF);
+  static const Color lightRatingEasy = Color(0xFF57CA22);
 
   // ---------------------------------------------------------------------------
-  // Dark-theme palette — role tones: {20, 30, 80, 90}
+  // Dark-theme palette — Tokyo Nebula adapted.
   // ---------------------------------------------------------------------------
 
-  static const Color primary20 = Color(0xFF2B2596);
-  static const Color primary30 = Color(0xFF3F36BD);
-  static const Color primary40 = Color(0xFF4F46E5);
-  static const Color primary80 = Color(0xFFA5B4FC);
-  static const Color primary90 = Color(0xFFE0E7FF);
+  static const Color primary20 = Color(0xFF221D55);
+  static const Color primary30 = Color(0xFF2B304D);
+  static const Color primary40 = Color(0xFF5E50C8);
+  static const Color primary80 = Color(0xFF8C7CF0);
+  static const Color primary90 = Color(0xFFE8E5FF);
 
-  static const Color secondary20 = Color(0xFF1E1B4B);
-  static const Color secondary30 = Color(0xFF312E81);
-  static const Color secondary80 = Color(0xFFC7D2FE);
-  static const Color secondary90 = Color(0xFFEEF2FF);
+  static const Color secondary20 = Color(0xFF242A48);
+  static const Color secondary30 = Color(0xFF2B304D);
+  static const Color secondary80 = Color(0xFF9EA4C1);
+  static const Color secondary90 = Color(0xFFE6E9F5);
 
-  static const Color tertiary20 = Color(0xFF115E59);
-  static const Color tertiary30 = Color(0xFF0F766E);
-  static const Color tertiary80 = Color(0xFF5EEAD4);
-  static const Color tertiary90 = Color(0xFFCCFBF1);
+  static const Color tertiary20 = Color(0xFF06344A);
+  static const Color tertiary30 = Color(0xFF0A4A66);
+  static const Color tertiary80 = Color(0xFF33C2FF);
+  static const Color tertiary90 = Color(0xFFD9F5FF);
 
-  static const Color error20 = Color(0xFF7F1D1D);
-  static const Color error30 = Color(0xFF991B1B);
-  static const Color error80 = Color(0xFFFCA5A5);
-  static const Color error90 = Color(0xFFFECACA);
+  static const Color error20 = Color(0xFF5B0011);
+  static const Color error30 = Color(0xFF7A0A1F);
+  static const Color error80 = Color(0xFFFF5575);
+  static const Color error90 = Color(0xFFFFDDE5);
 
-  static const Color neutral10 = Color(0xFF111218);
-  static const Color neutral70 = Color(0xFFA8AAB8);
-  static const Color neutral90 = Color(0xFFE4E5EC);
-  static const Color neutral95 = Color(0xFFF2F3F7);
+  static const Color neutral10 = Color(0xFF111633);
+  static const Color neutral70 = Color(0xFF9EA4C1);
+  static const Color neutral90 = Color(0xFFE6E9F5);
+  static const Color neutral95 = Color(0xFFFFFFFF);
 
-  static const Color darkNavy5 = Color(0xFF080B22);
-  static const Color darkNavy10 = Color(0xFF0A0E27);
-  static const Color darkNavy15 = Color(0xFF11162F);
-  static const Color darkNavy20 = Color(0xFF161C38);
-  static const Color darkNavy25 = Color(0xFF1B2242);
-  static const Color darkNavy30 = Color(0xFF22294F);
-  static const Color darkNavy40 = Color(0xFF2E3660);
-  static const Color darkNavyOutline = Color(0xFF2A3157);
-  static const Color darkNavyOutlineVariant = Color(0xFF1F2646);
+  static const Color darkNavy5 = Color(0xFF070C27);
+  static const Color darkNavy10 = Color(0xFF0B102D);
+  static const Color darkNavy15 = Color(0xFF111633);
+  static const Color darkNavy20 = Color(0xFF161B3A);
+  static const Color darkNavy25 = Color(0xFF1D2344);
+  static const Color darkNavy30 = Color(0xFF272C48);
+  static const Color darkNavy40 = Color(0xFF353B61);
+  static const Color darkNavyOutline = Color(0xFF3B4168);
+  static const Color darkNavyOutlineVariant = Color(0xFF272C48);
 
   // Semantic dark tokens.
-  static const Color success30 = Color(0xFF14532D);
-  static const Color success80 = Color(0xFF22C55E);
-  static const Color success90 = Color(0xFFBBF7D0);
+  static const Color success30 = Color(0xFF174A05);
+  static const Color success80 = Color(0xFF57CA22);
+  static const Color success90 = Color(0xFFDFF7D6);
 
-  static const Color warning30 = Color(0xFF854D0E);
-  static const Color warning80 = Color(0xFFFACC15);
-  static const Color warning90 = Color(0xFFFEF08A);
+  static const Color warning30 = Color(0xFF5C3600);
+  static const Color warning80 = Color(0xFFFFA319);
+  static const Color warning90 = Color(0xFFFFEDCC);
 
-  static const Color info30 = Color(0xFF1E40AF);
-  static const Color info80 = Color(0xFF60A5FA);
-  static const Color info90 = Color(0xFFBFDBFE);
+  static const Color info30 = Color(0xFF0A4A66);
+  static const Color info80 = Color(0xFF33C2FF);
+  static const Color info90 = Color(0xFFD9F5FF);
 
-  static const Color ratingAgain = Color(0xFFEF4444);
-  static const Color ratingGood = Color(0xFF22C55E);
-  static const Color ratingEasy = Color(0xFF14B8A6);
+  static const Color ratingAgain = Color(0xFFFF1943);
+  static const Color ratingGood = Color(0xFF33C2FF);
+  static const Color ratingEasy = Color(0xFF57CA22);
 }

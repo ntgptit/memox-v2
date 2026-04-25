@@ -15,7 +15,7 @@ import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:memox/presentation/shared/widgets/mx_term_row.dart';
 
 void main() {
-  testWidgets('MxActionSheetList pops the selected value', (tester) async {
+  testWidgets('DT1 onSelect: MxActionSheetList pops the selected value', (tester) async {
     String? selectedAction;
 
     await tester.pumpWidget(
@@ -59,7 +59,7 @@ void main() {
     expect(selectedAction, 'delete');
   });
 
-  testWidgets('MxDestinationPickerSheet filters and returns a destination', (
+  testWidgets('DT1 onSearchFilterSort: MxDestinationPickerSheet filters and returns a destination', (
     tester,
   ) async {
     String? selectedDestination;
@@ -112,7 +112,7 @@ void main() {
     expect(selectedDestination, 'folder-a');
   });
 
-  testWidgets('MxSearchSortToolbar reports search and sort changes', (
+  testWidgets('DT2 onSearchFilterSort: MxSearchSortToolbar reports search and sort changes', (
     tester,
   ) async {
     String? searchQuery;
@@ -153,7 +153,7 @@ void main() {
     expect(sortValue, 'recent');
   });
 
-  testWidgets('MxAnswerOptionCard wraps long text and respects states', (
+  testWidgets('DT1 onUpdate: MxAnswerOptionCard wraps long text and respects states', (
     tester,
   ) async {
     var enabledTapCount = 0;
@@ -199,7 +199,7 @@ void main() {
     expect(disabledTapCount, 0);
   });
 
-  testWidgets('MxFlashcard keeps long content scrollable', (tester) async {
+  testWidgets('DT1 onBehavior: MxFlashcard keeps long content scrollable', (tester) async {
     const longContent =
         'A very long flashcard face that needs to remain readable during study. '
         'It contains several clauses and repeated explanatory text so the card '
@@ -219,7 +219,7 @@ void main() {
     expect(find.text(longContent), findsOneWidget);
   });
 
-  testWidgets('MxSegmentedControl adaptive fallback updates selection', (
+  testWidgets('DT2 onSelect: MxSegmentedControl adaptive fallback updates selection', (
     tester,
   ) async {
     var selected = <int>{1};
@@ -256,7 +256,7 @@ void main() {
   });
 
   testWidgets(
-    'MxSearchSortToolbar keeps selected sort icon without checkmark',
+    'DT3 onSelect: MxSearchSortToolbar keeps selected sort icon without checkmark',
     (tester) async {
       await tester.pumpWidget(
         _TestApp(
@@ -283,7 +283,7 @@ void main() {
     },
   );
 
-  testWidgets('MxBulkActionBar renders labels and action buttons', (
+  testWidgets('DT4 onSelect: MxBulkActionBar renders labels and action buttons', (
     tester,
   ) async {
     var archiveTapped = false;
@@ -321,7 +321,7 @@ void main() {
     expect(archiveTapped, isTrue);
   });
 
-  testWidgets('MxTermRow renders content and selected state', (tester) async {
+  testWidgets('DT5 onSelect: MxTermRow renders content and selected state', (tester) async {
     var tapped = false;
 
     await tester.pumpWidget(
@@ -347,7 +347,7 @@ void main() {
     expect(tapped, isTrue);
   });
 
-  testWidgets('MxReorderableList renders keyed items', (tester) async {
+  testWidgets('DT1 onMove: MxReorderableList renders keyed items', (tester) async {
     final items = ['One', 'Two', 'Three'];
 
     await tester.pumpWidget(

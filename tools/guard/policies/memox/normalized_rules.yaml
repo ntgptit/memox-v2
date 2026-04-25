@@ -875,15 +875,15 @@ rules:
         - "\\bAppTypography\\."
       skip_comments: true
 
-  - id: presentation_no_direct_material_colors
+  - id: app_no_direct_material_colors
     type: forbidden_pattern
-    name: "Presentation No Direct Material Colors"
-    description: "Code in `lib/presentation/**` must not use `Colors.*` directly. Read colors from `Theme.of(context)`, `colorScheme`, custom theme extensions, or shared semantic accessors instead."
-    message_code: presentation_no_direct_material_colors
+    name: "App No Direct Material Colors"
+    description: "App source must not use `Colors.*` directly. Read colors from the active `ColorScheme`, a custom theme extension, or a shared semantic accessor instead."
+    message_code: app_no_direct_material_colors
     severity: error
     impact: design_system
-    scope: ui
-    fix_hint_code: use_theme_colors_in_presentation
+    scope: non_legacy_app_source
+    fix_hint_code: use_theme_colors_in_app_source
     params:
       patterns:
         - "\\bColors\\."
@@ -1613,6 +1613,75 @@ rules:
       source_scope: provider_files
       test_roots:
         - "test"
+
+  - id: decision_table_source_coverage
+    type: project_check
+    name: "Decision Table Source Coverage"
+    description: "Behavioral app source must have matching Decision Table markdown and tests for its source file and required event boundaries."
+    message_code: decision_table_source_coverage
+    severity: error
+    impact: testing
+    scope: all
+    fix_hint_code: add_decision_table_tests
+    meta:
+      requires_project_scan: true
+      cost: medium
+    params:
+      check_id: decision_table_source_coverage
+      source_scope: non_legacy_app_source
+      test_roots:
+        - "test"
+      decision_table_roots:
+        - "docs/decision-tables"
+      exclude_source_paths:
+        - "lib/l10n/generated/**"
+
+  - id: decision_table_case_coverage
+    type: project_check
+    name: "Decision Table Case Coverage"
+    description: "Decision Table markdown rows and test names must stay in one-to-one sync."
+    message_code: decision_table_case_coverage
+    severity: error
+    impact: testing
+    scope: all
+    fix_hint_code: sync_decision_table_cases
+    meta:
+      requires_project_scan: true
+      cost: medium
+    params:
+      check_id: decision_table_case_coverage
+      test_roots:
+        - "test"
+      decision_table_roots:
+        - "docs/decision-tables"
+
+  - id: lazy_list_rendering
+    type: project_check
+    name: "Lazy List Rendering"
+    description: "Dynamic feature lists must use builder/sliver rendering instead of eager `children` construction."
+    message_code: lazy_list_rendering
+    severity: error
+    impact: performance
+    scope: all
+    fix_hint_code: use_lazy_list_rendering
+    meta:
+      requires_project_scan: true
+      cost: medium
+    params:
+      check_id: lazy_list_rendering
+      source_scope: feature_ui
+      candidate_path_patterns:
+        - "lib/presentation/features/**/screens/*_screen.dart"
+        - "lib/presentation/features/**/widgets/*list*.dart"
+        - "lib/presentation/features/**/widgets/**/*list*.dart"
+        - "lib/presentation/features/**/widgets/*tree_section.dart"
+        - "lib/presentation/features/**/widgets/**/*tree_section.dart"
+        - "lib/presentation/features/**/widgets/*preview_section.dart"
+        - "lib/presentation/features/**/widgets/**/*preview_section.dart"
+        - "lib/presentation/features/**/widgets/*reorder_section.dart"
+        - "lib/presentation/features/**/widgets/**/*reorder_section.dart"
+      exclude_path_patterns:
+        - "**/*_skeleton.dart"
 
   - id: router_redirect_purity
     type: ast_check

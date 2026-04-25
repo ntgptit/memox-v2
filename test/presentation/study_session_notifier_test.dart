@@ -14,7 +14,7 @@ import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
 void main() {
   test(
-    'studyAnswerOptions preserves source order when answer shuffle is off',
+    'DT1 onUpdate: studyAnswerOptions preserves source order when answer shuffle is off',
     () {
       final snapshot = _snapshot(
         mode: StudyMode.match,
@@ -37,7 +37,7 @@ void main() {
     },
   );
 
-  test('session action controller cancels without provider error', () async {
+  test('DT2 onUpdate: session action controller cancels without provider error', () async {
     final repo = _CancelOnlyStudyRepo();
     final container = ProviderContainer(
       overrides: [studyRepoProvider.overrideWithValue(repo)],
@@ -57,7 +57,7 @@ void main() {
     );
   });
 
-  testWidgets('cancel opens confirm dialog before cancelling session', (
+  testWidgets('DT3 onUpdate: cancel opens confirm dialog before cancelling session', (
     tester,
   ) async {
     final repo = _CancelOnlyStudyRepo();
@@ -81,7 +81,7 @@ void main() {
     expect(repo.cancelCount, 0);
   });
 
-  testWidgets('Fill mode clears answer text when the item changes', (
+  testWidgets('DT4 onUpdate: Fill mode clears answer text when the item changes', (
     tester,
   ) async {
     final first = _snapshot(
@@ -117,7 +117,7 @@ void main() {
     expect(_editableText(tester).controller.text, isEmpty);
   });
 
-  testWidgets('answer tap shows feedback before continue', (tester) async {
+  testWidgets('DT5 onUpdate: answer tap shows feedback before continue', (tester) async {
     final snapshot = _snapshot(
       mode: StudyMode.guess,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
@@ -142,7 +142,7 @@ void main() {
     expect(continueCount, 0);
   });
 
-  testWidgets('continue calls answer once and disables while loading', (
+  testWidgets('DT6 onUpdate: continue calls answer once and disables while loading', (
     tester,
   ) async {
     final snapshot = _snapshot(
@@ -189,7 +189,7 @@ void main() {
     expect(continueCount, 1);
   });
 
-  testWidgets('empty fill answer cannot submit', (tester) async {
+  testWidgets('DT7 onUpdate: empty fill answer cannot submit', (tester) async {
     final snapshot = _snapshot(
       mode: StudyMode.fill,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
@@ -209,7 +209,7 @@ void main() {
     expect(answerCount, 0);
   });
 
-  testWidgets('match mode renders answer cards instead of secondary buttons', (
+  testWidgets('DT8 onUpdate: match mode renders answer cards instead of secondary buttons', (
     tester,
   ) async {
     final snapshot = _snapshot(
@@ -232,7 +232,7 @@ void main() {
     expect(find.widgetWithText(MxSecondaryButton, 'back 3'), findsNothing);
   });
 
-  testWidgets('selecting a long match option shows feedback', (tester) async {
+  testWidgets('DT1 onSelect: selecting a long match option shows feedback', (tester) async {
     const longWrongAnswer =
         'A very long distractor answer that should remain readable and tappable '
         'when rendered as a match option.';
@@ -264,7 +264,7 @@ void main() {
     expect(find.text('Continue'), findsOneWidget);
   });
 
-  testWidgets('incorrect feedback can be marked correct before continuing', (
+  testWidgets('DT9 onUpdate: incorrect feedback can be marked correct before continuing', (
     tester,
   ) async {
     final snapshot = _snapshot(
@@ -297,7 +297,7 @@ void main() {
     expect(correctedFeedback?.isCorrect, isTrue);
   });
 
-  testWidgets('fill feedback shows the submitted answer', (tester) async {
+  testWidgets('DT10 onUpdate: fill feedback shows the submitted answer', (tester) async {
     final snapshot = _snapshot(
       mode: StudyMode.fill,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'answer 1'),

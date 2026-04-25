@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/library_overview_viewmodel.dart';
 
@@ -14,16 +14,11 @@ class LibraryHeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
 
-    return Container(
+    return MxCard(
+      variant: MxCardVariant.elevated,
       padding: const EdgeInsets.all(MxSpace.xl),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        borderRadius: MxFeatureRadii.heroPanel,
-        border: Border.all(color: scheme.outlineVariant),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

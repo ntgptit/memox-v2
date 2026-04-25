@@ -4,7 +4,7 @@ import 'package:memox/core/network/network_info.dart';
 
 void main() {
   group('ConnectivityService', () {
-    test('refresh applies the probed status immediately', () async {
+    test('DT1 onRefreshRetry: refresh applies the probed status immediately', () async {
       final service = ConnectivityService(
         initialStatus: NetworkStatus.offline,
         debounce: Duration.zero,
@@ -19,7 +19,7 @@ void main() {
       expect(service.isOnline, isTrue);
     });
 
-    test('watch emits the current status and debounced updates', () async {
+    test('DT1 onUpdate: watch emits the current status and debounced updates', () async {
       final service = ConnectivityService(
         initialStatus: NetworkStatus.offline,
         debounce: const Duration(milliseconds: 1),

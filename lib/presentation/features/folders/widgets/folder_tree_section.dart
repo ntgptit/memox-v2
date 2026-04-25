@@ -8,50 +8,6 @@ import '../../../shared/widgets/mx_study_progress_action.dart';
 import '../../../shared/widgets/mx_study_set_tile.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 
-class FolderTreeSection extends StatelessWidget {
-  const FolderTreeSection({
-    required this.state,
-    required this.onOpenSubfolder,
-    this.onOpenSubfolderActions,
-    this.onOpenDeckActions,
-    super.key,
-  });
-
-  final FolderDetailState state;
-  final ValueChanged<String> onOpenSubfolder;
-  final ValueChanged<FolderSubfolderItem>? onOpenSubfolderActions;
-  final ValueChanged<FolderDeckItem>? onOpenDeckActions;
-
-  @override
-  Widget build(BuildContext context) {
-    if (state.isSubfolderMode) {
-      final items = state.subfolders;
-      return Column(
-        children: [
-          for (var index = 0; index < items.length; index++) ...[
-            _SubfolderRow(
-              item: items[index],
-              onOpenSubfolder: onOpenSubfolder,
-              onOpenActions: onOpenSubfolderActions,
-            ),
-            if (index < items.length - 1) const MxDivider(),
-          ],
-        ],
-      );
-    }
-
-    final decks = state.decks;
-    return Column(
-      children: [
-        for (var index = 0; index < decks.length; index++) ...[
-          _DeckRow(item: decks[index], onOpenActions: onOpenDeckActions),
-          if (index < decks.length - 1) const MxDivider(),
-        ],
-      ],
-    );
-  }
-}
-
 /// Sliver-based renderer for a folder's children (subfolders or decks).
 ///
 /// Returns a [SliverList.separated] so rows are lazily built — important
@@ -141,7 +97,7 @@ class _DeckRow extends StatelessWidget {
       title: item.name,
       icon: Icons.style_outlined,
       metaLine: l10n.foldersDeckCardProgress(item.cardCount, item.dueToday),
-      onTap: () => context.pushDeckDetail(item.id),
+      onTap: () => context.pushFlashcardList(item.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
       trailing: MxStudyProgressAction(
         key: ValueKey('deck_study_${item.id}'),

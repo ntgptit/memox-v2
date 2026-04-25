@@ -14,15 +14,9 @@ const double _deckSectionTitleHeight = 18;
 const double _deckSectionSubtitleHeight = 14;
 const double _deckOverviewTitleWidth = 140;
 const double _deckOverviewSubtitleWidth = 240;
-const double _deckActionsTitleWidth = 180;
-const double _deckActionsSubtitleWidth = 260;
 const double _deckStudySetLeadingSize = 40;
 const double _deckStudySetTitleWidth = 180;
 const double _deckStudySetMetaWidth = 140;
-const double _deckActionHeight = 40;
-const double _deckActionPrimaryWidth = 132;
-const double _deckActionSecondaryWidth = 136;
-const double _deckActionTertiaryWidth = 128;
 
 class DeckDetailSkeleton extends StatelessWidget {
   const DeckDetailSkeleton({super.key});
@@ -38,12 +32,6 @@ class DeckDetailSkeleton extends StatelessWidget {
           titleWidth: _deckOverviewTitleWidth,
           subtitleWidth: _deckOverviewSubtitleWidth,
           body: _StudySetTileSkeleton(),
-        ),
-        MxGap(MxSpace.xl),
-        _DeckSectionSkeleton(
-          titleWidth: _deckActionsTitleWidth,
-          subtitleWidth: _deckActionsSubtitleWidth,
-          body: _DeckActionSkeleton(),
         ),
       ],
     );
@@ -150,35 +138,6 @@ class _StudySetTileSkeleton extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _DeckActionSkeleton extends StatelessWidget {
-  const _DeckActionSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Wrap(
-      spacing: MxSpace.sm,
-      runSpacing: MxSpace.sm,
-      children: [
-        MxSkeleton(
-          height: _deckActionHeight,
-          width: _deckActionPrimaryWidth,
-          borderRadius: MxFeatureRadii.full,
-        ),
-        MxSkeleton(
-          height: _deckActionHeight,
-          width: _deckActionSecondaryWidth,
-          borderRadius: MxFeatureRadii.full,
-        ),
-        MxSkeleton(
-          height: _deckActionHeight,
-          width: _deckActionTertiaryWidth,
-          borderRadius: MxFeatureRadii.full,
-        ),
-      ],
     );
   }
 }

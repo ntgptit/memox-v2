@@ -84,14 +84,14 @@ class _MxSearchFieldState extends State<MxSearchField> {
               )
             : null,
         filled: true,
-        fillColor: scheme.surfaceContainerHigh,
-        border: const OutlineInputBorder(
+        fillColor: scheme.surfaceContainerLow,
+        border: OutlineInputBorder(
           borderRadius: AppRadius.borderFull,
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: scheme.outlineVariant),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: AppRadius.borderFull,
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: scheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.borderFull,

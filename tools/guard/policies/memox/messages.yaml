@@ -37,6 +37,12 @@ messages:
     en: "Provider-owned files must not publish raw string error states; use `AppFailure` instead."
   presentation_action_controller_test_coverage:
     en: "Action controller `{controller_class}` must have a provider-level test that references `{provider_name}`."
+  decision_table_source_coverage:
+    en: "Decision Table source coverage breach: {detail}"
+  decision_table_case_coverage:
+    en: "Decision Table case coverage breach: {detail}"
+  lazy_list_rendering:
+    en: "Lazy list rendering breach: {detail}"
   core_service_map_state_return:
     en: "Core service/provider state surfaces in `lib/core/services/**` must not return `Map<String, dynamic>` or `Map<String, bool>` from `build()` or state getter methods. Introduce an immutable typed state object instead."
   core_service_map_state_key_access:
@@ -337,8 +343,8 @@ messages:
     en: "Use the token files directly; `AppDimens` and `app_dimens.dart` are no longer allowed."
   ui_direct_color_typography_tokens:
     en: "UI code must consume colors and typography via context/theme extensions, not raw theme sources such as `AppColors` or `AppTypography`."
-  presentation_no_direct_material_colors:
-    en: "Code in `lib/presentation/**` must not use `Colors.*` directly. Read colors from the active theme instead."
+  app_no_direct_material_colors:
+    en: "App source must not use `Colors.*` directly. Read colors from the active theme or shared semantic color accessors instead."
   riverpod_syntax:
     en: "Provider-owned files must use Riverpod annotation syntax and generated parts."
   provider_file_naming:
@@ -535,6 +541,9 @@ fix_hints:
   use_theme_colors_in_presentation:
     text:
       en: "Replace `Colors.*` with `Theme.of(context).colorScheme`, a custom theme extension such as `theme.customColors`, or another shared semantic color accessor so presentation code stays theme-driven."
+  use_theme_colors_in_app_source:
+    text:
+      en: "Replace `Colors.*` with `ColorScheme` values, a custom theme extension such as `theme.customColors`, or another shared semantic color accessor so app source stays theme-driven."
   use_provider_refresh_invalidation:
     text:
       en: "Replace the legacy refresh registry/counter call with an explicit notifier refresh method or a targeted `ref.invalidate(...)` at the owning provider boundary."
@@ -604,6 +613,15 @@ fix_hints:
   add_action_controller_provider_test:
     text:
       en: "Add a targeted provider test under `test/presentation/**` that reads the generated action-controller provider and covers at least one success or validation/error state transition."
+  add_decision_table_tests:
+    text:
+      en: "Add or update a matching markdown Decision Table under `docs/decision-tables/**` plus a `*_test.dart` file with `DTx <eventName>:` test names and C0/C1 coverage for this behavioral source."
+  sync_decision_table_cases:
+    text:
+      en: "Keep each markdown Decision Table row and executable test name in sync: every `DTx` row needs a matching `DTx <eventName>:` test, each row needs C0/C1 coverage, and every such test needs a markdown row."
+  use_lazy_list_rendering:
+    text:
+      en: "Replace eager dynamic `children` construction with `CustomScrollView` + `SliverList.builder`/`SliverList.separated`, or use a bounded `ListView.builder`/`ListView.separated` for nested panels."
   use_notifier_or_use_case_from_ui:
     text:
       en: "Keep widgets on render orchestration only: call a notifier/use-case provider or pass prepared view data into the widget instead of importing repositories or reading repository providers directly."

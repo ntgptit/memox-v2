@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../tokens/app_opacity.dart';
 import '../tokens/app_radius.dart';
 import '../tokens/app_typography.dart';
 
@@ -9,20 +10,25 @@ abstract final class SegmentedButtonThemeBuilder {
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return scheme.secondaryContainer;
+            return scheme.primary;
           }
-          return Colors.transparent;
+          return scheme.surfaceContainerLow;
         }),
         foregroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return scheme.onSurface.withValues(alpha: 0.38);
+            return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
           }
           if (states.contains(WidgetState.selected)) {
-            return scheme.onSecondaryContainer;
+            return scheme.onPrimary;
           }
           return scheme.onSurfaceVariant;
         }),
-        side: WidgetStateProperty.all(BorderSide(color: scheme.outline)),
+        side: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return BorderSide(color: scheme.primary);
+          }
+          return BorderSide(color: scheme.outlineVariant);
+        }),
         shape: WidgetStateProperty.all(
           const RoundedRectangleBorder(borderRadius: AppRadius.button),
         ),

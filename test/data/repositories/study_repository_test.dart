@@ -29,7 +29,7 @@ void main() {
       await harness.dispose();
     });
 
-    test('runs New Study through five modes and finalizes to box 2', () async {
+    test('DT1 onNavigate: runs New Study through five modes and finalizes to box 2', () async {
       await harness.seedDeckWithCards(cardCount: 2);
 
       var snapshot = await harness.start.execute(
@@ -69,7 +69,7 @@ void main() {
       expect(progressRows.map((row) => row.dueAt), everyElement(isNotNull));
     });
 
-    test('skip requeues without passing the item', () async {
+    test('DT1 repositoryFlow: skip requeues without passing the item', () async {
       await harness.seedDeckWithCards(cardCount: 1);
 
       final started = await harness.start.execute(
@@ -95,7 +95,7 @@ void main() {
       expect(skipped.summary.completedAttempts, 0);
     });
 
-    test('does not mark completed session failed on stale finalize', () async {
+    test('DT1 onUpdate: does not mark completed session failed on stale finalize', () async {
       await harness.seedDeckWithCards(cardCount: 1);
 
       var snapshot = await harness.start.execute(
@@ -140,7 +140,7 @@ void main() {
       expect(persistedSession.status, SessionStatus.completed.storageValue);
     });
 
-    test('does not cancel a completed session', () async {
+    test('DT2 onUpdate: does not cancel a completed session', () async {
       await harness.seedDeckWithCards(cardCount: 1);
 
       var snapshot = await harness.start.execute(
@@ -182,7 +182,7 @@ void main() {
     });
 
     test(
-      'restart cancels the previous session and links the new one',
+      'DT3 onUpdate: restart cancels the previous session and links the new one',
       () async {
         await harness.seedDeckWithCards(cardCount: 2);
 
@@ -225,7 +225,7 @@ void main() {
       },
     );
 
-    test('SRS Review treats forgot as retry and finalizes to box 1', () async {
+    test('DT1 onRefreshRetry: SRS Review treats forgot as retry and finalizes to box 1', () async {
       await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
 
       var snapshot = await harness.start.execute(

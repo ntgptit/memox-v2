@@ -6,38 +6,6 @@ import '../../../shared/widgets/mx_folder_tile.dart';
 import '../../../shared/widgets/mx_study_progress_action.dart';
 import '../models/library_folder.dart';
 
-class LibraryFolderList extends StatelessWidget {
-  const LibraryFolderList({
-    required this.folders,
-    required this.onOpenFolder,
-    required this.onStartStudy,
-    this.onOpenActions,
-    super.key,
-  });
-
-  final List<LibraryFolder> folders;
-  final ValueChanged<String> onOpenFolder;
-  final ValueChanged<String> onStartStudy;
-  final ValueChanged<LibraryFolder>? onOpenActions;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var index = 0; index < folders.length; index++) ...[
-          _LibraryFolderRow(
-            folder: folders[index],
-            onOpenFolder: onOpenFolder,
-            onStartStudy: onStartStudy,
-            onOpenActions: onOpenActions,
-          ),
-          if (index < folders.length - 1) const MxDivider(),
-        ],
-      ],
-    );
-  }
-}
-
 /// Sliver-based folder list for the library overview.
 ///
 /// Lazy-builds each row so a large library does not blow up the first frame.

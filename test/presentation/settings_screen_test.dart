@@ -7,7 +7,45 @@ import 'package:memox/presentation/features/settings/providers/theme_mode_notifi
 import 'package:memox/presentation/features/settings/screens/settings_screen.dart';
 
 void main() {
-  testWidgets('updates theme and locale providers from segmented controls', (
+  testWidgets('DT1 onOpen: renders settings page with default controls', (
+    tester,
+  ) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: SettingsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Settings'), findsWidgets);
+    expect(find.text('Light'), findsOneWidget);
+    expect(find.text('System'), findsWidgets);
+    expect(find.text('English'), findsOneWidget);
+  });
+
+  testWidgets('DT1 onDisplay: shows theme and language sections', (
+    tester,
+  ) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: SettingsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Appearance'), findsOneWidget);
+    expect(find.text('Language'), findsOneWidget);
+  });
+
+  testWidgets('DT1 onUpdate: updates theme and locale providers from segmented controls', (
     tester,
   ) async {
     final container = ProviderContainer();
@@ -33,7 +71,7 @@ void main() {
     expect(container.read(localeProvider), const Locale('vi'));
   });
 
-  testWidgets('compact text-scale fallback still updates providers', (
+  testWidgets('DT2 onUpdate: compact text-scale fallback still updates providers', (
     tester,
   ) async {
     final container = ProviderContainer();

@@ -93,20 +93,20 @@ class MxAnswerOptionCard extends StatelessWidget {
   Color _backgroundColor(ColorScheme scheme) {
     if (selected) {
       return enabled
-          ? scheme.secondaryContainer
-          : scheme.secondaryContainer.withValues(alpha: AppOpacity.half);
+          ? scheme.primaryContainer
+          : scheme.primaryContainer.withValues(alpha: AppOpacity.half);
     }
     if (!enabled) {
       return scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface);
     }
-    return scheme.surface;
+    return scheme.surfaceContainerLow;
   }
 
   Color _borderColor(ColorScheme scheme) {
     if (selected) {
       return enabled
-          ? scheme.secondary
-          : scheme.secondary.withValues(alpha: AppOpacity.half);
+          ? scheme.primary
+          : scheme.primary.withValues(alpha: AppOpacity.half);
     }
     if (!enabled) {
       return scheme.outlineVariant.withValues(alpha: AppOpacity.half);
@@ -117,8 +117,8 @@ class MxAnswerOptionCard extends StatelessWidget {
   Color _foregroundColor(ColorScheme scheme) {
     if (selected) {
       return enabled
-          ? scheme.onSecondaryContainer
-          : scheme.onSecondaryContainer.withValues(alpha: AppOpacity.disabled);
+          ? scheme.onPrimaryContainer
+          : scheme.onPrimaryContainer.withValues(alpha: AppOpacity.disabled);
     }
     if (!enabled) {
       return scheme.onSurface.withValues(alpha: AppOpacity.disabled);

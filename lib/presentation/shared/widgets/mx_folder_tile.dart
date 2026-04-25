@@ -121,11 +121,12 @@ class MxFolderTile extends StatelessWidget {
       ),
     );
 
-    if (onTap == null && onLongPress == null) return row;
     return MxTappable(
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
       onTap: onTap,
       onLongPress: onLongPress,
+      backgroundColor: scheme.surfaceContainerLow,
+      overlayBaseColor: scheme.primary,
       child: row,
     );
   }

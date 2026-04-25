@@ -35,7 +35,7 @@ class MxChip extends StatelessWidget {
     final (Color bg, Color fg) = switch (tone) {
       MxChipTone.neutral =>
         selected
-            ? (scheme.secondaryContainer, scheme.onSecondaryContainer)
+            ? (scheme.primaryContainer, scheme.onPrimaryContainer)
             : (scheme.surfaceContainerHighest, scheme.onSurface),
       MxChipTone.primary => (
         scheme.primaryContainer,

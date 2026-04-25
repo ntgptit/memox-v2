@@ -89,6 +89,21 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 - Keep feature boundaries explicit. Do not import screens or widgets directly from another feature.
 - Promote reused UI patterns into `lib/presentation/shared/**` instead of duplicating them across features.
 
+## Decision Table Contract
+
+- Use the global `decision-table-tests` skill for any feature, logic, or test change.
+- Decision Tables are repo artifacts. Store them as markdown under `docs/decision-tables/**`; do not rely on test-file comments as the source of truth.
+- Every Decision Table markdown file must declare its executable test file with ``Test file: `test/..._test.dart` ``.
+- Any changed or added behavior must update the relevant markdown Decision Table before or with the tests.
+- Screen Decision Tables must be organized by event boundary: `onOpen`, `onDisplay`, `onInsert`, `onUpdate`, `onDelete`, `onMove`, `onSelect`, `onSearchFilterSort`, `onRefreshRetry`, `onNavigate`, `onExternalChange`, and `onDispose`.
+- Non-screen logic Decision Tables must map rows to implementation branches such as `if`, `switch`, `case`, `catch`, validation, loading, error, empty, success, disabled, cancellation, and retry.
+- Test names must map to markdown table rows with the format `DT<number> <eventName>: <expected behavior>`.
+- Every Decision Table row must include a `Coverage` cell with `C0`, `C1`, or `C0+C1`.
+- Every event table must achieve both `C0` statement/path coverage and `C1` branch/decision coverage.
+- Decision Table rows must be complete and tied to real branches: do not use filler cells such as `arranged state`, `action under test`, `expected behavior`, `branch for ...`, `test fixture creates ...`, `command under test`, `assertions verify ...`, or generic proof text.
+- Final reports for behavior changes must state which Decision Table events/cases were added or updated.
+- Do not claim verification complete unless the MemoX guard, including markdown Decision Table rules, and the targeted tests pass.
+
 ## UI And Theme Contract
 
 - UI code should consume colors from `Theme.of(context).colorScheme` or theme extensions, not raw palette files.
