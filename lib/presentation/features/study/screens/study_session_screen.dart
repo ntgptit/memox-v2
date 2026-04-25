@@ -4,8 +4,10 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/study/entities/study_models.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/study_enums.dart';
+import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
@@ -20,17 +22,24 @@ import '../providers/study_session_notifier.dart';
 import '../study_labels.dart';
 import '../widgets/study_session/study_mode_panel.dart';
 
-class StudySessionScreen extends ConsumerWidget {
+class StudySessionScreen extends ConsumerStatefulWidget {
   const StudySessionScreen({required this.sessionId, super.key});
 
   final String sessionId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StudySessionScreen> createState() => _StudySessionScreenState();
+}
+
+class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
+  StudyAnswerFeedback? _feedback;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final sessionState = ref.watch(studySessionStateProvider(sessionId));
+    final sessionState = ref.watch(studySessionStateProvider(widget.sessionId));
     final actionState = ref.watch(
-      studySessionActionControllerProvider(sessionId),
+      studySessionActionControllerProvider(widget.sessionId),
     );
     final canCancel =
         sessionState.whenOrNull(
@@ -41,12 +50,18 @@ class StudySessionScreen extends ConsumerWidget {
         false;
 
     ref.listen<AsyncValue<void>>(
-      studySessionActionControllerProvider(sessionId),
+      studySessionActionControllerProvider(widget.sessionId),
       (_, next) {
         if (next.hasError) {
           MxSnackbar.error(context, studyErrorMessage(next.error));
         }
       },
+    );
+    ref.listen<AsyncValue<StudySessionSnapshot>>(
+      studySessionStateProvider(widget.sessionId),
+      (_, next) => _clearFeedbackForNextItem(
+        next.whenOrNull(data: (snapshot) => snapshot.currentItem?.id),
+      ),
     );
 
     return MxScaffold(
@@ -57,7 +72,7 @@ class StudySessionScreen extends ConsumerWidget {
             tooltip: l10n.studyCancelAction,
             onPressed: actionState.isLoading
                 ? null
-                : () => _cancel(context, ref, sessionId),
+                : () => _confirmCancel(context),
             icon: Icons.close_rounded,
           ),
       ],
@@ -69,13 +84,18 @@ class StudySessionScreen extends ConsumerWidget {
           error: (error, stackTrace) => MxErrorState(
             title: l10n.sharedErrorTitle,
             message: studyErrorMessage(error),
-            onRetry: () => ref.invalidate(studySessionStateProvider(sessionId)),
+            onRetry: () =>
+                ref.invalidate(studySessionStateProvider(widget.sessionId)),
           ),
           data: (snapshot) {
             if (snapshot.session.status == SessionStatus.completed ||
                 snapshot.session.status == SessionStatus.cancelled) {
-              return _SessionTerminalView(sessionId: sessionId);
+              return _SessionTerminalView(sessionId: widget.sessionId);
             }
+            final currentItemId = snapshot.currentItem?.id;
+            final feedback = _feedback?.itemId == currentItemId
+                ? _feedback
+                : null;
             return ListView(
               children: [
                 MxText(
@@ -86,13 +106,12 @@ class StudySessionScreen extends ConsumerWidget {
                 StudyModePanel(
                   snapshot: snapshot,
                   answerOptions: studyAnswerOptions(snapshot),
-                  onAnswer: (grade) => ref
-                      .read(
-                        studySessionActionControllerProvider(
-                          sessionId,
-                        ).notifier,
-                      )
-                      .answer(grade),
+                  isSubmitting: actionState.isLoading,
+                  feedback: feedback,
+                  onAnswer: (grade) => _recordFeedback(snapshot, grade),
+                  onContinue: feedback == null
+                      ? null
+                      : () => _continueAfterFeedback(feedback),
                 ),
                 const MxGap(MxSpace.xl),
                 if (snapshot.canFinalize)
@@ -105,13 +124,14 @@ class StudySessionScreen extends ConsumerWidget {
                       final success = await ref
                           .read(
                             studySessionActionControllerProvider(
-                              sessionId,
+                              widget.sessionId,
                             ).notifier,
                           )
                           .finalizeSession();
-                      if (context.mounted && success) {
-                        context.goStudyResult(sessionId);
+                      if (!context.mounted || !success) {
+                        return;
                       }
+                      context.goStudyResult(widget.sessionId);
                     },
                   ),
                 if (!snapshot.canFinalize)
@@ -123,7 +143,7 @@ class StudySessionScreen extends ConsumerWidget {
                     onPressed: () => ref
                         .read(
                           studySessionActionControllerProvider(
-                            sessionId,
+                            widget.sessionId,
                           ).notifier,
                         )
                         .skip(),
@@ -136,18 +156,68 @@ class StudySessionScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _cancel(
-    BuildContext context,
-    WidgetRef ref,
-    String sessionId,
-  ) async {
+  void _recordFeedback(StudySessionSnapshot snapshot, AttemptGrade grade) {
+    final item = snapshot.currentItem;
+    if (item == null || _feedback != null) {
+      return;
+    }
+    setState(() {
+      _feedback = StudyAnswerFeedback(
+        itemId: item.id,
+        selectedGrade: grade,
+        isCorrect:
+            grade == AttemptGrade.correct || grade == AttemptGrade.remembered,
+        correctAnswer: item.flashcard.back,
+      );
+    });
+  }
+
+  Future<void> _continueAfterFeedback(StudyAnswerFeedback feedback) async {
     final success = await ref
-        .read(studySessionActionControllerProvider(sessionId).notifier)
+        .read(studySessionActionControllerProvider(widget.sessionId).notifier)
+        .answer(feedback.selectedGrade);
+    if (!mounted || !success) {
+      return;
+    }
+    setState(() {
+      _feedback = null;
+    });
+  }
+
+  Future<void> _confirmCancel(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await MxConfirmationDialog.show(
+      context: context,
+      title: l10n.studyCancelConfirmTitle,
+      message: l10n.studyCancelConfirmMessage,
+      confirmLabel: l10n.studyCancelConfirmAction,
+      icon: Icons.close_rounded,
+      tone: MxConfirmationTone.danger,
+    );
+    if (!context.mounted || !confirmed) {
+      return;
+    }
+    await _cancel(context);
+  }
+
+  Future<void> _cancel(BuildContext context) async {
+    final success = await ref
+        .read(studySessionActionControllerProvider(widget.sessionId).notifier)
         .cancel();
     if (!context.mounted || !success) {
       return;
     }
-    context.goStudyResult(sessionId);
+    context.goStudyResult(widget.sessionId);
+  }
+
+  void _clearFeedbackForNextItem(String? currentItemId) {
+    final feedback = _feedback;
+    if (feedback == null || feedback.itemId == currentItemId) {
+      return;
+    }
+    setState(() {
+      _feedback = null;
+    });
   }
 }
 

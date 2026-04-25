@@ -45,6 +45,24 @@ class FileScanner:
 
         return sorted(files, key=lambda item: item[1])
 
+    def resolve_scope_intersection(
+        self,
+        first_scope_id: str,
+        second_scope_id: str,
+    ) -> list[tuple[Path, str]]:
+        """Return files that are present in both configured scopes."""
+        first_files = self.resolve_scope(first_scope_id)
+        if first_scope_id == second_scope_id:
+            return first_files
+
+        second_files = self.resolve_scope(second_scope_id)
+        second_paths = {rel_path for _, rel_path in second_files}
+        return [
+            (abs_path, rel_path)
+            for abs_path, rel_path in first_files
+            if rel_path in second_paths
+        ]
+
     def filter_by_targets(
         self,
         files: list[tuple[Path, str]],

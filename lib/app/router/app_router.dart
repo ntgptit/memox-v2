@@ -6,12 +6,14 @@ import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../core/errors/error_mapper.dart';
 import '../../core/errors/failures.dart';
+import '../../presentation/features/dashboard/screens/dashboard_screen.dart';
 import '../../presentation/features/decks/screens/deck_detail_screen.dart';
 import '../../presentation/features/flashcards/screens/deck_import_screen.dart';
 import '../../presentation/features/flashcards/screens/flashcard_editor_screen.dart';
 import '../../presentation/features/flashcards/screens/flashcard_list_screen.dart';
 import '../../presentation/features/folders/screens/folder_detail_screen.dart';
 import '../../presentation/features/folders/screens/library_overview_screen.dart';
+import '../../presentation/features/settings/screens/settings_screen.dart';
 import '../../presentation/features/study/screens/study_entry_screen.dart';
 import '../../presentation/features/study/screens/study_result_screen.dart';
 import '../../presentation/features/study/screens/study_session_screen.dart';
@@ -46,15 +48,8 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: RoutePaths.home,
                 name: RouteNames.home,
-                pageBuilder: (context, state) {
-                  final l10n = AppLocalizations.of(context);
-                  return NoTransitionPage(
-                    child: _ShellPlaceholderView(
-                      title: l10n.homeTitle,
-                      description: l10n.appShellHomePlaceholderDescription,
-                    ),
-                  );
-                },
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: DashboardScreen()),
               ),
             ],
           ),
@@ -200,15 +195,8 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: RoutePaths.settings,
                 name: RouteNames.settings,
-                pageBuilder: (context, state) {
-                  final l10n = AppLocalizations.of(context);
-                  return NoTransitionPage(
-                    child: _ShellPlaceholderView(
-                      title: l10n.settingsTitle,
-                      description: l10n.appShellSettingsPlaceholderDescription,
-                    ),
-                  );
-                },
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: SettingsScreen()),
               ),
             ],
           ),

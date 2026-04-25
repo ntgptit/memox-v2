@@ -20,6 +20,7 @@ class MxPageDots extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final localizations = MaterialLocalizations.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -27,28 +28,47 @@ class MxPageDots extends StatelessWidget {
           Builder(
             builder: (context) {
               final isActive = i == activeIndex;
+              final hasTap = onDotTap != null;
+              final semanticsLabel = localizations.tabLabel(
+                tabIndex: i + 1,
+                tabCount: count,
+              );
 
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
-                child: MxTappable(
-                  shape: isActive
-                      ? const StadiumBorder()
-                      : const CircleBorder(),
-                  onTap: onDotTap == null ? null : () => onDotTap!(i),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    width: isActive
-                        ? AppSpacing
-                              .sm // guard:raw-size-reviewed active dot uses sm token
-                        : AppSpacing
-                              .xs, // guard:raw-size-reviewed inactive dot uses xs token
-                    height: AppSpacing
-                        .xs, // guard:raw-size-reviewed dot height uses xs token
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? scheme.primary
-                          : scheme.onSurfaceVariant,
-                      shape: BoxShape.circle,
+                child: Semantics(
+                  button: hasTap,
+                  enabled: hasTap ? true : null,
+                  selected: isActive,
+                  label: semanticsLabel,
+                  onTap: hasTap ? () => onDotTap!(i) : null,
+                  child: ExcludeSemantics(
+                    child: MxTappable(
+                      shape: isActive
+                          ? const StadiumBorder()
+                          : const CircleBorder(),
+                      onTap: hasTap ? () => onDotTap!(i) : null,
+                      child: SizedBox.square(
+                        dimension: kMinInteractiveDimension,
+                        child: Center(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            width: isActive
+                                ? AppSpacing
+                                      .sm // guard:raw-size-reviewed active dot uses sm token
+                                : AppSpacing
+                                      .xs, // guard:raw-size-reviewed inactive dot uses xs token
+                            height: AppSpacing
+                                .xs, // guard:raw-size-reviewed dot height uses xs token
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? scheme.primary
+                                  : scheme.onSurfaceVariant,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

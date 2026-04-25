@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -34,6 +35,7 @@ class DeckImportScreen extends ConsumerStatefulWidget {
 class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
   late final TextEditingController _rawContentController =
       TextEditingController();
+  _ImportPendingAction? _pendingAction;
 
   @override
   void dispose() {
@@ -56,12 +58,10 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     );
 
     final draft = ref.watch(flashcardImportDraftProvider(widget.deckId));
-    final draftNotifier = ref.read(
-      flashcardImportDraftProvider(widget.deckId).notifier,
+    final importActionState = ref.watch(
+      flashcardImportControllerProvider(widget.deckId),
     );
-    final controller = ref.read(
-      flashcardImportControllerProvider(widget.deckId).notifier,
-    );
+    final isImportBusy = importActionState.isLoading || _pendingAction != null;
 
     if (_rawContentController.text != draft.rawContent) {
       _rawContentController.value = TextEditingValue(
@@ -84,22 +84,33 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  MxSegmentedControl<ImportSourceFormat>(
-                    segments: [
-                      MxSegment(
-                        value: ImportSourceFormat.csv,
-                        label: l10n.importCsvLabel,
-                        icon: Icons.table_chart_outlined,
+                  Semantics(
+                    enabled: !isImportBusy,
+                    child: IgnorePointer(
+                      ignoring: isImportBusy,
+                      child: MxSegmentedControl<ImportSourceFormat>(
+                        segments: [
+                          MxSegment(
+                            value: ImportSourceFormat.csv,
+                            label: l10n.importCsvLabel,
+                            icon: Icons.table_chart_outlined,
+                          ),
+                          MxSegment(
+                            value: ImportSourceFormat.structuredText,
+                            label: l10n.importTextFormatLabel,
+                            icon: Icons.notes_outlined,
+                          ),
+                        ],
+                        selected: <ImportSourceFormat>{draft.format},
+                        onChanged: (selection) => ref
+                            .read(
+                              flashcardImportDraftProvider(
+                                widget.deckId,
+                              ).notifier,
+                            )
+                            .setFormat(selection.first),
                       ),
-                      MxSegment(
-                        value: ImportSourceFormat.structuredText,
-                        label: l10n.importTextFormatLabel,
-                        icon: Icons.notes_outlined,
-                      ),
-                    ],
-                    selected: <ImportSourceFormat>{draft.format},
-                    onChanged: (selection) =>
-                        draftNotifier.setFormat(selection.first),
+                    ),
                   ),
                   const MxGap(MxSpace.lg),
                   Wrap(
@@ -110,12 +121,22 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
                         label: l10n.importLoadFile,
                         leadingIcon: Icons.file_open_outlined,
                         variant: MxSecondaryVariant.outlined,
-                        onPressed: () => _pickFile(context, draftNotifier),
+                        onPressed: isImportBusy
+                            ? null
+                            : () => _pickFile(context),
                       ),
                       MxSecondaryButton(
                         label: l10n.commonClear,
                         variant: MxSecondaryVariant.text,
-                        onPressed: draftNotifier.reset,
+                        onPressed: isImportBusy
+                            ? null
+                            : () => ref
+                                  .read(
+                                    flashcardImportDraftProvider(
+                                      widget.deckId,
+                                    ).notifier,
+                                  )
+                                  .reset(),
                       ),
                     ],
                   ),
@@ -130,7 +151,11 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
                         : l10n.importTextHint,
                     minLines: 10,
                     maxLines: 18,
-                    onChanged: draftNotifier.setRawContent,
+                    onChanged: (value) => ref
+                        .read(
+                          flashcardImportDraftProvider(widget.deckId).notifier,
+                        )
+                        .setRawContent(value),
                   ),
                   const MxGap(MxSpace.lg),
                   Wrap(
@@ -141,27 +166,21 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
                         label: l10n.importPreviewAction,
                         leadingIcon: Icons.preview_outlined,
                         variant: MxSecondaryVariant.outlined,
-                        onPressed: controller.preparePreview,
+                        isLoading:
+                            _pendingAction == _ImportPendingAction.preview,
+                        onPressed: isImportBusy
+                            ? null
+                            : () => _preparePreview(),
                       ),
                       MxPrimaryButton(
                         label: l10n.commonImport,
                         leadingIcon: Icons.file_upload_outlined,
-                        onPressed: draft.preparation?.canCommit == true
-                            ? () async {
-                                final count = await controller.commitImport();
-                                if (!context.mounted || count == null) {
-                                  return;
-                                }
-                                MxSnackbar.success(
-                                  context,
-                                  l10n.importSuccessMessage(count),
-                                );
-                                await context.popRoute(
-                                  fallback: () =>
-                                      context.goDeckDetail(widget.deckId),
-                                );
-                              }
-                            : null,
+                        isLoading:
+                            _pendingAction == _ImportPendingAction.commit,
+                        onPressed:
+                            isImportBusy || draft.preparation?.canCommit != true
+                            ? null
+                            : () => _commitImport(context),
                       ),
                     ],
                   ),
@@ -178,10 +197,37 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     );
   }
 
-  Future<void> _pickFile(
-    BuildContext context,
-    FlashcardImportDraft draftNotifier,
-  ) async {
+  Future<void> _preparePreview() async {
+    setState(() => _pendingAction = _ImportPendingAction.preview);
+    await ref
+        .read(flashcardImportControllerProvider(widget.deckId).notifier)
+        .preparePreview();
+    if (mounted) {
+      setState(() => _pendingAction = null);
+    }
+  }
+
+  Future<void> _commitImport(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    setState(() => _pendingAction = _ImportPendingAction.commit);
+    final count = await ref
+        .read(flashcardImportControllerProvider(widget.deckId).notifier)
+        .commitImport();
+    if (!context.mounted) {
+      return;
+    }
+    if (count == null) {
+      setState(() => _pendingAction = null);
+      return;
+    }
+    MxSnackbar.success(context, l10n.importSuccessMessage(count));
+    await context.popRoute(fallback: () => context.goDeckDetail(widget.deckId));
+    if (mounted) {
+      setState(() => _pendingAction = null);
+    }
+  }
+
+  Future<void> _pickFile(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
@@ -193,13 +239,34 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     }
 
     final file = result.files.single;
-    final content = file.bytes != null
-        ? String.fromCharCodes(file.bytes!)
-        : await File(file.path!).readAsString();
+    final content = await readDeckImportFileContent(file);
     if (!context.mounted) {
       return;
     }
-    draftNotifier.setRawContent(content);
+    if (content == null) {
+      MxSnackbar.error(context, l10n.importFileUnavailableMessage);
+      return;
+    }
+    ref
+        .read(flashcardImportDraftProvider(widget.deckId).notifier)
+        .setRawContent(content);
     MxSnackbar.success(context, l10n.importLoadedFileMessage(file.name));
   }
+}
+
+enum _ImportPendingAction { preview, commit }
+
+@visibleForTesting
+Future<String?> readDeckImportFileContent(PlatformFile file) async {
+  final bytes = file.bytes;
+  if (bytes != null) {
+    return utf8.decode(bytes);
+  }
+
+  final path = file.path;
+  if (path == null) {
+    return null;
+  }
+
+  return File(path).readAsString(encoding: utf8);
 }

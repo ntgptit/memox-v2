@@ -7,6 +7,7 @@ import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
+import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/study_mode_panel.dart';
 
 void main() {
@@ -35,10 +36,9 @@ void main() {
   );
 
   test('session action controller cancels without provider error', () async {
+    final repo = _CancelOnlyStudyRepo();
     final container = ProviderContainer(
-      overrides: [
-        studyRepoProvider.overrideWithValue(const _CancelOnlyStudyRepo()),
-      ],
+      overrides: [studyRepoProvider.overrideWithValue(repo)],
     );
     addTearDown(container.dispose);
 
@@ -53,6 +53,30 @@ void main() {
           .hasError,
       isFalse,
     );
+  });
+
+  testWidgets('cancel opens confirm dialog before cancelling session', (
+    tester,
+  ) async {
+    final repo = _CancelOnlyStudyRepo();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: StudySessionScreen(sessionId: 'session-1'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Cancel session'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Cancel this session?'), findsOneWidget);
+    expect(repo.cancelCount, 0);
   });
 
   testWidgets('Fill mode clears answer text when the item changes', (
@@ -90,13 +114,106 @@ void main() {
 
     expect(_editableText(tester).controller.text, isEmpty);
   });
+
+  testWidgets('answer tap shows feedback before continue', (tester) async {
+    final snapshot = _snapshot(
+      mode: StudyMode.guess,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+    );
+    var continueCount = 0;
+
+    await tester.pumpWidget(
+      _InteractiveStudyModeHost(
+        snapshot: snapshot,
+        onContinue: () => continueCount += 1,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Correct'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Continue'), findsOneWidget);
+    expect(find.textContaining('back 1'), findsWidgets);
+    expect(continueCount, 0);
+  });
+
+  testWidgets('continue calls answer once and disables while loading', (
+    tester,
+  ) async {
+    final snapshot = _snapshot(
+      mode: StudyMode.guess,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+    );
+    final feedback = StudyAnswerFeedback(
+      itemId: snapshot.currentItem!.id,
+      selectedGrade: AttemptGrade.correct,
+      isCorrect: true,
+      correctAnswer: snapshot.currentItem!.flashcard.back,
+    );
+    var continueCount = 0;
+
+    await tester.pumpWidget(
+      _StudyModeHost(
+        snapshot: snapshot,
+        feedback: feedback,
+        onContinue: () => continueCount += 1,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+
+    expect(continueCount, 1);
+
+    await tester.pumpWidget(
+      _StudyModeHost(
+        snapshot: snapshot,
+        feedback: feedback,
+        isSubmitting: true,
+        onContinue: () => continueCount += 1,
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byType(ElevatedButton).last);
+    await tester.pump();
+
+    expect(continueCount, 1);
+  });
+
+  testWidgets('empty fill answer cannot submit', (tester) async {
+    final snapshot = _snapshot(
+      mode: StudyMode.fill,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+    );
+    var answerCount = 0;
+
+    await tester.pumpWidget(
+      _StudyModeHost(snapshot: snapshot, onAnswer: (_) => answerCount += 1),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Submit'));
+    await tester.pumpAndSettle();
+
+    expect(answerCount, 0);
+  });
 }
 
 final class _CancelOnlyStudyRepo implements StudyRepo {
-  const _CancelOnlyStudyRepo();
+  int cancelCount = 0;
 
   @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
+    cancelCount += 1;
     return _snapshot(
       mode: StudyMode.fill,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
@@ -131,8 +248,13 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) {
-    throw UnimplementedError();
+  Future<StudySessionSnapshot> loadSession(String sessionId) async {
+    return _snapshot(
+      mode: StudyMode.guess,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+    );
   }
 
   @override
@@ -167,9 +289,19 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
 }
 
 class _StudyModeHost extends StatelessWidget {
-  const _StudyModeHost({required this.snapshot});
+  const _StudyModeHost({
+    required this.snapshot,
+    this.isSubmitting = false,
+    this.feedback,
+    this.onAnswer,
+    this.onContinue,
+  });
 
   final StudySessionSnapshot snapshot;
+  final bool isSubmitting;
+  final StudyAnswerFeedback? feedback;
+  final ValueChanged<AttemptGrade>? onAnswer;
+  final VoidCallback? onContinue;
 
   @override
   Widget build(BuildContext context) {
@@ -180,9 +312,49 @@ class _StudyModeHost extends StatelessWidget {
         body: StudyModePanel(
           snapshot: snapshot,
           answerOptions: studyAnswerOptions(snapshot),
-          onAnswer: (_) {},
+          isSubmitting: isSubmitting,
+          feedback: feedback,
+          onAnswer: onAnswer ?? (_) {},
+          onContinue: onContinue,
         ),
       ),
+    );
+  }
+}
+
+class _InteractiveStudyModeHost extends StatefulWidget {
+  const _InteractiveStudyModeHost({
+    required this.snapshot,
+    required this.onContinue,
+  });
+
+  final StudySessionSnapshot snapshot;
+  final VoidCallback onContinue;
+
+  @override
+  State<_InteractiveStudyModeHost> createState() =>
+      _InteractiveStudyModeHostState();
+}
+
+class _InteractiveStudyModeHostState extends State<_InteractiveStudyModeHost> {
+  StudyAnswerFeedback? _feedback;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.snapshot.currentItem!;
+    return _StudyModeHost(
+      snapshot: widget.snapshot,
+      feedback: _feedback,
+      onAnswer: (grade) => setState(() {
+        _feedback = StudyAnswerFeedback(
+          itemId: item.id,
+          selectedGrade: grade,
+          isCorrect:
+              grade == AttemptGrade.correct || grade == AttemptGrade.remembered,
+          correctAnswer: item.flashcard.back,
+        );
+      }),
+      onContinue: widget.onContinue,
     );
   }
 }

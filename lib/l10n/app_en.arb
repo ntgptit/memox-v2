@@ -40,6 +40,43 @@
   "appShellHomePlaceholderDescription": "Home dashboard foundation is not wired yet.",
   "appShellProgressPlaceholderDescription": "Progress foundation is not wired yet.",
   "appShellSettingsPlaceholderDescription": "Settings foundation is not wired yet.",
+  "dashboardHeading": "Today's study focus",
+  "dashboardSubtitle": "Review due cards and keep your library moving.",
+  "dashboardDueTodayTitle": "Due today",
+  "dashboardDueTodayMessage": "{count} cards ready to review",
+  "@dashboardDueTodayMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardLibrarySummary": "{folderCount} folders · {cardCount} cards",
+  "@dashboardLibrarySummary": {
+    "placeholders": {
+      "folderCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardNoDueTitle": "No cards due now",
+  "dashboardNoDueMessage": "Open your library to add cards or start a focused deck session.",
+  "dashboardStudyTodayAction": "Study today",
+  "dashboardOpenLibraryAction": "Open library",
+  "settingsAppearanceTitle": "Appearance",
+  "settingsThemeModeLabel": "Theme mode",
+  "settingsThemeSystem": "System",
+  "settingsThemeLight": "Light",
+  "settingsThemeDark": "Dark",
+  "settingsLanguageTitle": "Language",
+  "settingsLocaleLabel": "App language",
+  "settingsLocaleSystem": "System",
+  "settingsLocaleEnglish": "English",
+  "settingsLocaleVietnamese": "Vietnamese",
+  "settingsUpdatedMessage": "Settings updated.",
   "appRouterErrorTitle": "Navigation error",
   "errorConfiguration": "The app configuration is invalid.",
   "errorRequestTimedOut": "The request timed out.",
@@ -105,6 +142,13 @@
   "foldersSummaryUnlocked": "This folder is empty and can hold subfolders or decks.",
   "foldersEmptyTitle": "This folder is empty",
   "foldersEmptyMessage": "Choose a direction first. A folder can contain subfolders or decks, not both.",
+  "foldersEmptySubfoldersTitle": "No subfolders yet",
+  "foldersEmptySubfoldersMessage": "Create a subfolder to keep this branch organized.",
+  "foldersEmptyDecksTitle": "No decks yet",
+  "foldersEmptyDecksMessage": "Create a deck to start adding flashcards here.",
+  "foldersNoResultsTitle": "No matching items",
+  "foldersNoResultsMessage": "Clear search or try a different term.",
+  "foldersClearSearchAction": "Clear search",
   "libraryCreateFolderTooltip": "Create folder",
   "libraryCreateFolderDialogTitle": "Create folder",
   "libraryFolderCreatedMessage": "Folder created.",
@@ -165,6 +209,9 @@
   },
   "decksManageContentTitle": "Manage content",
   "decksManageContentSubtitle": "Open flashcards, import into this deck, or continue editing content.",
+  "decksEmptyStudyTitle": "Add cards before studying",
+  "decksEmptyStudyMessage": "This deck has no flashcards yet. Add or import cards first.",
+  "decksStudyUnavailableNoCards": "Study is available after this deck has at least one flashcard.",
   "decksRenameTitle": "Rename deck",
   "decksUpdatedMessage": "Deck updated.",
   "decksMoveTitle": "Move deck",
@@ -282,6 +329,19 @@
   "studyIncorrectAction": "Incorrect",
   "studyRememberedAction": "Remembered",
   "studyForgotAction": "Forgot",
+  "studyAnswerCorrectTitle": "Correct",
+  "studyAnswerIncorrectTitle": "Not quite",
+  "studyCorrectAnswerLabel": "Correct answer: {answer}",
+  "@studyCorrectAnswerLabel": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "studyContinueAction": "Continue",
+  "studyEmptyAnswerMessage": "Enter an answer before submitting.",
+  "studyCancelConfirmTitle": "Cancel this session?",
+  "studyCancelConfirmMessage": "Your current study session will stop and you will be taken to the result screen.",
+  "studyCancelConfirmAction": "Cancel session",
   "flashcardsImportTitle": "Import flashcards",
   "importSourceTitle": "Source",
   "importSourceSubtitle": "Import is preview-first and atomic. Any invalid line blocks the entire write.",
@@ -307,6 +367,7 @@
       "fileName": {}
     }
   },
+  "importFileUnavailableMessage": "This file cannot be read. Choose another CSV or text file.",
   "importValidationIssuesTitle": "Validation issues",
   "importValidationIssuesSubtitle": "Fix every issue before importing.",
   "importValidationIssueLine": "Line {line}",

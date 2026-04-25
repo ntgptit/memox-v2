@@ -170,6 +170,111 @@ void main() {
     expect(find.text('1 decks · 2 cards'), findsOneWidget);
   });
 
+  testWidgets('unlocked folder renders both create choices', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('This folder is empty'), findsOneWidget);
+    expect(find.text('New subfolder'), findsOneWidget);
+    expect(find.text('New deck'), findsOneWidget);
+  });
+
+  testWidgets('empty subfolder mode renders only subfolder CTA', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_emptySubfolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('No subfolders yet'), findsOneWidget);
+    expect(find.text('New subfolder'), findsOneWidget);
+    expect(find.text('New deck'), findsNothing);
+  });
+
+  testWidgets('empty deck mode renders only deck CTA', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_emptyDeckFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('No decks yet'), findsOneWidget);
+    expect(find.text('New deck'), findsOneWidget);
+    expect(find.text('New subfolder'), findsNothing);
+  });
+
+  testWidgets('search with no results renders clear search action', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_searchNoResultState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('No matching items'), findsOneWidget);
+    expect(find.text('Clear search'), findsOneWidget);
+    expect(find.text('New deck'), findsNothing);
+    expect(find.byType(FloatingActionButton), findsNothing);
+  });
+
   testWidgets('falls back to zero progress for legacy subfolder data', (
     WidgetTester tester,
   ) async {
@@ -426,6 +531,66 @@ const _deckFolderState = FolderDetailState(
       lastStudiedAt: null,
     ),
   ],
+);
+
+const _unlockedFolderState = FolderDetailState(
+  header: FolderDetailHeader(
+    id: 'folder-001',
+    name: 'New branch',
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'New branch', folderId: 'folder-001'),
+    ],
+  ),
+  mode: FolderDetailMode.unlocked,
+  sortMode: ContentSortMode.manual,
+  searchTerm: '',
+  subfolders: <FolderSubfolderItem>[],
+  decks: <FolderDeckItem>[],
+);
+
+const _emptySubfolderState = FolderDetailState(
+  header: FolderDetailHeader(
+    id: 'folder-001',
+    name: 'Japanese',
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'Japanese', folderId: 'folder-001'),
+    ],
+  ),
+  mode: FolderDetailMode.subfolders,
+  sortMode: ContentSortMode.manual,
+  searchTerm: '',
+  subfolders: <FolderSubfolderItem>[],
+  decks: <FolderDeckItem>[],
+);
+
+const _emptyDeckFolderState = FolderDetailState(
+  header: FolderDetailHeader(
+    id: 'folder-001',
+    name: 'Korean',
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
+    ],
+  ),
+  mode: FolderDetailMode.decks,
+  sortMode: ContentSortMode.manual,
+  searchTerm: '',
+  subfolders: <FolderSubfolderItem>[],
+  decks: <FolderDeckItem>[],
+);
+
+const _searchNoResultState = FolderDetailState(
+  header: FolderDetailHeader(
+    id: 'folder-001',
+    name: 'Korean',
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
+    ],
+  ),
+  mode: FolderDetailMode.decks,
+  sortMode: ContentSortMode.manual,
+  searchTerm: 'biology',
+  subfolders: <FolderSubfolderItem>[],
+  decks: <FolderDeckItem>[],
 );
 
 class _FutureController<T> extends ChangeNotifier {

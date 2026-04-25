@@ -71,8 +71,11 @@ class Runner:
 
         results: list[GuardResult] = []
         for rule in rules:
-            effective_scope = scope or rule.scope
-            files = self.scanner.resolve_scope(effective_scope)
+            files = (
+                self.scanner.resolve_scope_intersection(rule.scope, scope)
+                if scope
+                else self.scanner.resolve_scope(rule.scope)
+            )
             files = self.scanner.filter_by_targets(files, rule.targets, rule.exclude)
 
             started = time.perf_counter()

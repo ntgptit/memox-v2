@@ -1,3 +1,5 @@
+import 'dart:ui' show Tristate;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/theme/tokens/app_spacing.dart';
@@ -123,11 +125,81 @@ void main() {
     );
 
     expect(find.byType(MxTappable), findsNWidgets(3));
+    expect(
+      tester.getSize(find.byType(MxTappable).at(0)).width,
+      greaterThanOrEqualTo(kMinInteractiveDimension),
+    );
+    expect(
+      tester.getSize(find.byType(MxTappable).at(0)).height,
+      greaterThanOrEqualTo(kMinInteractiveDimension),
+    );
 
     await tester.tap(find.byType(MxTappable).at(2));
     await tester.pump();
 
     expect(tappedIndex, 2);
+  });
+
+  testWidgets('MxPageDots exposes page position and selected semantics', (
+    tester,
+  ) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      late String selectedLabel;
+
+      await tester.pumpWidget(
+        _TestApp(
+          child: Builder(
+            builder: (context) {
+              selectedLabel = MaterialLocalizations.of(
+                context,
+              ).tabLabel(tabIndex: 2, tabCount: 3);
+              return const MxPageDots(count: 3, activeIndex: 1);
+            },
+          ),
+        ),
+      );
+
+      final selectedNode = tester.getSemantics(
+        find.bySemanticsLabel(selectedLabel),
+      );
+
+      expect(selectedNode.flagsCollection.isSelected, Tristate.isTrue);
+      expect(selectedNode.flagsCollection.isButton, isFalse);
+    } finally {
+      semanticsHandle.dispose();
+    }
+  });
+
+  testWidgets('MxPageDots marks tappable dots as semantic buttons', (
+    tester,
+  ) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      late String selectedLabel;
+
+      await tester.pumpWidget(
+        _TestApp(
+          child: Builder(
+            builder: (context) {
+              selectedLabel = MaterialLocalizations.of(
+                context,
+              ).tabLabel(tabIndex: 2, tabCount: 3);
+              return MxPageDots(count: 3, activeIndex: 1, onDotTap: (_) {});
+            },
+          ),
+        ),
+      );
+
+      final selectedNode = tester.getSemantics(
+        find.bySemanticsLabel(selectedLabel),
+      );
+
+      expect(selectedNode.flagsCollection.isSelected, Tristate.isTrue);
+      expect(selectedNode.flagsCollection.isButton, isTrue);
+    } finally {
+      semanticsHandle.dispose();
+    }
   });
 }
 

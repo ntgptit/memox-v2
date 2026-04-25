@@ -81,6 +81,8 @@ class DeckDetailScreen extends ConsumerWidget {
                 ),
                 const MxGap(MxSpace.xl),
                 DeckStudyActionSection(
+                  cardCount: state.cardCount,
+                  dueTodayCount: state.dueTodayCount,
                   onOpenFlashcards: () => context.pushFlashcardList(state.id),
                   onAddFlashcard: () => context.pushFlashcardCreate(state.id),
                   onImport: () => context.pushDeckImport(state.id),

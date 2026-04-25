@@ -62,33 +62,32 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
 
     final queryState = ref.watch(folderDetailQueryProvider(widget.folderId));
     final queryData = queryState.value;
+    final showFab = queryData != null && _shouldShowFab(queryData);
     final toolbarState = ref.watch(
       folderChildrenToolbarStateProvider(widget.folderId),
     );
-    final toolbarNotifier = ref.read(
-      folderChildrenToolbarStateProvider(widget.folderId).notifier,
-    );
-
     return MxScaffold(
-      floatingActionButton: queryData == null
-          ? null
-          : queryData.isUnlocked
-          ? null
-          : MxFab(
+      floatingActionButton: showFab
+          ? MxFab(
               icon: Icons.add,
               tooltip: queryData.isSubfolderMode
                   ? l10n.foldersNewSubfolderTooltip
                   : l10n.foldersNewDeckTooltip,
               onPressed: _isReorderMode
                   ? null
-                  : () => queryData.isSubfolderMode
-                        ? _createSubfolder()
-                        : _createDeck(),
-            ),
+                  : () {
+                      if (queryData.isSubfolderMode) {
+                        _createSubfolder();
+                        return;
+                      }
+                      _createDeck();
+                    },
+            )
+          : null,
       body: MxContentShell(
         width: MxContentWidth.wide,
         applyVerticalPadding: true,
-        hasFab: queryData != null && !queryData.isUnlocked && !_isReorderMode,
+        hasFab: showFab,
         child: MxRetainedAsyncState<FolderDetailState>(
           data: queryState.value,
           isLoading: queryState.isLoading,
@@ -103,8 +102,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                 SliverToBoxAdapter(
                   child: FolderHeaderSection(
                     state: state,
-                    onBack: () =>
-                        context.popRoute(fallback: context.goLibrary),
+                    onBack: () => context.popRoute(fallback: context.goLibrary),
                     onOpenActions: () => _openActions(state),
                     onOpenBreadcrumb: (folderId) =>
                         context.goFolderDetail(folderId),
@@ -114,12 +112,30 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                 SliverToBoxAdapter(
                   child: MxSearchSortToolbar<ContentSortMode>(
                     searchHintText: l10n.commonSearch,
-                    onSearchChanged: toolbarNotifier.setSearchTerm,
-                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                    onSearchChanged: (value) => ref
+                        .read(
+                          folderChildrenToolbarStateProvider(
+                            widget.folderId,
+                          ).notifier,
+                        )
+                        .setSearchTerm(value),
+                    onSearchClear: () => ref
+                        .read(
+                          folderChildrenToolbarStateProvider(
+                            widget.folderId,
+                          ).notifier,
+                        )
+                        .setSearchTerm(''),
                     sortOptions: sortOptions,
                     selectedSort: toolbarState.sortMode,
                     sortLabel: l10n.commonSort,
-                    onSortSelected: toolbarNotifier.setSortMode,
+                    onSortSelected: (sortMode) => ref
+                        .read(
+                          folderChildrenToolbarStateProvider(
+                            widget.folderId,
+                          ).notifier,
+                        )
+                        .setSortMode(sortMode),
                     trailing: _isReorderMode
                         ? <Widget>[
                             MxSecondaryButton(
@@ -157,8 +173,10 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
             child: KeyedSubtree(
               key: const ValueKey(_FolderBodyMode.empty),
               child: FolderEmptyStateSection(
+                mode: _resolveEmptyStateMode(state),
                 onCreateSubfolder: _createSubfolder,
                 onCreateDeck: _createDeck,
+                onClearSearch: _clearSearch,
               ),
             ),
           ),
@@ -185,10 +203,52 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     if (state.isUnlocked) {
       return _FolderBodyMode.empty;
     }
-    if (_isReorderMode) {
+    if (_isReorderMode && _hasActiveItems(state)) {
       return _FolderBodyMode.reorder;
     }
-    return _FolderBodyMode.tree;
+    if (_hasActiveItems(state)) {
+      return _FolderBodyMode.tree;
+    }
+    return _FolderBodyMode.empty;
+  }
+
+  FolderEmptyStateMode _resolveEmptyStateMode(FolderDetailState state) {
+    if (_isSearchNoResult(state)) {
+      return FolderEmptyStateMode.noResults;
+    }
+    if (state.isSubfolderMode) {
+      return FolderEmptyStateMode.subfolders;
+    }
+    if (state.isDeckMode) {
+      return FolderEmptyStateMode.decks;
+    }
+    return FolderEmptyStateMode.unlocked;
+  }
+
+  bool _shouldShowFab(FolderDetailState state) {
+    return !state.isUnlocked && !_isReorderMode && !_isSearchNoResult(state);
+  }
+
+  bool _isSearchNoResult(FolderDetailState state) {
+    return !state.isUnlocked &&
+        state.searchTerm.isNotEmpty &&
+        !_hasActiveItems(state);
+  }
+
+  bool _hasActiveItems(FolderDetailState state) {
+    if (state.isSubfolderMode) {
+      return state.subfolders.isNotEmpty;
+    }
+    if (state.isDeckMode) {
+      return state.decks.isNotEmpty;
+    }
+    return false;
+  }
+
+  void _clearSearch() {
+    ref
+        .read(folderChildrenToolbarStateProvider(widget.folderId).notifier)
+        .setSearchTerm('');
   }
 
   Future<void> _createSubfolder() async {

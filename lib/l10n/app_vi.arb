@@ -40,6 +40,43 @@
   "appShellHomePlaceholderDescription": "Phần nền cho Trang chủ chưa được nối xong.",
   "appShellProgressPlaceholderDescription": "Phần nền cho Tiến độ chưa được nối xong.",
   "appShellSettingsPlaceholderDescription": "Phần nền cho Cài đặt chưa được nối xong.",
+  "dashboardHeading": "Trọng tâm học hôm nay",
+  "dashboardSubtitle": "Ôn các thẻ đến hạn và tiếp tục xây dựng thư viện của bạn.",
+  "dashboardDueTodayTitle": "Đến hạn hôm nay",
+  "dashboardDueTodayMessage": "{count} thẻ sẵn sàng để ôn",
+  "@dashboardDueTodayMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardLibrarySummary": "{folderCount} thư mục · {cardCount} thẻ",
+  "@dashboardLibrarySummary": {
+    "placeholders": {
+      "folderCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardNoDueTitle": "Hiện không có thẻ đến hạn",
+  "dashboardNoDueMessage": "Mở thư viện để thêm thẻ hoặc bắt đầu học một bộ thẻ cụ thể.",
+  "dashboardStudyTodayAction": "Học hôm nay",
+  "dashboardOpenLibraryAction": "Mở thư viện",
+  "settingsAppearanceTitle": "Giao diện",
+  "settingsThemeModeLabel": "Chế độ giao diện",
+  "settingsThemeSystem": "Theo hệ thống",
+  "settingsThemeLight": "Sáng",
+  "settingsThemeDark": "Tối",
+  "settingsLanguageTitle": "Ngôn ngữ",
+  "settingsLocaleLabel": "Ngôn ngữ app",
+  "settingsLocaleSystem": "Theo hệ thống",
+  "settingsLocaleEnglish": "Tiếng Anh",
+  "settingsLocaleVietnamese": "Tiếng Việt",
+  "settingsUpdatedMessage": "Đã cập nhật cài đặt.",
   "appRouterErrorTitle": "Lỗi điều hướng",
   "errorConfiguration": "Cấu hình ứng dụng không hợp lệ.",
   "errorRequestTimedOut": "Yêu cầu đã hết thời gian chờ.",
@@ -105,6 +142,13 @@
   "foldersSummaryUnlocked": "Thư mục này đang trống và có thể chứa thư mục con hoặc bộ thẻ.",
   "foldersEmptyTitle": "Thư mục này đang trống",
   "foldersEmptyMessage": "Hãy chọn một hướng trước. Một thư mục chỉ có thể chứa thư mục con hoặc bộ thẻ, không thể chứa cả hai.",
+  "foldersEmptySubfoldersTitle": "Chưa có thư mục con",
+  "foldersEmptySubfoldersMessage": "Tạo thư mục con để sắp xếp nhánh này.",
+  "foldersEmptyDecksTitle": "Chưa có bộ thẻ",
+  "foldersEmptyDecksMessage": "Tạo bộ thẻ để bắt đầu thêm flashcard tại đây.",
+  "foldersNoResultsTitle": "Không có mục phù hợp",
+  "foldersNoResultsMessage": "Xóa tìm kiếm hoặc thử từ khóa khác.",
+  "foldersClearSearchAction": "Xóa tìm kiếm",
   "libraryCreateFolderTooltip": "Tạo thư mục",
   "libraryCreateFolderDialogTitle": "Tạo thư mục",
   "libraryFolderCreatedMessage": "Đã tạo thư mục.",
@@ -165,6 +209,9 @@
   },
   "decksManageContentTitle": "Quản lý nội dung",
   "decksManageContentSubtitle": "Mở flashcard, nhập dữ liệu vào bộ thẻ này, hoặc tiếp tục chỉnh sửa nội dung.",
+  "decksEmptyStudyTitle": "Thêm thẻ trước khi học",
+  "decksEmptyStudyMessage": "Bộ thẻ này chưa có flashcard. Hãy thêm hoặc nhập thẻ trước.",
+  "decksStudyUnavailableNoCards": "Có thể học sau khi bộ thẻ có ít nhất một flashcard.",
   "decksRenameTitle": "Đổi tên bộ thẻ",
   "decksUpdatedMessage": "Đã cập nhật bộ thẻ.",
   "decksMoveTitle": "Di chuyển bộ thẻ",
@@ -282,6 +329,19 @@
   "studyIncorrectAction": "Sai",
   "studyRememberedAction": "Nhớ",
   "studyForgotAction": "Quên",
+  "studyAnswerCorrectTitle": "Đúng",
+  "studyAnswerIncorrectTitle": "Chưa đúng",
+  "studyCorrectAnswerLabel": "Đáp án đúng: {answer}",
+  "@studyCorrectAnswerLabel": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "studyContinueAction": "Tiếp tục",
+  "studyEmptyAnswerMessage": "Hãy nhập đáp án trước khi gửi.",
+  "studyCancelConfirmTitle": "Hủy phiên học này?",
+  "studyCancelConfirmMessage": "Phiên học hiện tại sẽ dừng lại và bạn sẽ được đưa đến màn hình kết quả.",
+  "studyCancelConfirmAction": "Hủy phiên học",
   "flashcardsImportTitle": "Nhập flashcard",
   "importSourceTitle": "Nguồn dữ liệu",
   "importSourceSubtitle": "Luồng import luôn preview trước và ghi atomically. Chỉ cần một dòng lỗi là chặn toàn bộ lần ghi.",
@@ -307,6 +367,7 @@
       "fileName": {}
     }
   },
+  "importFileUnavailableMessage": "Không thể đọc file này. Hãy chọn một file CSV hoặc text khác.",
   "importValidationIssuesTitle": "Lỗi xác thực",
   "importValidationIssuesSubtitle": "Hãy sửa toàn bộ lỗi trước khi nhập.",
   "importValidationIssueLine": "Dòng {line}",
