@@ -116,6 +116,16 @@ final class StudyRepoImpl implements StudyRepo {
   }
 
   @override
+  Future<List<StudySessionSnapshot>> listActiveSessions() async {
+    final sessions = await _studySessionDao.listActiveSessions();
+    final snapshots = <StudySessionSnapshot>[];
+    for (final session in sessions) {
+      snapshots.add(await _loadSnapshot(session.id));
+    }
+    return snapshots;
+  }
+
+  @override
   Future<StudySessionSnapshot> startSession({
     required StudyContext context,
     required StudyFlow flow,

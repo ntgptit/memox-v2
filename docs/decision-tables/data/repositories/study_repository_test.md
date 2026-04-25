@@ -23,6 +23,12 @@ Test file: `test/data/repositories/study_repository_test.dart`
 | DT6 | Review batch submit is called after the session has already advanced to Match | new-study session has passed Review and current item is Match | repository batch answer is requested again | request fails fast with validation instead of writing another batch | C0+C1 |
 | DT7 | Review batch submit is called after the session is terminal | new-study session has completed all modes and finalized to `completed` | repository batch answer is requested | request fails fast with validation and terminal status is not reopened | C0+C1 |
 
+## Decision table: listActiveSessions
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | session list contains active and terminal statuses | stored sessions include `inProgress`, `readyToFinalize`, `failedToFinalize`, `completed`, and `cancelled` statuses with different start times | repository lists active sessions | only the three resumable/manageable statuses are returned, ordered by newest `startedAt` first | C0+C1 |
+
 ## Decision table: onUpdate
 
 | ID | Branch / condition | Given | When | Then | Coverage |

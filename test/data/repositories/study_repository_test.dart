@@ -468,6 +468,56 @@ void main() {
     );
 
     test(
+      'DT1 listActiveSessions: returns only active sessions ordered newest first',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        final completed = await harness.startOneCardNewStudy();
+        harness.clock.advance(const Duration(minutes: 1));
+        final cancelled = await harness.startOneCardNewStudy();
+        harness.clock.advance(const Duration(minutes: 1));
+        final inProgress = await harness.startOneCardNewStudy();
+        harness.clock.advance(const Duration(minutes: 1));
+        final ready = await harness.startOneCardNewStudy();
+        harness.clock.advance(const Duration(minutes: 1));
+        final failed = await harness.startOneCardNewStudy();
+
+        await harness.setSessionStatus(
+          sessionId: completed.session.id,
+          status: SessionStatus.completed,
+        );
+        await harness.setSessionStatus(
+          sessionId: cancelled.session.id,
+          status: SessionStatus.cancelled,
+        );
+        await harness.setSessionStatus(
+          sessionId: ready.session.id,
+          status: SessionStatus.readyToFinalize,
+        );
+        await harness.setSessionStatus(
+          sessionId: failed.session.id,
+          status: SessionStatus.failedToFinalize,
+        );
+
+        final active = await harness.resume.listActiveSessions();
+
+        expect(active.map((snapshot) => snapshot.session.id), <String>[
+          failed.session.id,
+          ready.session.id,
+          inProgress.session.id,
+        ]);
+        expect(
+          active.map((snapshot) => snapshot.session.status),
+          <SessionStatus>[
+            SessionStatus.failedToFinalize,
+            SessionStatus.readyToFinalize,
+            SessionStatus.inProgress,
+          ],
+        );
+      },
+    );
+
+    test(
       'DT3 repositoryFlow: recovered SRS Review decreases box once after retry pass',
       () async {
         await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
@@ -873,7 +923,9 @@ void main() {
 final class _StudyHarness {
   _StudyHarness._({
     required this.database,
+    required this.clock,
     required this.start,
+    required this.resume,
     required this.answer,
     required this.answerBatch,
     required this.skip,
@@ -903,10 +955,12 @@ final class _StudyHarness {
     ]);
     return _StudyHarness._(
       database: database,
+      clock: clock,
       start: StartStudySessionUseCase(
         repository: repo,
         strategyFactory: factory,
       ),
+      resume: ResumeStudySessionUseCase(repo),
       answer: AnswerFlashcardUseCase(
         repository: repo,
         strategyFactory: factory,
@@ -929,7 +983,9 @@ final class _StudyHarness {
   }
 
   final AppDatabase database;
+  final TestClock clock;
   final StartStudySessionUseCase start;
+  final ResumeStudySessionUseCase resume;
   final AnswerFlashcardUseCase answer;
   final AnswerCurrentModeBatchUseCase answerBatch;
   final SkipFlashcardUseCase skip;
@@ -996,6 +1052,36 @@ final class _StudyHarness {
             ),
           );
     }
+  }
+
+  Future<StudySessionSnapshot> startOneCardNewStudy() {
+    return start.execute(
+      const StudyContext(
+        entryType: StudyEntryType.deck,
+        entryRefId: 'deck-1',
+        studyType: StudyType.newStudy,
+        settings: StudySettingsSnapshot(
+          batchSize: 1,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+        ),
+      ),
+    );
+  }
+
+  Future<void> setSessionStatus({
+    required String sessionId,
+    required SessionStatus status,
+  }) {
+    return (database.update(
+      database.studySessions,
+    )..where((table) => table.id.equals(sessionId))).write(
+      StudySessionsCompanion(
+        status: Value(status.storageValue),
+        endedAt: Value(clock.nowEpochMillis()),
+      ),
+    );
   }
 
   Future<void> dispose() => database.close();

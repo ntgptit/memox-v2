@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
@@ -25,6 +26,9 @@ import '../../../shared/widgets/mx_text.dart';
 import '../providers/study_session_notifier.dart';
 import '../study_labels.dart';
 import '../widgets/study_session/study_mode_panel.dart';
+
+const _reviewPointerScrollThreshold = 20.0;
+const _reviewPageTurnDuration = Duration(milliseconds: 250);
 
 class StudySessionScreen extends ConsumerStatefulWidget {
   const StudySessionScreen({required this.sessionId, super.key});
@@ -327,6 +331,7 @@ class _ReviewModeSessionViewState extends State<_ReviewModeSessionView> {
   late int _pageIndex;
   Timer? _autoSubmitTimer;
   bool _hasSubmitted = false;
+  bool _isPagingFromPointerSignal = false;
 
   @override
   void initState() {
@@ -395,53 +400,109 @@ class _ReviewModeSessionViewState extends State<_ReviewModeSessionView> {
           children: [
             Row(
               children: [
-                Expanded(child: MxLinearProgress(value: progress)),
+                Expanded(
+                  child: MxLinearProgress(
+                    value: progress,
+                    size: MxProgressSize.large,
+                  ),
+                ),
                 const MxGap(MxSpace.sm),
                 MxText(
                   l10n.studyReviewProgressPercent(percent),
-                  role: MxTextRole.badge,
+                  role: MxTextRole.reviewProgress,
                 ),
               ],
             ),
             const MxGap(MxSpace.md),
             Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: cards.length,
-                onPageChanged: _handlePageChanged,
-                itemBuilder: (context, index) {
-                  final card = cards[index];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: _ReviewModeCard(
-                          tooltip: l10n.studyReviewEditCardTooltip,
-                          actionIcon: Icons.mode_edit_outline,
-                          text: card.front,
-                          role: MxTextRole.pageTitle,
-                        ),
-                      ),
-                      const MxGap(MxSpace.md),
-                      Expanded(
-                        flex: 1,
-                        child: _ReviewModeCard(
-                          tooltip: l10n.studyReviewCardAudioTooltip,
-                          actionIcon: Icons.volume_up_outlined,
-                          text: card.back,
-                          role: MxTextRole.displayLarge,
-                        ),
-                      ),
-                    ],
-                  );
-                },
+              child: Listener(
+                onPointerSignal: _handlePointerSignal,
+                child: ScrollConfiguration(
+                  behavior: const _ReviewPageScrollBehavior(),
+                  child: PageView.builder(
+                    controller: _pageController,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: cards.length,
+                    onPageChanged: _handlePageChanged,
+                    itemBuilder: (context, index) {
+                      final card = cards[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: _ReviewModeCard(
+                              tooltip: l10n.studyReviewEditCardTooltip,
+                              actionIcon: Icons.mode_edit_outline,
+                              text: card.front,
+                              role: MxTextRole.reviewFront,
+                            ),
+                          ),
+                          const MxGap(MxSpace.md),
+                          Expanded(
+                            flex: 1,
+                            child: _ReviewModeCard(
+                              tooltip: l10n.studyReviewCardAudioTooltip,
+                              actionIcon: Icons.volume_up_outlined,
+                              text: card.back,
+                              role: MxTextRole.reviewBack,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _handlePointerSignal(PointerSignalEvent event) {
+    if (event is! PointerScrollEvent) {
+      return;
+    }
+    final scrollDelta = _primaryScrollDelta(event);
+    if (scrollDelta.abs() < _reviewPointerScrollThreshold) {
+      return;
+    }
+    if (scrollDelta > 0) {
+      unawaited(_turnPage(_pageIndex + 1));
+      return;
+    }
+    unawaited(_turnPage(_pageIndex - 1));
+  }
+
+  double _primaryScrollDelta(PointerScrollEvent event) {
+    final delta = event.scrollDelta;
+    if (delta.dx.abs() > delta.dy.abs()) {
+      return delta.dx;
+    }
+    return delta.dy;
+  }
+
+  Future<void> _turnPage(int targetIndex) async {
+    if (_isPagingFromPointerSignal ||
+        targetIndex < 0 ||
+        targetIndex >= _reviewCards.length ||
+        !_pageController.hasClients) {
+      return;
+    }
+    _isPagingFromPointerSignal = true;
+    try {
+      await _pageController.animateToPage(
+        targetIndex,
+        duration: _reviewPageTurnDuration,
+        curve: Curves.easeOutCubic,
+      );
+    } finally {
+      if (mounted) {
+        _isPagingFromPointerSignal = false;
+      }
+    }
   }
 
   List<StudyFlashcardRef> get _reviewCards {
@@ -511,6 +572,18 @@ class _ReviewModeSessionViewState extends State<_ReviewModeSessionView> {
     _autoSubmitTimer = null;
     await widget.onSubmit();
   }
+}
+
+class _ReviewPageScrollBehavior extends MaterialScrollBehavior {
+  const _ReviewPageScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => const <PointerDeviceKind>{
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.invertedStylus,
+  };
 }
 
 class _ReviewModeCard extends StatelessWidget {

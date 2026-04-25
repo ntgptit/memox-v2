@@ -8,6 +8,8 @@ abstract interface class StudyRepo {
 
   Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context);
 
+  Future<List<StudySessionSnapshot>> listActiveSessions();
+
   Future<StudySessionSnapshot> startSession({
     required StudyContext context,
     required StudyFlow flow,

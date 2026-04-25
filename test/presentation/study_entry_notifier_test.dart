@@ -61,6 +61,11 @@ final class _EmptyStudyRepo implements StudyRepo {
   }
 
   @override
+  Future<List<StudySessionSnapshot>> listActiveSessions() {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<StudySessionSnapshot> startSession({
     required StudyContext context,
     required StudyFlow flow,

@@ -21,6 +21,7 @@ MemoX là hệ thống học tập cá nhân dùng flashcard và spaced repetiti
 - New Study yêu cầu pass đủ 5 mode học, bao gồm `Fill`
 - SRS Review chỉ dùng Fill mode và retry cho tới khi batch review pass
 - Resume session dang dở hoặc restart session
+- Theo dõi và quản lý session đang mở từ màn Progress: tiếp tục học, hủy, finalize hoặc retry finalize
 - Bỏ qua thẻ, học lại thẻ sai trong mode hiện tại và kết thúc sớm session
 - Điều khiển session bằng study type, batch size, shuffle và ưu tiên thẻ quá hạn
 - Lưu session history để theo dõi kết quả học

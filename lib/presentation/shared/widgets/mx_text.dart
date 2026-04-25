@@ -13,12 +13,15 @@ enum MxTextRole {
   listTitle,
   listSubtitle,
   badge,
+  reviewProgress,
   stateTitle,
   stateMessage,
   formLabel,
   formHelper,
   breadcrumb,
   contentBody,
+  reviewFront,
+  reviewBack,
   avatarInitials,
 }
 
@@ -64,6 +67,10 @@ abstract final class MxTextStyles {
       MxTextRole.badge => textTheme.labelSmall!.copyWith(
         color: scheme.onSurface,
       ),
+      MxTextRole.reviewProgress => textTheme.labelLarge!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w600,
+      ),
       MxTextRole.stateTitle => textTheme.titleLarge!.copyWith(
         color: scheme.onSurface,
       ),
@@ -81,6 +88,14 @@ abstract final class MxTextStyles {
       ),
       MxTextRole.contentBody => textTheme.bodyMedium!.copyWith(
         color: scheme.onSurfaceVariant,
+      ),
+      MxTextRole.reviewFront => textTheme.headlineMedium!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w500,
+      ),
+      MxTextRole.reviewBack => textTheme.titleLarge!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w400,
       ),
       MxTextRole.avatarInitials => textTheme.labelMedium!.copyWith(
         color: scheme.onSurfaceVariant,

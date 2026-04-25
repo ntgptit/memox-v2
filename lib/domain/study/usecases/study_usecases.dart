@@ -44,6 +44,10 @@ final class ResumeStudySessionUseCase {
 
   final StudyRepo _repository;
 
+  Future<List<StudySessionSnapshot>> listActiveSessions() {
+    return _repository.listActiveSessions();
+  }
+
   Future<StudySessionSnapshot?> findCandidate(StudyContext context) {
     return _repository.findResumeCandidate(context);
   }

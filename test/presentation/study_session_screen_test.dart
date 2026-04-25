@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -91,25 +92,33 @@ void main() {
     },
   );
 
-  testWidgets('DT4 onDisplay: review mode initial progress is zero percent', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          studySessionStateProvider(
-            'session-001',
-          ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
-        ],
-        child: const _TestApp(
-          child: StudySessionScreen(sessionId: 'session-001'),
+  testWidgets(
+    'DT4 onDisplay: review mode initial progress row uses larger synchronized sizing',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('0%'), findsOneWidget);
-  });
+      final progress = tester.widget<LinearProgressIndicator>(
+        find.byType(LinearProgressIndicator),
+      );
+      final progressLabelStyle = tester.widget<Text>(find.text('0%')).style!;
+      expect(find.text('0%'), findsOneWidget);
+      expect(progress.minHeight, 8);
+      expect(progressLabelStyle.fontSize, greaterThanOrEqualTo(14));
+      expect(progressLabelStyle.fontWeight, FontWeight.w600);
+    },
+  );
 
   testWidgets('DT5 onDisplay: review mode hides grading and skip controls', (
     tester,
@@ -132,6 +141,43 @@ void main() {
     expect(find.text('Remembered'), findsNothing);
     expect(find.text('Skip card'), findsNothing);
   });
+
+  testWidgets(
+    'DT6 onDisplay: review faces use fixed larger non-heavy typography',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_mixedLengthReviewSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final frontStyle = tester.widget<Text>(find.text('front 1')).style!;
+      final shortAnswerStyle = tester.widget<Text>(find.text('back 1')).style!;
+      expect(frontStyle.fontSize, greaterThan(shortAnswerStyle.fontSize!));
+      expect(frontStyle.fontWeight, FontWeight.w500);
+      expect(shortAnswerStyle.fontWeight, FontWeight.w400);
+
+      await tester.dragFrom(const Offset(700, 400), const Offset(-500, 0));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      final longAnswerStyle = tester
+          .widget<Text>(find.text(_longReviewBack))
+          .style!;
+      expect(longAnswerStyle.fontSize, shortAnswerStyle.fontSize);
+      expect(longAnswerStyle.fontWeight, FontWeight.w400);
+      expect(shortAnswerStyle.fontWeight, longAnswerStyle.fontWeight);
+      expect(shortAnswerStyle.color, longAnswerStyle.color);
+    },
+  );
 
   testWidgets(
     'DT1 onUpdate: single-card review auto-submits after two seconds',
@@ -164,7 +210,7 @@ void main() {
   );
 
   testWidgets(
-    'DT2 onUpdate: multi-card review submits only after last card waits',
+    'DT2 onUpdate: web mouse right-to-left drag advances review vocabulary and only the last card can auto-submit',
     (tester) async {
       final repo = _BatchAnswerStudyRepo();
 
@@ -187,7 +233,11 @@ void main() {
       await tester.pump();
       expect(repo.batchAnswerCount, 0);
 
-      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.dragFrom(
+        const Offset(700, 400),
+        const Offset(-500, 0),
+        kind: PointerDeviceKind.mouse,
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
       expect(find.text('front 2'), findsOneWidget);
@@ -198,6 +248,40 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
       await tester.pump();
       expect(repo.batchAnswerCount, 1);
+    },
+  );
+
+  testWidgets(
+    'DT3 onUpdate: web mouse wheel scroll advances review vocabulary',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_multiReviewSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      tester.binding.handlePointerEvent(
+        const PointerScrollEvent(
+          position: Offset(700, 400),
+          scrollDelta: Offset(0, 80),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text('front 2'), findsOneWidget);
+      expect(repo.batchAnswerCount, 0);
     },
   );
 
@@ -257,6 +341,15 @@ final _singleReviewSnapshot = _reviewSnapshot([
 final _multiReviewSnapshot = _reviewSnapshot([
   _card(id: 'card-001', front: 'front 1', back: 'back 1'),
   _card(id: 'card-002', front: 'front 2', back: 'back 2'),
+]);
+
+const _longReviewBack =
+    'Welfare / Phúc lợi (Danh từ, chế độ đảm bảo đời sống xã hội, '
+    'âm Hán Việt: Phúc chỉ; Phúc: phúc lợi, Chỉ: hưởng đến lợi ích)';
+
+final _mixedLengthReviewSnapshot = _reviewSnapshot([
+  _card(id: 'card-001', front: 'front 1', back: 'back 1'),
+  _card(id: 'card-002', front: '복지', back: _longReviewBack),
 ]);
 
 final _terminalSnapshot = StudySessionSnapshot(
@@ -366,6 +459,11 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
 
   @override
   Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudySessionSnapshot>> listActiveSessions() {
     throw UnimplementedError();
   }
 

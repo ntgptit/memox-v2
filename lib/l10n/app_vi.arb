@@ -82,6 +82,59 @@
       }
     }
   },
+  "progressActiveSessionsHeading": "Phiên học",
+  "progressActiveSessionsSubtitle": "Tiếp tục, finalize, thử lại finalize hoặc hủy các phiên học vẫn đang mở.",
+  "progressActiveSessionsCount": "Đang mở",
+  "progressReadySessionsCount": "Sẵn sàng",
+  "progressFailedSessionsCount": "Cần thử lại",
+  "progressEmptyTitle": "Không có phiên học đang mở",
+  "progressEmptyMessage": "Bắt đầu học từ Thư viện. Các phiên đang học hoặc đang chờ finalize sẽ xuất hiện ở đây.",
+  "progressSessionTitle": "{studyType} · {entryType}",
+  "@progressSessionTitle": {
+    "placeholders": {
+      "studyType": {},
+      "entryType": {}
+    }
+  },
+  "progressSessionCardProgress": "Đã xong {completed}/{total} thẻ · còn {remaining}",
+  "@progressSessionCardProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "progressSessionCurrentCard": "Thẻ hiện tại: {card}",
+  "@progressSessionCurrentCard": {
+    "placeholders": {
+      "card": {}
+    }
+  },
+  "progressSessionStartedAt": "Bắt đầu {date} lúc {time}",
+  "@progressSessionStartedAt": {
+    "placeholders": {
+      "date": {},
+      "time": {}
+    }
+  },
+  "progressEntryDeck": "Bộ thẻ",
+  "progressEntryFolder": "Thư mục",
+  "progressEntryToday": "Hôm nay",
+  "progressSessionStatusInProgress": "Đang học",
+  "progressSessionStatusReady": "Sẵn sàng finalize",
+  "progressSessionStatusFailed": "Finalize lỗi",
+  "progressCancelConfirmTitle": "Hủy phiên học này?",
+  "progressCancelConfirmMessage": "Phiên học hiện tại sẽ dừng lại. Các lượt đã hoàn thành vẫn nằm trong lịch sử, nhưng thẻ còn pending sẽ bị bỏ dở.",
+  "progressSessionCancelledMessage": "Đã hủy phiên học.",
+  "progressSessionFinalizedMessage": "Đã finalize phiên học.",
+  "progressSessionRetryFinalizeMessage": "Đã thử finalize lại.",
+  "progressSessionActionFailed": "Thao tác với phiên học thất bại.",
   "settingsAppearanceTitle": "Giao diện",
   "settingsThemeModeLabel": "Chế độ giao diện",
   "settingsThemeSystem": "Theo hệ thống",

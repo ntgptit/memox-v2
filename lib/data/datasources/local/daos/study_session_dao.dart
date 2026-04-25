@@ -37,6 +37,19 @@ final class StudySessionDao {
     return statement.getSingleOrNull();
   }
 
+  Future<List<StudySession>> listActiveSessions() {
+    return (_database.select(_database.studySessions)
+          ..where(
+            (table) => table.status.isIn(const <String>[
+              'in_progress',
+              'ready_to_finalize',
+              'failed_to_finalize',
+            ]),
+          )
+          ..orderBy([(table) => OrderingTerm.desc(table.startedAt)]))
+        .get();
+  }
+
   Future<void> insertSession(StudySessionsCompanion companion) {
     return _database.into(_database.studySessions).insert(companion);
   }

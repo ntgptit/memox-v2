@@ -6,6 +6,9 @@ import '../layouts/mx_gap.dart';
 
 enum MxProgressSize { small, medium, large }
 
+const _defaultLinearProgressTrackHeight =
+    6.0; // guard:raw-size-reviewed default track height
+
 /// Determinate or indeterminate circular spinner.
 class MxCircularProgress extends StatelessWidget {
   const MxCircularProgress({
@@ -49,6 +52,7 @@ class MxLinearProgress extends StatelessWidget {
     required this.value,
     this.label,
     this.showPercentage = false,
+    this.size = MxProgressSize.medium,
     this.color,
     super.key,
   });
@@ -56,13 +60,21 @@ class MxLinearProgress extends StatelessWidget {
   final double value;
   final String? label;
   final bool showPercentage;
+  final MxProgressSize size;
   final Color? color;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final progressTheme = Theme.of(context).progressIndicatorTheme;
     final pct = (value.clamp(0.0, 1.0) * 100).round();
+    final trackHeight = switch (size) {
+      MxProgressSize.small => AppSpacing.xs,
+      MxProgressSize.medium =>
+        progressTheme.linearMinHeight ?? _defaultLinearProgressTrackHeight,
+      MxProgressSize.large => AppSpacing.sm,
+    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -98,7 +110,7 @@ class MxLinearProgress extends StatelessWidget {
           child: LinearProgressIndicator(
             value: value.clamp(0.0, 1.0),
             color: color,
-            minHeight: 6, // guard:raw-size-reviewed track height
+            minHeight: trackHeight,
           ),
         ),
       ],

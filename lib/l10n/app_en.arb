@@ -82,6 +82,59 @@
       }
     }
   },
+  "progressActiveSessionsHeading": "Study sessions",
+  "progressActiveSessionsSubtitle": "Resume, finalize, retry, or cancel the study sessions that are still open.",
+  "progressActiveSessionsCount": "Active",
+  "progressReadySessionsCount": "Ready",
+  "progressFailedSessionsCount": "Needs retry",
+  "progressEmptyTitle": "No active study sessions",
+  "progressEmptyMessage": "Start studying from Library. Sessions that are in progress or waiting to finalize will appear here.",
+  "progressSessionTitle": "{studyType} · {entryType}",
+  "@progressSessionTitle": {
+    "placeholders": {
+      "studyType": {},
+      "entryType": {}
+    }
+  },
+  "progressSessionCardProgress": "{completed} of {total} cards · {remaining} remaining",
+  "@progressSessionCardProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "progressSessionCurrentCard": "Current card: {card}",
+  "@progressSessionCurrentCard": {
+    "placeholders": {
+      "card": {}
+    }
+  },
+  "progressSessionStartedAt": "Started {date} at {time}",
+  "@progressSessionStartedAt": {
+    "placeholders": {
+      "date": {},
+      "time": {}
+    }
+  },
+  "progressEntryDeck": "Deck",
+  "progressEntryFolder": "Folder",
+  "progressEntryToday": "Today",
+  "progressSessionStatusInProgress": "In progress",
+  "progressSessionStatusReady": "Ready to finalize",
+  "progressSessionStatusFailed": "Finalize failed",
+  "progressCancelConfirmTitle": "Cancel this study session?",
+  "progressCancelConfirmMessage": "The current session will stop. Completed attempts remain in its history, but pending cards are abandoned.",
+  "progressSessionCancelledMessage": "Session cancelled.",
+  "progressSessionFinalizedMessage": "Session finalized.",
+  "progressSessionRetryFinalizeMessage": "Finalize retried.",
+  "progressSessionActionFailed": "Session action failed.",
   "settingsAppearanceTitle": "Appearance",
   "settingsThemeModeLabel": "Theme mode",
   "settingsThemeSystem": "System",

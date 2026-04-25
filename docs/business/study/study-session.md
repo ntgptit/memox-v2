@@ -21,6 +21,7 @@ Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rul
 - User có thể resume session ở trạng thái `In Progress`, `Ready To Finalize`, hoặc `Failed To Finalize`
 - Resume không gom lại pool mới từ đầu, không random lại batch
 - Resume tiếp tục ghi vào cùng session history
+- Màn Progress phải liệt kê các session đang có thể resume/manage, gồm `In Progress`, `Ready To Finalize`, và `Failed To Finalize`, sắp xếp session mới bắt đầu gần nhất lên trước
 
 ### Resume New Study phải giữ nguyên
 - tập thẻ còn lại
@@ -65,6 +66,7 @@ Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rul
 - Trong SRS Review, các thẻ chưa pass Fill không được tự động chấm hay tự động cập nhật SRS
 - Các item còn `pending` trong session đó chuyển sang trạng thái bỏ dở
 - Không commit box / due date cho các flashcard chưa hoàn thành theo rule của flow
+- Từ màn Progress, user có thể hủy một session đang mở sau khi xác nhận; rule hủy và commit boundary vẫn giống thao tác hủy trong màn học
 
 ## Rule commit SRS cuối session
 
@@ -75,6 +77,9 @@ Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rul
   - toàn bộ transaction rollback
   - session chuyển sang `Failed To Finalize` (không phải `Completed`)
   - user có thể retry finalize
+- Từ màn Progress, user có thể finalize session ở trạng thái `Ready To Finalize`
+- Từ màn Progress, user có thể retry finalize session ở trạng thái `Failed To Finalize`
+- Sau khi finalize thành công, session không còn nằm trong danh sách session đang mở của màn Progress
 
 ### New Study commit
 - box cũ

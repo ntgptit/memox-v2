@@ -398,6 +398,11 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   }
 
   @override
+  Future<List<StudySessionSnapshot>> listActiveSessions() {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<StudySessionSnapshot> startSession({
     required StudyContext context,
     required StudyFlow flow,
@@ -503,6 +508,11 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
 
   @override
   Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudySessionSnapshot>> listActiveSessions() {
     throw UnimplementedError();
   }
 

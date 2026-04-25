@@ -6,7 +6,6 @@ import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../core/errors/error_mapper.dart';
 import '../../core/errors/failures.dart';
-import '../../core/theme/responsive/app_layout.dart';
 import '../../presentation/features/dashboard/screens/dashboard_screen.dart';
 import '../../presentation/features/decks/screens/deck_detail_screen.dart';
 import '../../presentation/features/flashcards/screens/deck_import_screen.dart';
@@ -14,12 +13,11 @@ import '../../presentation/features/flashcards/screens/flashcard_editor_screen.d
 import '../../presentation/features/flashcards/screens/flashcard_list_screen.dart';
 import '../../presentation/features/folders/screens/folder_detail_screen.dart';
 import '../../presentation/features/folders/screens/library_overview_screen.dart';
+import '../../presentation/features/progress/screens/progress_screen.dart';
 import '../../presentation/features/settings/screens/settings_screen.dart';
 import '../../presentation/features/study/screens/study_entry_screen.dart';
 import '../../presentation/features/study/screens/study_result_screen.dart';
 import '../../presentation/features/study/screens/study_session_screen.dart';
-import '../../presentation/shared/layouts/mx_content_shell.dart';
-import '../../presentation/shared/states/mx_empty_state.dart';
 import '../../presentation/shared/states/mx_error_state.dart';
 import '../app_shell.dart';
 import '../di/providers.dart';
@@ -182,15 +180,8 @@ GoRouter appRouter(Ref ref) {
               GoRoute(
                 path: RoutePaths.progress,
                 name: RouteNames.progress,
-                pageBuilder: (context, state) {
-                  final l10n = AppLocalizations.of(context);
-                  return NoTransitionPage(
-                    child: _ShellPlaceholderView(
-                      title: l10n.progressTitle,
-                      description: l10n.appShellProgressPlaceholderDescription,
-                    ),
-                  );
-                },
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: ProgressScreen()),
               ),
             ],
           ),
@@ -215,26 +206,6 @@ GoRouter appRouter(Ref ref) {
       );
     },
   );
-}
-
-class _ShellPlaceholderView extends StatelessWidget {
-  const _ShellPlaceholderView({required this.title, required this.description});
-
-  final String title;
-  final String description;
-
-  @override
-  Widget build(BuildContext context) {
-    return MxContentShell(
-      width: MxContentWidth.reading,
-      applyVerticalPadding: true,
-      child: MxEmptyState(
-        icon: Icons.insights_outlined,
-        title: title,
-        message: description,
-      ),
-    );
-  }
 }
 
 class _RouterErrorView extends StatelessWidget {
