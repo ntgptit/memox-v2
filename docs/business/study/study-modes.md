@@ -18,7 +18,10 @@ Mode nào dùng ở flow nào: xem [New Study Flow — Mode bắt buộc](./new-
 ### Review
 - xem term và meaning trực tiếp
 - có thể vuốt để đổi thẻ
-- user vẫn phải tự chấm `remembered` hoặc `forgot` để xác định pass mode
+- không hiển thị nút tự chấm `remembered` / `forgot`
+- mỗi flashcard đã xem trong Review được stage là `remembered`
+- khi user tới thẻ cuối, app tự ghi một batch attempt `remembered` cho toàn bộ item pending của Review mode sau delay 2 giây
+- nếu màn hình bị dispose trước khi batch submit, không ghi attempt và session resume lại Review mode chưa đổi
 
 ### Match
 - ghép cặp đúng
@@ -44,6 +47,7 @@ Mode nào dùng ở flow nào: xem [New Study Flow — Mode bắt buộc](./new-
 - mode không tự cập nhật SRS
 - mode không tự quyết định finalize session
 - kết quả mode được ghi nhận qua attempt và session progress
+- riêng Review mode ghi attempt theo batch ở cuối mode, không ghi từng lần vuốt thẻ
 - SRS chỉ cập nhật tại finalize boundary của session
 - `Review` ở đây là tên mode tương tác, khác với study flow `SRS Review`
 - Shuffle đáp án chỉ áp dụng cho mode có danh sách đáp án hoặc vị trí đáp án cần tráo

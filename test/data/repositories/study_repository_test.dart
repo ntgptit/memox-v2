@@ -303,6 +303,171 @@ void main() {
     );
 
     test(
+      'DT4 repositoryFlow: batch review submit inserts remembered attempt per pending item',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        final answered = await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+
+        final attempts = await harness.database
+            .select(harness.database.studyAttempts)
+            .get();
+        final reviewItems =
+            await (harness.database.select(harness.database.studySessionItems)
+                  ..where((table) => table.sessionId.equals(started.session.id))
+                  ..where(
+                    (table) =>
+                        table.studyMode.equals(StudyMode.review.storageValue),
+                  ))
+                .get();
+
+        expect(answered.summary.completedAttempts, 2);
+        expect(attempts, hasLength(2));
+        expect(
+          attempts.map((attempt) => attempt.result),
+          everyElement(AttemptGrade.remembered.storageValue),
+        );
+        expect(
+          reviewItems.map((item) => item.status),
+          everyElement(SessionItemStatus.completed.storageValue),
+        );
+      },
+    );
+
+    test(
+      'DT5 repositoryFlow: batch review submit advances from Review to Match',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        final answered = await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+
+        expect(answered.session.status, SessionStatus.inProgress);
+        expect(answered.currentItem?.studyMode, StudyMode.match);
+        expect(answered.currentItem?.modeOrder, 2);
+      },
+    );
+
+    test(
+      'DT6 repositoryFlow: batch review submit fails fast outside Review mode',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        final afterReview = await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+
+        expect(afterReview.currentItem?.studyMode, StudyMode.match);
+        await expectLater(
+          () => harness.answerBatch.execute(
+            sessionId: started.session.id,
+            studyType: started.session.studyType,
+            grade: AttemptGrade.remembered,
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+      },
+    );
+
+    test(
+      'DT7 repositoryFlow: batch review submit fails fast for terminal session',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        var snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        snapshot = await harness.answerBatch.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+          grade: AttemptGrade.remembered,
+        );
+        while (snapshot.currentItem != null) {
+          snapshot = await harness.answer.execute(
+            sessionId: snapshot.session.id,
+            studyType: snapshot.session.studyType,
+            grade: AttemptGrade.remembered,
+          );
+        }
+        snapshot = await harness.finalize.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+        );
+
+        expect(snapshot.session.status, SessionStatus.completed);
+        await expectLater(
+          () => harness.answerBatch.execute(
+            sessionId: snapshot.session.id,
+            studyType: snapshot.session.studyType,
+            grade: AttemptGrade.remembered,
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+      },
+    );
+
+    test(
       'DT3 repositoryFlow: recovered SRS Review decreases box once after retry pass',
       () async {
         await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
@@ -710,6 +875,7 @@ final class _StudyHarness {
     required this.database,
     required this.start,
     required this.answer,
+    required this.answerBatch,
     required this.skip,
     required this.cancel,
     required this.restart,
@@ -745,6 +911,10 @@ final class _StudyHarness {
         repository: repo,
         strategyFactory: factory,
       ),
+      answerBatch: AnswerCurrentModeBatchUseCase(
+        repository: repo,
+        strategyFactory: factory,
+      ),
       skip: SkipFlashcardUseCase(repo),
       cancel: CancelStudySessionUseCase(repo),
       restart: RestartStudySessionUseCase(
@@ -761,6 +931,7 @@ final class _StudyHarness {
   final AppDatabase database;
   final StartStudySessionUseCase start;
   final AnswerFlashcardUseCase answer;
+  final AnswerCurrentModeBatchUseCase answerBatch;
   final SkipFlashcardUseCase skip;
   final CancelStudySessionUseCase cancel;
   final RestartStudySessionUseCase restart;

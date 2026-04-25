@@ -16,6 +16,7 @@ Test file: `test/presentation/study_session_notifier_test.dart`
 | DT8 | match mode renders long-answer cards through `MxAnswerOptionCard`, not one-line secondary buttons | match-mode snapshot has three answer options and answer shuffle disabled | `StudyModePanel` renders match mode | three `MxAnswerOptionCard`s are present and `MxSecondaryButton` is absent for each answer text | C0+C1 |
 | DT9 | incorrect feedback exposes Mark correct and converts the pending grade before continue | fill-mode feedback has `selectedGrade=incorrect` and `isCorrect=false` | user taps `Mark correct` | callback receives feedback with `selectedGrade=correct` and `isCorrect=true` | C0+C1 |
 | DT10 | fill feedback includes both submitted answer and correct answer | fill-mode feedback contains submitted answer `anser 1` and correct answer `answer 1` | feedback panel renders | `Your answer: anser 1` and `Correct answer: answer 1` are visible | C0+C1 |
+| DT11 | review batch controller path uses the current study strategy and fixed remembered grade | repo fake returns a New Study review snapshot and records batch calls | `answerCurrentReviewModeAsRemembered()` is called | repo receives one batch call with grade `remembered`, the New Study mode list, and controller state has no error | C0+C1 |
 
 ## Decision table: onSelect
 

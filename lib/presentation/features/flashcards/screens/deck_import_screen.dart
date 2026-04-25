@@ -183,33 +183,15 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
                           )
                           .setRawContent(value),
                     ),
-                    const MxGap(MxSpace.lg),
-                    Wrap(
-                      spacing: MxSpace.sm,
-                      runSpacing: MxSpace.sm,
-                      children: [
-                        MxSecondaryButton(
-                          label: l10n.importPreviewAction,
-                          leadingIcon: Icons.preview_outlined,
-                          variant: MxSecondaryVariant.outlined,
-                          isLoading:
-                              _pendingAction == _ImportPendingAction.preview,
-                          onPressed: isImportBusy
-                              ? null
-                              : () => _preparePreview(),
-                        ),
-                        MxPrimaryButton(
-                          label: l10n.commonImport,
-                          leadingIcon: Icons.file_upload_outlined,
-                          isLoading:
-                              _pendingAction == _ImportPendingAction.commit,
-                          onPressed:
-                              isImportBusy ||
-                                  draft.preparation?.canCommit != true
-                              ? null
-                              : () => _commitImport(context),
-                        ),
-                      ],
+                    const MxGap(MxSpace.xl),
+                    _ImportSubmitRow(
+                      previewLabel: l10n.importPreviewAction,
+                      importLabel: l10n.commonImport,
+                      isBusy: isImportBusy,
+                      canCommit: draft.preparation?.canCommit == true,
+                      pendingAction: _pendingAction,
+                      onPreview: _preparePreview,
+                      onCommit: () => _commitImport(context),
                     ),
                   ],
                 ),
@@ -306,6 +288,85 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
 }
 
 enum _ImportPendingAction { preview, commit }
+
+class _ImportSubmitRow extends StatelessWidget {
+  const _ImportSubmitRow({
+    required this.previewLabel,
+    required this.importLabel,
+    required this.isBusy,
+    required this.canCommit,
+    required this.pendingAction,
+    required this.onPreview,
+    required this.onCommit,
+  });
+
+  final String previewLabel;
+  final String importLabel;
+  final bool isBusy;
+  final bool canCommit;
+  final _ImportPendingAction? pendingAction;
+  final VoidCallback onPreview;
+  final VoidCallback onCommit;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 600) {
+          return _buildCompact();
+        }
+        return _buildWide();
+      },
+    );
+  }
+
+  Widget _buildCompact() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        MxSecondaryButton(
+          label: previewLabel,
+          leadingIcon: Icons.preview_outlined,
+          variant: MxSecondaryVariant.outlined,
+          fullWidth: true,
+          isLoading: pendingAction == _ImportPendingAction.preview,
+          onPressed: isBusy ? null : onPreview,
+        ),
+        const MxGap(MxSpace.sm),
+        MxPrimaryButton(
+          label: importLabel,
+          leadingIcon: Icons.file_upload_outlined,
+          size: MxButtonSize.large,
+          fullWidth: true,
+          isLoading: pendingAction == _ImportPendingAction.commit,
+          onPressed: isBusy || !canCommit ? null : onCommit,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWide() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        MxSecondaryButton(
+          label: previewLabel,
+          leadingIcon: Icons.preview_outlined,
+          variant: MxSecondaryVariant.outlined,
+          isLoading: pendingAction == _ImportPendingAction.preview,
+          onPressed: isBusy ? null : onPreview,
+        ),
+        const MxGap(MxSpace.md),
+        MxPrimaryButton(
+          label: importLabel,
+          leadingIcon: Icons.file_upload_outlined,
+          isLoading: pendingAction == _ImportPendingAction.commit,
+          onPressed: isBusy || !canCommit ? null : onCommit,
+        ),
+      ],
+    );
+  }
+}
 
 class _ImportSeparatorSelector extends StatelessWidget {
   const _ImportSeparatorSelector({

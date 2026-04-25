@@ -48,6 +48,34 @@ class StudySessionActionController extends _$StudySessionActionController {
     }
   }
 
+  Future<bool> answerCurrentReviewModeAsRemembered() async {
+    state = const AsyncLoading<void>();
+    final snapshot = await ref.read(
+      studySessionStateProvider(sessionId).future,
+    );
+    try {
+      await ref
+          .read(answerCurrentModeBatchUseCaseProvider)
+          .execute(
+            sessionId: sessionId,
+            studyType: snapshot.session.studyType,
+            grade: AttemptGrade.remembered,
+          );
+      if (!ref.mounted) {
+        return false;
+      }
+      ref.invalidate(studySessionStateProvider(sessionId));
+      state = const AsyncData<void>(null);
+      return true;
+    } catch (error, stackTrace) {
+      if (!ref.mounted) {
+        return false;
+      }
+      state = AsyncError<void>(error, stackTrace);
+      return false;
+    }
+  }
+
   Future<bool> skip() async {
     state = const AsyncLoading<void>();
     try {

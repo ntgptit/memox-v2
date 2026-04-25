@@ -123,18 +123,6 @@ GoRouter appRouter(Ref ref) {
                     ),
                   ),
                   GoRoute(
-                    path: RoutePaths.studyEntrySegment,
-                    name: RouteNames.studyEntry,
-                    pageBuilder: (_, state) => NoTransitionPage(
-                      child: StudyEntryScreen(
-                        entryType: state
-                            .pathParameters[RoutePaths.studyEntryTypeParam]!,
-                        entryRefId: state
-                            .pathParameters[RoutePaths.studyEntryRefIdParam],
-                      ),
-                    ),
-                  ),
-                  GoRoute(
                     path: RoutePaths.studySessionSegment,
                     name: RouteNames.studySession,
                     pageBuilder: (_, state) => NoTransitionPage(
@@ -151,6 +139,18 @@ GoRouter appRouter(Ref ref) {
                       child: StudyResultScreen(
                         sessionId: state
                             .pathParameters[RoutePaths.studySessionIdParam]!,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.studyEntrySegment,
+                    name: RouteNames.studyEntry,
+                    pageBuilder: (_, state) => NoTransitionPage(
+                      child: StudyEntryScreen(
+                        entryType: state
+                            .pathParameters[RoutePaths.studyEntryTypeParam]!,
+                        entryRefId: state
+                            .pathParameters[RoutePaths.studyEntryRefIdParam],
                       ),
                     ),
                   ),

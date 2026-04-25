@@ -23,6 +23,12 @@ abstract interface class StudyRepo {
     required List<StudyMode> modes,
   });
 
+  Future<StudySessionSnapshot> answerCurrentModeBatch({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  });
+
   Future<StudySessionSnapshot> skipCurrentItem(String sessionId);
 
   Future<StudySessionSnapshot> cancelSession(String sessionId);

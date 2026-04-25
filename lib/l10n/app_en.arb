@@ -304,6 +304,19 @@
   "studyCancelAction": "Cancel session",
   "studyFinalizeAction": "Finalize",
   "studySkipAction": "Skip card",
+  "studyReviewTextSettingsTooltip": "Text settings",
+  "studyReviewAudioTooltip": "Audio",
+  "studyReviewMoreActionsTooltip": "More actions",
+  "studyReviewEditCardTooltip": "Edit card",
+  "studyReviewCardAudioTooltip": "Play card audio",
+  "studyReviewProgressPercent": "{percent}%",
+  "@studyReviewProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "studySessionEnded": "This session has ended.",
   "studyViewResultAction": "View result",
   "studyProgressModeRound": "{mode} · round {round}",

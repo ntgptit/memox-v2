@@ -18,6 +18,10 @@ Test file: `test/data/repositories/study_repository_test.dart`
 | DT1 | skip action is requested for the current item | session has a pending current item | repository skips that item | item is requeued without recording a passing attempt | C0+C1 |
 | DT2 | New Study answer fails in the current mode | new-study session has one pending Review item | repository records an incorrect answer | same flashcard is requeued in Review round 2 and no SRS progress is committed | C0+C1 |
 | DT3 | SRS Review answer is incorrect before later passing | due card starts in box 4 | repository records incorrect, then correct, and finalizes | review result is recovered, box decreases by one, and lapse count increments once | C0+C1 |
+| DT4 | Review mode batch submit is requested for all pending items in the current Review round | new-study session has two pending Review items | repository batch answer runs with `grade=remembered` | two remembered attempts are inserted and both Review items become completed | C0+C1 |
+| DT5 | Review mode batch submit completes the first New Study mode | new-study session has one pending Review item and Match is the next configured mode | repository batch answer runs with `grade=remembered` | session remains in progress and current item advances to `StudyMode.match` with `modeOrder=2` | C0+C1 |
+| DT6 | Review batch submit is called after the session has already advanced to Match | new-study session has passed Review and current item is Match | repository batch answer is requested again | request fails fast with validation instead of writing another batch | C0+C1 |
+| DT7 | Review batch submit is called after the session is terminal | new-study session has completed all modes and finalized to `completed` | repository batch answer is requested | request fails fast with validation and terminal status is not reopened | C0+C1 |
 
 ## Decision table: onUpdate
 

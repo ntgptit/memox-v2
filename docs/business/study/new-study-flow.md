@@ -53,6 +53,16 @@ Nếu user thấy session quá nặng, user chỉnh batch size trong [Study Sett
 
 Trong mỗi mode, toàn bộ flashcard của batch phải pass.
 
+Riêng Review mode:
+
+- user xem trực tiếp `front` và `back` của từng flashcard
+- app stage mỗi flashcard đã xem là `remembered`
+- khi user tới thẻ cuối, app tự flush một batch attempt `remembered` cho toàn bộ item pending trong Review mode sau delay 2 giây
+- Review mode không tạo retry batch vì không còn input `forgot` trong UI Review
+- nếu user rời màn hình trước khi auto-submit chạy, không có attempt nào được ghi và session resume lại Review mode như cũ
+
+Với các mode còn lại:
+
 Khi user trả lời đúng:
 
 - đánh dấu flashcard pass trong mode hiện tại

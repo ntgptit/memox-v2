@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/app/di/study_providers.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/ports/study_repo.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
@@ -38,7 +40,58 @@ void main() {
     expect(find.byType(MxLoadingState), findsOneWidget);
   });
 
-  testWidgets('DT1 onDisplay: active session renders progress and answer panel', (
+  testWidgets(
+    'DT1 onDisplay: active session renders progress and answer panel',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_activeSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Guess · round 1'), findsOneWidget);
+      expect(find.text('front 1'), findsOneWidget);
+      expect(find.text('Correct'), findsOneWidget);
+      expect(find.text('Skip card'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT3 onDisplay: review mode renders title actions progress and two cards',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Review'), findsOneWidget);
+      expect(find.byIcon(Icons.text_fields), findsOneWidget);
+      expect(find.byIcon(Icons.volume_up_outlined), findsNWidgets(2));
+      expect(find.byIcon(Icons.more_vert), findsOneWidget);
+      expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
+      expect(find.text('front 1'), findsOneWidget);
+      expect(find.text('back 1'), findsOneWidget);
+    },
+  );
+
+  testWidgets('DT4 onDisplay: review mode initial progress is zero percent', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -46,7 +99,7 @@ void main() {
         overrides: [
           studySessionStateProvider(
             'session-001',
-          ).overrideWith((ref) => Future.value(_activeSnapshot)),
+          ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
         ],
         child: const _TestApp(
           child: StudySessionScreen(sessionId: 'session-001'),
@@ -55,11 +108,98 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Guess · round 1'), findsOneWidget);
-    expect(find.text('front 1'), findsOneWidget);
-    expect(find.text('Correct'), findsOneWidget);
-    expect(find.text('Skip card'), findsOneWidget);
+    expect(find.text('0%'), findsOneWidget);
   });
+
+  testWidgets('DT5 onDisplay: review mode hides grading and skip controls', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Forgot'), findsNothing);
+    expect(find.text('Remembered'), findsNothing);
+    expect(find.text('Skip card'), findsNothing);
+  });
+
+  testWidgets(
+    'DT1 onUpdate: single-card review auto-submits after two seconds',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(repo.batchAnswerCount, 0);
+
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pump();
+
+      expect(repo.batchAnswerCount, 1);
+      expect(repo.lastGrade, AttemptGrade.remembered);
+    },
+  );
+
+  testWidgets(
+    'DT2 onUpdate: multi-card review submits only after last card waits',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_multiReviewSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pump();
+      expect(repo.batchAnswerCount, 0);
+
+      await tester.drag(find.byType(PageView), const Offset(-400, 0));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.text('front 2'), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 1));
+      expect(repo.batchAnswerCount, 0);
+
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump();
+      expect(repo.batchAnswerCount, 1);
+    },
+  );
 
   testWidgets('DT2 onDisplay: terminal session shows result handoff', (
     tester,
@@ -110,6 +250,15 @@ final _activeSnapshot = StudySessionSnapshot(
   canFinalize: false,
 );
 
+final _singleReviewSnapshot = _reviewSnapshot([
+  _card(id: 'card-001', front: 'front 1', back: 'back 1'),
+]);
+
+final _multiReviewSnapshot = _reviewSnapshot([
+  _card(id: 'card-001', front: 'front 1', back: 'back 1'),
+  _card(id: 'card-002', front: 'front 2', back: 'back 2'),
+]);
+
 final _terminalSnapshot = StudySessionSnapshot(
   session: _session(SessionStatus.completed),
   currentItem: null,
@@ -146,6 +295,36 @@ StudySession _session(SessionStatus status) {
   );
 }
 
+StudySessionSnapshot _reviewSnapshot(List<StudyFlashcardRef> cards) {
+  final current = cards.first;
+  return StudySessionSnapshot(
+    session: _session(SessionStatus.inProgress),
+    currentItem: StudySessionItem(
+      id: 'item-001',
+      sessionId: 'session-001',
+      flashcard: current,
+      studyMode: StudyMode.review,
+      modeOrder: 1,
+      roundIndex: 1,
+      queuePosition: 1,
+      sourcePool: SessionItemSourcePool.due,
+      status: SessionItemStatus.pending,
+      completedAt: null,
+    ),
+    sessionFlashcards: cards,
+    summary: StudySummary(
+      totalCards: cards.length,
+      completedAttempts: 0,
+      correctAttempts: 0,
+      incorrectAttempts: 0,
+      increasedBoxCount: 0,
+      decreasedBoxCount: 0,
+      remainingCount: cards.length,
+    ),
+    canFinalize: false,
+  );
+}
+
 StudyFlashcardRef _card({
   required String id,
   required String front,
@@ -158,6 +337,87 @@ StudyFlashcardRef _card({
     back: back,
     sourcePool: SessionItemSourcePool.due,
   );
+}
+
+final class _BatchAnswerStudyRepo implements StudyRepo {
+  int batchAnswerCount = 0;
+  AttemptGrade? lastGrade;
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentModeBatch({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) async {
+    batchAnswerCount += 1;
+    lastGrade = grade;
+    return _activeSnapshot;
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> startSession({
+    required StudyContext context,
+    required StudyFlow flow,
+    required List<StudyMode> modes,
+    required List<StudyFlashcardRef> batch,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> loadSession(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentItem({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> cancelSession(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> finalizeSession({
+    required String sessionId,
+    required StudyType studyType,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> retryFinalize({
+    required String sessionId,
+    required StudyType studyType,
+  }) {
+    throw UnimplementedError();
+  }
 }
 
 class _TestApp extends StatelessWidget {

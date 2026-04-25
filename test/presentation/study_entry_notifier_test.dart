@@ -85,6 +85,15 @@ final class _EmptyStudyRepo implements StudyRepo {
   }
 
   @override
+  Future<StudySessionSnapshot> answerCurrentModeBatch({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
     throw UnimplementedError();
   }

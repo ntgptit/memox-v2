@@ -92,6 +92,14 @@ AnswerFlashcardUseCase answerFlashcardUseCase(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+AnswerCurrentModeBatchUseCase answerCurrentModeBatchUseCase(Ref ref) {
+  return AnswerCurrentModeBatchUseCase(
+    repository: ref.watch(studyRepoProvider),
+    strategyFactory: ref.watch(studyStrategyFactoryProvider),
+  );
+}
+
+@Riverpod(keepAlive: true)
 SkipFlashcardUseCase skipFlashcardUseCase(Ref ref) {
   return SkipFlashcardUseCase(ref.watch(studyRepoProvider));
 }

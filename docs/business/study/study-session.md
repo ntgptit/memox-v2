@@ -29,6 +29,7 @@ Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rul
 - retry round hiện tại trong mode hiện tại
 - danh sách flashcard đã pass trong mode hiện tại
 - danh sách flashcard chưa pass trong mode hiện tại
+- Review mode chưa auto-submit thì không có attempt nào được ghi và phải resume lại từ queue Review chưa đổi
 - các mode đã pass
 - session control đã dùng khi tạo session
 
@@ -89,6 +90,16 @@ Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rul
 - flashcard có từng sai trong mode hay không
 
 ## Sau mỗi lượt trả lời cần ghi nhận
+
+Ngoại lệ Review mode trong New Study:
+
+- vuốt qua từng flashcard chỉ là UI staging tạm thời
+- khi tới thẻ cuối, app đợi 2 giây rồi ghi một batch attempt `remembered` cho toàn bộ Review item còn pending trong cùng transaction
+- mỗi pending Review item nhận đúng một attempt `remembered`
+- sau batch submit, Review mode pass và session chuyển sang mode tiếp theo hoặc `Ready To Finalize` nếu đó là mode cuối
+- nếu màn hình bị dispose trước khi batch submit, không ghi attempt và không đổi session progress
+
+Với các lượt trả lời thông thường cần ghi nhận:
 
 - trạng thái hoàn thành
 - mức độ đúng / sai / nhớ / quên

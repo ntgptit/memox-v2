@@ -5,9 +5,12 @@ import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/options/content_sort_options.dart';
+import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_search_field.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
+import '../../../shared/widgets/mx_sort_menu_chip.dart';
 
 class FlashcardToolbarSection extends StatelessWidget {
   const FlashcardToolbarSection({
@@ -42,19 +45,14 @@ class FlashcardToolbarSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final sortOptions = buildContentSortOptions(l10n);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        MxSearchSortToolbar<ContentSortMode>(
-          searchHintText: l10n.flashcardsSearchHint,
-          onSearchChanged: onSearchChanged,
-          onSearchClear: onSearchClear,
-          sortOptions: sortOptions,
-          selectedSort: selectedSort,
-          sortLabel: l10n.commonSort,
-          onSortSelected: onSortSelected,
+        MxSearchField(
+          hintText: l10n.flashcardsSearchHint,
+          onChanged: onSearchChanged,
+          onClear: onSearchClear,
         ),
         const MxGap(MxSpace.md),
         _buildActions(l10n),
@@ -72,6 +70,10 @@ class FlashcardToolbarSection extends StatelessWidget {
       );
     }
     return _DeckActionGroup(
+      sortOptions: buildContentSortOptions(l10n),
+      selectedSort: selectedSort,
+      sortLabel: l10n.commonSort,
+      onSortSelected: onSortSelected,
       studyLabel: l10n.studyStartAction,
       importLabel: l10n.commonImport,
       reorderLabel: l10n.commonReorder,
@@ -86,6 +88,10 @@ class FlashcardToolbarSection extends StatelessWidget {
 
 class _DeckActionGroup extends StatelessWidget {
   const _DeckActionGroup({
+    required this.sortOptions,
+    required this.selectedSort,
+    required this.sortLabel,
+    required this.onSortSelected,
     required this.studyLabel,
     required this.importLabel,
     required this.reorderLabel,
@@ -96,6 +102,10 @@ class _DeckActionGroup extends StatelessWidget {
     required this.onReorder,
   });
 
+  final List<MxSortOption<ContentSortMode>> sortOptions;
+  final ContentSortMode selectedSort;
+  final String sortLabel;
+  final ValueChanged<ContentSortMode> onSortSelected;
   final String studyLabel;
   final String importLabel;
   final String reorderLabel;
@@ -128,27 +138,20 @@ class _DeckActionGroup extends StatelessWidget {
           fullWidth: true,
           onPressed: canStartStudy ? onStartStudy : null,
         ),
-        const MxGap(MxSpace.sm),
+        const MxGap(MxSpace.md),
         Row(
           children: [
-            Expanded(
-              child: MxSecondaryButton(
-                label: importLabel,
-                leadingIcon: Icons.file_upload_outlined,
-                variant: MxSecondaryVariant.outlined,
-                fullWidth: true,
-                onPressed: onImport,
-              ),
+            Flexible(child: _buildSortChip()),
+            const Spacer(),
+            MxIconButton(
+              icon: Icons.file_upload_outlined,
+              tooltip: importLabel,
+              onPressed: onImport,
             ),
-            const MxGap(MxSpace.sm),
-            Expanded(
-              child: MxSecondaryButton(
-                label: reorderLabel,
-                leadingIcon: Icons.reorder_rounded,
-                variant: MxSecondaryVariant.outlined,
-                fullWidth: true,
-                onPressed: canReorder ? onReorder : null,
-              ),
+            MxIconButton(
+              icon: Icons.reorder_rounded,
+              tooltip: reorderLabel,
+              onPressed: canReorder ? onReorder : null,
             ),
           ],
         ),
@@ -158,8 +161,9 @@ class _DeckActionGroup extends StatelessWidget {
 
   Widget _buildWide() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        _buildSortChip(),
+        const Spacer(),
         MxSecondaryButton(
           label: importLabel,
           leadingIcon: Icons.file_upload_outlined,
@@ -180,6 +184,15 @@ class _DeckActionGroup extends StatelessWidget {
           onPressed: canStartStudy ? onStartStudy : null,
         ),
       ],
+    );
+  }
+
+  Widget _buildSortChip() {
+    return MxSortMenuChip<ContentSortMode>(
+      options: sortOptions,
+      selectedValue: selectedSort,
+      fallbackLabel: sortLabel,
+      onSelected: onSortSelected,
     );
   }
 }

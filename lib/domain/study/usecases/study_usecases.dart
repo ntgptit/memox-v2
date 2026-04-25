@@ -146,6 +146,30 @@ final class AnswerFlashcardUseCase {
   }
 }
 
+final class AnswerCurrentModeBatchUseCase {
+  const AnswerCurrentModeBatchUseCase({
+    required StudyRepo repository,
+    required StudyStrategyFactory strategyFactory,
+  }) : _repository = repository,
+       _strategyFactory = strategyFactory;
+
+  final StudyRepo _repository;
+  final StudyStrategyFactory _strategyFactory;
+
+  Future<StudySessionSnapshot> execute({
+    required String sessionId,
+    required StudyType studyType,
+    required AttemptGrade grade,
+  }) {
+    final strategy = _strategyFactory.of(studyType);
+    return _repository.answerCurrentModeBatch(
+      sessionId: sessionId,
+      grade: grade,
+      modes: strategy.modes,
+    );
+  }
+}
+
 final class SkipFlashcardUseCase {
   const SkipFlashcardUseCase(this._repository);
 

@@ -37,87 +37,126 @@ void main() {
     },
   );
 
-  test('DT2 onUpdate: session action controller cancels without provider error', () async {
-    final repo = _CancelOnlyStudyRepo();
-    final container = ProviderContainer(
-      overrides: [studyRepoProvider.overrideWithValue(repo)],
-    );
-    addTearDown(container.dispose);
-
-    final success = await container
-        .read(studySessionActionControllerProvider('session-1').notifier)
-        .cancel();
-
-    expect(success, isTrue);
-    expect(
-      container
-          .read(studySessionActionControllerProvider('session-1'))
-          .hasError,
-      isFalse,
-    );
-  });
-
-  testWidgets('DT3 onUpdate: cancel opens confirm dialog before cancelling session', (
-    tester,
-  ) async {
-    final repo = _CancelOnlyStudyRepo();
-
-    await tester.pumpWidget(
-      ProviderScope(
+  test(
+    'DT2 onUpdate: session action controller cancels without provider error',
+    () async {
+      final repo = _CancelOnlyStudyRepo();
+      final container = ProviderContainer(
         overrides: [studyRepoProvider.overrideWithValue(repo)],
-        child: const MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: StudySessionScreen(sessionId: 'session-1'),
+      );
+      addTearDown(container.dispose);
+
+      final success = await container
+          .read(studySessionActionControllerProvider('session-1').notifier)
+          .cancel();
+
+      expect(success, isTrue);
+      expect(
+        container
+            .read(studySessionActionControllerProvider('session-1'))
+            .hasError,
+        isFalse,
+      );
+    },
+  );
+
+  test(
+    'DT11 onUpdate: review batch controller submits remembered grade without provider error',
+    () async {
+      final repo = _ReviewBatchStudyRepo();
+      final container = ProviderContainer(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
+
+      final success = await container
+          .read(studySessionActionControllerProvider('session-1').notifier)
+          .answerCurrentReviewModeAsRemembered();
+
+      expect(success, isTrue);
+      expect(repo.batchAnswerCount, 1);
+      expect(repo.lastGrade, AttemptGrade.remembered);
+      expect(repo.lastModes, <StudyMode>[
+        StudyMode.review,
+        StudyMode.match,
+        StudyMode.guess,
+        StudyMode.recall,
+        StudyMode.fill,
+      ]);
+      expect(
+        container
+            .read(studySessionActionControllerProvider('session-1'))
+            .hasError,
+        isFalse,
+      );
+    },
+  );
+
+  testWidgets(
+    'DT3 onUpdate: cancel opens confirm dialog before cancelling session',
+    (tester) async {
+      final repo = _CancelOnlyStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [studyRepoProvider.overrideWithValue(repo)],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: StudySessionScreen(sessionId: 'session-1'),
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Cancel session'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Cancel session'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Cancel this session?'), findsOneWidget);
-    expect(repo.cancelCount, 0);
-  });
+      expect(find.text('Cancel this session?'), findsOneWidget);
+      expect(repo.cancelCount, 0);
+    },
+  );
 
-  testWidgets('DT4 onUpdate: Fill mode clears answer text when the item changes', (
+  testWidgets(
+    'DT4 onUpdate: Fill mode clears answer text when the item changes',
+    (tester) async {
+      final first = _snapshot(
+        mode: StudyMode.fill,
+        itemId: 'item-1',
+        currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+        cards: [
+          _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+          _card(id: 'card-2', front: 'front 2', back: 'back 2'),
+        ],
+        shuffleAnswers: false,
+      );
+      final second = _snapshot(
+        mode: StudyMode.fill,
+        itemId: 'item-2',
+        currentCard: _card(id: 'card-2', front: 'front 2', back: 'back 2'),
+        cards: [
+          _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+          _card(id: 'card-2', front: 'front 2', back: 'back 2'),
+        ],
+        shuffleAnswers: false,
+      );
+
+      await tester.pumpWidget(_StudyModeHost(snapshot: first));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextFormField), 'stale answer');
+      expect(_editableText(tester).controller.text, 'stale answer');
+
+      await tester.pumpWidget(_StudyModeHost(snapshot: second));
+      await tester.pump();
+
+      expect(_editableText(tester).controller.text, isEmpty);
+    },
+  );
+
+  testWidgets('DT5 onUpdate: answer tap shows feedback before continue', (
     tester,
   ) async {
-    final first = _snapshot(
-      mode: StudyMode.fill,
-      itemId: 'item-1',
-      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-      cards: [
-        _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-        _card(id: 'card-2', front: 'front 2', back: 'back 2'),
-      ],
-      shuffleAnswers: false,
-    );
-    final second = _snapshot(
-      mode: StudyMode.fill,
-      itemId: 'item-2',
-      currentCard: _card(id: 'card-2', front: 'front 2', back: 'back 2'),
-      cards: [
-        _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-        _card(id: 'card-2', front: 'front 2', back: 'back 2'),
-      ],
-      shuffleAnswers: false,
-    );
-
-    await tester.pumpWidget(_StudyModeHost(snapshot: first));
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byType(TextFormField), 'stale answer');
-    expect(_editableText(tester).controller.text, 'stale answer');
-
-    await tester.pumpWidget(_StudyModeHost(snapshot: second));
-    await tester.pump();
-
-    expect(_editableText(tester).controller.text, isEmpty);
-  });
-
-  testWidgets('DT5 onUpdate: answer tap shows feedback before continue', (tester) async {
     final snapshot = _snapshot(
       mode: StudyMode.guess,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
@@ -142,52 +181,53 @@ void main() {
     expect(continueCount, 0);
   });
 
-  testWidgets('DT6 onUpdate: continue calls answer once and disables while loading', (
-    tester,
-  ) async {
-    final snapshot = _snapshot(
-      mode: StudyMode.guess,
-      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
-      shuffleAnswers: false,
-    );
-    final feedback = StudyAnswerFeedback(
-      itemId: snapshot.currentItem!.id,
-      selectedGrade: AttemptGrade.correct,
-      isCorrect: true,
-      correctAnswer: snapshot.currentItem!.flashcard.back,
-    );
-    var continueCount = 0;
+  testWidgets(
+    'DT6 onUpdate: continue calls answer once and disables while loading',
+    (tester) async {
+      final snapshot = _snapshot(
+        mode: StudyMode.guess,
+        currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+        cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+        shuffleAnswers: false,
+      );
+      final feedback = StudyAnswerFeedback(
+        itemId: snapshot.currentItem!.id,
+        selectedGrade: AttemptGrade.correct,
+        isCorrect: true,
+        correctAnswer: snapshot.currentItem!.flashcard.back,
+      );
+      var continueCount = 0;
 
-    await tester.pumpWidget(
-      _StudyModeHost(
-        snapshot: snapshot,
-        feedback: feedback,
-        onContinue: () => continueCount += 1,
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        _StudyModeHost(
+          snapshot: snapshot,
+          feedback: feedback,
+          onContinue: () => continueCount += 1,
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Continue'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
 
-    expect(continueCount, 1);
+      expect(continueCount, 1);
 
-    await tester.pumpWidget(
-      _StudyModeHost(
-        snapshot: snapshot,
-        feedback: feedback,
-        isSubmitting: true,
-        onContinue: () => continueCount += 1,
-      ),
-    );
-    await tester.pump();
+      await tester.pumpWidget(
+        _StudyModeHost(
+          snapshot: snapshot,
+          feedback: feedback,
+          isSubmitting: true,
+          onContinue: () => continueCount += 1,
+        ),
+      );
+      await tester.pump();
 
-    await tester.tap(find.byType(ElevatedButton).last);
-    await tester.pump();
+      await tester.tap(find.byType(ElevatedButton).last);
+      await tester.pump();
 
-    expect(continueCount, 1);
-  });
+      expect(continueCount, 1);
+    },
+  );
 
   testWidgets('DT7 onUpdate: empty fill answer cannot submit', (tester) async {
     final snapshot = _snapshot(
@@ -209,30 +249,33 @@ void main() {
     expect(answerCount, 0);
   });
 
-  testWidgets('DT8 onUpdate: match mode renders answer cards instead of secondary buttons', (
+  testWidgets(
+    'DT8 onUpdate: match mode renders answer cards instead of secondary buttons',
+    (tester) async {
+      final snapshot = _snapshot(
+        mode: StudyMode.match,
+        currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+        cards: [
+          _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+          _card(id: 'card-2', front: 'front 2', back: 'back 2'),
+          _card(id: 'card-3', front: 'front 3', back: 'back 3'),
+        ],
+        shuffleAnswers: false,
+      );
+
+      await tester.pumpWidget(_StudyModeHost(snapshot: snapshot));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MxAnswerOptionCard), findsNWidgets(3));
+      expect(find.widgetWithText(MxSecondaryButton, 'back 1'), findsNothing);
+      expect(find.widgetWithText(MxSecondaryButton, 'back 2'), findsNothing);
+      expect(find.widgetWithText(MxSecondaryButton, 'back 3'), findsNothing);
+    },
+  );
+
+  testWidgets('DT1 onSelect: selecting a long match option shows feedback', (
     tester,
   ) async {
-    final snapshot = _snapshot(
-      mode: StudyMode.match,
-      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-      cards: [
-        _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-        _card(id: 'card-2', front: 'front 2', back: 'back 2'),
-        _card(id: 'card-3', front: 'front 3', back: 'back 3'),
-      ],
-      shuffleAnswers: false,
-    );
-
-    await tester.pumpWidget(_StudyModeHost(snapshot: snapshot));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(MxAnswerOptionCard), findsNWidgets(3));
-    expect(find.widgetWithText(MxSecondaryButton, 'back 1'), findsNothing);
-    expect(find.widgetWithText(MxSecondaryButton, 'back 2'), findsNothing);
-    expect(find.widgetWithText(MxSecondaryButton, 'back 3'), findsNothing);
-  });
-
-  testWidgets('DT1 onSelect: selecting a long match option shows feedback', (tester) async {
     const longWrongAnswer =
         'A very long distractor answer that should remain readable and tappable '
         'when rendered as a match option.';
@@ -264,40 +307,43 @@ void main() {
     expect(find.text('Continue'), findsOneWidget);
   });
 
-  testWidgets('DT9 onUpdate: incorrect feedback can be marked correct before continuing', (
+  testWidgets(
+    'DT9 onUpdate: incorrect feedback can be marked correct before continuing',
+    (tester) async {
+      final snapshot = _snapshot(
+        mode: StudyMode.fill,
+        currentCard: _card(id: 'card-1', front: 'front 1', back: 'answer 1'),
+        cards: [_card(id: 'card-1', front: 'front 1', back: 'answer 1')],
+        shuffleAnswers: false,
+      );
+      final feedback = StudyAnswerFeedback(
+        itemId: snapshot.currentItem!.id,
+        selectedGrade: AttemptGrade.incorrect,
+        isCorrect: false,
+        correctAnswer: snapshot.currentItem!.flashcard.back,
+      );
+      StudyAnswerFeedback? correctedFeedback;
+
+      await tester.pumpWidget(
+        _StudyModeHost(
+          snapshot: snapshot,
+          feedback: feedback,
+          onMarkCorrect: (value) => correctedFeedback = value,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Mark correct'));
+      await tester.pumpAndSettle();
+
+      expect(correctedFeedback?.selectedGrade, AttemptGrade.correct);
+      expect(correctedFeedback?.isCorrect, isTrue);
+    },
+  );
+
+  testWidgets('DT10 onUpdate: fill feedback shows the submitted answer', (
     tester,
   ) async {
-    final snapshot = _snapshot(
-      mode: StudyMode.fill,
-      currentCard: _card(id: 'card-1', front: 'front 1', back: 'answer 1'),
-      cards: [_card(id: 'card-1', front: 'front 1', back: 'answer 1')],
-      shuffleAnswers: false,
-    );
-    final feedback = StudyAnswerFeedback(
-      itemId: snapshot.currentItem!.id,
-      selectedGrade: AttemptGrade.incorrect,
-      isCorrect: false,
-      correctAnswer: snapshot.currentItem!.flashcard.back,
-    );
-    StudyAnswerFeedback? correctedFeedback;
-
-    await tester.pumpWidget(
-      _StudyModeHost(
-        snapshot: snapshot,
-        feedback: feedback,
-        onMarkCorrect: (value) => correctedFeedback = value,
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Mark correct'));
-    await tester.pumpAndSettle();
-
-    expect(correctedFeedback?.selectedGrade, AttemptGrade.correct);
-    expect(correctedFeedback?.isCorrect, isTrue);
-  });
-
-  testWidgets('DT10 onUpdate: fill feedback shows the submitted answer', (tester) async {
     final snapshot = _snapshot(
       mode: StudyMode.fill,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'answer 1'),
@@ -381,7 +427,111 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   }
 
   @override
+  Future<StudySessionSnapshot> answerCurrentModeBatch({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> finalizeSession({
+    required String sessionId,
+    required StudyType studyType,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> retryFinalize({
+    required String sessionId,
+    required StudyType studyType,
+  }) {
+    throw UnimplementedError();
+  }
+}
+
+final class _ReviewBatchStudyRepo implements StudyRepo {
+  int batchAnswerCount = 0;
+  AttemptGrade? lastGrade;
+  List<StudyMode>? lastModes;
+
+  @override
+  Future<StudySessionSnapshot> loadSession(String sessionId) async {
+    return _snapshot(
+      mode: StudyMode.review,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+      studyType: StudyType.newStudy,
+    );
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentModeBatch({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) async {
+    batchAnswerCount += 1;
+    lastGrade = grade;
+    lastModes = modes;
+    return _snapshot(
+      mode: StudyMode.match,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+      shuffleAnswers: false,
+      studyType: StudyType.newStudy,
+    );
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> startSession({
+    required StudyContext context,
+    required StudyFlow flow,
+    required List<StudyMode> modes,
+    required List<StudyFlashcardRef> batch,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentItem({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> cancelSession(String sessionId) {
     throw UnimplementedError();
   }
 
@@ -489,14 +639,17 @@ StudySessionSnapshot _snapshot({
   required List<StudyFlashcardRef> cards,
   required bool shuffleAnswers,
   String itemId = 'item-1',
+  StudyType studyType = StudyType.srsReview,
 }) {
   return StudySessionSnapshot(
     session: StudySession(
       id: 'session-1',
       entryType: StudyEntryType.deck,
       entryRefId: 'deck-1',
-      studyType: StudyType.srsReview,
-      studyFlow: StudyFlow.srsFillReview,
+      studyType: studyType,
+      studyFlow: studyType == StudyType.newStudy
+          ? StudyFlow.newFullCycle
+          : StudyFlow.srsFillReview,
       settings: StudySettingsSnapshot(
         batchSize: cards.length,
         shuffleFlashcards: false,

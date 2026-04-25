@@ -304,6 +304,19 @@
   "studyCancelAction": "Hủy phiên học",
   "studyFinalizeAction": "Finalize",
   "studySkipAction": "Bỏ qua thẻ",
+  "studyReviewTextSettingsTooltip": "Tùy chỉnh chữ",
+  "studyReviewAudioTooltip": "Âm thanh",
+  "studyReviewMoreActionsTooltip": "Thêm thao tác",
+  "studyReviewEditCardTooltip": "Chỉnh sửa thẻ",
+  "studyReviewCardAudioTooltip": "Phát âm thanh thẻ",
+  "studyReviewProgressPercent": "{percent}%",
+  "@studyReviewProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "studySessionEnded": "Phiên học này đã kết thúc.",
   "studyViewResultAction": "Xem kết quả",
   "studyProgressModeRound": "{mode} · lượt {round}",
