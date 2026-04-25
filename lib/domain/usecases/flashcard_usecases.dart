@@ -105,8 +105,14 @@ final class PrepareFlashcardImportUseCase {
   Future<Result<FlashcardImportPreparation>> execute({
     required ImportSourceFormat format,
     required String rawContent,
+    ImportStructuredTextSeparator structuredTextSeparator =
+        ImportStructuredTextSeparator.auto,
   }) {
-    return _repository.prepareImport(format: format, rawContent: rawContent);
+    return _repository.prepareImport(
+      format: format,
+      rawContent: rawContent,
+      structuredTextSeparator: structuredTextSeparator,
+    );
   }
 }
 

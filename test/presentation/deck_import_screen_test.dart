@@ -39,8 +39,12 @@ void main() {
     const deckId = 'deck-001';
     final prepareCompleter = Completer<Result<FlashcardImportPreparation>>();
     final repository = _ImportOnlyFlashcardRepository(
-      prepareHandler: ({required format, required rawContent}) =>
-          prepareCompleter.future,
+      prepareHandler:
+          ({
+            required format,
+            required rawContent,
+            required structuredTextSeparator,
+          }) => prepareCompleter.future,
     );
 
     await tester.pumpWidget(
@@ -81,8 +85,12 @@ void main() {
     const deckId = 'deck-001';
     final commitCompleter = Completer<Result<int>>();
     final repository = _ImportOnlyFlashcardRepository(
-      prepareHandler: ({required format, required rawContent}) =>
-          Future.value(const Success(_validPreparation)),
+      prepareHandler:
+          ({
+            required format,
+            required rawContent,
+            required structuredTextSeparator,
+          }) => Future.value(const Success(_validPreparation)),
       commitHandler: ({required deckId, required preparation}) =>
           commitCompleter.future,
     );
@@ -120,8 +128,12 @@ void main() {
   ) async {
     const deckId = 'deck-001';
     final repository = _ImportOnlyFlashcardRepository(
-      prepareHandler: ({required format, required rawContent}) =>
-          Future.value(const Success(_preparationWithIssue)),
+      prepareHandler:
+          ({
+            required format,
+            required rawContent,
+            required structuredTextSeparator,
+          }) => Future.value(const Success(_preparationWithIssue)),
     );
 
     await tester.pumpWidget(
@@ -148,6 +160,66 @@ void main() {
     expect(find.text('1 valid · 1 issues'), findsOneWidget);
     expect(find.text('Line 3'), findsOneWidget);
     expect(find.text('Back is required.'), findsOneWidget);
+  });
+
+  testWidgets('text separator selection is passed to preview', (
+    WidgetTester tester,
+  ) async {
+    const deckId = 'deck-001';
+    ImportSourceFormat? capturedFormat;
+    ImportStructuredTextSeparator? capturedSeparator;
+    String? capturedContent;
+    final repository = _ImportOnlyFlashcardRepository(
+      prepareHandler:
+          ({
+            required format,
+            required rawContent,
+            required structuredTextSeparator,
+          }) {
+            capturedFormat = format;
+            capturedContent = rawContent;
+            capturedSeparator = structuredTextSeparator;
+            return Future.value(
+              const Success(
+                FlashcardImportPreparation(
+                  format: ImportSourceFormat.structuredText,
+                  previewItems: [
+                    FlashcardImportPreviewItem(
+                      sourceLabel: 'Line 1',
+                      draft: FlashcardDraft(front: '개다', back: 'Clear up'),
+                    ),
+                  ],
+                  issues: [],
+                ),
+              ),
+            );
+          },
+    );
+
+    await tester.pumpWidget(
+      _TestApp(
+        overrides: [flashcardRepositoryProvider.overrideWithValue(repository)],
+        child: const DeckImportScreen(deckId: deckId),
+      ),
+    );
+
+    await tester.tap(find.text('Text format'));
+    await tester.pumpAndSettle();
+    expect(find.text('Separator'), findsOneWidget);
+
+    await tester.tap(find.text('Auto'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Slash'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), '개다 / Clear up');
+    await tester.ensureVisible(find.text('Preview'));
+    await tester.pump();
+    await tester.tap(find.text('Preview'));
+    await tester.pumpAndSettle();
+
+    expect(capturedFormat, ImportSourceFormat.structuredText);
+    expect(capturedSeparator, ImportStructuredTextSeparator.slash);
+    expect(capturedContent, '개다 / Clear up');
   });
 }
 
@@ -182,6 +254,7 @@ final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
   final Future<Result<FlashcardImportPreparation>> Function({
     required ImportSourceFormat format,
     required String rawContent,
+    required ImportStructuredTextSeparator structuredTextSeparator,
   })?
   prepareHandler;
 
@@ -195,8 +268,14 @@ final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
   Future<Result<FlashcardImportPreparation>> prepareImport({
     required ImportSourceFormat format,
     required String rawContent,
+    ImportStructuredTextSeparator structuredTextSeparator =
+        ImportStructuredTextSeparator.auto,
   }) {
-    return prepareHandler?.call(format: format, rawContent: rawContent) ??
+    return prepareHandler?.call(
+          format: format,
+          rawContent: rawContent,
+          structuredTextSeparator: structuredTextSeparator,
+        ) ??
         Future.value(const Success(_validPreparation));
   }
 

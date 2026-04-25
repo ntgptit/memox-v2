@@ -42,6 +42,8 @@ abstract interface class FlashcardRepository {
   Future<Result<FlashcardImportPreparation>> prepareImport({
     required ImportSourceFormat format,
     required String rawContent,
+    ImportStructuredTextSeparator structuredTextSeparator =
+        ImportStructuredTextSeparator.auto,
   });
 
   Future<Result<int>> commitImport({

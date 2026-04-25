@@ -38,6 +38,8 @@ final class ExportData {
 
 enum ImportSourceFormat { csv, structuredText }
 
+enum ImportStructuredTextSeparator { auto, tab, colon, slash, semicolon, pipe }
+
 final class FlashcardDraft {
   const FlashcardDraft({required this.front, required this.back, this.note});
 

@@ -7,10 +7,15 @@ final class FlashcardImportSupport {
   static FlashcardImportPreparation parse({
     required ImportSourceFormat format,
     required String rawContent,
+    ImportStructuredTextSeparator structuredTextSeparator =
+        ImportStructuredTextSeparator.auto,
   }) {
     return switch (format) {
       ImportSourceFormat.csv => _parseCsv(rawContent),
-      ImportSourceFormat.structuredText => _parseStructuredText(rawContent),
+      ImportSourceFormat.structuredText => _parseStructuredText(
+        rawContent,
+        structuredTextSeparator,
+      ),
     };
   }
 
@@ -88,10 +93,24 @@ final class FlashcardImportSupport {
     );
   }
 
-  static FlashcardImportPreparation _parseStructuredText(String rawContent) {
+  static FlashcardImportPreparation _parseStructuredText(
+    String rawContent,
+    ImportStructuredTextSeparator separator,
+  ) {
     final normalized = rawContent
         .replaceAll('\r\n', '\n')
         .replaceAll('\r', '\n');
+    if (separator == ImportStructuredTextSeparator.auto &&
+        !_hasStructuredBlockLabels(normalized)) {
+      final detected = _detectLineSeparator(normalized);
+      if (detected != null) {
+        return _parseSeparatedText(normalized, detected);
+      }
+    }
+    if (separator != ImportStructuredTextSeparator.auto) {
+      return _parseSeparatedText(normalized, separator);
+    }
+
     final blocks = normalized.split(RegExp(r'\n\s*\n'));
     final previewItems = <FlashcardImportPreviewItem>[];
     final issues = <ImportValidationIssue>[];
@@ -153,6 +172,158 @@ final class FlashcardImportSupport {
       previewItems: previewItems,
       issues: issues,
     );
+  }
+
+  static bool _hasStructuredBlockLabels(String normalized) {
+    final lines = normalized.split('\n');
+    return lines.any((line) {
+      final trimmed = line.trim();
+      return trimmed.startsWith('Front:') ||
+          trimmed.startsWith('Back:') ||
+          trimmed.startsWith('Note:');
+    });
+  }
+
+  static ImportStructuredTextSeparator? _detectLineSeparator(
+    String normalized,
+  ) {
+    final lines = normalized
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList(growable: false);
+    var bestCount = 0;
+    ImportStructuredTextSeparator? bestSeparator;
+    for (final separator in _autoDetectSeparators) {
+      final count = lines
+          .where(
+            (line) =>
+                _splitSeparatedLine(line, separator, clearOnly: true) != null,
+          )
+          .length;
+      if (count <= bestCount) {
+        continue;
+      }
+      bestCount = count;
+      bestSeparator = separator;
+    }
+    return bestSeparator;
+  }
+
+  static const _autoDetectSeparators = <ImportStructuredTextSeparator>[
+    ImportStructuredTextSeparator.tab,
+    ImportStructuredTextSeparator.slash,
+    ImportStructuredTextSeparator.pipe,
+    ImportStructuredTextSeparator.semicolon,
+    ImportStructuredTextSeparator.colon,
+  ];
+
+  static FlashcardImportPreparation _parseSeparatedText(
+    String normalized,
+    ImportStructuredTextSeparator separator,
+  ) {
+    final previewItems = <FlashcardImportPreviewItem>[];
+    final issues = <ImportValidationIssue>[];
+    final lines = normalized.split('\n');
+    for (var index = 0; index < lines.length; index++) {
+      final lineNumber = index + 1;
+      final line = lines[index].trim();
+      if (line.isEmpty) {
+        continue;
+      }
+
+      final split = _splitSeparatedLine(line, separator);
+      if (split == null) {
+        issues.add(
+          ImportValidationIssue(
+            lineNumber: lineNumber,
+            message: 'Each line must include a separator and both sides.',
+          ),
+        );
+        continue;
+      }
+
+      previewItems.add(
+        FlashcardImportPreviewItem(
+          sourceLabel: 'Line $lineNumber',
+          draft: FlashcardDraft(front: split.front, back: split.back),
+        ),
+      );
+    }
+
+    return FlashcardImportPreparation(
+      format: ImportSourceFormat.structuredText,
+      previewItems: previewItems,
+      issues: issues,
+    );
+  }
+
+  static ({String front, String back})? _splitSeparatedLine(
+    String line,
+    ImportStructuredTextSeparator separator, {
+    bool clearOnly = false,
+  }) {
+    final separatorIndex = _separatorIndex(
+      line,
+      separator,
+      clearOnly: clearOnly,
+    );
+    if (separatorIndex == null) {
+      return null;
+    }
+    final front = line.substring(0, separatorIndex).trim();
+    final back = line.substring(separatorIndex + 1).trim();
+    if (front.isEmpty || back.isEmpty) {
+      return null;
+    }
+    return (front: front, back: back);
+  }
+
+  static int? _separatorIndex(
+    String line,
+    ImportStructuredTextSeparator separator, {
+    required bool clearOnly,
+  }) {
+    return switch (separator) {
+      ImportStructuredTextSeparator.auto => null,
+      ImportStructuredTextSeparator.tab => _firstIndex(line, '\t'),
+      ImportStructuredTextSeparator.colon =>
+        clearOnly ? _clearColonIndex(line) : _firstIndex(line, ':'),
+      ImportStructuredTextSeparator.slash =>
+        clearOnly ? _spacedTokenIndex(line, '/') : _firstIndex(line, '/'),
+      ImportStructuredTextSeparator.semicolon =>
+        clearOnly ? _spacedTokenIndex(line, ';') : _firstIndex(line, ';'),
+      ImportStructuredTextSeparator.pipe =>
+        clearOnly ? _spacedTokenIndex(line, '|') : _firstIndex(line, '|'),
+    };
+  }
+
+  static int? _firstIndex(String line, String token) {
+    final index = line.indexOf(token);
+    if (index < 0) {
+      return null;
+    }
+    return index;
+  }
+
+  static int? _spacedTokenIndex(String line, String token) {
+    final index = line.indexOf(' $token ');
+    if (index < 0) {
+      return null;
+    }
+    return index + 1;
+  }
+
+  static int? _clearColonIndex(String line) {
+    final spacedIndex = _spacedTokenIndex(line, ':');
+    if (spacedIndex != null) {
+      return spacedIndex;
+    }
+    final index = line.indexOf(': ');
+    if (index < 0) {
+      return null;
+    }
+    return index;
   }
 
   static List<String> _parseCsvLine(String line) {

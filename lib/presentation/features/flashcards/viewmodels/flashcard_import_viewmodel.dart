@@ -14,22 +14,27 @@ part 'flashcard_import_viewmodel.g.dart';
 class FlashcardImportDraftState {
   const FlashcardImportDraftState({
     required this.format,
+    required this.structuredTextSeparator,
     required this.rawContent,
     this.preparation,
   });
 
   final ImportSourceFormat format;
+  final ImportStructuredTextSeparator structuredTextSeparator;
   final String rawContent;
   final FlashcardImportPreparation? preparation;
 
   FlashcardImportDraftState copyWith({
     ImportSourceFormat? format,
+    ImportStructuredTextSeparator? structuredTextSeparator,
     String? rawContent,
     FlashcardImportPreparation? preparation,
     bool clearPreparation = false,
   }) {
     return FlashcardImportDraftState(
       format: format ?? this.format,
+      structuredTextSeparator:
+          structuredTextSeparator ?? this.structuredTextSeparator,
       rawContent: rawContent ?? this.rawContent,
       preparation: clearPreparation ? null : (preparation ?? this.preparation),
     );
@@ -42,6 +47,7 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
   FlashcardImportDraftState build(String deckId) {
     return const FlashcardImportDraftState(
       format: ImportSourceFormat.csv,
+      structuredTextSeparator: ImportStructuredTextSeparator.auto,
       rawContent: '',
     );
   }
@@ -51,6 +57,18 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
       return;
     }
     state = state.copyWith(format: format, clearPreparation: true);
+  }
+
+  void setStructuredTextSeparator(
+    ImportStructuredTextSeparator structuredTextSeparator,
+  ) {
+    if (state.structuredTextSeparator == structuredTextSeparator) {
+      return;
+    }
+    state = state.copyWith(
+      structuredTextSeparator: structuredTextSeparator,
+      clearPreparation: true,
+    );
   }
 
   void setRawContent(String rawContent) {
@@ -67,6 +85,7 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
   void reset() {
     state = const FlashcardImportDraftState(
       format: ImportSourceFormat.csv,
+      structuredTextSeparator: ImportStructuredTextSeparator.auto,
       rawContent: '',
     );
   }
@@ -83,7 +102,11 @@ class FlashcardImportController extends _$FlashcardImportController {
     state = const AsyncLoading<void>();
     final result = await ref
         .read(prepareFlashcardImportUseCaseProvider)
-        .execute(format: draft.format, rawContent: draft.rawContent);
+        .execute(
+          format: draft.format,
+          rawContent: draft.rawContent,
+          structuredTextSeparator: draft.structuredTextSeparator,
+        );
     if (!ref.mounted) {
       return null;
     }

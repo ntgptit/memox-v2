@@ -213,11 +213,14 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
   Future<Result<FlashcardImportPreparation>> prepareImport({
     required ImportSourceFormat format,
     required String rawContent,
+    ImportStructuredTextSeparator structuredTextSeparator =
+        ImportStructuredTextSeparator.auto,
   }) {
     return runRepositoryAction(() async {
       return FlashcardImportSupport.parse(
         format: format,
         rawContent: rawContent,
+        structuredTextSeparator: structuredTextSeparator,
       );
     });
   }

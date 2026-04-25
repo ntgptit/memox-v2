@@ -10,14 +10,19 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/value_objects/content_actions.dart';
+import '../../../shared/dialogs/mx_action_sheet_list.dart';
+import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
+import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
+import '../../../shared/widgets/mx_text.dart';
 import '../../../shared/widgets/mx_text_field.dart';
 import '../widgets/deck_import_header_section.dart';
 import '../widgets/deck_import_preview_section.dart';
@@ -113,6 +118,21 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
                       ),
                     ),
                   ),
+                  if (draft.format == ImportSourceFormat.structuredText) ...[
+                    const MxGap(MxSpace.lg),
+                    MxText(
+                      l10n.importSeparatorLabel,
+                      role: MxTextRole.formLabel,
+                    ),
+                    const MxGap(MxSpace.xs),
+                    _ImportSeparatorSelector(
+                      value: draft.structuredTextSeparator,
+                      enabled: !isImportBusy,
+                      onTap: () => _chooseStructuredTextSeparator(
+                        draft.structuredTextSeparator,
+                      ),
+                    ),
+                  ],
                   const MxGap(MxSpace.lg),
                   Wrap(
                     spacing: MxSpace.sm,
@@ -253,9 +273,111 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
         .setRawContent(content);
     MxSnackbar.success(context, l10n.importLoadedFileMessage(file.name));
   }
+
+  Future<void> _chooseStructuredTextSeparator(
+    ImportStructuredTextSeparator current,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final selected = await MxBottomSheet.show<ImportStructuredTextSeparator>(
+      context: context,
+      title: l10n.importSeparatorLabel,
+      child: MxActionSheetList<ImportStructuredTextSeparator>(
+        items: _buildImportSeparatorActions(l10n),
+        selectedValue: current,
+      ),
+    );
+    if (!mounted || selected == null) {
+      return;
+    }
+    ref
+        .read(flashcardImportDraftProvider(widget.deckId).notifier)
+        .setStructuredTextSeparator(selected);
+  }
 }
 
 enum _ImportPendingAction { preview, commit }
+
+class _ImportSeparatorSelector extends StatelessWidget {
+  const _ImportSeparatorSelector({
+    required this.value,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final ImportStructuredTextSeparator value;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return MxCard(
+      variant: MxCardVariant.outlined,
+      padding: EdgeInsets.zero,
+      onTap: enabled ? onTap : null,
+      child: MxListTile(
+        leadingIcon: _separatorIcon(value),
+        title: _separatorLabel(l10n, value),
+        subtitle: _separatorDescription(l10n, value),
+        showChevron: enabled,
+      ),
+    );
+  }
+}
+
+List<MxActionSheetItem<ImportStructuredTextSeparator>>
+_buildImportSeparatorActions(AppLocalizations l10n) {
+  return [
+    for (final separator in ImportStructuredTextSeparator.values)
+      MxActionSheetItem(
+        value: separator,
+        label: _separatorLabel(l10n, separator),
+        subtitle: _separatorDescription(l10n, separator),
+        icon: _separatorIcon(separator),
+      ),
+  ];
+}
+
+String _separatorLabel(
+  AppLocalizations l10n,
+  ImportStructuredTextSeparator separator,
+) {
+  return switch (separator) {
+    ImportStructuredTextSeparator.auto => l10n.importSeparatorAuto,
+    ImportStructuredTextSeparator.tab => l10n.importSeparatorTab,
+    ImportStructuredTextSeparator.colon => l10n.importSeparatorColon,
+    ImportStructuredTextSeparator.slash => l10n.importSeparatorSlash,
+    ImportStructuredTextSeparator.semicolon => l10n.importSeparatorSemicolon,
+    ImportStructuredTextSeparator.pipe => l10n.importSeparatorPipe,
+  };
+}
+
+String _separatorDescription(
+  AppLocalizations l10n,
+  ImportStructuredTextSeparator separator,
+) {
+  return switch (separator) {
+    ImportStructuredTextSeparator.auto => l10n.importSeparatorAutoDescription,
+    ImportStructuredTextSeparator.tab => l10n.importSeparatorTabDescription,
+    ImportStructuredTextSeparator.colon => l10n.importSeparatorColonDescription,
+    ImportStructuredTextSeparator.slash => l10n.importSeparatorSlashDescription,
+    ImportStructuredTextSeparator.semicolon =>
+      l10n.importSeparatorSemicolonDescription,
+    ImportStructuredTextSeparator.pipe => l10n.importSeparatorPipeDescription,
+  };
+}
+
+IconData _separatorIcon(ImportStructuredTextSeparator separator) {
+  return switch (separator) {
+    ImportStructuredTextSeparator.auto => Icons.auto_awesome_outlined,
+    ImportStructuredTextSeparator.tab => Icons.keyboard_tab_outlined,
+    ImportStructuredTextSeparator.colon => Icons.more_vert_outlined,
+    ImportStructuredTextSeparator.slash => Icons.code_outlined,
+    ImportStructuredTextSeparator.semicolon => Icons.data_array_outlined,
+    ImportStructuredTextSeparator.pipe => Icons.vertical_align_center_outlined,
+  };
+}
 
 @visibleForTesting
 Future<String?> readDeckImportFileContent(PlatformFile file) async {
