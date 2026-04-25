@@ -24,19 +24,30 @@ Mode nào dùng ở flow nào: xem [New Study Flow — Mode bắt buộc](./new-
 - nếu màn hình bị dispose trước khi batch submit, không ghi attempt và session resume lại Review mode chưa đổi
 
 ### Match
-- ghép toàn bộ cặp trong current Match round trên một board hai cột
-- cột trái hiển thị `back` / definition dài; cột phải hiển thị `front` / label ngắn
+- ghép toàn bộ cặp trong current Match round bằng board hai cột
+- board chỉ hiển thị tối đa 5 cặp trong một display batch để màn hình không bị quá tải
+- nếu display batch có ít cặp, mỗi tile vẫn dùng chiều cao slot như layout 5 cặp và căn lên trên, không kéo giãn theo số cặp hiện có
+- khi user ghép xong toàn bộ cặp trong display batch hiện tại, app chuyển sang display batch kế tiếp của cùng Match round
+- cột trái hiển thị `front` / term; cột phải hiển thị `back` / meaning
+- meaning dùng font size cố định giữa các tile; nếu nội dung quá dài thì giới hạn số dòng và cắt bằng ellipsis
 - thứ tự cột phải tuân theo setting `shuffleAnswers`; nếu tắt thì giữ source order của round hiện tại
 - mismatch chỉ tạo trạng thái UI tạm thời: flash lỗi, rung thẻ, reset selection, không ghi database tại thời điểm sai
-- nếu một flashcard từng mismatch trong board, flashcard đó được stage là `incorrect` cho lần flush cuối board
+- ghép đúng giữ success highlight trong một nhịp ngắn rồi mới fade/scale thẻ ra khỏi board
+- nếu một flashcard từng mismatch trong bất kỳ display batch nào của Match round, flashcard đó được stage là `incorrect` cho lần flush cuối round
 - flashcard không từng mismatch và được ghép đúng được stage là `correct`
-- khi toàn bộ board được ghép xong, app ghi một batch attempt cho toàn bộ pending item của Match round trong một transaction
+- khi toàn bộ display batch của Match round được ghép xong, app ghi một batch attempt cho toàn bộ pending item của Match round trong một transaction
 - nếu batch có item `incorrect`, app tạo retry Match round kế tiếp chỉ gồm các flashcard sai
 - nếu toàn bộ item `correct`, Match mode pass và chuyển sang mode tiếp theo
 - không persist distractor riêng trong database
 
 ### Guess
-- nhìn một phía, đoán phía còn lại
+- là mode trắc nghiệm: prompt hiển thị `front`, danh sách lựa chọn hiển thị tối đa 5 `back` gồm đáp án đúng và tối đa 4 distractor
+- các option meaning trong cùng màn hình có chiều cao bằng nhau và lấp đầy vùng danh sách; meaning dài bị giới hạn dòng và cắt bằng ellipsis
+- user chọn một option để app tự chấm, không hiển thị nút tự chấm `correct` / `incorrect`
+- chọn đúng làm option được chọn chuyển trạng thái success
+- chọn sai làm option được chọn chuyển trạng thái error và đồng thời tô success cho option đúng
+- sau feedback delay ngắn trong khoảng 500-800ms, app ghi attempt cho current item bằng `correct` hoặc `incorrect`
+- nếu submit thất bại, lựa chọn tạm thời được reset để user có thể chọn lại
 
 ### Recall
 - tự nhớ trước khi xem đáp án
@@ -55,7 +66,7 @@ Mode nào dùng ở flow nào: xem [New Study Flow — Mode bắt buộc](./new-
 - mode không tự quyết định finalize session
 - kết quả mode được ghi nhận qua attempt và session progress
 - riêng Review mode ghi attempt theo batch ở cuối mode, không ghi từng lần vuốt thẻ
-- riêng Match mode ghi attempt theo batch ở cuối board, không ghi tại thời điểm mismatch
+- riêng Match mode ghi attempt theo batch ở cuối Match round, không ghi khi hoàn tất từng display batch và không ghi tại thời điểm mismatch
 - SRS chỉ cập nhật tại finalize boundary của session
 - `Review` ở đây là tên mode tương tác, khác với study flow `SRS Review`
 - Shuffle đáp án chỉ áp dụng cho mode có danh sách đáp án hoặc vị trí đáp án cần tráo

@@ -21,6 +21,7 @@ enum MxTextRole {
   formHelper,
   breadcrumb,
   contentBody,
+  guessPrompt,
   reviewFront,
   reviewBack,
   avatarInitials,
@@ -93,6 +94,10 @@ abstract final class MxTextStyles {
       ),
       MxTextRole.contentBody => textTheme.bodyMedium!.copyWith(
         color: scheme.onSurfaceVariant,
+      ),
+      MxTextRole.guessPrompt => textTheme.headlineMedium!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w500,
       ),
       MxTextRole.reviewFront => textTheme.headlineMedium!.copyWith(
         color: scheme.onSurface,

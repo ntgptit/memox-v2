@@ -4,7 +4,7 @@ import '../../../../../../core/theme/extensions/theme_extensions.dart';
 
 enum MatchTileSide { left, right }
 
-enum MatchTileState { idle, selected, error, matched }
+enum MatchTileState { idle, selected, error, success, matched }
 
 final class MatchTileVisual {
   const MatchTileVisual({
@@ -27,8 +27,8 @@ final class MatchTileVisual {
     return switch (state) {
       MatchTileState.idle => MatchTileVisual(
         foregroundColor: side == MatchTileSide.left
-            ? scheme.onSurfaceVariant
-            : scheme.onSurface,
+            ? scheme.onSurface
+            : scheme.onSurfaceVariant,
       ),
       MatchTileState.selected => MatchTileVisual(
         backgroundColor: scheme.primaryContainer,
@@ -39,6 +39,11 @@ final class MatchTileVisual {
         backgroundColor: scheme.errorContainer,
         borderColor: scheme.error,
         foregroundColor: scheme.onErrorContainer,
+      ),
+      MatchTileState.success => MatchTileVisual(
+        backgroundColor: mxColors.successContainer,
+        borderColor: mxColors.ratingEasy,
+        foregroundColor: mxColors.onSuccessContainer,
       ),
       MatchTileState.matched => MatchTileVisual(
         backgroundColor: mxColors.successContainer,

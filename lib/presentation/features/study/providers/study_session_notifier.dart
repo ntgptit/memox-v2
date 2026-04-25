@@ -10,6 +10,9 @@ import '../../../../domain/study/entities/study_models.dart';
 
 part 'study_session_notifier.g.dart';
 
+const _defaultAnswerDistractorLimit = 3;
+const _guessAnswerDistractorLimit = 4;
+
 @Riverpod(keepAlive: true)
 class StudySessionDataRevision extends _$StudySessionDataRevision {
   @override
@@ -205,6 +208,23 @@ class StudySessionActionController extends _$StudySessionActionController {
 }
 
 List<StudyFlashcardRef> studyAnswerOptions(StudySessionSnapshot snapshot) {
+  return _studyAnswerOptions(
+    snapshot,
+    distractorLimit: _defaultAnswerDistractorLimit,
+  );
+}
+
+List<StudyFlashcardRef> studyGuessAnswerOptions(StudySessionSnapshot snapshot) {
+  return _studyAnswerOptions(
+    snapshot,
+    distractorLimit: _guessAnswerDistractorLimit,
+  );
+}
+
+List<StudyFlashcardRef> _studyAnswerOptions(
+  StudySessionSnapshot snapshot, {
+  required int distractorLimit,
+}) {
   final item = snapshot.currentItem;
   if (item == null) {
     return const <StudyFlashcardRef>[];
@@ -221,7 +241,7 @@ List<StudyFlashcardRef> studyAnswerOptions(StudySessionSnapshot snapshot) {
   );
   final optionIds = <String>{
     item.flashcard.id,
-    for (final distractor in distractors.take(3)) distractor.id,
+    for (final distractor in distractors.take(distractorLimit)) distractor.id,
   };
   final options = snapshot.sessionFlashcards
       .where((flashcard) => optionIds.contains(flashcard.id))

@@ -64,6 +64,32 @@ void main() {
   );
 
   test(
+    'DT15 onUpdate: studyGuessAnswerOptions returns five source-order options',
+    () {
+      final snapshot = _snapshot(
+        mode: StudyMode.guess,
+        currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+        cards: [
+          _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+          _card(id: 'card-2', front: 'front 2', back: 'back 2'),
+          _card(id: 'card-3', front: 'front 3', back: 'back 3'),
+          _card(id: 'card-4', front: 'front 4', back: 'back 4'),
+          _card(id: 'card-5', front: 'front 5', back: 'back 5'),
+        ],
+        shuffleAnswers: false,
+      );
+
+      expect(studyGuessAnswerOptions(snapshot).map((card) => card.id), [
+        'card-1',
+        'card-2',
+        'card-3',
+        'card-4',
+        'card-5',
+      ]);
+    },
+  );
+
+  test(
     'DT11 onUpdate: review batch controller submits remembered grade without provider error',
     () async {
       final repo = _ReviewBatchStudyRepo();
@@ -505,7 +531,7 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   @override
   Future<StudySessionSnapshot> loadSession(String sessionId) async {
     return _snapshot(
-      mode: StudyMode.guess,
+      mode: StudyMode.fill,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
       cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
       shuffleAnswers: false,

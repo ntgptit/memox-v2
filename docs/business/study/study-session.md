@@ -107,8 +107,9 @@ Ngoại lệ Review mode trong New Study:
 Ngoại lệ Match mode trong New Study:
 
 - chọn sai cặp chỉ là UI staging tạm thời, không ghi attempt và không đổi trạng thái item ngay lúc mismatch
-- khi toàn bộ board ghép xong, app ghi một batch attempt cho toàn bộ pending Match item trong cùng transaction
-- mỗi pending Match item nhận đúng một attempt: `incorrect` nếu item từng mismatch trong board, ngược lại `correct`
+- UI Match board chia current Match round thành các display batch tối đa 5 cặp; hoàn tất display batch hiện tại chỉ chuyển sang display batch kế tiếp
+- khi toàn bộ display batch của Match round ghép xong, app ghi một batch attempt cho toàn bộ pending Match item trong cùng transaction
+- mỗi pending Match item nhận đúng một attempt: `incorrect` nếu item từng mismatch trong round, ngược lại `correct`
 - toàn bộ pending Match item trong round được chuyển sang `completed` cùng một completed timestamp
 - nếu có item `incorrect`, app tạo Match retry round kế tiếp chỉ gồm các flashcard sai
 - nếu toàn bộ item `correct`, session chuyển sang mode tiếp theo hoặc `Ready To Finalize` nếu đó là mode cuối

@@ -63,7 +63,11 @@ class _MatchModeTileState extends State<MatchModeTile>
   Widget build(BuildContext context) {
     final visual = MatchTileVisual.resolve(context, widget.state, widget.side);
     final isMatched = widget.state == MatchTileState.matched;
-    final canTap = widget.enabled && !isMatched;
+    final isResolved =
+        widget.state == MatchTileState.success ||
+        widget.state == MatchTileState.matched;
+    final canTap = widget.enabled && !isResolved;
+    final isTerm = widget.side == MatchTileSide.left;
 
     return MxShakeTransition(
       animation: _shakeController,
@@ -86,24 +90,20 @@ class _MatchModeTileState extends State<MatchModeTile>
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.center,
-                      child: SizedBox(
-                        width: constraints.maxWidth,
-                        child: MxText(
-                          widget.side == MatchTileSide.left
-                              ? widget.item.flashcard.back
-                              : widget.item.flashcard.front,
-                          role: widget.side == MatchTileSide.left
-                              ? MxTextRole.contentBody
-                              : MxTextRole.tileTitle,
-                          color: visual.foregroundColor,
-                          maxLines: widget.side == MatchTileSide.left ? 6 : 3,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          softWrap: true,
-                        ),
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      child: MxText(
+                        isTerm
+                            ? widget.item.flashcard.front
+                            : widget.item.flashcard.back,
+                        role: isTerm
+                            ? MxTextRole.tileTitle
+                            : MxTextRole.contentBody,
+                        color: visual.foregroundColor,
+                        maxLines: isTerm ? 3 : 4,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        softWrap: true,
                       ),
                     ),
                   );

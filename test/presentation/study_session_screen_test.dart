@@ -11,8 +11,10 @@ import 'package:memox/domain/study/ports/study_repo.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
+import 'package:memox/presentation/features/study/widgets/study_session/guess/guess_motion.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 
 void main() {
   testWidgets('DT1 onOpen: shows loading state while session loads', (
@@ -42,29 +44,56 @@ void main() {
     expect(find.byType(MxLoadingState), findsOneWidget);
   });
 
-  testWidgets(
-    'DT1 onDisplay: active session renders progress and answer panel',
-    (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            studySessionStateProvider(
-              'session-001',
-            ).overrideWith((ref) => Future.value(_activeSnapshot)),
-          ],
-          child: const _TestApp(
-            child: StudySessionScreen(sessionId: 'session-001'),
-          ),
+  testWidgets('DT1 onDisplay: guess mode renders trắc nghiệm layout', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_activeSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(find.text('Guess · round 1'), findsOneWidget);
-      expect(find.text('front 1'), findsOneWidget);
-      expect(find.text('Correct'), findsOneWidget);
-      expect(find.text('Skip card'), findsOneWidget);
-    },
-  );
+    expect(find.text('Guess'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+    expect(find.byIcon(Icons.text_fields), findsOneWidget);
+    expect(find.byIcon(Icons.volume_up_outlined), findsNWidgets(2));
+    expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    expect(find.text('40%'), findsOneWidget);
+    expect(find.text('front 1'), findsOneWidget);
+    expect(find.text('back 1'), findsOneWidget);
+    expect(find.text('back 2'), findsOneWidget);
+    expect(find.text('back 3'), findsOneWidget);
+    expect(find.text('back 4'), findsOneWidget);
+    expect(find.text('back 5'), findsOneWidget);
+    expect(find.byType(ListView), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is MxText &&
+            widget.data == 'front 1' &&
+            widget.role == MxTextRole.guessPrompt,
+      ),
+      findsOneWidget,
+    );
+    final promptStyle = tester.widget<Text>(find.text('front 1')).style!;
+    final promptTheme = Theme.of(tester.element(find.text('front 1')));
+    expect(
+      promptStyle.fontSize,
+      lessThan(promptTheme.textTheme.displayMedium!.fontSize!),
+    );
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text('Incorrect'), findsNothing);
+    expect(find.text('Continue'), findsNothing);
+    expect(find.text('Skip card'), findsNothing);
+  });
 
   testWidgets(
     'DT3 onDisplay: review mode renders title actions progress and two cards',
@@ -202,14 +231,38 @@ void main() {
     expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
     expect(find.text('0%'), findsOneWidget);
-    expect(find.text(_alphaBack), findsOneWidget);
-    expect(find.text(_betaBack), findsOneWidget);
-    expect(find.text(_alphaFront), findsOneWidget);
-    expect(find.text(_betaFront), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('match-left-item-001')),
+        matching: find.text(_alphaFront),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('match-right-item-001')),
+        matching: find.text(_alphaBack),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('match-left-item-002')),
+        matching: find.text(_betaFront),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('match-right-item-002')),
+        matching: find.text(_betaBack),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets(
-    'DT8 onDisplay: match mode keeps long definitions visible and hides skip',
+    'DT8 onDisplay: match mode keeps meaning text fixed and ellipsized',
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -225,14 +278,151 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final alphaStyle = tester.widget<Text>(find.text(_alphaFront)).style!;
-      final betaStyle = tester.widget<Text>(find.text(_betaFront)).style!;
-      expect(find.text(_longMatchBack), findsOneWidget);
-      expect(alphaStyle.fontSize, betaStyle.fontSize);
-      expect(alphaStyle.fontWeight, betaStyle.fontWeight);
+      final longMeaning = tester.widget<Text>(
+        find.descendant(
+          of: find.byKey(const ValueKey('match-right-item-001')),
+          matching: find.text(_longMatchBack),
+        ),
+      );
+      final shortMeaning = tester.widget<Text>(
+        find.descendant(
+          of: find.byKey(const ValueKey('match-right-item-002')),
+          matching: find.text(_betaBack),
+        ),
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('match-left-item-001')),
+          matching: find.text(_alphaFront),
+        ),
+        findsOneWidget,
+      );
+      expect(longMeaning.style!.fontSize, shortMeaning.style!.fontSize);
+      expect(longMeaning.style!.fontWeight, shortMeaning.style!.fontWeight);
+      expect(longMeaning.maxLines, 4);
+      expect(longMeaning.overflow, TextOverflow.ellipsis);
       expect(find.text('Skip card'), findsNothing);
     },
   );
+
+  testWidgets('DT9 onDisplay: match mode shows only first display batch', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_largeMatchSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (var index = 1; index <= 5; index++) {
+      expect(find.text(_matchFront(index)), findsOneWidget);
+      expect(find.text(_matchBack(index)), findsOneWidget);
+    }
+    expect(find.text(_matchFront(6)), findsNothing);
+    expect(find.text(_matchBack(6)), findsNothing);
+    expect(find.text(_matchFront(7)), findsNothing);
+    expect(find.text(_matchBack(7)), findsNothing);
+    expect(find.byKey(const ValueKey('match-left-item-006')), findsNothing);
+    expect(find.byKey(const ValueKey('match-right-item-006')), findsNothing);
+    expect(find.byKey(const ValueKey('match-left-item-007')), findsNothing);
+    expect(find.byKey(const ValueKey('match-right-item-007')), findsNothing);
+  });
+
+  testWidgets(
+    'DT10 onDisplay: match mode uses five-pair slot height for sparse batch',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_matchSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final sparseTileHeight = _matchTileHeight(tester, 'match-left-item-001');
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_fivePairMatchSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final fivePairTileHeight = _matchTileHeight(
+        tester,
+        'match-left-item-001',
+      );
+
+      expect(sparseTileHeight, closeTo(fivePairTileHeight, 0.1));
+    },
+  );
+
+  testWidgets('DT11 onDisplay: guess mode keeps long option scrollable', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_longGuessOptionSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final longOption = tester.widget<Text>(
+      find.descendant(
+        of: find.byKey(const ValueKey('guess-option-card-002')),
+        matching: find.text(_longGuessBack),
+      ),
+    );
+    final optionHeights = [
+      for (var index = 1; index <= 5; index++)
+        _cardHeightForKey(tester, 'guess-option-card-00$index'),
+    ];
+    final firstOptionHeight = optionHeights.first;
+    final listBottom = tester
+        .getBottomLeft(find.byKey(const ValueKey('guess-options-list')))
+        .dy;
+    final lastCardBottom = tester
+        .getBottomLeft(_cardFinderForKey('guess-option-card-005'))
+        .dy;
+
+    expect(find.byType(ListView), findsOneWidget);
+    expect(find.text(_longGuessBack), findsOneWidget);
+    for (final height in optionHeights) {
+      expect(height, closeTo(firstOptionHeight, 0.1));
+    }
+    expect(lastCardBottom, closeTo(listBottom, 0.1));
+    expect(longOption.maxLines, 2);
+    expect(longOption.overflow, TextOverflow.ellipsis);
+    expect(longOption.textAlign, TextAlign.center);
+  });
 
   testWidgets(
     'DT1 onUpdate: single-card review auto-submits after two seconds',
@@ -264,40 +454,50 @@ void main() {
     },
   );
 
-  testWidgets(
-    'DT4 onUpdate: match correct pair increments progress without submit',
-    (tester) async {
-      final repo = _BatchAnswerStudyRepo();
+  testWidgets('DT4 onUpdate: match correct pair holds success before fade', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            studyRepoProvider.overrideWithValue(repo),
-            studySessionStateProvider(
-              'session-001',
-            ).overrideWith((ref) => Future.value(_matchSnapshot)),
-          ],
-          child: const _TestApp(
-            child: StudySessionScreen(sessionId: 'session-001'),
-          ),
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_matchSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      await _tapMatchTile(tester, 'match-left-item-001');
-      await tester.pump();
-      await _tapMatchTile(tester, 'match-right-item-001');
-      await tester.pump();
+    await _tapMatchTile(tester, 'match-left-item-001');
+    await tester.pump();
+    await _tapMatchTile(tester, 'match-right-item-001');
+    await tester.pump();
 
-      expect(find.text('50%'), findsOneWidget);
-      expect(find.byKey(const ValueKey('match-left-item-001')), findsOneWidget);
-      expect(
-        find.byKey(const ValueKey('match-right-item-001')),
-        findsOneWidget,
-      );
-      expect(repo.matchBatchAnswerCount, 0);
-    },
-  );
+    final successCard = tester.widget<MxCard>(
+      find.descendant(
+        of: find.byKey(const ValueKey('match-left-item-001')),
+        matching: find.byType(MxCard),
+      ),
+    );
+    expect(find.text('50%'), findsOneWidget);
+    expect(successCard.backgroundColor, isNotNull);
+    expect(_matchTileOpacity(tester, 'match-left-item-001'), 1);
+    expect(find.byKey(const ValueKey('match-left-item-001')), findsOneWidget);
+    expect(find.byKey(const ValueKey('match-right-item-001')), findsOneWidget);
+    expect(repo.matchBatchAnswerCount, 0);
+
+    await tester.pump(const Duration(milliseconds: 700));
+    await tester.pump();
+
+    expect(_matchTileOpacity(tester, 'match-left-item-001'), 0);
+    expect(repo.matchBatchAnswerCount, 0);
+  });
 
   testWidgets('DT5 onUpdate: match mismatch resets locally without submit', (
     tester,
@@ -373,7 +573,7 @@ void main() {
       await _tapMatchTile(tester, 'match-left-item-002');
       await tester.pump();
       await _tapMatchTile(tester, 'match-right-item-002');
-      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 700));
       await tester.pump();
 
       expect(repo.matchBatchAnswerCount, 1);
@@ -383,6 +583,166 @@ void main() {
       });
     },
   );
+
+  testWidgets(
+    'DT7 onUpdate: match display batch advances before final submit',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_largeMatchSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      for (var index = 1; index <= 5; index++) {
+        await _completeMatchPair(tester, index);
+      }
+      expect(repo.matchBatchAnswerCount, 0);
+
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pump();
+
+      expect(find.text('71%'), findsOneWidget);
+      expect(find.text(_matchFront(6)), findsOneWidget);
+      expect(find.text(_matchBack(6)), findsOneWidget);
+      expect(find.text(_matchFront(7)), findsOneWidget);
+      expect(find.text(_matchBack(7)), findsOneWidget);
+      expect(repo.matchBatchAnswerCount, 0);
+
+      await _completeMatchPair(tester, 6);
+      await tester.pump();
+      expect(repo.matchBatchAnswerCount, 0);
+
+      await _completeMatchPair(tester, 7);
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pump();
+
+      expect(repo.matchBatchAnswerCount, 1);
+      expect(repo.lastItemGrades, <String, AttemptGrade>{
+        for (var index = 1; index <= 7; index++)
+          _matchItemId(index): AttemptGrade.correct,
+      });
+    },
+  );
+
+  testWidgets(
+    'DT8 onUpdate: guess correct option submits correct after feedback',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_activeSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _tapGuessOption(tester, 'card-001');
+      await tester.pump();
+      await tester.pump(guessColorTransitionDuration);
+
+      final selectedCard = _cardForKey(tester, 'guess-option-card-001');
+      final idleCard = _cardForKey(tester, 'guess-option-card-002');
+      expect(selectedCard.backgroundColor, isNot(idleCard.backgroundColor));
+      expect(repo.itemAnswerCount, 0);
+
+      await tester.pump(guessFeedbackDelay - guessColorTransitionDuration);
+      await tester.pump();
+
+      expect(repo.itemAnswerCount, 1);
+      expect(repo.lastGrade, AttemptGrade.correct);
+    },
+  );
+
+  testWidgets(
+    'DT9 onUpdate: guess incorrect option submits incorrect after feedback',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_activeSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _tapGuessOption(tester, 'card-002');
+      await tester.pump();
+      await tester.pump(guessColorTransitionDuration);
+
+      final wrongCard = _cardForKey(tester, 'guess-option-card-002');
+      final correctCard = _cardForKey(tester, 'guess-option-card-001');
+      final idleCard = _cardForKey(tester, 'guess-option-card-003');
+      expect(wrongCard.backgroundColor, isNot(idleCard.backgroundColor));
+      expect(correctCard.backgroundColor, isNot(idleCard.backgroundColor));
+      expect(wrongCard.backgroundColor, isNot(correctCard.backgroundColor));
+      expect(repo.itemAnswerCount, 0);
+
+      await tester.pump(guessFeedbackDelay - guessColorTransitionDuration);
+      await tester.pump();
+
+      expect(repo.itemAnswerCount, 1);
+      expect(repo.lastGrade, AttemptGrade.incorrect);
+    },
+  );
+
+  testWidgets('DT10 onUpdate: guess ignores taps while resolving', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_activeSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await _tapGuessOption(tester, 'card-002');
+    await tester.pump();
+    await _tapGuessOption(tester, 'card-001');
+    await tester.pump();
+
+    await tester.pump(guessFeedbackDelay);
+    await tester.pump();
+
+    expect(repo.itemAnswerCount, 1);
+    expect(repo.lastGrade, AttemptGrade.incorrect);
+  });
 
   testWidgets(
     'DT2 onUpdate: web mouse right-to-left drag advances review vocabulary and only the last card can auto-submit',
@@ -482,32 +842,25 @@ void main() {
   });
 }
 
-final _activeSnapshot = StudySessionSnapshot(
-  session: _session(SessionStatus.inProgress),
-  currentItem: StudySessionItem(
-    id: 'item-001',
-    sessionId: 'session-001',
-    flashcard: _card(id: 'card-001', front: 'front 1', back: 'back 1'),
-    studyMode: StudyMode.guess,
-    modeOrder: 1,
-    roundIndex: 1,
-    queuePosition: 1,
-    sourcePool: SessionItemSourcePool.due,
-    status: SessionItemStatus.pending,
-    completedAt: null,
-  ),
-  sessionFlashcards: [_card(id: 'card-001', front: 'front 1', back: 'back 1')],
-  summary: const StudySummary(
-    totalCards: 2,
-    completedAttempts: 1,
-    correctAttempts: 1,
-    incorrectAttempts: 0,
-    increasedBoxCount: 1,
-    decreasedBoxCount: 0,
-    remainingCount: 1,
-  ),
-  canFinalize: false,
-);
+final _activeSnapshot = _guessSnapshotFor([
+  _card(id: 'card-001', front: 'front 1', back: 'back 1'),
+  _card(id: 'card-002', front: 'front 2', back: 'back 2'),
+  _card(id: 'card-003', front: 'front 3', back: 'back 3'),
+  _card(id: 'card-004', front: 'front 4', back: 'back 4'),
+  _card(id: 'card-005', front: 'front 5', back: 'back 5'),
+]);
+
+const _longGuessBack =
+    'Missing person / Người mất tích (Danh từ, người không xác định được '
+    'vị trí hiện tại, cần giữ nguyên toàn bộ nội dung trong option card)';
+
+final _longGuessOptionSnapshot = _guessSnapshotFor([
+  _card(id: 'card-001', front: 'front 1', back: 'back 1'),
+  _card(id: 'card-002', front: 'front 2', back: _longGuessBack),
+  _card(id: 'card-003', front: 'front 3', back: 'back 3'),
+  _card(id: 'card-004', front: 'front 4', back: 'back 4'),
+  _card(id: 'card-005', front: 'front 5', back: 'back 5'),
+]);
 
 final _singleReviewSnapshot = _reviewSnapshot([
   _card(id: 'card-001', front: 'front 1', back: 'back 1'),
@@ -543,6 +896,24 @@ final _matchSnapshot = _matchSnapshotFor([
 final _matchLongTextSnapshot = _matchSnapshotFor([
   _card(id: 'card-001', front: _alphaFront, back: _longMatchBack),
   _card(id: 'card-002', front: _betaFront, back: _betaBack),
+]);
+
+final _largeMatchSnapshot = _matchSnapshotFor([
+  for (var index = 1; index <= 7; index++)
+    _card(
+      id: 'card-${index.toString().padLeft(3, '0')}',
+      front: _matchFront(index),
+      back: _matchBack(index),
+    ),
+]);
+
+final _fivePairMatchSnapshot = _matchSnapshotFor([
+  for (var index = 1; index <= 5; index++)
+    _card(
+      id: 'card-${index.toString().padLeft(3, '0')}',
+      front: _matchFront(index),
+      back: _matchBack(index),
+    ),
 ]);
 
 final _terminalSnapshot = StudySessionSnapshot(
@@ -598,6 +969,37 @@ StudySession _newStudySession(SessionStatus status) {
     startedAt: 0,
     endedAt: status == SessionStatus.inProgress ? null : 1,
     restartedFromSessionId: null,
+  );
+}
+
+StudySessionSnapshot _guessSnapshotFor(List<StudyFlashcardRef> cards) {
+  final current = cards.first;
+  const completedAttempts = 2;
+  return StudySessionSnapshot(
+    session: _newStudySession(SessionStatus.inProgress),
+    currentItem: StudySessionItem(
+      id: 'item-001',
+      sessionId: 'session-001',
+      flashcard: current,
+      studyMode: StudyMode.guess,
+      modeOrder: 3,
+      roundIndex: 1,
+      queuePosition: 1,
+      sourcePool: SessionItemSourcePool.newCards,
+      status: SessionItemStatus.pending,
+      completedAt: null,
+    ),
+    sessionFlashcards: cards,
+    summary: StudySummary(
+      totalCards: cards.length,
+      completedAttempts: completedAttempts,
+      correctAttempts: completedAttempts,
+      incorrectAttempts: 0,
+      increasedBoxCount: 0,
+      decreasedBoxCount: 0,
+      remainingCount: cards.length - completedAttempts,
+    ),
+    canFinalize: false,
   );
 }
 
@@ -679,11 +1081,70 @@ StudyFlashcardRef _card({
   );
 }
 
+Future<void> _tapGuessOption(WidgetTester tester, String cardId) {
+  return tester.tap(
+    find.byKey(ValueKey<String>('guess-option-$cardId')),
+    warnIfMissed: false,
+  );
+}
+
 Future<void> _tapMatchTile(WidgetTester tester, String key) {
   return tester.tap(find.byKey(ValueKey<String>(key)), warnIfMissed: false);
 }
 
+MxCard _cardForKey(WidgetTester tester, String key) {
+  return tester.widget<MxCard>(_cardFinderForKey(key));
+}
+
+double _cardHeightForKey(WidgetTester tester, String key) {
+  return tester.getSize(_cardFinderForKey(key)).height;
+}
+
+Finder _cardFinderForKey(String key) {
+  return find.descendant(
+    of: find.byKey(ValueKey<String>(key)),
+    matching: find.byType(MxCard),
+  );
+}
+
+double _matchTileOpacity(WidgetTester tester, String key) {
+  return tester
+      .widget<AnimatedOpacity>(
+        find.descendant(
+          of: find.byKey(ValueKey<String>(key)),
+          matching: find.byType(AnimatedOpacity),
+        ),
+      )
+      .opacity;
+}
+
+double _matchTileHeight(WidgetTester tester, String key) {
+  return tester
+      .getSize(
+        find.descendant(
+          of: find.byKey(ValueKey<String>(key)),
+          matching: find.byType(MxCard),
+        ),
+      )
+      .height;
+}
+
+Future<void> _completeMatchPair(WidgetTester tester, int index) async {
+  final itemId = _matchItemId(index);
+  await _tapMatchTile(tester, 'match-left-$itemId');
+  await tester.pump();
+  await _tapMatchTile(tester, 'match-right-$itemId');
+  await tester.pump();
+}
+
+String _matchItemId(int index) => 'item-${index.toString().padLeft(3, '0')}';
+
+String _matchFront(int index) => 'Match front $index';
+
+String _matchBack(int index) => 'Match definition $index';
+
 final class _BatchAnswerStudyRepo implements StudyRepo {
+  int itemAnswerCount = 0;
   int batchAnswerCount = 0;
   int matchBatchAnswerCount = 0;
   AttemptGrade? lastGrade;
@@ -752,7 +1213,9 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
     required AttemptGrade grade,
     required List<StudyMode> modes,
   }) {
-    throw UnimplementedError();
+    itemAnswerCount += 1;
+    lastGrade = grade;
+    return Future.value(_activeSnapshot);
   }
 
   @override

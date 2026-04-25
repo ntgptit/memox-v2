@@ -10,6 +10,7 @@ import '../../../../../shared/layouts/mx_gap.dart';
 import '../../../../../shared/layouts/mx_space.dart';
 import '../study_mode_progress_row.dart';
 import '../study_mode_session_scaffold.dart';
+import 'match_batching.dart';
 import 'match_board.dart';
 import 'match_motion.dart';
 import 'match_seed.dart';
@@ -35,11 +36,13 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
   String? _boardKey;
   List<String> _rightOrderItemIds = const <String>[];
   Set<String> _matchedItemIds = <String>{};
+  Set<String> _successItemIds = <String>{};
   Set<String> _failedItemIds = <String>{};
   String? _selectedLeftItemId;
   String? _selectedRightItemId;
   String? _errorLeftItemId;
   String? _errorRightItemId;
+  int _visibleBatchStartIndex = 0;
   bool _isResolving = false;
   bool _hasSubmitted = false;
 
@@ -63,6 +66,7 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final roundItems = _roundItems;
+    final visibleItems = visibleMatchBatch(roundItems, _visibleBatchStartIndex);
     final progress = _matchProgress(roundItems.length);
     final percent = (progress * 100).round();
 
@@ -78,8 +82,8 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
           const MxGap(MxSpace.md),
           Expanded(
             child: MatchBoard(
-              leftItems: roundItems,
-              rightItems: _rightItems(roundItems),
+              leftItems: visibleItems,
+              rightItems: _rightItems(visibleItems),
               isLocked: widget.isSubmitting || _isResolving || _hasSubmitted,
               tileStateFor: _tileStateFor,
               onTileTap: _handleTileTap,
@@ -121,11 +125,13 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     _boardKey = _computeBoardKey(roundItems);
     _rightOrderItemIds = _buildRightOrder(roundItems);
     _matchedItemIds = <String>{};
+    _successItemIds = <String>{};
     _failedItemIds = <String>{};
     _selectedLeftItemId = null;
     _selectedRightItemId = null;
     _errorLeftItemId = null;
     _errorRightItemId = null;
+    _visibleBatchStartIndex = 0;
     _isResolving = false;
     _hasSubmitted = false;
   }
@@ -168,6 +174,9 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     }
     if (side == MatchTileSide.right && _errorRightItemId == item.id) {
       return MatchTileState.error;
+    }
+    if (_successItemIds.contains(item.id)) {
+      return MatchTileState.success;
     }
     if (_matchedItemIds.contains(item.id)) {
       return MatchTileState.matched;
@@ -215,8 +224,9 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
         _selectedLeftItemId = null;
         _selectedRightItemId = null;
         _matchedItemIds = <String>{..._matchedItemIds, leftItemId};
+        _successItemIds = <String>{..._successItemIds, leftItemId};
       });
-      _submitIfComplete();
+      unawaited(_settleMatchedPair(leftItemId));
       return;
     }
 
@@ -239,11 +249,13 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     });
   }
 
-  void _submitIfComplete() {
+  void _advanceBatchOrSubmitIfComplete() {
     final roundItems = _roundItems;
     if (_hasSubmitted ||
         roundItems.isEmpty ||
+        _successItemIds.isNotEmpty ||
         _matchedItemIds.length != roundItems.length) {
+      _advanceVisibleBatchIfComplete(roundItems);
       return;
     }
     _hasSubmitted = true;
@@ -256,10 +268,43 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     unawaited(_submitAfterAnimation(itemGrades));
   }
 
+  Future<void> _settleMatchedPair(String itemId) async {
+    await Future<void>.delayed(matchSuccessHoldDuration);
+    if (!mounted || !_successItemIds.contains(itemId)) {
+      return;
+    }
+    setState(() {
+      _successItemIds = <String>{..._successItemIds}..remove(itemId);
+    });
+    await Future<void>.delayed(matchFadeDuration);
+    if (!mounted) {
+      return;
+    }
+    _advanceBatchOrSubmitIfComplete();
+  }
+
+  void _advanceVisibleBatchIfComplete(List<StudySessionItem> roundItems) {
+    final visibleItems = visibleMatchBatch(roundItems, _visibleBatchStartIndex);
+    if (_successItemIds.isNotEmpty) {
+      return;
+    }
+    if (!isVisibleMatchBatchComplete(
+      visibleItems: visibleItems,
+      matchedItemIds: _matchedItemIds,
+    )) {
+      return;
+    }
+    setState(() {
+      _visibleBatchStartIndex = nextVisibleMatchBatchStart(
+        items: _roundItems,
+        matchedItemIds: _matchedItemIds,
+      );
+    });
+  }
+
   Future<void> _submitAfterAnimation(
     Map<String, AttemptGrade> itemGrades,
   ) async {
-    await Future<void>.delayed(matchResolveDelay);
     if (!mounted) {
       return;
     }

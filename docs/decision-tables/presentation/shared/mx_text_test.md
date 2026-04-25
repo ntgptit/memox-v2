@@ -7,6 +7,7 @@ Test file: `test/presentation/shared/mx_text_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | `MxTextRole.pageTitle` should resolve from active theme title style | material theme provides `textTheme.titleLarge` and `colorScheme.onSurface` | `MxText('Library', role: pageTitle)` renders | rendered `Text.style` font size, weight, and color match the expected theme-derived style | C0+C1 |
+| DT2 | `MxTextRole.guessPrompt` should resolve smaller than display typography | material theme provides `textTheme.headlineMedium`, `textTheme.displayMedium`, and `colorScheme.onSurface` | `MxText('상식', role: guessPrompt)` renders | rendered `Text.style` uses headline-medium sizing, medium weight, and stays below display-medium sizing | C0+C1 |
 
 ## Decision table: onDisplay
 

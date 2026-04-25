@@ -33,7 +33,42 @@ void main() {
     expect(text.style?.color, expectedStyle.color);
   });
 
-  testWidgets('DT1 onDisplay: MxText applies semantic role color override', (tester) async {
+  testWidgets(
+    'DT2 onUpdate: MxText resolves guessPrompt below display typography',
+    (tester) async {
+      late TextStyle expectedStyle;
+      late double displayFontSize;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final theme = Theme.of(context);
+                expectedStyle = theme.textTheme.headlineMedium!.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                );
+                displayFontSize = theme.textTheme.displayMedium!.fontSize!;
+                return const MxText('상식', role: MxTextRole.guessPrompt);
+              },
+            ),
+          ),
+        ),
+      );
+
+      final text = tester.widget<Text>(find.text('상식'));
+
+      expect(text.style?.fontSize, expectedStyle.fontSize);
+      expect(text.style?.fontSize, lessThan(displayFontSize));
+      expect(text.style?.fontWeight, expectedStyle.fontWeight);
+      expect(text.style?.color, expectedStyle.color);
+    },
+  );
+
+  testWidgets('DT1 onDisplay: MxText applies semantic role color override', (
+    tester,
+  ) async {
     const overrideColor = Colors.deepOrange;
 
     await tester.pumpWidget(
@@ -53,73 +88,75 @@ void main() {
     expect(text.style?.color, overrideColor);
   });
 
-  testWidgets('DT2 onDisplay: MxSection renders semantic title and subtitle roles', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: MxSection(
-            title: 'Folders',
-            subtitle: 'Manage your folder tree',
-            child: SizedBox.shrink(),
+  testWidgets(
+    'DT2 onDisplay: MxSection renders semantic title and subtitle roles',
+    (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: MxSection(
+              title: 'Folders',
+              subtitle: 'Manage your folder tree',
+              child: SizedBox.shrink(),
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is MxText &&
-            widget.data == 'Folders' &&
-            widget.role == MxTextRole.sectionTitle,
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is MxText &&
-            widget.data == 'Manage your folder tree' &&
-            widget.role == MxTextRole.sectionSubtitle,
-      ),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is MxText &&
+              widget.data == 'Folders' &&
+              widget.role == MxTextRole.sectionTitle,
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is MxText &&
+              widget.data == 'Manage your folder tree' &&
+              widget.role == MxTextRole.sectionSubtitle,
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 
-  testWidgets('DT1 onNavigate: MxStudySetTile renders title and meta with semantic roles', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: MxStudySetTile(
-            title: 'Vitamin B1',
-            icon: Icons.style_outlined,
-            metaLine: '1 cards · 0 due today',
+  testWidgets(
+    'DT1 onNavigate: MxStudySetTile renders title and meta with semantic roles',
+    (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: MxStudySetTile(
+              title: 'Vitamin B1',
+              icon: Icons.style_outlined,
+              metaLine: '1 cards · 0 due today',
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is MxText &&
-            widget.data == 'Vitamin B1' &&
-            widget.role == MxTextRole.tileTitle,
-      ),
-      findsOneWidget,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is MxText &&
-            widget.data == '1 cards · 0 due today' &&
-            widget.role == MxTextRole.tileMeta,
-      ),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is MxText &&
+              widget.data == 'Vitamin B1' &&
+              widget.role == MxTextRole.tileTitle,
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is MxText &&
+              widget.data == '1 cards · 0 due today' &&
+              widget.role == MxTextRole.tileMeta,
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 }

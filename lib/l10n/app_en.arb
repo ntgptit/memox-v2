@@ -360,6 +360,8 @@
   "studyTextSettingsTooltip": "Text settings",
   "studyAudioTooltip": "Audio",
   "studyMoreActionsTooltip": "More actions",
+  "studyEditCardTooltip": "Edit card",
+  "studyCardAudioTooltip": "Play card audio",
   "studyReviewTextSettingsTooltip": "Text settings",
   "studyReviewAudioTooltip": "Audio",
   "studyReviewMoreActionsTooltip": "More actions",

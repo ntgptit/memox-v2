@@ -21,6 +21,7 @@ import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/study_session_notifier.dart';
 import '../study_labels.dart';
+import '../widgets/study_session/guess/guess_mode_session_view.dart';
 import '../widgets/study_session/match/match_mode_session_view.dart';
 import '../widgets/study_session/review/review_mode_session_view.dart';
 import '../widgets/study_session/study_mode_panel.dart';
@@ -135,6 +136,21 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
               studySessionActionControllerProvider(widget.sessionId).notifier,
             )
             .answerCurrentMatchModeBatch(itemGrades),
+      );
+    }
+    if (currentItem != null &&
+        currentItem.studyMode == StudyMode.guess &&
+        snapshot.session.status == SessionStatus.inProgress) {
+      return GuessModeSessionView(
+        snapshot: snapshot,
+        answerOptions: studyGuessAnswerOptions(snapshot),
+        progress: _sessionProgress(snapshot),
+        isSubmitting: actionState.isLoading,
+        onSubmit: (grade) => ref
+            .read(
+              studySessionActionControllerProvider(widget.sessionId).notifier,
+            )
+            .answer(grade),
       );
     }
 

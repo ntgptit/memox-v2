@@ -64,10 +64,12 @@ Riêng Review mode:
 Riêng Match mode:
 
 - user ghép toàn bộ cặp trong current Match round trên UI board
+- UI board chia current Match round thành các display batch tối đa 5 cặp
+- hoàn tất display batch hiện tại chỉ chuyển sang display batch kế tiếp, chưa ghi attempt
 - mismatch chỉ hiển thị feedback tạm thời và stage flashcard đó là `incorrect`
 - không ghi attempt, không complete item, và không tạo retry tại thời điểm mismatch
-- khi toàn bộ board được ghép xong, app flush một batch attempt cho toàn bộ pending Match item trong cùng transaction
-- flashcard từng mismatch trong board ghi `incorrect`; flashcard không từng mismatch ghi `correct`
+- khi toàn bộ display batch của Match round được ghép xong, app flush một batch attempt cho toàn bộ pending Match item trong cùng transaction
+- flashcard từng mismatch trong round ghi `incorrect`; flashcard không từng mismatch ghi `correct`
 - nếu batch có item `incorrect`, chỉ các flashcard sai được đưa vào retry Match round kế tiếp
 - nếu toàn bộ item `correct`, Match mode pass và chuyển mode tiếp theo
 
