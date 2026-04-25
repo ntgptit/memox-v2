@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memox/core/theme/app_spacing.dart';
-import 'package:memox/core/theme/mx_gap.dart';
+import 'package:memox/core/theme/tokens/app_spacing.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_page_dots.dart';

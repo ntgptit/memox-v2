@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_breakpoints.dart';
-import '../../../core/theme/app_layout.dart';
+import '../../../core/theme/responsive/app_breakpoints.dart';
+import '../../../core/theme/responsive/app_layout.dart';
 import 'mx_content_shell.dart';
 
 /// Destination descriptor used by [MxAdaptiveScaffold] to render the right

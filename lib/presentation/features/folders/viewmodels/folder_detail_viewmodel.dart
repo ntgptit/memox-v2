@@ -37,17 +37,21 @@ class FolderSubfolderItem {
     required this.icon,
     required int deckCount,
     required int itemCount,
+    required int? masteryPercent,
   }) : _deckCount = deckCount,
-       _itemCount = itemCount;
+       _itemCount = itemCount,
+       _masteryPercent = masteryPercent;
 
   final String id;
   final String name;
   final IconData icon;
+  final int? _masteryPercent;
   final int? _deckCount;
   final int? _itemCount;
 
   int get deckCount => _deckCount ?? 0;
   int get itemCount => _itemCount ?? 0;
+  int get masteryPercent => _masteryPercent ?? 0;
 }
 
 @immutable
@@ -276,6 +280,7 @@ FolderDetailState _mapFolderDetailState(
             icon: Icons.folder_copy_outlined,
             deckCount: item.deckCount,
             itemCount: item.itemCount,
+            masteryPercent: item.masteryPercent,
           ),
         )
         .toList(growable: false),

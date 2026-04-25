@@ -3,36 +3,93 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_folder_tile.dart';
+import '../../../shared/widgets/mx_study_progress_action.dart';
 import '../models/library_folder.dart';
 
 class LibraryFolderList extends StatelessWidget {
   const LibraryFolderList({
     required this.folders,
     required this.onOpenFolder,
+    required this.onStartStudy,
     super.key,
   });
 
   final List<LibraryFolder> folders;
   final ValueChanged<String> onOpenFolder;
+  final ValueChanged<String> onStartStudy;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         for (var index = 0; index < folders.length; index++) ...[
-          MxFolderTile(
-            name: folders[index].name,
-            icon: folders[index].icon,
-            caption: AppLocalizations.of(context).libraryFolderStats(
-              folders[index].deckCount,
-              folders[index].itemCount,
-            ),
-            masteryPercent: folders[index].masteryPercent,
-            onTap: () => onOpenFolder(folders[index].id),
+          _LibraryFolderRow(
+            folder: folders[index],
+            onOpenFolder: onOpenFolder,
+            onStartStudy: onStartStudy,
           ),
           if (index < folders.length - 1) const MxDivider(),
         ],
       ],
+    );
+  }
+}
+
+/// Sliver-based folder list for the library overview.
+///
+/// Lazy-builds each row so a large library does not blow up the first frame.
+class LibraryFolderSliver extends StatelessWidget {
+  const LibraryFolderSliver({
+    required this.folders,
+    required this.onOpenFolder,
+    required this.onStartStudy,
+    super.key,
+  });
+
+  final List<LibraryFolder> folders;
+  final ValueChanged<String> onOpenFolder;
+  final ValueChanged<String> onStartStudy;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverList.separated(
+      itemCount: folders.length,
+      itemBuilder: (context, index) => _LibraryFolderRow(
+        folder: folders[index],
+        onOpenFolder: onOpenFolder,
+        onStartStudy: onStartStudy,
+      ),
+      separatorBuilder: (context, index) => const MxDivider(),
+    );
+  }
+}
+
+class _LibraryFolderRow extends StatelessWidget {
+  const _LibraryFolderRow({
+    required this.folder,
+    required this.onOpenFolder,
+    required this.onStartStudy,
+  });
+
+  final LibraryFolder folder;
+  final ValueChanged<String> onOpenFolder;
+  final ValueChanged<String> onStartStudy;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MxFolderTile(
+      name: folder.name,
+      icon: folder.icon,
+      caption: l10n.libraryFolderStats(folder.deckCount, folder.itemCount),
+      onTap: () => onOpenFolder(folder.id),
+      trailing: MxStudyProgressAction(
+        key: ValueKey('library_folder_recursive_study_${folder.id}'),
+        masteryPercent: folder.masteryPercent,
+        cardCount: folder.itemCount,
+        tooltip: l10n.studyStartAction,
+        onPressed: () => onStartStudy(folder.id),
+      ),
     );
   }
 }

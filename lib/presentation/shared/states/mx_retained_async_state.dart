@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/errors/error_mapper.dart';
-import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
 import '../feedback/mx_snackbar.dart';
 import 'mx_error_state.dart';
 import 'mx_loading_state.dart';

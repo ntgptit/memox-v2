@@ -1,38 +1,38 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
-import 'app_typography.dart';
-import 'theme_extensions.dart';
-import 'component_themes/app_bar_theme.dart';
-import 'component_themes/button_theme.dart';
-import 'component_themes/card_theme.dart';
-import 'component_themes/chip_theme.dart';
-import 'component_themes/dialog_theme.dart';
-import 'component_themes/divider_theme.dart';
-import 'component_themes/icon_theme.dart';
-import 'component_themes/input_theme.dart';
-import 'component_themes/list_tile_theme.dart';
-import 'component_themes/navigation_bar_theme.dart';
-import 'component_themes/popup_menu_theme.dart';
-import 'component_themes/progress_indicator_theme.dart';
-import 'component_themes/scrollbar_theme.dart';
-import 'component_themes/segmented_button_theme.dart';
-import 'component_themes/text_selection_theme.dart';
-import 'component_themes/toggle_theme.dart';
-import 'component_themes/tooltip_theme.dart';
+import '../tokens/app_colors.dart';
+import '../tokens/app_typography.dart';
+import '../extensions/theme_extensions.dart';
+import '../component_themes/app_bar_theme.dart';
+import '../component_themes/button_theme.dart';
+import '../component_themes/card_theme.dart';
+import '../component_themes/chip_theme.dart';
+import '../component_themes/dialog_theme.dart';
+import '../component_themes/divider_theme.dart';
+import '../component_themes/icon_theme.dart';
+import '../component_themes/input_theme.dart';
+import '../component_themes/list_tile_theme.dart';
+import '../component_themes/navigation_bar_theme.dart';
+import '../component_themes/popup_menu_theme.dart';
+import '../component_themes/progress_indicator_theme.dart';
+import '../component_themes/scrollbar_theme.dart';
+import '../component_themes/segmented_button_theme.dart';
+import '../component_themes/text_selection_theme.dart';
+import '../component_themes/toggle_theme.dart';
+import '../component_themes/tooltip_theme.dart';
 
 /// Dark [ColorScheme] derived from the MemoX brand palette.
 const ColorScheme _darkScheme = ColorScheme(
   brightness: Brightness.dark,
-  primary: AppColors.primary70,
+  primary: AppColors.primary80,
   onPrimary: AppColors.primary20,
   primaryContainer: AppColors.primary30,
   onPrimaryContainer: AppColors.primary90,
-  secondary: AppColors.secondary70,
+  secondary: AppColors.secondary80,
   onSecondary: AppColors.secondary20,
   secondaryContainer: AppColors.secondary30,
   onSecondaryContainer: AppColors.secondary90,
-  tertiary: AppColors.tertiary70,
+  tertiary: AppColors.tertiary80,
   onTertiary: AppColors.tertiary20,
   tertiaryContainer: AppColors.tertiary30,
   onTertiaryContainer: AppColors.tertiary90,
@@ -57,7 +57,7 @@ const ColorScheme _darkScheme = ColorScheme(
   outlineVariant: AppColors.darkNavyOutlineVariant,
   shadow: Color(0xFF000000),
   scrim: Color(0xFF000000),
-  surfaceTint: AppColors.primary70,
+  surfaceTint: AppColors.primary80,
 );
 
 ThemeData buildDarkTheme() {

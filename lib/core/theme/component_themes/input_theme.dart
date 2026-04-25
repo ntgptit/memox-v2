@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../app_opacity.dart';
-import '../app_radius.dart';
-import '../app_typography.dart';
+import '../tokens/app_opacity.dart';
+import '../tokens/app_radius.dart';
+import '../tokens/app_typography.dart';
 
 abstract final class InputThemeBuilder {
   static InputDecorationTheme build(ColorScheme scheme) {

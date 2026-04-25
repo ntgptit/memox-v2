@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
-import '../../../core/theme/app_opacity.dart';
-import '../../../core/theme/app_radius.dart';
-import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
+import '../../../core/theme/tokens/app_radius.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
 import 'mx_text.dart';
 
 /// Opinionated list tile with stronger title weight, optional leading tile

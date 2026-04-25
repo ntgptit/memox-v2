@@ -148,6 +148,9 @@ final class FolderRepositoryImpl implements FolderRepository {
           folder: subfolder,
           deckCount: await _folderDao.countDecksInSubtree(subfolder.id),
           itemCount: await _folderDao.countFlashcardsInSubtree(subfolder.id),
+          masteryPercent: computeMasteryPercent(
+            await _folderDao.getCurrentBoxesInSubtree(subfolder.id),
+          ),
         ),
       );
     }

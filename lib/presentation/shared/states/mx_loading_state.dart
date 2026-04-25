@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_radius.dart';
-import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/tokens/app_radius.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
 import '../widgets/mx_progress_indicator.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../layouts/mx_gap.dart';
 import '../widgets/mx_text.dart';
 
 /// Full-area loading placeholder with optional label.

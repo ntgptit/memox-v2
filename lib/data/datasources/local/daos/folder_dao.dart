@@ -301,6 +301,7 @@ final class FolderDao {
       INNER JOIN flashcards f ON f.id = p.flashcard_id
       INNER JOIN decks d ON d.id = f.deck_id
       WHERE d.folder_id IN (${_placeholders(subtreeIds.length)})
+        AND p.current_box IS NOT NULL
       ''',
           variables: subtreeIds.map(Variable<String>.new).toList(),
           readsFrom: {
@@ -311,7 +312,8 @@ final class FolderDao {
         )
         .get();
     return rows
-        .map((row) => row.read<int>('current_box'))
+        .map((row) => row.read<int?>('current_box'))
+        .whereType<int>()
         .toList(growable: false);
   }
 

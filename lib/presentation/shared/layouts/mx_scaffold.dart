@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_layout.dart';
+import '../../../core/theme/responsive/app_layout.dart';
 import 'mx_content_shell.dart';
 
 /// Thin wrapper over [Scaffold] that sets MemoX defaults:

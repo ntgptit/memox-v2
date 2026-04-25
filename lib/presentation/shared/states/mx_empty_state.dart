@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
-import '../../../core/theme/app_radius.dart';
-import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_radius.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
 import '../widgets/mx_primary_button.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../layouts/mx_gap.dart';
 import '../widgets/mx_text.dart';
 
 /// Standardized empty-state placeholder with illustration slot, title, body,

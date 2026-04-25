@@ -2,9 +2,9 @@ import 'package:flutter/widgets.dart';
 
 /// 4-point spacing scale.
 ///
-/// Raw token layer — owned by `core/theme/`. Features must not import this
-/// file directly (guard: `feature_theme_token_imports`). They read spacing
-/// through `MxSpace` in `theme_extensions.dart`.
+/// Raw token layer — owned by `core/theme/tokens/`. Features must not import
+/// this file directly (guard: `feature_theme_token_imports`). They read
+/// spacing through `MxSpace` in `presentation/shared/layouts/mx_space.dart`.
 abstract final class AppSpacing {
   static const double none = 0;
   static const double xxs = 2;

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../core/theme/app_radius.dart';
+import '../../../core/theme/tokens/app_radius.dart';
 
 abstract final class MxFeatureSizes {
   static const double reorderPanelHeight = 520;

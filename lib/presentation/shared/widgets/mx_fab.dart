@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
 
 enum MxFabVariant { primary, surface, tonal }
 

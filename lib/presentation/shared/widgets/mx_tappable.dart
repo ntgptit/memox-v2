@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_opacity.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/component_themes/focus_theme.dart';
 
 /// Shared shaped tap surface for custom MemoX widgets.

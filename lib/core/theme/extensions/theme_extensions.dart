@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
+import '../tokens/app_colors.dart';
 
 /// Theme extension exposing MemoX semantic colors that are not part of
-/// the standard [ColorScheme] (success, warning, info, rating grades, etc.).
+/// the standard [ColorScheme] (success / warning / info / rating / mastery /
+/// streak).
 ///
-/// This is the ONLY role of this file. Tokens (spacing/radii/icon sizes,
-/// opacity), the layout spec, the gap widget, and the repetition-order
-/// mapping each live in their own files.
+/// Each field here has at least one widget consumer. When adding a new
+/// field, wire the consumer in the same change — unused fields are
+/// intentionally not carried.
 @immutable
 class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
   const MxColorsExtension({
@@ -24,7 +25,6 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
     required this.infoContainer,
     required this.onInfoContainer,
     required this.ratingAgain,
-    required this.ratingHard,
     required this.ratingGood,
     required this.ratingEasy,
     required this.mastery,
@@ -47,7 +47,6 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
   final Color onInfoContainer;
 
   final Color ratingAgain;
-  final Color ratingHard;
   final Color ratingGood;
   final Color ratingEasy;
   final Color mastery;
@@ -73,10 +72,6 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
   }
 
   /// Resolve a mastery/progress color tier from the current completion value.
-  ///
-  /// Light mode follows the provided low / mid / high legend:
-  /// rose → amber → mastery green. Dark mode keeps the same semantic split
-  /// using its own extension values.
   Color masteryProgress(double value) {
     final clamped = value.clamp(0.0, 1.0).toDouble();
     if (clamped < 0.34) return ratingAgain;
@@ -85,20 +80,19 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
   }
 
   static const light = MxColorsExtension(
-    success: AppColors.lightSuccess60,
+    success: AppColors.lightSuccess40,
     onSuccess: AppColors.lightNeutral10,
-    successContainer: AppColors.lightSuccess95,
-    onSuccessContainer: AppColors.lightSuccess30,
-    warning: AppColors.lightWarning50,
+    successContainer: AppColors.lightSuccess90,
+    onSuccessContainer: AppColors.lightSuccess10,
+    warning: AppColors.lightWarning40,
     onWarning: AppColors.lightNeutral10,
-    warningContainer: AppColors.lightWarning95,
-    onWarningContainer: AppColors.lightWarning30,
-    info: AppColors.lightInfo50,
+    warningContainer: AppColors.lightWarning90,
+    onWarningContainer: AppColors.lightWarning10,
+    info: AppColors.lightInfo40,
     onInfo: AppColors.lightNeutral10,
-    infoContainer: AppColors.lightInfo95,
-    onInfoContainer: AppColors.lightInfo30,
+    infoContainer: AppColors.lightInfo90,
+    onInfoContainer: AppColors.lightInfo10,
     ratingAgain: AppColors.lightRatingAgain,
-    ratingHard: AppColors.lightRatingHard,
     ratingGood: AppColors.lightRatingGood,
     ratingEasy: AppColors.lightRatingEasy,
     mastery: AppColors.lightMastery,
@@ -106,24 +100,23 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
   );
 
   static const dark = MxColorsExtension(
-    success: AppColors.success60,
+    success: AppColors.success80,
     onSuccess: AppColors.neutral10,
     successContainer: AppColors.success30,
     onSuccessContainer: AppColors.success90,
-    warning: AppColors.warning60,
+    warning: AppColors.warning80,
     onWarning: AppColors.neutral10,
     warningContainer: AppColors.warning30,
     onWarningContainer: AppColors.warning90,
-    info: AppColors.info60,
+    info: AppColors.info80,
     onInfo: AppColors.neutral10,
     infoContainer: AppColors.info30,
     onInfoContainer: AppColors.info90,
     ratingAgain: AppColors.ratingAgain,
-    ratingHard: AppColors.ratingHard,
     ratingGood: AppColors.ratingGood,
     ratingEasy: AppColors.ratingEasy,
-    mastery: AppColors.success60,
-    streak: AppColors.warning60,
+    mastery: AppColors.success80,
+    streak: AppColors.warning80,
   );
 
   @override
@@ -141,7 +134,6 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
     Color? infoContainer,
     Color? onInfoContainer,
     Color? ratingAgain,
-    Color? ratingHard,
     Color? ratingGood,
     Color? ratingEasy,
     Color? mastery,
@@ -161,7 +153,6 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
       infoContainer: infoContainer ?? this.infoContainer,
       onInfoContainer: onInfoContainer ?? this.onInfoContainer,
       ratingAgain: ratingAgain ?? this.ratingAgain,
-      ratingHard: ratingHard ?? this.ratingHard,
       ratingGood: ratingGood ?? this.ratingGood,
       ratingEasy: ratingEasy ?? this.ratingEasy,
       mastery: mastery ?? this.mastery,
@@ -175,34 +166,21 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
     return MxColorsExtension(
       success: Color.lerp(success, other.success, t)!,
       onSuccess: Color.lerp(onSuccess, other.onSuccess, t)!,
-      successContainer: Color.lerp(
-        successContainer,
-        other.successContainer,
-        t,
-      )!,
-      onSuccessContainer: Color.lerp(
-        onSuccessContainer,
-        other.onSuccessContainer,
-        t,
-      )!,
+      successContainer:
+          Color.lerp(successContainer, other.successContainer, t)!,
+      onSuccessContainer:
+          Color.lerp(onSuccessContainer, other.onSuccessContainer, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       onWarning: Color.lerp(onWarning, other.onWarning, t)!,
-      warningContainer: Color.lerp(
-        warningContainer,
-        other.warningContainer,
-        t,
-      )!,
-      onWarningContainer: Color.lerp(
-        onWarningContainer,
-        other.onWarningContainer,
-        t,
-      )!,
+      warningContainer:
+          Color.lerp(warningContainer, other.warningContainer, t)!,
+      onWarningContainer:
+          Color.lerp(onWarningContainer, other.onWarningContainer, t)!,
       info: Color.lerp(info, other.info, t)!,
       onInfo: Color.lerp(onInfo, other.onInfo, t)!,
       infoContainer: Color.lerp(infoContainer, other.infoContainer, t)!,
       onInfoContainer: Color.lerp(onInfoContainer, other.onInfoContainer, t)!,
       ratingAgain: Color.lerp(ratingAgain, other.ratingAgain, t)!,
-      ratingHard: Color.lerp(ratingHard, other.ratingHard, t)!,
       ratingGood: Color.lerp(ratingGood, other.ratingGood, t)!,
       ratingEasy: Color.lerp(ratingEasy, other.ratingEasy, t)!,
       mastery: Color.lerp(mastery, other.mastery, t)!,
@@ -221,7 +199,8 @@ extension MxColorsContext on BuildContext {
 //
 // Kept in this file intentionally: the guard rule
 // `theme_repetition_semantic_colors` pins these symbols to
-// `theme_extensions.dart` so the semantic mapping contract stays findable.
+// `extensions/theme_extensions.dart` so the semantic mapping contract stays
+// findable.
 // ---------------------------------------------------------------------------
 
 /// Semantic role tiers for spaced-repetition indicators.

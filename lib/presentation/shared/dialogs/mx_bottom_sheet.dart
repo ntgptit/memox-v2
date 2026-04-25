@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
+import '../layouts/mx_gap.dart';
 
 /// Themed modal bottom sheet with a centered drag handle, a title row, and
 /// an optional action area.

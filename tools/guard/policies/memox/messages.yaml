@@ -84,7 +84,7 @@ messages:
   missing_router_contract:
     en: "`lib/app/router/app_router.dart` is missing required router markers: {missing_patterns}."
   theme_repetition_semantic_colors:
-    en: "`lib/core/theme/theme_extensions.dart` must map repetition colors through semantic roles such as `customColors.repetitionFirst` and `customColors.repetitionAdvanced`, not through a raw seed palette list."
+    en: "`lib/core/theme/extensions/theme_extensions.dart` must map repetition colors through semantic roles such as `customColors.repetitionFirst` and `customColors.repetitionAdvanced`, not through a raw seed palette list."
   feature_theme_token_imports:
     en: "Feature-layer source must not import `{import_path}` directly. Read UI values through `Theme.of(context)`, semantic/context extensions, or shared widgets instead."
   features_no_direct_text_theme:
@@ -396,7 +396,7 @@ fix_hints:
       en: "Map repetition colors through semantic theme roles such as `repetitionFirst`, `repetitionSecond`, `repetitionThird`, `repetitionAdvanced`, and `repetitionExpert`. Do not rotate raw `ColorTokens.seed*` values inside theme logic."
   use_theme_accessors_in_features:
     text:
-      en: "Remove the direct import of raw theme source files such as `core/theme/app_colors.dart`, `app_typography.dart`, or other `core/theme/app_*.dart` files from `lib/presentation/features/**`. Route spacing, radius, size, color, elevation, motion, and typography through `Theme.of(context)`, semantic/context extensions, or shared widgets that already wrap the theme contract."
+      en: "Remove the direct import of raw theme source files such as `core/theme/tokens/app_colors.dart`, `core/theme/tokens/app_typography.dart`, or other `core/theme/tokens/app_*.dart` files from `lib/presentation/features/**`. Route spacing, radius, size, color, elevation, motion, and typography through `Theme.of(context)`, semantic/context extensions, or shared widgets that already wrap the theme contract."
   use_mx_text_role_in_features:
     text:
       en: "Replace direct `Theme.of(context).textTheme.*` usage in feature code with `MxText(role: MxTextRole.*)` or another shared widget that already owns the semantic text role. If the typography intent is genuinely new and repeats, add a new `MxTextRole` instead of picking a Material role ad hoc at the call site."

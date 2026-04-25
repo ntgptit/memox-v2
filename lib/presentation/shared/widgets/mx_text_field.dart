@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
 
 /// Themed text input with label, helper text, error state, and optional
 /// leading/trailing icons.

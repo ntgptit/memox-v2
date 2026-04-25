@@ -867,10 +867,10 @@ rules:
     scope: ui
     params:
       patterns:
-        - "import\\s+'package:memox/core/theme/app_colors\\.dart';"
-        - "import\\s+'package:memox/core/theme/app_typography\\.dart';"
-        - "import\\s+'(?:\\.\\./)+core/theme/app_colors\\.dart';"
-        - "import\\s+'(?:\\.\\./)+core/theme/app_typography\\.dart';"
+        - "import\\s+'package:memox/core/theme/tokens/app_colors\\.dart';"
+        - "import\\s+'package:memox/core/theme/tokens/app_typography\\.dart';"
+        - "import\\s+'(?:\\.\\./)+core/theme/tokens/app_colors\\.dart';"
+        - "import\\s+'(?:\\.\\./)+core/theme/tokens/app_typography\\.dart';"
         - "\\bAppColors\\."
         - "\\bAppTypography\\."
       skip_comments: true

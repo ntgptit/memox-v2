@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
-import '../../../core/theme/app_radius.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_radius.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
+import '../layouts/mx_gap.dart';
 import 'mx_progress_ring.dart';
 import 'mx_text.dart';
 import 'mx_tappable.dart';
@@ -27,6 +27,7 @@ class MxFolderTile extends StatelessWidget {
     this.tileColor,
     this.iconColor,
     this.onTap,
+    this.trailing,
     super.key,
   });
 
@@ -49,6 +50,8 @@ class MxFolderTile extends StatelessWidget {
   final Color? iconColor;
 
   final VoidCallback? onTap;
+
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +108,10 @@ class MxFolderTile extends StatelessWidget {
             if (masteryPercent != null) ...[
               const SizedBox(width: AppSpacing.md),
               MxProgressRing(value: masteryPercent! / 100),
+            ],
+            if (trailing != null) ...[
+              const SizedBox(width: AppSpacing.sm),
+              trailing!,
             ],
           ],
         ),

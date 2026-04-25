@@ -60,7 +60,7 @@ Tokens live in `lib/core/theme/` as **separate files**, not a single barrel:
 
 | File | Purpose |
 |---|---|
-| `app_colors.dart` | Raw color palette (Indigo / Amber / Teal + neutrals + success/warning/info + rating grades). **Shared widgets and features must NOT import this directly.** |
+| `app_colors.dart` | Raw color palette (Indigo / Teal + neutrals + semantic success/warning/info + rating grades). **Shared widgets and features must NOT import this directly.** Tone numbers are consistent per brightness: **light role palettes use `{10, 40, 90, 100}`**, **dark role palettes use `{20, 30, 80, 90}`**. `neutral*`, `darkNavy*`, `mastery`, `streak`, and `rating*` are single-tone semantic tokens with independent scales. Semantic tokens (`success` / `warning` / `info`) carry their own hex values — do **not** alias them to `tertiary` / `primary` / etc., so future divergence stays a one-line edit. Never declare a token without a concrete consumer. |
 | `app_spacing.dart` | `AppSpacing` — spacing + gaps (`xxs`, `xs`, `sm`, `md`, `lg`, `xl`, `xxl`, `xxxl`, `xxxxl`, `screen`). |
 | `app_radius.dart` | `AppRadius` — radii + `BorderRadius` helpers (`borderSm`, `borderMd`, `borderLg`, `borderFull`). |
 | `app_icon_sizes.dart` | `AppIconSizes` — icon size scale. |

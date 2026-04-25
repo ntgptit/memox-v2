@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../app_opacity.dart';
-import '../app_typography.dart';
+import '../tokens/app_opacity.dart';
+import '../tokens/app_typography.dart';
 import 'focus_theme.dart';
 
 /// Form-control surfaces: switch, checkbox, radio, slider.

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/theme_extensions.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
+import '../../../core/theme/extensions/theme_extensions.dart';
+import '../layouts/mx_gap.dart';
 
 enum MxSnackbarTone { neutral, success, warning, error }
 

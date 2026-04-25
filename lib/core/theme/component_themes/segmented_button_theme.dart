@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../app_radius.dart';
-import '../app_typography.dart';
+import '../tokens/app_radius.dart';
+import '../tokens/app_typography.dart';
 
 abstract final class SegmentedButtonThemeBuilder {
   static SegmentedButtonThemeData build(ColorScheme scheme) {

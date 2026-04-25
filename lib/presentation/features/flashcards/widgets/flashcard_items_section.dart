@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/mx_gap.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_term_row.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';

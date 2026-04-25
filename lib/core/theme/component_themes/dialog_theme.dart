@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../app_elevation.dart';
-import '../app_radius.dart';
-import '../app_typography.dart';
+import '../tokens/app_elevation.dart';
+import '../tokens/app_radius.dart';
+import '../tokens/app_typography.dart';
 
 abstract final class DialogThemeBuilder {
   static DialogThemeData dialog(ColorScheme scheme) {

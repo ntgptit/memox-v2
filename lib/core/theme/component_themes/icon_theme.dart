@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../app_icon_sizes.dart';
+import '../tokens/app_icon_sizes.dart';
 
 abstract final class IconThemeBuilder {
   static IconThemeData primary(ColorScheme scheme) =>

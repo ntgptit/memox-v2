@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
+import '../layouts/mx_gap.dart';
 
 /// Base MemoX dialog — consistent padding, title + optional icon, scrollable
 /// content area, and a row of action buttons at the bottom.

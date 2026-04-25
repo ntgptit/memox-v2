@@ -54,14 +54,16 @@ rules:
     scope: all
     params:
       required_files:
-        - "lib/core/theme/app_colors.dart"
-        - "lib/core/theme/app_typography.dart"
-        - "lib/core/theme/app_spacing.dart"
-        - "lib/core/theme/app_icon_sizes.dart"
-        - "lib/core/theme/app_radius.dart"
-        - "lib/core/theme/app_elevation.dart"
-        - "lib/core/theme/app_motion.dart"
-        - "lib/core/theme/app_breakpoints.dart"
+        - "lib/core/theme/tokens/app_colors.dart"
+        - "lib/core/theme/tokens/app_typography.dart"
+        - "lib/core/theme/tokens/app_spacing.dart"
+        - "lib/core/theme/tokens/app_icon_sizes.dart"
+        - "lib/core/theme/tokens/app_radius.dart"
+        - "lib/core/theme/tokens/app_elevation.dart"
+        - "lib/core/theme/tokens/app_motion.dart"
+        - "lib/core/theme/tokens/app_opacity.dart"
+        - "lib/core/theme/responsive/app_breakpoints.dart"
+        - "lib/core/theme/responsive/app_layout.dart"
 
   - id: required_l10n_files
     type: file_existence

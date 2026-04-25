@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../core/theme/mx_gap.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_breadcrumb_bar.dart';
 import '../../../shared/widgets/mx_icon_button.dart';

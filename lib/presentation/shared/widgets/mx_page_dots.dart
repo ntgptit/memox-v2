@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
 import 'mx_tappable.dart';
 
 /// Compact page indicator dots used under the flashcard carousel and other

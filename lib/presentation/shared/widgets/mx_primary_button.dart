@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
-import '../../../core/theme/app_opacity.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
+import '../layouts/mx_gap.dart';
 
 enum MxButtonSize { small, medium, large }
 

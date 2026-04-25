@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../app_opacity.dart';
+import '../tokens/app_opacity.dart';
 
 /// Focus + state-layer tokens.
 ///

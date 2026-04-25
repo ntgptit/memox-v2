@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/app_layout.dart';
-import '../../../../core/theme/mx_gap.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
@@ -17,6 +17,7 @@ import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/options/content_sort_options.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_animated_switcher.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
@@ -25,11 +26,12 @@ import '../widgets/folder_detail_skeleton.dart';
 import '../widgets/folder_empty_state_section.dart';
 import '../widgets/folder_header_section.dart';
 import '../widgets/folder_reorder_section.dart';
-import '../widgets/folder_summary_section.dart';
 import '../widgets/folder_tree_section.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 
 enum _FolderAction { edit, move, reorder, delete }
+
+enum _FolderBodyMode { empty, reorder, tree }
 
 class FolderDetailScreen extends ConsumerStatefulWidget {
   const FolderDetailScreen({required this.folderId, super.key});
@@ -96,69 +98,97 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
           onRetry: () =>
               ref.invalidate(folderDetailQueryProvider(widget.folderId)),
           dataBuilder: (context, state) {
-            final content = switch ((state.isUnlocked, _isReorderMode)) {
-              (true, _) => FolderEmptyStateSection(
-                onCreateSubfolder: _createSubfolder,
-                onCreateDeck: _createDeck,
-              ),
-              (_, true) => FolderReorderSection(
-                state: state,
-                orderedIds: _orderedIds,
-                onReorder: _handleReorder,
-              ),
-              _ => FolderTreeSection(
-                state: state,
-                onOpenSubfolder: _openSubfolder,
-              ),
-            };
-            return ListView(
-              children: [
-                FolderHeaderSection(
-                  state: state,
-                  onBack: () => context.popRoute(fallback: context.goLibrary),
-                  onOpenActions: () => _openActions(state),
-                  onOpenBreadcrumb: (folderId) =>
-                      context.goFolderDetail(folderId),
-                ),
-                const MxGap(MxSpace.xl),
-                MxSearchSortToolbar<ContentSortMode>(
-                  searchHintText: l10n.commonSearch,
-                  onSearchChanged: toolbarNotifier.setSearchTerm,
-                  onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                  sortOptions: sortOptions,
-                  selectedSort: toolbarState.sortMode,
-                  sortLabel: l10n.commonSort,
-                  onSortSelected: toolbarNotifier.setSortMode,
-                  trailing: _isReorderMode
-                      ? <Widget>[
-                          MxSecondaryButton(
-                            label: l10n.commonCancel,
-                            variant: MxSecondaryVariant.text,
-                            onPressed: _cancelReorder,
-                          ),
-                          MxPrimaryButton(
-                            label: l10n.commonSaveOrder,
-                            onPressed: () => _saveReorder(state),
-                          ),
-                        ]
-                      : const <Widget>[],
-                ),
-                const MxGap(MxSpace.xl),
-                FolderSummarySection(
-                  state: state,
-                  onStartStudy: () => context.goStudyEntry(
-                    entryType: 'folder',
-                    entryRefId: state.header.id,
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: FolderHeaderSection(
+                    state: state,
+                    onBack: () =>
+                        context.popRoute(fallback: context.goLibrary),
+                    onOpenActions: () => _openActions(state),
+                    onOpenBreadcrumb: (folderId) =>
+                        context.goFolderDetail(folderId),
                   ),
                 ),
-                const MxGap(MxSpace.xl),
-                content,
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: MxSearchSortToolbar<ContentSortMode>(
+                    searchHintText: l10n.commonSearch,
+                    onSearchChanged: toolbarNotifier.setSearchTerm,
+                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                    sortOptions: sortOptions,
+                    selectedSort: toolbarState.sortMode,
+                    sortLabel: l10n.commonSort,
+                    onSortSelected: toolbarNotifier.setSortMode,
+                    trailing: _isReorderMode
+                        ? <Widget>[
+                            MxSecondaryButton(
+                              label: l10n.commonCancel,
+                              variant: MxSecondaryVariant.text,
+                              onPressed: _cancelReorder,
+                            ),
+                            MxPrimaryButton(
+                              label: l10n.commonSaveOrder,
+                              onPressed: () => _saveReorder(state),
+                            ),
+                          ]
+                        : const <Widget>[],
+                  ),
+                ),
+                const MxSliverGap(MxSpace.xl),
+                ..._buildBodySlivers(state),
               ],
             );
           },
         ),
       ),
     );
+  }
+
+  List<Widget> _buildBodySlivers(FolderDetailState state) {
+    final mode = _resolveBodyMode(state);
+    return switch (mode) {
+      _FolderBodyMode.tree => [
+        FolderTreeSliver(state: state, onOpenSubfolder: _openSubfolder),
+      ],
+      _FolderBodyMode.empty => [
+        SliverToBoxAdapter(
+          child: MxAnimatedSwitcher(
+            child: KeyedSubtree(
+              key: const ValueKey(_FolderBodyMode.empty),
+              child: FolderEmptyStateSection(
+                onCreateSubfolder: _createSubfolder,
+                onCreateDeck: _createDeck,
+              ),
+            ),
+          ),
+        ),
+      ],
+      _FolderBodyMode.reorder => [
+        SliverToBoxAdapter(
+          child: MxAnimatedSwitcher(
+            child: KeyedSubtree(
+              key: const ValueKey(_FolderBodyMode.reorder),
+              child: FolderReorderSection(
+                state: state,
+                orderedIds: _orderedIds,
+                onReorder: _handleReorder,
+              ),
+            ),
+          ),
+        ),
+      ],
+    };
+  }
+
+  _FolderBodyMode _resolveBodyMode(FolderDetailState state) {
+    if (state.isUnlocked) {
+      return _FolderBodyMode.empty;
+    }
+    if (_isReorderMode) {
+      return _FolderBodyMode.reorder;
+    }
+    return _FolderBodyMode.tree;
   }
 
   Future<void> _createSubfolder() async {

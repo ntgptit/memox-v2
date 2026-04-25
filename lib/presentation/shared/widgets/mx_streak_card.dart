@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
-import '../../../core/theme/app_radius.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/theme_extensions.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_radius.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
+import '../../../core/theme/extensions/theme_extensions.dart';
 import 'mx_card.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../layouts/mx_gap.dart';
 
 /// Daily-streak surface with the flame icon, streak count, encouragement
 /// line, and a compact 7-day row. Used on the profile tab.

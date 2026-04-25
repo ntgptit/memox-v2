@@ -2,40 +2,45 @@ import 'package:flutter/material.dart';
 
 /// Centralized color tokens used by the MemoX themes.
 ///
-/// Naming is intentionally split:
+/// Naming split:
 /// - `light*` tokens apply to the light theme only
-/// - unprefixed tokens are kept for the dark theme and shared dark-safe
-///   semantics
+/// - unprefixed tokens belong to the dark theme
 ///
-/// Keep only tokens that are actively consumed by `light_theme.dart`,
-/// `dark_theme.dart`, or `theme_extensions.dart`.
+/// Tone numbers are consistent within each brightness so dev can
+/// predict the palette without checking: light role palettes use
+/// `{10, 40, 90}` (+ `100` = white on primary); dark role palettes use
+/// `{20, 30, 80, 90}`. Neutral and `darkNavy*` scales are independent
+/// by design.
+///
+/// Every token declared here must have at least one active consumer
+/// (theme scheme builder or `MxColorsExtension`). When adding a new
+/// role, wire the consumer first. Semantic tokens (success / warning /
+/// info / rating / mastery / streak) carry their own hex values instead
+/// of aliasing raw palette tokens so a future divergence is a one-line
+/// edit.
 abstract final class AppColors {
   // ---------------------------------------------------------------------------
-  // Light-theme palette
+  // Light-theme palette — role tones: {10, 40, 90, 100}
   // ---------------------------------------------------------------------------
 
-  // Brand / seed colors approved for light mode.
   static const Color lightPrimary10 = Color(0xFF121C52);
   static const Color lightPrimary40 = Color(0xFF24389C);
-  static const Color lightPrimary70 = Color(0xFF9EACE0);
+  static const Color lightPrimary80 = Color(0xFF9EACE0);
   static const Color lightPrimary90 = Color(0xFFE1E6F7);
   static const Color lightPrimary100 = Color(0xFFFFFFFF);
 
-  // Muted indigo secondary — stays in the primary family so dark mode
-  // reads calm. Distinct from primary by being deeper / less saturated.
-  static const Color lightSecondary20 = Color(0xFF312E81);
-  static const Color lightSecondary50 = Color(0xFF6366F1);
-  static const Color lightSecondary95 = Color(0xFFEEF2FF);
+  static const Color lightSecondary10 = Color(0xFF312E81);
+  static const Color lightSecondary40 = Color(0xFF6366F1);
+  static const Color lightSecondary90 = Color(0xFFEEF2FF);
 
-  static const Color lightTertiary20 = Color(0xFF1D5F58);
+  static const Color lightTertiary10 = Color(0xFF1D5F58);
   static const Color lightTertiary40 = Color(0xFF4DB6AC);
   static const Color lightTertiary90 = Color(0xFFD8F2EF);
 
-  static const Color lightError20 = Color(0xFF410002);
-  static const Color lightError50 = Color(0xFFBA1A1A);
-  static const Color lightError95 = Color(0xFFFFDAD6);
+  static const Color lightError10 = Color(0xFF410002);
+  static const Color lightError40 = Color(0xFFBA1A1A);
+  static const Color lightError90 = Color(0xFFFFDAD6);
 
-  // Light surfaces from the latest palette spec.
   static const Color lightSurface = Color(0xFFF7F9FB);
   static const Color lightSurfaceBright = Color(0xFFF7F9FB);
   static const Color lightSurfaceDim = Color(0xFFE0E3E5);
@@ -51,48 +56,45 @@ abstract final class AppColors {
   static const Color lightNeutralVariant60 = Color(0xFF757684);
   static const Color lightNeutralVariant90 = Color(0xFFC5C5D4);
 
-  static const Color lightSuccess30 = lightTertiary20;
-  static const Color lightSuccess60 = lightTertiary40;
-  static const Color lightSuccess95 = lightTertiary90;
+  // Semantic light tokens (each has its own hex — not aliased, so future
+  // divergence from tertiary/primary is a one-line edit).
+  static const Color lightSuccess10 = Color(0xFF1D5F58);
+  static const Color lightSuccess40 = Color(0xFF4DB6AC);
+  static const Color lightSuccess90 = Color(0xFFD8F2EF);
 
-  // Warning keeps the conventional amber semantic, decoupled from the
-  // rose secondary palette.
-  static const Color lightWarning30 = Color(0xFF78350F);
-  static const Color lightWarning50 = Color(0xFFF59E0B);
-  static const Color lightWarning95 = Color(0xFFFEF3C7);
+  static const Color lightWarning10 = Color(0xFF78350F);
+  static const Color lightWarning40 = Color(0xFFF59E0B);
+  static const Color lightWarning90 = Color(0xFFFEF3C7);
 
-  static const Color lightInfo30 = lightPrimary10;
-  static const Color lightInfo50 = lightPrimary40;
-  static const Color lightInfo95 = lightPrimary90;
+  static const Color lightInfo10 = Color(0xFF121C52);
+  static const Color lightInfo40 = Color(0xFF24389C);
+  static const Color lightInfo90 = Color(0xFFE1E6F7);
 
   static const Color lightMastery = Color(0xFF004E1A);
   static const Color lightStreak = Color(0xFFF97316);
 
   static const Color lightRatingAgain = Color(0xFFE57373);
-  static const Color lightRatingHard = lightWarning50;
-  static const Color lightRatingGood = lightSuccess60;
-  static const Color lightRatingEasy = lightMastery;
+  static const Color lightRatingGood = Color(0xFF4DB6AC);
+  static const Color lightRatingEasy = Color(0xFF004E1A);
 
   // ---------------------------------------------------------------------------
-  // Dark-theme palette
+  // Dark-theme palette — role tones: {20, 30, 80, 90}
   // ---------------------------------------------------------------------------
 
   static const Color primary20 = Color(0xFF2B2596);
   static const Color primary30 = Color(0xFF3F36BD);
   static const Color primary40 = Color(0xFF4F46E5);
-  static const Color primary70 = Color(0xFFA5B4FC);
+  static const Color primary80 = Color(0xFFA5B4FC);
   static const Color primary90 = Color(0xFFE0E7FF);
 
-  // Muted indigo secondary for dark mode — same family as primary so the
-  // surface reads calm. Lighter than primary70 to stay distinguishable.
   static const Color secondary20 = Color(0xFF1E1B4B);
   static const Color secondary30 = Color(0xFF312E81);
-  static const Color secondary70 = Color(0xFFC7D2FE);
+  static const Color secondary80 = Color(0xFFC7D2FE);
   static const Color secondary90 = Color(0xFFEEF2FF);
 
   static const Color tertiary20 = Color(0xFF115E59);
   static const Color tertiary30 = Color(0xFF0F766E);
-  static const Color tertiary70 = Color(0xFF5EEAD4);
+  static const Color tertiary80 = Color(0xFF5EEAD4);
   static const Color tertiary90 = Color(0xFFCCFBF1);
 
   static const Color error20 = Color(0xFF7F1D1D);
@@ -115,20 +117,20 @@ abstract final class AppColors {
   static const Color darkNavyOutline = Color(0xFF2A3157);
   static const Color darkNavyOutlineVariant = Color(0xFF1F2646);
 
+  // Semantic dark tokens.
   static const Color success30 = Color(0xFF14532D);
-  static const Color success60 = Color(0xFF22C55E);
+  static const Color success80 = Color(0xFF22C55E);
   static const Color success90 = Color(0xFFBBF7D0);
 
   static const Color warning30 = Color(0xFF854D0E);
-  static const Color warning60 = Color(0xFFFACC15);
+  static const Color warning80 = Color(0xFFFACC15);
   static const Color warning90 = Color(0xFFFEF08A);
 
   static const Color info30 = Color(0xFF1E40AF);
-  static const Color info60 = Color(0xFF60A5FA);
+  static const Color info80 = Color(0xFF60A5FA);
   static const Color info90 = Color(0xFFBFDBFE);
 
   static const Color ratingAgain = Color(0xFFEF4444);
-  static const Color ratingHard = Color(0xFFF59E0B);
   static const Color ratingGood = Color(0xFF22C55E);
   static const Color ratingEasy = Color(0xFF14B8A6);
 }

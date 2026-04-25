@@ -59,11 +59,15 @@ final class FolderSubfolderReadModel {
     required this.folder,
     required this.deckCount,
     required this.itemCount,
-  });
+    required int? masteryPercent,
+  }) : _masteryPercent = masteryPercent;
 
   final FolderEntity folder;
   final int deckCount;
   final int itemCount;
+  final int? _masteryPercent;
+
+  int get masteryPercent => _masteryPercent ?? 0;
 }
 
 final class FolderDetailReadModel {

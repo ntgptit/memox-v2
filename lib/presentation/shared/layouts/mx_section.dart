@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/mx_gap.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
+import 'mx_gap.dart';
 import '../widgets/mx_text.dart';
 
 /// Grouping header + optional action + body. Useful on dashboards and

@@ -169,6 +169,165 @@ void main() {
 
     expect(find.text('1 decks · 2 cards'), findsOneWidget);
   });
+
+  testWidgets('falls back to zero progress for legacy subfolder data', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_legacyFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Legacy'), findsOneWidget);
+    expect(find.text('0%'), findsOneWidget);
+  });
+
+  testWidgets('opens recursive folder study from the subfolder card icon', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    const subfolderId = 'folder-002';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final router = GoRouter(
+      initialLocation: '/folder/$folderId',
+      routes: [
+        GoRoute(
+          path: '/${RoutePaths.folderDetailSegment}',
+          name: RouteNames.folderDetail,
+          builder: (context, state) => FolderDetailScreen(
+            folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+          ),
+        ),
+        GoRoute(
+          path: '/${RoutePaths.studyEntrySegment}',
+          name: RouteNames.studyEntry,
+          builder: (context, state) => const SizedBox.shrink(),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final studyButton = find.byKey(
+      const ValueKey('folder_recursive_study_$subfolderId'),
+    );
+
+    expect(find.text('Study now'), findsNothing);
+    expect(studyButton, findsOneWidget);
+    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+    expect(find.text('19%'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+    expect(
+      tester.getCenter(studyButton).dy,
+      closeTo(tester.getCenter(find.text('Vocabulary')).dy, 16),
+    );
+
+    await tester.tap(studyButton);
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/study/folder/$subfolderId',
+    );
+  });
+
+  testWidgets('opens deck study from the deck card progress action', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    const deckId = 'deck-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_deckFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final router = GoRouter(
+      initialLocation: '/folder/$folderId',
+      routes: [
+        GoRoute(
+          path: '/${RoutePaths.folderDetailSegment}',
+          name: RouteNames.folderDetail,
+          builder: (context, state) => FolderDetailScreen(
+            folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+          ),
+        ),
+        GoRoute(
+          path: '/${RoutePaths.deckDetailSegment}',
+          name: RouteNames.deckDetail,
+          builder: (context, state) => const SizedBox.shrink(),
+        ),
+        GoRoute(
+          path: '/${RoutePaths.studyEntrySegment}',
+          name: RouteNames.studyEntry,
+          builder: (context, state) => const SizedBox.shrink(),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final studyButton = find.byKey(const ValueKey('deck_study_$deckId'));
+
+    expect(find.text('Vitamin B1'), findsOneWidget);
+    expect(studyButton, findsOneWidget);
+    expect(find.text('42%'), findsOneWidget);
+    expect(find.text('1'), findsOneWidget);
+
+    await tester.tap(studyButton);
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/study/deck/$deckId',
+    );
+  });
 }
 
 const _sampleFolderState = FolderDetailState(
@@ -190,6 +349,7 @@ const _sampleFolderState = FolderDetailState(
       icon: Icons.folder_copy_outlined,
       deckCount: 1,
       itemCount: 2,
+      masteryPercent: 19,
     ),
   ],
   decks: <FolderDeckItem>[],
@@ -213,9 +373,59 @@ const _parentFolderState = FolderDetailState(
       icon: Icons.folder_copy_outlined,
       deckCount: 1,
       itemCount: 2,
+      masteryPercent: 19,
     ),
   ],
   decks: <FolderDeckItem>[],
+);
+
+const _legacyFolderState = FolderDetailState(
+  header: FolderDetailHeader(
+    id: 'folder-001',
+    name: 'Japanese N5',
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'Japanese N5', folderId: 'folder-001'),
+    ],
+  ),
+  mode: FolderDetailMode.subfolders,
+  sortMode: ContentSortMode.manual,
+  searchTerm: '',
+  subfolders: <FolderSubfolderItem>[
+    FolderSubfolderItem(
+      id: 'folder-legacy',
+      name: 'Legacy',
+      icon: Icons.folder_copy_outlined,
+      deckCount: 0,
+      itemCount: 1,
+      masteryPercent: null,
+    ),
+  ],
+  decks: <FolderDeckItem>[],
+);
+
+const _deckFolderState = FolderDetailState(
+  header: FolderDetailHeader(
+    id: 'folder-001',
+    name: 'Topik I',
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-000'),
+      BreadcrumbSegmentReadModel(label: 'Topik I', folderId: 'folder-001'),
+    ],
+  ),
+  mode: FolderDetailMode.decks,
+  sortMode: ContentSortMode.manual,
+  searchTerm: '',
+  subfolders: <FolderSubfolderItem>[],
+  decks: <FolderDeckItem>[
+    FolderDeckItem(
+      id: 'deck-001',
+      name: 'Vitamin B1',
+      cardCount: 1,
+      dueToday: 0,
+      masteryPercent: 42,
+      lastStudiedAt: null,
+    ),
+  ],
 );
 
 class _FutureController<T> extends ChangeNotifier {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../app_opacity.dart';
-import '../app_radius.dart';
-import '../app_spacing.dart';
+import '../tokens/app_opacity.dart';
+import '../tokens/app_radius.dart';
+import '../tokens/app_spacing.dart';
 
 abstract final class ListTileThemeBuilder {
   static ListTileThemeData build(ColorScheme scheme) {

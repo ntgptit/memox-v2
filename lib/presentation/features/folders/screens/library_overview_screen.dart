@@ -3,19 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/app_layout.dart';
-import '../../../../core/theme/mx_gap.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/options/content_sort_options.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_animated_switcher.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
+import '../../../shared/widgets/mx_text.dart';
 import '../widgets/library_empty_state_section.dart';
 import '../widgets/library_folder_list.dart';
 import '../widgets/library_hero_section.dart';
@@ -65,41 +66,87 @@ class LibraryOverviewView extends ConsumerWidget {
           error: queryState.hasError ? queryState.error : null,
           stackTrace: queryState.hasError ? queryState.stackTrace : null,
           dataBuilder: (context, state) {
-            return ListView(
-              children: [
-                LibraryHeroSection(state: state),
-                const MxGap(MxSpace.xl),
-                MxSearchSortToolbar<ContentSortMode>(
-                  searchHintText: l10n.commonSearch,
-                  onSearchChanged: toolbarNotifier.setSearchTerm,
-                  onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                  sortOptions: sortOptions,
-                  selectedSort: toolbarState.sortMode,
-                  sortLabel: l10n.commonSort,
-                  onSortSelected: toolbarNotifier.setSortMode,
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(child: LibraryHeroSection(state: state)),
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: MxSearchSortToolbar<ContentSortMode>(
+                    searchHintText: l10n.commonSearch,
+                    onSearchChanged: toolbarNotifier.setSearchTerm,
+                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                    sortOptions: sortOptions,
+                    selectedSort: toolbarState.sortMode,
+                    sortLabel: l10n.commonSort,
+                    onSortSelected: toolbarNotifier.setSortMode,
+                  ),
                 ),
-                const MxGap(MxSpace.xl),
-                MxSection(
-                  title: l10n.libraryFoldersSectionTitle,
-                  subtitle: toolbarState.searchTerm.trim().isEmpty
-                      ? l10n.libraryManageFoldersSubtitle
-                      : l10n.librarySearchResultsSubtitle,
-                  child: state.isEmpty
-                      ? LibraryEmptyStateSection(
-                          onCreateFolder: () =>
-                              _handleCreateFolder(context, ref),
-                        )
-                      : LibraryFolderList(
-                          folders: state.folders,
-                          onOpenFolder: (folderId) =>
-                              _openFolder(context, ref, folderId),
-                        ),
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: _LibrarySectionHeader(
+                    title: l10n.libraryFoldersSectionTitle,
+                    subtitle: toolbarState.searchTerm.trim().isEmpty
+                        ? l10n.libraryManageFoldersSubtitle
+                        : l10n.librarySearchResultsSubtitle,
+                  ),
                 ),
+                const MxSliverGap(MxSpace.md),
+                ..._buildFolderListSlivers(context, ref, state),
               ],
             );
           },
         ),
       ),
+    );
+  }
+}
+
+List<Widget> _buildFolderListSlivers(
+  BuildContext context,
+  WidgetRef ref,
+  LibraryOverviewState state,
+) {
+  if (state.isEmpty) {
+    return [
+      SliverToBoxAdapter(
+        child: MxAnimatedSwitcher(
+          child: KeyedSubtree(
+            key: const ValueKey('library_empty'),
+            child: LibraryEmptyStateSection(
+              onCreateFolder: () => _handleCreateFolder(context, ref),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+  return [
+    LibraryFolderSliver(
+      folders: state.folders,
+      onOpenFolder: (folderId) => _openFolder(context, ref, folderId),
+      onStartStudy: (folderId) => context.goStudyEntry(
+        entryType: 'folder',
+        entryRefId: folderId,
+      ),
+    ),
+  ];
+}
+
+class _LibrarySectionHeader extends StatelessWidget {
+  const _LibrarySectionHeader({required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxText(title, role: MxTextRole.sectionTitle),
+        const MxGap(MxSpace.xxs),
+        MxText(subtitle, role: MxTextRole.sectionSubtitle),
+      ],
     );
   }
 }

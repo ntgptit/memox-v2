@@ -7,8 +7,8 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/app_layout.dart';
-import '../../../../core/theme/mx_gap.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';

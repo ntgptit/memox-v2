@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../shared/layouts/mx_feature_layout.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/library_overview_viewmodel.dart';
@@ -19,8 +20,9 @@ class LibraryHeroSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(MxSpace.xl),
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerLow,
+        color: scheme.surfaceContainerHigh,
         borderRadius: MxFeatureRadii.heroPanel,
+        border: Border.all(color: scheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,9 +31,9 @@ class LibraryHeroSection extends StatelessWidget {
             '${state.greeting.salutation}, ${state.greeting.userName}',
             role: MxTextRole.pageGreeting,
           ),
-          const SizedBox(height: MxSpace.xs),
+          const MxGap(MxSpace.xs),
           MxText(l10n.libraryTitle, role: MxTextRole.pageTitle),
-          const SizedBox(height: MxSpace.md),
+          const MxGap(MxSpace.md),
           MxText(
             l10n.libraryHeroDueToday(state.dueToday),
             role: MxTextRole.heroAccent,

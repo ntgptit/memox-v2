@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../app_elevation.dart';
-import '../app_radius.dart';
+import '../tokens/app_elevation.dart';
+import '../tokens/app_radius.dart';
 
 abstract final class CardThemeBuilder {
   static CardThemeData build(ColorScheme scheme) {

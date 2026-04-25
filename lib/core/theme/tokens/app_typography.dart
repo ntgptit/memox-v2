@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app_breakpoints.dart';
+import '../responsive/app_breakpoints.dart';
 
 /// MemoX typography — Material 3 type scale, tuned for readable flashcards.
 ///

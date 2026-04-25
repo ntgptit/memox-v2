@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_icon_sizes.dart';
-import '../../../core/theme/theme_extensions.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/extensions/theme_extensions.dart';
 
 enum MxChipTone { neutral, primary, success, warning, error, info }
 

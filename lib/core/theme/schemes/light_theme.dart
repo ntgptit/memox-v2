@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
-import 'app_typography.dart';
-import 'theme_extensions.dart';
-import 'component_themes/app_bar_theme.dart';
-import 'component_themes/button_theme.dart';
-import 'component_themes/card_theme.dart';
-import 'component_themes/chip_theme.dart';
-import 'component_themes/dialog_theme.dart';
-import 'component_themes/divider_theme.dart';
-import 'component_themes/icon_theme.dart';
-import 'component_themes/input_theme.dart';
-import 'component_themes/list_tile_theme.dart';
-import 'component_themes/navigation_bar_theme.dart';
-import 'component_themes/popup_menu_theme.dart';
-import 'component_themes/progress_indicator_theme.dart';
-import 'component_themes/scrollbar_theme.dart';
-import 'component_themes/segmented_button_theme.dart';
-import 'component_themes/text_selection_theme.dart';
-import 'component_themes/toggle_theme.dart';
-import 'component_themes/tooltip_theme.dart';
+import '../tokens/app_colors.dart';
+import '../tokens/app_typography.dart';
+import '../extensions/theme_extensions.dart';
+import '../component_themes/app_bar_theme.dart';
+import '../component_themes/button_theme.dart';
+import '../component_themes/card_theme.dart';
+import '../component_themes/chip_theme.dart';
+import '../component_themes/dialog_theme.dart';
+import '../component_themes/divider_theme.dart';
+import '../component_themes/icon_theme.dart';
+import '../component_themes/input_theme.dart';
+import '../component_themes/list_tile_theme.dart';
+import '../component_themes/navigation_bar_theme.dart';
+import '../component_themes/popup_menu_theme.dart';
+import '../component_themes/progress_indicator_theme.dart';
+import '../component_themes/scrollbar_theme.dart';
+import '../component_themes/segmented_button_theme.dart';
+import '../component_themes/text_selection_theme.dart';
+import '../component_themes/toggle_theme.dart';
+import '../component_themes/tooltip_theme.dart';
 
 /// Light [ColorScheme] derived from the MemoX brand palette.
 const ColorScheme _lightScheme = ColorScheme(
@@ -28,18 +28,18 @@ const ColorScheme _lightScheme = ColorScheme(
   onPrimary: AppColors.lightPrimary100,
   primaryContainer: AppColors.lightPrimary90,
   onPrimaryContainer: AppColors.lightPrimary10,
-  secondary: AppColors.lightSecondary50,
+  secondary: AppColors.lightSecondary40,
   onSecondary: AppColors.lightNeutral10,
-  secondaryContainer: AppColors.lightSecondary95,
-  onSecondaryContainer: AppColors.lightSecondary20,
+  secondaryContainer: AppColors.lightSecondary90,
+  onSecondaryContainer: AppColors.lightSecondary10,
   tertiary: AppColors.lightTertiary40,
   onTertiary: AppColors.lightNeutral10,
   tertiaryContainer: AppColors.lightTertiary90,
-  onTertiaryContainer: AppColors.lightTertiary20,
-  error: AppColors.lightError50,
+  onTertiaryContainer: AppColors.lightTertiary10,
+  error: AppColors.lightError40,
   onError: AppColors.lightPrimary100,
-  errorContainer: AppColors.lightError95,
-  onErrorContainer: AppColors.lightError20,
+  errorContainer: AppColors.lightError90,
+  onErrorContainer: AppColors.lightError10,
   surface: AppColors.lightSurface,
   onSurface: AppColors.lightNeutral10,
   onSurfaceVariant: AppColors.lightNeutral40,
@@ -52,7 +52,7 @@ const ColorScheme _lightScheme = ColorScheme(
   surfaceBright: AppColors.lightSurfaceBright,
   inverseSurface: AppColors.lightNeutral20,
   onInverseSurface: AppColors.lightSurfaceContainerLow,
-  inversePrimary: AppColors.lightPrimary70,
+  inversePrimary: AppColors.lightPrimary80,
   outline: AppColors.lightNeutralVariant60,
   outlineVariant: AppColors.lightNeutralVariant90,
   shadow: Color(0xFF000000),

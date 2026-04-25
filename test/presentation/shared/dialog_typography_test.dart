@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:memox/core/theme/app_theme.dart';
-import 'package:memox/core/theme/app_typography.dart';
+import 'package:memox/core/theme/tokens/app_typography.dart';
 import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';
 
 void main() {

@@ -178,7 +178,7 @@ rules:
     impact: design_system
     scope: all
     targets:
-      - "lib/core/theme/theme_extensions.dart"
+      - "lib/core/theme/extensions/theme_extensions.dart"
     fix_hint_code: use_semantic_repetition_color_roles
     params:
       patterns:
@@ -199,14 +199,15 @@ rules:
     params:
       check_id: forbidden_import_paths
       forbidden_import_paths:
-        - "core/theme/app_colors.dart"
-        - "core/theme/app_typography.dart"
-        - "core/theme/app_spacing.dart"
-        - "core/theme/app_radius.dart"
-        - "core/theme/app_elevation.dart"
-        - "core/theme/app_motion.dart"
-        - "core/theme/app_breakpoints.dart"
-        - "core/theme/app_icon_sizes.dart"
+        - "core/theme/tokens/app_colors.dart"
+        - "core/theme/tokens/app_typography.dart"
+        - "core/theme/tokens/app_spacing.dart"
+        - "core/theme/tokens/app_radius.dart"
+        - "core/theme/tokens/app_elevation.dart"
+        - "core/theme/tokens/app_motion.dart"
+        - "core/theme/tokens/app_opacity.dart"
+        - "core/theme/responsive/app_breakpoints.dart"
+        - "core/theme/tokens/app_icon_sizes.dart"
 
   - id: features_no_direct_text_theme
     type: forbidden_pattern
@@ -233,7 +234,7 @@ rules:
     fix_hint_code: derive_app_text_styles_from_text_theme
     targets:
       - "lib/core/theme/app_theme.dart"
-      - "lib/core/theme/app_typography.dart"
+      - "lib/core/theme/tokens/app_typography.dart"
     params:
       check_id: theme_typography_contract
       max_global_step_reduction: 0

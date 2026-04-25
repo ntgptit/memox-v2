@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../app_elevation.dart';
-import '../app_typography.dart';
+import '../tokens/app_elevation.dart';
+import '../tokens/app_typography.dart';
 
 abstract final class NavigationBarThemeBuilder {
   static NavigationBarThemeData bar(ColorScheme scheme) {

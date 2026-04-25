@@ -1,4 +1,4 @@
-import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
 
 /// Feature-facing spacing surface for local UI rhythm.
 ///

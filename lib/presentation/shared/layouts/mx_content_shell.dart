@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_layout.dart';
+import '../../../core/theme/responsive/app_layout.dart';
 
 /// Caps a content column at a role-appropriate max width and applies the
 /// current tier's page padding.

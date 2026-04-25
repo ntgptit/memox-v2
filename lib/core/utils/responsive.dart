@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../theme/app_breakpoints.dart';
+import '../theme/responsive/app_breakpoints.dart';
 
 // -----------------------------------------------------------------------------
 // Responsive primitives
@@ -13,7 +13,7 @@ import '../theme/app_breakpoints.dart';
 //
 //   1. Any layout decision that is repeated across screens — page padding,
 //      content-column width, section gap, grid columns, rail width, dialog
-//      width — MUST live in `core/theme/app_layout.dart` (`AppLayout` +
+//      width — MUST live in `core/theme/responsive/app_layout.dart` (`AppLayout` +
 //      `LayoutContext` extension). Features read those via
 //      `context.pagePadding`, `context.contentMaxWidth(role)`,
 //      `context.sectionGap`, `context.gridColumns(...)`, etc.

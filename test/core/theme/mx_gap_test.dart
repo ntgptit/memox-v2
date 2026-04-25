@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memox/core/theme/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 
 void main() {
   testWidgets('MxGap adds horizontal spacing inside Row', (tester) async {

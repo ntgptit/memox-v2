@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/app_layout.dart';
-import '../../../../core/theme/mx_gap.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
