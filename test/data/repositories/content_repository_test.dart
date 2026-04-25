@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/data/datasources/local/app_database.dart';
 import 'package:memox/domain/enums/content_sort_mode.dart';
@@ -56,22 +56,178 @@ void main() {
       },
     );
 
-    test('DT2 onInsert: creating a deck in an unlocked folder locks it to decks', () async {
-      final root = await harness.folderRepository.createRootFolder('Languages');
-      final rootId = root.valueOrNull!.id;
+    test(
+      'DT2 onInsert: creating a deck in an unlocked folder locks it to decks',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final rootId = root.valueOrNull!.id;
 
-      final deck = await harness.deckRepository.createDeck(
-        folderId: rootId,
-        name: 'N5 Core',
-      );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: rootId,
+          name: 'N5 Core',
+        );
 
-      expect(deck.isSuccess, isTrue);
+        expect(deck.isSuccess, isTrue);
 
-      final storedRoot = await (harness.database.select(
-        harness.database.folders,
-      )..where((table) => table.id.equals(rootId))).getSingle();
-      expect(storedRoot.contentMode, 'decks');
-    });
+        final storedRoot = await (harness.database.select(
+          harness.database.folders,
+        )..where((table) => table.id.equals(rootId))).getSingle();
+        expect(storedRoot.contentMode, 'decks');
+      },
+    );
+
+    test(
+      'DT4 onInsert: creating a deck in a subfolder-locked folder is rejected',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final rootId = root.valueOrNull!.id;
+        await harness.folderRepository.createSubfolder(
+          parentFolderId: rootId,
+          name: 'Japanese',
+        );
+
+        final deck = await harness.deckRepository.createDeck(
+          folderId: rootId,
+          name: 'N5 Core',
+        );
+
+        expect(deck.isFailure, isTrue);
+
+        final storedRoot = await (harness.database.select(
+          harness.database.folders,
+        )..where((table) => table.id.equals(rootId))).getSingle();
+        final decks = await (harness.database.select(
+          harness.database.decks,
+        )..where((table) => table.folderId.equals(rootId))).get();
+
+        expect(storedRoot.contentMode, 'subfolders');
+        expect(decks, isEmpty);
+      },
+    );
+
+    test(
+      'DT5 onInsert: creating a subfolder in a deck-locked folder is rejected',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final rootId = root.valueOrNull!.id;
+        await harness.deckRepository.createDeck(
+          folderId: rootId,
+          name: 'N5 Core',
+        );
+
+        final child = await harness.folderRepository.createSubfolder(
+          parentFolderId: rootId,
+          name: 'Japanese',
+        );
+
+        expect(child.isFailure, isTrue);
+
+        final storedRoot = await (harness.database.select(
+          harness.database.folders,
+        )..where((table) => table.id.equals(rootId))).getSingle();
+        final children = await (harness.database.select(
+          harness.database.folders,
+        )..where((table) => table.parentId.equals(rootId))).get();
+
+        expect(storedRoot.contentMode, 'decks');
+        expect(children, isEmpty);
+      },
+    );
+
+    test(
+      'DT6 onInsert: creating a manual flashcard trims content and initializes progress',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+
+        final created = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(
+            front: '  hello  ',
+            back: '  xin chao  ',
+            note: '   ',
+          ),
+        );
+
+        expect(created.isSuccess, isTrue);
+
+        final card =
+            await (harness.database.select(harness.database.flashcards)
+                  ..where((table) => table.id.equals(created.valueOrNull!.id)))
+                .getSingle();
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals(card.id))).getSingle();
+
+        expect(card.front, 'hello');
+        expect(card.back, 'xin chao');
+        expect(card.note, isNull);
+        expect(progress.currentBox, 1);
+        expect(progress.reviewCount, 0);
+        expect(progress.dueAt, isNull);
+      },
+    );
+
+    test(
+      'DT7 onInsert: committing a valid CSV import writes new cards in order',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
+
+        final preparation = await harness.flashcardRepository.prepareImport(
+          format: ImportSourceFormat.csv,
+          rawContent: 'front,back,note\nhello,xin chao,\nbye,tam biet,note',
+        );
+
+        expect(preparation.isSuccess, isTrue);
+        expect(preparation.valueOrNull!.canCommit, isTrue);
+
+        final commit = await harness.flashcardRepository.commitImport(
+          deckId: deckId,
+          preparation: preparation.valueOrNull!,
+        );
+
+        expect(commit.valueOrNull, 2);
+
+        final cards =
+            await (harness.database.select(harness.database.flashcards)
+                  ..where((table) => table.deckId.equals(deckId))
+                  ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+                .get();
+        final progressRows =
+            await (harness.database.select(harness.database.flashcardProgress)
+                  ..where(
+                    (table) =>
+                        table.flashcardId.isIn(cards.map((card) => card.id)),
+                  ))
+                .get();
+
+        expect(cards.map((card) => card.front), <String>['hello', 'bye']);
+        expect(cards.map((card) => card.back), <String>[
+          'xin chao',
+          'tam biet',
+        ]);
+        expect(progressRows.map((row) => row.currentBox), everyElement(1));
+        expect(progressRows.map((row) => row.dueAt), everyElement(isNull));
+      },
+    );
 
     test(
       'DT1 onDelete: deleting the last subfolder resets parent folder mode to unlocked',
@@ -98,21 +254,151 @@ void main() {
       },
     );
 
-    test('DT1 repositoryFlow: moving a folder into its descendant is rejected', () async {
-      final root = await harness.folderRepository.createRootFolder('Languages');
-      final rootId = root.valueOrNull!.id;
-      final child = await harness.folderRepository.createSubfolder(
-        parentFolderId: rootId,
-        name: 'Japanese',
-      );
+    test(
+      'DT2 onDelete: deleting the last deck cascades flashcards and unlocks the parent',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final folderId = folder.valueOrNull!.id;
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folderId,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
+        final flashcard = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+        final flashcardId = flashcard.valueOrNull!.id;
 
-      final moveResult = await harness.folderRepository.moveFolder(
-        folderId: rootId,
-        targetParentId: child.valueOrNull!.id,
-      );
+        final result = await harness.deckRepository.deleteDeck(deckId);
 
-      expect(moveResult.isFailure, isTrue);
-    });
+        expect(result.isSuccess, isTrue);
+
+        final folderStored = await (harness.database.select(
+          harness.database.folders,
+        )..where((table) => table.id.equals(folderId))).getSingle();
+        final deletedDeck = await (harness.database.select(
+          harness.database.decks,
+        )..where((table) => table.id.equals(deckId))).getSingleOrNull();
+        final deletedCard = await (harness.database.select(
+          harness.database.flashcards,
+        )..where((table) => table.id.equals(flashcardId))).getSingleOrNull();
+        final deletedProgress =
+            await (harness.database.select(harness.database.flashcardProgress)
+                  ..where((table) => table.flashcardId.equals(flashcardId)))
+                .getSingleOrNull();
+
+        expect(folderStored.contentMode, 'unlocked');
+        expect(deletedDeck, isNull);
+        expect(deletedCard, isNull);
+        expect(deletedProgress, isNull);
+      },
+    );
+
+    test(
+      'DT3 onDelete: deleting an empty flashcard selection is a no-op',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final card = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+
+        final result = await harness.flashcardRepository.deleteFlashcards(
+          const <String>[],
+        );
+
+        expect(result.isSuccess, isTrue);
+
+        final cards = await harness.database
+            .select(harness.database.flashcards)
+            .get();
+        final progress = await harness.database
+            .select(harness.database.flashcardProgress)
+            .get();
+
+        expect(cards.map((item) => item.id), <String>[card.valueOrNull!.id]);
+        expect(progress.map((item) => item.flashcardId), <String>[
+          card.valueOrNull!.id,
+        ]);
+      },
+    );
+
+    test(
+      'DT4 onDelete: bulk deleting selected flashcards keeps unselected cards',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
+        final first = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'one', back: 'mot'),
+        );
+        final second = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'two', back: 'hai'),
+        );
+        final third = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'three', back: 'ba'),
+        );
+
+        final result = await harness.flashcardRepository.deleteFlashcards([
+          first.valueOrNull!.id,
+          third.valueOrNull!.id,
+        ]);
+
+        expect(result.isSuccess, isTrue);
+
+        final remainingCards = await harness.database
+            .select(harness.database.flashcards)
+            .get();
+        final remainingProgress = await harness.database
+            .select(harness.database.flashcardProgress)
+            .get();
+
+        expect(remainingCards.map((item) => item.id), <String>[
+          second.valueOrNull!.id,
+        ]);
+        expect(remainingProgress.map((item) => item.flashcardId), <String>[
+          second.valueOrNull!.id,
+        ]);
+      },
+    );
+
+    test(
+      'DT1 repositoryFlow: moving a folder into its descendant is rejected',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final rootId = root.valueOrNull!.id;
+        final child = await harness.folderRepository.createSubfolder(
+          parentFolderId: rootId,
+          name: 'Japanese',
+        );
+
+        final moveResult = await harness.folderRepository.moveFolder(
+          folderId: rootId,
+          targetParentId: child.valueOrNull!.id,
+        );
+
+        expect(moveResult.isFailure, isTrue);
+      },
+    );
 
     test(
       'DT2 repositoryFlow: moving the last deck resets source folder and preserves flashcard progress',
@@ -178,67 +464,163 @@ void main() {
       },
     );
 
-    test('DT3 repositoryFlow: duplicating a deck copies content and resets progress', () async {
-      final folder = await harness.folderRepository.createRootFolder(
-        'Languages',
-      );
-      final folderId = folder.valueOrNull!.id;
-      final deck = await harness.deckRepository.createDeck(
-        folderId: folderId,
-        name: 'Deck A',
-      );
-      final deckId = deck.valueOrNull!.id;
-
-      final first = await harness.flashcardRepository.createFlashcard(
-        deckId: deckId,
-        draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
-      );
-      final second = await harness.flashcardRepository.createFlashcard(
-        deckId: deckId,
-        draft: const FlashcardDraft(front: 'bye', back: 'tam biet'),
-      );
-
-      for (final flashcardId in <String>[
-        first.valueOrNull!.id,
-        second.valueOrNull!.id,
-      ]) {
-        await (harness.database.update(
-          harness.database.flashcardProgress,
-        )..where((table) => table.flashcardId.equals(flashcardId))).write(
-          const FlashcardProgressCompanion(
-            currentBox: Value(6),
-            reviewCount: Value(20),
-            lapseCount: Value(2),
-            lastStudiedAt: Value(1713859200000),
-            dueAt: Value(1713945600000),
-          ),
+    test(
+      'DT3 repositoryFlow: duplicating a deck copies content and resets progress',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
         );
-      }
+        final folderId = folder.valueOrNull!.id;
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folderId,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
 
-      final duplicate = await harness.deckRepository.duplicateDeck(
-        deckId: deckId,
-        targetFolderId: folderId,
-      );
+        final first = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+        final second = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'bye', back: 'tam biet'),
+        );
 
-      expect(duplicate.isSuccess, isTrue);
+        for (final flashcardId in <String>[
+          first.valueOrNull!.id,
+          second.valueOrNull!.id,
+        ]) {
+          await (harness.database.update(
+            harness.database.flashcardProgress,
+          )..where((table) => table.flashcardId.equals(flashcardId))).write(
+            const FlashcardProgressCompanion(
+              currentBox: Value(6),
+              reviewCount: Value(20),
+              lapseCount: Value(2),
+              lastStudiedAt: Value(1713859200000),
+              dueAt: Value(1713945600000),
+            ),
+          );
+        }
 
-      final duplicatedDeckId = duplicate.valueOrNull!.id;
-      final duplicatedCards = await (harness.database.select(
-        harness.database.flashcards,
-      )..where((table) => table.deckId.equals(duplicatedDeckId))).get();
+        final duplicate = await harness.deckRepository.duplicateDeck(
+          deckId: deckId,
+          targetFolderId: folderId,
+        );
 
-      expect(duplicatedCards, hasLength(2));
+        expect(duplicate.isSuccess, isTrue);
 
-      for (final card in duplicatedCards) {
-        final progress = await (harness.database.select(
-          harness.database.flashcardProgress,
-        )..where((table) => table.flashcardId.equals(card.id))).getSingle();
-        expect(progress.currentBox, 1);
-        expect(progress.reviewCount, 0);
-        expect(progress.lastStudiedAt, isNull);
-        expect(progress.dueAt, isNull);
-      }
-    });
+        final duplicatedDeckId = duplicate.valueOrNull!.id;
+        final duplicatedCards = await (harness.database.select(
+          harness.database.flashcards,
+        )..where((table) => table.deckId.equals(duplicatedDeckId))).get();
+
+        expect(duplicatedCards, hasLength(2));
+
+        for (final card in duplicatedCards) {
+          final progress = await (harness.database.select(
+            harness.database.flashcardProgress,
+          )..where((table) => table.flashcardId.equals(card.id))).getSingle();
+          expect(progress.currentBox, 1);
+          expect(progress.reviewCount, 0);
+          expect(progress.lastStudiedAt, isNull);
+          expect(progress.dueAt, isNull);
+        }
+      },
+    );
+
+    test(
+      'DT4 repositoryFlow: moving a folder into itself is rejected',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final rootId = root.valueOrNull!.id;
+
+        final moveResult = await harness.folderRepository.moveFolder(
+          folderId: rootId,
+          targetParentId: rootId,
+        );
+
+        expect(moveResult.isFailure, isTrue);
+
+        final storedRoot = await (harness.database.select(
+          harness.database.folders,
+        )..where((table) => table.id.equals(rootId))).getSingle();
+        expect(storedRoot.parentId, isNull);
+      },
+    );
+
+    test(
+      'DT5 repositoryFlow: moving a folder into a deck-locked folder is rejected',
+      () async {
+        final source = await harness.folderRepository.createRootFolder(
+          'Source',
+        );
+        final target = await harness.folderRepository.createRootFolder(
+          'Target',
+        );
+        await harness.deckRepository.createDeck(
+          folderId: target.valueOrNull!.id,
+          name: 'Target Deck',
+        );
+
+        final moveResult = await harness.folderRepository.moveFolder(
+          folderId: source.valueOrNull!.id,
+          targetParentId: target.valueOrNull!.id,
+        );
+
+        expect(moveResult.isFailure, isTrue);
+
+        final storedSource =
+            await (harness.database.select(harness.database.folders)
+                  ..where((table) => table.id.equals(source.valueOrNull!.id)))
+                .getSingle();
+        expect(storedSource.parentId, isNull);
+      },
+    );
+
+    test(
+      'DT6 repositoryFlow: exporting a deck includes content but omits SRS fields',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final flashcard = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+        await (harness.database.update(harness.database.flashcardProgress)
+              ..where(
+                (table) => table.flashcardId.equals(flashcard.valueOrNull!.id),
+              ))
+            .write(
+              const FlashcardProgressCompanion(
+                currentBox: Value(6),
+                reviewCount: Value(20),
+                lastStudiedAt: Value(1713859200000),
+                dueAt: Value(1713945600000),
+              ),
+            );
+
+        final exported = await harness.deckRepository.exportDeck(
+          deck.valueOrNull!.id,
+        );
+
+        expect(exported.isSuccess, isTrue);
+        expect(exported.valueOrNull!.content, contains('front,back,note'));
+        expect(
+          exported.valueOrNull!.content,
+          contains('"hello","xin chao",""'),
+        );
+        expect(exported.valueOrNull!.content, isNot(contains('current_box')));
+        expect(exported.valueOrNull!.content, isNot(contains('1713945600000')));
+      },
+    );
 
     test(
       'DT1 onSearchFilterSort: sort by last studied pushes never-studied flashcards to the end',
@@ -289,6 +671,110 @@ void main() {
           second.valueOrNull!.id,
           first.valueOrNull!.id,
           third.valueOrNull!.id,
+        ]);
+      },
+    );
+
+    test(
+      'DT2 onSearchFilterSort: folder search returns matching nested folder with breadcrumb',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final child = await harness.folderRepository.createSubfolder(
+          parentFolderId: root.valueOrNull!.id,
+          name: 'Japanese',
+        );
+
+        final overview = await harness.folderRepository.getLibraryOverview(
+          const ContentQuery(searchTerm: 'japan'),
+        );
+
+        expect(overview.folders.map((item) => item.folder.id), <String>[
+          child.valueOrNull!.id,
+        ]);
+        expect(overview.folders.single.breadcrumb, <String>[
+          'Languages',
+          'Japanese',
+        ]);
+      },
+    );
+
+    test(
+      'DT3 onSearchFilterSort: sort by last studied pushes never-studied decks to the end',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final folderId = folder.valueOrNull!.id;
+        final studiedDeck = await harness.deckRepository.createDeck(
+          folderId: folderId,
+          name: 'Studied',
+        );
+        final newDeck = await harness.deckRepository.createDeck(
+          folderId: folderId,
+          name: 'New',
+        );
+        final studiedCard = await harness.flashcardRepository.createFlashcard(
+          deckId: studiedDeck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: newDeck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'bye', back: 'tam biet'),
+        );
+        await (harness.database.update(harness.database.flashcardProgress)
+              ..where(
+                (table) =>
+                    table.flashcardId.equals(studiedCard.valueOrNull!.id),
+              ))
+            .write(
+              const FlashcardProgressCompanion(lastStudiedAt: Value(5000)),
+            );
+
+        final decks = await harness.deckRepository.getDecksInFolder(
+          folderId,
+          const ContentQuery(sortMode: ContentSortMode.lastStudied),
+        );
+
+        expect(decks.map((item) => item.deck.id), <String>[
+          studiedDeck.valueOrNull!.id,
+          newDeck.valueOrNull!.id,
+        ]);
+      },
+    );
+
+    test(
+      'DT4 onSearchFilterSort: flashcard search matches back text and keeps deck breadcrumb',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
+        await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+        final target = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'bye', back: 'tam biet'),
+        );
+
+        final list = await harness.flashcardRepository.getFlashcards(
+          deckId,
+          const ContentQuery(searchTerm: 'tam'),
+        );
+
+        expect(list.items.map((item) => item.flashcard.id), <String>[
+          target.valueOrNull!.id,
+        ]);
+        expect(list.breadcrumb.map((item) => item.label), <String>[
+          'Languages',
+          'Deck A',
         ]);
       },
     );
@@ -377,6 +863,115 @@ void main() {
         expect(movedCards, hasLength(200));
         expect(remainingCards, isEmpty);
         expect(progressRows, hasLength(200));
+      },
+    );
+
+    test(
+      'DT2 onMove: moving an empty flashcard selection is a no-op',
+      () async {
+        final sourceFolder = await harness.folderRepository.createRootFolder(
+          'Source',
+        );
+        final targetFolder = await harness.folderRepository.createRootFolder(
+          'Target',
+        );
+        final sourceDeck = await harness.deckRepository.createDeck(
+          folderId: sourceFolder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final targetDeck = await harness.deckRepository.createDeck(
+          folderId: targetFolder.valueOrNull!.id,
+          name: 'Deck B',
+        );
+        final card = await harness.flashcardRepository.createFlashcard(
+          deckId: sourceDeck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+
+        final moveResult = await harness.flashcardRepository.moveFlashcards(
+          flashcardIds: const <String>[],
+          targetDeckId: targetDeck.valueOrNull!.id,
+        );
+
+        expect(moveResult.isSuccess, isTrue);
+
+        final sourceCards =
+            await (harness.database.select(harness.database.flashcards)..where(
+                  (table) => table.deckId.equals(sourceDeck.valueOrNull!.id),
+                ))
+                .get();
+        final targetCards =
+            await (harness.database.select(harness.database.flashcards)..where(
+                  (table) => table.deckId.equals(targetDeck.valueOrNull!.id),
+                ))
+                .get();
+
+        expect(sourceCards.map((item) => item.id), <String>[
+          card.valueOrNull!.id,
+        ]);
+        expect(targetCards, isEmpty);
+      },
+    );
+
+    test(
+      'DT3 onMove: reordering flashcards changes order without changing deck or progress',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
+        final first = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'one', back: 'mot'),
+        );
+        final second = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'two', back: 'hai'),
+        );
+        final third = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'three', back: 'ba'),
+        );
+        await (harness.database.update(harness.database.flashcardProgress)
+              ..where(
+                (table) => table.flashcardId.equals(second.valueOrNull!.id),
+              ))
+            .write(const FlashcardProgressCompanion(currentBox: Value(4)));
+
+        final result = await harness.flashcardRepository.reorderFlashcards(
+          deckId: deckId,
+          orderedFlashcardIds: [
+            third.valueOrNull!.id,
+            first.valueOrNull!.id,
+            second.valueOrNull!.id,
+          ],
+        );
+
+        expect(result.isSuccess, isTrue);
+
+        final cards =
+            await (harness.database.select(harness.database.flashcards)
+                  ..where((table) => table.deckId.equals(deckId))
+                  ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+                .get();
+        final progress =
+            await (harness.database.select(harness.database.flashcardProgress)
+                  ..where(
+                    (table) => table.flashcardId.equals(second.valueOrNull!.id),
+                  ))
+                .getSingle();
+
+        expect(cards.map((item) => item.id), <String>[
+          third.valueOrNull!.id,
+          first.valueOrNull!.id,
+          second.valueOrNull!.id,
+        ]);
+        expect(cards.map((item) => item.deckId), everyElement(deckId));
+        expect(progress.currentBox, 4);
       },
     );
   });

@@ -29,116 +29,374 @@ void main() {
       await harness.dispose();
     });
 
-    test('DT1 onNavigate: runs New Study through five modes and finalizes to box 2', () async {
-      await harness.seedDeckWithCards(cardCount: 2);
+    test(
+      'DT1 onNavigate: runs New Study through five modes and finalizes to box 2',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
 
-      var snapshot = await harness.start.execute(
-        const StudyContext(
-          entryType: StudyEntryType.deck,
-          entryRefId: 'deck-1',
-          studyType: StudyType.newStudy,
-          settings: StudySettingsSnapshot(
-            batchSize: 2,
-            shuffleFlashcards: false,
-            shuffleAnswers: false,
-            prioritizeOverdue: true,
+        var snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
           ),
-        ),
-      );
+        );
 
-      while (snapshot.currentItem != null) {
+        while (snapshot.currentItem != null) {
+          snapshot = await harness.answer.execute(
+            sessionId: snapshot.session.id,
+            studyType: snapshot.session.studyType,
+            grade: AttemptGrade.remembered,
+          );
+        }
+
+        expect(snapshot.session.status, SessionStatus.readyToFinalize);
+
+        snapshot = await harness.finalize.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+        );
+
+        expect(snapshot.session.status, SessionStatus.completed);
+        final progressRows = await harness.database
+            .select(harness.database.flashcardProgress)
+            .get();
+        expect(progressRows.map((row) => row.currentBox), everyElement(2));
+        expect(progressRows.map((row) => row.dueAt), everyElement(isNotNull));
+      },
+    );
+
+    test(
+      'DT2 onNavigate: rejects New Study from the today entry point',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1, due: true);
+
+        await expectLater(
+          () => harness.start.execute(
+            const StudyContext(
+              entryType: StudyEntryType.today,
+              entryRefId: null,
+              studyType: StudyType.newStudy,
+              settings: StudySettingsSnapshot(
+                batchSize: 1,
+                shuffleFlashcards: false,
+                shuffleAnswers: false,
+                prioritizeOverdue: true,
+              ),
+            ),
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+
+        final sessions = await harness.database
+            .select(harness.database.studySessions)
+            .get();
+        expect(sessions, isEmpty);
+      },
+    );
+
+    test(
+      'DT3 onNavigate: starts SRS Review from today with only due and overdue cards',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 3);
+        final now = DateTime.utc(2026, 4, 24, 9).millisecondsSinceEpoch;
+        await (harness.database.update(harness.database.flashcardProgress)
+              ..where((table) => table.flashcardId.equals('card-2')))
+            .write(FlashcardProgressCompanion(dueAt: Value(now)));
+        await (harness.database.update(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-3'))).write(
+          FlashcardProgressCompanion(
+            dueAt: Value(now - Duration.millisecondsPerDay),
+          ),
+        );
+
+        final snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.today,
+            entryRefId: null,
+            studyType: StudyType.srsReview,
+            settings: StudySettingsSnapshot(
+              batchSize: 3,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        expect(snapshot.sessionFlashcards.map((card) => card.id), <String>[
+          'card-3',
+          'card-2',
+        ]);
+        expect(
+          snapshot.sessionFlashcards.map((card) => card.sourcePool),
+          <SessionItemSourcePool>[
+            SessionItemSourcePool.overdue,
+            SessionItemSourcePool.due,
+          ],
+        );
+      },
+    );
+
+    test(
+      'DT4 onNavigate: starts New Study from cards in a nested folder deck',
+      () async {
+        final now = DateTime.utc(2026, 4, 24, 9).millisecondsSinceEpoch;
+        await harness.database
+            .into(harness.database.folders)
+            .insert(
+              FoldersCompanion.insert(
+                id: 'folder-root',
+                name: 'Root',
+                contentMode: 'subfolders',
+                sortOrder: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+        await harness.database
+            .into(harness.database.folders)
+            .insert(
+              FoldersCompanion.insert(
+                id: 'folder-child',
+                parentId: const Value('folder-root'),
+                name: 'Child',
+                contentMode: 'decks',
+                sortOrder: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+        await harness.database
+            .into(harness.database.decks)
+            .insert(
+              DecksCompanion.insert(
+                id: 'deck-child',
+                folderId: 'folder-child',
+                name: 'Nested Deck',
+                sortOrder: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+        await harness.database
+            .into(harness.database.flashcards)
+            .insert(
+              FlashcardsCompanion.insert(
+                id: 'nested-card',
+                deckId: 'deck-child',
+                front: 'front',
+                back: 'back',
+                sortOrder: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+        await harness.database
+            .into(harness.database.flashcardProgress)
+            .insert(
+              FlashcardProgressCompanion.insert(
+                flashcardId: 'nested-card',
+                currentBox: 1,
+                reviewCount: 0,
+                lapseCount: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+
+        final snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.folder,
+            entryRefId: 'folder-root',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 5,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        expect(snapshot.sessionFlashcards.map((card) => card.id), <String>[
+          'nested-card',
+        ]);
+        expect(snapshot.currentItem?.flashcard.deckId, 'deck-child');
+      },
+    );
+
+    test(
+      'DT1 repositoryFlow: skip requeues without passing the item',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        final skipped = await harness.skip.execute(started.session.id);
+
+        expect(skipped.session.status, SessionStatus.inProgress);
+        expect(
+          skipped.currentItem?.flashcard.id,
+          started.currentItem?.flashcard.id,
+        );
+        expect(skipped.summary.completedAttempts, 0);
+      },
+    );
+
+    test(
+      'DT2 repositoryFlow: incorrect New Study answer requeues the same mode without SRS commit',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        final answered = await harness.answer.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          grade: AttemptGrade.incorrect,
+        );
+
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
+
+        expect(answered.session.status, SessionStatus.inProgress);
+        expect(answered.currentItem?.flashcard.id, 'card-1');
+        expect(answered.currentItem?.studyMode, StudyMode.review);
+        expect(answered.currentItem?.roundIndex, 2);
+        expect(answered.summary.completedAttempts, 1);
+        expect(progress.currentBox, 1);
+        expect(progress.reviewCount, 0);
+        expect(progress.dueAt, isNull);
+      },
+    );
+
+    test(
+      'DT3 repositoryFlow: recovered SRS Review decreases box once after retry pass',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
+
+        var snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.srsReview,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
         snapshot = await harness.answer.execute(
           sessionId: snapshot.session.id,
           studyType: snapshot.session.studyType,
-          grade: AttemptGrade.remembered,
+          grade: AttemptGrade.incorrect,
         );
-      }
+        expect(snapshot.currentItem?.roundIndex, 2);
 
-      expect(snapshot.session.status, SessionStatus.readyToFinalize);
-
-      snapshot = await harness.finalize.execute(
-        sessionId: snapshot.session.id,
-        studyType: snapshot.session.studyType,
-      );
-
-      expect(snapshot.session.status, SessionStatus.completed);
-      final progressRows = await harness.database
-          .select(harness.database.flashcardProgress)
-          .get();
-      expect(progressRows.map((row) => row.currentBox), everyElement(2));
-      expect(progressRows.map((row) => row.dueAt), everyElement(isNotNull));
-    });
-
-    test('DT1 repositoryFlow: skip requeues without passing the item', () async {
-      await harness.seedDeckWithCards(cardCount: 1);
-
-      final started = await harness.start.execute(
-        const StudyContext(
-          entryType: StudyEntryType.deck,
-          entryRefId: 'deck-1',
-          studyType: StudyType.newStudy,
-          settings: StudySettingsSnapshot(
-            batchSize: 1,
-            shuffleFlashcards: false,
-            shuffleAnswers: false,
-            prioritizeOverdue: true,
-          ),
-        ),
-      );
-      final skipped = await harness.skip.execute(started.session.id);
-
-      expect(skipped.session.status, SessionStatus.inProgress);
-      expect(
-        skipped.currentItem?.flashcard.id,
-        started.currentItem?.flashcard.id,
-      );
-      expect(skipped.summary.completedAttempts, 0);
-    });
-
-    test('DT1 onUpdate: does not mark completed session failed on stale finalize', () async {
-      await harness.seedDeckWithCards(cardCount: 1);
-
-      var snapshot = await harness.start.execute(
-        const StudyContext(
-          entryType: StudyEntryType.deck,
-          entryRefId: 'deck-1',
-          studyType: StudyType.newStudy,
-          settings: StudySettingsSnapshot(
-            batchSize: 1,
-            shuffleFlashcards: false,
-            shuffleAnswers: false,
-            prioritizeOverdue: true,
-          ),
-        ),
-      );
-
-      while (snapshot.currentItem != null) {
         snapshot = await harness.answer.execute(
           sessionId: snapshot.session.id,
           studyType: snapshot.session.studyType,
-          grade: AttemptGrade.remembered,
+          grade: AttemptGrade.correct,
         );
-      }
+        expect(snapshot.session.status, SessionStatus.readyToFinalize);
 
-      snapshot = await harness.finalize.execute(
-        sessionId: snapshot.session.id,
-        studyType: snapshot.session.studyType,
-      );
-      expect(snapshot.session.status, SessionStatus.completed);
-
-      await expectLater(
-        () => harness.finalize.execute(
+        await harness.finalize.execute(
           sessionId: snapshot.session.id,
           studyType: snapshot.session.studyType,
-        ),
-        throwsA(isA<ValidationException>()),
-      );
+        );
 
-      final persistedSession = await (harness.database.select(
-        harness.database.studySessions,
-      )..where((table) => table.id.equals(snapshot.session.id))).getSingle();
-      expect(persistedSession.status, SessionStatus.completed.storageValue);
-    });
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
+
+        expect(progress.currentBox, 3);
+        expect(progress.lastResult, ReviewResult.recovered.storageValue);
+        expect(progress.lapseCount, 1);
+      },
+    );
+
+    test(
+      'DT1 onUpdate: does not mark completed session failed on stale finalize',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        var snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        while (snapshot.currentItem != null) {
+          snapshot = await harness.answer.execute(
+            sessionId: snapshot.session.id,
+            studyType: snapshot.session.studyType,
+            grade: AttemptGrade.remembered,
+          );
+        }
+
+        snapshot = await harness.finalize.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+        );
+        expect(snapshot.session.status, SessionStatus.completed);
+
+        await expectLater(
+          () => harness.finalize.execute(
+            sessionId: snapshot.session.id,
+            studyType: snapshot.session.studyType,
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+
+        final persistedSession = await (harness.database.select(
+          harness.database.studySessions,
+        )..where((table) => table.id.equals(snapshot.session.id))).getSingle();
+        expect(persistedSession.status, SessionStatus.completed.storageValue);
+      },
+    );
 
     test('DT2 onUpdate: does not cancel a completed session', () async {
       await harness.seedDeckWithCards(cardCount: 1);
@@ -225,49 +483,225 @@ void main() {
       },
     );
 
-    test('DT1 onRefreshRetry: SRS Review treats forgot as retry and finalizes to box 1', () async {
-      await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
+    test(
+      'DT4 onUpdate: perfect SRS Review increases box and schedules the next interval',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
 
-      var snapshot = await harness.start.execute(
-        const StudyContext(
-          entryType: StudyEntryType.deck,
-          entryRefId: 'deck-1',
-          studyType: StudyType.srsReview,
-          settings: StudySettingsSnapshot(
-            batchSize: 1,
-            shuffleFlashcards: false,
-            shuffleAnswers: false,
-            prioritizeOverdue: true,
+        var snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.srsReview,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
           ),
-        ),
-      );
+        );
 
-      snapshot = await harness.answer.execute(
-        sessionId: snapshot.session.id,
-        studyType: snapshot.session.studyType,
-        grade: AttemptGrade.forgot,
-      );
-      expect(snapshot.currentItem, isNotNull);
-      expect(snapshot.session.status, SessionStatus.inProgress);
+        snapshot = await harness.answer.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+          grade: AttemptGrade.correct,
+        );
 
-      snapshot = await harness.answer.execute(
-        sessionId: snapshot.session.id,
-        studyType: snapshot.session.studyType,
-        grade: AttemptGrade.correct,
-      );
-      expect(snapshot.session.status, SessionStatus.readyToFinalize);
+        await harness.finalize.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+        );
 
-      await harness.finalize.execute(
-        sessionId: snapshot.session.id,
-        studyType: snapshot.session.studyType,
-      );
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
+        final expectedDueAt = DateTime.utc(
+          2026,
+          4,
+          24,
+          9,
+        ).add(const Duration(days: 14)).millisecondsSinceEpoch;
 
-      final progress = await (harness.database.select(
-        harness.database.flashcardProgress,
-      )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
-      expect(progress.currentBox, 1);
-      expect(progress.lastResult, ReviewResult.forgot.storageValue);
-    });
+        expect(progress.currentBox, 5);
+        expect(progress.lastResult, ReviewResult.perfect.storageValue);
+        expect(progress.dueAt, expectedDueAt);
+      },
+    );
+
+    test(
+      'DT5 onUpdate: overdue priority chooses overdue card before due card when batch is limited',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+        final now = DateTime.utc(2026, 4, 24, 9).millisecondsSinceEpoch;
+        await (harness.database.update(harness.database.flashcardProgress)
+              ..where((table) => table.flashcardId.equals('card-1')))
+            .write(FlashcardProgressCompanion(dueAt: Value(now)));
+        await (harness.database.update(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-2'))).write(
+          FlashcardProgressCompanion(
+            dueAt: Value(now - Duration.millisecondsPerDay),
+          ),
+        );
+
+        final snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.srsReview,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        expect(snapshot.sessionFlashcards.map((card) => card.id), <String>[
+          'card-2',
+        ]);
+        expect(
+          snapshot.sessionFlashcards.single.sourcePool,
+          SessionItemSourcePool.overdue,
+        );
+      },
+    );
+
+    test(
+      'DT6 onUpdate: cancelling an in-progress session abandons pending items',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        final cancelled = await harness.cancel.execute(started.session.id);
+
+        final items = await (harness.database.select(
+          harness.database.studySessionItems,
+        )..where((table) => table.sessionId.equals(started.session.id))).get();
+
+        expect(cancelled.session.status, SessionStatus.cancelled);
+        expect(cancelled.currentItem, isNull);
+        expect(items.map((item) => item.status), everyElement('abandoned'));
+      },
+    );
+
+    test(
+      'DT1 onRefreshRetry: SRS Review treats forgot as retry and finalizes to box 1',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
+
+        var snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.srsReview,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        snapshot = await harness.answer.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+          grade: AttemptGrade.forgot,
+        );
+        expect(snapshot.currentItem, isNotNull);
+        expect(snapshot.session.status, SessionStatus.inProgress);
+
+        snapshot = await harness.answer.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+          grade: AttemptGrade.correct,
+        );
+        expect(snapshot.session.status, SessionStatus.readyToFinalize);
+
+        await harness.finalize.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+        );
+
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
+        expect(progress.currentBox, 1);
+        expect(progress.lastResult, ReviewResult.forgot.storageValue);
+      },
+    );
+
+    test(
+      'DT2 onRefreshRetry: New Study with no eligible new cards creates no session',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1, due: true);
+
+        await expectLater(
+          () => harness.start.execute(
+            const StudyContext(
+              entryType: StudyEntryType.deck,
+              entryRefId: 'deck-1',
+              studyType: StudyType.newStudy,
+              settings: StudySettingsSnapshot(
+                batchSize: 1,
+                shuffleFlashcards: false,
+                shuffleAnswers: false,
+                prioritizeOverdue: true,
+              ),
+            ),
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+
+        final sessions = await harness.database
+            .select(harness.database.studySessions)
+            .get();
+        expect(sessions, isEmpty);
+      },
+    );
+
+    test(
+      'DT3 onRefreshRetry: missing deck entry reference fails before creating a session',
+      () async {
+        await expectLater(
+          () => harness.start.execute(
+            const StudyContext(
+              entryType: StudyEntryType.deck,
+              entryRefId: null,
+              studyType: StudyType.newStudy,
+              settings: StudySettingsSnapshot(
+                batchSize: 1,
+                shuffleFlashcards: false,
+                shuffleAnswers: false,
+                prioritizeOverdue: true,
+              ),
+            ),
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+
+        final sessions = await harness.database
+            .select(harness.database.studySessions)
+            .get();
+        expect(sessions, isEmpty);
+      },
+    );
   });
 }
 

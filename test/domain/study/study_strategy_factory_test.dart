@@ -25,6 +25,21 @@ void main() {
       ]);
     });
 
+    test(
+      'DT2 onNavigate: exposes supported entry points for each v1 strategy',
+      () {
+        const newStudy = NewStudyStrategy();
+        const srsReview = SrsReviewStrategy();
+
+        expect(newStudy.supportsEntry(StudyEntryType.deck), isTrue);
+        expect(newStudy.supportsEntry(StudyEntryType.folder), isTrue);
+        expect(newStudy.supportsEntry(StudyEntryType.today), isFalse);
+        expect(srsReview.supportsEntry(StudyEntryType.deck), isTrue);
+        expect(srsReview.supportsEntry(StudyEntryType.folder), isTrue);
+        expect(srsReview.supportsEntry(StudyEntryType.today), isTrue);
+      },
+    );
+
     test('DT1 selectStrategy: throws on duplicate strategy registration', () {
       expect(
         () => StudyStrategyFactory(const <StudyStrategy>[
@@ -34,5 +49,16 @@ void main() {
         throwsStateError,
       );
     });
+
+    test(
+      'DT2 selectStrategy: throws when no strategy is registered for a study type',
+      () {
+        final factory = StudyStrategyFactory(const <StudyStrategy>[
+          NewStudyStrategy(),
+        ]);
+
+        expect(() => factory.of(StudyType.srsReview), throwsStateError);
+      },
+    );
   });
 }
