@@ -7,6 +7,8 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/folders/models/library_folder.dart';
 import 'package:memox/presentation/features/folders/screens/library_overview_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/library_overview_viewmodel.dart';
+import 'package:memox/presentation/features/folders/widgets/library_folder_list.dart';
+import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
 
 import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';
 
@@ -44,6 +46,12 @@ void main() {
           path: RoutePaths.library,
           name: RouteNames.library,
           builder: (context, state) => const LibraryOverviewView(),
+        ),
+        GoRoute(
+          path: '/${RoutePaths.folderDetailSegment}',
+          name: RouteNames.folderDetail,
+          builder: (context, state) =>
+              const SizedBox(key: ValueKey('folder_detail_destination')),
         ),
         GoRoute(
           path: '/${RoutePaths.studyEntrySegment}',
@@ -90,6 +98,76 @@ void main() {
       router.routeInformationProvider.value.uri.path,
       '/study/folder/$folderId',
     );
+  });
+
+  testWidgets('root folder long press opens direct folder actions', (
+    WidgetTester tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: RoutePaths.library,
+      routes: [
+        GoRoute(
+          path: RoutePaths.library,
+          name: RouteNames.library,
+          builder: (context, state) => const LibraryOverviewView(),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith(
+            (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+          ),
+        ],
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('Korean1'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Folder actions'), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Move'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+  });
+
+  testWidgets('root folder tap still calls open-folder callback', (
+    WidgetTester tester,
+  ) async {
+    String? openedFolderId;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              LibraryFolderSliver(
+                folders: _sampleLibraryState.folders,
+                onOpenFolder: (folderId) => openedFolderId = folderId,
+                onStartStudy: (_) {},
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(MxFolderTile));
+    await tester.pumpAndSettle();
+
+    expect(openedFolderId, 'folder-root-001');
   });
 
   testWidgets('dialog action using dialog context closes only the dialog', (

@@ -82,6 +82,35 @@ void main() {
     final studyButton = tester.widget<MxSecondaryButton>(studyButtonFinder);
     expect(studyButton.onPressed, isNull);
   });
+
+  testWidgets('header more action still opens deck actions', (
+    WidgetTester tester,
+  ) async {
+    const deckId = 'deck-001';
+    final container = ProviderContainer(
+      overrides: [
+        deckDetailQueryProvider(deckId).overrideWith(
+          (ref) => Future<DeckDetailState>.value(_zeroCardDeckState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: DeckDetailScreen(deckId: deckId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('More actions'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Deck actions'), findsOneWidget);
+    expect(find.text('Duplicate deck'), findsOneWidget);
+    expect(find.text('Export CSV'), findsOneWidget);
+  });
 }
 
 const _zeroCardDeckState = DeckDetailState(

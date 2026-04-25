@@ -6,10 +6,6 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
-import '../../../shared/dialogs/mx_action_sheet_list.dart';
-import '../../../shared/dialogs/mx_bottom_sheet.dart';
-import '../../../shared/dialogs/mx_confirmation_dialog.dart';
-import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
@@ -22,14 +18,15 @@ import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
+import '../../decks/actions/deck_quick_actions.dart';
+import '../../decks/viewmodels/deck_detail_viewmodel.dart';
+import '../actions/folder_quick_actions.dart';
 import '../widgets/folder_detail_skeleton.dart';
 import '../widgets/folder_empty_state_section.dart';
 import '../widgets/folder_header_section.dart';
 import '../widgets/folder_reorder_section.dart';
 import '../widgets/folder_tree_section.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
-
-enum _FolderAction { edit, move, reorder, delete }
 
 enum _FolderBodyMode { empty, reorder, tree }
 
@@ -62,6 +59,30 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
 
     final queryState = ref.watch(folderDetailQueryProvider(widget.folderId));
     final queryData = queryState.value;
+    if (queryData != null) {
+      for (final subfolder in queryData.subfolders) {
+        ref.listen<AsyncValue<void>>(
+          folderActionControllerProvider(subfolder.id),
+          (_, next) {
+            final failure = folderActionError(next);
+            if (failure != null) {
+              MxSnackbar.error(context, folderActionErrorMessage(failure));
+            }
+          },
+        );
+      }
+      for (final deck in queryData.decks) {
+        ref.listen<AsyncValue<void>>(deckActionControllerProvider(deck.id), (
+          _,
+          next,
+        ) {
+          final failure = deckActionError(next);
+          if (failure != null) {
+            MxSnackbar.error(context, deckActionErrorMessage(failure));
+          }
+        });
+      }
+    }
     final showFab = queryData != null && _shouldShowFab(queryData);
     final toolbarState = ref.watch(
       folderChildrenToolbarStateProvider(widget.folderId),
@@ -103,7 +124,19 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                   child: FolderHeaderSection(
                     state: state,
                     onBack: () => context.popRoute(fallback: context.goLibrary),
-                    onOpenActions: () => _openActions(state),
+                    onOpenActions: () => showFolderActions(
+                      context: context,
+                      ref: ref,
+                      folderId: widget.folderId,
+                      folderName: state.header.name,
+                      includeReorder: true,
+                      canReorder: state.canManualReorder,
+                      isUnlocked: state.isUnlocked,
+                      onReorder: () => _enterReorderMode(state),
+                      onDeleted: () async {
+                        await context.popRoute(fallback: context.goLibrary);
+                      },
+                    ),
                     onOpenBreadcrumb: (folderId) =>
                         context.goFolderDetail(folderId),
                   ),
@@ -165,7 +198,12 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     final mode = _resolveBodyMode(state);
     return switch (mode) {
       _FolderBodyMode.tree => [
-        FolderTreeSliver(state: state, onOpenSubfolder: _openSubfolder),
+        FolderTreeSliver(
+          state: state,
+          onOpenSubfolder: _openSubfolder,
+          onOpenSubfolderActions: _openSubfolderActions,
+          onOpenDeckActions: _openDeckActions,
+        ),
       ],
       _FolderBodyMode.empty => [
         SliverToBoxAdapter(
@@ -293,146 +331,6 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     MxSnackbar.success(context, l10n.decksCreatedMessage);
   }
 
-  Future<void> _openActions(FolderDetailState state) async {
-    final l10n = AppLocalizations.of(context);
-    final action = await MxBottomSheet.show<_FolderAction>(
-      context: context,
-      title: l10n.foldersActionsTitle,
-      child: MxActionSheetList<_FolderAction>(
-        items: [
-          MxActionSheetItem(
-            value: _FolderAction.edit,
-            label: l10n.commonEdit,
-            icon: Icons.edit_outlined,
-          ),
-          MxActionSheetItem(
-            value: _FolderAction.move,
-            label: l10n.commonMove,
-            icon: Icons.drive_file_move_outline,
-          ),
-          MxActionSheetItem(
-            value: _FolderAction.reorder,
-            label: l10n.foldersReorder,
-            icon: Icons.reorder_rounded,
-            enabled: state.canManualReorder && !state.isUnlocked,
-            subtitle: state.canManualReorder
-                ? null
-                : l10n.foldersReorderManualOnlyHint,
-          ),
-          MxActionSheetItem(
-            value: _FolderAction.delete,
-            label: l10n.commonDelete,
-            icon: Icons.delete_outline,
-            tone: MxActionSheetItemTone.destructive,
-          ),
-        ],
-      ),
-    );
-    if (!mounted || action == null) {
-      return;
-    }
-
-    switch (action) {
-      case _FolderAction.edit:
-        await _renameFolder(state);
-      case _FolderAction.move:
-        await _moveFolder();
-      case _FolderAction.reorder:
-        _enterReorderMode(state);
-      case _FolderAction.delete:
-        await _deleteFolder();
-    }
-  }
-
-  Future<void> _renameFolder(FolderDetailState state) async {
-    final l10n = AppLocalizations.of(context);
-    final name = await MxNameDialog.show(
-      context: context,
-      title: l10n.foldersRenameTitle,
-      label: l10n.foldersFolderNameLabel,
-      hintText: l10n.foldersFolderNameHint,
-      confirmLabel: l10n.commonSave,
-      initialValue: state.header.name,
-    );
-    if (!mounted || name == null) {
-      return;
-    }
-
-    final success = await ref
-        .read(folderActionControllerProvider(widget.folderId).notifier)
-        .updateFolder(name);
-    if (!mounted || !success) {
-      return;
-    }
-    MxSnackbar.success(context, l10n.foldersUpdatedMessage);
-  }
-
-  Future<void> _moveFolder() async {
-    final l10n = AppLocalizations.of(context);
-    final targets = await ref.read(
-      folderMovePickerProvider(widget.folderId).future,
-    );
-    if (!mounted) {
-      return;
-    }
-
-    final destination = await MxDestinationPickerSheet.show<String?>(
-      context: context,
-      title: l10n.foldersMoveTitle,
-      destinations: [
-        for (final target in targets)
-          MxDestinationOption<String?>(
-            value: target.id,
-            title: target.isRoot ? l10n.foldersMoveRootTitle : target.name,
-            subtitle: target.isRoot
-                ? l10n.foldersMoveRootSubtitle
-                : target.breadcrumb.join(' / '),
-            icon: target.isRoot
-                ? Icons.home_outlined
-                : Icons.folder_open_outlined,
-            searchTerms: target.breadcrumb,
-          ),
-      ],
-      emptyLabel: l10n.commonNoValidDestinationFound,
-    );
-    if (!mounted ||
-        destination == null && !targets.any((item) => item.id == null)) {
-      return;
-    }
-
-    final success = await ref
-        .read(folderActionControllerProvider(widget.folderId).notifier)
-        .moveFolder(destination);
-    if (!mounted || !success) {
-      return;
-    }
-    MxSnackbar.success(context, l10n.foldersMovedMessage);
-  }
-
-  Future<void> _deleteFolder() async {
-    final l10n = AppLocalizations.of(context);
-    final confirmed = await MxConfirmationDialog.show(
-      context: context,
-      title: l10n.foldersDeleteTitle,
-      message: l10n.foldersDeleteMessage,
-      confirmLabel: l10n.commonDelete,
-      tone: MxConfirmationTone.danger,
-      icon: Icons.delete_outline,
-    );
-    if (!mounted || !confirmed) {
-      return;
-    }
-
-    final success = await ref
-        .read(folderActionControllerProvider(widget.folderId).notifier)
-        .deleteFolder();
-    if (!mounted || !success) {
-      return;
-    }
-    MxSnackbar.success(context, l10n.foldersDeletedMessage);
-    await context.popRoute(fallback: context.goLibrary);
-  }
-
   void _enterReorderMode(FolderDetailState state) {
     final l10n = AppLocalizations.of(context);
     if (!state.canManualReorder || state.isUnlocked) {
@@ -468,6 +366,24 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
   void _openSubfolder(String folderId) {
     ref.read(folderDetailQueryProvider(folderId));
     context.pushFolderDetail(folderId);
+  }
+
+  Future<void> _openSubfolderActions(FolderSubfolderItem item) {
+    return showFolderActions(
+      context: context,
+      ref: ref,
+      folderId: item.id,
+      folderName: item.name,
+    );
+  }
+
+  Future<void> _openDeckActions(FolderDeckItem item) {
+    return showDeckActions(
+      context: context,
+      ref: ref,
+      deckId: item.id,
+      deckName: item.name,
+    );
   }
 
   Future<void> _saveReorder(FolderDetailState state) async {

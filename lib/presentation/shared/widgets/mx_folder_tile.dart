@@ -27,6 +27,7 @@ class MxFolderTile extends StatelessWidget {
     this.tileColor,
     this.iconColor,
     this.onTap,
+    this.onLongPress,
     this.trailing,
     super.key,
   });
@@ -50,6 +51,7 @@ class MxFolderTile extends StatelessWidget {
   final Color? iconColor;
 
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   final Widget? trailing;
 
@@ -119,10 +121,11 @@ class MxFolderTile extends StatelessWidget {
       ),
     );
 
-    if (onTap == null) return row;
+    if (onTap == null && onLongPress == null) return row;
     return MxTappable(
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
       onTap: onTap,
+      onLongPress: onLongPress,
       child: row,
     );
   }

@@ -142,6 +142,12 @@ class FlashcardActionController extends _$FlashcardActionController {
   @override
   FutureOr<void> build(String deckId) {}
 
+  Future<List<DeckMoveTarget>> loadMoveTargets(List<String> flashcardIds) {
+    return ref
+        .read(getFlashcardMoveTargetsUseCaseProvider)
+        .execute(deckId: deckId, flashcardIds: flashcardIds);
+  }
+
   Future<bool> deleteFlashcards(List<String> flashcardIds) async {
     // guard:retry-reviewed
     state = const AsyncLoading<void>();

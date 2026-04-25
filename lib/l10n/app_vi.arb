@@ -13,6 +13,7 @@
   "commonExport": "Xuất",
   "commonMove": "Di chuyển",
   "commonClear": "Xóa chọn",
+  "commonSelect": "Chọn",
   "commonSelectAll": "Chọn tất cả",
   "commonSaveOrder": "Lưu thứ tự",
   "commonOverview": "Tổng quan",
@@ -240,6 +241,7 @@
   "flashcardsOpenListAction": "Mở danh sách flashcard",
   "flashcardsAddAction": "Thêm flashcard",
   "flashcardsAddTooltip": "Thêm flashcard",
+  "flashcardsActionsTitle": "Thao tác flashcard",
   "flashcardsSearchHint": "Tìm flashcard",
   "flashcardsBulkSelected": "Đã chọn {count}",
   "@flashcardsBulkSelected": {

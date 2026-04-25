@@ -11,12 +11,14 @@ class LibraryFolderList extends StatelessWidget {
     required this.folders,
     required this.onOpenFolder,
     required this.onStartStudy,
+    this.onOpenActions,
     super.key,
   });
 
   final List<LibraryFolder> folders;
   final ValueChanged<String> onOpenFolder;
   final ValueChanged<String> onStartStudy;
+  final ValueChanged<LibraryFolder>? onOpenActions;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,7 @@ class LibraryFolderList extends StatelessWidget {
             folder: folders[index],
             onOpenFolder: onOpenFolder,
             onStartStudy: onStartStudy,
+            onOpenActions: onOpenActions,
           ),
           if (index < folders.length - 1) const MxDivider(),
         ],
@@ -43,12 +46,14 @@ class LibraryFolderSliver extends StatelessWidget {
     required this.folders,
     required this.onOpenFolder,
     required this.onStartStudy,
+    this.onOpenActions,
     super.key,
   });
 
   final List<LibraryFolder> folders;
   final ValueChanged<String> onOpenFolder;
   final ValueChanged<String> onStartStudy;
+  final ValueChanged<LibraryFolder>? onOpenActions;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +63,7 @@ class LibraryFolderSliver extends StatelessWidget {
         folder: folders[index],
         onOpenFolder: onOpenFolder,
         onStartStudy: onStartStudy,
+        onOpenActions: onOpenActions,
       ),
       separatorBuilder: (context, index) => const MxDivider(),
     );
@@ -69,11 +75,13 @@ class _LibraryFolderRow extends StatelessWidget {
     required this.folder,
     required this.onOpenFolder,
     required this.onStartStudy,
+    this.onOpenActions,
   });
 
   final LibraryFolder folder;
   final ValueChanged<String> onOpenFolder;
   final ValueChanged<String> onStartStudy;
+  final ValueChanged<LibraryFolder>? onOpenActions;
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +91,7 @@ class _LibraryFolderRow extends StatelessWidget {
       icon: folder.icon,
       caption: l10n.libraryFolderStats(folder.deckCount, folder.itemCount),
       onTap: () => onOpenFolder(folder.id),
+      onLongPress: onOpenActions == null ? null : () => onOpenActions!(folder),
       trailing: MxStudyProgressAction(
         key: ValueKey('library_folder_recursive_study_${folder.id}'),
         masteryPercent: folder.masteryPercent,

@@ -433,6 +433,68 @@ void main() {
       '/study/deck/$deckId',
     );
   });
+
+  testWidgets('long pressing a subfolder opens direct folder actions', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('Vocabulary'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Folder actions'), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Move'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+  });
+
+  testWidgets('long pressing a deck opens direct deck actions', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_deckFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('Vitamin B1'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Deck actions'), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Move'), findsOneWidget);
+    expect(find.text('Duplicate deck'), findsOneWidget);
+    expect(find.text('Export CSV'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+  });
 }
 
 const _sampleFolderState = FolderDetailState(

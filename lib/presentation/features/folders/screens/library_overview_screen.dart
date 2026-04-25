@@ -17,6 +17,8 @@ import '../../../shared/widgets/mx_animated_switcher.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_text.dart';
+import '../actions/folder_quick_actions.dart';
+import '../models/library_folder.dart';
 import '../widgets/library_empty_state_section.dart';
 import '../widgets/library_folder_list.dart';
 import '../widgets/library_hero_section.dart';
@@ -51,6 +53,17 @@ class LibraryOverviewView extends ConsumerWidget {
     });
 
     final queryState = ref.watch(libraryOverviewQueryProvider);
+    for (final folder in queryState.value?.folders ?? <LibraryFolder>[]) {
+      ref.listen<AsyncValue<void>>(folderActionControllerProvider(folder.id), (
+        _,
+        next,
+      ) {
+        final failure = folderActionError(next);
+        if (failure != null) {
+          MxSnackbar.error(context, folderActionErrorMessage(failure));
+        }
+      });
+    }
     final toolbarState = ref.watch(libraryToolbarStateProvider);
     final toolbarNotifier = ref.read(libraryToolbarStateProvider.notifier);
 
@@ -124,10 +137,15 @@ List<Widget> _buildFolderListSlivers(
     LibraryFolderSliver(
       folders: state.folders,
       onOpenFolder: (folderId) => _openFolder(context, ref, folderId),
-      onStartStudy: (folderId) => context.goStudyEntry(
-        entryType: 'folder',
-        entryRefId: folderId,
+      onOpenActions: (folder) => showFolderActions(
+        context: context,
+        ref: ref,
+        folderId: folder.id,
+        folderName: folder.name,
+        allowRootDestination: false,
       ),
+      onStartStudy: (folderId) =>
+          context.goStudyEntry(entryType: 'folder', entryRefId: folderId),
     ),
   ];
 }

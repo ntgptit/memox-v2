@@ -9,6 +9,8 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
+import '../../../shared/dialogs/mx_action_sheet_list.dart';
+import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
@@ -25,6 +27,8 @@ import '../widgets/flashcard_list_skeleton.dart';
 import '../widgets/flashcard_reorder_list.dart';
 import '../widgets/flashcard_toolbar_section.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
+
+enum _FlashcardRowAction { edit, move, export, select, delete }
 
 class FlashcardListScreen extends ConsumerStatefulWidget {
   const FlashcardListScreen({required this.deckId, super.key});
@@ -91,6 +95,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
               deckId: widget.deckId,
               selection: selection,
               onToggleSelection: selectionNotifier.toggle,
+              onOpenActions: _openFlashcardActions,
             );
             if (state.items.isEmpty) {
               content = FlashcardEmptyStateSection(deckId: widget.deckId);
@@ -198,9 +203,9 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
 
   Future<void> _moveSelected(List<String> flashcardIds) async {
     final l10n = AppLocalizations.of(context);
-    final targets = await ref.read(
-      flashcardMoveTargetsProvider(widget.deckId).future,
-    );
+    final targets = await ref
+        .read(flashcardActionControllerProvider(widget.deckId).notifier)
+        .loadMoveTargets(flashcardIds);
     if (!mounted) {
       return;
     }
@@ -272,5 +277,61 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
       return;
     }
     MxSnackbar.success(context, l10n.flashcardsDeletedMessage);
+  }
+
+  Future<void> _openFlashcardActions(FlashcardListItemState item) async {
+    final l10n = AppLocalizations.of(context);
+    final action = await MxBottomSheet.show<_FlashcardRowAction>(
+      context: context,
+      title: l10n.flashcardsActionsTitle,
+      child: MxActionSheetList<_FlashcardRowAction>(
+        items: [
+          MxActionSheetItem(
+            value: _FlashcardRowAction.edit,
+            label: l10n.commonEdit,
+            icon: Icons.edit_outlined,
+          ),
+          MxActionSheetItem(
+            value: _FlashcardRowAction.move,
+            label: l10n.commonMove,
+            icon: Icons.drive_file_move_outline,
+          ),
+          MxActionSheetItem(
+            value: _FlashcardRowAction.export,
+            label: l10n.commonExport,
+            icon: Icons.file_download_outlined,
+          ),
+          MxActionSheetItem(
+            value: _FlashcardRowAction.select,
+            label: l10n.commonSelect,
+            icon: Icons.check_circle_outline_rounded,
+          ),
+          MxActionSheetItem(
+            value: _FlashcardRowAction.delete,
+            label: l10n.commonDelete,
+            icon: Icons.delete_outline,
+            tone: MxActionSheetItemTone.destructive,
+          ),
+        ],
+      ),
+    );
+    if (!mounted || action == null) {
+      return;
+    }
+
+    switch (action) {
+      case _FlashcardRowAction.edit:
+        context.pushFlashcardEdit(deckId: widget.deckId, flashcardId: item.id);
+      case _FlashcardRowAction.move:
+        await _moveSelected([item.id]);
+      case _FlashcardRowAction.export:
+        await _exportSelected([item.id]);
+      case _FlashcardRowAction.select:
+        ref
+            .read(flashcardSelectionProvider(widget.deckId).notifier)
+            .toggle(item.id);
+      case _FlashcardRowAction.delete:
+        await _deleteSelected([item.id]);
+    }
   }
 }

@@ -21,6 +21,7 @@ class MxStudySetTile extends StatelessWidget {
     this.ownerBadge,
     this.trailing,
     this.onTap,
+    this.onLongPress,
     this.iconBackground,
     this.iconColor,
     super.key,
@@ -40,6 +41,7 @@ class MxStudySetTile extends StatelessWidget {
 
   final Widget? trailing;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   final Color? iconBackground;
   final Color? iconColor;
@@ -114,10 +116,11 @@ class MxStudySetTile extends StatelessWidget {
       ),
     );
 
-    if (onTap == null) return tile;
+    if (onTap == null && onLongPress == null) return tile;
     return MxTappable(
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
       onTap: onTap,
+      onLongPress: onLongPress,
       child: tile,
     );
   }

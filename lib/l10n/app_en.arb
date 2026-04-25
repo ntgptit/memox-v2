@@ -13,6 +13,7 @@
   "commonExport": "Export",
   "commonMove": "Move",
   "commonClear": "Clear",
+  "commonSelect": "Select",
   "commonSelectAll": "Select all",
   "commonSaveOrder": "Save order",
   "commonOverview": "Overview",
@@ -240,6 +241,7 @@
   "flashcardsOpenListAction": "Open flashcards",
   "flashcardsAddAction": "Add flashcard",
   "flashcardsAddTooltip": "Add flashcard",
+  "flashcardsActionsTitle": "Flashcard actions",
   "flashcardsSearchHint": "Search flashcards",
   "flashcardsBulkSelected": "{count} selected",
   "@flashcardsBulkSelected": {

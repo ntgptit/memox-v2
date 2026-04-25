@@ -12,11 +12,15 @@ class FolderTreeSection extends StatelessWidget {
   const FolderTreeSection({
     required this.state,
     required this.onOpenSubfolder,
+    this.onOpenSubfolderActions,
+    this.onOpenDeckActions,
     super.key,
   });
 
   final FolderDetailState state;
   final ValueChanged<String> onOpenSubfolder;
+  final ValueChanged<FolderSubfolderItem>? onOpenSubfolderActions;
+  final ValueChanged<FolderDeckItem>? onOpenDeckActions;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +29,11 @@ class FolderTreeSection extends StatelessWidget {
       return Column(
         children: [
           for (var index = 0; index < items.length; index++) ...[
-            _SubfolderRow(item: items[index], onOpenSubfolder: onOpenSubfolder),
+            _SubfolderRow(
+              item: items[index],
+              onOpenSubfolder: onOpenSubfolder,
+              onOpenActions: onOpenSubfolderActions,
+            ),
             if (index < items.length - 1) const MxDivider(),
           ],
         ],
@@ -36,7 +44,7 @@ class FolderTreeSection extends StatelessWidget {
     return Column(
       children: [
         for (var index = 0; index < decks.length; index++) ...[
-          _DeckRow(item: decks[index]),
+          _DeckRow(item: decks[index], onOpenActions: onOpenDeckActions),
           if (index < decks.length - 1) const MxDivider(),
         ],
       ],
@@ -53,11 +61,15 @@ class FolderTreeSliver extends StatelessWidget {
   const FolderTreeSliver({
     required this.state,
     required this.onOpenSubfolder,
+    this.onOpenSubfolderActions,
+    this.onOpenDeckActions,
     super.key,
   });
 
   final FolderDetailState state;
   final ValueChanged<String> onOpenSubfolder;
+  final ValueChanged<FolderSubfolderItem>? onOpenSubfolderActions;
+  final ValueChanged<FolderDeckItem>? onOpenDeckActions;
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +77,11 @@ class FolderTreeSliver extends StatelessWidget {
       final items = state.subfolders;
       return SliverList.separated(
         itemCount: items.length,
-        itemBuilder: (context, index) =>
-            _SubfolderRow(item: items[index], onOpenSubfolder: onOpenSubfolder),
+        itemBuilder: (context, index) => _SubfolderRow(
+          item: items[index],
+          onOpenSubfolder: onOpenSubfolder,
+          onOpenActions: onOpenSubfolderActions,
+        ),
         separatorBuilder: (context, index) => const MxDivider(),
       );
     }
@@ -74,17 +89,23 @@ class FolderTreeSliver extends StatelessWidget {
     final decks = state.decks;
     return SliverList.separated(
       itemCount: decks.length,
-      itemBuilder: (context, index) => _DeckRow(item: decks[index]),
+      itemBuilder: (context, index) =>
+          _DeckRow(item: decks[index], onOpenActions: onOpenDeckActions),
       separatorBuilder: (context, index) => const MxDivider(),
     );
   }
 }
 
 class _SubfolderRow extends StatelessWidget {
-  const _SubfolderRow({required this.item, required this.onOpenSubfolder});
+  const _SubfolderRow({
+    required this.item,
+    required this.onOpenSubfolder,
+    this.onOpenActions,
+  });
 
   final FolderSubfolderItem item;
   final ValueChanged<String> onOpenSubfolder;
+  final ValueChanged<FolderSubfolderItem>? onOpenActions;
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +115,7 @@ class _SubfolderRow extends StatelessWidget {
       icon: item.icon,
       caption: l10n.libraryFolderStats(item.deckCount, item.itemCount),
       onTap: () => onOpenSubfolder(item.id),
+      onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
       trailing: MxStudyProgressAction(
         key: ValueKey('folder_recursive_study_${item.id}'),
         masteryPercent: item.masteryPercent,
@@ -107,9 +129,10 @@ class _SubfolderRow extends StatelessWidget {
 }
 
 class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.item});
+  const _DeckRow({required this.item, this.onOpenActions});
 
   final FolderDeckItem item;
+  final ValueChanged<FolderDeckItem>? onOpenActions;
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +142,7 @@ class _DeckRow extends StatelessWidget {
       icon: Icons.style_outlined,
       metaLine: l10n.foldersDeckCardProgress(item.cardCount, item.dueToday),
       onTap: () => context.pushDeckDetail(item.id),
+      onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
       trailing: MxStudyProgressAction(
         key: ValueKey('deck_study_${item.id}'),
         masteryPercent: item.masteryPercent,

@@ -12,6 +12,7 @@ class FlashcardItemsSection extends StatelessWidget {
     required this.deckId,
     required this.selection,
     required this.onToggleSelection,
+    required this.onOpenActions,
     super.key,
   });
 
@@ -19,6 +20,7 @@ class FlashcardItemsSection extends StatelessWidget {
   final String deckId;
   final Set<String> selection;
   final ValueChanged<String> onToggleSelection;
+  final ValueChanged<FlashcardListItemState> onOpenActions;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +42,13 @@ class FlashcardItemsSection extends StatelessWidget {
                 flashcardId: state.items[index].id,
               );
             },
-            onLongPress: () => onToggleSelection(state.items[index].id),
+            onLongPress: () {
+              if (selection.isNotEmpty) {
+                onToggleSelection(state.items[index].id);
+                return;
+              }
+              onOpenActions(state.items[index]);
+            },
           ),
           if (index < state.items.length - 1) const MxGap(MxSpace.sm),
         ],
