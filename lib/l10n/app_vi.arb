@@ -66,6 +66,21 @@
   "dashboardNoDueMessage": "Mở thư viện để thêm thẻ hoặc bắt đầu học một bộ thẻ cụ thể.",
   "dashboardStudyTodayAction": "Học hôm nay",
   "dashboardOpenLibraryAction": "Mở thư viện",
+  "dashboardLibraryProgressTitle": "Tiến độ thư viện",
+  "dashboardLibraryProgressMessage": "{percent}% thành thạo · {folderCount} thư mục · {cardCount} thẻ",
+  "@dashboardLibraryProgressMessage": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "folderCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
   "settingsAppearanceTitle": "Giao diện",
   "settingsThemeModeLabel": "Chế độ giao diện",
   "settingsThemeSystem": "Theo hệ thống",
@@ -244,14 +259,14 @@
   "flashcardsDeletedMessage": "Đã xóa flashcard.",
   "flashcardsEditTitle": "Chỉnh sửa flashcard",
   "flashcardsNewTitle": "Flashcard mới",
-  "flashcardsFieldTitleLabel": "Tiêu đề",
-  "flashcardsFieldTitleHint": "Tiêu đề hiển thị tùy chọn",
   "flashcardsFieldFrontLabel": "Mặt trước",
   "flashcardsFieldFrontHint": "Prompt hoặc câu hỏi",
   "flashcardsFieldBackLabel": "Mặt sau",
   "flashcardsFieldBackHint": "Đáp án hoặc định nghĩa",
   "flashcardsFieldNoteLabel": "Ghi chú",
   "flashcardsFieldNoteHint": "Ghi chú bổ sung tùy chọn",
+  "flashcardsLongContentHelper": "Hỗ trợ nhiều dòng. Hãy giữ đáp án đầy đủ và dễ đọc khi học.",
+  "flashcardsNoteHelper": "Ngữ cảnh, ví dụ hoặc gợi ý ghi nhớ tùy chọn.",
   "flashcardsSaveAndAddNext": "Lưu và thêm tiếp",
   "flashcardsSavedMessage": "Đã lưu flashcard.",
   "flashcardsSaveChanges": "Lưu thay đổi",
@@ -307,6 +322,20 @@
   "studyResultBoxUp": "Tăng box",
   "studyResultBoxDown": "Giảm box",
   "studyResultRemaining": "Còn lại",
+  "studyResultAccuracyLabel": "Độ chính xác",
+  "studyResultCardsCompleted": "Đã hoàn thành {completed}/{total} thẻ",
+  "@studyResultCardsCompleted": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyResultReviewMoreAction": "Ôn tiếp",
+  "studyResultStudyAgainAction": "Học lại",
   "studyRetryFinalizeAction": "Thử finalize lại",
   "studyResultCompleted": "Đã hoàn thành",
   "studyResultCancelled": "Đã hủy",
@@ -337,6 +366,13 @@
       "answer": {}
     }
   },
+  "studyYourAnswerLabel": "Đáp án của bạn: {answer}",
+  "@studyYourAnswerLabel": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "studyMarkCorrectAction": "Đánh dấu đúng",
   "studyContinueAction": "Tiếp tục",
   "studyEmptyAnswerMessage": "Hãy nhập đáp án trước khi gửi.",
   "studyCancelConfirmTitle": "Hủy phiên học này?",
@@ -350,7 +386,7 @@
   "importLoadFile": "Tải file",
   "importCsvContentLabel": "Nội dung CSV",
   "importTextContentLabel": "Text có cấu trúc",
-  "importCsvHint": "title,front,back,note",
+  "importCsvHint": "front,back,note",
   "importTextHint": "Front: ...\nBack: ...\nNote: ...",
   "importPreviewAction": "Xem trước",
   "importSuccessMessage": "Đã nhập {count} flashcard.",
@@ -383,6 +419,17 @@
   "@importPreviewSubtitle": {
     "placeholders": {
       "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importPreviewSummary": "{valid} hợp lệ · {invalid} lỗi",
+  "@importPreviewSummary": {
+    "placeholders": {
+      "valid": {
+        "type": "int"
+      },
+      "invalid": {
         "type": "int"
       }
     }

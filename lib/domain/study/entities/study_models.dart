@@ -37,23 +37,13 @@ final class StudyFlashcardRef {
     required this.front,
     required this.back,
     required this.sourcePool,
-    this.title,
   });
 
   final String id;
   final String deckId;
-  final String? title;
   final String front;
   final String back;
   final SessionItemSourcePool sourcePool;
-
-  String get displayTitle {
-    final normalizedTitle = title?.trim();
-    if (normalizedTitle != null && normalizedTitle.isNotEmpty) {
-      return normalizedTitle;
-    }
-    return front;
-  }
 }
 
 final class StudySession {

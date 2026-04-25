@@ -47,7 +47,7 @@ DB v1 cần bao phủ:
 
 ## Giả định chốt cho v1
 - Khi folder trở thành rỗng hoàn toàn, `contentMode` được reset về `unlocked` để user có thể chọn lại hướng chứa
-- `title` của flashcard là optional; nếu không có thì sort và search ưu tiên `front`
+- Flashcard không có title riêng; `front` là nhãn hiển thị và khóa sort/search chính
 - `masteryPercent` là derived metric do query/service tính, chưa freeze công thức ở mức schema
 - `Fill` là mode bắt buộc trong New Study và là mode duy nhất của SRS Review
 - Cloze payload nâng cao cho `Fill` chưa thuộc schema v1

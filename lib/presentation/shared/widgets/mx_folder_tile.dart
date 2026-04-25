@@ -90,8 +90,9 @@ class MxFolderTile extends StatelessWidget {
                   MxText(
                     name,
                     role: MxTextRole.tileTitle,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                    softWrap: true,
                   ),
                   if (caption != null) ...[
                     const MxGap(AppSpacing.xxs),

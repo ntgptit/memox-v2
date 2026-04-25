@@ -26,9 +26,9 @@ class FlashcardItemsSection extends StatelessWidget {
       children: [
         for (var index = 0; index < state.items.length; index++) ...[
           MxTermRow(
-            term: state.items[index].title,
+            term: state.items[index].front,
             definition: state.items[index].back,
-            caption: state.items[index].front,
+            caption: state.items[index].note,
             selected: selection.contains(state.items[index].id),
             onTap: () {
               if (selection.isNotEmpty) {

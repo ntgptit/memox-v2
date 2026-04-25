@@ -16,6 +16,7 @@ import '../../../shared/states/mx_error_state.dart';
 import '../../../shared/states/mx_loading_state.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_progress_indicator.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/study_session_notifier.dart';
@@ -102,16 +103,20 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                   studyProgressLabel(l10n, snapshot),
                   role: MxTextRole.pageGreeting,
                 ),
+                const MxGap(MxSpace.sm),
+                MxLinearProgress(value: _sessionProgress(snapshot)),
                 const MxGap(MxSpace.md),
                 StudyModePanel(
                   snapshot: snapshot,
                   answerOptions: studyAnswerOptions(snapshot),
                   isSubmitting: actionState.isLoading,
                   feedback: feedback,
-                  onAnswer: (grade) => _recordFeedback(snapshot, grade),
+                  onAnswer: (submission) =>
+                      _recordFeedback(snapshot, submission),
                   onContinue: feedback == null
                       ? null
                       : () => _continueAfterFeedback(feedback),
+                  onMarkCorrect: _markFeedbackCorrect,
                 ),
                 const MxGap(MxSpace.xl),
                 if (snapshot.canFinalize)
@@ -134,7 +139,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
                       context.goStudyResult(widget.sessionId);
                     },
                   ),
-                if (!snapshot.canFinalize)
+                if (!snapshot.canFinalize && feedback == null)
                   MxSecondaryButton(
                     label: l10n.studySkipAction,
                     leadingIcon: Icons.skip_next_rounded,
@@ -156,7 +161,19 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     );
   }
 
-  void _recordFeedback(StudySessionSnapshot snapshot, AttemptGrade grade) {
+  double _sessionProgress(StudySessionSnapshot snapshot) {
+    final completed = snapshot.summary.completedAttempts;
+    final total = completed + snapshot.summary.remainingCount;
+    if (total <= 0) {
+      return 0;
+    }
+    return completed / total;
+  }
+
+  void _recordFeedback(
+    StudySessionSnapshot snapshot,
+    StudyAnswerSubmission submission,
+  ) {
     final item = snapshot.currentItem;
     if (item == null || _feedback != null) {
       return;
@@ -164,11 +181,23 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     setState(() {
       _feedback = StudyAnswerFeedback(
         itemId: item.id,
-        selectedGrade: grade,
+        selectedGrade: submission.grade,
         isCorrect:
-            grade == AttemptGrade.correct || grade == AttemptGrade.remembered,
+            submission.grade == AttemptGrade.correct ||
+            submission.grade == AttemptGrade.remembered,
         correctAnswer: item.flashcard.back,
+        submittedAnswer: submission.submittedAnswer,
+        selectedOptionId: submission.selectedOptionId,
       );
+    });
+  }
+
+  void _markFeedbackCorrect(StudyAnswerFeedback feedback) {
+    if (_feedback?.itemId != feedback.itemId) {
+      return;
+    }
+    setState(() {
+      _feedback = feedback;
     });
   }
 

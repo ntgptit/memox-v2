@@ -114,6 +114,41 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets('preview summary shows valid and issue counts', (
+    WidgetTester tester,
+  ) async {
+    const deckId = 'deck-001';
+    final repository = _ImportOnlyFlashcardRepository(
+      prepareHandler: ({required format, required rawContent}) =>
+          Future.value(const Success(_preparationWithIssue)),
+    );
+
+    await tester.pumpWidget(
+      _TestApp(
+        overrides: [flashcardRepositoryProvider.overrideWithValue(repository)],
+        child: const DeckImportScreen(deckId: deckId),
+      ),
+    );
+
+    await tester.enterText(
+      find.byType(TextFormField),
+      'front,back\nXin chao,Hello\nMissing back,',
+    );
+    await tester.ensureVisible(find.text('Preview'));
+    await tester.pump();
+    await tester.tap(find.text('Preview'));
+    await tester.pumpAndSettle();
+
+    await tester.drag(
+      find.byKey(const ValueKey('deck_import_content')),
+      const Offset(0, -360),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('1 valid · 1 issues'), findsOneWidget);
+    expect(find.text('Line 3'), findsOneWidget);
+    expect(find.text('Back is required.'), findsOneWidget);
+  });
 }
 
 const _validPreparation = FlashcardImportPreparation(
@@ -125,6 +160,17 @@ const _validPreparation = FlashcardImportPreparation(
     ),
   ],
   issues: [],
+);
+
+const _preparationWithIssue = FlashcardImportPreparation(
+  format: ImportSourceFormat.csv,
+  previewItems: [
+    FlashcardImportPreviewItem(
+      sourceLabel: 'Line 2',
+      draft: FlashcardDraft(front: 'Xin chao', back: 'Hello'),
+    ),
+  ],
+  issues: [ImportValidationIssue(lineNumber: 3, message: 'Back is required.')],
 );
 
 final class _ImportOnlyFlashcardRepository implements FlashcardRepository {

@@ -28,7 +28,7 @@ class FolderReorderSection extends StatelessWidget {
           state.subfolders.firstWhere((item) => item.id == id),
       ];
       return SizedBox(
-        height: MxFeatureSizes.reorderPanelHeight,
+        height: MxFeatureSizes.reorderPanelHeightFor(context),
         child: MxReorderableList.builder(
           itemCount: orderedItems.length,
           buildDefaultDragHandles: true,
@@ -49,7 +49,7 @@ class FolderReorderSection extends StatelessWidget {
         state.decks.firstWhere((item) => item.id == id),
     ];
     return SizedBox(
-      height: MxFeatureSizes.reorderPanelHeight,
+      height: MxFeatureSizes.reorderPanelHeightFor(context),
       child: MxReorderableList.builder(
         itemCount: orderedItems.length,
         buildDefaultDragHandles: true,

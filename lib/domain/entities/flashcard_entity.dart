@@ -6,7 +6,6 @@ final class FlashcardEntity extends BaseEntity {
     required super.createdAt,
     required super.updatedAt,
     required this.deckId,
-    required this.title,
     required this.front,
     required this.back,
     required this.note,
@@ -14,18 +13,10 @@ final class FlashcardEntity extends BaseEntity {
   });
 
   final String deckId;
-  final String? title;
   final String front;
   final String back;
   final String? note;
   final int sortOrder;
 
-  String get displayName {
-    final trimmedTitle = title?.trim();
-    if (trimmedTitle != null && trimmedTitle.isNotEmpty) {
-      return trimmedTitle;
-    }
-
-    return front;
-  }
+  String get displayName => front;
 }

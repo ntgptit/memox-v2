@@ -6,6 +6,7 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/study_enums.dart';
+import '../../../../domain/study/entities/study_models.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
@@ -13,6 +14,8 @@ import '../../../shared/states/mx_error_state.dart';
 import '../../../shared/states/mx_loading_state.dart';
 import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_progress_indicator.dart';
+import '../../../shared/widgets/mx_progress_ring.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/study_session_notifier.dart';
@@ -51,6 +54,8 @@ class StudyResultScreen extends ConsumerWidget {
                 role: MxTextRole.contentBody,
               ),
               const MxGap(MxSpace.xl),
+              _ResultProgressSummary(snapshot: snapshot),
+              const MxGap(MxSpace.lg),
               MxCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -101,11 +106,7 @@ class StudyResultScreen extends ConsumerWidget {
                       .finalizeSession(),
                 ),
               if (snapshot.session.status != SessionStatus.failedToFinalize)
-                MxSecondaryButton(
-                  label: l10n.commonBack,
-                  leadingIcon: Icons.arrow_back_rounded,
-                  onPressed: context.goLibrary,
-                ),
+                _ResultActions(snapshot: snapshot),
             ],
           ),
         ),
@@ -122,6 +123,111 @@ class StudyResultScreen extends ConsumerWidget {
       SessionStatus.inProgress => l10n.studyResultInProgress,
       SessionStatus.draft => l10n.studyResultDraft,
     };
+  }
+}
+
+class _ResultProgressSummary extends StatelessWidget {
+  const _ResultProgressSummary({required this.snapshot});
+
+  final StudySessionSnapshot snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final completed = snapshot.summary.completedAttempts;
+    final total = completed + snapshot.summary.remainingCount;
+    final accuracy = _progressValue(
+      snapshot.summary.correctAttempts,
+      completed,
+    );
+    final cardsCompleted = _progressValue(completed, total);
+
+    return MxCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              MxProgressRing(value: accuracy),
+              const MxGap(MxSpace.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    MxText(
+                      l10n.studyResultAccuracyLabel,
+                      role: MxTextRole.sectionTitle,
+                    ),
+                    const MxGap(MxSpace.xs),
+                    MxText(
+                      '${(accuracy * 100).round()}%',
+                      role: MxTextRole.pageTitle,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const MxGap(MxSpace.lg),
+          MxLinearProgress(
+            value: cardsCompleted,
+            label: l10n.studyResultCardsCompleted(completed, total),
+            showPercentage: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  double _progressValue(int value, int total) {
+    if (total <= 0) {
+      return 0;
+    }
+    return value / total;
+  }
+}
+
+class _ResultActions extends StatelessWidget {
+  const _ResultActions({required this.snapshot});
+
+  final StudySessionSnapshot snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final entryRefId = snapshot.session.entryRefId;
+    final canStudyEntry =
+        entryRefId != null &&
+        (snapshot.session.entryType == StudyEntryType.deck ||
+            snapshot.session.entryType == StudyEntryType.folder);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        MxPrimaryButton(
+          label: l10n.studyResultReviewMoreAction,
+          leadingIcon: Icons.school_rounded,
+          onPressed: context.goStudyToday,
+        ),
+        if (canStudyEntry) ...[
+          const MxGap(MxSpace.sm),
+          MxSecondaryButton(
+            label: l10n.studyResultStudyAgainAction,
+            leadingIcon: Icons.replay_rounded,
+            onPressed: () => context.goStudyEntry(
+              entryType: snapshot.session.entryType.storageValue,
+              entryRefId: entryRefId,
+            ),
+          ),
+        ],
+        const MxGap(MxSpace.sm),
+        MxSecondaryButton(
+          label: l10n.commonBack,
+          leadingIcon: Icons.arrow_back_rounded,
+          onPressed: context.goLibrary,
+        ),
+      ],
+    );
   }
 }
 

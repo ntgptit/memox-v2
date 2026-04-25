@@ -133,11 +133,7 @@ void main() {
 
         final flashcard = await harness.flashcardRepository.createFlashcard(
           deckId: deckId,
-          draft: const FlashcardDraft(
-            title: 'Greeting',
-            front: 'hello',
-            back: 'xin chao',
-          ),
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
         );
 
         final flashcardId = flashcard.valueOrNull!.id;
@@ -311,7 +307,7 @@ void main() {
 
         final preparation = await harness.flashcardRepository.prepareImport(
           format: ImportSourceFormat.csv,
-          rawContent: 'title,front,back\nGreeting,hello,xin chao\nBroken,,',
+          rawContent: 'front,back\nhello,xin chao\nBroken,',
         );
 
         expect(preparation.isSuccess, isTrue);

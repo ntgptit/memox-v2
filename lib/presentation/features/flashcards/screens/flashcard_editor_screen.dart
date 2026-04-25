@@ -33,7 +33,6 @@ class FlashcardEditorScreen extends ConsumerStatefulWidget {
 }
 
 class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
-  late final TextEditingController _titleController = TextEditingController();
   late final TextEditingController _frontController = TextEditingController();
   late final TextEditingController _backController = TextEditingController();
   late final TextEditingController _noteController = TextEditingController();
@@ -41,7 +40,6 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
 
   @override
   void dispose() {
-    _titleController.dispose();
     _frontController.dispose();
     _backController.dispose();
     _noteController.dispose();
@@ -80,7 +78,6 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
           stackTrace: draftState.hasError ? draftState.stackTrace : null,
           dataBuilder: (context, draft) {
             if (!_didSeedControllers) {
-              _titleController.text = draft.title;
               _frontController.text = draft.front;
               _backController.text = draft.back;
               _noteController.text = draft.note;
@@ -100,11 +97,9 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
                 const MxGap(MxSpace.xl),
                 FlashcardEditorForm(
                   draft: draft,
-                  titleController: _titleController,
                   frontController: _frontController,
                   backController: _backController,
                   noteController: _noteController,
-                  onTitleChanged: draftNotifier.setTitle,
                   onFrontChanged: draftNotifier.setFront,
                   onBackChanged: draftNotifier.setBack,
                   onNoteChanged: draftNotifier.setNote,
@@ -116,7 +111,6 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
                       return;
                     }
                     _didSeedControllers = false;
-                    _titleController.clear();
                     _frontController.clear();
                     _backController.clear();
                     _noteController.clear();

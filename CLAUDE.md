@@ -4,6 +4,8 @@ Personal flashcard / spaced-repetition app. Flutter 3.11+ / Dart 3.11, Riverpod 
 
 This file is the **workspace router**. It takes precedence over generic skills and global defaults per the global priority contract (system → global CLAUDE.md → **this file** → skills → CI).
 
+Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt ra, code sau khi thực hiện sẽ được Codex code và ChatGPT phiên bản web review.
+
 ---
 
 ## Non-negotiable: the local guard
@@ -27,7 +29,7 @@ Pair with `flutter analyze` (must also report clean) after every change batch.
 
 ## Architecture (Clean Architecture, enforced by guard)
 
-```
+```text
 lib/
 ├── app/                      # bootstrap, DI, router, global config
 │   ├── app.dart              # barrel → re-exports MemoxApp from main.dart
@@ -46,6 +48,7 @@ lib/
 ```
 
 **Layer rules**:
+
 - `domain/` must not import `flutter/material.dart`, Drift, or any `data/`/`presentation/`.
 - `data/` depends on `domain/` only. Drift transactions stay in `data/` or `core/database/`.
 - `presentation/` never imports `data/` implementations or Drift. UI reaches state via providers.
@@ -59,7 +62,7 @@ lib/
 Tokens live in `lib/core/theme/` as **separate files**, not a single barrel:
 
 | File | Purpose |
-|---|---|
+| --- | --- |
 | `app_colors.dart` | Raw color palette (Indigo / Teal + neutrals + semantic success/warning/info + rating grades). **Shared widgets and features must NOT import this directly.** Tone numbers are consistent per brightness: **light role palettes use `{10, 40, 90, 100}`**, **dark role palettes use `{20, 30, 80, 90}`**. `neutral*`, `darkNavy*`, `mastery`, `streak`, and `rating*` are single-tone semantic tokens with independent scales. Semantic tokens (`success` / `warning` / `info`) carry their own hex values — do **not** alias them to `tertiary` / `primary` / etc., so future divergence stays a one-line edit. Never declare a token without a concrete consumer. |
 | `app_spacing.dart` | `AppSpacing` — spacing + gaps (`xxs`, `xs`, `sm`, `md`, `lg`, `xl`, `xxl`, `xxxl`, `xxxxl`, `screen`). |
 | `app_radius.dart` | `AppRadius` — radii + `BorderRadius` helpers (`borderSm`, `borderMd`, `borderLg`, `borderFull`). |
@@ -76,7 +79,7 @@ Tokens live in `lib/core/theme/` as **separate files**, not a single barrel:
 **Component themes (`component_themes/*.dart`)** — every Material surface is themed centrally so features get consistent focus / hover / pressed / disabled behavior for free:
 
 | File | Covers |
-|---|---|
+| --- | --- |
 | `focus_theme.dart` | `AppFocus` state-layer opacities (`hoverOpacity`, `focusOpacity`, `pressedOpacity`, `selectedOpacity`), ring width, `overlay(...)` + `overlayProperty(...)` helpers for `WidgetStateProperty<Color?>`. |
 | `app_bar_theme.dart` | `AppBar` surface + title style. |
 | `button_theme.dart` | Elevated / Filled / Outlined / Text / IconButton / FAB. Focus routed through `AppFocus`. |
@@ -97,11 +100,13 @@ Tokens live in `lib/core/theme/` as **separate files**, not a single barrel:
 | `tooltip_theme.dart` | `TooltipTheme`. |
 
 **Rules**:
+
 - New Material component surfaces MUST be configured here before being used in a feature. Do not thread `color:` / `padding:` per call site — add it to the component theme.
 - Focus / hover / pressed visuals MUST flow through `AppFocus.overlay(...)` or `AppFocus.overlayProperty(...)`. Do not hand-roll focus rings with `Container + Border` or hardcode alpha values.
 - Shared `Mx*` widgets compose on top of these themes; they do not re-declare the same colors or paddings.
 
 **Hard rules enforced by guard**:
+
 - UI code gets colors via `Theme.of(context).colorScheme.*` and `context.mxColors.*`, never from `app_colors.dart`.
 - Typography via `Theme.of(context).textTheme.*`, never from `app_typography.dart` directly.
 - No raw `Colors.transparent` in presentation — use `MaterialType.transparency` or a themed color.
@@ -125,6 +130,7 @@ Dark mode targets a **deep-navy + indigo accent** aesthetic, not flat grey:
 - Text: `onSurface` uses `neutral95` for brighter contrast on navy.
 
 **Rules**:
+
 - Do not introduce new "dark grey" neutrals for backgrounds. Extend `AppColors.darkNavy*` if a new tier is needed.
 - Do not hardcode background colors in widgets — always go through `scheme.surface` / `scheme.surfaceContainer*`.
 - Test every screen in **both** themes before shipping; a component that only works in light mode is a bug.
@@ -149,6 +155,7 @@ Dark mode targets a **deep-navy + indigo accent** aesthetic, not flat grey:
 All reusable UI lives in `lib/presentation/shared/`. Features MUST reach for a shared widget first; only drop to raw Material widgets when the shared catalogue is a mismatch, and in that case consider promoting the new pattern into `shared/` for the next feature.
 
 **Interaction shape rules**:
+
 - Ink, hover, focus, and splash overlays MUST match the rendered shape of the widget they decorate.
 - Do not use `PopupMenuButton(child: ...)` for rounded, pill, or stadium triggers. Its internal overlay does not reliably inherit the child shape. Prefer `MenuAnchor` with a trigger widget that owns its own interaction shape, such as `MxChip(onTap: ...)` or `MxIconButton`.
 - Any `InkWell` / `InkResponse` wrapping a rounded trigger must set `customBorder` or `borderRadius` to match the visual shape.
@@ -157,7 +164,7 @@ All reusable UI lives in `lib/presentation/shared/`. Features MUST reach for a s
 ### Layouts (`presentation/shared/layouts/`)
 
 | Widget | Use when |
-|---|---|
+| --- | --- |
 | `MxAdaptiveScaffold` | Top-level shell with destinations. Handles bottom nav → rail → extended rail across tiers. |
 | `MxScaffold` | Leaf-screen scaffold (no destinations). |
 | `MxContentShell` | Caps reading column width at a `MxContentWidth` role. |
@@ -166,7 +173,7 @@ All reusable UI lives in `lib/presentation/shared/`. Features MUST reach for a s
 ### Widgets (`presentation/shared/widgets/`)
 
 | Widget | Purpose |
-|---|---|
+| --- | --- |
 | `MxPrimaryButton` / `MxSecondaryButton` | Filled / outlined / text buttons with size variants. |
 | `MxIconButton` | Themed icon-only button. |
 | `MxTextField` / `MxSearchField` | Input fields, bound to input theme. |
@@ -186,7 +193,7 @@ All reusable UI lives in `lib/presentation/shared/`. Features MUST reach for a s
 ### Dialogs / Feedback / States
 
 | Widget | Purpose |
-|---|---|
+| --- | --- |
 | `MxDialog`, `MxConfirmationDialog`, `MxBottomSheet` | Modal surfaces. |
 | `MxBanner`, `MxSnackbar` | Inline + transient feedback. |
 | `MxEmptyState`, `MxErrorState`, `MxLoadingState`, `MxOfflineState` | Full-area states. |
@@ -217,7 +224,7 @@ MemoX must render correctly on **every** window size from phone portrait to extr
 ### Window sizes (Material 3 window size classes)
 
 | Tier | Width | Typical device |
-|---|---|---|
+| --- | --- | --- |
 | `compact` | `< 600` | phone portrait |
 | `medium` | `600–839` | phone landscape, small tablet |
 | `expanded` | `840–1199` | tablet, small laptop |
@@ -235,7 +242,7 @@ Two layers. **Prefer the layout-spec layer.** Drop to the primitive layer only f
 `lib/core/theme/app_layout.dart` holds the repeated layout rules. Every new screen reads here:
 
 | API | Returns | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `context.pagePadding` | `EdgeInsets` | Horizontal page gutter for the active tier. |
 | `context.contentMaxWidth(MxContentWidth role)` | `double` | Max width for a centered content column by role (`reading` / `wide` / `hero` / `full`). |
 | `context.sectionGap` | `double` | Vertical gap between top-level page sections. |
@@ -253,7 +260,7 @@ If you need a "responsive number" that is plausibly reused across screens, **add
 `lib/core/utils/responsive.dart` is the low-level escape hatch. Use **only** for tier-aware values that do not correspond to a layout role:
 
 | API | Purpose |
-|---|---|
+| --- | --- |
 | `context.windowSize` / `context.isCompact` / `context.isExpandedOrLarger` | Read the current tier (defined in `app_breakpoints.dart`). |
 | `context.responsive<T>(compact:, medium:, expanded:, large:, extraLarge:)` | Pick a tier-aware value with mobile-first fallback. |
 | `context.adaptive<T>(compact:, expanded:)` | Two-way phone vs. everything-else split. |

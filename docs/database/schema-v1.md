@@ -59,7 +59,6 @@ erDiagram
 | --- | --- | --- | --- |
 | `id` | TEXT | no | PK |
 | `deck_id` | TEXT | no | FK -> `decks.id` |
-| `title` | TEXT | yes | optional, phục vụ sort/search |
 | `front` | TEXT | no | mặt trước |
 | `back` | TEXT | no | mặt sau |
 | `note` | TEXT | yes | ghi chú thêm nếu có |
@@ -69,8 +68,8 @@ erDiagram
 
 ### Rule
 - Mỗi flashcard luôn thuộc đúng 1 deck
-- Sort theo tên dùng `COALESCE(title, front)`
-- Search ít nhất trên `title`, `front`, `back`
+- Sort theo tên dùng `front`
+- Search ít nhất trên `front`, `back`
 
 ## 4. `flashcard_progress`
 | Column | Type | Null | Notes |

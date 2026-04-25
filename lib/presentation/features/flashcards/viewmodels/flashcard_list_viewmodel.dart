@@ -17,7 +17,6 @@ part 'flashcard_list_viewmodel.g.dart';
 class FlashcardListItemState {
   const FlashcardListItemState({
     required this.id,
-    required this.title,
     required this.front,
     required this.back,
     required this.note,
@@ -25,7 +24,6 @@ class FlashcardListItemState {
   });
 
   final String id;
-  final String title;
   final String front;
   final String back;
   final String? note;
@@ -91,7 +89,6 @@ Future<FlashcardListState> flashcardListQuery(Ref ref, String deckId) async {
         .map(
           (item) => FlashcardListItemState(
             id: item.flashcard.id,
-            title: item.flashcard.displayName,
             front: item.flashcard.front,
             back: item.flashcard.back,
             note: item.flashcard.note,

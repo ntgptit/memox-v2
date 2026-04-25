@@ -75,6 +75,7 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
         width: MxContentWidth.wide,
         applyVerticalPadding: true,
         child: ListView(
+          key: const ValueKey('deck_import_content'),
           children: [
             DeckImportHeaderSection(deckId: widget.deckId),
             const MxGap(MxSpace.xl),

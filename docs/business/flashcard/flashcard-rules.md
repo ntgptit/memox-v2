@@ -58,8 +58,7 @@
 - Hỗ trợ sort theo tên
 - Hỗ trợ sort theo mới nhất
 - Hỗ trợ sort theo học gần nhất
-- Với flashcard, tên là nhãn hiển thị chính của flashcard
-- Nếu flashcard không có title riêng thì dùng front làm khóa sort theo tên
+- Với flashcard, front là nhãn hiển thị chính và khóa sort theo tên
 - Mới nhất được hiểu là createdAt giảm dần
 - Học gần nhất được hiểu là lastStudiedAt giảm dần
 - Flashcard chưa từng có lịch sử học nằm cuối khi sort theo học gần nhất

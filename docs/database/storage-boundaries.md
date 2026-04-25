@@ -55,7 +55,7 @@ Lý do:
 ### V1
 - Folder search: query theo `folders.name`
 - Deck search: query theo `decks.name`
-- Flashcard search: query theo `COALESCE(title, front)`, `front`, `back`
+- Flashcard search: query theo `front`, `back`
 - Ưu tiên `LIKE` hoặc `LOWER(...) LIKE LOWER(...)` trong Drift cho bản đầu
 
 ### V2 khi dữ liệu lớn

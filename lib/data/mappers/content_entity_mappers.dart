@@ -37,7 +37,6 @@ extension FlashcardDataMapper on Flashcard {
     return FlashcardEntity(
       id: id,
       deckId: deckId,
-      title: title,
       front: front,
       back: back,
       note: note,

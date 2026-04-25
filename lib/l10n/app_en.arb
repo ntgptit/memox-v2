@@ -66,6 +66,21 @@
   "dashboardNoDueMessage": "Open your library to add cards or start a focused deck session.",
   "dashboardStudyTodayAction": "Study today",
   "dashboardOpenLibraryAction": "Open library",
+  "dashboardLibraryProgressTitle": "Library progress",
+  "dashboardLibraryProgressMessage": "{percent}% mastery · {folderCount} folders · {cardCount} cards",
+  "@dashboardLibraryProgressMessage": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "folderCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
   "settingsAppearanceTitle": "Appearance",
   "settingsThemeModeLabel": "Theme mode",
   "settingsThemeSystem": "System",
@@ -244,14 +259,14 @@
   "flashcardsDeletedMessage": "Flashcards deleted.",
   "flashcardsEditTitle": "Edit flashcard",
   "flashcardsNewTitle": "New flashcard",
-  "flashcardsFieldTitleLabel": "Title",
-  "flashcardsFieldTitleHint": "Optional display title",
   "flashcardsFieldFrontLabel": "Front",
   "flashcardsFieldFrontHint": "Prompt or question",
   "flashcardsFieldBackLabel": "Back",
   "flashcardsFieldBackHint": "Answer or definition",
   "flashcardsFieldNoteLabel": "Note",
   "flashcardsFieldNoteHint": "Optional extra note",
+  "flashcardsLongContentHelper": "Supports multiple lines. Keep the full answer readable during study.",
+  "flashcardsNoteHelper": "Optional context, examples, or memory hints.",
   "flashcardsSaveAndAddNext": "Save & add next",
   "flashcardsSavedMessage": "Flashcard saved.",
   "flashcardsSaveChanges": "Save changes",
@@ -307,6 +322,20 @@
   "studyResultBoxUp": "Box increased",
   "studyResultBoxDown": "Box decreased",
   "studyResultRemaining": "Remaining",
+  "studyResultAccuracyLabel": "Accuracy",
+  "studyResultCardsCompleted": "{completed} of {total} cards completed",
+  "@studyResultCardsCompleted": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyResultReviewMoreAction": "Review more",
+  "studyResultStudyAgainAction": "Study again",
   "studyRetryFinalizeAction": "Retry finalize",
   "studyResultCompleted": "Completed",
   "studyResultCancelled": "Cancelled",
@@ -337,6 +366,13 @@
       "answer": {}
     }
   },
+  "studyYourAnswerLabel": "Your answer: {answer}",
+  "@studyYourAnswerLabel": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "studyMarkCorrectAction": "Mark correct",
   "studyContinueAction": "Continue",
   "studyEmptyAnswerMessage": "Enter an answer before submitting.",
   "studyCancelConfirmTitle": "Cancel this session?",
@@ -350,7 +386,7 @@
   "importLoadFile": "Load file",
   "importCsvContentLabel": "CSV content",
   "importTextContentLabel": "Structured text",
-  "importCsvHint": "title,front,back,note",
+  "importCsvHint": "front,back,note",
   "importTextHint": "Front: ...\nBack: ...\nNote: ...",
   "importPreviewAction": "Preview",
   "importSuccessMessage": "Imported {count} flashcards.",
@@ -383,6 +419,17 @@
   "@importPreviewSubtitle": {
     "placeholders": {
       "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importPreviewSummary": "{valid} valid · {invalid} issues",
+  "@importPreviewSummary": {
+    "placeholders": {
+      "valid": {
+        "type": "int"
+      },
+      "invalid": {
         "type": "int"
       }
     }

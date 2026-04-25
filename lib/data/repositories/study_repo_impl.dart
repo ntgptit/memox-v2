@@ -338,7 +338,7 @@ final class StudyRepoImpl implements StudyRepo {
     final rows = await _database
         .customSelect(
           '''
-      SELECT f.id, f.deck_id, f.title, f.front, f.back, p.due_at
+      SELECT f.id, f.deck_id, f.front, f.back, p.due_at
       FROM flashcards f
       INNER JOIN decks d ON d.id = f.deck_id
       LEFT JOIN flashcard_progress p ON p.flashcard_id = f.id
@@ -682,7 +682,6 @@ final class StudyRepoImpl implements StudyRepo {
     return StudyFlashcardRef(
       id: flashcard.id,
       deckId: flashcard.deckId,
-      title: flashcard.title,
       front: flashcard.front,
       back: flashcard.back,
       sourcePool: DatabaseEnumCodecs.sessionItemSourcePoolFromStorage(
@@ -698,7 +697,6 @@ final class StudyRepoImpl implements StudyRepo {
     return StudyFlashcardRef(
       id: row.read<String>('id'),
       deckId: row.read<String>('deck_id'),
-      title: row.read<String?>('title'),
       front: row.read<String>('front'),
       back: row.read<String>('back'),
       sourcePool: sourcePool,

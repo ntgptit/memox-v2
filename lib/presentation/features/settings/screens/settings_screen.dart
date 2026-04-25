@@ -39,6 +39,7 @@ class SettingsScreen extends ConsumerWidget {
               title: l10n.settingsAppearanceTitle,
               label: l10n.settingsThemeModeLabel,
               child: MxSegmentedControl<ThemeMode>(
+                adaptive: true,
                 segments: [
                   MxSegment(
                     value: ThemeMode.system,
@@ -69,6 +70,7 @@ class SettingsScreen extends ConsumerWidget {
               title: l10n.settingsLanguageTitle,
               label: l10n.settingsLocaleLabel,
               child: MxSegmentedControl<_LocaleChoice>(
+                adaptive: true,
                 segments: [
                   MxSegment(
                     value: _LocaleChoice.system,

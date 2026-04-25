@@ -28,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -40,6 +40,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 2) {
         await _rebuildLegacyFlashcardProgressIfNeeded(migrator);
         await _resetLegacyStudyTablesIfNeeded(migrator);
+      }
+      if (from < 3) {
+        await _migrateFlashcardsForSchemaV3(migrator);
       }
       await _createIndexes();
     },
@@ -183,6 +186,54 @@ class AppDatabase extends _$AppDatabase {
       return true;
     }
     return !await _hasColumn('study_attempts', 'attempt_number');
+  }
+
+  Future<void> _migrateFlashcardsForSchemaV3(Migrator migrator) async {
+    if (!await _hasTable('flashcards')) {
+      await migrator.createTable(flashcards);
+      return;
+    }
+
+    if (!await _hasRequiredFlashcardColumns()) {
+      await _dropAndCreateFlashcardContentTables(migrator);
+      return;
+    }
+
+    if (!await _hasColumn('flashcards', 'title')) {
+      return;
+    }
+
+    // ignore: experimental_member_use
+    await migrator.alterTable(TableMigration(flashcards));
+  }
+
+  Future<bool> _hasRequiredFlashcardColumns() async {
+    return await _hasColumn('flashcards', 'id') &&
+        await _hasColumn('flashcards', 'deck_id') &&
+        await _hasColumn('flashcards', 'front') &&
+        await _hasColumn('flashcards', 'back') &&
+        await _hasColumn('flashcards', 'note') &&
+        await _hasColumn('flashcards', 'sort_order') &&
+        await _hasColumn('flashcards', 'created_at') &&
+        await _hasColumn('flashcards', 'updated_at');
+  }
+
+  Future<void> _dropAndCreateFlashcardContentTables(Migrator migrator) async {
+    await customStatement('PRAGMA foreign_keys = OFF');
+    await customStatement('DROP TABLE IF EXISTS study_attempts');
+    await customStatement('DROP TABLE IF EXISTS study_session_items');
+    await customStatement('DROP TABLE IF EXISTS study_sessions');
+    await customStatement('DROP TABLE IF EXISTS flashcard_progress');
+    await customStatement(
+      'DROP INDEX IF EXISTS idx_flashcards_deck_sort_order',
+    );
+    await customStatement('DROP TABLE IF EXISTS flashcards');
+    await migrator.createTable(flashcards);
+    await migrator.createTable(flashcardProgress);
+    await migrator.createTable(studySessions);
+    await migrator.createTable(studySessionItems);
+    await migrator.createTable(studyAttempts);
+    await customStatement('PRAGMA foreign_keys = ON');
   }
 
   Future<bool> _hasTable(String tableName) async {

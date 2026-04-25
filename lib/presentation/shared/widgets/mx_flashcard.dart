@@ -61,13 +61,39 @@ class MxFlashcard extends StatelessWidget {
                   color: scheme.onSurfaceVariant,
                 ),
               ),
-            Center(
-              child: MxText(
-                content,
-                role: MxTextRole.displayLarge,
-                textAlign: TextAlign.center,
-                maxLines: 6,
-                overflow: TextOverflow.ellipsis,
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: language != null ? AppSpacing.xl : AppSpacing.none,
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bottomInset = onFullscreen != null
+                        ? AppIconSizes.lg + AppSpacing.xl
+                        : AppSpacing.none;
+                    final minHeight = constraints.maxHeight > bottomInset
+                        ? constraints.maxHeight - bottomInset
+                        : AppSpacing.none;
+
+                    return Scrollbar(
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.only(bottom: bottomInset),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(minHeight: minHeight),
+                          child: Center(
+                            child: MxText(
+                              content,
+                              role: MxTextRole.displayLarge,
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
             if (onFullscreen != null)

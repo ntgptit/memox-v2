@@ -27,8 +27,7 @@ final class FlashcardDao {
       statement.where(
         (table) =>
             table.front.lower().like(pattern) |
-            table.back.lower().like(pattern) |
-            table.title.lower().isNotNull() & table.title.lower().like(pattern),
+            table.back.lower().like(pattern),
       );
     }
     switch (query.sortMode) {
@@ -80,9 +79,6 @@ final class FlashcardDao {
           FlashcardsCompanion.insert(
             id: id,
             deckId: deckId,
-            title: Value(
-              draft.title?.trim().isEmpty ?? true ? null : draft.title?.trim(),
-            ),
             front: draft.front.trim(),
             back: draft.back.trim(),
             note: Value(
@@ -116,9 +112,6 @@ final class FlashcardDao {
       _database.flashcards,
     )..where((table) => table.id.equals(flashcardId))).write(
       FlashcardsCompanion(
-        title: Value(
-          draft.title?.trim().isEmpty ?? true ? null : draft.title?.trim(),
-        ),
         front: Value(draft.front.trim()),
         back: Value(draft.back.trim()),
         note: Value(

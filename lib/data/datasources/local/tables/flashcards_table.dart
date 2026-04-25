@@ -14,10 +14,6 @@ class Flashcards extends Table {
       .named('deck_id')
       .references(Decks, #id, onDelete: KeyAction.cascade)();
 
-  TextColumn get title => text().nullable().check(
-    title.isNull() | title.trim().length.isBiggerOrEqualValue(1),
-  )();
-
   TextColumn get front =>
       text().check(front.trim().length.isBiggerOrEqualValue(1))();
 

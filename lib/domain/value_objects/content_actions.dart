@@ -39,14 +39,8 @@ final class ExportData {
 enum ImportSourceFormat { csv, structuredText }
 
 final class FlashcardDraft {
-  const FlashcardDraft({
-    required this.front,
-    required this.back,
-    this.title,
-    this.note,
-  });
+  const FlashcardDraft({required this.front, required this.back, this.note});
 
-  final String? title;
   final String front;
   final String back;
   final String? note;

@@ -6,6 +6,7 @@ import '../../../../domain/value_objects/content_actions.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/states/mx_error_state.dart';
+import '../../../shared/widgets/mx_text.dart';
 import '../../../shared/widgets/mx_term_row.dart';
 
 class DeckImportPreviewSection extends StatelessWidget {
@@ -20,6 +21,14 @@ class DeckImportPreviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        MxText(
+          l10n.importPreviewSummary(
+            preparation.previewItems.length,
+            preparation.issues.length,
+          ),
+          role: MxTextRole.formHelper,
+        ),
+        const MxGap(MxSpace.xl),
         if (preparation.issues.isNotEmpty)
           MxSection(
             title: l10n.importValidationIssuesTitle,
@@ -60,13 +69,7 @@ class DeckImportPreviewSection extends StatelessWidget {
                       index++
                     ) ...[
                       MxTermRow(
-                        term:
-                            preparation.previewItems[index].draft.title
-                                    ?.trim()
-                                    .isNotEmpty ==
-                                true
-                            ? preparation.previewItems[index].draft.title!
-                            : preparation.previewItems[index].draft.front,
+                        term: preparation.previewItems[index].draft.front,
                         definition: preparation.previewItems[index].draft.back,
                         caption: preparation.previewItems[index].sourceLabel,
                       ),

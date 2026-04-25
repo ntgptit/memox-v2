@@ -6,6 +6,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../core/errors/error_mapper.dart';
 import '../../core/errors/failures.dart';
+import '../../core/theme/responsive/app_layout.dart';
 import '../../presentation/features/dashboard/screens/dashboard_screen.dart';
 import '../../presentation/features/decks/screens/deck_detail_screen.dart';
 import '../../presentation/features/flashcards/screens/deck_import_screen.dart';
@@ -17,6 +18,9 @@ import '../../presentation/features/settings/screens/settings_screen.dart';
 import '../../presentation/features/study/screens/study_entry_screen.dart';
 import '../../presentation/features/study/screens/study_result_screen.dart';
 import '../../presentation/features/study/screens/study_session_screen.dart';
+import '../../presentation/shared/layouts/mx_content_shell.dart';
+import '../../presentation/shared/states/mx_empty_state.dart';
+import '../../presentation/shared/states/mx_error_state.dart';
 import '../app_shell.dart';
 import '../di/providers.dart';
 import 'route_guards.dart';
@@ -221,35 +225,13 @@ class _ShellPlaceholderView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final scheme = Theme.of(context).colorScheme;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: textTheme.headlineSmall?.copyWith(
-                  color: scheme.onSurface,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                description,
-                style: textTheme.bodyLarge?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+    return MxContentShell(
+      width: MxContentWidth.reading,
+      applyVerticalPadding: true,
+      child: MxEmptyState(
+        icon: Icons.insights_outlined,
+        title: title,
+        message: description,
       ),
     );
   }
@@ -267,51 +249,14 @@ class _RouterErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final textTheme = Theme.of(context).textTheme;
-    final scheme = Theme.of(context).colorScheme;
     final technicalDetail = failure.technicalDetails;
     final message = _localizedMessage(l10n);
 
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.error_outline, size: 40, color: scheme.error),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.appRouterErrorTitle,
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: scheme.onSurface,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  message,
-                  style: textTheme.bodyLarge?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                if (showTechnicalDetails && technicalDetail != null) ...[
-                  const SizedBox(height: 16),
-                  SelectableText(
-                    technicalDetail,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
+      body: MxErrorState(
+        title: l10n.appRouterErrorTitle,
+        message: message,
+        details: showTechnicalDetails ? technicalDetail : null,
       ),
     );
   }

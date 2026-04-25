@@ -11,6 +11,7 @@ import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_progress_indicator.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../../folders/viewmodels/library_overview_viewmodel.dart';
@@ -55,6 +56,13 @@ class _DashboardContent extends StatelessWidget {
       0,
       (sum, folder) => sum + folder.itemCount,
     );
+    final weightedMasteryTotal = state.folders.fold<int>(
+      0,
+      (sum, folder) => sum + folder.itemCount * folder.masteryPercent,
+    );
+    final weightedMastery = cardCount == 0
+        ? 0
+        : (weightedMasteryTotal / cardCount).round();
     final hasDueCards = dueToday > 0;
 
     return ListView(
@@ -79,30 +87,38 @@ class _DashboardContent extends StatelessWidget {
           value: '$folderCount',
           message: l10n.dashboardLibrarySummary(folderCount, cardCount),
         ),
-        const MxGap(MxSpace.xl),
-        MxPrimaryButton(
-          key: const ValueKey('dashboard_study_today_action'),
-          label: l10n.dashboardStudyTodayAction,
-          leadingIcon: Icons.play_arrow_rounded,
-          fullWidth: true,
-          onPressed: hasDueCards ? () => context.goStudyToday() : null,
+        const MxGap(MxSpace.lg),
+        _DashboardProgressCard(
+          percent: weightedMastery,
+          folderCount: folderCount,
+          cardCount: cardCount,
         ),
-        if (!hasDueCards) ...[
-          const MxGap(MxSpace.sm),
-          MxText(
-            l10n.dashboardNoDueTitle,
-            role: MxTextRole.formHelper,
-            textAlign: TextAlign.center,
+        const MxGap(MxSpace.xl),
+        if (hasDueCards) ...[
+          MxPrimaryButton(
+            key: const ValueKey('dashboard_study_today_action'),
+            label: l10n.dashboardStudyTodayAction,
+            leadingIcon: Icons.play_arrow_rounded,
+            fullWidth: true,
+            onPressed: () => context.goStudyToday(),
+          ),
+          const MxGap(MxSpace.md),
+          MxSecondaryButton(
+            key: const ValueKey('dashboard_open_library_action'),
+            label: l10n.dashboardOpenLibraryAction,
+            leadingIcon: Icons.folder_open_outlined,
+            fullWidth: true,
+            onPressed: () => context.goLibrary(),
+          ),
+        ] else ...[
+          MxPrimaryButton(
+            key: const ValueKey('dashboard_open_library_action'),
+            label: l10n.dashboardOpenLibraryAction,
+            leadingIcon: Icons.folder_open_outlined,
+            fullWidth: true,
+            onPressed: () => context.goLibrary(),
           ),
         ],
-        const MxGap(MxSpace.md),
-        MxSecondaryButton(
-          key: const ValueKey('dashboard_open_library_action'),
-          label: l10n.dashboardOpenLibraryAction,
-          leadingIcon: Icons.folder_open_outlined,
-          fullWidth: true,
-          onPressed: () => context.goLibrary(),
-        ),
       ],
     );
   }
@@ -143,6 +159,46 @@ class _DashboardMetricCard extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DashboardProgressCard extends StatelessWidget {
+  const _DashboardProgressCard({
+    required this.percent,
+    required this.folderCount,
+    required this.cardCount,
+  });
+
+  final int percent;
+  final int folderCount;
+  final int cardCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return MxCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MxText(
+            l10n.dashboardLibraryProgressTitle,
+            role: MxTextRole.sectionTitle,
+          ),
+          const MxGap(MxSpace.sm),
+          MxText(
+            l10n.dashboardLibraryProgressMessage(
+              percent,
+              folderCount,
+              cardCount,
+            ),
+            role: MxTextRole.contentBody,
+          ),
+          const MxGap(MxSpace.md),
+          MxLinearProgress(value: percent / 100, showPercentage: true),
         ],
       ),
     );

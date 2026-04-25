@@ -59,6 +59,10 @@ void main() {
           .customSelect('PRAGMA table_info(flashcard_progress)')
           .map((row) => row.read<String>('name'))
           .get();
+      final flashcardColumns = await database
+          .customSelect('PRAGMA table_info(flashcards)')
+          .map((row) => row.read<String>('name'))
+          .get();
       final indexRows = await database
           .customSelect(
             "SELECT name FROM sqlite_master WHERE type = 'index' "
@@ -73,6 +77,8 @@ void main() {
         progressColumns,
         containsAll(<String>['current_box', 'review_count', 'last_result']),
       );
+      expect(flashcardColumns, containsAll(<String>['front', 'back', 'note']));
+      expect(flashcardColumns, isNot(contains('title')));
       expect(indexRows, hasLength(1));
     });
 

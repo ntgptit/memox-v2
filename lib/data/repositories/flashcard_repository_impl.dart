@@ -124,7 +124,6 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       return FlashcardEntity(
         id: id,
         deckId: deckId,
-        title: draft.title?.trim(),
         front: draft.front.trim(),
         back: draft.back.trim(),
         note: draft.note?.trim(),
@@ -152,7 +151,6 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       return FlashcardEntity(
         id: flashcard.id,
         deckId: flashcard.deckId,
-        title: normalized.title?.trim(),
         front: normalized.front.trim(),
         back: normalized.back.trim(),
         note: normalized.note?.trim(),
@@ -260,10 +258,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     return runRepositoryAction(() async {
       final flashcards = await _flashcardDao.listFlashcardsByIds(flashcardIds);
       final lines = <String>[
-        'title,front,back,note',
+        'front,back,note',
         for (final flashcard in flashcards)
           [
-            escapeCsvCell(flashcard.title),
             escapeCsvCell(flashcard.front),
             escapeCsvCell(flashcard.back),
             escapeCsvCell(flashcard.note),
@@ -299,12 +296,7 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     if (front.isEmpty || back.isEmpty) {
       throw const ValidationException(message: 'front and back are required.');
     }
-    return FlashcardDraft(
-      title: draft.title?.trim(),
-      front: front,
-      back: back,
-      note: draft.note?.trim(),
-    );
+    return FlashcardDraft(front: front, back: back, note: draft.note?.trim());
   }
 
   void _sortFlashcardItems(

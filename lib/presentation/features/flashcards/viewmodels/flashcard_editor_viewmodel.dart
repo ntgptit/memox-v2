@@ -35,7 +35,6 @@ class FlashcardEditorDraftState {
   const FlashcardEditorDraftState({
     required this.deckId,
     required this.flashcardId,
-    required this.title,
     required this.front,
     required this.back,
     required this.note,
@@ -43,7 +42,6 @@ class FlashcardEditorDraftState {
 
   final String deckId;
   final String? flashcardId;
-  final String title;
   final String front;
   final String back;
   final String note;
@@ -51,11 +49,10 @@ class FlashcardEditorDraftState {
   bool get isEditing => flashcardId != null;
 
   FlashcardDraft toDraft() {
-    return FlashcardDraft(title: title, front: front, back: back, note: note);
+    return FlashcardDraft(front: front, back: back, note: note);
   }
 
   FlashcardEditorDraftState copyWith({
-    String? title,
     String? front,
     String? back,
     String? note,
@@ -63,7 +60,6 @@ class FlashcardEditorDraftState {
     return FlashcardEditorDraftState(
       deckId: deckId,
       flashcardId: flashcardId,
-      title: title ?? this.title,
       front: front ?? this.front,
       back: back ?? this.back,
       note: note ?? this.note,
@@ -79,7 +75,6 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
       return FlashcardEditorDraftState(
         deckId: args.deckId,
         flashcardId: null,
-        title: '',
         front: '',
         back: '',
         note: '',
@@ -92,19 +87,10 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
     return FlashcardEditorDraftState(
       deckId: flashcard.deckId,
       flashcardId: flashcard.id,
-      title: flashcard.title ?? '',
       front: flashcard.front,
       back: flashcard.back,
       note: flashcard.note ?? '',
     );
-  }
-
-  void setTitle(String value) {
-    final current = _currentDraft(state);
-    if (current == null) {
-      return;
-    }
-    state = AsyncData(current.copyWith(title: value));
   }
 
   void setFront(String value) {
@@ -140,7 +126,6 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
       FlashcardEditorDraftState(
         deckId: current.deckId,
         flashcardId: null,
-        title: '',
         front: '',
         back: '',
         note: '',

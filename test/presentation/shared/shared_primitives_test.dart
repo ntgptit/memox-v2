@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/dialogs/mx_action_sheet_list.dart';
 import 'package:memox/presentation/shared/dialogs/mx_destination_picker_sheet.dart';
 import 'package:memox/presentation/shared/dialogs/mx_bottom_sheet.dart';
 import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
+import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_reorderable_list.dart';
 import 'package:memox/presentation/shared/widgets/mx_search_sort_toolbar.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_flashcard.dart';
+import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:memox/presentation/shared/widgets/mx_term_row.dart';
 
 void main() {
@@ -149,6 +153,108 @@ void main() {
     expect(sortValue, 'recent');
   });
 
+  testWidgets('MxAnswerOptionCard wraps long text and respects states', (
+    tester,
+  ) async {
+    var enabledTapCount = 0;
+    var disabledTapCount = 0;
+    const longAnswer =
+        'This is a deliberately long matching answer that should wrap across '
+        'multiple lines instead of truncating the option text.';
+
+    await tester.pumpWidget(
+      _TestApp(
+        child: Column(
+          children: [
+            SizedBox(
+              width: 220,
+              child: MxAnswerOptionCard(
+                label: longAnswer,
+                selected: true,
+                onPressed: () => enabledTapCount += 1,
+              ),
+            ),
+            const SizedBox(height: 12),
+            MxAnswerOptionCard(
+              label: 'Disabled answer',
+              enabled: false,
+              onPressed: () => disabledTapCount += 1,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text(longAnswer));
+    expect(label.softWrap, isTrue);
+    expect(label.overflow, TextOverflow.visible);
+    expect(label.maxLines, greaterThan(1));
+    expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+
+    await tester.tap(find.text(longAnswer));
+    await tester.tap(find.text('Disabled answer'));
+    await tester.pump();
+
+    expect(enabledTapCount, 1);
+    expect(disabledTapCount, 0);
+  });
+
+  testWidgets('MxFlashcard keeps long content scrollable', (tester) async {
+    const longContent =
+        'A very long flashcard face that needs to remain readable during study. '
+        'It contains several clauses and repeated explanatory text so the card '
+        'surface has to scroll instead of clipping the learner-visible answer.';
+
+    await tester.pumpWidget(
+      const _TestApp(
+        child: SizedBox(
+          width: 240,
+          child: MxFlashcard(content: longContent, aspectRatio: 0.7),
+        ),
+      ),
+    );
+
+    expect(find.byType(Scrollbar), findsOneWidget);
+    expect(find.byType(SingleChildScrollView), findsOneWidget);
+    expect(find.text(longContent), findsOneWidget);
+  });
+
+  testWidgets('MxSegmentedControl adaptive fallback updates selection', (
+    tester,
+  ) async {
+    var selected = <int>{1};
+
+    await tester.pumpWidget(
+      _TestApp(
+        child: StatefulBuilder(
+          builder: (context, setState) {
+            return SizedBox(
+              width: 180,
+              child: MxSegmentedControl<int>(
+                adaptive: true,
+                segments: const [
+                  MxSegment(value: 1, label: 'One'),
+                  MxSegment(value: 2, label: 'Two'),
+                  MxSegment(value: 3, label: 'Three'),
+                ],
+                selected: selected,
+                onChanged: (value) => setState(() => selected = value),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    expect(find.byType(SegmentedButton<int>), findsNothing);
+    expect(find.byType(RadioListTile<int>), findsNWidgets(3));
+
+    await tester.tap(find.text('Three'));
+    await tester.pump();
+
+    expect(selected, {3});
+  });
+
   testWidgets(
     'MxSearchSortToolbar keeps selected sort icon without checkmark',
     (tester) async {
@@ -276,6 +382,8 @@ class _TestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: Padding(padding: const EdgeInsets.all(24), child: child),
       ),

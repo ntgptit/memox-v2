@@ -100,12 +100,84 @@ void main() {
     expect(find.text('2'), findsOneWidget);
     expect(find.text('1 folders · 12 cards'), findsOneWidget);
 
+    final dashboardScroll = find.descendant(
+      of: find.byKey(const ValueKey('dashboard_content')),
+      matching: find.byType(Scrollable),
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('dashboard_study_today_action')),
+      120,
+      scrollable: dashboardScroll,
+    );
     await tester.tap(
       find.byKey(const ValueKey('dashboard_study_today_action')),
     );
     await tester.pumpAndSettle();
 
     expect(router.routeInformationProvider.value.uri.path, '/study/today');
+  });
+
+  testWidgets('no-due primary CTA opens library and remains enabled', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: RoutePaths.home,
+      routes: [
+        GoRoute(
+          path: RoutePaths.home,
+          name: RouteNames.home,
+          builder: (context, state) => const DashboardScreen(),
+        ),
+        GoRoute(
+          path: RoutePaths.library,
+          name: RouteNames.library,
+          builder: (context, state) => const SizedBox.shrink(),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith(
+            (ref) => Future<LibraryOverviewState>.value(_noDueLibraryState),
+          ),
+        ],
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final dashboardScroll = find.descendant(
+      of: find.byKey(const ValueKey('dashboard_content')),
+      matching: find.byType(Scrollable),
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('dashboard_open_library_action')),
+      120,
+      scrollable: dashboardScroll,
+    );
+    final cta = find.byKey(const ValueKey('dashboard_open_library_action'));
+    expect(cta, findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('dashboard_study_today_action')),
+      findsNothing,
+    );
+
+    final button = tester.widget<ElevatedButton>(
+      find.descendant(of: cta, matching: find.byType(ElevatedButton)),
+    );
+    expect(button.onPressed, isNotNull);
+
+    await tester.tap(cta);
+    await tester.pumpAndSettle();
+
+    expect(router.routeInformationProvider.value.uri.path, '/library');
   });
 }
 
@@ -130,6 +202,24 @@ const _sampleLibraryState = LibraryOverviewState(
     userName: 'Lan',
   ),
   dueToday: 2,
+  folders: <LibraryFolder>[
+    LibraryFolder(
+      id: 'folder-root-001',
+      name: 'Korean',
+      icon: Icons.folder_outlined,
+      deckCount: 1,
+      itemCount: 12,
+      masteryPercent: 30,
+    ),
+  ],
+);
+
+const _noDueLibraryState = LibraryOverviewState(
+  greeting: LibraryOverviewGreeting(
+    salutation: 'Good morning',
+    userName: 'Lan',
+  ),
+  dueToday: 0,
   folders: <LibraryFolder>[
     LibraryFolder(
       id: 'folder-root-001',

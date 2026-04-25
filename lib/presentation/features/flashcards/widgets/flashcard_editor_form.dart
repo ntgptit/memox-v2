@@ -11,11 +11,9 @@ import '../viewmodels/flashcard_editor_viewmodel.dart';
 class FlashcardEditorForm extends StatelessWidget {
   const FlashcardEditorForm({
     required this.draft,
-    required this.titleController,
     required this.frontController,
     required this.backController,
     required this.noteController,
-    required this.onTitleChanged,
     required this.onFrontChanged,
     required this.onBackChanged,
     required this.onNoteChanged,
@@ -25,11 +23,9 @@ class FlashcardEditorForm extends StatelessWidget {
   });
 
   final FlashcardEditorDraftState draft;
-  final TextEditingController titleController;
   final TextEditingController frontController;
   final TextEditingController backController;
   final TextEditingController noteController;
-  final ValueChanged<String> onTitleChanged;
   final ValueChanged<String> onFrontChanged;
   final ValueChanged<String> onBackChanged;
   final ValueChanged<String> onNoteChanged;
@@ -44,16 +40,10 @@ class FlashcardEditorForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxTextField(
-          controller: titleController,
-          label: l10n.flashcardsFieldTitleLabel,
-          hintText: l10n.flashcardsFieldTitleHint,
-          onChanged: onTitleChanged,
-        ),
-        const MxGap(MxSpace.lg),
-        MxTextField(
           controller: frontController,
           label: l10n.flashcardsFieldFrontLabel,
           hintText: l10n.flashcardsFieldFrontHint,
+          helperText: l10n.flashcardsLongContentHelper,
           minLines: 3,
           maxLines: 6,
           onChanged: onFrontChanged,
@@ -63,6 +53,7 @@ class FlashcardEditorForm extends StatelessWidget {
           controller: backController,
           label: l10n.flashcardsFieldBackLabel,
           hintText: l10n.flashcardsFieldBackHint,
+          helperText: l10n.flashcardsLongContentHelper,
           minLines: 3,
           maxLines: 6,
           onChanged: onBackChanged,
@@ -72,6 +63,7 @@ class FlashcardEditorForm extends StatelessWidget {
           controller: noteController,
           label: l10n.flashcardsFieldNoteLabel,
           hintText: l10n.flashcardsFieldNoteHint,
+          helperText: l10n.flashcardsNoteHelper,
           minLines: 2,
           maxLines: 4,
           onChanged: onNoteChanged,

@@ -35,13 +35,13 @@
 ## Rule tìm kiếm
 - Hệ thống hỗ trợ search riêng cho folder, deck, flashcard
 - Folder và deck search theo tên hiển thị
-- Flashcard search theo `title` nếu có, cùng với `front` và `back`
+- Flashcard search theo `front` và `back`
 - Kết quả search cần giữ ngữ cảnh cha để user biết đối tượng đang nằm ở đâu
 
 ## Rule sắp xếp
 - Hệ thống hỗ trợ sort theo tên, mới nhất, học gần nhất
 - Tên là tên hiển thị của folder hoặc deck
-- Với flashcard, tên là nhãn hiển thị chính; nếu không có title riêng thì dùng front
+- Với flashcard, front là nhãn hiển thị chính
 - Mới nhất được hiểu là createdAt giảm dần
 - Học gần nhất được hiểu là lastStudiedAt giảm dần
 - Với deck, học gần nhất là giá trị lớn nhất của các flashcard trong deck

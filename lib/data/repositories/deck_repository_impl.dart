@@ -291,7 +291,6 @@ final class DeckRepositoryImpl implements DeckRepository {
             id: _idGenerator.nextId(),
             deckId: newDeckId,
             draft: FlashcardDraft(
-              title: sourceFlashcards[index].title,
               front: sourceFlashcards[index].front,
               back: sourceFlashcards[index].back,
               note: sourceFlashcards[index].note,
@@ -319,10 +318,9 @@ final class DeckRepositoryImpl implements DeckRepository {
       final deck = await _requireDeck(deckId);
       final flashcards = await _deckDao.listDeckFlashcards(deckId);
       final lines = <String>[
-        'title,front,back,note',
+        'front,back,note',
         for (final flashcard in flashcards)
           [
-            escapeCsvCell(flashcard.title),
             escapeCsvCell(flashcard.front),
             escapeCsvCell(flashcard.back),
             escapeCsvCell(flashcard.note),

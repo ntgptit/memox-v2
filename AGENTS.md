@@ -6,6 +6,7 @@ MemoX is a Flutter full-app for flashcard learning and spaced repetition.
 Primary stack: Flutter 3.11+, Dart 3.11, Riverpod Annotation, Drift, Material 3.
 
 Use this file as the repository router for Codex work in this workspace.
+Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt ra, code sau khi thực hiện sẽ được Claude code và ChatGPT phiên bản web review.
 
 ## Skill Routing
 

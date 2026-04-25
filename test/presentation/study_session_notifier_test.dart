@@ -9,6 +9,8 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/study_mode_panel.dart';
+import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
 void main() {
   test(
@@ -206,6 +208,118 @@ void main() {
 
     expect(answerCount, 0);
   });
+
+  testWidgets('match mode renders answer cards instead of secondary buttons', (
+    tester,
+  ) async {
+    final snapshot = _snapshot(
+      mode: StudyMode.match,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+      cards: [
+        _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+        _card(id: 'card-2', front: 'front 2', back: 'back 2'),
+        _card(id: 'card-3', front: 'front 3', back: 'back 3'),
+      ],
+      shuffleAnswers: false,
+    );
+
+    await tester.pumpWidget(_StudyModeHost(snapshot: snapshot));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MxAnswerOptionCard), findsNWidgets(3));
+    expect(find.widgetWithText(MxSecondaryButton, 'back 1'), findsNothing);
+    expect(find.widgetWithText(MxSecondaryButton, 'back 2'), findsNothing);
+    expect(find.widgetWithText(MxSecondaryButton, 'back 3'), findsNothing);
+  });
+
+  testWidgets('selecting a long match option shows feedback', (tester) async {
+    const longWrongAnswer =
+        'A very long distractor answer that should remain readable and tappable '
+        'when rendered as a match option.';
+    final snapshot = _snapshot(
+      mode: StudyMode.match,
+      currentCard: _card(
+        id: 'card-1',
+        front: 'front 1',
+        back: 'correct answer',
+      ),
+      cards: [
+        _card(id: 'card-1', front: 'front 1', back: 'correct answer'),
+        _card(id: 'card-2', front: 'front 2', back: longWrongAnswer),
+      ],
+      shuffleAnswers: false,
+    );
+
+    await tester.pumpWidget(
+      _InteractiveStudyModeHost(snapshot: snapshot, onContinue: () {}),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text(longWrongAnswer));
+    await tester.tap(find.text(longWrongAnswer));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Not quite'), findsOneWidget);
+    expect(find.text('Correct answer: correct answer'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
+  });
+
+  testWidgets('incorrect feedback can be marked correct before continuing', (
+    tester,
+  ) async {
+    final snapshot = _snapshot(
+      mode: StudyMode.fill,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'answer 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'answer 1')],
+      shuffleAnswers: false,
+    );
+    final feedback = StudyAnswerFeedback(
+      itemId: snapshot.currentItem!.id,
+      selectedGrade: AttemptGrade.incorrect,
+      isCorrect: false,
+      correctAnswer: snapshot.currentItem!.flashcard.back,
+    );
+    StudyAnswerFeedback? correctedFeedback;
+
+    await tester.pumpWidget(
+      _StudyModeHost(
+        snapshot: snapshot,
+        feedback: feedback,
+        onMarkCorrect: (value) => correctedFeedback = value,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Mark correct'));
+    await tester.pumpAndSettle();
+
+    expect(correctedFeedback?.selectedGrade, AttemptGrade.correct);
+    expect(correctedFeedback?.isCorrect, isTrue);
+  });
+
+  testWidgets('fill feedback shows the submitted answer', (tester) async {
+    final snapshot = _snapshot(
+      mode: StudyMode.fill,
+      currentCard: _card(id: 'card-1', front: 'front 1', back: 'answer 1'),
+      cards: [_card(id: 'card-1', front: 'front 1', back: 'answer 1')],
+      shuffleAnswers: false,
+    );
+    final feedback = StudyAnswerFeedback(
+      itemId: snapshot.currentItem!.id,
+      selectedGrade: AttemptGrade.incorrect,
+      isCorrect: false,
+      correctAnswer: snapshot.currentItem!.flashcard.back,
+      submittedAnswer: 'anser 1',
+    );
+
+    await tester.pumpWidget(
+      _StudyModeHost(snapshot: snapshot, feedback: feedback),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your answer: anser 1'), findsOneWidget);
+    expect(find.text('Correct answer: answer 1'), findsOneWidget);
+  });
 }
 
 final class _CancelOnlyStudyRepo implements StudyRepo {
@@ -295,13 +409,15 @@ class _StudyModeHost extends StatelessWidget {
     this.feedback,
     this.onAnswer,
     this.onContinue,
+    this.onMarkCorrect,
   });
 
   final StudySessionSnapshot snapshot;
   final bool isSubmitting;
   final StudyAnswerFeedback? feedback;
-  final ValueChanged<AttemptGrade>? onAnswer;
+  final ValueChanged<StudyAnswerSubmission>? onAnswer;
   final VoidCallback? onContinue;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -316,6 +432,7 @@ class _StudyModeHost extends StatelessWidget {
           feedback: feedback,
           onAnswer: onAnswer ?? (_) {},
           onContinue: onContinue,
+          onMarkCorrect: onMarkCorrect,
         ),
       ),
     );
@@ -345,13 +462,16 @@ class _InteractiveStudyModeHostState extends State<_InteractiveStudyModeHost> {
     return _StudyModeHost(
       snapshot: widget.snapshot,
       feedback: _feedback,
-      onAnswer: (grade) => setState(() {
+      onAnswer: (submission) => setState(() {
         _feedback = StudyAnswerFeedback(
           itemId: item.id,
-          selectedGrade: grade,
+          selectedGrade: submission.grade,
           isCorrect:
-              grade == AttemptGrade.correct || grade == AttemptGrade.remembered,
+              submission.grade == AttemptGrade.correct ||
+              submission.grade == AttemptGrade.remembered,
           correctAnswer: item.flashcard.back,
+          submittedAnswer: submission.submittedAnswer,
+          selectedOptionId: submission.selectedOptionId,
         );
       }),
       onContinue: widget.onContinue,

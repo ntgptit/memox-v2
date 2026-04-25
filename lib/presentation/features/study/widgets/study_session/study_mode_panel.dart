@@ -6,6 +6,7 @@ import '../../../../../domain/enums/study_enums.dart';
 import '../../../../../domain/study/entities/study_models.dart';
 import '../../../../shared/layouts/mx_space.dart';
 import '../../../../shared/widgets/mx_card.dart';
+import '../../../../shared/widgets/mx_answer_option_card.dart';
 import '../../../../shared/widgets/mx_primary_button.dart';
 import '../../../../shared/widgets/mx_secondary_button.dart';
 import '../../../../shared/widgets/mx_text.dart';
@@ -19,6 +20,7 @@ class StudyModePanel extends StatelessWidget {
     required this.onAnswer,
     this.feedback,
     this.onContinue,
+    this.onMarkCorrect,
     super.key,
   });
 
@@ -26,8 +28,9 @@ class StudyModePanel extends StatelessWidget {
   final List<StudyFlashcardRef> answerOptions;
   final bool isSubmitting;
   final StudyAnswerFeedback? feedback;
-  final ValueChanged<AttemptGrade> onAnswer;
+  final ValueChanged<StudyAnswerSubmission> onAnswer;
   final VoidCallback? onContinue;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +45,7 @@ class StudyModePanel extends StatelessWidget {
         feedback: feedback,
         onAnswer: onAnswer,
         onContinue: onContinue,
+        onMarkCorrect: onMarkCorrect,
       ),
       StudyMode.match => _MatchMode(
         item: item,
@@ -50,6 +54,7 @@ class StudyModePanel extends StatelessWidget {
         feedback: feedback,
         onAnswer: onAnswer,
         onContinue: onContinue,
+        onMarkCorrect: onMarkCorrect,
       ),
       StudyMode.guess => _GuessMode(
         item: item,
@@ -57,6 +62,7 @@ class StudyModePanel extends StatelessWidget {
         feedback: feedback,
         onAnswer: onAnswer,
         onContinue: onContinue,
+        onMarkCorrect: onMarkCorrect,
       ),
       StudyMode.recall => _RecallMode(
         item: item,
@@ -64,6 +70,7 @@ class StudyModePanel extends StatelessWidget {
         feedback: feedback,
         onAnswer: onAnswer,
         onContinue: onContinue,
+        onMarkCorrect: onMarkCorrect,
       ),
       StudyMode.fill => _FillMode(
         item: item,
@@ -71,9 +78,22 @@ class StudyModePanel extends StatelessWidget {
         feedback: feedback,
         onAnswer: onAnswer,
         onContinue: onContinue,
+        onMarkCorrect: onMarkCorrect,
       ),
     };
   }
+}
+
+class StudyAnswerSubmission {
+  const StudyAnswerSubmission({
+    required this.grade,
+    this.submittedAnswer,
+    this.selectedOptionId,
+  });
+
+  final AttemptGrade grade;
+  final String? submittedAnswer;
+  final String? selectedOptionId;
 }
 
 class StudyAnswerFeedback {
@@ -82,12 +102,41 @@ class StudyAnswerFeedback {
     required this.selectedGrade,
     required this.isCorrect,
     required this.correctAnswer,
+    this.submittedAnswer,
+    this.selectedOptionId,
   });
 
   final String itemId;
   final AttemptGrade selectedGrade;
   final bool isCorrect;
   final String correctAnswer;
+  final String? submittedAnswer;
+  final String? selectedOptionId;
+
+  StudyAnswerFeedback copyWith({
+    String? itemId,
+    AttemptGrade? selectedGrade,
+    bool? isCorrect,
+    String? correctAnswer,
+    String? submittedAnswer,
+    String? selectedOptionId,
+  }) {
+    return StudyAnswerFeedback(
+      itemId: itemId ?? this.itemId,
+      selectedGrade: selectedGrade ?? this.selectedGrade,
+      isCorrect: isCorrect ?? this.isCorrect,
+      correctAnswer: correctAnswer ?? this.correctAnswer,
+      submittedAnswer: submittedAnswer ?? this.submittedAnswer,
+      selectedOptionId: selectedOptionId ?? this.selectedOptionId,
+    );
+  }
+
+  StudyAnswerFeedback markCorrected() {
+    final correctedGrade = selectedGrade == AttemptGrade.forgot
+        ? AttemptGrade.remembered
+        : AttemptGrade.correct;
+    return copyWith(selectedGrade: correctedGrade, isCorrect: true);
+  }
 }
 
 class _ReadyToFinalizePanel extends StatelessWidget {
@@ -119,13 +168,15 @@ class _ReviewMode extends StatelessWidget {
     required this.onAnswer,
     this.feedback,
     this.onContinue,
+    this.onMarkCorrect,
   });
 
   final StudySessionItem item;
   final bool isSubmitting;
   final StudyAnswerFeedback? feedback;
-  final ValueChanged<AttemptGrade> onAnswer;
+  final ValueChanged<StudyAnswerSubmission> onAnswer;
   final VoidCallback? onContinue;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -137,18 +188,25 @@ class _ReviewMode extends StatelessWidget {
       feedback: feedback,
       isSubmitting: isSubmitting,
       onContinue: onContinue,
+      onMarkCorrect: onMarkCorrect,
       actions: [
         MxSecondaryButton(
           label: l10n.studyForgotAction,
           leadingIcon: Icons.close_rounded,
-          onPressed: isSubmitting ? null : () => onAnswer(AttemptGrade.forgot),
+          onPressed: isSubmitting
+              ? null
+              : () => onAnswer(
+                  const StudyAnswerSubmission(grade: AttemptGrade.forgot),
+                ),
         ),
         MxPrimaryButton(
           label: l10n.studyRememberedAction,
           leadingIcon: Icons.check_rounded,
           onPressed: isSubmitting
               ? null
-              : () => onAnswer(AttemptGrade.remembered),
+              : () => onAnswer(
+                  const StudyAnswerSubmission(grade: AttemptGrade.remembered),
+                ),
         ),
       ],
     );
@@ -163,14 +221,16 @@ class _MatchMode extends StatelessWidget {
     required this.onAnswer,
     this.feedback,
     this.onContinue,
+    this.onMarkCorrect,
   });
 
   final StudySessionItem item;
   final List<StudyFlashcardRef> answerOptions;
   final bool isSubmitting;
   final StudyAnswerFeedback? feedback;
-  final ValueChanged<AttemptGrade> onAnswer;
+  final ValueChanged<StudyAnswerSubmission> onAnswer;
   final VoidCallback? onContinue;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -182,18 +242,27 @@ class _MatchMode extends StatelessWidget {
       feedback: feedback,
       isSubmitting: isSubmitting,
       onContinue: onContinue,
+      onMarkCorrect: onMarkCorrect,
       actions: [
         for (final option in answerOptions)
-          MxSecondaryButton(
-            label: option.back,
-            variant: MxSecondaryVariant.tonal,
-            onPressed: isSubmitting
-                ? null
-                : () => onAnswer(
-                    option.id == item.flashcard.id
-                        ? AttemptGrade.correct
-                        : AttemptGrade.incorrect,
-                  ),
+          SizedBox(
+            width: double.infinity,
+            child: MxAnswerOptionCard(
+              label: option.back,
+              selected: feedback?.selectedOptionId == option.id,
+              enabled: !isSubmitting && feedback == null,
+              onPressed: isSubmitting || feedback != null
+                  ? null
+                  : () => onAnswer(
+                      StudyAnswerSubmission(
+                        grade: option.id == item.flashcard.id
+                            ? AttemptGrade.correct
+                            : AttemptGrade.incorrect,
+                        submittedAnswer: option.back,
+                        selectedOptionId: option.id,
+                      ),
+                    ),
+            ),
           ),
       ],
     );
@@ -207,13 +276,15 @@ class _GuessMode extends StatelessWidget {
     required this.onAnswer,
     this.feedback,
     this.onContinue,
+    this.onMarkCorrect,
   });
 
   final StudySessionItem item;
   final bool isSubmitting;
   final StudyAnswerFeedback? feedback;
-  final ValueChanged<AttemptGrade> onAnswer;
+  final ValueChanged<StudyAnswerSubmission> onAnswer;
   final VoidCallback? onContinue;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -225,18 +296,25 @@ class _GuessMode extends StatelessWidget {
       feedback: feedback,
       isSubmitting: isSubmitting,
       onContinue: onContinue,
+      onMarkCorrect: onMarkCorrect,
       actions: [
         MxSecondaryButton(
           label: l10n.studyIncorrectAction,
           leadingIcon: Icons.close_rounded,
           onPressed: isSubmitting
               ? null
-              : () => onAnswer(AttemptGrade.incorrect),
+              : () => onAnswer(
+                  const StudyAnswerSubmission(grade: AttemptGrade.incorrect),
+                ),
         ),
         MxPrimaryButton(
           label: l10n.studyCorrectAction,
           leadingIcon: Icons.check_rounded,
-          onPressed: isSubmitting ? null : () => onAnswer(AttemptGrade.correct),
+          onPressed: isSubmitting
+              ? null
+              : () => onAnswer(
+                  const StudyAnswerSubmission(grade: AttemptGrade.correct),
+                ),
         ),
       ],
     );
@@ -250,13 +328,15 @@ class _RecallMode extends StatelessWidget {
     required this.onAnswer,
     this.feedback,
     this.onContinue,
+    this.onMarkCorrect,
   });
 
   final StudySessionItem item;
   final bool isSubmitting;
   final StudyAnswerFeedback? feedback;
-  final ValueChanged<AttemptGrade> onAnswer;
+  final ValueChanged<StudyAnswerSubmission> onAnswer;
   final VoidCallback? onContinue;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -268,18 +348,25 @@ class _RecallMode extends StatelessWidget {
       feedback: feedback,
       isSubmitting: isSubmitting,
       onContinue: onContinue,
+      onMarkCorrect: onMarkCorrect,
       actions: [
         MxSecondaryButton(
           label: l10n.studyForgotAction,
           leadingIcon: Icons.close_rounded,
-          onPressed: isSubmitting ? null : () => onAnswer(AttemptGrade.forgot),
+          onPressed: isSubmitting
+              ? null
+              : () => onAnswer(
+                  const StudyAnswerSubmission(grade: AttemptGrade.forgot),
+                ),
         ),
         MxPrimaryButton(
           label: l10n.studyRememberedAction,
           leadingIcon: Icons.check_rounded,
           onPressed: isSubmitting
               ? null
-              : () => onAnswer(AttemptGrade.remembered),
+              : () => onAnswer(
+                  const StudyAnswerSubmission(grade: AttemptGrade.remembered),
+                ),
         ),
       ],
     );
@@ -293,13 +380,15 @@ class _FillMode extends StatefulWidget {
     required this.onAnswer,
     this.feedback,
     this.onContinue,
+    this.onMarkCorrect,
   });
 
   final StudySessionItem item;
   final bool isSubmitting;
   final StudyAnswerFeedback? feedback;
-  final ValueChanged<AttemptGrade> onAnswer;
+  final ValueChanged<StudyAnswerSubmission> onAnswer;
   final VoidCallback? onContinue;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   State<_FillMode> createState() => _FillModeState();
@@ -342,16 +431,19 @@ class _FillModeState extends State<_FillMode> {
       feedback: widget.feedback,
       isSubmitting: widget.isSubmitting,
       onContinue: widget.onContinue,
+      onMarkCorrect: widget.onMarkCorrect,
       content: MxTextField(
         label: l10n.studyAnswerLabel,
         controller: _controller,
         enabled: !inputDisabled,
         errorText: _showEmptyError ? l10n.studyEmptyAnswerMessage : null,
-        textInputAction: TextInputAction.done,
+        minLines: 2,
+        maxLines: 4,
+        keyboardType: TextInputType.multiline,
+        textInputAction: TextInputAction.newline,
         onChanged: (_) => setState(() {
           _showEmptyError = false;
         }),
-        onSubmitted: inputDisabled ? null : (_) => _submit(),
       ),
       actions: [
         MxPrimaryButton(
@@ -375,7 +467,12 @@ class _FillModeState extends State<_FillMode> {
     final expected = widget.item.flashcard.back.trim().toLowerCase();
     final actual = answer.toLowerCase();
     widget.onAnswer(
-      actual == expected ? AttemptGrade.correct : AttemptGrade.incorrect,
+      StudyAnswerSubmission(
+        grade: actual == expected
+            ? AttemptGrade.correct
+            : AttemptGrade.incorrect,
+        submittedAnswer: answer,
+      ),
     );
   }
 }
@@ -390,6 +487,7 @@ class _PromptCard extends StatelessWidget {
     this.content,
     this.feedback,
     this.onContinue,
+    this.onMarkCorrect,
   });
 
   final String title;
@@ -400,6 +498,7 @@ class _PromptCard extends StatelessWidget {
   final StudyAnswerFeedback? feedback;
   final bool isSubmitting;
   final VoidCallback? onContinue;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -416,7 +515,10 @@ class _PromptCard extends StatelessWidget {
           if (content != null) ...[const MxGap(MxSpace.lg), content!],
           const MxGap(MxSpace.lg),
           if (feedback != null) ...[
-            _AnswerFeedbackPanel(feedback: feedback!),
+            _AnswerFeedbackPanel(
+              feedback: feedback!,
+              onMarkCorrect: isSubmitting ? null : onMarkCorrect,
+            ),
             const MxGap(MxSpace.md),
             MxPrimaryButton(
               label: l10n.studyContinueAction,
@@ -439,9 +541,10 @@ class _PromptCard extends StatelessWidget {
 }
 
 class _AnswerFeedbackPanel extends StatelessWidget {
-  const _AnswerFeedbackPanel({required this.feedback});
+  const _AnswerFeedbackPanel({required this.feedback, this.onMarkCorrect});
 
   final StudyAnswerFeedback feedback;
+  final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
   Widget build(BuildContext context) {
@@ -488,11 +591,30 @@ class _AnswerFeedbackPanel extends StatelessWidget {
               ],
             ),
             const MxGap(MxSpace.sm),
+            if (feedback.submittedAnswer?.isNotEmpty ?? false) ...[
+              MxText(
+                l10n.studyYourAnswerLabel(feedback.submittedAnswer!),
+                role: MxTextRole.contentBody,
+                color: foreground,
+                softWrap: true,
+              ),
+              const MxGap(MxSpace.xs),
+            ],
             MxText(
               l10n.studyCorrectAnswerLabel(feedback.correctAnswer),
               role: MxTextRole.contentBody,
               color: foreground,
+              softWrap: true,
             ),
+            if (!feedback.isCorrect && onMarkCorrect != null) ...[
+              const MxGap(MxSpace.sm),
+              MxSecondaryButton(
+                label: l10n.studyMarkCorrectAction,
+                leadingIcon: Icons.check_rounded,
+                variant: MxSecondaryVariant.text,
+                onPressed: () => onMarkCorrect!(feedback.markCorrected()),
+              ),
+            ],
           ],
         ),
       ),

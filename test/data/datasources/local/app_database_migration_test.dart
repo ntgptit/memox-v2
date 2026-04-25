@@ -21,6 +21,12 @@ void main() {
     final attemptColumns = await _columnNames(database, 'study_attempts');
     expect(attemptColumns, contains('attempt_number'));
 
+    final flashcardColumns = await _columnNames(database, 'flashcards');
+    expect(flashcardColumns, isNot(contains('title')));
+    final flashcard = await database.select(database.flashcards).getSingle();
+    expect(flashcard.front, 'front');
+    expect(flashcard.back, 'back');
+
     await database
         .into(database.studySessions)
         .insert(

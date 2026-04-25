@@ -73,7 +73,6 @@ final class FlashcardImportSupport {
         FlashcardImportPreviewItem(
           sourceLabel: 'Line $lineNumber',
           draft: FlashcardDraft(
-            title: _readCsvCell(cells, headerMap['title']),
             front: front,
             back: back,
             note: _readCsvCell(cells, headerMap['note']),
@@ -109,17 +108,12 @@ final class FlashcardImportSupport {
       final startLineNumber = consumedLineCount + 1;
       consumedLineCount += blockLines.length + 1;
 
-      String? title;
       String? front;
       String? back;
       String? note;
       for (final rawLine in blockLines) {
         final line = rawLine.trim();
         if (line.isEmpty) {
-          continue;
-        }
-        if (line.startsWith('Title:')) {
-          title = line.substring('Title:'.length).trim();
           continue;
         }
         if (line.startsWith('Front:')) {
@@ -149,12 +143,7 @@ final class FlashcardImportSupport {
       previewItems.add(
         FlashcardImportPreviewItem(
           sourceLabel: 'Block starting at line $startLineNumber',
-          draft: FlashcardDraft(
-            title: title,
-            front: front!,
-            back: back!,
-            note: note,
-          ),
+          draft: FlashcardDraft(front: front!, back: back!, note: note),
         ),
       );
     }

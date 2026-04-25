@@ -215,7 +215,6 @@ void main() {
         final draftNotifier = container.read(
           flashcardEditorDraftProvider(args).notifier,
         );
-        draftNotifier.setTitle('Greeting');
         draftNotifier.setFront('Hello');
         draftNotifier.setBack('Xin chao');
         draftNotifier.setNote('Basic greeting');
@@ -228,15 +227,11 @@ void main() {
         await _flush(container);
 
         expect(listSubscription.read().requireValue.items, hasLength(1));
-        expect(
-          listSubscription.read().requireValue.items.first.title,
-          'Greeting',
-        );
+        expect(listSubscription.read().requireValue.items.first.front, 'Hello');
 
         final clearedDraft = await container.read(
           flashcardEditorDraftProvider(args).future,
         );
-        expect(clearedDraft.title, isEmpty);
         expect(clearedDraft.front, isEmpty);
         expect(clearedDraft.back, isEmpty);
         expect(clearedDraft.note, isEmpty);
