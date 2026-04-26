@@ -152,3 +152,27 @@ rules:
     params:
       patterns:
         - "\\bMxGap\\.h\\s*\\("
+
+  - id: app_string_normalization_uses_string_utils
+    type: forbidden_pattern
+    name: "String Normalization Must Use StringUtils"
+    description: >
+      App source must route runtime string trimming, case normalization,
+      matching, and sorting through `StringUtils` instead of calling core
+      string normalization methods directly. Centralizing this keeps search,
+      comparison, and answer matching semantics consistent across app layers.
+    message_code: app_string_normalization_uses_string_utils
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/**/*.dart"
+    exclude:
+      - "lib/core/utils/string_utils.dart"
+      - "lib/data/datasources/local/tables/*.dart"
+    fix_hint_code: use_string_utils
+    params:
+      patterns:
+        - "\\.trim\\s*\\("
+        - "\\.toLowerCase\\s*\\("
+        - "\\.toUpperCase\\s*\\("

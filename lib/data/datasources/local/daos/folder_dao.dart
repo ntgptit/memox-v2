@@ -338,7 +338,7 @@ final class FolderDao {
       return;
     }
 
-    final pattern = '%${query.normalizedSearchTerm.toLowerCase()}%';
+    final pattern = '%${query.normalizedSearchTerm}%';
     statement.where((table) => table.name.lower().like(pattern));
   }
 

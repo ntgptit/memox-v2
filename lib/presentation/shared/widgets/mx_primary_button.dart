@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
+import '../../../core/theme/extensions/theme_extensions.dart';
 import '../layouts/mx_gap.dart';
 
 enum MxButtonSize { small, medium, large }
 
-enum MxPrimaryButtonTone { primary, danger }
+enum MxPrimaryButtonTone { primary, success, danger }
 
 /// Primary CTA button. Renders as an [ElevatedButton] backed by
 /// [ColorScheme.primary]. Supports loading and leading/trailing icons.
@@ -37,9 +38,11 @@ class MxPrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    final mxColors = context.mxColors;
     final effectiveOnPressed = isLoading ? null : onPressed;
     final spinnerColor = switch (tone) {
       MxPrimaryButtonTone.primary => theme.colorScheme.onPrimary,
+      MxPrimaryButtonTone.success => mxColors.onSuccess,
       MxPrimaryButtonTone.danger => theme.colorScheme.onError,
     };
 
@@ -76,20 +79,24 @@ class MxPrimaryButton extends StatelessWidget {
 
     final button = ElevatedButton(
       onPressed: effectiveOnPressed,
-      style: _resolvedStyle(theme, textTheme),
+      style: _resolvedStyle(theme, textTheme, mxColors),
       child: child,
     );
 
     return fullWidth ? SizedBox(width: double.infinity, child: button) : button;
   }
 
-  ButtonStyle? _resolvedStyle(ThemeData theme, TextTheme textTheme) {
+  ButtonStyle? _resolvedStyle(
+    ThemeData theme,
+    TextTheme textTheme,
+    MxColorsExtension mxColors,
+  ) {
     return _mergeButtonStyles(
       _mergeButtonStyles(
         theme.elevatedButtonTheme.style,
         _sizeStyle(size, textTheme),
       ),
-      _toneStyle(theme),
+      _toneStyle(theme, mxColors),
     );
   }
 
@@ -113,23 +120,43 @@ class MxPrimaryButton extends StatelessWidget {
     };
   }
 
-  ButtonStyle? _toneStyle(ThemeData theme) {
-    if (tone != MxPrimaryButtonTone.danger) return null;
+  ButtonStyle? _toneStyle(ThemeData theme, MxColorsExtension mxColors) {
     final scheme = theme.colorScheme;
-    return ButtonStyle(
-      backgroundColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.disabled)) {
-          return scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface);
-        }
-        return scheme.error;
-      }),
-      foregroundColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.disabled)) {
-          return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
-        }
-        return scheme.onError;
-      }),
-    );
+    return switch (tone) {
+      MxPrimaryButtonTone.primary => null,
+      MxPrimaryButtonTone.success => ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return scheme.onSurface.withValues(
+              alpha: AppOpacity.disabledSurface,
+            );
+          }
+          return mxColors.success;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
+          }
+          return mxColors.onSuccess;
+        }),
+      ),
+      MxPrimaryButtonTone.danger => ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return scheme.onSurface.withValues(
+              alpha: AppOpacity.disabledSurface,
+            );
+          }
+          return scheme.error;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
+          }
+          return scheme.onError;
+        }),
+      ),
+    };
   }
 
   ButtonStyle? _mergeButtonStyles(ButtonStyle? base, ButtonStyle? overrides) {

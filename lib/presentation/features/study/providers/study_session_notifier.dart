@@ -64,7 +64,7 @@ class StudySessionActionController extends _$StudySessionActionController {
     }
   }
 
-  Future<bool> answerCurrentReviewModeAsRemembered() async {
+  Future<bool> answerCurrentReviewModeAsCorrect() async {
     state = const AsyncLoading<void>();
     final snapshot = await ref.read(
       studySessionStateProvider(sessionId).future,
@@ -78,7 +78,6 @@ class StudySessionActionController extends _$StudySessionActionController {
           .execute(
             sessionId: sessionId,
             studyType: snapshot.session.studyType,
-            grade: AttemptGrade.remembered,
           );
       if (!ref.mounted) {
         return false;
@@ -95,7 +94,7 @@ class StudySessionActionController extends _$StudySessionActionController {
     }
   }
 
-  Future<bool> answerCurrentMatchModeBatch(
+  Future<bool> answerCurrentModeItemGradesBatch(
     Map<String, AttemptGrade> itemGrades,
   ) async {
     state = const AsyncLoading<void>();
@@ -107,7 +106,7 @@ class StudySessionActionController extends _$StudySessionActionController {
     }
     try {
       await ref
-          .read(answerCurrentMatchModeBatchUseCaseProvider)
+          .read(answerCurrentModeItemGradesBatchUseCaseProvider)
           .execute(
             sessionId: sessionId,
             studyType: snapshot.session.studyType,

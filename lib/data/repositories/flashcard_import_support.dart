@@ -1,4 +1,5 @@
 import '../../core/errors/app_exception.dart';
+import '../../core/utils/string_utils.dart';
 import '../../domain/value_objects/content_actions.dart';
 
 final class FlashcardImportSupport {
@@ -24,7 +25,7 @@ final class FlashcardImportSupport {
         .replaceAll('\r\n', '\n')
         .replaceAll('\r', '\n')
         .split('\n')
-        .where((line) => line.trim().isNotEmpty)
+        .where(StringUtils.isNotBlank)
         .toList(growable: false);
     if (lines.isEmpty) {
       return const FlashcardImportPreparation(
@@ -42,7 +43,8 @@ final class FlashcardImportSupport {
     final headerCells = _parseCsvLine(lines.first);
     final headerMap = <String, int>{};
     for (var index = 0; index < headerCells.length; index++) {
-      headerMap[headerCells[index].trim().toLowerCase()] = index;
+      headerMap[StringUtils.normalizedForComparison(headerCells[index])] =
+          index;
     }
 
     if (!headerMap.containsKey('front') || !headerMap.containsKey('back')) {
@@ -65,7 +67,7 @@ final class FlashcardImportSupport {
       final cells = _parseCsvLine(lines[index]);
       final front = _readCsvCell(cells, headerMap['front']);
       final back = _readCsvCell(cells, headerMap['back']);
-      if (front.trim().isEmpty || back.trim().isEmpty) {
+      if (StringUtils.isBlank(front) || StringUtils.isBlank(back)) {
         issues.add(
           ImportValidationIssue(
             lineNumber: lineNumber,
@@ -117,7 +119,7 @@ final class FlashcardImportSupport {
     var consumedLineCount = 0;
 
     for (final block in blocks) {
-      final trimmedBlock = block.trim();
+      final trimmedBlock = StringUtils.trimmed(block);
       if (trimmedBlock.isEmpty) {
         consumedLineCount += block.split('\n').length + 1;
         continue;
@@ -131,20 +133,20 @@ final class FlashcardImportSupport {
       String? back;
       String? note;
       for (final rawLine in blockLines) {
-        final line = rawLine.trim();
+        final line = StringUtils.trimmed(rawLine);
         if (line.isEmpty) {
           continue;
         }
         if (line.startsWith('Front:')) {
-          front = line.substring('Front:'.length).trim();
+          front = StringUtils.trimmed(line.substring('Front:'.length));
           continue;
         }
         if (line.startsWith('Back:')) {
-          back = line.substring('Back:'.length).trim();
+          back = StringUtils.trimmed(line.substring('Back:'.length));
           continue;
         }
         if (line.startsWith('Note:')) {
-          note = line.substring('Note:'.length).trim();
+          note = StringUtils.trimmed(line.substring('Note:'.length));
           continue;
         }
       }
@@ -177,7 +179,7 @@ final class FlashcardImportSupport {
   static bool _hasStructuredBlockLabels(String normalized) {
     final lines = normalized.split('\n');
     return lines.any((line) {
-      final trimmed = line.trim();
+      final trimmed = StringUtils.trimmed(line);
       return trimmed.startsWith('Front:') ||
           trimmed.startsWith('Back:') ||
           trimmed.startsWith('Note:');
@@ -189,7 +191,7 @@ final class FlashcardImportSupport {
   ) {
     final lines = normalized
         .split('\n')
-        .map((line) => line.trim())
+        .map(StringUtils.trimmed)
         .where((line) => line.isNotEmpty)
         .toList(growable: false);
     var bestCount = 0;
@@ -227,7 +229,7 @@ final class FlashcardImportSupport {
     final lines = normalized.split('\n');
     for (var index = 0; index < lines.length; index++) {
       final lineNumber = index + 1;
-      final line = lines[index].trim();
+      final line = StringUtils.trimmed(lines[index]);
       if (line.isEmpty) {
         continue;
       }
@@ -271,8 +273,8 @@ final class FlashcardImportSupport {
     if (separatorIndex == null) {
       return null;
     }
-    final front = line.substring(0, separatorIndex).trim();
-    final back = line.substring(separatorIndex + 1).trim();
+    final front = StringUtils.trimmed(line.substring(0, separatorIndex));
+    final back = StringUtils.trimmed(line.substring(separatorIndex + 1));
     if (front.isEmpty || back.isEmpty) {
       return null;
     }
@@ -356,7 +358,7 @@ final class FlashcardImportSupport {
     if (index == null || index < 0 || index >= cells.length) {
       return '';
     }
-    return cells[index].trim();
+    return StringUtils.trimmed(cells[index]);
   }
 
   static String ensureImportableContent(

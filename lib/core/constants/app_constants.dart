@@ -20,6 +20,16 @@ abstract final class AppConstants {
       'settings.study.shuffle_answers';
   static const String sharedPrefsPrioritizeOverdueKey =
       'settings.study.prioritize_overdue';
+  static const String sharedPrefsTtsAutoPlayKey = 'settings.tts.auto_play';
+  static const String sharedPrefsTtsFrontLanguageKey =
+      'settings.tts.front_language';
+  static const String sharedPrefsTtsBackLanguageKey =
+      'settings.tts.back_language';
+  static const String sharedPrefsTtsRateKey = 'settings.tts.rate';
+  static const String sharedPrefsTtsFrontVoiceNameKey =
+      'settings.tts.front_voice_name';
+  static const String sharedPrefsTtsBackVoiceNameKey =
+      'settings.tts.back_voice_name';
   static const String localDatabaseName = 'memox';
 
   static const Duration connectivityDebounce = Duration(milliseconds: 250);

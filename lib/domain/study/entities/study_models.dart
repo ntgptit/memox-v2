@@ -133,6 +133,7 @@ final class StudySummary {
     required this.increasedBoxCount,
     required this.decreasedBoxCount,
     required this.remainingCount,
+    this.totalModeCount = 1,
   });
 
   final int totalCards;
@@ -142,6 +143,20 @@ final class StudySummary {
   final int increasedBoxCount;
   final int decreasedBoxCount;
   final int remainingCount;
+  final int totalModeCount;
+
+  StudySummary copyWith({int? totalModeCount}) {
+    return StudySummary(
+      totalCards: totalCards,
+      completedAttempts: completedAttempts,
+      correctAttempts: correctAttempts,
+      incorrectAttempts: incorrectAttempts,
+      increasedBoxCount: increasedBoxCount,
+      decreasedBoxCount: decreasedBoxCount,
+      remainingCount: remainingCount,
+      totalModeCount: totalModeCount ?? this.totalModeCount,
+    );
+  }
 }
 
 final class StudySessionSnapshot {
@@ -160,4 +175,15 @@ final class StudySessionSnapshot {
   final List<StudyFlashcardRef> sessionFlashcards;
   final StudySummary summary;
   final bool canFinalize;
+
+  StudySessionSnapshot copyWith({StudySummary? summary}) {
+    return StudySessionSnapshot(
+      session: session,
+      currentItem: currentItem,
+      currentRoundItems: currentRoundItems,
+      sessionFlashcards: sessionFlashcards,
+      summary: summary ?? this.summary,
+      canFinalize: canFinalize,
+    );
+  }
 }

@@ -1,6 +1,7 @@
 import '../../core/errors/error_mapper.dart';
 import '../../core/errors/result.dart';
 import '../../core/services/clock.dart';
+import '../../core/utils/string_utils.dart';
 
 Future<Result<T>> runRepositoryAction<T>(Future<T> Function() action) async {
   try {
@@ -37,8 +38,7 @@ int endOfTodayEpochMillis(Clock clock) {
 }
 
 String sanitizeFileName(String raw) {
-  final sanitized = raw
-      .trim()
+  final sanitized = StringUtils.trimmed(raw)
       .replaceAll(RegExp(r'[^\w\-]+'), '_')
       .replaceAll(RegExp(r'_+'), '_')
       .replaceAll(RegExp(r'^_|_$'), '');

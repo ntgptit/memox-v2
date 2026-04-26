@@ -66,6 +66,81 @@ void main() {
     },
   );
 
+  testWidgets(
+    'DT3 onUpdate: MxText resolves recall roles with fixed hierarchy',
+    (tester) async {
+      late Color expectedColor;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                expectedColor = Theme.of(context).colorScheme.onSurface;
+                return const Column(
+                  children: [
+                    MxText('신고하다', role: MxTextRole.recallFront),
+                    MxText('Report / Báo cáo', role: MxTextRole.recallBack),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      final front = tester.widget<Text>(find.text('신고하다'));
+      final back = tester.widget<Text>(find.text('Report / Báo cáo'));
+
+      expect(front.style?.fontSize, greaterThan(back.style!.fontSize!));
+      expect(front.style?.fontWeight, FontWeight.w500);
+      expect(back.style?.fontWeight, FontWeight.w400);
+      expect(front.style?.color, expectedColor);
+      expect(back.style?.color, expectedColor);
+    },
+  );
+
+  testWidgets(
+    'DT4 onUpdate: MxText resolves fill roles with semantic hierarchy',
+    (tester) async {
+      late Color expectedOnSurface;
+      late Color expectedError;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final scheme = Theme.of(context).colorScheme;
+                expectedOnSurface = scheme.onSurface;
+                expectedError = scheme.error;
+                return const Column(
+                  children: [
+                    MxText('meaning', role: MxTextRole.fillPrompt),
+                    MxText('term', role: MxTextRole.fillInput),
+                    MxText('wrong', role: MxTextRole.fillIncorrectInput),
+                    MxText('right', role: MxTextRole.fillCorrectAnswer),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      final prompt = tester.widget<Text>(find.text('meaning'));
+      final input = tester.widget<Text>(find.text('term'));
+      final incorrect = tester.widget<Text>(find.text('wrong'));
+      final correct = tester.widget<Text>(find.text('right'));
+
+      expect(input.style?.fontSize, greaterThan(prompt.style!.fontSize!));
+      expect(input.style?.fontWeight, FontWeight.w500);
+      expect(incorrect.style?.color, expectedError);
+      expect(correct.style?.color, expectedOnSurface);
+      expect(correct.style?.fontWeight, FontWeight.w500);
+    },
+  );
+
   testWidgets('DT1 onDisplay: MxText applies semantic role color override', (
     tester,
   ) async {

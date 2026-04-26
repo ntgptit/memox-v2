@@ -24,6 +24,10 @@ Test file: `test/presentation/shared/shared_primitives_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | answer option card has long selected text and another disabled option | first option is selected with long label, second option is disabled | user taps the selected option and then the disabled option | long text wraps visibly, selected check icon appears, enabled tap count increments once, and disabled tap count remains zero | C0+C1 |
+| DT2 | semantic button tones are requested for Recall actions | primary button uses `success` tone and secondary button uses `danger` tone | buttons render under the MemoX theme fallback extension | primary background/foreground resolve to success colors and secondary foreground/border resolve to rating-again color | C0+C1 |
+| DT3 | borderless text field variant is requested for full-card input | `MxTextField` uses `MxTextFieldVariant.borderless`, centered alignment, `fillInput` text role, and expansion inside a bounded card area | text field renders | visible input decoration has no outline border and the inner `TextField` expands with centered text and fill-input typography | C0+C1 |
+| DT4 | speak button switches between idle and speaking affordances | `MxSpeakButton` is rendered idle, then rerendered with `isSpeaking=true` | user taps idle button and widget updates | idle icon is volume-up, callback fires once, and speaking state uses volume-off icon | C0+C1 |
+| DT5 | inline toggle replaces heavy list-tile settings controls | `MxInlineToggle` has a label, helper text, leading icon, value false, and a change callback | user taps its switch | label, helper text, and icon are visible, and callback receives true | C0+C1 |
 
 ## Decision table: onBehavior
 

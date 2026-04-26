@@ -110,6 +110,15 @@ Sau này có thể mở rộng:
 
 Trạng thái học dở để resume an toàn.
 
+Progress bar trong màn học hiển thị tiến độ chung của toàn session, không phải
+tiến độ riêng của mode hiện tại. Với `New Study`, mẫu số là số flashcard nhân
+với 5 mode chính. Với `SRS Review`, mẫu số là số flashcard nhân với số mode của
+flow review đó.
+
+Tử số của progress bar chỉ tính các đơn vị đã pass (`correct`). Kết quả
+`incorrect` không làm tăng progress bar, dù đã được stage trên UI hoặc đã được
+ghi vào database, vì flashcard đó vẫn phải đi qua retry round để pass mode.
+
 ### Cần lưu
 
 - session id

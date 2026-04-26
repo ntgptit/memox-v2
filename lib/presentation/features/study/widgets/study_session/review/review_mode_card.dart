@@ -7,17 +7,21 @@ import '../../../../../shared/widgets/mx_text.dart';
 
 class ReviewModeCard extends StatelessWidget {
   const ReviewModeCard({
-    required this.tooltip,
-    required this.actionIcon,
     required this.text,
     required this.role,
+    this.tooltip,
+    this.actionIcon,
+    this.action,
+    this.secondaryAction,
     super.key,
   });
 
-  final String tooltip;
-  final IconData actionIcon;
+  final String? tooltip;
+  final IconData? actionIcon;
   final String text;
   final MxTextRole role;
+  final Widget? action;
+  final Widget? secondaryAction;
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +29,19 @@ class ReviewModeCard extends StatelessWidget {
       variant: MxCardVariant.outlined,
       child: Stack(
         children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: MxIconButton(
-              tooltip: tooltip,
-              icon: actionIcon,
-              onPressed: null,
+          if (action != null || actionIcon != null)
+            Align(
+              alignment: Alignment.topRight,
+              child:
+                  action ??
+                  MxIconButton(
+                    tooltip: tooltip ?? '',
+                    icon: actionIcon!,
+                    onPressed: null,
+                  ),
             ),
-          ),
+          if (secondaryAction != null)
+            Align(alignment: Alignment.bottomRight, child: secondaryAction),
           Positioned.fill(
             child: Padding(
               padding: const EdgeInsets.only(top: MxSpace.xxl),

@@ -2,6 +2,7 @@ import '../../core/errors/app_exception.dart';
 import '../../core/errors/result.dart';
 import '../../core/services/clock.dart';
 import '../../core/services/id_generator.dart';
+import '../../core/utils/string_utils.dart';
 import '../../domain/entities/deck_entity.dart';
 import '../../domain/enums/content_sort_mode.dart';
 import '../../domain/repositories/deck_repository.dart';
@@ -366,7 +367,7 @@ final class DeckRepositoryImpl implements DeckRepository {
   }
 
   String _normalizeName(String name) {
-    final trimmed = name.trim();
+    final trimmed = StringUtils.trimmed(name);
     if (trimmed.isEmpty) {
       throw const ValidationException(message: 'The name is required.');
     }
@@ -382,8 +383,7 @@ final class DeckRepositoryImpl implements DeckRepository {
         items.sort((a, b) => a.deck.sortOrder.compareTo(b.deck.sortOrder));
       case ContentSortMode.name:
         items.sort(
-          (a, b) =>
-              a.deck.name.toLowerCase().compareTo(b.deck.name.toLowerCase()),
+          (a, b) => StringUtils.compareNormalized(a.deck.name, b.deck.name),
         );
       case ContentSortMode.newest:
         items.sort((a, b) => b.deck.createdAt.compareTo(a.deck.createdAt));

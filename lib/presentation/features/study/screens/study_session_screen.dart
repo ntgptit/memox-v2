@@ -21,10 +21,8 @@ import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/study_session_notifier.dart';
 import '../study_labels.dart';
-import '../widgets/study_session/guess/guess_mode_session_view.dart';
-import '../widgets/study_session/match/match_mode_session_view.dart';
-import '../widgets/study_session/review/review_mode_session_view.dart';
 import '../widgets/study_session/study_mode_panel.dart';
+import '../widgets/study_session/study_mode_session_view_factory.dart';
 
 class StudySessionScreen extends ConsumerStatefulWidget {
   const StudySessionScreen({required this.sessionId, super.key});
@@ -36,6 +34,8 @@ class StudySessionScreen extends ConsumerStatefulWidget {
 }
 
 class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
+  static const _modeViewFactory = StudyModeSessionViewFactory();
+
   StudyAnswerFeedback? _feedback;
 
   @override
@@ -111,47 +111,18 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       );
     }
 
-    final currentItem = snapshot.currentItem;
-    if (currentItem != null &&
-        currentItem.studyMode == StudyMode.review &&
-        snapshot.session.status == SessionStatus.inProgress) {
-      return ReviewModeSessionView(
-        snapshot: snapshot,
-        isSubmitting: actionState.isLoading,
-        onSubmit: () => ref
-            .read(
-              studySessionActionControllerProvider(widget.sessionId).notifier,
-            )
-            .answerCurrentReviewModeAsRemembered(),
-      );
-    }
-    if (currentItem != null &&
-        currentItem.studyMode == StudyMode.match &&
-        snapshot.session.status == SessionStatus.inProgress) {
-      return MatchModeSessionView(
-        snapshot: snapshot,
-        isSubmitting: actionState.isLoading,
-        onSubmit: (itemGrades) => ref
-            .read(
-              studySessionActionControllerProvider(widget.sessionId).notifier,
-            )
-            .answerCurrentMatchModeBatch(itemGrades),
-      );
-    }
-    if (currentItem != null &&
-        currentItem.studyMode == StudyMode.guess &&
-        snapshot.session.status == SessionStatus.inProgress) {
-      return GuessModeSessionView(
-        snapshot: snapshot,
-        answerOptions: studyGuessAnswerOptions(snapshot),
-        progress: _sessionProgress(snapshot),
-        isSubmitting: actionState.isLoading,
-        onSubmit: (grade) => ref
-            .read(
-              studySessionActionControllerProvider(widget.sessionId).notifier,
-            )
-            .answer(grade),
-      );
+    final activeModeView = _modeViewFactory.build(
+      snapshot: snapshot,
+      isSubmitting: actionState.isLoading,
+      onReviewSubmit: () => ref
+          .read(studySessionActionControllerProvider(widget.sessionId).notifier)
+          .answerCurrentReviewModeAsCorrect(),
+      onBatchSubmit: (itemGrades) => ref
+          .read(studySessionActionControllerProvider(widget.sessionId).notifier)
+          .answerCurrentModeItemGradesBatch(itemGrades),
+    );
+    if (activeModeView != null) {
+      return activeModeView;
     }
 
     final currentItemId = snapshot.currentItem?.id;
@@ -249,12 +220,11 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
   }
 
   double _sessionProgress(StudySessionSnapshot snapshot) {
-    final completed = snapshot.summary.completedAttempts;
-    final total = completed + snapshot.summary.remainingCount;
+    final total = snapshot.summary.totalCards * snapshot.summary.totalModeCount;
     if (total <= 0) {
       return 0;
     }
-    return completed / total;
+    return (snapshot.summary.correctAttempts / total).clamp(0, 1).toDouble();
   }
 
   void _recordFeedback(
@@ -269,9 +239,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       _feedback = StudyAnswerFeedback(
         itemId: item.id,
         selectedGrade: submission.grade,
-        isCorrect:
-            submission.grade == AttemptGrade.correct ||
-            submission.grade == AttemptGrade.remembered,
+        isCorrect: submission.grade == AttemptGrade.correct,
         correctAnswer: item.flashcard.back,
         submittedAnswer: submission.submittedAnswer,
         selectedOptionId: submission.selectedOptionId,

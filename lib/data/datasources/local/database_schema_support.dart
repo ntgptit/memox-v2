@@ -53,8 +53,6 @@ abstract final class DatabaseEnumValues {
   static const List<String> rawStudyResults = <String>[
     'correct',
     'incorrect',
-    'remembered',
-    'forgot',
   ];
 
   static const List<String> reviewResults = <String>[

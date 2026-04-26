@@ -78,6 +78,47 @@ void main() {
     expect(find.text('Cancel session'), findsWidgets);
   });
 
+  testWidgets('DT3 onDisplay: medium overview metrics share one row', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressStudySessionsProvider.overrideWith(
+            (ref) => Future.value([
+              _snapshot(id: 'session-1'),
+              _snapshot(id: 'session-2', status: SessionStatus.readyToFinalize),
+              _snapshot(
+                id: 'session-3',
+                status: SessionStatus.failedToFinalize,
+              ),
+            ]),
+          ),
+        ],
+        child: const _TestApp(child: ProgressScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final activeRect = tester.getRect(
+      find.byKey(const ValueKey('progress_metric_active')),
+    );
+    final readyRect = tester.getRect(
+      find.byKey(const ValueKey('progress_metric_ready')),
+    );
+    final failedRect = tester.getRect(
+      find.byKey(const ValueKey('progress_metric_failed')),
+    );
+
+    expect(activeRect.top, moreOrLessEquals(readyRect.top));
+    expect(activeRect.top, moreOrLessEquals(failedRect.top));
+    expect(readyRect.left, greaterThan(activeRect.right));
+    expect(failedRect.left, greaterThan(readyRect.right));
+  });
+
   testWidgets('DT1 onSelect: cancel confirms before mutating session', (
     tester,
   ) async {
@@ -184,16 +225,7 @@ final class _ProgressScreenStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> answerCurrentModeBatch({
-    required String sessionId,
-    required AttemptGrade grade,
-    required List<StudyMode> modes,
-  }) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+  Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
     required String sessionId,
     required Map<String, AttemptGrade> itemGrades,
     required List<StudyMode> modes,
@@ -210,6 +242,7 @@ final class _ProgressScreenStudyRepo implements StudyRepo {
   Future<StudySessionSnapshot> finalizeSession({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) {
     throw UnimplementedError();
   }
@@ -218,6 +251,7 @@ final class _ProgressScreenStudyRepo implements StudyRepo {
   Future<StudySessionSnapshot> retryFinalize({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) {
     throw UnimplementedError();
   }

@@ -5,18 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/study_providers.dart';
+import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/guess/guess_motion.dart';
+import 'package:memox/presentation/features/study/widgets/study_session/fill/fill_motion.dart';
+import 'package:memox/presentation/features/study/widgets/study_session/recall/recall_motion.dart';
+import 'package:memox/presentation/features/study/widgets/study_session/study_speak_button.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
+import 'package:memox/presentation/shared/widgets/mx_text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('DT1 onOpen: shows loading state while session loads', (
     tester,
   ) async {
@@ -59,12 +70,12 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpStudyScreenData(tester);
 
     expect(find.text('Guess'), findsOneWidget);
     expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     expect(find.byIcon(Icons.text_fields), findsOneWidget);
-    expect(find.byIcon(Icons.volume_up_outlined), findsNWidgets(2));
+    expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
     expect(find.text('40%'), findsOneWidget);
     expect(find.text('front 1'), findsOneWidget);
@@ -114,7 +125,7 @@ void main() {
 
       expect(find.text('Review'), findsOneWidget);
       expect(find.byIcon(Icons.text_fields), findsOneWidget);
-      expect(find.byIcon(Icons.volume_up_outlined), findsNWidgets(2));
+      expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
       expect(find.byIcon(Icons.more_vert), findsOneWidget);
       expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
       expect(find.text('front 1'), findsOneWidget);
@@ -165,7 +176,7 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpStudyScreenData(tester);
 
     expect(find.text('Forgot'), findsNothing);
     expect(find.text('Remembered'), findsNothing);
@@ -224,13 +235,13 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpStudyScreenData(tester);
 
     expect(find.text('Match'), findsOneWidget);
     expect(find.byIcon(Icons.text_fields), findsOneWidget);
     expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
-    expect(find.text('0%'), findsOneWidget);
+    expect(find.text('20%'), findsOneWidget);
     expect(
       find.descendant(
         of: find.byKey(const ValueKey('match-left-item-001')),
@@ -424,10 +435,155 @@ void main() {
     expect(longOption.textAlign, TextAlign.center);
   });
 
+  testWidgets('DT12 onDisplay: recall mode renders hidden answer layout', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_recallSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    final questionHeight = tester.getSize(
+      find.byKey(const ValueKey<String>('recall-question-card')),
+    );
+    final answerHeight = tester.getSize(
+      find.byKey(const ValueKey<String>('recall-answer-card')),
+    );
+    final frontText = tester.widget<MxText>(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is MxText &&
+            widget.data == 'front 1' &&
+            widget.role == MxTextRole.recallFront,
+      ),
+    );
+
+    expect(find.text('Recall'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+    expect(find.byIcon(Icons.text_fields), findsOneWidget);
+    expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
+    expect(find.text('60%'), findsOneWidget);
+    expect(frontText.textAlign, TextAlign.center);
+    expect(
+      find.byKey(const ValueKey<String>('recall-answer-hidden')),
+      findsOneWidget,
+    );
+    expect(find.byType(ImageFiltered), findsOneWidget);
+    expect(find.text('Show (20s)'), findsOneWidget);
+    expect(find.text('Forgot'), findsNothing);
+    expect(find.text('Remembered'), findsNothing);
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text('Incorrect'), findsNothing);
+    expect(find.text('Continue'), findsNothing);
+    expect(find.text('Skip card'), findsNothing);
+    expect(questionHeight.height, closeTo(answerHeight.height, 0.1));
+  });
+
+  testWidgets('DT13 onDisplay: fill mode renders input layout', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_fillSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    final checkButton = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Check'),
+    );
+    final inputTextField = tester.widget<TextField>(find.byType(TextField));
+
+    expect(find.text('Fill'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+    expect(find.byIcon(Icons.text_fields), findsOneWidget);
+    expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
+    expect(find.text('80%'), findsOneWidget);
+    expect(find.text('back 1'), findsOneWidget);
+    expect(find.text('Help'), findsOneWidget);
+    expect(find.text('Check'), findsOneWidget);
+    expect(checkButton.onPressed, isNull);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is MxTextField &&
+            widget.variant == MxTextFieldVariant.borderless &&
+            widget.textRole == MxTextRole.fillInput &&
+            widget.textAlign == TextAlign.center &&
+            widget.expands,
+      ),
+      findsOneWidget,
+    );
+    expect(inputTextField.expands, isTrue);
+    expect(inputTextField.maxLines, isNull);
+    expect(inputTextField.minLines, isNull);
+    expect(find.text('Continue'), findsNothing);
+    expect(find.text('Skip card'), findsNothing);
+  });
+
+  testWidgets(
+    'DT14 onDisplay: fill mode avoids keyboard overflow in short viewport',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 620);
+      tester.view.devicePixelRatio = 1;
+      tester.view.viewInsets = const FakeViewPadding(bottom: 260);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetViewInsets();
+      });
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_fillSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await _pumpStudyScreenData(tester);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('80%'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey<String>('fill-prompt-card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('fill-input-card')),
+        findsOneWidget,
+      );
+      expect(find.text('Help'), findsOneWidget);
+      expect(find.text('Check'), findsOneWidget);
+    },
+  );
+
   testWidgets(
     'DT1 onUpdate: single-card review auto-submits after two seconds',
     (tester) async {
-      final repo = _BatchAnswerStudyRepo();
+      final repo = _BatchAnswerStudyRepo(_singleReviewSnapshot);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -450,14 +606,14 @@ void main() {
       await tester.pump();
 
       expect(repo.batchAnswerCount, 1);
-      expect(repo.lastGrade, AttemptGrade.remembered);
+      expect(repo.lastGrade, AttemptGrade.correct);
     },
   );
 
   testWidgets('DT4 onUpdate: match correct pair holds success before fade', (
     tester,
   ) async {
-    final repo = _BatchAnswerStudyRepo();
+    final repo = _BatchAnswerStudyRepo(_matchSnapshot);
 
     await tester.pumpWidget(
       ProviderScope(
@@ -485,7 +641,7 @@ void main() {
         matching: find.byType(MxCard),
       ),
     );
-    expect(find.text('50%'), findsOneWidget);
+    expect(find.text('30%'), findsOneWidget);
     expect(successCard.backgroundColor, isNotNull);
     expect(_matchTileOpacity(tester, 'match-left-item-001'), 1);
     expect(find.byKey(const ValueKey('match-left-item-001')), findsOneWidget);
@@ -502,7 +658,7 @@ void main() {
   testWidgets('DT5 onUpdate: match mismatch resets locally without submit', (
     tester,
   ) async {
-    final repo = _BatchAnswerStudyRepo();
+    final repo = _BatchAnswerStudyRepo(_matchSnapshot);
 
     await tester.pumpWidget(
       ProviderScope(
@@ -532,19 +688,19 @@ void main() {
     );
     expect(errorCard.backgroundColor, isNotNull);
     expect(repo.matchBatchAnswerCount, 0);
-    expect(find.text('0%'), findsOneWidget);
+    expect(find.text('20%'), findsOneWidget);
 
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump();
 
     expect(repo.matchBatchAnswerCount, 0);
-    expect(find.text('0%'), findsOneWidget);
+    expect(find.text('20%'), findsOneWidget);
   });
 
   testWidgets(
     'DT6 onUpdate: match board submits mixed grades once after completion',
     (tester) async {
-      final repo = _BatchAnswerStudyRepo();
+      final repo = _BatchAnswerStudyRepo(_matchSnapshot);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -570,6 +726,7 @@ void main() {
       await tester.pump();
       await _tapMatchTile(tester, 'match-right-item-001');
       await tester.pump();
+      expect(find.text('20%'), findsOneWidget);
       await _tapMatchTile(tester, 'match-left-item-002');
       await tester.pump();
       await _tapMatchTile(tester, 'match-right-item-002');
@@ -587,7 +744,7 @@ void main() {
   testWidgets(
     'DT7 onUpdate: match display batch advances before final submit',
     (tester) async {
-      final repo = _BatchAnswerStudyRepo();
+      final repo = _BatchAnswerStudyRepo(_largeMatchSnapshot);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -612,7 +769,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 700));
       await tester.pump();
 
-      expect(find.text('71%'), findsOneWidget);
+      expect(find.text('34%'), findsOneWidget);
       expect(find.text(_matchFront(6)), findsOneWidget);
       expect(find.text(_matchBack(6)), findsOneWidget);
       expect(find.text(_matchFront(7)), findsOneWidget);
@@ -638,7 +795,7 @@ void main() {
   testWidgets(
     'DT8 onUpdate: guess correct option submits correct after feedback',
     (tester) async {
-      final repo = _BatchAnswerStudyRepo();
+      final repo = _BatchAnswerStudyRepo(_activeSnapshot);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -667,8 +824,11 @@ void main() {
       await tester.pump(guessFeedbackDelay - guessColorTransitionDuration);
       await tester.pump();
 
-      expect(repo.itemAnswerCount, 1);
-      expect(repo.lastGrade, AttemptGrade.correct);
+      expect(repo.itemAnswerCount, 0);
+      expect(repo.modeItemBatchAnswerCount, 1);
+      expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+        'item-001': AttemptGrade.correct,
+      });
     },
   );
 
@@ -702,20 +862,25 @@ void main() {
       expect(wrongCard.backgroundColor, isNot(idleCard.backgroundColor));
       expect(correctCard.backgroundColor, isNot(idleCard.backgroundColor));
       expect(wrongCard.backgroundColor, isNot(correctCard.backgroundColor));
+      expect(find.text('40%'), findsOneWidget);
       expect(repo.itemAnswerCount, 0);
 
       await tester.pump(guessFeedbackDelay - guessColorTransitionDuration);
       await tester.pump();
 
-      expect(repo.itemAnswerCount, 1);
-      expect(repo.lastGrade, AttemptGrade.incorrect);
+      expect(repo.itemAnswerCount, 0);
+      expect(repo.modeItemBatchAnswerCount, 1);
+      expect(find.text('40%'), findsOneWidget);
+      expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+        'item-001': AttemptGrade.incorrect,
+      });
     },
   );
 
   testWidgets('DT10 onUpdate: guess ignores taps while resolving', (
     tester,
   ) async {
-    final repo = _BatchAnswerStudyRepo();
+    final repo = _BatchAnswerStudyRepo(_activeSnapshot);
 
     await tester.pumpWidget(
       ProviderScope(
@@ -740,14 +905,592 @@ void main() {
     await tester.pump(guessFeedbackDelay);
     await tester.pump();
 
-    expect(repo.itemAnswerCount, 1);
-    expect(repo.lastGrade, AttemptGrade.incorrect);
+    expect(repo.itemAnswerCount, 0);
+    expect(repo.modeItemBatchAnswerCount, 1);
+    expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+      'item-001': AttemptGrade.incorrect,
+    });
+  });
+
+  testWidgets(
+    'DT27 onUpdate: guess stages local answers until the last mode item',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo(_twoItemGuessSnapshot);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_twoItemGuessSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _tapGuessOption(tester, 'card-001');
+      await tester.pump(guessFeedbackDelay);
+      await tester.pump();
+
+      expect(find.text('front 2'), findsOneWidget);
+      expect(repo.modeItemBatchAnswerCount, 0);
+
+      await _tapGuessOption(tester, 'card-001');
+      await tester.pump(guessFeedbackDelay);
+      await tester.pump();
+
+      expect(repo.modeItemBatchAnswerCount, 1);
+      expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+        'item-001': AttemptGrade.correct,
+        'item-002': AttemptGrade.incorrect,
+      });
+    },
+  );
+
+  testWidgets('DT11 onUpdate: recall show reveals answer without submit', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo(_recallSnapshot);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_recallSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    await tester.tap(find.text('Show (20s)'));
+    await _pumpRecallRevealTransition(tester);
+
+    final answerText = tester.widget<Text>(
+      find.descendant(
+        of: find.byKey(const ValueKey<String>('recall-answer-revealed')),
+        matching: find.text(_longRecallBack),
+      ),
+    );
+
+    expect(
+      find.byKey(const ValueKey<String>('recall-answer-revealed')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey<String>('recall-answer-revealed')),
+        matching: find.byType(SingleChildScrollView),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Forgot'), findsOneWidget);
+    expect(find.text('Remembered'), findsOneWidget);
+    expect(find.text('Show (20s)'), findsNothing);
+    expect(answerText.maxLines, isNull);
+    expect(repo.itemAnswerCount, 0);
+  });
+
+  testWidgets('DT12 onUpdate: recall Forgot submits incorrect batch grade', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo(_recallSnapshot);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_recallSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    await tester.tap(find.text('Show (20s)'));
+    await _pumpRecallRevealTransition(tester);
+    await tester.tap(find.text('Forgot'));
+    await tester.pump();
+
+    expect(find.text('60%'), findsOneWidget);
+    expect(repo.itemAnswerCount, 0);
+    expect(repo.modeItemBatchAnswerCount, 1);
+    expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+      'item-001': AttemptGrade.incorrect,
+    });
+  });
+
+  testWidgets('DT13 onUpdate: recall Remembered submits correct batch grade', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo(_recallSnapshot);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_recallSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    await tester.tap(find.text('Show (20s)'));
+    await _pumpRecallRevealTransition(tester);
+    await tester.tap(find.text('Remembered'));
+    await tester.pump();
+
+    expect(repo.itemAnswerCount, 0);
+    expect(repo.modeItemBatchAnswerCount, 1);
+    expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+      'item-001': AttemptGrade.correct,
+    });
+  });
+
+  testWidgets('DT14 onUpdate: recall item change resets hidden answer', (
+    tester,
+  ) async {
+    var currentSnapshot = _recallSnapshot;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => currentSnapshot),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    await tester.tap(find.text('Show (20s)'));
+    await _pumpRecallRevealTransition(tester);
+    expect(find.text('Forgot'), findsOneWidget);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(StudySessionScreen)),
+    );
+    currentSnapshot = _secondRecallSnapshot;
+    container.invalidate(studySessionStateProvider('session-001'));
+    await tester.pump();
+    await _pumpStudyScreenData(tester);
+    await _pumpRecallRevealTransition(tester);
+
+    expect(find.text('front 2'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('recall-answer-hidden')),
+      findsAtLeastNWidgets(1),
+    );
+    expect(find.text('Show (20s)'), findsOneWidget);
+    expect(find.text('Forgot'), findsNothing);
+    expect(find.text('Remembered'), findsNothing);
+  });
+
+  testWidgets('DT15 onUpdate: recall ignores taps while submitting', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo(_recallSnapshot)
+      ..modeItemBatchCompleter = Completer<StudySessionSnapshot>();
+    addTearDown(() {
+      final completer = repo.modeItemBatchCompleter;
+      if (completer != null && !completer.isCompleted) {
+        completer.complete(_recallSnapshot);
+      }
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_recallSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    await tester.tap(find.text('Show (20s)'));
+    await _pumpRecallRevealTransition(tester);
+    await tester.tap(find.text('Remembered'));
+    await tester.pump();
+    await tester.tap(find.text('Forgot'), warnIfMissed: false);
+    await tester.pump();
+
+    expect(repo.itemAnswerCount, 0);
+    expect(repo.modeItemBatchAnswerCount, 1);
+    expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+      'item-001': AttemptGrade.correct,
+    });
+
+    repo.modeItemBatchCompleter!.complete(_recallSnapshot);
+    await tester.pump();
+  });
+
+  testWidgets('DT16 onUpdate: recall timeout reveals answer with next action', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo(_recallSnapshot);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_recallSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    await tester.pump(recallAnswerTimeoutDuration);
+    await _pumpRecallRevealTransition(tester);
+
+    expect(
+      find.byKey(const ValueKey<String>('recall-answer-revealed')),
+      findsOneWidget,
+    );
+    expect(find.text('Next'), findsOneWidget);
+    expect(find.text('Forgot'), findsNothing);
+    expect(find.text('Remembered'), findsNothing);
+    expect(repo.itemAnswerCount, 0);
+
+    final actionRight = tester.getTopRight(
+      find.byKey(const ValueKey<String>('recall-next-action')),
+    );
+    final cardRight = tester
+        .getTopRight(find.byKey(const ValueKey<String>('recall-answer-card')))
+        .dx;
+    expect(actionRight.dx, closeTo(cardRight, 1));
+  });
+
+  testWidgets(
+    'DT17 onUpdate: recall timeout Next submits incorrect batch grade',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo(_recallSnapshot);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_recallSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await _pumpStudyScreenData(tester);
+
+      await tester.pump(recallAnswerTimeoutDuration);
+      await _pumpRecallRevealTransition(tester);
+      await tester.tap(find.text('Next'));
+      await tester.pump();
+
+      expect(find.text('60%'), findsOneWidget);
+      expect(repo.itemAnswerCount, 0);
+      expect(repo.modeItemBatchAnswerCount, 1);
+      expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+        'item-001': AttemptGrade.incorrect,
+      });
+    },
+  );
+
+  testWidgets(
+    'DT28 onUpdate: recall stages correct and incorrect until mode completes',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo(_twoItemRecallSnapshot);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_twoItemRecallSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await _pumpStudyScreenData(tester);
+
+      await tester.tap(find.text('Show (20s)'));
+      await _pumpRecallRevealTransition(tester);
+      await tester.tap(find.text('Remembered'));
+      await tester.pump();
+
+      expect(find.text('front 2'), findsOneWidget);
+      expect(repo.modeItemBatchAnswerCount, 0);
+
+      await tester.tap(find.text('Show (20s)'));
+      await _pumpRecallRevealTransition(tester);
+      await tester.tap(find.text('Forgot'));
+      await tester.pump();
+
+      expect(repo.modeItemBatchAnswerCount, 1);
+      expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+        'item-001': AttemptGrade.correct,
+        'item-002': AttemptGrade.incorrect,
+      });
+    },
+  );
+
+  testWidgets('DT18 onUpdate: fill keeps check disabled for blank input', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo();
+
+    await _pumpFillScreen(tester, repo: repo);
+
+    await tester.enterText(find.byType(TextField), '   ');
+    await tester.pump();
+
+    final checkButton = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Check'),
+    );
+    expect(checkButton.onPressed, isNull);
+    expect(repo.itemAnswerCount, 0);
+  });
+
+  testWidgets(
+    'DT19 onUpdate: fill correct input submits mode batch when mode completes',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo(_multiReviewSnapshot);
+
+      await _pumpFillScreen(tester, repo: repo);
+
+      await tester.enterText(find.byType(TextField), ' Front 1 ');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
+      await tester.pump();
+
+      expect(repo.itemAnswerCount, 0);
+      expect(repo.modeItemBatchAnswerCount, 1);
+      expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+        'item-001': AttemptGrade.correct,
+      });
+    },
+  );
+
+  testWidgets('DT20 onUpdate: fill incorrect input reveals result locally', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo();
+
+    await _pumpFillScreen(tester, repo: repo);
+
+    await _enterWrongFillAnswer(tester);
+
+    expect(find.text('80%'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('fill-result-card')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey<String>('fill-result-card')),
+        matching: find.text('wrong'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('front 1'), findsOneWidget);
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text('Next'), findsOneWidget);
+    expect(find.text('Try again'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey<String>('fill-result-card')),
+        matching: find.byIcon(Icons.refresh),
+      ),
+      findsNothing,
+    );
+    expect(repo.itemAnswerCount, 0);
+  });
+
+  testWidgets('DT21 onUpdate: fill next submits incorrect grade', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo();
+
+    await _pumpFillScreen(tester, repo: repo);
+    await _enterWrongFillAnswer(tester);
+    _pressFillAction(tester, 'fill-next-action');
+    await tester.pump();
+
+    expect(find.text('80%'), findsOneWidget);
+    expect(repo.itemAnswerCount, 0);
+    expect(repo.modeItemBatchAnswerCount, 1);
+    expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+      'item-001': AttemptGrade.incorrect,
+    });
+  });
+
+  testWidgets('DT25 onUpdate: fill help stages incorrect and next flushes', (
+    tester,
+  ) async {
+    final repo = _BatchAnswerStudyRepo();
+
+    await _pumpFillScreen(tester, repo: repo);
+    await tester.tap(find.byKey(const ValueKey<String>('fill-help-action')));
+    await _pumpFillStateTransition(tester);
+
+    expect(repo.itemAnswerCount, 0);
+    expect(repo.modeItemBatchAnswerCount, 0);
+    expect(
+      find.byKey(const ValueKey<String>('fill-result-card')),
+      findsOneWidget,
+    );
+    expect(find.text('Correct'), findsNothing);
+    expect(find.text('Next'), findsOneWidget);
+    expect(find.text('80%'), findsOneWidget);
+
+    _pressFillAction(tester, 'fill-next-action');
+    await tester.pump();
+
+    expect(repo.itemAnswerCount, 0);
+    expect(repo.modeItemBatchAnswerCount, 1);
+    expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+      'item-001': AttemptGrade.incorrect,
+    });
+  });
+
+  testWidgets('DT26 onUpdate: fill item change resets input state', (
+    tester,
+  ) async {
+    var currentSnapshot = _fillSnapshot;
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => currentSnapshot),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    await _enterWrongFillAnswer(tester);
+    expect(find.text('Next'), findsOneWidget);
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(StudySessionScreen)),
+    );
+    currentSnapshot = _secondFillSnapshot;
+    container.invalidate(studySessionStateProvider('session-001'));
+    await tester.pump();
+    await _pumpStudyScreenData(tester);
+    await _pumpFillStateTransition(tester);
+
+    final input = tester.widget<TextField>(find.byType(TextField));
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey<String>('fill-prompt-card')),
+        matching: find.text('back 2'),
+      ),
+      findsOneWidget,
+    );
+    expect(input.controller?.text, isEmpty);
+    expect(find.text('Help'), findsOneWidget);
+    expect(find.text('Check'), findsOneWidget);
+    expect(find.text('Next'), findsNothing);
+  });
+
+  testWidgets(
+    'DT29 onUpdate: fill stages local answers until the last mode item',
+    (tester) async {
+      final repo = _BatchAnswerStudyRepo(_multiReviewSnapshot);
+
+      await _pumpFillScreen(tester, repo: repo, snapshot: _twoItemFillSnapshot);
+
+      await tester.enterText(find.byType(TextField), 'Front 1');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
+      await tester.pump();
+
+      expect(find.text('back 2'), findsOneWidget);
+      expect(repo.modeItemBatchAnswerCount, 0);
+
+      await tester.enterText(find.byType(TextField), 'wrong');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
+      await _pumpFillStateTransition(tester);
+      _pressFillAction(tester, 'fill-next-action');
+      await tester.pump();
+
+      expect(repo.modeItemBatchAnswerCount, 1);
+      expect(repo.lastModeItemGrades, <String, AttemptGrade>{
+        'item-001': AttemptGrade.correct,
+        'item-002': AttemptGrade.incorrect,
+      });
+    },
+  );
+
+  testWidgets('DT30 onUpdate: study speak buttons only bind front TTS side', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider(
+            'session-001',
+          ).overrideWith((ref) => Future.value(_activeSnapshot)),
+        ],
+        child: const _TestApp(
+          child: StudySessionScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await _pumpStudyScreenData(tester);
+
+    final frontButton = tester.widget<StudySpeakButton>(
+      find.byKey(const ValueKey<String>('guess-front-speak-card-001')),
+    );
+
+    expect(frontButton.text, 'front 1');
+    expect(frontButton.side, TtsTextSide.front);
+    expect(
+      find.byKey(const ValueKey<String>('guess-back-speak-card-001')),
+      findsNothing,
+    );
   });
 
   testWidgets(
     'DT2 onUpdate: web mouse right-to-left drag advances review vocabulary and only the last card can auto-submit',
     (tester) async {
-      final repo = _BatchAnswerStudyRepo();
+      final repo = _BatchAnswerStudyRepo(_multiReviewSnapshot);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -789,7 +1532,7 @@ void main() {
   testWidgets(
     'DT3 onUpdate: web mouse wheel scroll advances review vocabulary',
     (tester) async {
-      final repo = _BatchAnswerStudyRepo();
+      final repo = _BatchAnswerStudyRepo(_multiReviewSnapshot);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -861,6 +1604,60 @@ final _longGuessOptionSnapshot = _guessSnapshotFor([
   _card(id: 'card-004', front: 'front 4', back: 'back 4'),
   _card(id: 'card-005', front: 'front 5', back: 'back 5'),
 ]);
+
+final _twoItemGuessSnapshot = _modeRoundSnapshotFor(
+  mode: StudyMode.guess,
+  modeOrder: 3,
+  completedAttempts: 4,
+  cards: [
+    _card(id: 'card-001', front: 'front 1', back: 'back 1'),
+    _card(id: 'card-002', front: 'front 2', back: 'back 2'),
+  ],
+);
+
+const _longRecallBack =
+    'Report / Báo cáo, khai báo (Động từ, trình bày lại một sự việc đã xảy ra '
+    'hoặc thông tin cần được ghi nhận trong quá trình học)';
+
+final _recallSnapshot = _recallSnapshotFor(
+  itemId: 'item-001',
+  card: _card(id: 'card-001', front: 'front 1', back: _longRecallBack),
+);
+
+final _secondRecallSnapshot = _recallSnapshotFor(
+  itemId: 'item-002',
+  card: _card(id: 'card-002', front: 'front 2', back: 'back 2'),
+);
+
+final _twoItemRecallSnapshot = _modeRoundSnapshotFor(
+  mode: StudyMode.recall,
+  modeOrder: 4,
+  completedAttempts: 6,
+  cards: [
+    _card(id: 'card-001', front: 'front 1', back: _longRecallBack),
+    _card(id: 'card-002', front: 'front 2', back: 'back 2'),
+  ],
+);
+
+final _fillSnapshot = _fillSnapshotFor(
+  itemId: 'item-001',
+  card: _card(id: 'card-001', front: 'front 1', back: 'back 1'),
+);
+
+final _secondFillSnapshot = _fillSnapshotFor(
+  itemId: 'item-002',
+  card: _card(id: 'card-002', front: 'front 2', back: 'back 2'),
+);
+
+final _twoItemFillSnapshot = _modeRoundSnapshotFor(
+  mode: StudyMode.fill,
+  modeOrder: 5,
+  completedAttempts: 8,
+  cards: [
+    _card(id: 'card-001', front: 'front 1', back: 'back 1'),
+    _card(id: 'card-002', front: 'front 2', back: 'back 2'),
+  ],
+);
 
 final _singleReviewSnapshot = _reviewSnapshot([
   _card(id: 'card-001', front: 'front 1', back: 'back 1'),
@@ -974,7 +1771,8 @@ StudySession _newStudySession(SessionStatus status) {
 
 StudySessionSnapshot _guessSnapshotFor(List<StudyFlashcardRef> cards) {
   final current = cards.first;
-  const completedAttempts = 2;
+  final completedAttempts = cards.length * 2;
+  final remainingCount = cards.length * 3;
   return StudySessionSnapshot(
     session: _newStudySession(SessionStatus.inProgress),
     currentItem: StudySessionItem(
@@ -992,12 +1790,13 @@ StudySessionSnapshot _guessSnapshotFor(List<StudyFlashcardRef> cards) {
     sessionFlashcards: cards,
     summary: StudySummary(
       totalCards: cards.length,
+      totalModeCount: 5,
       completedAttempts: completedAttempts,
       correctAttempts: completedAttempts,
       incorrectAttempts: 0,
       increasedBoxCount: 0,
       decreasedBoxCount: 0,
-      remainingCount: cards.length - completedAttempts,
+      remainingCount: remainingCount,
     ),
     canFinalize: false,
   );
@@ -1006,7 +1805,7 @@ StudySessionSnapshot _guessSnapshotFor(List<StudyFlashcardRef> cards) {
 StudySessionSnapshot _reviewSnapshot(List<StudyFlashcardRef> cards) {
   final current = cards.first;
   return StudySessionSnapshot(
-    session: _session(SessionStatus.inProgress),
+    session: _newStudySession(SessionStatus.inProgress),
     currentItem: StudySessionItem(
       id: 'item-001',
       sessionId: 'session-001',
@@ -1022,12 +1821,123 @@ StudySessionSnapshot _reviewSnapshot(List<StudyFlashcardRef> cards) {
     sessionFlashcards: cards,
     summary: StudySummary(
       totalCards: cards.length,
+      totalModeCount: 5,
       completedAttempts: 0,
       correctAttempts: 0,
       incorrectAttempts: 0,
       increasedBoxCount: 0,
       decreasedBoxCount: 0,
       remainingCount: cards.length,
+    ),
+    canFinalize: false,
+  );
+}
+
+StudySessionSnapshot _recallSnapshotFor({
+  required String itemId,
+  required StudyFlashcardRef card,
+}) {
+  const completedAttempts = 3;
+  const remainingCount = 2;
+  return StudySessionSnapshot(
+    session: _newStudySession(SessionStatus.inProgress),
+    currentItem: StudySessionItem(
+      id: itemId,
+      sessionId: 'session-001',
+      flashcard: card,
+      studyMode: StudyMode.recall,
+      modeOrder: 4,
+      roundIndex: 1,
+      queuePosition: 1,
+      sourcePool: SessionItemSourcePool.newCards,
+      status: SessionItemStatus.pending,
+      completedAt: null,
+    ),
+    sessionFlashcards: [card],
+    summary: const StudySummary(
+      totalCards: 1,
+      totalModeCount: 5,
+      completedAttempts: completedAttempts,
+      correctAttempts: completedAttempts,
+      incorrectAttempts: 0,
+      increasedBoxCount: 0,
+      decreasedBoxCount: 0,
+      remainingCount: remainingCount,
+    ),
+    canFinalize: false,
+  );
+}
+
+StudySessionSnapshot _fillSnapshotFor({
+  required String itemId,
+  required StudyFlashcardRef card,
+}) {
+  const completedAttempts = 4;
+  const remainingCount = 1;
+  return StudySessionSnapshot(
+    session: _newStudySession(SessionStatus.inProgress),
+    currentItem: StudySessionItem(
+      id: itemId,
+      sessionId: 'session-001',
+      flashcard: card,
+      studyMode: StudyMode.fill,
+      modeOrder: 5,
+      roundIndex: 1,
+      queuePosition: 1,
+      sourcePool: SessionItemSourcePool.newCards,
+      status: SessionItemStatus.pending,
+      completedAt: null,
+    ),
+    sessionFlashcards: [card],
+    summary: const StudySummary(
+      totalCards: 1,
+      totalModeCount: 5,
+      completedAttempts: completedAttempts,
+      correctAttempts: completedAttempts,
+      incorrectAttempts: 0,
+      increasedBoxCount: 0,
+      decreasedBoxCount: 0,
+      remainingCount: remainingCount,
+    ),
+    canFinalize: false,
+  );
+}
+
+StudySessionSnapshot _modeRoundSnapshotFor({
+  required StudyMode mode,
+  required int modeOrder,
+  required int completedAttempts,
+  required List<StudyFlashcardRef> cards,
+}) {
+  final items = [
+    for (var index = 0; index < cards.length; index++)
+      StudySessionItem(
+        id: 'item-${(index + 1).toString().padLeft(3, '0')}',
+        sessionId: 'session-001',
+        flashcard: cards[index],
+        studyMode: mode,
+        modeOrder: modeOrder,
+        roundIndex: 1,
+        queuePosition: index + 1,
+        sourcePool: SessionItemSourcePool.newCards,
+        status: SessionItemStatus.pending,
+        completedAt: null,
+      ),
+  ];
+  return StudySessionSnapshot(
+    session: _newStudySession(SessionStatus.inProgress),
+    currentItem: items.first,
+    currentRoundItems: items,
+    sessionFlashcards: cards,
+    summary: StudySummary(
+      totalCards: cards.length,
+      totalModeCount: 5,
+      completedAttempts: completedAttempts,
+      correctAttempts: completedAttempts,
+      incorrectAttempts: 0,
+      increasedBoxCount: 0,
+      decreasedBoxCount: 0,
+      remainingCount: (cards.length * 5) - completedAttempts,
     ),
     canFinalize: false,
   );
@@ -1056,12 +1966,13 @@ StudySessionSnapshot _matchSnapshotFor(List<StudyFlashcardRef> cards) {
     sessionFlashcards: cards,
     summary: StudySummary(
       totalCards: cards.length,
+      totalModeCount: 5,
       completedAttempts: cards.length,
       correctAttempts: cards.length,
       incorrectAttempts: 0,
       increasedBoxCount: 0,
       decreasedBoxCount: 0,
-      remainingCount: cards.length,
+      remainingCount: cards.length * 4,
     ),
     canFinalize: false,
   );
@@ -1079,6 +1990,74 @@ StudyFlashcardRef _card({
     back: back,
     sourcePool: SessionItemSourcePool.due,
   );
+}
+
+Future<void> _pumpStudyScreenData(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump();
+}
+
+Future<void> _pumpRecallRevealTransition(WidgetTester tester) async {
+  await tester.pump(recallRevealTransitionDuration);
+  await tester.pump();
+}
+
+Future<void> _pumpFillStateTransition(WidgetTester tester) async {
+  await tester.pump(
+    fillStateTransitionDuration + const Duration(milliseconds: 50),
+  );
+  await tester.pump();
+}
+
+Future<void> _pumpFillScreen(
+  WidgetTester tester, {
+  required _BatchAnswerStudyRepo repo,
+  StudySessionSnapshot? snapshot,
+}) async {
+  repo.sessionSnapshot = snapshot ?? _fillSnapshot;
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        studyRepoProvider.overrideWithValue(repo),
+        studySessionStateProvider(
+          'session-001',
+        ).overrideWith((ref) => Future.value(snapshot ?? _fillSnapshot)),
+      ],
+      child: const _TestApp(
+        child: StudySessionScreen(sessionId: 'session-001'),
+      ),
+    ),
+  );
+  await _pumpStudyScreenData(tester);
+}
+
+Future<void> _enterWrongFillAnswer(WidgetTester tester) async {
+  await tester.enterText(find.byType(TextField), 'wrong');
+  await tester.pump();
+  await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
+  await _pumpFillStateTransition(tester);
+}
+
+void _pressFillAction(WidgetTester tester, String key) {
+  final root = find.byKey(ValueKey<String>(key));
+  final primary = find.descendant(
+    of: root,
+    matching: find.byType(ElevatedButton),
+  );
+  if (primary.evaluate().isNotEmpty) {
+    tester.widget<ElevatedButton>(primary).onPressed!();
+    return;
+  }
+  final outlined = find.descendant(
+    of: root,
+    matching: find.byType(OutlinedButton),
+  );
+  if (outlined.evaluate().isNotEmpty) {
+    tester.widget<OutlinedButton>(outlined).onPressed!();
+    return;
+  }
+  final tonal = find.descendant(of: root, matching: find.byType(FilledButton));
+  tester.widget<FilledButton>(tonal).onPressed!();
 }
 
 Future<void> _tapGuessOption(WidgetTester tester, String cardId) {
@@ -1144,32 +2123,44 @@ String _matchFront(int index) => 'Match front $index';
 String _matchBack(int index) => 'Match definition $index';
 
 final class _BatchAnswerStudyRepo implements StudyRepo {
+  _BatchAnswerStudyRepo([StudySessionSnapshot? sessionSnapshot])
+    : sessionSnapshot = sessionSnapshot ?? _activeSnapshot;
+
+  StudySessionSnapshot sessionSnapshot;
   int itemAnswerCount = 0;
   int batchAnswerCount = 0;
+  int modeItemBatchAnswerCount = 0;
   int matchBatchAnswerCount = 0;
   AttemptGrade? lastGrade;
+  Map<String, AttemptGrade>? lastModeItemGrades;
   Map<String, AttemptGrade>? lastItemGrades;
+  Completer<StudySessionSnapshot>? itemAnswerCompleter;
+  Completer<StudySessionSnapshot>? modeItemBatchCompleter;
 
   @override
-  Future<StudySessionSnapshot> answerCurrentModeBatch({
-    required String sessionId,
-    required AttemptGrade grade,
-    required List<StudyMode> modes,
-  }) async {
-    batchAnswerCount += 1;
-    lastGrade = grade;
-    return _activeSnapshot;
-  }
-
-  @override
-  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+  Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
     required String sessionId,
     required Map<String, AttemptGrade> itemGrades,
     required List<StudyMode> modes,
   }) async {
-    matchBatchAnswerCount += 1;
-    lastItemGrades = itemGrades;
-    return _activeSnapshot;
+    final currentMode = sessionSnapshot.currentItem?.studyMode;
+    if (currentMode == StudyMode.review) {
+      batchAnswerCount += 1;
+      lastGrade = itemGrades.values.single;
+      return sessionSnapshot;
+    }
+    if (currentMode == StudyMode.match) {
+      matchBatchAnswerCount += 1;
+      lastItemGrades = itemGrades;
+      return sessionSnapshot;
+    }
+    modeItemBatchAnswerCount += 1;
+    lastModeItemGrades = itemGrades;
+    final completer = modeItemBatchCompleter;
+    if (completer != null) {
+      return completer.future;
+    }
+    return sessionSnapshot;
   }
 
   @override
@@ -1204,7 +2195,7 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
 
   @override
   Future<StudySessionSnapshot> loadSession(String sessionId) {
-    throw UnimplementedError();
+    return Future.value(sessionSnapshot);
   }
 
   @override
@@ -1215,7 +2206,11 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
   }) {
     itemAnswerCount += 1;
     lastGrade = grade;
-    return Future.value(_activeSnapshot);
+    final completer = itemAnswerCompleter;
+    if (completer != null) {
+      return completer.future;
+    }
+    return Future.value(sessionSnapshot);
   }
 
   @override
@@ -1232,6 +2227,7 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
   Future<StudySessionSnapshot> finalizeSession({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) {
     throw UnimplementedError();
   }
@@ -1240,6 +2236,7 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
   Future<StudySessionSnapshot> retryFinalize({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) {
     throw UnimplementedError();
   }
@@ -1248,6 +2245,8 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
 class _TestApp extends StatelessWidget {
   const _TestApp({required this.child});
 
+  static final TtsService _defaultTtsService = _NoopStudyTtsService();
+
   final Widget child;
 
   @override
@@ -1255,7 +2254,34 @@ class _TestApp extends StatelessWidget {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: child,
+      home: ProviderScope(
+        overrides: [ttsServiceProvider.overrideWithValue(_defaultTtsService)],
+        child: child,
+      ),
     );
   }
+}
+
+final class _NoopStudyTtsService implements TtsService {
+  @override
+  Stream<TtsState> get state => const Stream<TtsState>.empty();
+
+  @override
+  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async {
+    return const <TtsVoice>[];
+  }
+
+  @override
+  Future<void> speak(
+    String text, {
+    required TtsLanguage language,
+    required double rate,
+    String? voiceName,
+  }) async {}
+
+  @override
+  Future<void> stop() async {}
+
+  @override
+  Future<void> dispose() async {}
 }

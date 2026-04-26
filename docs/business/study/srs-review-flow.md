@@ -51,25 +51,29 @@ Không chạy đủ 5 mode như New Study.
 
 Khi user trả lời đúng:
 
-- đánh dấu flashcard pass Fill mode
+- stage flashcard pass Fill mode trong state tạm
+- không ghi attempt ngay tại thời điểm trả lời
 - không đưa vào retry batch
 
 Khi user trả lời sai:
 
 - báo sai cho user
-- ghi nhận attempt sai
+- stage kết quả sai trong state tạm
+- không ghi attempt ngay tại thời điểm trả lời
 - chuyển sang flashcard tiếp theo
-- đưa flashcard vào retry batch
+- đưa flashcard vào retry batch khi batch cuối mode được flush thành công
 
-Nếu raw result là `forgot`:
+Nếu raw result là `incorrect`:
 
 - vẫn xử lý như failed attempt
 - vẫn đưa flashcard vào retry batch
-- review result cuối cùng của flashcard giữ là `forgot`
-- finalize đưa box về `1`
+- review result cuối cùng của flashcard là `recovered` nếu flashcard pass retry trước khi finalize
+- finalize giảm box hoặc đặt lịch ôn sớm hơn theo rule `recovered`
 
 Sau khi đi hết lượt hiện tại:
 
+- app flush một batch attempt cho toàn bộ pending Fill item trong current round
+- toàn bộ pending item trong round được chuyển sang `completed` cùng timestamp
 - nếu retry batch rỗng:
   - Fill mode hoàn thành
   - Review Session sẵn sàng finalize (`Ready To Finalize`)
@@ -139,15 +143,15 @@ Kết quả:
 - giảm box hoặc đưa về box thấp hơn theo rule SRS
 - due date sớm hơn
 
-### Forgot
+### Recovered after incorrect
 
-Flashcard từng có raw result `forgot` trong review session.
+Flashcard từng có raw result `incorrect` trong review session.
 
 Kết quả:
 
 - vẫn retry cho đến khi pass Fill mode
-- review result cuối session là `forgot`
-- finalize đưa box về `1`
+- review result cuối session là `recovered`
+- finalize giảm box hoặc đặt lịch ôn sớm hơn theo rule `recovered`
 
 ## Rule tổng kết
 
@@ -155,7 +159,7 @@ Kết quả:
 SRS Review = ôn flashcard đến due.
 Chỉ học Fill mode.
 Nếu sai thì retry đến khi pass (retryBatch.isEmpty).
-Nếu forgot thì vẫn retry, nhưng review result cuối là forgot và box về 1.
+Nếu từng incorrect thì vẫn retry, nhưng review result cuối là recovered khi pass retry.
 Stage kết quả khi kết thúc Fill mode.
 Chỉ commit box/due khi session chuyển Completed.
 Finalize theo transaction — rollback toàn bộ nếu lỗi.

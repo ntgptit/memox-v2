@@ -48,9 +48,6 @@ class StudyAnswerFeedback {
   }
 
   StudyAnswerFeedback markCorrected() {
-    final correctedGrade = selectedGrade == AttemptGrade.forgot
-        ? AttemptGrade.remembered
-        : AttemptGrade.correct;
-    return copyWith(selectedGrade: correctedGrade, isCorrect: true);
+    return copyWith(selectedGrade: AttemptGrade.correct, isCorrect: true);
   }
 }

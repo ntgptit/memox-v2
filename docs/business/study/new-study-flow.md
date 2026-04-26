@@ -56,9 +56,9 @@ Trong mỗi mode, toàn bộ flashcard của batch phải pass.
 Riêng Review mode:
 
 - user xem trực tiếp `front` và `back` của từng flashcard
-- app stage mỗi flashcard đã xem là `remembered`
-- khi user tới thẻ cuối, app tự flush một batch attempt `remembered` cho toàn bộ item pending trong Review mode sau delay 2 giây
-- Review mode không tạo retry batch vì không còn input `forgot` trong UI Review
+- app stage mỗi flashcard đã xem là `correct`
+- khi user tới thẻ cuối, app tự flush một batch attempt `correct` cho toàn bộ item pending trong Review mode sau delay 2 giây
+- Review mode không tạo retry batch vì không còn input `incorrect` trong UI Review
 - nếu user rời màn hình trước khi auto-submit chạy, không có attempt nào được ghi và session resume lại Review mode như cũ
 
 Riêng Match mode:
@@ -77,18 +77,22 @@ Với các mode Guess / Recall / Fill:
 
 Khi user trả lời đúng:
 
-- đánh dấu flashcard pass trong mode hiện tại
-- không đưa vào retry batch
+- stage flashcard là kết quả pass của mode hiện tại (`correct`) trong state tạm
+- không ghi attempt ngay tại thời điểm trả lời
+- không đưa vào retry batch nếu batch cuối mode được flush thành công
 
 Khi user trả lời sai:
 
 - báo sai cho user
-- ghi nhận attempt sai
-- chuyển sang flashcard tiếp theo
-- đưa flashcard vào retry batch
+- stage flashcard là kết quả fail của mode hiện tại (`incorrect`) trong state tạm
+- không ghi attempt ngay tại thời điểm trả lời
+- chuyển sang flashcard tiếp theo trong UI
+- đưa flashcard vào retry batch khi batch cuối mode được flush thành công
 
 Sau khi đi hết lượt hiện tại:
 
+- app flush một batch attempt cho toàn bộ pending item của current mode round trong cùng transaction
+- toàn bộ pending item trong round được chuyển sang `completed` cùng timestamp
 - nếu retry batch rỗng:
   - mode hiện tại pass
   - chuyển mode tiếp theo

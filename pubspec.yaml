@@ -54,6 +54,7 @@ dependencies:
     sdk: flutter
   talker_flutter: ^5.1.16
   talker_riverpod_logger: ^5.1.16
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:

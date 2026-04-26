@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
@@ -23,7 +24,7 @@ final class FlashcardDao {
     final statement = _database.select(_database.flashcards)
       ..where((table) => table.deckId.equals(deckId));
     if (query.hasSearchTerm) {
-      final pattern = '%${query.normalizedSearchTerm.toLowerCase()}%';
+      final pattern = '%${query.normalizedSearchTerm}%';
       statement.where(
         (table) =>
             table.front.lower().like(pattern) |
@@ -79,11 +80,9 @@ final class FlashcardDao {
           FlashcardsCompanion.insert(
             id: id,
             deckId: deckId,
-            front: draft.front.trim(),
-            back: draft.back.trim(),
-            note: Value(
-              draft.note?.trim().isEmpty ?? true ? null : draft.note?.trim(),
-            ),
+            front: StringUtils.trimmed(draft.front),
+            back: StringUtils.trimmed(draft.back),
+            note: Value(StringUtils.trimToNull(draft.note)),
             sortOrder: sortOrder,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -112,11 +111,9 @@ final class FlashcardDao {
       _database.flashcards,
     )..where((table) => table.id.equals(flashcardId))).write(
       FlashcardsCompanion(
-        front: Value(draft.front.trim()),
-        back: Value(draft.back.trim()),
-        note: Value(
-          draft.note?.trim().isEmpty ?? true ? null : draft.note?.trim(),
-        ),
+        front: Value(StringUtils.trimmed(draft.front)),
+        back: Value(StringUtils.trimmed(draft.back)),
+        note: Value(StringUtils.trimToNull(draft.note)),
         updatedAt: Value(updatedAt),
       ),
     );

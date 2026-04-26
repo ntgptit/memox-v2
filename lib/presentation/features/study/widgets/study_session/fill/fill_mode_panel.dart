@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../../../core/utils/string_utils.dart';
 import '../../../../../../domain/enums/study_enums.dart';
 import '../../../../../../domain/study/entities/study_models.dart';
 import '../../../../../shared/widgets/mx_primary_button.dart';
@@ -58,7 +59,7 @@ class _FillModePanelState extends State<FillModePanel> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final answer = _controller.text.trim();
+    final answer = StringUtils.trimmed(_controller.text);
     final inputDisabled = widget.isSubmitting || widget.feedback != null;
     return PromptCard(
       title: l10n.studyModeFill,
@@ -93,18 +94,16 @@ class _FillModePanelState extends State<FillModePanel> {
   }
 
   void _submit() {
-    final answer = _controller.text.trim();
+    final answer = StringUtils.trimmed(_controller.text);
     if (answer.isEmpty) {
       setState(() {
         _showEmptyError = true;
       });
       return;
     }
-    final expected = widget.item.flashcard.back.trim().toLowerCase();
-    final actual = answer.toLowerCase();
     widget.onAnswer(
       StudyAnswerSubmission(
-        grade: actual == expected
+        grade: StringUtils.equalsNormalized(answer, widget.item.flashcard.back)
             ? AttemptGrade.correct
             : AttemptGrade.incorrect,
         submittedAnswer: answer,

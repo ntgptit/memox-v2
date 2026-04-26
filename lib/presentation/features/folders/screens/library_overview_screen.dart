@@ -4,6 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../core/utils/string_utils.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
@@ -98,7 +99,7 @@ class LibraryOverviewView extends ConsumerWidget {
                 SliverToBoxAdapter(
                   child: _LibrarySectionHeader(
                     title: l10n.libraryFoldersSectionTitle,
-                    subtitle: toolbarState.searchTerm.trim().isEmpty
+                    subtitle: StringUtils.isBlank(toolbarState.searchTerm)
                         ? l10n.libraryManageFoldersSubtitle
                         : l10n.librarySearchResultsSubtitle,
                   ),

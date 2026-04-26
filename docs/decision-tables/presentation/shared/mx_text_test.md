@@ -8,6 +8,8 @@ Test file: `test/presentation/shared/mx_text_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT1 | `MxTextRole.pageTitle` should resolve from active theme title style | material theme provides `textTheme.titleLarge` and `colorScheme.onSurface` | `MxText('Library', role: pageTitle)` renders | rendered `Text.style` font size, weight, and color match the expected theme-derived style | C0+C1 |
 | DT2 | `MxTextRole.guessPrompt` should resolve smaller than display typography | material theme provides `textTheme.headlineMedium`, `textTheme.displayMedium`, and `colorScheme.onSurface` | `MxText('상식', role: guessPrompt)` renders | rendered `Text.style` uses headline-medium sizing, medium weight, and stays below display-medium sizing | C0+C1 |
+| DT3 | Recall front and back roles should keep fixed hierarchy | material theme provides `headlineMedium`, `bodyLarge`, and `colorScheme.onSurface` | `MxText` renders Recall front and back roles together | front text is larger with medium weight, back text is regular weight, and both use `onSurface` | C0+C1 |
+| DT4 | Fill input/result roles should keep semantic hierarchy and colors | material theme provides `headlineMedium`, `titleLarge`, `bodyLarge`, `colorScheme.error`, and `colorScheme.onSurface` | `MxText` renders Fill prompt, input, incorrect input, and correct answer roles together | prompt uses body text, input is larger than prompt, incorrect input uses error color, and correct answer uses on-surface color | C0+C1 |
 
 ## Decision table: onDisplay
 

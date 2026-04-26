@@ -97,9 +97,8 @@ erDiagram
 - Các kết quả fail hoặc retry trong New Study khi chưa pass đủ 5 mode chỉ nằm trong `study_attempts` và `study_session_items`
 - Các kết quả fail hoặc retry trong SRS Review trước khi Fill mode kết thúc chỉ nằm trong `study_attempts` và `study_session_items`
 - Mapping raw result sang nhánh SRS:
-  - `correct` và `remembered` -> nhánh làm tốt
-  - `incorrect` -> nhánh chưa tốt
-  - `forgot` -> nhánh quên
+  - `correct` -> nhánh làm tốt
+  - `incorrect` -> nhánh chưa tốt / recovered
 
 ## 5. `study_sessions`
 | Column | Type | Null | Notes |
@@ -169,7 +168,7 @@ erDiagram
 | `session_item_id` | TEXT | no | FK -> `study_session_items.id` |
 | `flashcard_id` | TEXT | no | FK -> `flashcards.id` |
 | `attempt_number` | INTEGER | no | thứ tự attempt của flashcard trong session và mode hiện tại |
-| `result` | TEXT | no | raw result: `correct`, `incorrect`, `remembered`, `forgot` (reserved cho mở rộng sau: `skipped`, `timeout`, `partially_correct`) |
+| `result` | TEXT | no | raw result: chỉ `correct` hoặc `incorrect`; migration v4 normalize `remembered -> correct` và `forgot -> incorrect` |
 | `old_box` | INTEGER | yes | box trước khi commit SRS chính thức, chỉ điền trong bước commit cuối session |
 | `new_box` | INTEGER | yes | box sau khi commit SRS chính thức, chỉ điền trong bước commit cuối session |
 | `next_due_at` | INTEGER | yes | UTC epoch ms chính thức, chỉ điền trong bước commit cuối session |
@@ -185,7 +184,7 @@ erDiagram
 - SRS Review attempt trước khi Fill mode kết thúc không cập nhật `flashcard_progress`
 - SRS Review khi Fill mode kết thúc và retry batch rỗng chỉ tạo dữ liệu đủ điều kiện để commit cuối session
 - SRS Review flashcard từng sai trong Fill mode bằng `incorrect` có review result `recovered` và được commit theo nhánh giảm box hoặc due sớm hơn
-- SRS Review flashcard từng `forgot` trong Fill mode có review result `forgot` và finalize đưa box về `1`
+- Current v1 không persist `forgot` trong `study_attempts`; `ReviewResult.forgot` chỉ còn là legacy/future SRS result, không sinh từ attempt `correct/incorrect`
 - SRS Review flashcard pass Fill mà không sai có review result `perfect` và được commit theo nhánh làm tốt
 - `old_box`, `new_box`, `next_due_at` chỉ được ghi khi session chuyển sang `completed`
 - Commit cuối session phải cập nhật `study_attempts` và `flashcard_progress` trong cùng transaction nghiệp vụ

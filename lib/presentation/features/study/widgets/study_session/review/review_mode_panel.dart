@@ -44,7 +44,7 @@ class ReviewModePanel extends StatelessWidget {
           onPressed: isSubmitting
               ? null
               : () => onAnswer(
-                  const StudyAnswerSubmission(grade: AttemptGrade.forgot),
+                  const StudyAnswerSubmission(grade: AttemptGrade.incorrect),
                 ),
         ),
         MxPrimaryButton(
@@ -53,7 +53,7 @@ class ReviewModePanel extends StatelessWidget {
           onPressed: isSubmitting
               ? null
               : () => onAnswer(
-                  const StudyAnswerSubmission(grade: AttemptGrade.remembered),
+                  const StudyAnswerSubmission(grade: AttemptGrade.correct),
                 ),
         ),
       ],

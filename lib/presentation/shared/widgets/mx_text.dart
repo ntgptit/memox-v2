@@ -22,6 +22,12 @@ enum MxTextRole {
   breadcrumb,
   contentBody,
   guessPrompt,
+  recallFront,
+  recallBack,
+  fillPrompt,
+  fillInput,
+  fillIncorrectInput,
+  fillCorrectAnswer,
   reviewFront,
   reviewBack,
   avatarInitials,
@@ -96,6 +102,30 @@ abstract final class MxTextStyles {
         color: scheme.onSurfaceVariant,
       ),
       MxTextRole.guessPrompt => textTheme.headlineMedium!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w500,
+      ),
+      MxTextRole.recallFront => textTheme.headlineMedium!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w500,
+      ),
+      MxTextRole.recallBack => textTheme.bodyLarge!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w400,
+      ),
+      MxTextRole.fillPrompt => textTheme.bodyLarge!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w400,
+      ),
+      MxTextRole.fillInput => textTheme.headlineMedium!.copyWith(
+        color: scheme.onSurface,
+        fontWeight: FontWeight.w500,
+      ),
+      MxTextRole.fillIncorrectInput => textTheme.titleLarge!.copyWith(
+        color: scheme.error,
+        fontWeight: FontWeight.w500,
+      ),
+      MxTextRole.fillCorrectAnswer => textTheme.titleLarge!.copyWith(
         color: scheme.onSurface,
         fontWeight: FontWeight.w500,
       ),

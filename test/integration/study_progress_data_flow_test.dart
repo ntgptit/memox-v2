@@ -328,7 +328,7 @@ void main() {
       expect(await harness.distinctModeCount(sessionId), 5);
       expect(await harness.currentStudyMode(sessionId), StudyMode.fill);
       expect(find.text('Fill'), findsOneWidget);
-      expect(find.text(_alphaFront), findsOneWidget);
+      expect(find.text(_alphaBack), findsOneWidget);
     },
   );
 
@@ -420,7 +420,7 @@ void main() {
 
       expect(await harness.distinctModeCount(sessionId), 5);
       expect(await harness.currentStudyMode(sessionId), StudyMode.fill);
-      expect(find.text(_alphaFront), findsOneWidget);
+      expect(find.text(_alphaBack), findsOneWidget);
     },
   );
 
@@ -1205,7 +1205,7 @@ Future<String> _startStudyAndLeaveMatchRetry(
   final sessionId = await harness.singleActiveSessionId();
 
   await _advanceReviewToMatch(tester);
-  await _mismatchPair(tester, back: _alphaBack, wrongFront: _betaFront);
+  await _mismatchPair(tester, front: _alphaFront, wrongBack: _betaBack);
   expect(await harness.attemptCountForMode(sessionId, StudyMode.match), 0);
   await _matchPair(tester, back: _alphaBack, front: _alphaFront);
   await _matchPair(tester, back: _betaBack, front: _betaFront);
@@ -1221,46 +1221,56 @@ Future<void> _matchPair(
   required String back,
   required String front,
 }) async {
-  await _pumpUntilFound(tester, find.text(back));
-  await tester.tap(find.text(back));
-  await tester.pump(const Duration(milliseconds: 50));
+  await _pumpUntilFound(tester, find.text(front));
   await tester.tap(find.text(front));
+  await tester.pump(const Duration(milliseconds: 50));
+  await tester.tap(find.text(back));
   await tester.pump(const Duration(milliseconds: 500));
 }
 
 Future<void> _mismatchPair(
   WidgetTester tester, {
-  required String back,
-  required String wrongFront,
+  required String front,
+  required String wrongBack,
 }) async {
-  await _pumpUntilFound(tester, find.text(back));
-  await tester.tap(find.text(back));
+  await _pumpUntilFound(tester, find.text(front));
+  await tester.tap(find.text(front));
   await tester.pump(const Duration(milliseconds: 50));
-  await tester.tap(find.text(wrongFront));
+  await tester.tap(find.text(wrongBack));
   await tester.pump(const Duration(milliseconds: 500));
 }
 
 Future<void> _completeGuessMode(WidgetTester tester) async {
-  await _answerCurrentPrompt(tester, front: _alphaFront, action: 'Correct');
-  await _answerCurrentPrompt(tester, front: _betaFront, action: 'Correct');
+  await _answerGuessPrompt(tester, front: _alphaFront, back: _alphaBack);
+  await _answerGuessPrompt(tester, front: _betaFront, back: _betaBack);
   await _pumpUntilFound(tester, find.text('Recall'));
 }
 
 Future<void> _completeRecallMode(WidgetTester tester) async {
-  await _answerCurrentPrompt(tester, front: _alphaFront, action: 'Remembered');
-  await _answerCurrentPrompt(tester, front: _betaFront, action: 'Remembered');
+  await _answerRecallPrompt(tester, front: _alphaFront, action: 'Remembered');
+  await _answerRecallPrompt(tester, front: _betaFront, action: 'Remembered');
   await _pumpUntilFound(tester, find.text('Fill'));
 }
 
-Future<void> _answerCurrentPrompt(
+Future<void> _answerGuessPrompt(
+  WidgetTester tester, {
+  required String front,
+  required String back,
+}) async {
+  await _pumpUntilFound(tester, find.text(front));
+  await _tapText(tester, back);
+  await tester.pump(const Duration(milliseconds: 700));
+}
+
+Future<void> _answerRecallPrompt(
   WidgetTester tester, {
   required String front,
   required String action,
 }) async {
   await _pumpUntilFound(tester, find.text(front));
+  await _tapText(tester, 'Show (20s)');
+  await tester.pump(const Duration(milliseconds: 300));
   await _tapText(tester, action);
-  await _pumpUntilFound(tester, find.text('Continue'));
-  await _tapText(tester, 'Continue');
   await tester.pump(const Duration(milliseconds: 100));
 }
 

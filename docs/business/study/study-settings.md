@@ -10,6 +10,10 @@
 - bật hoặc tắt shuffle flashcard
 - bật hoặc tắt shuffle đáp án
 - bật hoặc tắt ưu tiên thẻ quá hạn
+- bật hoặc tắt auto-play phát âm trong Study UI
+- chọn ngôn ngữ TTS cho mặt trước: chỉ `Korean` hoặc `English`
+- chỉnh tốc độ phát âm TTS trong khoảng `0.3x` đến `0.7x`
+- chọn voice hệ thống nếu platform có voice cho `ko-KR` hoặc `en-US`
 
 ## Rule áp dụng cơ bản
 
@@ -29,6 +33,20 @@
 - Chỉ áp dụng cho SRS Review
 - Nếu bật: thẻ quá hạn được chọn trước thẻ vừa đến due khi cần giới hạn batch
 - Áp dụng trước bước cắt batch theo `reviewBatchSize`
+
+## Speech / TTS v1
+
+- TTS v1 dùng on-device engine qua platform; không yêu cầu Cloud TTS hoặc API key.
+- App chỉ support phát âm tiếng Hàn và tiếng Anh:
+  - `Korean` map tới locale `ko-KR`
+  - `English` map tới locale `en-US`
+- TTS không support tiếng Việt trong v1, kể cả khi app language đang là Vietnamese.
+- Chỉ front / term được phép phát âm. Back / meaning không có nút phát và không auto-play.
+- Default: `frontLanguage = Korean`, `rate = 0.5`, `autoPlay = false`.
+- Cấu hình Speech v1 là global user preference lưu bằng SharedPreferences; không ghi vào DB deck/folder và không cần migration.
+- Nếu platform không có voice cho `ko-KR` hoặc `en-US`, voice picker hiển thị empty/disabled state nhưng nút phát vẫn best-effort theo engine mặc định của platform.
+- Khi user bấm phát âm nhiều lần, app phải stop audio đang phát trước khi speak lượt mới để tránh overlap.
+- Auto-play chỉ phát nội dung đã hiển thị hoặc vừa reveal trong Study UI; không thay đổi grading, retry, session progress hoặc SRS.
 
 ## Override bằng lựa chọn tại entry
 

@@ -8,6 +8,7 @@ Test file: `test/presentation/progress_screen_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT1 | active session list is empty | progress provider returns an empty active session list | Progress screen renders | empty state explains that no active study sessions exist and offers Library navigation | C0+C1 |
 | DT2 | active session list has in-progress, ready, and failed-finalize sessions | progress provider returns three active sessions across the supported active statuses | Progress screen renders | overview counters, status badges, session cards, and management actions are visible | C0+C1 |
+| DT3 | medium-width overview has enough horizontal space for metric cards | progress provider returns active sessions and the viewport resolves to a non-compact layout | Progress screen renders the overview | the active, ready, and retry counters share one horizontal row instead of narrowing into a centered vertical stack | C0+C1 |
 
 ## Decision table: onSelect
 

@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../app/di/content_providers.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/services/clock.dart';
+import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../models/library_folder.dart';
@@ -44,7 +45,7 @@ class LibraryToolbarState extends _$LibraryToolbarState {
   ContentQuery build() => const ContentQuery();
 
   void setSearchTerm(String value) {
-    final next = value.trim();
+    final next = StringUtils.trimmed(value);
     if (next == state.searchTerm) {
       return;
     }

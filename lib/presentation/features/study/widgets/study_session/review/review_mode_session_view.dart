@@ -4,12 +4,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../../../domain/services/tts_service.dart';
 import '../../../../../../domain/study/entities/study_models.dart';
 import '../../../../../shared/layouts/mx_gap.dart';
 import '../../../../../shared/layouts/mx_space.dart';
 import '../../../../../shared/widgets/mx_text.dart';
+import '../study_mode_local_round.dart';
 import '../study_mode_progress_row.dart';
 import '../study_mode_session_scaffold.dart';
+import '../study_speak_button.dart';
 import 'review_mode_card.dart';
 import 'review_page_scroll_behavior.dart';
 
@@ -71,7 +74,10 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cards = _reviewCards;
-    final progress = _reviewProgress(cards.length);
+    final progress = overallStudyProgress(
+      snapshot: widget.snapshot,
+      localCorrectCount: _reviewLocalCorrectCount(cards.length),
+    );
     final percent = (progress * 100).round();
 
     return StudyModeSessionScaffold(
@@ -87,41 +93,57 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
           Expanded(
             child: Listener(
               onPointerSignal: _handlePointerSignal,
-              child: ScrollConfiguration(
-                behavior: const ReviewPageScrollBehavior(),
-                child: PageView.builder(
-                  controller: _pageController,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: cards.length,
-                  onPageChanged: _handlePageChanged,
-                  itemBuilder: (context, index) {
-                    final card = cards[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: ReviewModeCard(
-                            tooltip: l10n.studyReviewEditCardTooltip,
-                            actionIcon: Icons.mode_edit_outline,
-                            text: card.front,
-                            role: MxTextRole.reviewFront,
-                          ),
-                        ),
-                        const MxGap(MxSpace.md),
-                        Expanded(
-                          flex: 1,
-                          child: ReviewModeCard(
-                            tooltip: l10n.studyReviewCardAudioTooltip,
-                            actionIcon: Icons.volume_up_outlined,
-                            text: card.back,
-                            role: MxTextRole.reviewBack,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+              child: Stack(
+                children: [
+                  ScrollConfiguration(
+                    behavior: const ReviewPageScrollBehavior(),
+                    child: PageView.builder(
+                      controller: _pageController,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: cards.length,
+                      onPageChanged: _handlePageChanged,
+                      itemBuilder: (context, index) {
+                        final card = cards[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: ReviewModeCard(
+                                tooltip: l10n.studyReviewEditCardTooltip,
+                                actionIcon: Icons.mode_edit_outline,
+                                text: card.front,
+                                role: MxTextRole.reviewFront,
+                                secondaryAction: StudySpeakButton(
+                                  key: ValueKey<String>(
+                                    'review-front-speak-${card.id}',
+                                  ),
+                                  text: card.front,
+                                  side: TtsTextSide.front,
+                                  tooltip: l10n.studyReviewCardAudioTooltip,
+                                ),
+                              ),
+                            ),
+                            const MxGap(MxSpace.md),
+                            Expanded(
+                              flex: 1,
+                              child: ReviewModeCard(
+                                text: card.back,
+                                role: MxTextRole.reviewBack,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  if (cards.isNotEmpty)
+                    StudyAutoSpeakEffect(
+                      triggerKey: 'review:$_pageIndex:${cards[_pageIndex].id}',
+                      text: cards[_pageIndex].front,
+                      side: TtsTextSide.front,
+                    ),
+                ],
               ),
             ),
           ),
@@ -211,6 +233,10 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
       return 0;
     }
     return _pageIndex / lastPage;
+  }
+
+  double _reviewLocalCorrectCount(int cardCount) {
+    return _reviewProgress(cardCount) * cardCount;
   }
 
   void _handlePageChanged(int index) {

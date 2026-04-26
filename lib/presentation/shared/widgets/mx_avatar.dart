@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../../../core/theme/tokens/app_radius.dart';
+import '../../../core/utils/string_utils.dart';
 import '../layouts/mx_gap.dart';
 import 'mx_text.dart';
 import 'mx_tappable.dart';
@@ -88,10 +89,9 @@ class MxAvatar extends StatelessWidget {
   }
 
   String get _resolvedInitials {
-    final value = (initials ?? '').trim();
-    if (value.isEmpty) return '?';
-    return value.length <= 2
-        ? value.toUpperCase()
-        : value.substring(0, 2).toUpperCase();
+    final value = StringUtils.trimToNull(initials);
+    if (value == null) return '?';
+    final resolved = value.length <= 2 ? value : value.substring(0, 2);
+    return StringUtils.uppercased(resolved);
   }
 }

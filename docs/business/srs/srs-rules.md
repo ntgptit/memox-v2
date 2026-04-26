@@ -73,15 +73,11 @@ Danh sách hằng ngày gồm:
   - kết quả chính thức map vào nhánh làm tốt
 - `correct`:
   - map vào nhánh làm tốt
-- `remembered`:
-  - map vào nhánh làm tốt
 - `incorrect`:
   - map vào nhánh chưa tốt
-- `forgot`:
-  - map vào nhánh quên
-  - trong SRS Review được xem là attempt fail, vẫn vào retry batch
-  - review result cuối cùng là `forgot`
-  - finalize đưa box về 1
+  - trong SRS Review được xem là attempt fail, vẫn vào retry batch cho tới khi pass retry
+  - review result cuối cùng là `recovered` nếu flashcard từng sai nhưng pass retry
+  - finalize giảm box hoặc đặt lịch ôn sớm hơn theo rule `recovered`
 
 ## Rule ưu tiên thẻ quá hạn
 - Thẻ quá hạn là tập con của thẻ due
@@ -104,8 +100,8 @@ Danh sách hằng ngày gồm:
 - Mode học chỉ khác cách tương tác
 - Không mode nào tự xử lý SRS riêng
 - Pass trong mode New Study dùng cùng raw result với SRS:
-  - `correct` và `remembered` được xem là pass mode
-  - `incorrect` và `forgot` được xem là chưa pass mode
+  - `correct` được xem là pass mode
+  - `incorrect` được xem là chưa pass mode
 - Retry round trong mode không tạo nhánh SRS riêng
 - Mỗi lượt chấm thật trong round đầu hoặc retry round vẫn được ghi vào session history
 - New Study chỉ cập nhật SRS chính thức khi flashcard pass đủ `Review`, `Match`, `Guess`, `Recall`, `Fill` trong session

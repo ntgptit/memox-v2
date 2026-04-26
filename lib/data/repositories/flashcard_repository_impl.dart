@@ -2,6 +2,7 @@ import '../../core/errors/app_exception.dart';
 import '../../core/errors/result.dart';
 import '../../core/services/clock.dart';
 import '../../core/services/id_generator.dart';
+import '../../core/utils/string_utils.dart';
 import '../../domain/entities/flashcard_entity.dart';
 import '../../domain/enums/content_sort_mode.dart';
 import '../../domain/repositories/flashcard_repository.dart';
@@ -124,9 +125,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       return FlashcardEntity(
         id: id,
         deckId: deckId,
-        front: draft.front.trim(),
-        back: draft.back.trim(),
-        note: draft.note?.trim(),
+        front: StringUtils.trimmed(draft.front),
+        back: StringUtils.trimmed(draft.back),
+        note: StringUtils.trimToNull(draft.note),
         sortOrder: sortOrder,
         createdAt: now,
         updatedAt: now,
@@ -151,9 +152,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       return FlashcardEntity(
         id: flashcard.id,
         deckId: flashcard.deckId,
-        front: normalized.front.trim(),
-        back: normalized.back.trim(),
-        note: normalized.note?.trim(),
+        front: StringUtils.trimmed(normalized.front),
+        back: StringUtils.trimmed(normalized.back),
+        note: StringUtils.trimToNull(normalized.note),
         sortOrder: flashcard.sortOrder,
         createdAt: flashcard.createdAt,
         updatedAt: now,
@@ -294,12 +295,16 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
   }
 
   FlashcardDraft _normalizeDraft(FlashcardDraft draft) {
-    final front = draft.front.trim();
-    final back = draft.back.trim();
+    final front = StringUtils.trimmed(draft.front);
+    final back = StringUtils.trimmed(draft.back);
     if (front.isEmpty || back.isEmpty) {
       throw const ValidationException(message: 'front and back are required.');
     }
-    return FlashcardDraft(front: front, back: back, note: draft.note?.trim());
+    return FlashcardDraft(
+      front: front,
+      back: back,
+      note: StringUtils.trimToNull(draft.note),
+    );
   }
 
   void _sortFlashcardItems(
@@ -313,8 +318,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
         );
       case ContentSortMode.name:
         items.sort(
-          (a, b) => a.flashcard.displayName.toLowerCase().compareTo(
-            b.flashcard.displayName.toLowerCase(),
+          (a, b) => StringUtils.compareNormalized(
+            a.flashcard.displayName,
+            b.flashcard.displayName,
           ),
         );
       case ContentSortMode.newest:

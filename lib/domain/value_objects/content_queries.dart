@@ -1,3 +1,4 @@
+import '../../core/utils/string_utils.dart';
 import '../enums/content_sort_mode.dart';
 
 final class ContentQuery {
@@ -9,6 +10,7 @@ final class ContentQuery {
   final String searchTerm;
   final ContentSortMode sortMode;
 
-  String get normalizedSearchTerm => searchTerm.trim();
+  String get normalizedSearchTerm =>
+      StringUtils.normalizedForSearch(searchTerm);
   bool get hasSearchTerm => normalizedSearchTerm.isNotEmpty;
 }

@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../app/di/content_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_actions.dart';
@@ -103,7 +104,7 @@ class FolderChildrenToolbarState extends _$FolderChildrenToolbarState {
   ContentQuery build(String folderId) => const ContentQuery();
 
   void setSearchTerm(String value) {
-    final next = value.trim();
+    final next = StringUtils.trimmed(value);
     if (next == state.searchTerm) {
       return;
     }

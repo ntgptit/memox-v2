@@ -9,6 +9,7 @@ import '../../../../../../domain/study/entities/study_models.dart';
 import '../../../../../shared/layouts/mx_gap.dart';
 import '../../../../../shared/layouts/mx_space.dart';
 import '../study_mode_progress_row.dart';
+import '../study_mode_local_round.dart';
 import '../study_mode_session_scaffold.dart';
 import 'match_batching.dart';
 import 'match_board.dart';
@@ -67,7 +68,10 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     final l10n = AppLocalizations.of(context);
     final roundItems = _roundItems;
     final visibleItems = visibleMatchBatch(roundItems, _visibleBatchStartIndex);
-    final progress = _matchProgress(roundItems.length);
+    final progress = overallStudyProgress(
+      snapshot: widget.snapshot,
+      localCorrectCount: _localCorrectMatchCount,
+    );
     final percent = (progress * 100).round();
 
     return StudyModeSessionScaffold(
@@ -109,6 +113,13 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
       (left, right) => left.queuePosition.compareTo(right.queuePosition),
     );
     return items;
+  }
+
+  double get _localCorrectMatchCount {
+    return _matchedItemIds
+        .where((itemId) => !_failedItemIds.contains(itemId))
+        .length
+        .toDouble();
   }
 
   List<StudySessionItem> _rightItems(List<StudySessionItem> roundItems) {
@@ -159,13 +170,6 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
       ),
     );
     return ids;
-  }
-
-  double _matchProgress(int itemCount) {
-    if (itemCount <= 0) {
-      return 0;
-    }
-    return _matchedItemIds.length / itemCount;
   }
 
   MatchTileState _tileStateFor(MatchTileSide side, StudySessionItem item) {

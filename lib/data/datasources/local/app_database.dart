@@ -28,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,6 +43,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 3) {
         await _migrateFlashcardsForSchemaV3(migrator);
+      }
+      if (from < 4) {
+        await _normalizeStudyAttemptResultsForSchemaV4(migrator);
       }
       await _createIndexes();
     },
@@ -165,6 +168,67 @@ class AppDatabase extends _$AppDatabase {
     await migrator.createTable(studySessions);
     await migrator.createTable(studySessionItems);
     await migrator.createTable(studyAttempts);
+  }
+
+  Future<void> _normalizeStudyAttemptResultsForSchemaV4(
+    Migrator migrator,
+  ) async {
+    if (!await _hasTable('study_attempts')) {
+      await migrator.createTable(studyAttempts);
+      return;
+    }
+
+    final tableSql = await _tableSql('study_attempts') ?? '';
+    if (!tableSql.contains("'remembered'") &&
+        !tableSql.contains("'forgot'")) {
+      await customStatement('''
+        UPDATE study_attempts
+        SET result = CASE result
+          WHEN 'remembered' THEN 'correct'
+          WHEN 'forgot' THEN 'incorrect'
+          ELSE result
+        END
+        ''');
+      return;
+    }
+
+    await customStatement('PRAGMA foreign_keys = OFF');
+    await customStatement(
+      'ALTER TABLE study_attempts RENAME TO study_attempts_legacy',
+    );
+    await migrator.createTable(studyAttempts);
+    await customStatement('''
+      INSERT INTO study_attempts (
+        id,
+        session_id,
+        session_item_id,
+        flashcard_id,
+        attempt_number,
+        result,
+        old_box,
+        new_box,
+        next_due_at,
+        answered_at
+      )
+      SELECT
+        id,
+        session_id,
+        session_item_id,
+        flashcard_id,
+        attempt_number,
+        CASE result
+          WHEN 'remembered' THEN 'correct'
+          WHEN 'forgot' THEN 'incorrect'
+          ELSE result
+        END,
+        old_box,
+        new_box,
+        next_due_at,
+        answered_at
+      FROM study_attempts_legacy
+      ''');
+    await customStatement('DROP TABLE study_attempts_legacy');
+    await customStatement('PRAGMA foreign_keys = ON');
   }
 
   Future<bool> _needsStudyTableReset() async {

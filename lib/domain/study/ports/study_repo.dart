@@ -25,13 +25,7 @@ abstract interface class StudyRepo {
     required List<StudyMode> modes,
   });
 
-  Future<StudySessionSnapshot> answerCurrentModeBatch({
-    required String sessionId,
-    required AttemptGrade grade,
-    required List<StudyMode> modes,
-  });
-
-  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+  Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
     required String sessionId,
     required Map<String, AttemptGrade> itemGrades,
     required List<StudyMode> modes,
@@ -44,10 +38,12 @@ abstract interface class StudyRepo {
   Future<StudySessionSnapshot> finalizeSession({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   });
 
   Future<StudySessionSnapshot> retryFinalize({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   });
 }

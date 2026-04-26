@@ -96,15 +96,15 @@ Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rul
 
 ## Sau mỗi lượt trả lời cần ghi nhận
 
-Ngoại lệ Review mode trong New Study:
+Review mode trong New Study:
 
 - vuốt qua từng flashcard chỉ là UI staging tạm thời
-- khi tới thẻ cuối, app đợi 2 giây rồi ghi một batch attempt `remembered` cho toàn bộ Review item còn pending trong cùng transaction
-- mỗi pending Review item nhận đúng một attempt `remembered`
+- khi tới thẻ cuối, app đợi 2 giây rồi ghi một batch attempt `correct` cho toàn bộ Review item còn pending trong cùng transaction
+- mỗi pending Review item nhận đúng một attempt `correct`
 - sau batch submit, Review mode pass và session chuyển sang mode tiếp theo hoặc `Ready To Finalize` nếu đó là mode cuối
 - nếu màn hình bị dispose trước khi batch submit, không ghi attempt và không đổi session progress
 
-Ngoại lệ Match mode trong New Study:
+Match mode trong New Study:
 
 - chọn sai cặp chỉ là UI staging tạm thời, không ghi attempt và không đổi trạng thái item ngay lúc mismatch
 - UI Match board chia current Match round thành các display batch tối đa 5 cặp; hoàn tất display batch hiện tại chỉ chuyển sang display batch kế tiếp
@@ -114,10 +114,20 @@ Ngoại lệ Match mode trong New Study:
 - nếu có item `incorrect`, app tạo Match retry round kế tiếp chỉ gồm các flashcard sai
 - nếu toàn bộ item `correct`, session chuyển sang mode tiếp theo hoặc `Ready To Finalize` nếu đó là mode cuối
 
+Guess / Recall / Fill trong New Study và Fill trong SRS Review:
+
+- trả lời từng câu chỉ stage kết quả trong state tạm của màn hình, không ghi attempt và không đổi trạng thái item ngay
+- khi toàn bộ pending item của current mode round đã có kết quả tạm, app ghi một batch attempt cho toàn bộ item đó trong cùng transaction
+- mỗi pending item nhận đúng một attempt: `correct` hoặc `incorrect`
+- toàn bộ pending item trong round được chuyển sang `completed` cùng một completed timestamp
+- nếu có item fail (`incorrect`), app tạo retry round kế tiếp của chính mode đó chỉ gồm các flashcard fail
+- nếu không có item fail, session chuyển sang mode tiếp theo hoặc `Ready To Finalize` nếu đó là mode cuối
+- nếu màn hình bị dispose trước khi mode round flush, các kết quả tạm chưa được ghi và session resume lại từ database state chưa đổi
+
 Với các lượt trả lời thông thường cần ghi nhận:
 
 - trạng thái hoàn thành
-- mức độ đúng / sai / nhớ / quên
+- kết quả thống nhất `correct` / `incorrect`
 - thời điểm hoàn thành
 - mode hiện tại
 - mode order

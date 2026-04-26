@@ -149,6 +149,7 @@ final class _ProgressStudyRepo implements StudyRepo {
   Future<StudySessionSnapshot> finalizeSession({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) async {
     finalizeCount += 1;
     hasResumeCandidate = false;
@@ -160,6 +161,7 @@ final class _ProgressStudyRepo implements StudyRepo {
   Future<StudySessionSnapshot> retryFinalize({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) async {
     retryFinalizeCount += 1;
     hasResumeCandidate = false;
@@ -211,18 +213,8 @@ final class _ProgressStudyRepo implements StudyRepo {
   }) {
     throw UnimplementedError();
   }
-
-  @override
-  Future<StudySessionSnapshot> answerCurrentModeBatch({
-    required String sessionId,
-    required AttemptGrade grade,
-    required List<StudyMode> modes,
-  }) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+@override
+  Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
     required String sessionId,
     required Map<String, AttemptGrade> itemGrades,
     required List<StudyMode> modes,

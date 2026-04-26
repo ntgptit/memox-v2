@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import 'mx_primary_button.dart';
 import '../layouts/mx_gap.dart';
 
 enum MxSecondaryVariant { tonal, outlined, text }
+
+enum MxSecondaryButtonTone { neutral, danger }
 
 /// Secondary action button. Supports tonal/outlined/text variants.
 class MxSecondaryButton extends StatelessWidget {
@@ -16,6 +20,7 @@ class MxSecondaryButton extends StatelessWidget {
     this.trailingIcon,
     this.size = MxButtonSize.medium,
     this.variant = MxSecondaryVariant.outlined,
+    this.tone = MxSecondaryButtonTone.neutral,
     this.isLoading = false,
     this.fullWidth = false,
     super.key,
@@ -27,18 +32,23 @@ class MxSecondaryButton extends StatelessWidget {
   final IconData? trailingIcon;
   final MxButtonSize size;
   final MxSecondaryVariant variant;
+  final MxSecondaryButtonTone tone;
   final bool isLoading;
   final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final mxColors = context.mxColors;
     final effectiveOnPressed = isLoading ? null : onPressed;
 
-    final spinnerColor = switch (variant) {
-      MxSecondaryVariant.tonal => theme.colorScheme.onSecondaryContainer,
-      MxSecondaryVariant.outlined => theme.colorScheme.primary,
-      MxSecondaryVariant.text => theme.colorScheme.primary,
+    final spinnerColor = switch (tone) {
+      MxSecondaryButtonTone.danger => mxColors.ratingAgain,
+      MxSecondaryButtonTone.neutral => switch (variant) {
+        MxSecondaryVariant.tonal => theme.colorScheme.onSecondaryContainer,
+        MxSecondaryVariant.outlined => theme.colorScheme.primary,
+        MxSecondaryVariant.text => theme.colorScheme.primary,
+      },
     };
 
     final child = isLoading
@@ -55,17 +65,17 @@ class MxSecondaryButton extends StatelessWidget {
     final button = switch (variant) {
       MxSecondaryVariant.tonal => FilledButton.tonal(
         onPressed: effectiveOnPressed,
-        style: _resolvedStyle(theme),
+        style: _resolvedStyle(theme, mxColors),
         child: child,
       ),
       MxSecondaryVariant.outlined => OutlinedButton(
         onPressed: effectiveOnPressed,
-        style: _resolvedStyle(theme),
+        style: _resolvedStyle(theme, mxColors),
         child: child,
       ),
       MxSecondaryVariant.text => TextButton(
         onPressed: effectiveOnPressed,
-        style: _resolvedStyle(theme),
+        style: _resolvedStyle(theme, mxColors),
         child: child,
       ),
     };
@@ -93,13 +103,16 @@ class MxSecondaryButton extends StatelessWidget {
     );
   }
 
-  ButtonStyle? _resolvedStyle(ThemeData theme) {
+  ButtonStyle? _resolvedStyle(ThemeData theme, MxColorsExtension mxColors) {
     final baseStyle = switch (variant) {
       MxSecondaryVariant.tonal => theme.filledButtonTheme.style,
       MxSecondaryVariant.outlined => theme.outlinedButtonTheme.style,
       MxSecondaryVariant.text => theme.textButtonTheme.style,
     };
-    return _mergeButtonStyles(baseStyle, _sizeStyle(size, theme.textTheme));
+    return _mergeButtonStyles(
+      _mergeButtonStyles(baseStyle, _sizeStyle(size, theme.textTheme)),
+      _toneStyle(theme, mxColors),
+    );
   }
 
   ButtonStyle? _sizeStyle(MxButtonSize size, TextTheme textTheme) {
@@ -125,5 +138,26 @@ class MxSecondaryButton extends StatelessWidget {
   ButtonStyle? _mergeButtonStyles(ButtonStyle? base, ButtonStyle? overrides) {
     if (base == null) return overrides;
     return base.merge(overrides);
+  }
+
+  ButtonStyle? _toneStyle(ThemeData theme, MxColorsExtension mxColors) {
+    if (tone != MxSecondaryButtonTone.danger) {
+      return null;
+    }
+    final scheme = theme.colorScheme;
+    return ButtonStyle(
+      foregroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
+        }
+        return mxColors.ratingAgain;
+      }),
+      side: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return BorderSide(color: scheme.outlineVariant);
+        }
+        return BorderSide(color: mxColors.ratingAgain);
+      }),
+    );
   }
 }

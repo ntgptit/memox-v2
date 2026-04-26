@@ -145,6 +145,43 @@
   "settingsLocaleSystem": "Theo hệ thống",
   "settingsLocaleEnglish": "Tiếng Anh",
   "settingsLocaleVietnamese": "Tiếng Việt",
+  "settingsSpeechTitle": "Giọng nói",
+  "settingsSpeechLabel": "Hỗ trợ phát âm tiếng Hàn và tiếng Anh",
+  "settingsSpeechLoading": "Đang tải cài đặt giọng nói",
+  "settingsSpeechAutoPlayLabel": "Tự phát trong khi học",
+  "settingsSpeechAutoPlaySubtitle": "Tự phát âm thẻ sau các chuyển trạng thái học.",
+  "settingsSpeechFrontLanguageLabel": "Ngôn ngữ mặt trước",
+  "settingsSpeechKorean": "Tiếng Hàn",
+  "settingsSpeechEnglish": "Tiếng Anh",
+  "settingsSpeechRateLabel": "Tốc độ phát âm",
+  "settingsSpeechRateValue": "{value}x",
+  "@settingsSpeechRateValue": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "settingsSpeechFrontVoiceLabel": "Giọng mặt trước",
+  "settingsSpeechSystemVoice": "Giọng hệ thống",
+  "settingsSpeechLoadingVoices": "Đang tải danh sách giọng...",
+  "settingsSpeechNoVoices": "Thiết bị chưa báo có giọng {language}.",
+  "@settingsSpeechNoVoices": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+  "settingsSpeechPreviewKorean": "Nghe thử tiếng Hàn",
+  "settingsSpeechPreviewEnglish": "Nghe thử tiếng Anh",
+  "settingsSpeechPreviewSelected": "Nghe thử",
+  "settingsSpeechVoiceOptions": "Tùy chọn giọng",
+  "settingsSpeechHideVoiceOptions": "Ẩn tùy chọn giọng",
+  "settingsSpeechKoreanPreviewText": "안녕하세요",
+  "settingsSpeechEnglishPreviewText": "Hello",
+  "settingsSpeechPreviewTextLabel": "Văn bản thử",
+  "settingsSpeechPreviewTextHelper": "Để trống sẽ dùng văn bản mẫu mặc định.",
+  "settingsSpeechPreviewTextHint": "Nhập hoặc dán văn bản bất kỳ để thử...",
+  "settingsSpeechPreviewClearTooltip": "Xóa văn bản thử",
   "settingsUpdatedMessage": "Đã cập nhật cài đặt.",
   "appRouterErrorTitle": "Lỗi điều hướng",
   "errorConfiguration": "Cấu hình ứng dụng không hợp lệ.",
@@ -362,6 +399,7 @@
   "studyMoreActionsTooltip": "Thêm thao tác",
   "studyEditCardTooltip": "Chỉnh sửa thẻ",
   "studyCardAudioTooltip": "Phát âm thanh thẻ",
+  "studyStopAudioTooltip": "Dừng âm thanh",
   "studyReviewTextSettingsTooltip": "Tùy chỉnh chữ",
   "studyReviewAudioTooltip": "Âm thanh",
   "studyReviewMoreActionsTooltip": "Thêm thao tác",
@@ -419,18 +457,31 @@
   "studyModeReview": "Xem lại",
   "studyModeMatch": "Ghép đôi",
   "studyModeGuess": "Đoán",
-  "studyModeRecall": "Tự nhớ",
-  "studyModeFill": "Điền đáp án",
+  "studyModeRecall": "Nhớ lại",
+  "studyModeFill": "Điền",
   "studyReadyToFinalizeTitle": "Sẵn sàng finalize",
   "studyReadyToFinalizeMessage": "Toàn bộ thẻ bắt buộc đã pass. Finalize để commit tiến độ SRS.",
   "studyChooseMatchingAnswer": "Chọn đáp án khớp.",
   "studyTypeMatchingAnswer": "Nhập đáp án khớp.",
   "studyAnswerLabel": "Đáp án",
   "studySubmitAnswer": "Gửi",
+  "studyHelpAction": "Trợ giúp",
+  "studyCheckAnswerAction": "Kiểm tra",
+  "studyFillNoAnswerLabel": "Chưa nhập đáp án",
   "studyCorrectAction": "Đúng",
   "studyIncorrectAction": "Sai",
-  "studyRememberedAction": "Nhớ",
-  "studyForgotAction": "Quên",
+  "studyRememberedAction": "Nhớ được",
+  "studyForgotAction": "Đã quên",
+  "studyShowAnswerAction": "Hiển thị",
+  "studyShowAnswerCountdownAction": "Hiển thị ({seconds}s)",
+  "@studyShowAnswerCountdownAction": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "studyNextAction": "Tiếp theo",
   "studyAnswerCorrectTitle": "Đúng",
   "studyAnswerIncorrectTitle": "Chưa đúng",
   "studyCorrectAnswerLabel": "Đáp án đúng: {answer}",

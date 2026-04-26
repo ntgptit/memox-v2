@@ -24,6 +24,7 @@ MemoX là hệ thống học tập cá nhân dùng flashcard và spaced repetiti
 - Theo dõi và quản lý session đang mở từ màn Progress: tiếp tục học, hủy, finalize hoặc retry finalize
 - Bỏ qua thẻ, học lại thẻ sai trong mode hiện tại và kết thúc sớm session
 - Điều khiển session bằng study type, batch size, shuffle và ưu tiên thẻ quá hạn
+- Phát âm nội dung flashcard bằng on-device TTS cho tiếng Hàn và tiếng Anh trong Study UI
 - Lưu session history để theo dõi kết quả học
 - Tìm kiếm folder, deck, flashcard
 - Sắp xếp theo tên, mới nhất, học gần nhất

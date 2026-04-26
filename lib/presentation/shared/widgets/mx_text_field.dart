@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import 'mx_text.dart';
+
+enum MxTextFieldVariant { outlined, borderless }
 
 /// Themed text input with label, helper text, error state, and optional
 /// leading/trailing icons.
@@ -29,6 +32,11 @@ class MxTextField extends StatelessWidget {
     this.focusNode,
     this.validator,
     this.textCapitalization = TextCapitalization.sentences,
+    this.variant = MxTextFieldVariant.outlined,
+    this.textAlign = TextAlign.start,
+    this.textAlignVertical,
+    this.textRole,
+    this.expands = false,
     super.key,
   });
 
@@ -54,10 +62,18 @@ class MxTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final FormFieldValidator<String>? validator;
   final TextCapitalization textCapitalization;
+  final MxTextFieldVariant variant;
+  final TextAlign textAlign;
+  final TextAlignVertical? textAlignVertical;
+  final MxTextRole? textRole;
+  final bool expands;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final style = textRole == null
+        ? textTheme.bodyLarge
+        : MxTextStyles.resolve(context, textRole!);
 
     return TextFormField(
       controller: controller,
@@ -66,8 +82,9 @@ class MxTextField extends StatelessWidget {
       readOnly: readOnly,
       autofocus: autofocus,
       obscureText: obscureText,
-      maxLines: obscureText ? 1 : maxLines,
-      minLines: minLines,
+      expands: expands,
+      maxLines: expands ? null : (obscureText ? 1 : maxLines),
+      minLines: expands ? null : minLines,
       maxLength: maxLength,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
@@ -76,9 +93,16 @@ class MxTextField extends StatelessWidget {
       onFieldSubmitted: onSubmitted,
       validator: validator,
       textCapitalization: textCapitalization,
-      style: textTheme.bodyLarge,
-      decoration: InputDecoration(
-        labelText: label,
+      textAlign: textAlign,
+      textAlignVertical: textAlignVertical,
+      style: style,
+      decoration: _decoration(),
+    );
+  }
+
+  InputDecoration _decoration() {
+    if (variant == MxTextFieldVariant.borderless) {
+      return InputDecoration(
         hintText: hintText,
         helperText: helperText,
         errorText: errorText,
@@ -86,7 +110,25 @@ class MxTextField extends StatelessWidget {
             ? Icon(prefixIcon, size: AppIconSizes.md)
             : null,
         suffixIcon: suffixIcon,
-      ),
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        contentPadding: EdgeInsets.zero,
+      );
+    }
+
+    return InputDecoration(
+      labelText: label,
+      hintText: hintText,
+      helperText: helperText,
+      errorText: errorText,
+      prefixIcon: prefixIcon != null
+          ? Icon(prefixIcon, size: AppIconSizes.md)
+          : null,
+      suffixIcon: suffixIcon,
     );
   }
 }

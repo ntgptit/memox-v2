@@ -260,86 +260,7 @@ final class StudyRepoImpl implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> answerCurrentModeBatch({
-    required String sessionId,
-    required AttemptGrade grade,
-    required List<StudyMode> modes,
-  }) async {
-    await _transactionRunner.write((_) async {
-      final session = await _requireSession(sessionId);
-      _requireStatus(session, const <SessionStatus>[SessionStatus.inProgress]);
-      final currentItem = await _requireCurrentItem(sessionId);
-      final currentMode = DatabaseEnumCodecs.studyModeFromStorage(
-        currentItem.studyMode,
-      );
-      if (currentMode != StudyMode.review) {
-        throw const ValidationException(
-          message: 'Batch mode answer is only available for Review mode.',
-        );
-      }
-
-      final now = _clock.nowEpochMillis();
-      final items = await _studySessionItemDao.listModeRoundItems(
-        sessionId: sessionId,
-        modeOrder: currentItem.modeOrder,
-        roundIndex: currentItem.roundIndex,
-      );
-      final pendingItems = items
-          .where(
-            (item) => item.status == SessionItemStatus.pending.storageValue,
-          )
-          .toList(growable: false);
-      if (pendingItems.isEmpty) {
-        throw const ValidationException(message: 'No pending study item.');
-      }
-
-      for (final item in pendingItems) {
-        final attemptNumber = await _studyAttemptDao.nextAttemptNumber(
-          sessionId: sessionId,
-          flashcardId: item.flashcardId,
-        );
-        await _studyAttemptDao.insertAttempt(
-          local.StudyAttemptsCompanion.insert(
-            id: _idGenerator.nextId(),
-            sessionId: sessionId,
-            sessionItemId: item.id,
-            flashcardId: item.flashcardId,
-            attemptNumber: attemptNumber,
-            result: grade.storageValue,
-            answeredAt: now,
-          ),
-        );
-        await _studySessionItemDao.completeItem(
-          itemId: item.id,
-          completedAt: now,
-        );
-      }
-
-      if (currentItem.modeOrder < modes.length) {
-        final nextModeOrder = currentItem.modeOrder + 1;
-        final batch = await _originalBatchFlashcards(sessionId);
-        await _insertQueue(
-          sessionId: sessionId,
-          cards: batch,
-          mode: modes[nextModeOrder - 1],
-          modeOrder: nextModeOrder,
-          roundIndex: 1,
-          sourcePoolOverride: null,
-        );
-        return;
-      }
-
-      await _studySessionDao.updateStatus(
-        sessionId: sessionId,
-        status: SessionStatus.readyToFinalize.storageValue,
-        endedAt: now,
-      );
-    });
-    return _loadSnapshot(sessionId);
-  }
-
-  @override
-  Future<StudySessionSnapshot> answerCurrentMatchModeBatch({
+  Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
     required String sessionId,
     required Map<String, AttemptGrade> itemGrades,
     required List<StudyMode> modes,
@@ -351,12 +272,6 @@ final class StudyRepoImpl implements StudyRepo {
       final currentMode = DatabaseEnumCodecs.studyModeFromStorage(
         currentItem.studyMode,
       );
-      if (currentMode != StudyMode.match) {
-        throw const ValidationException(
-          message: 'Match batch answer is only available for Match mode.',
-        );
-      }
-
       final items = await _studySessionItemDao.listModeRoundItems(
         sessionId: sessionId,
         modeOrder: currentItem.modeOrder,
@@ -376,15 +291,18 @@ final class StudyRepoImpl implements StudyRepo {
       if (pendingItemIds.length != submittedItemIds.length ||
           !pendingItemIds.containsAll(submittedItemIds)) {
         throw const ValidationException(
-          message: 'Match batch must include every pending item exactly once.',
+          message: 'Mode batch must include every pending item exactly once.',
         );
       }
-      if (itemGrades.values.any(
-        (grade) =>
-            grade != AttemptGrade.correct && grade != AttemptGrade.incorrect,
-      )) {
-        throw const ValidationException(
-          message: 'Match batch only accepts correct or incorrect grades.',
+
+      const acceptedGrades = <AttemptGrade>{
+        AttemptGrade.correct,
+        AttemptGrade.incorrect,
+      };
+      if (itemGrades.values.any((grade) => !acceptedGrades.contains(grade))) {
+        throw ValidationException(
+          message:
+              'Mode batch only accepts ${_acceptedBatchGradeLabel(acceptedGrades)} grades.',
         );
       }
 
@@ -420,7 +338,7 @@ final class StudyRepoImpl implements StudyRepo {
         await _insertQueue(
           sessionId: sessionId,
           cards: failedCards,
-          mode: StudyMode.match,
+          mode: currentMode,
           modeOrder: currentItem.modeOrder,
           roundIndex: currentItem.roundIndex + 1,
           sourcePoolOverride: SessionItemSourcePool.retry,
@@ -449,6 +367,10 @@ final class StudyRepoImpl implements StudyRepo {
       );
     });
     return _loadSnapshot(sessionId);
+  }
+
+  String _acceptedBatchGradeLabel(Set<AttemptGrade> grades) {
+    return grades.map((grade) => grade.storageValue).join(' or ');
   }
 
   @override
@@ -490,6 +412,7 @@ final class StudyRepoImpl implements StudyRepo {
   Future<StudySessionSnapshot> finalizeSession({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) async {
     final session = await _requireSession(sessionId);
     _requireReadyToFinalize(session);
@@ -500,7 +423,7 @@ final class StudyRepoImpl implements StudyRepo {
         final currentSession = await _requireSession(sessionId);
         _requireReadyToFinalize(currentSession);
         _requireMatchingStudyType(currentSession, studyType);
-        await _commitSrs(sessionId: sessionId, studyType: studyType);
+        await _commitSrs(sessionId: sessionId, finalizePolicy: finalizePolicy);
         await _studySessionDao.updateStatus(
           sessionId: sessionId,
           status: SessionStatus.completed.storageValue,
@@ -522,8 +445,13 @@ final class StudyRepoImpl implements StudyRepo {
   Future<StudySessionSnapshot> retryFinalize({
     required String sessionId,
     required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) {
-    return finalizeSession(sessionId: sessionId, studyType: studyType);
+    return finalizeSession(
+      sessionId: sessionId,
+      studyType: studyType,
+      finalizePolicy: finalizePolicy,
+    );
   }
 
   Future<List<QueryRow>> _eligibleFlashcards({
@@ -655,7 +583,7 @@ final class StudyRepoImpl implements StudyRepo {
 
   Future<void> _commitSrs({
     required String sessionId,
-    required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
   }) async {
     final batch = await _originalBatchFlashcards(sessionId);
     final attempts = await _studyAttemptDao.listAttempts(sessionId);
@@ -671,15 +599,20 @@ final class StudyRepoImpl implements StudyRepo {
       final oldBox = progress?.currentBox ?? 1;
       final cardAttempts =
           attemptsByCard[card.id] ?? const <local.StudyAttempt>[];
-      final outcome = studyType == StudyType.newStudy
-          ? _SrsOutcome(
+      final outcome = switch (finalizePolicy) {
+        StudyFinalizePolicy.newStudy => _SrsOutcome(
               result: ReviewResult.perfect,
               oldBox: oldBox,
               newBox: 2,
               nextDueAt: now + const Duration(days: 1).inMilliseconds,
               lapseDelta: 0,
-            )
-          : _reviewOutcome(oldBox: oldBox, attempts: cardAttempts, now: now);
+            ),
+        StudyFinalizePolicy.srsReview => _reviewOutcome(
+          oldBox: oldBox,
+          attempts: cardAttempts,
+          now: now,
+        ),
+      };
       await _upsertProgress(
         flashcardId: card.id,
         outcome: outcome,
@@ -708,15 +641,6 @@ final class StudyRepoImpl implements StudyRepo {
               DatabaseEnumCodecs.attemptGradeFromStorage(attempt.result),
         )
         .toList(growable: false);
-    if (grades.contains(AttemptGrade.forgot)) {
-      return _SrsOutcome(
-        result: ReviewResult.forgot,
-        oldBox: oldBox,
-        newBox: 1,
-        nextDueAt: now + _intervalForBox(1).inMilliseconds,
-        lapseDelta: 1,
-      );
-    }
     if (grades.any((grade) => grade.isFailing)) {
       final newBox = max(1, oldBox - 1);
       return _SrsOutcome(

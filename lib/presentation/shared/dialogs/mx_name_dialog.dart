@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/string_utils.dart';
 import '../widgets/mx_primary_button.dart';
 import '../widgets/mx_secondary_button.dart';
 import '../widgets/mx_text_field.dart';
@@ -70,7 +71,7 @@ class _MxNameDialogState extends State<MxNameDialog> {
   }
 
   void _submit() {
-    final trimmedValue = _controller.text.trim();
+    final trimmedValue = StringUtils.trimmed(_controller.text);
     if (trimmedValue.isEmpty) {
       return;
     }
@@ -92,7 +93,7 @@ class _MxNameDialogState extends State<MxNameDialog> {
         ValueListenableBuilder<TextEditingValue>(
           valueListenable: _controller,
           builder: (_, value, child) {
-            final canSubmit = value.text.trim().isNotEmpty;
+            final canSubmit = StringUtils.isNotBlank(value.text);
             return MxPrimaryButton(
               label: widget.confirmLabel,
               onPressed: canSubmit ? _submit : null,

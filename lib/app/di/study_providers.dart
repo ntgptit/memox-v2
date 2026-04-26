@@ -7,6 +7,7 @@ import '../../data/datasources/local/daos/study_session_item_dao.dart';
 import '../../data/repositories/study_repo_impl.dart';
 import '../../data/settings/study_settings_store.dart';
 import '../../domain/study/ports/study_repo.dart';
+import '../../domain/study/strategy/study_mode_strategy.dart';
 import '../../domain/study/strategy/study_strategy.dart';
 import '../../domain/study/strategy/study_strategy_factory.dart';
 import '../../domain/study/usecases/study_usecases.dart';
@@ -41,10 +42,21 @@ StudyAttemptDao studyAttemptDao(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-StudyStrategyFactory studyStrategyFactory(Ref ref) {
-  return StudyStrategyFactory(const <StudyStrategy>[
+StudyFlowStrategyFactory studyStrategyFactory(Ref ref) {
+  return StudyFlowStrategyFactory(const <StudyFlowStrategy>[
     NewStudyStrategy(),
     SrsReviewStrategy(),
+  ]);
+}
+
+@Riverpod(keepAlive: true)
+StudyModeStrategyFactory studyModeStrategyFactory(Ref ref) {
+  return StudyModeStrategyFactory(const <StudyModeStrategy>[
+    ReviewModeStrategy(),
+    MatchModeStrategy(),
+    GuessModeStrategy(),
+    RecallModeStrategy(),
+    FillModeStrategy(),
   ]);
 }
 
@@ -72,7 +84,10 @@ StartStudySessionUseCase startStudySessionUseCase(Ref ref) {
 
 @Riverpod(keepAlive: true)
 ResumeStudySessionUseCase resumeStudySessionUseCase(Ref ref) {
-  return ResumeStudySessionUseCase(ref.watch(studyRepoProvider));
+  return ResumeStudySessionUseCase(
+    repository: ref.watch(studyRepoProvider),
+    strategyFactory: ref.watch(studyStrategyFactoryProvider),
+  );
 }
 
 @Riverpod(keepAlive: true)
@@ -95,7 +110,19 @@ AnswerFlashcardUseCase answerFlashcardUseCase(Ref ref) {
 AnswerCurrentModeBatchUseCase answerCurrentModeBatchUseCase(Ref ref) {
   return AnswerCurrentModeBatchUseCase(
     repository: ref.watch(studyRepoProvider),
-    strategyFactory: ref.watch(studyStrategyFactoryProvider),
+    flowStrategyFactory: ref.watch(studyStrategyFactoryProvider),
+    modeStrategyFactory: ref.watch(studyModeStrategyFactoryProvider),
+  );
+}
+
+@Riverpod(keepAlive: true)
+AnswerCurrentModeItemGradesBatchUseCase answerCurrentModeItemGradesBatchUseCase(
+  Ref ref,
+) {
+  return AnswerCurrentModeItemGradesBatchUseCase(
+    repository: ref.watch(studyRepoProvider),
+    flowStrategyFactory: ref.watch(studyStrategyFactoryProvider),
+    modeStrategyFactory: ref.watch(studyModeStrategyFactoryProvider),
   );
 }
 
@@ -103,7 +130,8 @@ AnswerCurrentModeBatchUseCase answerCurrentModeBatchUseCase(Ref ref) {
 AnswerCurrentMatchModeBatchUseCase answerCurrentMatchModeBatchUseCase(Ref ref) {
   return AnswerCurrentMatchModeBatchUseCase(
     repository: ref.watch(studyRepoProvider),
-    strategyFactory: ref.watch(studyStrategyFactoryProvider),
+    flowStrategyFactory: ref.watch(studyStrategyFactoryProvider),
+    modeStrategyFactory: ref.watch(studyModeStrategyFactoryProvider),
   );
 }
 

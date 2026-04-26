@@ -11,6 +11,7 @@ import 'package:memox/data/datasources/local/local_transaction_runner.dart';
 import 'package:memox/data/repositories/study_repo_impl.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/strategy/study_mode_strategy.dart';
 import 'package:memox/domain/study/strategy/study_strategy.dart';
 import 'package:memox/domain/study/strategy/study_strategy_factory.dart';
 import 'package:memox/domain/study/usecases/study_usecases.dart';
@@ -52,7 +53,7 @@ void main() {
           snapshot = await harness.answer.execute(
             sessionId: snapshot.session.id,
             studyType: snapshot.session.studyType,
-            grade: AttemptGrade.remembered,
+            grade: AttemptGrade.correct,
           );
         }
 
@@ -333,7 +334,6 @@ void main() {
         await harness.answerBatch.execute(
           sessionId: started.session.id,
           studyType: started.session.studyType,
-          grade: AttemptGrade.remembered,
         );
 
         await _expectSessionRow(
@@ -385,7 +385,7 @@ void main() {
           sessionItemId: 'id-0001',
           flashcardId: 'card-1',
           attemptNumber: 1,
-          result: AttemptGrade.remembered,
+          result: AttemptGrade.correct,
           oldBox: null,
           newBox: null,
           nextDueAt: null,
@@ -398,7 +398,7 @@ void main() {
           sessionItemId: 'id-0002',
           flashcardId: 'card-2',
           attemptNumber: 1,
-          result: AttemptGrade.remembered,
+          result: AttemptGrade.correct,
           oldBox: null,
           newBox: null,
           nextDueAt: null,
@@ -466,7 +466,6 @@ void main() {
         await harness.answerBatch.execute(
           sessionId: started.session.id,
           studyType: started.session.studyType,
-          grade: AttemptGrade.remembered,
         );
 
         await harness.answerMatchBatch.execute(
@@ -644,7 +643,7 @@ void main() {
     );
 
     test(
-      'DT4 repositoryFlow: batch review submit inserts remembered attempt per pending item',
+      'DT4 repositoryFlow: batch review submit inserts correct attempt per pending item',
       () async {
         await harness.seedDeckWithCards(cardCount: 2);
 
@@ -665,7 +664,6 @@ void main() {
         final answered = await harness.answerBatch.execute(
           sessionId: started.session.id,
           studyType: started.session.studyType,
-          grade: AttemptGrade.remembered,
         );
 
         final attempts = await harness.database
@@ -684,7 +682,7 @@ void main() {
         expect(attempts, hasLength(2));
         expect(
           attempts.map((attempt) => attempt.result),
-          everyElement(AttemptGrade.remembered.storageValue),
+          everyElement(AttemptGrade.correct.storageValue),
         );
         expect(
           reviewItems.map((item) => item.status),
@@ -715,7 +713,6 @@ void main() {
         final answered = await harness.answerBatch.execute(
           sessionId: started.session.id,
           studyType: started.session.studyType,
-          grade: AttemptGrade.remembered,
         );
 
         expect(answered.session.status, SessionStatus.inProgress);
@@ -745,7 +742,6 @@ void main() {
         final afterReview = await harness.answerBatch.execute(
           sessionId: started.session.id,
           studyType: started.session.studyType,
-          grade: AttemptGrade.remembered,
         );
 
         expect(afterReview.currentItem?.studyMode, StudyMode.match);
@@ -753,7 +749,6 @@ void main() {
           () => harness.answerBatch.execute(
             sessionId: started.session.id,
             studyType: started.session.studyType,
-            grade: AttemptGrade.remembered,
           ),
           throwsA(isA<ValidationException>()),
         );
@@ -782,13 +777,12 @@ void main() {
         snapshot = await harness.answerBatch.execute(
           sessionId: snapshot.session.id,
           studyType: snapshot.session.studyType,
-          grade: AttemptGrade.remembered,
         );
         while (snapshot.currentItem != null) {
           snapshot = await harness.answer.execute(
             sessionId: snapshot.session.id,
             studyType: snapshot.session.studyType,
-            grade: AttemptGrade.remembered,
+            grade: AttemptGrade.correct,
           );
         }
         snapshot = await harness.finalize.execute(
@@ -801,7 +795,6 @@ void main() {
           () => harness.answerBatch.execute(
             sessionId: snapshot.session.id,
             studyType: snapshot.session.studyType,
-            grade: AttemptGrade.remembered,
           ),
           throwsA(isA<ValidationException>()),
         );
@@ -829,7 +822,6 @@ void main() {
         await harness.answerBatch.execute(
           sessionId: started.session.id,
           studyType: started.session.studyType,
-          grade: AttemptGrade.remembered,
         );
 
         final answered = await harness.answerMatchBatch.execute(
@@ -869,7 +861,6 @@ void main() {
         await harness.answerBatch.execute(
           sessionId: started.session.id,
           studyType: started.session.studyType,
-          grade: AttemptGrade.remembered,
         );
 
         final answered = await harness.answerMatchBatch.execute(
@@ -942,7 +933,6 @@ void main() {
       await harness.answerBatch.execute(
         sessionId: started.session.id,
         studyType: started.session.studyType,
-        grade: AttemptGrade.remembered,
       );
 
       await expectLater(
@@ -973,7 +963,7 @@ void main() {
     });
 
     test(
-      'DT12 repositoryFlow: Match batch rejects unsupported grades',
+      'DT12 repositoryFlow: Match batch accepts normalized correct grades',
       () async {
         await harness.seedDeckWithCards(cardCount: 2);
 
@@ -993,21 +983,319 @@ void main() {
         await harness.answerBatch.execute(
           sessionId: started.session.id,
           studyType: started.session.studyType,
-          grade: AttemptGrade.remembered,
         );
 
-        await expectLater(
-          () => harness.answerMatchBatch.execute(
-            sessionId: started.session.id,
-            studyType: started.session.studyType,
-            itemGrades: const <String, AttemptGrade>{
-              'id-0005': AttemptGrade.remembered,
-              'id-0006': AttemptGrade.correct,
-            },
-          ),
-          throwsA(isA<ValidationException>()),
+        final answered = await harness.answerMatchBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0005': AttemptGrade.correct,
+            'id-0006': AttemptGrade.correct,
+          },
         );
-        await _expectAttemptCount(harness, 2);
+        expect(answered.currentItem?.studyMode, StudyMode.guess);
+        await _expectAttemptCount(harness, 4);
+      },
+    );
+
+    test(
+      'DT13 repositoryFlow: Guess mode item batch saves attempts and failed retry rows',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+        );
+        await harness.answerMatchBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0005': AttemptGrade.correct,
+            'id-0006': AttemptGrade.correct,
+          },
+        );
+
+        final answered = await harness.answerModeItemBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0009': AttemptGrade.incorrect,
+            'id-0010': AttemptGrade.correct,
+          },
+        );
+
+        expect(answered.currentItem?.studyMode, StudyMode.guess);
+        expect(answered.currentItem?.roundIndex, 2);
+        await _expectItemRow(
+          harness,
+          id: 'id-0009',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.guess,
+          modeOrder: 3,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.completed,
+          completedAt: _studyNow,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0010',
+          sessionId: 'id-0000',
+          flashcardId: 'card-2',
+          studyMode: StudyMode.guess,
+          modeOrder: 3,
+          roundIndex: 1,
+          queuePosition: 2,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.completed,
+          completedAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0011',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0009',
+          flashcardId: 'card-1',
+          attemptNumber: 3,
+          result: AttemptGrade.incorrect,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0012',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0010',
+          flashcardId: 'card-2',
+          attemptNumber: 3,
+          result: AttemptGrade.correct,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0013',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.guess,
+          modeOrder: 3,
+          roundIndex: 2,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.retry,
+          status: SessionItemStatus.pending,
+          completedAt: null,
+        );
+        await _expectProgressRow(
+          harness,
+          flashcardId: 'card-1',
+          currentBox: 1,
+          reviewCount: 0,
+          lapseCount: 0,
+          lastResult: null,
+          lastStudiedAt: null,
+          dueAt: null,
+          createdAt: _studyNow,
+          updatedAt: _studyNow,
+        );
+      },
+    );
+
+    test(
+      'DT14 repositoryFlow: Recall mode item batch saves correct and incorrect fields',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+        );
+        await harness.answerMatchBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0005': AttemptGrade.correct,
+            'id-0006': AttemptGrade.correct,
+          },
+        );
+        await harness.answerModeItemBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0009': AttemptGrade.correct,
+            'id-0010': AttemptGrade.correct,
+          },
+        );
+
+        final answered = await harness.answerModeItemBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0013': AttemptGrade.incorrect,
+            'id-0014': AttemptGrade.correct,
+          },
+        );
+
+        expect(answered.currentItem?.studyMode, StudyMode.recall);
+        expect(answered.currentItem?.roundIndex, 2);
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0015',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0013',
+          flashcardId: 'card-1',
+          attemptNumber: 4,
+          result: AttemptGrade.incorrect,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0016',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0014',
+          flashcardId: 'card-2',
+          attemptNumber: 4,
+          result: AttemptGrade.correct,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
+        await _expectItemRow(
+          harness,
+          id: 'id-0017',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.recall,
+          modeOrder: 4,
+          roundIndex: 2,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.retry,
+          status: SessionItemStatus.pending,
+          completedAt: null,
+        );
+      },
+    );
+
+    test(
+      'DT15 repositoryFlow: Fill mode item batch completes final mode as ready to finalize',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+        );
+        await harness.answerMatchBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0005': AttemptGrade.correct,
+            'id-0006': AttemptGrade.correct,
+          },
+        );
+        await harness.answerModeItemBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0009': AttemptGrade.correct,
+            'id-0010': AttemptGrade.correct,
+          },
+        );
+        await harness.answerModeItemBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0013': AttemptGrade.correct,
+            'id-0014': AttemptGrade.correct,
+          },
+        );
+
+        final answered = await harness.answerModeItemBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+          itemGrades: const <String, AttemptGrade>{
+            'id-0017': AttemptGrade.correct,
+            'id-0018': AttemptGrade.correct,
+          },
+        );
+
+        expect(answered.session.status, SessionStatus.readyToFinalize);
+        expect(answered.session.endedAt, _studyNow);
+        await _expectItemRow(
+          harness,
+          id: 'id-0017',
+          sessionId: 'id-0000',
+          flashcardId: 'card-1',
+          studyMode: StudyMode.fill,
+          modeOrder: 5,
+          roundIndex: 1,
+          queuePosition: 1,
+          sourcePool: SessionItemSourcePool.newCards,
+          status: SessionItemStatus.completed,
+          completedAt: _studyNow,
+        );
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0019',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0017',
+          flashcardId: 'card-1',
+          attemptNumber: 5,
+          result: AttemptGrade.correct,
+          oldBox: null,
+          newBox: null,
+          nextDueAt: null,
+          answeredAt: _studyNow,
+        );
       },
     );
 
@@ -1132,7 +1420,7 @@ void main() {
           snapshot = await harness.answer.execute(
             sessionId: snapshot.session.id,
             studyType: snapshot.session.studyType,
-            grade: AttemptGrade.remembered,
+            grade: AttemptGrade.correct,
           );
         }
 
@@ -1178,7 +1466,7 @@ void main() {
         snapshot = await harness.answer.execute(
           sessionId: snapshot.session.id,
           studyType: snapshot.session.studyType,
-          grade: AttemptGrade.remembered,
+          grade: AttemptGrade.correct,
         );
       }
 
@@ -1514,7 +1802,7 @@ void main() {
     );
 
     test(
-      'DT1 onRefreshRetry: SRS Review treats forgot as retry and finalizes to box 1',
+      'DT1 onRefreshRetry: SRS Review treats incorrect as retry and finalizes recovered review',
       () async {
         await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
 
@@ -1535,7 +1823,7 @@ void main() {
         snapshot = await harness.answer.execute(
           sessionId: snapshot.session.id,
           studyType: snapshot.session.studyType,
-          grade: AttemptGrade.forgot,
+          grade: AttemptGrade.incorrect,
         );
         expect(snapshot.currentItem, isNotNull);
         expect(snapshot.session.status, SessionStatus.inProgress);
@@ -1555,8 +1843,8 @@ void main() {
         final progress = await (harness.database.select(
           harness.database.flashcardProgress,
         )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
-        expect(progress.currentBox, 1);
-        expect(progress.lastResult, ReviewResult.forgot.storageValue);
+        expect(progress.currentBox, 3);
+        expect(progress.lastResult, ReviewResult.recovered.storageValue);
       },
     );
 
@@ -1755,6 +2043,7 @@ final class _StudyHarness {
     required this.resume,
     required this.answer,
     required this.answerBatch,
+    required this.answerModeItemBatch,
     required this.answerMatchBatch,
     required this.skip,
     required this.cancel,
@@ -1781,6 +2070,13 @@ final class _StudyHarness {
       NewStudyStrategy(),
       SrsReviewStrategy(),
     ]);
+    final modeFactory = StudyModeStrategyFactory(const <StudyModeStrategy>[
+      ReviewModeStrategy(),
+      MatchModeStrategy(),
+      GuessModeStrategy(),
+      RecallModeStrategy(),
+      FillModeStrategy(),
+    ]);
     return _StudyHarness._(
       database: database,
       clock: clock,
@@ -1788,18 +2084,28 @@ final class _StudyHarness {
         repository: repo,
         strategyFactory: factory,
       ),
-      resume: ResumeStudySessionUseCase(repo),
+      resume: ResumeStudySessionUseCase(
+        repository: repo,
+        strategyFactory: factory,
+      ),
       answer: AnswerFlashcardUseCase(
         repository: repo,
         strategyFactory: factory,
       ),
       answerBatch: AnswerCurrentModeBatchUseCase(
         repository: repo,
-        strategyFactory: factory,
+        flowStrategyFactory: factory,
+        modeStrategyFactory: modeFactory,
+      ),
+      answerModeItemBatch: AnswerCurrentModeItemGradesBatchUseCase(
+        repository: repo,
+        flowStrategyFactory: factory,
+        modeStrategyFactory: modeFactory,
       ),
       answerMatchBatch: AnswerCurrentMatchModeBatchUseCase(
         repository: repo,
-        strategyFactory: factory,
+        flowStrategyFactory: factory,
+        modeStrategyFactory: modeFactory,
       ),
       skip: SkipFlashcardUseCase(repo),
       cancel: CancelStudySessionUseCase(repo),
@@ -1820,6 +2126,7 @@ final class _StudyHarness {
   final ResumeStudySessionUseCase resume;
   final AnswerFlashcardUseCase answer;
   final AnswerCurrentModeBatchUseCase answerBatch;
+  final AnswerCurrentModeItemGradesBatchUseCase answerModeItemBatch;
   final AnswerCurrentMatchModeBatchUseCase answerMatchBatch;
   final SkipFlashcardUseCase skip;
   final CancelStudySessionUseCase cancel;

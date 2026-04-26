@@ -2,6 +2,7 @@ import '../../core/errors/app_exception.dart';
 import '../../core/errors/result.dart';
 import '../../core/services/clock.dart';
 import '../../core/services/id_generator.dart';
+import '../../core/utils/string_utils.dart';
 import '../../domain/entities/folder_entity.dart';
 import '../../domain/enums/content_sort_mode.dart';
 import '../../domain/enums/folder_content_mode.dart';
@@ -47,8 +48,9 @@ final class FolderRepositoryImpl implements FolderRepository {
     final folders = query.hasSearchTerm
         ? (await _folderDao.listAllFolders())
               .where(
-                (folder) => folder.name.toLowerCase().contains(
-                  query.normalizedSearchTerm.toLowerCase(),
+                (folder) => StringUtils.containsNormalized(
+                  folder.name,
+                  query.normalizedSearchTerm,
                 ),
               )
               .toList(growable: false)
@@ -130,7 +132,7 @@ final class FolderRepositoryImpl implements FolderRepository {
         _sortFolderDeckItems(deckItems, query.sortMode);
       case ContentSortMode.name:
         subfolderEntities.sort(
-          (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+          (a, b) => StringUtils.compareNormalized(a.name, b.name),
         );
         _sortFolderDeckItems(deckItems, query.sortMode);
       case ContentSortMode.newest:
@@ -417,7 +419,7 @@ final class FolderRepositoryImpl implements FolderRepository {
   }
 
   String _normalizeName(String name) {
-    final trimmed = name.trim();
+    final trimmed = StringUtils.trimmed(name);
     if (trimmed.isEmpty) {
       throw const ValidationException(message: 'The name is required.');
     }
@@ -435,9 +437,7 @@ final class FolderRepositoryImpl implements FolderRepository {
         );
       case ContentSortMode.name:
         folders.sort(
-          (a, b) => a.folder.name.toLowerCase().compareTo(
-            b.folder.name.toLowerCase(),
-          ),
+          (a, b) => StringUtils.compareNormalized(a.folder.name, b.folder.name),
         );
       case ContentSortMode.newest:
         folders.sort(
@@ -470,8 +470,7 @@ final class FolderRepositoryImpl implements FolderRepository {
         decks.sort((a, b) => a.deck.sortOrder.compareTo(b.deck.sortOrder));
       case ContentSortMode.name:
         decks.sort(
-          (a, b) =>
-              a.deck.name.toLowerCase().compareTo(b.deck.name.toLowerCase()),
+          (a, b) => StringUtils.compareNormalized(a.deck.name, b.deck.name),
         );
       case ContentSortMode.newest:
         decks.sort((a, b) => b.deck.createdAt.compareTo(a.deck.createdAt));

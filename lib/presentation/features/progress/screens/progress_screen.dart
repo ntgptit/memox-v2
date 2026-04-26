@@ -139,25 +139,52 @@ class _ProgressOverview extends StatelessWidget {
         )
         .length;
 
+    final activeMetric = _MetricCard(
+      key: const ValueKey('progress_metric_active'),
+      label: l10n.progressActiveSessionsCount,
+      value: '$activeCount',
+      icon: Icons.play_circle_outline,
+    );
+    final readyMetric = _MetricCard(
+      key: const ValueKey('progress_metric_ready'),
+      label: l10n.progressReadySessionsCount,
+      value: '$readyCount',
+      icon: Icons.flag_outlined,
+    );
+    final failedMetric = _MetricCard(
+      key: const ValueKey('progress_metric_failed'),
+      label: l10n.progressFailedSessionsCount,
+      value: '$failedCount',
+      icon: Icons.error_outline,
+    );
+
+    final shouldUseMetricRow = context.gridColumns() > 1;
+    if (shouldUseMetricRow) {
+      return Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: activeMetric),
+              const MxGap(MxSpace.md),
+              Expanded(child: readyMetric),
+              const MxGap(MxSpace.md),
+              Expanded(child: failedMetric),
+            ],
+          ),
+          const MxGap(MxSpace.lg),
+        ],
+      );
+    }
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _MetricCard(
-          label: l10n.progressActiveSessionsCount,
-          value: '$activeCount',
-          icon: Icons.play_circle_outline,
-        ),
+        activeMetric,
         const MxGap(MxSpace.md),
-        _MetricCard(
-          label: l10n.progressReadySessionsCount,
-          value: '$readyCount',
-          icon: Icons.flag_outlined,
-        ),
+        readyMetric,
         const MxGap(MxSpace.md),
-        _MetricCard(
-          label: l10n.progressFailedSessionsCount,
-          value: '$failedCount',
-          icon: Icons.error_outline,
-        ),
+        failedMetric,
         const MxGap(MxSpace.lg),
       ],
     );
@@ -169,6 +196,7 @@ class _MetricCard extends StatelessWidget {
     required this.label,
     required this.value,
     required this.icon,
+    super.key,
   });
 
   final String label;

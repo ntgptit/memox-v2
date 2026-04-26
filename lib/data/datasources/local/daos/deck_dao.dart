@@ -28,7 +28,7 @@ final class DeckDao {
     final statement = _database.select(_database.decks)
       ..where((table) => table.folderId.equals(folderId));
     if (query.hasSearchTerm) {
-      final pattern = '%${query.normalizedSearchTerm.toLowerCase()}%';
+      final pattern = '%${query.normalizedSearchTerm}%';
       statement.where((table) => table.name.lower().like(pattern));
     }
     switch (query.sortMode) {

@@ -145,6 +145,43 @@
   "settingsLocaleSystem": "System",
   "settingsLocaleEnglish": "English",
   "settingsLocaleVietnamese": "Vietnamese",
+  "settingsSpeechTitle": "Speech",
+  "settingsSpeechLabel": "Korean and English pronunciation support",
+  "settingsSpeechLoading": "Loading speech settings",
+  "settingsSpeechAutoPlayLabel": "Auto-play in study",
+  "settingsSpeechAutoPlaySubtitle": "Automatically pronounce cards after study transitions.",
+  "settingsSpeechFrontLanguageLabel": "Front language",
+  "settingsSpeechKorean": "Korean",
+  "settingsSpeechEnglish": "English",
+  "settingsSpeechRateLabel": "Speech rate",
+  "settingsSpeechRateValue": "{value}x",
+  "@settingsSpeechRateValue": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "settingsSpeechFrontVoiceLabel": "Front voice",
+  "settingsSpeechSystemVoice": "System voice",
+  "settingsSpeechLoadingVoices": "Loading voices...",
+  "settingsSpeechNoVoices": "No {language} voice was reported by this device.",
+  "@settingsSpeechNoVoices": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+  "settingsSpeechPreviewKorean": "Preview Korean",
+  "settingsSpeechPreviewEnglish": "Preview English",
+  "settingsSpeechPreviewSelected": "Preview audio",
+  "settingsSpeechVoiceOptions": "Voice options",
+  "settingsSpeechHideVoiceOptions": "Hide voice options",
+  "settingsSpeechKoreanPreviewText": "안녕하세요",
+  "settingsSpeechEnglishPreviewText": "Hello",
+  "settingsSpeechPreviewTextLabel": "Test text",
+  "settingsSpeechPreviewTextHelper": "Leave empty to use the default sample.",
+  "settingsSpeechPreviewTextHint": "Type or paste any text to test...",
+  "settingsSpeechPreviewClearTooltip": "Clear test text",
   "settingsUpdatedMessage": "Settings updated.",
   "appRouterErrorTitle": "Navigation error",
   "errorConfiguration": "The app configuration is invalid.",
@@ -362,6 +399,7 @@
   "studyMoreActionsTooltip": "More actions",
   "studyEditCardTooltip": "Edit card",
   "studyCardAudioTooltip": "Play card audio",
+  "studyStopAudioTooltip": "Stop audio",
   "studyReviewTextSettingsTooltip": "Text settings",
   "studyReviewAudioTooltip": "Audio",
   "studyReviewMoreActionsTooltip": "More actions",
@@ -427,10 +465,23 @@
   "studyTypeMatchingAnswer": "Type the matching answer.",
   "studyAnswerLabel": "Answer",
   "studySubmitAnswer": "Submit",
+  "studyHelpAction": "Help",
+  "studyCheckAnswerAction": "Check",
+  "studyFillNoAnswerLabel": "No answer entered",
   "studyCorrectAction": "Correct",
   "studyIncorrectAction": "Incorrect",
   "studyRememberedAction": "Remembered",
   "studyForgotAction": "Forgot",
+  "studyShowAnswerAction": "Show",
+  "studyShowAnswerCountdownAction": "Show ({seconds}s)",
+  "@studyShowAnswerCountdownAction": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "studyNextAction": "Next",
   "studyAnswerCorrectTitle": "Correct",
   "studyAnswerIncorrectTitle": "Not quite",
   "studyCorrectAnswerLabel": "Correct answer: {answer}",

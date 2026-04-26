@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
+import '../../../core/utils/string_utils.dart';
 import '../layouts/mx_gap.dart';
 import '../widgets/mx_search_field.dart';
 import 'mx_action_sheet_list.dart';
@@ -102,7 +103,7 @@ class _MxDestinationPickerSheetState<T>
     text: widget.initialQuery,
   );
 
-  String get _query => _controller.text.trim().toLowerCase();
+  String get _query => StringUtils.normalizedForSearch(_controller.text);
 
   @override
   void dispose() {
@@ -160,13 +161,14 @@ class _MxDestinationPickerSheetState<T>
   bool _matchesQuery(MxDestinationOption<T> destination, String query) {
     if (query.isEmpty) return true;
 
-    final haystack = [
-      destination.title,
-      if (destination.subtitle != null) destination.subtitle!,
-      ...destination.searchTerms,
-    ].join(' ').toLowerCase();
-
-    return haystack.contains(query);
+    return StringUtils.containsNormalized(
+      [
+        destination.title,
+        if (destination.subtitle != null) destination.subtitle!,
+        ...destination.searchTerms,
+      ].join(' '),
+      query,
+    );
   }
 }
 

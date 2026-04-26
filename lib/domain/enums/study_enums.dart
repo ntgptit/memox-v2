@@ -26,6 +26,8 @@ enum StudyFlow {
   final String storageValue;
 }
 
+enum StudyFinalizePolicy { newStudy, srsReview }
+
 enum StudyMode {
   review('review'),
   match('match'),
@@ -74,9 +76,7 @@ enum SessionItemStatus {
 
 enum RawStudyResult {
   correct('correct'),
-  incorrect('incorrect'),
-  remembered('remembered'),
-  forgot('forgot');
+  incorrect('incorrect');
 
   const RawStudyResult(this.storageValue);
 
@@ -85,15 +85,13 @@ enum RawStudyResult {
 
 enum AttemptGrade {
   correct('correct'),
-  incorrect('incorrect'),
-  remembered('remembered'),
-  forgot('forgot');
+  incorrect('incorrect');
 
   const AttemptGrade(this.storageValue);
 
   final String storageValue;
 
-  bool get isPassing => this == correct || this == remembered;
+  bool get isPassing => this == correct;
 
   bool get isFailing => !isPassing;
 }

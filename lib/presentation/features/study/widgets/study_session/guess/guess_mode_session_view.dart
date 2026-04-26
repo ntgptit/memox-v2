@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../../../domain/services/tts_service.dart';
 import '../../../../../../domain/enums/study_enums.dart';
 import '../../../../../../domain/study/entities/study_models.dart';
 import '../../../../../shared/layouts/mx_gap.dart';
@@ -10,8 +12,10 @@ import '../../../../../shared/layouts/mx_space.dart';
 import '../../../../../shared/widgets/mx_card.dart';
 import '../../../../../shared/widgets/mx_icon_button.dart';
 import '../../../../../shared/widgets/mx_text.dart';
+import '../study_mode_local_round.dart';
 import '../study_mode_progress_row.dart';
 import '../study_mode_session_scaffold.dart';
+import '../study_speak_button.dart';
 import 'guess_motion.dart';
 import 'guess_option_models.dart';
 import 'guess_option_tile.dart';
@@ -19,41 +23,52 @@ import 'guess_option_tile.dart';
 class GuessModeSessionView extends StatefulWidget {
   const GuessModeSessionView({
     required this.snapshot,
-    required this.answerOptions,
-    required this.progress,
     required this.isSubmitting,
     required this.onSubmit,
     super.key,
   });
 
   final StudySessionSnapshot snapshot;
-  final List<StudyFlashcardRef> answerOptions;
-  final double progress;
   final bool isSubmitting;
-  final Future<bool> Function(AttemptGrade grade) onSubmit;
+  final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
 
   @override
   State<GuessModeSessionView> createState() => _GuessModeSessionViewState();
 }
 
 class _GuessModeSessionViewState extends State<GuessModeSessionView> {
+  String? _roundKey;
+  int _itemIndex = 0;
+  Map<String, AttemptGrade> _stagedGrades = const <String, AttemptGrade>{};
   String? _selectedOptionId;
   bool _isResolving = false;
   bool _hasSubmitted = false;
+  bool _isLocalSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _resetRound(_roundItems);
+  }
 
   @override
   void didUpdateWidget(covariant GuessModeSessionView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.snapshot.currentItem?.id != widget.snapshot.currentItem?.id) {
-      _resetSelection();
+    final items = _roundItems;
+    final nextRoundKey = modeRoundKey(widget.snapshot, items);
+    if (_roundKey != nextRoundKey) {
+      _resetRound(items);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final item = widget.snapshot.currentItem;
-    final progress = widget.progress.clamp(0, 1).toDouble();
+    final item = _currentItem;
+    final progress = overallStudyProgress(
+      snapshot: widget.snapshot,
+      localCorrectCount: localCorrectGradeCount(_stagedGrades),
+    ).clamp(0, 1).toDouble();
     final percent = (progress * 100).round();
     if (item == null) {
       return StudyModeSessionScaffold(
@@ -67,6 +82,11 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          StudyAutoSpeakEffect(
+            triggerKey: 'guess:$_itemIndex:${item.id}',
+            text: item.flashcard.front,
+            side: TtsTextSide.front,
+          ),
           StudyModeProgressRow(
             value: progress,
             label: l10n.commonPercentValue(percent),
@@ -88,20 +108,45 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     );
   }
 
-  bool get _isLocked => widget.isSubmitting || _isResolving || _hasSubmitted;
+  bool get _isLocked =>
+      widget.isSubmitting ||
+      _isResolving ||
+      _hasSubmitted ||
+      _isLocalSubmitting;
 
   List<StudyFlashcardRef> get _options {
-    final item = widget.snapshot.currentItem;
+    final item = _currentItem;
     if (item == null) {
       return const <StudyFlashcardRef>[];
     }
-    final hasCurrent = widget.answerOptions.any(
-      (option) => option.id == item.flashcard.id,
+    final distractors = widget.snapshot.sessionFlashcards
+        .where((flashcard) => flashcard.id != item.flashcard.id)
+        .toList(growable: true);
+    distractors.shuffle(
+      math.Random(
+        _stableSeed(
+          '${widget.snapshot.session.id}:${item.id}:${item.studyMode.storageValue}:${item.flashcard.id}',
+        ),
+      ),
     );
-    if (hasCurrent) {
-      return widget.answerOptions;
+    final optionIds = <String>{
+      item.flashcard.id,
+      for (final distractor in distractors.take(4)) distractor.id,
+    };
+    final options = widget.snapshot.sessionFlashcards
+        .where((flashcard) => optionIds.contains(flashcard.id))
+        .toList(growable: true);
+    if (!widget.snapshot.session.settings.shuffleAnswers) {
+      return options;
     }
-    return [item.flashcard, ...widget.answerOptions];
+    options.shuffle(
+      math.Random(
+        _stableSeed(
+          '${item.id}:${item.flashcard.id}:${widget.snapshot.session.settings.shuffleAnswers}',
+        ),
+      ),
+    );
+    return options;
   }
 
   GuessOptionState _optionState(StudyFlashcardRef option) {
@@ -109,7 +154,7 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     if (selectedOptionId == null) {
       return GuessOptionState.idle;
     }
-    final correctOptionId = widget.snapshot.currentItem?.flashcard.id;
+    final correctOptionId = _currentItem?.flashcard.id;
     if (option.id == correctOptionId) {
       return GuessOptionState.success;
     }
@@ -123,7 +168,7 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     if (_isLocked) {
       return;
     }
-    final current = widget.snapshot.currentItem;
+    final current = _currentItem;
     if (current == null) {
       return;
     }
@@ -133,28 +178,86 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     setState(() {
       _selectedOptionId = option.id;
       _isResolving = true;
-      _hasSubmitted = true;
     });
-    unawaited(_submitAfterFeedback(grade));
+    unawaited(_stageAfterFeedback(current, grade));
   }
 
-  Future<void> _submitAfterFeedback(AttemptGrade grade) async {
+  Future<void> _stageAfterFeedback(
+    StudySessionItem item,
+    AttemptGrade grade,
+  ) async {
     await Future<void>.delayed(guessFeedbackDelay);
     if (!mounted) {
       return;
     }
-    final success = await widget.onSubmit(grade);
+    final nextGrades = <String, AttemptGrade>{..._stagedGrades, item.id: grade};
+    if (!_isLastItem) {
+      setState(() {
+        _stagedGrades = nextGrades;
+        _itemIndex += 1;
+        _resetSelection();
+      });
+      return;
+    }
+
+    setState(() {
+      _stagedGrades = nextGrades;
+      _isResolving = false;
+      _isLocalSubmitting = true;
+      _hasSubmitted = true;
+    });
+    final success = await widget.onSubmit(nextGrades);
     if (!mounted || success) {
       return;
     }
-    setState(_resetSelection);
+    setState(() {
+      _isLocalSubmitting = false;
+      _hasSubmitted = false;
+      _resetSelection();
+    });
+  }
+
+  List<StudySessionItem> get _roundItems {
+    return pendingModeRoundItems(widget.snapshot);
+  }
+
+  StudySessionItem? get _currentItem {
+    final items = _roundItems;
+    if (items.isEmpty) {
+      return null;
+    }
+    return items[_itemIndex.clamp(0, items.length - 1)];
+  }
+
+  bool get _isLastItem {
+    final items = _roundItems;
+    return items.isEmpty || _itemIndex >= items.length - 1;
+  }
+
+  void _resetRound(List<StudySessionItem> items) {
+    _roundKey = modeRoundKey(widget.snapshot, items);
+    _itemIndex = initialModeRoundIndex(snapshot: widget.snapshot, items: items);
+    _stagedGrades = const <String, AttemptGrade>{};
+    _selectedOptionId = null;
+    _isResolving = false;
+    _hasSubmitted = false;
+    _isLocalSubmitting = false;
   }
 
   void _resetSelection() {
     _selectedOptionId = null;
     _isResolving = false;
-    _hasSubmitted = false;
   }
+}
+
+int _stableSeed(String raw) {
+  var hash = 0;
+  for (final codeUnit in raw.codeUnits) {
+    hash = 0x1fffffff & (hash + codeUnit);
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    hash ^= hash >> 6;
+  }
+  return hash;
 }
 
 class _GuessOptionsList extends StatelessWidget {
@@ -242,10 +345,11 @@ class _GuessTargetCard extends StatelessWidget {
           ),
           Align(
             alignment: Alignment.bottomRight,
-            child: MxIconButton(
+            child: StudySpeakButton(
+              key: ValueKey<String>('guess-front-speak-${item.flashcard.id}'),
               tooltip: l10n.studyCardAudioTooltip,
-              icon: Icons.volume_up_outlined,
-              onPressed: null,
+              text: item.flashcard.front,
+              side: TtsTextSide.front,
             ),
           ),
         ],
