@@ -11,6 +11,14 @@ Test file: `test/data/repositories/study_repository_test.dart`
 | DT3 | SRS Review is requested from the today entry point | global pool contains a new card, a due card, and an overdue card | start session is requested with today SRS Review | session batch contains only due and overdue cards from the daily pool | C0+C1 |
 | DT4 | folder entry contains cards in nested deck folders | parent folder has a child folder that contains a deck with new cards | New Study starts from the parent folder | recursive folder scope loads cards from the child deck | C0+C1 |
 
+## Decision table: loadBatch
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | flashcard shuffle is disabled | deck has four eligible new cards with ascending sort order and batch size two | New Study loads the batch | first two sorted cards are selected in query order | C0+C1 |
+| DT2 | flashcard shuffle is enabled for New Study | deck has eight eligible new cards and the repository RNG has advancing state | New Study loads two batches with the same deck and settings | second ordered batch differs from the first because shuffle uses RNG state instead of a stable entry seed | C0+C1 |
+| DT3 | SRS Review keeps overdue priority while shuffling | deck has two overdue cards, two due cards, batch size three, shuffle enabled, and overdue priority enabled | SRS Review loads the batch | overdue cards occupy the first two selected positions and one due card follows | C0+C1 |
+
 ## Decision table: onInsert
 
 | ID | Branch / condition | Given | When | Then | Coverage |

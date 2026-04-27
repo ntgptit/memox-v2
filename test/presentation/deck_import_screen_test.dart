@@ -108,9 +108,13 @@ void main() {
         find.byType(TextFormField),
         'front,back\nXin chao,Hello',
       );
-      await tester.ensureVisible(find.text('Preview'));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('deck_import_preview_action')),
+      );
       await tester.pump();
-      await tester.tap(find.text('Preview'));
+      await tester.tap(
+        find.byKey(const ValueKey('deck_import_preview_action')),
+      );
       await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -157,9 +161,11 @@ void main() {
       find.byType(TextFormField),
       'front,back\nXin chao,Hello',
     );
-    await tester.ensureVisible(find.text('Preview'));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('deck_import_preview_action')),
+    );
     await tester.pump();
-    await tester.tap(find.text('Preview'));
+    await tester.tap(find.byKey(const ValueKey('deck_import_preview_action')));
     await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.text('Import'));
@@ -198,9 +204,11 @@ void main() {
       find.byType(TextFormField),
       'front,back\nXin chao,Hello\nMissing back,',
     );
-    await tester.ensureVisible(find.text('Preview'));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('deck_import_preview_action')),
+    );
     await tester.pump();
-    await tester.tap(find.text('Preview'));
+    await tester.tap(find.byKey(const ValueKey('deck_import_preview_action')));
     await tester.pumpAndSettle();
 
     await tester.drag(
@@ -223,13 +231,17 @@ void main() {
 
     const deckId = 'deck-001';
     final preparation = _largePreparation();
+    var prepareCallCount = 0;
     final repository = _ImportOnlyFlashcardRepository(
       prepareHandler:
           ({
             required format,
             required rawContent,
             required structuredTextSeparator,
-          }) => Future.value(Success(preparation)),
+          }) {
+            prepareCallCount++;
+            return Future.value(Success(preparation));
+          },
     );
 
     await tester.pumpWidget(
@@ -240,14 +252,31 @@ void main() {
     );
 
     await tester.enterText(find.byType(TextFormField), 'front,back\nF,B');
-    await tester.ensureVisible(find.text('Preview'));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('deck_import_preview_action')),
+    );
     await tester.pump();
-    await tester.tap(find.text('Preview'));
+    await tester.tap(find.byKey(const ValueKey('deck_import_preview_action')));
     await tester.pumpAndSettle();
+
+    expect(prepareCallCount, 1);
+    expect(find.byType(CustomScrollView), findsOneWidget);
+    for (var index = 0; index < 8; index++) {
+      if (find
+          .byKey(const ValueKey('deck_import_preview_lazy_items'))
+          .evaluate()
+          .isNotEmpty) {
+        break;
+      }
+      await tester.drag(
+        find.byKey(const ValueKey('deck_import_content')),
+        const Offset(0, -500),
+      );
+      await tester.pumpAndSettle();
+    }
 
     final initiallyBuiltRows = find.byType(MxTermRow).evaluate().length;
 
-    expect(find.byType(CustomScrollView), findsOneWidget);
     expect(
       find.byKey(const ValueKey('deck_import_preview_lazy_items')),
       findsOneWidget,
@@ -321,9 +350,11 @@ void main() {
     await tester.tap(find.text('Slash'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField), '개다 / Clear up');
-    await tester.ensureVisible(find.text('Preview'));
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('deck_import_preview_action')),
+    );
     await tester.pump();
-    await tester.tap(find.text('Preview'));
+    await tester.tap(find.byKey(const ValueKey('deck_import_preview_action')));
     await tester.pumpAndSettle();
 
     expect(capturedFormat, ImportSourceFormat.structuredText);

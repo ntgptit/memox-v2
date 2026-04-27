@@ -26,6 +26,7 @@ final class StudyRepoImpl implements StudyRepo {
     required LocalTransactionRunner transactionRunner,
     required Clock clock,
     required IdGenerator idGenerator,
+    required Random shuffleRandom,
   }) : _database = database,
        _studySessionDao = studySessionDao,
        _studySessionItemDao = studySessionItemDao,
@@ -33,7 +34,8 @@ final class StudyRepoImpl implements StudyRepo {
        _folderDao = folderDao,
        _transactionRunner = transactionRunner,
        _clock = clock,
-       _idGenerator = idGenerator;
+       _idGenerator = idGenerator,
+       _shuffleRandom = shuffleRandom;
 
   final local.AppDatabase _database;
   final StudySessionDao _studySessionDao;
@@ -43,6 +45,7 @@ final class StudyRepoImpl implements StudyRepo {
   final LocalTransactionRunner _transactionRunner;
   final Clock _clock;
   final IdGenerator _idGenerator;
+  final Random _shuffleRandom;
 
   @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
@@ -601,12 +604,12 @@ final class StudyRepoImpl implements StudyRepo {
           attemptsByCard[card.id] ?? const <local.StudyAttempt>[];
       final outcome = switch (finalizePolicy) {
         StudyFinalizePolicy.newStudy => _SrsOutcome(
-              result: ReviewResult.perfect,
-              oldBox: oldBox,
-              newBox: 2,
-              nextDueAt: now + const Duration(days: 1).inMilliseconds,
-              lapseDelta: 0,
-            ),
+          result: ReviewResult.perfect,
+          oldBox: oldBox,
+          newBox: 2,
+          nextDueAt: now + const Duration(days: 1).inMilliseconds,
+          lapseDelta: 0,
+        ),
         StudyFinalizePolicy.srsReview => _reviewOutcome(
           oldBox: oldBox,
           attempts: cardAttempts,
@@ -929,39 +932,24 @@ final class StudyRepoImpl implements StudyRepo {
     if (!context.settings.shuffleFlashcards || cards.length < 2) {
       return;
     }
-    final random = Random(
-      _stableSeed(
-        '${context.entryType.storageValue}:${context.entryRefId}:${context.studyType.storageValue}',
-      ),
-    );
     if (!preserveOverduePriority || !context.settings.prioritizeOverdue) {
-      cards.shuffle(random);
+      cards.shuffle(_shuffleRandom);
       return;
     }
     final overdue =
         cards
             .where((card) => card.sourcePool == SessionItemSourcePool.overdue)
             .toList(growable: true)
-          ..shuffle(random);
+          ..shuffle(_shuffleRandom);
     final due =
         cards
             .where((card) => card.sourcePool != SessionItemSourcePool.overdue)
             .toList(growable: true)
-          ..shuffle(random);
+          ..shuffle(_shuffleRandom);
     cards
       ..clear()
       ..addAll(overdue)
       ..addAll(due);
-  }
-
-  int _stableSeed(String raw) {
-    var hash = 0;
-    for (final codeUnit in raw.codeUnits) {
-      hash = 0x1fffffff & (hash + codeUnit);
-      hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-      hash ^= hash >> 6;
-    }
-    return hash;
   }
 
   int _startOfTodayEpochMillis() {

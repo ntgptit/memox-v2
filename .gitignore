@@ -52,13 +52,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Code generation outputs
-**/*.g.dart
-**/*.freezed.dart
-**/*.mocks.dart
-
-# Localization generation
-lib/l10n/generated/
-
 # Flutter generated registrants
 **/generated_plugin_registrant.dart

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -231,6 +233,112 @@ void main() {
           'nested-card',
         ]);
         expect(snapshot.currentItem?.flashcard.deckId, 'deck-child');
+      },
+    );
+
+    test(
+      'DT1 loadBatch: keeps query order when flashcard shuffle is disabled',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 4);
+
+        final snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 2,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        expect(snapshot.sessionFlashcards.map((card) => card.id), <String>[
+          'card-1',
+          'card-2',
+        ]);
+      },
+    );
+
+    test(
+      'DT2 loadBatch: advances RNG state for repeated New Study shuffle',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 8);
+        const context = StudyContext(
+          entryType: StudyEntryType.deck,
+          entryRefId: 'deck-1',
+          studyType: StudyType.newStudy,
+          settings: StudySettingsSnapshot(
+            batchSize: 8,
+            shuffleFlashcards: true,
+            shuffleAnswers: false,
+            prioritizeOverdue: true,
+          ),
+        );
+
+        final first = await harness.start.execute(context);
+        final second = await harness.start.execute(context);
+        final firstIds = first.sessionFlashcards
+            .map((card) => card.id)
+            .toList(growable: false);
+        final secondIds = second.sessionFlashcards
+            .map((card) => card.id)
+            .toList(growable: false);
+
+        expect(firstIds, isNot(secondIds));
+        expect(firstIds.toSet(), secondIds.toSet());
+      },
+    );
+
+    test(
+      'DT3 loadBatch: keeps overdue priority when SRS Review shuffle is enabled',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 4);
+        final now = DateTime.utc(2026, 4, 24, 9).millisecondsSinceEpoch;
+        for (final cardId in <String>['card-1', 'card-2']) {
+          await (harness.database.update(harness.database.flashcardProgress)
+                ..where((table) => table.flashcardId.equals(cardId)))
+              .write(FlashcardProgressCompanion(dueAt: Value(now)));
+        }
+        for (final cardId in <String>['card-3', 'card-4']) {
+          await (harness.database.update(
+            harness.database.flashcardProgress,
+          )..where((table) => table.flashcardId.equals(cardId))).write(
+            FlashcardProgressCompanion(
+              dueAt: Value(now - Duration.millisecondsPerDay),
+            ),
+          );
+        }
+
+        final snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.srsReview,
+            settings: StudySettingsSnapshot(
+              batchSize: 3,
+              shuffleFlashcards: true,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        final ids = snapshot.sessionFlashcards
+            .map((card) => card.id)
+            .toList(growable: false);
+        final sourcePools = snapshot.sessionFlashcards
+            .map((card) => card.sourcePool)
+            .toList(growable: false);
+
+        expect(ids.take(2).toSet(), <String>{'card-3', 'card-4'});
+        expect(<String>{'card-1', 'card-2'}, contains(ids[2]));
+        expect(sourcePools, <SessionItemSourcePool>[
+          SessionItemSourcePool.overdue,
+          SessionItemSourcePool.overdue,
+          SessionItemSourcePool.due,
+        ]);
       },
     );
 
@@ -2065,6 +2173,7 @@ final class _StudyHarness {
       transactionRunner: transactionRunner,
       clock: clock,
       idGenerator: idGenerator,
+      shuffleRandom: Random(7),
     );
     final factory = StudyStrategyFactory(const <StudyStrategy>[
       NewStudyStrategy(),

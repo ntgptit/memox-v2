@@ -325,6 +325,7 @@ class _ImportSubmitRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         MxSecondaryButton(
+          key: const ValueKey('deck_import_preview_action'),
           label: previewLabel,
           leadingIcon: Icons.preview_outlined,
           variant: MxSecondaryVariant.outlined,
@@ -350,6 +351,7 @@ class _ImportSubmitRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         MxSecondaryButton(
+          key: const ValueKey('deck_import_preview_action'),
           label: previewLabel,
           leadingIcon: Icons.preview_outlined,
           variant: MxSecondaryVariant.outlined,

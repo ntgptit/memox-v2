@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -61,6 +63,11 @@ StudyModeStrategyFactory studyModeStrategyFactory(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+Random studyShuffleRandom(Ref ref) {
+  return Random();
+}
+
+@Riverpod(keepAlive: true)
 StudyRepo studyRepo(Ref ref) {
   return StudyRepoImpl(
     database: ref.watch(appDatabaseProvider),
@@ -71,6 +78,7 @@ StudyRepo studyRepo(Ref ref) {
     transactionRunner: ref.watch(localTransactionRunnerProvider),
     clock: ref.watch(clockProvider),
     idGenerator: ref.watch(idGeneratorProvider),
+    shuffleRandom: ref.watch(studyShuffleRandomProvider),
   );
 }
 

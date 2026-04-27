@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -1715,6 +1717,7 @@ class _StudyDriver {
       transactionRunner: transactionRunner,
       clock: clock,
       idGenerator: ids,
+      shuffleRandom: Random(7),
     );
   }
 
