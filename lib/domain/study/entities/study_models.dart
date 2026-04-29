@@ -133,10 +133,14 @@ final class StudySummary {
     required this.increasedBoxCount,
     required this.decreasedBoxCount,
     required this.remainingCount,
+    this.masteredCardCount = 0,
+    this.retryCardCount = 0,
     this.totalModeCount = 1,
   });
 
   final int totalCards;
+  final int masteredCardCount;
+  final int retryCardCount;
   final int completedAttempts;
   final int correctAttempts;
   final int incorrectAttempts;
@@ -145,9 +149,15 @@ final class StudySummary {
   final int remainingCount;
   final int totalModeCount;
 
-  StudySummary copyWith({int? totalModeCount}) {
+  StudySummary copyWith({
+    int? masteredCardCount,
+    int? retryCardCount,
+    int? totalModeCount,
+  }) {
     return StudySummary(
       totalCards: totalCards,
+      masteredCardCount: masteredCardCount ?? this.masteredCardCount,
+      retryCardCount: retryCardCount ?? this.retryCardCount,
       completedAttempts: completedAttempts,
       correctAttempts: correctAttempts,
       incorrectAttempts: incorrectAttempts,

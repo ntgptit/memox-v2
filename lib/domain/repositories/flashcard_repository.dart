@@ -25,6 +25,8 @@ abstract interface class FlashcardRepository {
   Future<Result<FlashcardEntity>> updateFlashcard({
     required String flashcardId,
     required FlashcardDraft draft,
+    FlashcardProgressEditPolicy progressPolicy =
+        FlashcardProgressEditPolicy.keepProgress,
   });
 
   Future<Result<void>> deleteFlashcards(List<String> flashcardIds);
@@ -40,8 +42,11 @@ abstract interface class FlashcardRepository {
   });
 
   Future<Result<FlashcardImportPreparation>> prepareImport({
+    required String deckId,
     required ImportSourceFormat format,
     required String rawContent,
+    FlashcardImportDuplicatePolicy duplicatePolicy =
+        FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
   });

@@ -581,6 +581,40 @@ void main() {
   );
 
   testWidgets(
+    'DT1 onSelect: active mode cancel opens confirmation before mutation',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider(
+              'session-001',
+            ).overrideWith((ref) => Future.value(_fillSnapshot)),
+          ],
+          child: const _TestApp(
+            child: StudySessionScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await _pumpStudyScreenData(tester);
+
+      expect(find.text('Fill'), findsOneWidget);
+      expect(find.byTooltip('Cancel session'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Cancel session'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cancel this session?'), findsOneWidget);
+      expect(
+        find.text(
+          'Your current study session will stop and you will be taken to '
+          'the result screen.',
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
     'DT1 onUpdate: single-card review auto-submits after two seconds',
     (tester) async {
       final repo = _BatchAnswerStudyRepo(_singleReviewSnapshot);

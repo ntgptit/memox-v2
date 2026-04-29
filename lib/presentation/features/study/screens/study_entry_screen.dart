@@ -4,9 +4,11 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/study/study_settings_policy.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
+import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
@@ -104,6 +106,8 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
               const MxGap(MxSpace.xl),
               _SettingsCard(
                 settings: _effectiveSettings(state),
+                minBatchSize: _minBatchSize(_effectiveType(state)),
+                maxBatchSize: _maxBatchSize(_effectiveType(state)),
                 onBatchSizeChanged: (value) => setState(() {
                   _batchSize = value;
                 }),
@@ -121,10 +125,8 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
               MxPrimaryButton(
                 label: state.resumeCandidate == null
                     ? l10n.studyStartAction
-                    : l10n.studyRestartAction,
-                leadingIcon: state.resumeCandidate == null
-                    ? Icons.play_arrow_rounded
-                    : Icons.restart_alt_rounded,
+                    : l10n.studyStartNewSessionAction,
+                leadingIcon: Icons.play_arrow_rounded,
                 isLoading: actionState.isLoading,
                 fullWidth: true,
                 onPressed: () => _start(state),
@@ -147,8 +149,9 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
     final base = _effectiveType(state) == StudyType.newStudy
         ? state.newStudyDefaults
         : state.reviewDefaults;
+    final studyType = _effectiveType(state);
     return StudySettingsSnapshot(
-      batchSize: _batchSize ?? base.batchSize,
+      batchSize: _clampBatchSize(_batchSize ?? base.batchSize, studyType),
       shuffleFlashcards: _shuffleFlashcards ?? base.shuffleFlashcards,
       shuffleAnswers: _shuffleAnswers ?? base.shuffleAnswers,
       prioritizeOverdue: _prioritizeOverdue ?? base.prioritizeOverdue,
@@ -156,6 +159,33 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
   }
 
   Future<void> _start(StudyEntryState state) async {
+    final restartedFromSessionId = state.resumeCandidate?.session.id;
+    if (restartedFromSessionId != null) {
+      final shouldStart = await _confirmStartNewSession();
+      if (!mounted || !shouldStart) {
+        return;
+      }
+    }
+
+    await _startSession(state, restartedFromSessionId);
+  }
+
+  Future<bool> _confirmStartNewSession() {
+    final l10n = AppLocalizations.of(context);
+    return MxConfirmationDialog.show(
+      context: context,
+      title: l10n.studyStartNewSessionConfirmTitle,
+      message: l10n.studyStartNewSessionConfirmMessage,
+      confirmLabel: l10n.studyStartNewSessionAction,
+      icon: Icons.play_arrow_rounded,
+      tone: MxConfirmationTone.danger,
+    );
+  }
+
+  Future<void> _startSession(
+    StudyEntryState state,
+    String? restartedFromSessionId,
+  ) async {
     final result = await ref
         .read(
           studyEntryActionControllerProvider(
@@ -166,7 +196,7 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
         .start(
           studyType: _effectiveType(state),
           settings: _effectiveSettings(state),
-          restartedFromSessionId: state.resumeCandidate?.session.id,
+          restartedFromSessionId: restartedFromSessionId,
         );
     if (!mounted || result == null) {
       return;
@@ -182,6 +212,18 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
     }
     context.goStudySession(sessionId);
   }
+}
+
+int _clampBatchSize(int value, StudyType studyType) {
+  return StudySettingsPolicy.clampBatchSize(value, studyType);
+}
+
+int _minBatchSize(StudyType studyType) {
+  return StudySettingsPolicy.minBatchSize(studyType);
+}
+
+int _maxBatchSize(StudyType studyType) {
+  return StudySettingsPolicy.maxBatchSize(studyType);
 }
 
 class _ResumeCard extends StatelessWidget {
@@ -205,7 +247,7 @@ class _ResumeCard extends StatelessWidget {
           ),
           const MxGap(MxSpace.md),
           MxSecondaryButton(
-            label: l10n.studyResumeAction,
+            label: l10n.studyContinueSessionAction,
             leadingIcon: Icons.history_rounded,
             onPressed: () => context.goStudySession(candidate.session.id),
           ),
@@ -266,6 +308,8 @@ class _FlowCard extends StatelessWidget {
 class _SettingsCard extends StatelessWidget {
   const _SettingsCard({
     required this.settings,
+    required this.minBatchSize,
+    required this.maxBatchSize,
     required this.onBatchSizeChanged,
     required this.onShuffleFlashcardsChanged,
     required this.onShuffleAnswersChanged,
@@ -273,6 +317,8 @@ class _SettingsCard extends StatelessWidget {
   });
 
   final StudySettingsSnapshot settings;
+  final int minBatchSize;
+  final int maxBatchSize;
   final ValueChanged<int> onBatchSizeChanged;
   final ValueChanged<bool> onShuffleFlashcardsChanged;
   final ValueChanged<bool> onShuffleAnswersChanged;
@@ -297,18 +343,25 @@ class _SettingsCard extends StatelessWidget {
               ),
               MxIconButton(
                 tooltip: l10n.studyDecreaseBatch,
-                onPressed: settings.batchSize <= 1
+                onPressed: settings.batchSize <= minBatchSize
                     ? null
                     : () => onBatchSizeChanged(settings.batchSize - 1),
                 icon: Icons.remove_rounded,
               ),
               MxIconButton(
                 tooltip: l10n.studyIncreaseBatch,
-                onPressed: () => onBatchSizeChanged(settings.batchSize + 1),
+                onPressed: settings.batchSize >= maxBatchSize
+                    ? null
+                    : () => onBatchSizeChanged(settings.batchSize + 1),
                 icon: Icons.add_rounded,
               ),
             ],
           ),
+          MxText(
+            l10n.studyBatchSizeRangeLabel(minBatchSize, maxBatchSize),
+            role: MxTextRole.formHelper,
+          ),
+          const MxGap(MxSpace.sm),
           MxToggle(
             value: settings.shuffleFlashcards,
             onChanged: onShuffleFlashcardsChanged,

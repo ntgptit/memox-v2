@@ -88,6 +88,134 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets(
+    'DT3 onDisplay: shows separate continue and start-new actions for resume candidate',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_resumeEntryState)),
+          ],
+          child: const _TestApp(
+            child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Session in progress'), findsOneWidget);
+      expect(find.text('Continue session'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Start new session'),
+        300,
+        scrollable: find.byType(Scrollable),
+      );
+      expect(find.text('Start new session'), findsOneWidget);
+      expect(find.text('Restart'), findsNothing);
+    },
+  );
+
+  testWidgets('DT4 onDisplay: keeps New Study batch size within 5-20', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyEntryStateProvider(
+            'deck',
+            'deck-001',
+          ).overrideWith((ref) => Future.value(_deckEntryState)),
+        ],
+        child: const _TestApp(
+          child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Batch size: 20'), findsOneWidget);
+    expect(find.text('5-20 cards'), findsOneWidget);
+
+    await tester.tap(
+      find.byTooltip('Increase batch size'),
+      warnIfMissed: false,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Batch size: 20'), findsOneWidget);
+    expect(find.text('Batch size: 21'), findsNothing);
+  });
+
+  testWidgets('DT5 onDisplay: keeps SRS Review batch size within 5-50', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyEntryStateProvider(
+            'today',
+            null,
+          ).overrideWith((ref) => Future.value(_todayMaxReviewEntryState)),
+        ],
+        child: const _TestApp(
+          child: StudyEntryScreen(entryType: 'today', entryRefId: null),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Batch size: 50'), findsOneWidget);
+    expect(find.text('5-50 cards'), findsOneWidget);
+
+    await tester.tap(
+      find.byTooltip('Increase batch size'),
+      warnIfMissed: false,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Batch size: 50'), findsOneWidget);
+    expect(find.text('Batch size: 51'), findsNothing);
+  });
+
+  testWidgets(
+    'DT1 onSelect: confirms before starting new session over a resume candidate',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_resumeEntryState)),
+          ],
+          child: const _TestApp(
+            child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.text('Start new session'),
+        300,
+        scrollable: find.byType(Scrollable),
+      );
+      await tester.tap(find.text('Start new session'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Start a new session?'), findsOneWidget);
+      expect(
+        find.text(
+          'Starting a new session will cancel the current unfinished session.',
+        ),
+        findsOneWidget,
+      );
+    },
+  );
 }
 
 const _newDefaults = StudySettingsSnapshot(
@@ -118,6 +246,75 @@ const _todayEntryState = StudyEntryState(
   newStudyDefaults: _newDefaults,
   reviewDefaults: _reviewDefaults,
   resumeCandidate: null,
+);
+
+const _reviewMaxDefaults = StudySettingsSnapshot(
+  batchSize: 50,
+  shuffleFlashcards: false,
+  shuffleAnswers: false,
+  prioritizeOverdue: true,
+);
+
+const _todayMaxReviewEntryState = StudyEntryState(
+  entryType: StudyEntryType.today,
+  entryRefId: null,
+  newStudyDefaults: _newDefaults,
+  reviewDefaults: _reviewMaxDefaults,
+  resumeCandidate: null,
+);
+
+const _resumeEntryState = StudyEntryState(
+  entryType: StudyEntryType.deck,
+  entryRefId: 'deck-001',
+  newStudyDefaults: _newDefaults,
+  reviewDefaults: _reviewDefaults,
+  resumeCandidate: _resumeSnapshot,
+);
+
+const _resumeSnapshot = StudySessionSnapshot(
+  session: StudySession(
+    id: 'session-001',
+    entryType: StudyEntryType.deck,
+    entryRefId: 'deck-001',
+    studyType: StudyType.newStudy,
+    studyFlow: StudyFlow.newFullCycle,
+    settings: _newDefaults,
+    status: SessionStatus.inProgress,
+    startedAt: 0,
+    endedAt: null,
+    restartedFromSessionId: null,
+  ),
+  currentItem: StudySessionItem(
+    id: 'item-001',
+    sessionId: 'session-001',
+    flashcard: _resumeFlashcard,
+    studyMode: StudyMode.review,
+    modeOrder: 1,
+    roundIndex: 1,
+    queuePosition: 1,
+    sourcePool: SessionItemSourcePool.newCards,
+    status: SessionItemStatus.pending,
+    completedAt: null,
+  ),
+  sessionFlashcards: [_resumeFlashcard],
+  summary: StudySummary(
+    totalCards: 1,
+    completedAttempts: 0,
+    correctAttempts: 0,
+    incorrectAttempts: 0,
+    increasedBoxCount: 0,
+    decreasedBoxCount: 0,
+    remainingCount: 1,
+  ),
+  canFinalize: false,
+);
+
+const _resumeFlashcard = StudyFlashcardRef(
+  id: 'card-001',
+  deckId: 'deck-001',
+  front: 'Front',
+  back: 'Back',
+  sourcePool: SessionItemSourcePool.newCards,
 );
 
 class _TestApp extends StatelessWidget {

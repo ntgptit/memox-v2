@@ -114,12 +114,15 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     final activeModeView = _modeViewFactory.build(
       snapshot: snapshot,
       isSubmitting: actionState.isLoading,
+      canCancel: canCancel,
       onReviewSubmit: () => ref
           .read(studySessionActionControllerProvider(widget.sessionId).notifier)
           .answerCurrentReviewModeAsCorrect(),
       onBatchSubmit: (itemGrades) => ref
           .read(studySessionActionControllerProvider(widget.sessionId).notifier)
           .answerCurrentModeItemGradesBatch(itemGrades),
+      onCancel: () => _confirmCancel(context),
+      onBack: () => context.popRoute(fallback: context.goLibrary),
     );
     if (activeModeView != null) {
       return activeModeView;

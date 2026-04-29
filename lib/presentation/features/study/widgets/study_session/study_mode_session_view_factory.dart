@@ -15,8 +15,11 @@ typedef _ModeViewBuilder =
     Widget Function({
       required StudySessionSnapshot snapshot,
       required bool isSubmitting,
+      required bool canCancel,
       required Future<bool> Function() onReviewSubmit,
       required StudyModeBatchSubmit onBatchSubmit,
+      required VoidCallback onCancel,
+      required VoidCallback onBack,
     });
 
 final class StudyModeSessionViewFactory {
@@ -28,64 +31,97 @@ final class StudyModeSessionViewFactory {
             ({
               required snapshot,
               required isSubmitting,
+              required canCancel,
               required onReviewSubmit,
               required onBatchSubmit,
+              required onCancel,
+              required onBack,
             }) => ReviewModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
+              canCancel: canCancel,
               onSubmit: onReviewSubmit,
+              onCancel: onCancel,
+              onBack: onBack,
             ),
         StudyMode.match:
             ({
               required snapshot,
               required isSubmitting,
+              required canCancel,
               required onReviewSubmit,
               required onBatchSubmit,
+              required onCancel,
+              required onBack,
             }) => MatchModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
+              canCancel: canCancel,
               onSubmit: onBatchSubmit,
+              onCancel: onCancel,
+              onBack: onBack,
             ),
         StudyMode.guess:
             ({
               required snapshot,
               required isSubmitting,
+              required canCancel,
               required onReviewSubmit,
               required onBatchSubmit,
+              required onCancel,
+              required onBack,
             }) => GuessModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
+              canCancel: canCancel,
               onSubmit: onBatchSubmit,
+              onCancel: onCancel,
+              onBack: onBack,
             ),
         StudyMode.recall:
             ({
               required snapshot,
               required isSubmitting,
+              required canCancel,
               required onReviewSubmit,
               required onBatchSubmit,
+              required onCancel,
+              required onBack,
             }) => RecallModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
+              canCancel: canCancel,
               onSubmit: onBatchSubmit,
+              onCancel: onCancel,
+              onBack: onBack,
             ),
         StudyMode.fill:
             ({
               required snapshot,
               required isSubmitting,
+              required canCancel,
               required onReviewSubmit,
               required onBatchSubmit,
+              required onCancel,
+              required onBack,
             }) => FillModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
+              canCancel: canCancel,
               onSubmit: onBatchSubmit,
+              onCancel: onCancel,
+              onBack: onBack,
             ),
       };
 
   Widget? build({
     required StudySessionSnapshot snapshot,
     required bool isSubmitting,
+    required bool canCancel,
     required Future<bool> Function() onReviewSubmit,
     required StudyModeBatchSubmit onBatchSubmit,
+    required VoidCallback onCancel,
+    required VoidCallback onBack,
   }) {
     final mode = snapshot.currentItem?.studyMode;
     if (mode == null || snapshot.session.status != SessionStatus.inProgress) {
@@ -98,8 +134,11 @@ final class StudyModeSessionViewFactory {
     return builder(
       snapshot: snapshot,
       isSubmitting: isSubmitting,
+      canCancel: canCancel,
       onReviewSubmit: onReviewSubmit,
       onBatchSubmit: onBatchSubmit,
+      onCancel: onCancel,
+      onBack: onBack,
     );
   }
 }

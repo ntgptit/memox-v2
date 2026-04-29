@@ -3,14 +3,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../../../app/router/app_navigation.dart';
-import '../../../../../../core/theme/responsive/app_layout.dart';
 import '../../../../../../domain/services/tts_service.dart';
 import '../../../../../../domain/enums/study_enums.dart';
 import '../../../../../../domain/study/entities/study_models.dart';
-import '../../../../../shared/layouts/mx_content_shell.dart';
 import '../../../../../shared/layouts/mx_gap.dart';
-import '../../../../../shared/layouts/mx_scaffold.dart';
 import '../../../../../shared/layouts/mx_space.dart';
 import '../../../../../shared/widgets/mx_card.dart';
 import '../../../../../shared/widgets/mx_icon_button.dart';
@@ -19,6 +15,7 @@ import '../../../../../shared/widgets/mx_secondary_button.dart';
 import '../../../../../shared/widgets/mx_text.dart';
 import '../study_mode_local_round.dart';
 import '../study_mode_progress_row.dart';
+import '../study_mode_session_scaffold.dart';
 import '../study_speak_button.dart';
 import 'recall_motion.dart';
 
@@ -26,13 +23,19 @@ class RecallModeSessionView extends StatefulWidget {
   const RecallModeSessionView({
     required this.snapshot,
     required this.isSubmitting,
+    required this.canCancel,
     required this.onSubmit,
+    required this.onCancel,
+    required this.onBack,
     super.key,
   });
 
   final StudySessionSnapshot snapshot;
   final bool isSubmitting;
+  final bool canCancel;
   final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
+  final VoidCallback onCancel;
+  final VoidCallback onBack;
 
   @override
   State<RecallModeSessionView> createState() => _RecallModeSessionViewState();
@@ -88,93 +91,70 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
     ).clamp(0, 1).toDouble();
     final percent = (progress * 100).round();
 
-    return MxScaffold(
+    return StudyModeSessionScaffold(
       title: l10n.studyModeRecall,
-      leading: MxIconButton(
-        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        icon: Icons.arrow_back,
-        onPressed: () => context.popRoute(fallback: context.goLibrary),
-      ),
-      actions: [
-        MxIconButton(
-          tooltip: l10n.studyTextSettingsTooltip,
-          icon: Icons.text_fields,
-          onPressed: null,
-        ),
-        MxIconButton(
-          tooltip: l10n.studyAudioTooltip,
-          icon: Icons.volume_up_outlined,
-          onPressed: null,
-        ),
-        MxIconButton(
-          tooltip: l10n.studyMoreActionsTooltip,
-          icon: Icons.more_vert,
-          onPressed: null,
-        ),
-      ],
-      body: MxContentShell(
-        width: MxContentWidth.reading,
-        applyVerticalPadding: true,
-        child: item == null
-            ? const SizedBox.shrink()
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  StudyAutoSpeakEffect(
-                    triggerKey: 'recall-front:$_itemIndex:${item.id}',
-                    text: item.flashcard.front,
-                    side: TtsTextSide.front,
-                  ),
-                  StudyModeProgressRow(
-                    value: progress,
-                    label: l10n.commonPercentValue(percent),
-                  ),
-                  const MxGap(MxSpace.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: _RecallQuestionCard(item: item)),
-                        const MxGap(MxSpace.md),
-                        Expanded(
-                          child: _RecallAnswerCard(
-                            answer: item.flashcard.back,
-                            isRevealed:
-                                _answerState != _RecallAnswerState.hidden,
-                          ),
+      canCancel: widget.canCancel,
+      isActionBusy: widget.isSubmitting,
+      onCancel: widget.onCancel,
+      onBack: widget.onBack,
+      child: item == null
+          ? const SizedBox.shrink()
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                StudyAutoSpeakEffect(
+                  triggerKey: 'recall-front:$_itemIndex:${item.id}',
+                  text: item.flashcard.front,
+                  side: TtsTextSide.front,
+                ),
+                StudyModeProgressRow(
+                  value: progress,
+                  label: l10n.commonPercentValue(percent),
+                ),
+                const MxGap(MxSpace.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: _RecallQuestionCard(item: item)),
+                      const MxGap(MxSpace.md),
+                      Expanded(
+                        child: _RecallAnswerCard(
+                          answer: item.flashcard.back,
+                          isRevealed: _answerState != _RecallAnswerState.hidden,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const MxGap(MxSpace.lg),
-                  AnimatedSwitcher(
-                    duration: recallRevealTransitionDuration,
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SizeTransition(
-                          sizeFactor: animation,
-                          axisAlignment: -1,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: _RecallActionArea(
-                      answerState: _answerState,
-                      timer: _timerController,
-                      isSubmitting: _isBusy,
-                      onShowAnswer: _revealAnswer,
-                      onForgot: () => _stageAnswer(AttemptGrade.incorrect),
-                      onRemembered: () => _stageAnswer(AttemptGrade.correct),
-                      onNextAfterTimeout: () =>
-                          _stageAnswer(AttemptGrade.incorrect),
-                    ),
+                ),
+                const MxGap(MxSpace.lg),
+                AnimatedSwitcher(
+                  duration: recallRevealTransitionDuration,
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SizeTransition(
+                        sizeFactor: animation,
+                        axisAlignment: -1,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: _RecallActionArea(
+                    answerState: _answerState,
+                    timer: _timerController,
+                    isSubmitting: _isBusy,
+                    onShowAnswer: _revealAnswer,
+                    onForgot: () => _stageAnswer(AttemptGrade.incorrect),
+                    onRemembered: () => _stageAnswer(AttemptGrade.correct),
+                    onNextAfterTimeout: () =>
+                        _stageAnswer(AttemptGrade.incorrect),
                   ),
-                ],
-              ),
-      ),
+                ),
+              ],
+            ),
     );
   }
 

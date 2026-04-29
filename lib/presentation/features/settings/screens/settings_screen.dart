@@ -10,6 +10,7 @@ import '../../../shared/widgets/mx_text.dart';
 import '../widgets/appearance_settings_group.dart';
 import '../widgets/language_settings_group.dart';
 import '../widgets/speech_settings_group.dart';
+import '../widgets/study_settings_group.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -31,6 +32,8 @@ class SettingsScreen extends StatelessWidget {
             const AppearanceSettingsGroup(),
             const MxGap(MxSpace.lg),
             const LanguageSettingsGroup(),
+            const MxGap(MxSpace.lg),
+            const StudySettingsGroup(),
             const MxGap(MxSpace.lg),
             const SpeechSettingsGroup(),
           ],

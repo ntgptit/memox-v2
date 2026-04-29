@@ -15,18 +15,21 @@ class FlashcardImportDraftState {
   const FlashcardImportDraftState({
     required this.format,
     required this.structuredTextSeparator,
+    required this.duplicatePolicy,
     required this.rawContent,
     this.preparation,
   });
 
   final ImportSourceFormat format;
   final ImportStructuredTextSeparator structuredTextSeparator;
+  final FlashcardImportDuplicatePolicy duplicatePolicy;
   final String rawContent;
   final FlashcardImportPreparation? preparation;
 
   FlashcardImportDraftState copyWith({
     ImportSourceFormat? format,
     ImportStructuredTextSeparator? structuredTextSeparator,
+    FlashcardImportDuplicatePolicy? duplicatePolicy,
     String? rawContent,
     FlashcardImportPreparation? preparation,
     bool clearPreparation = false,
@@ -35,6 +38,7 @@ class FlashcardImportDraftState {
       format: format ?? this.format,
       structuredTextSeparator:
           structuredTextSeparator ?? this.structuredTextSeparator,
+      duplicatePolicy: duplicatePolicy ?? this.duplicatePolicy,
       rawContent: rawContent ?? this.rawContent,
       preparation: clearPreparation ? null : (preparation ?? this.preparation),
     );
@@ -48,6 +52,7 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
     return const FlashcardImportDraftState(
       format: ImportSourceFormat.csv,
       structuredTextSeparator: ImportStructuredTextSeparator.auto,
+      duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
       rawContent: '',
     );
   }
@@ -71,6 +76,16 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
     );
   }
 
+  void setDuplicatePolicy(FlashcardImportDuplicatePolicy duplicatePolicy) {
+    if (state.duplicatePolicy == duplicatePolicy) {
+      return;
+    }
+    state = state.copyWith(
+      duplicatePolicy: duplicatePolicy,
+      clearPreparation: true,
+    );
+  }
+
   void setRawContent(String rawContent) {
     if (state.rawContent == rawContent) {
       return;
@@ -86,6 +101,7 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
     state = const FlashcardImportDraftState(
       format: ImportSourceFormat.csv,
       structuredTextSeparator: ImportStructuredTextSeparator.auto,
+      duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
       rawContent: '',
     );
   }
@@ -103,8 +119,10 @@ class FlashcardImportController extends _$FlashcardImportController {
     final result = await ref
         .read(prepareFlashcardImportUseCaseProvider)
         .execute(
+          deckId: deckId,
           format: draft.format,
           rawContent: draft.rawContent,
+          duplicatePolicy: draft.duplicatePolicy,
           structuredTextSeparator: draft.structuredTextSeparator,
         );
     if (!ref.mounted) {

@@ -13,6 +13,8 @@ Test file: `test/data/repositories/content_repository_test.dart`
 | DT5 | parent folder mode is decks and subfolder creation is requested | root folder already contains a deck | repository creates a subfolder under the same root | creation fails, no subfolder is written, and the folder remains locked to decks | C0+C1 |
 | DT6 | manual flashcard draft has surrounding whitespace and blank note | deck exists and draft contains padded front/back plus an empty note | repository creates the flashcard | stored content is trimmed, note is null, and SRS progress starts at box 1 without due date | C0+C1 |
 | DT7 | valid CSV import preparation has no validation issues | deck exists and CSV contains two valid flashcard rows | repository commits the prepared import | two flashcards are written in source order and each starts as a new SRS card | C0+C1 |
+| DT8 | import file contains an exact duplicate and a same-front different-back row | deck exists and raw CSV repeats one `front + back` pair while another row reuses only `front` | repository prepares and commits import with MVP duplicate policy | exact duplicate is skipped, same-front different-back row remains importable, and commit writes only importable rows | C0+C1 |
+| DT9 | target deck already contains an exact duplicate | deck contains `hello/xin chao` and import source contains `hello/xin chao` plus `hello/greeting` | repository prepares import with MVP duplicate policy | exact deck duplicate is skipped and same-front different-back row remains importable | C0+C1 |
 
 ## Decision table: onDelete
 
@@ -22,6 +24,13 @@ Test file: `test/data/repositories/content_repository_test.dart`
 | DT2 | parent folder has exactly one deck and that deck is deleted | folder contains one deck with flashcard progress | repository deletes that deck | deck, flashcard, and progress rows are removed and the parent folder unlocks | C0+C1 |
 | DT3 | empty flashcard selection is deleted | deck contains one flashcard and caller passes an empty id list | repository deletes flashcards | no mutation occurs and the existing flashcard remains | C0+C1 |
 | DT4 | bulk delete receives selected flashcards | deck contains selected and unselected flashcards with progress | repository deletes the selected flashcards | selected flashcards and progress are removed while unselected flashcards remain | C0+C1 |
+
+## Decision table: onUpdate
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | learned flashcard content update keeps progress by policy | flashcard has non-default SRS progress | repository updates front/back with `keepProgress` | flashcard content changes and existing progress fields remain unchanged | C0+C1 |
+| DT2 | learned flashcard content update resets progress by policy | flashcard has non-default SRS progress | repository updates front/back with `resetProgress` | flashcard content changes and progress row returns to new-card state | C0+C1 |
 
 ## Decision table: repositoryFlow
 
@@ -42,6 +51,13 @@ Test file: `test/data/repositories/content_repository_test.dart`
 | DT2 | folder search matches a nested folder name | root and child folders exist with the child matching the query | repository queries library overview by search term | matching child folder is returned with parent breadcrumb context | C0+C1 |
 | DT3 | deck sort mode is last studied and some decks have never been studied | folder contains studied and never-studied decks | repository queries decks sorted by last studied | studied deck is ordered first and never-studied deck is placed at the end | C0+C1 |
 | DT4 | flashcard search matches back text | deck contains cards whose back values differ | repository queries flashcards by a term found only in back text | matching flashcard is returned with the deck breadcrumb | C0+C1 |
+
+## Decision table: getLibraryOverview
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | daily study pool contains one overdue learned card, one due-today learned card, one future learned card, and one new card | library has two folders, one deck, four flashcards, and progress rows with overdue, today, and future `due_at` values | repository builds the library overview | `overdueCount=1`, `dueTodayCount=1`, `newCardCount=1`, and `totalFolderCount=2` are returned | C0+C1 |
+| DT2 | root folder subtree contains overdue, due-today, future, and new cards | root folder contains a nested child folder with one deck, four flashcards, and progress rows with overdue, today, future, and null `due_at` values | repository builds the library overview | the root folder item returns `itemCount=4`, `dueCardCount=2`, and `newCardCount=1` | C0+C1 |
 
 ## Decision table: onMove
 

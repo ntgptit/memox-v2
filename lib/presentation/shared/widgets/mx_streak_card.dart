@@ -72,13 +72,18 @@ class MxStreakCard extends StatelessWidget {
           ),
           const MxGap(AppSpacing.xl),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               for (final label in weekDays)
-                Text(
-                  label,
-                  style: textTheme.labelSmall?.copyWith(
-                    color: scheme.onSurfaceVariant,
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -94,12 +99,15 @@ class MxStreakCard extends StatelessWidget {
               borderRadius: AppRadius.borderFull,
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 for (var i = 0; i < 7; i++)
-                  _StreakDay(
-                    date: weekDates[i],
-                    active: activeIndices.contains(i),
+                  Expanded(
+                    child: Center(
+                      child: _StreakDay(
+                        date: weekDates[i],
+                        active: activeIndices.contains(i),
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -125,6 +133,8 @@ class _StreakDay extends StatelessWidget {
       children: [
         Text(
           '$date',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: textTheme.bodyMedium?.copyWith(color: scheme.onSurface),
         ),
         const MxGap(AppSpacing.xxs),

@@ -34,6 +34,7 @@ class MxDestinationPickerSheet<T> extends StatefulWidget {
   const MxDestinationPickerSheet({
     required this.destinations,
     this.selectedValue,
+    this.supportingText,
     this.searchHintText,
     this.emptyLabel,
     this.showSearch = true,
@@ -48,6 +49,7 @@ class MxDestinationPickerSheet<T> extends StatefulWidget {
 
   final List<MxDestinationOption<T>> destinations;
   final T? selectedValue;
+  final String? supportingText;
   final String? searchHintText;
   final String? emptyLabel;
   final bool showSearch;
@@ -61,6 +63,7 @@ class MxDestinationPickerSheet<T> extends StatefulWidget {
     required List<MxDestinationOption<T>> destinations,
     String? title,
     T? selectedValue,
+    String? supportingText,
     String? searchHintText,
     String? emptyLabel,
     bool showSearch = true,
@@ -81,6 +84,7 @@ class MxDestinationPickerSheet<T> extends StatefulWidget {
       child: MxDestinationPickerSheet<T>(
         destinations: destinations,
         selectedValue: selectedValue,
+        supportingText: supportingText,
         searchHintText: searchHintText,
         emptyLabel: emptyLabel,
         showSearch: showSearch,
@@ -144,6 +148,10 @@ class _MxDestinationPickerSheetState<T>
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (widget.supportingText != null) ...[
+          _MxDestinationSupportingText(widget.supportingText!),
+          const MxGap(AppSpacing.md),
+        ],
         if (widget.showSearch) ...[
           MxSearchField(
             controller: _controller,
@@ -168,6 +176,23 @@ class _MxDestinationPickerSheetState<T>
         ...destination.searchTerms,
       ].join(' '),
       query,
+    );
+  }
+}
+
+class _MxDestinationSupportingText extends StatelessWidget {
+  const _MxDestinationSupportingText(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Text(
+      label,
+      style: textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
     );
   }
 }

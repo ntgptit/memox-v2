@@ -192,6 +192,7 @@ void main() {
         final deckId = deck.valueOrNull!.id;
 
         final preparation = await harness.flashcardRepository.prepareImport(
+          deckId: deckId,
           format: ImportSourceFormat.csv,
           rawContent: 'front,back,note\nhello,xin chao,\nbye,tam biet,note',
         );
@@ -226,6 +227,113 @@ void main() {
         ]);
         expect(progressRows.map((row) => row.currentBox), everyElement(1));
         expect(progressRows.map((row) => row.dueAt), everyElement(isNull));
+      },
+    );
+
+    test(
+      'DT8 onInsert: import skips exact file duplicates but keeps same front with different back',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
+
+        final preparation = await harness.flashcardRepository.prepareImport(
+          deckId: deckId,
+          format: ImportSourceFormat.csv,
+          rawContent:
+              'front,back\nhello,xin chao\nhello,xin chao\nhello,greeting',
+        );
+
+        expect(preparation.isSuccess, isTrue);
+        final value = preparation.valueOrNull!;
+        expect(value.previewItems, hasLength(2));
+        expect(value.previewItems.map((item) => item.draft.back), <String>[
+          'xin chao',
+          'greeting',
+        ]);
+        expect(value.skippedDuplicates, hasLength(1));
+        expect(
+          value.skippedDuplicates.single.source,
+          FlashcardImportDuplicateSource.importFile,
+        );
+        expect(value.skippedDuplicates.single.sourceLabel, 'Line 3');
+
+        final commit = await harness.flashcardRepository.commitImport(
+          deckId: deckId,
+          preparation: value,
+        );
+
+        expect(commit.valueOrNull, 2);
+
+        final cards =
+            await (harness.database.select(harness.database.flashcards)
+                  ..where((table) => table.deckId.equals(deckId))
+                  ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+                .get();
+
+        expect(cards.map((card) => card.front), <String>['hello', 'hello']);
+        expect(cards.map((card) => card.back), <String>[
+          'xin chao',
+          'greeting',
+        ]);
+      },
+    );
+
+    test(
+      'DT9 onInsert: import skips exact deck duplicates but keeps same front with different back',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
+        await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+
+        final preparation = await harness.flashcardRepository.prepareImport(
+          deckId: deckId,
+          format: ImportSourceFormat.csv,
+          rawContent: 'front,back\nhello,xin chao\nhello,greeting',
+        );
+
+        expect(preparation.isSuccess, isTrue);
+        final value = preparation.valueOrNull!;
+        expect(value.previewItems, hasLength(1));
+        expect(value.previewItems.single.draft.back, 'greeting');
+        expect(value.skippedDuplicates, hasLength(1));
+        expect(
+          value.skippedDuplicates.single.source,
+          FlashcardImportDuplicateSource.deck,
+        );
+        expect(value.skippedDuplicates.single.sourceLabel, 'Line 2');
+
+        final commit = await harness.flashcardRepository.commitImport(
+          deckId: deckId,
+          preparation: value,
+        );
+
+        expect(commit.valueOrNull, 1);
+
+        final cards =
+            await (harness.database.select(harness.database.flashcards)
+                  ..where((table) => table.deckId.equals(deckId))
+                  ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+                .get();
+
+        expect(cards.map((card) => card.back), <String>[
+          'xin chao',
+          'greeting',
+        ]);
       },
     );
 
@@ -376,6 +484,100 @@ void main() {
         expect(remainingProgress.map((item) => item.flashcardId), <String>[
           second.valueOrNull!.id,
         ]);
+      },
+    );
+
+    test(
+      'DT1 onUpdate: updating learned flashcard keeps progress by policy',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final card = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+        final flashcardId = card.valueOrNull!.id;
+        await _setLearnedProgress(harness, flashcardId: flashcardId);
+
+        final result = await harness.flashcardRepository.updateFlashcard(
+          flashcardId: flashcardId,
+          draft: const FlashcardDraft(front: 'hello updated', back: 'updated'),
+          progressPolicy: FlashcardProgressEditPolicy.keepProgress,
+        );
+
+        expect(result.isSuccess, isTrue);
+
+        final storedCard = await (harness.database.select(
+          harness.database.flashcards,
+        )..where((table) => table.id.equals(flashcardId))).getSingle();
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals(flashcardId))).getSingle();
+        final editorCard = await harness.flashcardRepository.getFlashcard(
+          flashcardId,
+        );
+
+        expect(storedCard.front, 'hello updated');
+        expect(storedCard.back, 'updated');
+        expect(progress.currentBox, 5);
+        expect(progress.reviewCount, 12);
+        expect(progress.lapseCount, 2);
+        expect(progress.lastResult, 'perfect');
+        expect(progress.lastStudiedAt, 1713859200000);
+        expect(progress.dueAt, 1713945600000);
+        expect(editorCard.hasLearningProgress, isTrue);
+      },
+    );
+
+    test(
+      'DT2 onUpdate: updating learned flashcard can reset progress by policy',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final card = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'hello', back: 'xin chao'),
+        );
+        final flashcardId = card.valueOrNull!.id;
+        await _setLearnedProgress(harness, flashcardId: flashcardId);
+
+        final result = await harness.flashcardRepository.updateFlashcard(
+          flashcardId: flashcardId,
+          draft: const FlashcardDraft(front: 'new front', back: 'new back'),
+          progressPolicy: FlashcardProgressEditPolicy.resetProgress,
+        );
+
+        expect(result.isSuccess, isTrue);
+
+        final storedCard = await (harness.database.select(
+          harness.database.flashcards,
+        )..where((table) => table.id.equals(flashcardId))).getSingle();
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals(flashcardId))).getSingle();
+        final editorCard = await harness.flashcardRepository.getFlashcard(
+          flashcardId,
+        );
+
+        expect(storedCard.front, 'new front');
+        expect(storedCard.back, 'new back');
+        expect(progress.currentBox, 1);
+        expect(progress.reviewCount, 0);
+        expect(progress.lapseCount, 0);
+        expect(progress.lastResult, isNull);
+        expect(progress.lastStudiedAt, isNull);
+        expect(progress.dueAt, isNull);
+        expect(editorCard.hasLearningProgress, isFalse);
       },
     );
 
@@ -701,6 +903,121 @@ void main() {
     );
 
     test(
+      'DT1 getLibraryOverview: splits daily pool counts for dashboard',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        await harness.folderRepository.createRootFolder('Archive');
+        final deck = await harness.deckRepository.createDeck(
+          folderId: root.valueOrNull!.id,
+          name: 'N5 Core',
+        );
+        final overdue = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'overdue', back: 'late'),
+        );
+        final dueToday = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'today', back: 'due'),
+        );
+        final future = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'future', back: 'later'),
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'new', back: 'fresh'),
+        );
+        final now = harness.clock.nowEpochMillis();
+        await _setProgressDueAt(
+          harness,
+          flashcardId: overdue.valueOrNull!.id,
+          dueAt: now - const Duration(days: 2).inMilliseconds,
+        );
+        await _setProgressDueAt(
+          harness,
+          flashcardId: dueToday.valueOrNull!.id,
+          dueAt: now,
+        );
+        await _setProgressDueAt(
+          harness,
+          flashcardId: future.valueOrNull!.id,
+          dueAt: now + const Duration(days: 1).inMilliseconds,
+        );
+
+        final overview = await harness.folderRepository.getLibraryOverview(
+          const ContentQuery(),
+        );
+
+        expect(overview.overdueCount, 1);
+        expect(overview.dueTodayCount, 1);
+        expect(overview.newCardCount, 1);
+        expect(overview.totalFolderCount, 2);
+      },
+    );
+
+    test(
+      'DT2 getLibraryOverview: returns folder study availability counts',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final child = await harness.folderRepository.createSubfolder(
+          parentFolderId: root.valueOrNull!.id,
+          name: 'Japanese',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: child.valueOrNull!.id,
+          name: 'N5 Core',
+        );
+        final overdue = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'overdue', back: 'late'),
+        );
+        final dueToday = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'today', back: 'due'),
+        );
+        final future = await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'future', back: 'later'),
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'new', back: 'fresh'),
+        );
+        final now = harness.clock.nowEpochMillis();
+        await _setProgressDueAt(
+          harness,
+          flashcardId: overdue.valueOrNull!.id,
+          dueAt: now - const Duration(days: 2).inMilliseconds,
+        );
+        await _setProgressDueAt(
+          harness,
+          flashcardId: dueToday.valueOrNull!.id,
+          dueAt: now,
+        );
+        await _setProgressDueAt(
+          harness,
+          flashcardId: future.valueOrNull!.id,
+          dueAt: now + const Duration(days: 1).inMilliseconds,
+        );
+
+        final overview = await harness.folderRepository.getLibraryOverview(
+          const ContentQuery(),
+        );
+        final folder = overview.folders.singleWhere(
+          (item) => item.folder.id == root.valueOrNull!.id,
+        );
+
+        expect(folder.itemCount, 4);
+        expect(folder.dueCardCount, 2);
+        expect(folder.newCardCount, 1);
+      },
+    );
+
+    test(
       'DT3 onSearchFilterSort: sort by last studied pushes never-studied decks to the end',
       () async {
         final folder = await harness.folderRepository.createRootFolder(
@@ -792,6 +1109,7 @@ void main() {
         final deckId = deck.valueOrNull!.id;
 
         final preparation = await harness.flashcardRepository.prepareImport(
+          deckId: deckId,
           format: ImportSourceFormat.csv,
           rawContent: 'front,back\nhello,xin chao\nBroken,',
         );
@@ -975,4 +1293,40 @@ void main() {
       },
     );
   });
+}
+
+Future<void> _setProgressDueAt(
+  ContentRepositoryHarness harness, {
+  required String flashcardId,
+  required int dueAt,
+}) {
+  final now = harness.clock.nowEpochMillis();
+  return (harness.database.update(
+    harness.database.flashcardProgress,
+  )..where((table) => table.flashcardId.equals(flashcardId))).write(
+    FlashcardProgressCompanion(
+      currentBox: const Value(2),
+      reviewCount: const Value(1),
+      dueAt: Value(dueAt),
+      updatedAt: Value(now),
+    ),
+  );
+}
+
+Future<void> _setLearnedProgress(
+  ContentRepositoryHarness harness, {
+  required String flashcardId,
+}) {
+  return (harness.database.update(
+    harness.database.flashcardProgress,
+  )..where((table) => table.flashcardId.equals(flashcardId))).write(
+    const FlashcardProgressCompanion(
+      currentBox: Value(5),
+      reviewCount: Value(12),
+      lapseCount: Value(2),
+      lastResult: Value('perfect'),
+      lastStudiedAt: Value(1713859200000),
+      dueAt: Value(1713945600000),
+    ),
+  );
 }

@@ -67,6 +67,8 @@ void main() {
         );
 
         expect(snapshot.session.status, SessionStatus.completed);
+        expect(snapshot.summary.masteredCardCount, 2);
+        expect(snapshot.summary.retryCardCount, 0);
         final progressRows = await harness.database
             .select(harness.database.flashcardProgress)
             .get();
@@ -1490,10 +1492,12 @@ void main() {
         );
         expect(snapshot.session.status, SessionStatus.readyToFinalize);
 
-        await harness.finalize.execute(
+        snapshot = await harness.finalize.execute(
           sessionId: snapshot.session.id,
           studyType: snapshot.session.studyType,
         );
+        expect(snapshot.summary.masteredCardCount, 1);
+        expect(snapshot.summary.retryCardCount, 1);
 
         final progress = await (harness.database.select(
           harness.database.flashcardProgress,

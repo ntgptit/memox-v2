@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../../../app/router/app_navigation.dart';
-import '../../../../../../core/theme/responsive/app_layout.dart';
 import '../../../../../../core/utils/string_utils.dart';
 import '../../../../../../domain/enums/study_enums.dart';
 import '../../../../../../domain/study/entities/study_models.dart';
-import '../../../../../shared/layouts/mx_content_shell.dart';
 import '../../../../../shared/layouts/mx_gap.dart';
-import '../../../../../shared/layouts/mx_scaffold.dart';
 import '../../../../../shared/layouts/mx_space.dart';
-import '../../../../../shared/widgets/mx_icon_button.dart';
 import '../study_mode_local_round.dart';
 import '../study_mode_progress_row.dart';
+import '../study_mode_session_scaffold.dart';
 import 'fill_actions.dart';
 import 'fill_answer_cards.dart';
 import 'fill_motion.dart';
@@ -22,13 +18,19 @@ class FillModeSessionView extends StatefulWidget {
   const FillModeSessionView({
     required this.snapshot,
     required this.isSubmitting,
+    required this.canCancel,
     required this.onSubmit,
+    required this.onCancel,
+    required this.onBack,
     super.key,
   });
 
   final StudySessionSnapshot snapshot;
   final bool isSubmitting;
+  final bool canCancel;
   final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
+  final VoidCallback onCancel;
+  final VoidCallback onBack;
 
   @override
   State<FillModeSessionView> createState() => _FillModeSessionViewState();
@@ -85,112 +87,90 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
     ).clamp(0, 1).toDouble();
     final percent = (progress * 100).round();
 
-    return MxScaffold(
+    return StudyModeSessionScaffold(
       title: l10n.studyModeFill,
       resizeToAvoidBottomInset: true,
-      leading: MxIconButton(
-        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        icon: Icons.arrow_back,
-        onPressed: () => context.popRoute(fallback: context.goLibrary),
-      ),
-      actions: [
-        MxIconButton(
-          tooltip: l10n.studyTextSettingsTooltip,
-          icon: Icons.text_fields,
-          onPressed: null,
-        ),
-        MxIconButton(
-          tooltip: l10n.studyAudioTooltip,
-          icon: Icons.volume_up_outlined,
-          onPressed: null,
-        ),
-        MxIconButton(
-          tooltip: l10n.studyMoreActionsTooltip,
-          icon: Icons.more_vert,
-          onPressed: null,
-        ),
-      ],
-      body: MxContentShell(
-        width: MxContentWidth.reading,
-        applyVerticalPadding: true,
-        child: item == null
-            ? const SizedBox.shrink()
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  StudyModeProgressRow(
-                    value: progress,
-                    label: l10n.commonPercentValue(percent),
-                  ),
-                  const MxGap(MxSpace.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: FillPromptCard(item: item)),
-                        const MxGap(MxSpace.sm),
-                        Expanded(
-                          child: AnimatedSwitcher(
-                            duration: fillStateTransitionDuration,
-                            switchInCurve: fillStateTransitionCurve,
-                            switchOutCurve: fillStateExitCurve,
-                            child: _answerState == _FillAnswerState.input
-                                ? FillInputCard(
-                                    key: const ValueKey<String>(
-                                      'fill-input-card',
-                                    ),
-                                    controller: _controller,
-                                    focusNode: _focusNode,
-                                    isEnabled: !_isBusy,
-                                    canSubmit: _canCheck,
-                                    onSubmit: _checkAnswer,
-                                  )
-                                : FillIncorrectCard(
-                                    key: const ValueKey<String>(
-                                      'fill-result-card',
-                                    ),
-                                    submittedAnswer: _submittedAnswerForDisplay(
-                                      context,
-                                    ),
-                                    correctAnswer: item.flashcard.front,
+      canCancel: widget.canCancel,
+      isActionBusy: widget.isSubmitting,
+      onCancel: widget.onCancel,
+      onBack: widget.onBack,
+      child: item == null
+          ? const SizedBox.shrink()
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                StudyModeProgressRow(
+                  value: progress,
+                  label: l10n.commonPercentValue(percent),
+                ),
+                const MxGap(MxSpace.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: FillPromptCard(item: item)),
+                      const MxGap(MxSpace.sm),
+                      Expanded(
+                        child: AnimatedSwitcher(
+                          duration: fillStateTransitionDuration,
+                          switchInCurve: fillStateTransitionCurve,
+                          switchOutCurve: fillStateExitCurve,
+                          child: _answerState == _FillAnswerState.input
+                              ? FillInputCard(
+                                  key: const ValueKey<String>(
+                                    'fill-input-card',
                                   ),
-                          ),
+                                  controller: _controller,
+                                  focusNode: _focusNode,
+                                  isEnabled: !_isBusy,
+                                  canSubmit: _canCheck,
+                                  onSubmit: _checkAnswer,
+                                )
+                              : FillIncorrectCard(
+                                  key: const ValueKey<String>(
+                                    'fill-result-card',
+                                  ),
+                                  submittedAnswer: _submittedAnswerForDisplay(
+                                    context,
+                                  ),
+                                  correctAnswer: item.flashcard.front,
+                                ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  const MxGap(MxSpace.md),
-                  AnimatedSwitcher(
-                    duration: fillStateTransitionDuration,
-                    switchInCurve: fillStateTransitionCurve,
-                    switchOutCurve: fillStateExitCurve,
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SizeTransition(
-                          sizeFactor: animation,
-                          axisAlignment: -1,
-                          child: child,
+                ),
+                const MxGap(MxSpace.md),
+                AnimatedSwitcher(
+                  duration: fillStateTransitionDuration,
+                  switchInCurve: fillStateTransitionCurve,
+                  switchOutCurve: fillStateExitCurve,
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SizeTransition(
+                        sizeFactor: animation,
+                        axisAlignment: -1,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: _answerState == _FillAnswerState.input
+                      ? FillInputActions(
+                          key: const ValueKey<String>('fill-input-actions'),
+                          canCheck: _canCheck,
+                          isSubmitting: _isBusy,
+                          onHelp: _showHelp,
+                          onCheck: _checkAnswer,
+                        )
+                      : FillResultActions(
+                          key: const ValueKey<String>('fill-result-actions'),
+                          isSubmitting: _isBusy,
+                          onNext: () => _submit(AttemptGrade.incorrect),
                         ),
-                      );
-                    },
-                    child: _answerState == _FillAnswerState.input
-                        ? FillInputActions(
-                            key: const ValueKey<String>('fill-input-actions'),
-                            canCheck: _canCheck,
-                            isSubmitting: _isBusy,
-                            onHelp: _showHelp,
-                            onCheck: _checkAnswer,
-                          )
-                        : FillResultActions(
-                            key: const ValueKey<String>('fill-result-actions'),
-                            isSubmitting: _isBusy,
-                            onNext: () => _submit(AttemptGrade.incorrect),
-                          ),
-                  ),
-                ],
-              ),
-      ),
+                ),
+              ],
+            ),
     );
   }
 

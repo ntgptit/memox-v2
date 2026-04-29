@@ -103,7 +103,14 @@ class MxStudySetTile extends StatelessWidget {
                       ),
                       if (ownerBadge == null) ...[
                         const MxGap(AppSpacing.sm),
-                        MxText(ownerLabel!, role: MxTextRole.tileMeta),
+                        Expanded(
+                          child: MxText(
+                            ownerLabel!,
+                            role: MxTextRole.tileMeta,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                     ],
                   ),

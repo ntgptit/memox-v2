@@ -40,3 +40,20 @@ Each event table must declare coverage intent:
 - `C0+C1`: the row covers both the executed path and the decision branch.
 
 Every event table must cover both `C0` and `C1` across its rows.
+
+## CRUD Flow Coverage
+
+For a persistent entity flow, the Decision Table is incomplete if it only
+documents the happy-path create case. Folder, deck, flashcard, item, record, and
+similar CRUD surfaces must declare rows and executable tests for the full CRUD
+contract exposed by the UI:
+
+- `onInsert`: create or add the entity.
+- `onDisplay`: open and render an existing entity or list row.
+- `onUpdate`: edit, rename, save, move, reorder, or otherwise mutate it.
+- `onDelete`: delete it through the destructive path and confirmation UI when
+  the product requires confirmation.
+
+If a CRUD operation is intentionally unavailable, the markdown must say that
+explicitly before the executable case is omitted. Do not treat a single create
+test as coverage for the flow.

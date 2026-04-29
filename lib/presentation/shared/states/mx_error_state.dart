@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
@@ -32,6 +34,8 @@ class MxErrorState extends StatefulWidget {
 }
 
 class _MxErrorStateState extends State<MxErrorState> {
+  static const double _maxWidth = 420;
+
   bool _showDetails = false;
 
   @override
@@ -40,80 +44,89 @@ class _MxErrorStateState extends State<MxErrorState> {
     final l10n = AppLocalizations.of(context);
 
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 420, // guard:raw-size-reviewed error-state column width
-        ),
-        child: Padding(
-          padding: AppSpacing.screen,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 72, // guard:raw-size-reviewed illustration circle
-                height: 72, // guard:raw-size-reviewed illustration circle
-                decoration: BoxDecoration(
-                  color: scheme.errorContainer,
-                  borderRadius: AppRadius.borderFull,
-                ),
-                alignment: Alignment.center,
-                child: Icon(
-                  widget.icon,
-                  size: AppIconSizes.xl,
-                  color: scheme.onErrorContainer,
-                ),
-              ),
-              const MxGap(AppSpacing.xl),
-              MxText(
-                widget.title ?? l10n.sharedErrorTitle,
-                role: MxTextRole.stateTitle,
-                textAlign: TextAlign.center,
-              ),
-              if (widget.message != null) ...[
-                const MxGap(AppSpacing.sm),
-                MxText(
-                  widget.message!,
-                  role: MxTextRole.stateMessage,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              const MxGap(AppSpacing.xl),
-              Wrap(
-                spacing: AppSpacing.sm,
-                alignment: WrapAlignment.center,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.hasBoundedWidth
+              ? math.min(constraints.maxWidth, _maxWidth)
+              : _maxWidth;
+
+          return SizedBox(
+            width: width,
+            child: Padding(
+              padding: AppSpacing.screen,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (widget.onRetry != null)
-                    MxSecondaryButton(
-                      label: widget.retryLabel ?? l10n.sharedTryAgain,
-                      variant: MxSecondaryVariant.outlined,
-                      leadingIcon: Icons.refresh,
-                      onPressed: widget.onRetry,
+                  Container(
+                    width: 72, // guard:raw-size-reviewed illustration circle
+                    height: 72, // guard:raw-size-reviewed illustration circle
+                    decoration: BoxDecoration(
+                      color: scheme.errorContainer,
+                      borderRadius: AppRadius.borderFull,
                     ),
-                  if (widget.details != null)
-                    MxSecondaryButton(
-                      label: _showDetails
-                          ? l10n.sharedHideDetails
-                          : l10n.sharedShowDetails,
-                      variant: MxSecondaryVariant.text,
-                      onPressed: () =>
-                          setState(() => _showDetails = !_showDetails),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      widget.icon,
+                      size: AppIconSizes.xl,
+                      color: scheme.onErrorContainer,
                     ),
+                  ),
+                  const MxGap(AppSpacing.xl),
+                  MxText(
+                    widget.title ?? l10n.sharedErrorTitle,
+                    role: MxTextRole.stateTitle,
+                    textAlign: TextAlign.center,
+                  ),
+                  if (widget.message != null) ...[
+                    const MxGap(AppSpacing.sm),
+                    MxText(
+                      widget.message!,
+                      role: MxTextRole.stateMessage,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  const MxGap(AppSpacing.xl),
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      if (widget.onRetry != null)
+                        MxSecondaryButton(
+                          label: widget.retryLabel ?? l10n.sharedTryAgain,
+                          variant: MxSecondaryVariant.outlined,
+                          leadingIcon: Icons.refresh,
+                          onPressed: widget.onRetry,
+                        ),
+                      if (widget.details != null)
+                        MxSecondaryButton(
+                          label: _showDetails
+                              ? l10n.sharedHideDetails
+                              : l10n.sharedShowDetails,
+                          variant: MxSecondaryVariant.text,
+                          onPressed: () =>
+                              setState(() => _showDetails = !_showDetails),
+                        ),
+                    ],
+                  ),
+                  if (_showDetails && widget.details != null) ...[
+                    const MxGap(AppSpacing.lg),
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHighest,
+                        borderRadius: AppRadius.borderSm,
+                      ),
+                      child: MxText(
+                        widget.details!,
+                        role: MxTextRole.formHelper,
+                      ),
+                    ),
+                  ],
                 ],
               ),
-              if (_showDetails && widget.details != null) ...[
-                const MxGap(AppSpacing.lg),
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: scheme.surfaceContainerHighest,
-                    borderRadius: AppRadius.borderSm,
-                  ),
-                  child: MxText(widget.details!, role: MxTextRole.formHelper),
-                ),
-              ],
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

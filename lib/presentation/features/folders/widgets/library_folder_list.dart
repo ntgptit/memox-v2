@@ -57,7 +57,12 @@ class _LibraryFolderRow extends StatelessWidget {
     return MxFolderTile(
       name: folder.name,
       icon: folder.icon,
-      caption: l10n.libraryFolderStats(folder.deckCount, folder.itemCount),
+      caption: l10n.libraryFolderStudyStats(
+        folder.itemCount,
+        folder.dueCardCount,
+        folder.newCardCount,
+      ),
+      supportingCaption: l10n.libraryFolderMastery(folder.masteryPercent),
       onTap: () => onOpenFolder(folder.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(folder),
       trailing: MxStudyProgressAction(

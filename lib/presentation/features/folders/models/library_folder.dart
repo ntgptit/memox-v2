@@ -14,6 +14,8 @@ class LibraryFolder {
     required this.icon,
     required this.deckCount,
     required this.itemCount,
+    required this.dueCardCount,
+    required this.newCardCount,
     required this.masteryPercent,
   });
 
@@ -22,6 +24,8 @@ class LibraryFolder {
   final IconData icon;
   final int deckCount;
   final int itemCount;
+  final int dueCardCount;
+  final int newCardCount;
 
   /// Mastery in `[0, 100]`.
   final int masteryPercent;

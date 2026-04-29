@@ -235,6 +235,73 @@ void main() {
 
         self.assertEqual(result.violation_count, 0)
 
+    def test_integration_test_file_path_is_allowed(self) -> None:
+        self._write(
+            "integration_test/app_test.dart",
+            """
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  testWidgets('DT1 onOpen: boots integration app shell', (tester) async {});
+}
+""",
+        )
+        self._write_dt_doc(
+            "integration_test/app_test.md",
+            "integration_test/app_test.dart",
+            """
+## Decision table: onOpen
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | integration binding opens the app shell | app test starts with an integration root | widget test pumps the app shell | app shell is visible to the tester | C0+C1 |
+""",
+        )
+
+        result = self._run_rule(CASE_RULE)
+
+        self.assertEqual(result.violation_count, 0)
+
+    def test_integration_entrypoint_reads_imported_case_modules(self) -> None:
+        self._write(
+            "integration_test/app_test.dart",
+            """
+import 'package:integration_test/integration_test.dart';
+
+import 'cases/folder_flow_case.dart';
+
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  folderFlowTests();
+}
+""",
+        )
+        self._write(
+            "integration_test/cases/folder_flow_case.dart",
+            """
+import 'package:flutter_test/flutter_test.dart';
+
+void folderFlowTests() {
+  testWidgets('DT1 onInsert: creates a folder from the app entrypoint', (tester) async {});
+}
+""",
+        )
+        self._write_dt_doc(
+            "integration_test/app_test.md",
+            "integration_test/app_test.dart",
+            """
+## Decision table: onInsert
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | integration entrypoint imports a folder flow case module | app test calls the folder flow registration function | the guard reads app test metadata | imported case test name satisfies the markdown row | C0+C1 |
+""",
+        )
+
+        result = self._run_rule(CASE_RULE)
+
+        self.assertEqual(result.violation_count, 0)
+
     def test_generated_source_is_ignored(self) -> None:
         self._write(
             "lib/foo.g.dart",

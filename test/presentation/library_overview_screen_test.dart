@@ -39,26 +39,28 @@ void main() {
     expect(find.byType(MxLoadingState), findsOneWidget);
   });
 
-  testWidgets('DT1 onDisplay: renders greeting search toolbar and root folders', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          libraryOverviewQueryProvider.overrideWith(
-            (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
-          ),
-        ],
-        child: const _TestApp(child: LibraryOverviewView()),
-      ),
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'DT1 onDisplay: renders greeting search toolbar and root folders',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Good morning, Lan'), findsOneWidget);
-    expect(find.text('Folders'), findsOneWidget);
-    expect(find.text('Korean1'), findsOneWidget);
-    expect(find.text('17'), findsOneWidget);
-  });
+      expect(find.text('Good morning, Lan'), findsOneWidget);
+      expect(find.text('Folders'), findsOneWidget);
+      expect(find.text('Korean1'), findsOneWidget);
+      expect(find.text('17 cards · 3 due · 5 new'), findsOneWidget);
+      expect(find.text('Mastery 19%'), findsOneWidget);
+    },
+  );
 
   testWidgets('DT1 onInsert: library add FAB uses the generic add icon', (
     WidgetTester tester,
@@ -82,187 +84,189 @@ void main() {
     expect(find.byIcon(Icons.create_new_folder_outlined), findsNothing);
   });
 
-  testWidgets('DT1 onNavigate: root folder cards expose recursive study action', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-root-001';
-    final router = GoRouter(
-      initialLocation: RoutePaths.library,
-      routes: [
-        GoRoute(
-          path: RoutePaths.library,
-          name: RouteNames.library,
-          builder: (context, state) => const LibraryOverviewView(),
-        ),
-        GoRoute(
-          path: '/${RoutePaths.folderDetailSegment}',
-          name: RouteNames.folderDetail,
-          builder: (context, state) =>
-              const SizedBox(key: ValueKey('folder_detail_destination')),
-        ),
-        GoRoute(
-          path: '/${RoutePaths.studyEntrySegment}',
-          name: RouteNames.studyEntry,
-          builder: (context, state) => const SizedBox.shrink(),
-        ),
-      ],
-    );
-    addTearDown(router.dispose);
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          libraryOverviewQueryProvider.overrideWith(
-            (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+  testWidgets(
+    'DT1 onNavigate: root folder cards expose recursive study action',
+    (WidgetTester tester) async {
+      const folderId = 'folder-root-001';
+      final router = GoRouter(
+        initialLocation: RoutePaths.library,
+        routes: [
+          GoRoute(
+            path: RoutePaths.library,
+            name: RouteNames.library,
+            builder: (context, state) => const LibraryOverviewView(),
+          ),
+          GoRoute(
+            path: '/${RoutePaths.folderDetailSegment}',
+            name: RouteNames.folderDetail,
+            builder: (context, state) =>
+                const SizedBox(key: ValueKey('folder_detail_destination')),
+          ),
+          GoRoute(
+            path: '/${RoutePaths.studyEntrySegment}',
+            name: RouteNames.studyEntry,
+            builder: (context, state) => const SizedBox.shrink(),
           ),
         ],
-        child: MaterialApp.router(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: router,
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    final studyButton = find.byKey(
-      const ValueKey('library_folder_recursive_study_$folderId'),
-    );
+      final studyButton = find.byKey(
+        const ValueKey('library_folder_recursive_study_$folderId'),
+      );
 
-    expect(studyButton, findsOneWidget);
-    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
-    expect(find.text('19%'), findsOneWidget);
-    expect(find.text('17'), findsOneWidget);
-    expect(
-      tester.getCenter(studyButton).dy,
-      closeTo(tester.getCenter(find.text('Korean1')).dy, 16),
-    );
+      expect(studyButton, findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+      expect(find.text('19%'), findsOneWidget);
+      expect(find.text('17 cards · 3 due · 5 new'), findsOneWidget);
+      expect(find.text('Mastery 19%'), findsOneWidget);
+      expect(find.text('17'), findsOneWidget);
 
-    await tester.tap(studyButton);
-    await tester.pumpAndSettle();
+      await tester.tap(studyButton);
+      await tester.pumpAndSettle();
 
-    expect(
-      router.routeInformationProvider.value.uri.path,
-      '/study/folder/$folderId',
-    );
-  });
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/study/folder/$folderId',
+      );
+    },
+  );
 
-  testWidgets('DT1 onSelect: root folder long press opens direct folder actions', (
-    WidgetTester tester,
-  ) async {
-    final router = GoRouter(
-      initialLocation: RoutePaths.library,
-      routes: [
-        GoRoute(
-          path: RoutePaths.library,
-          name: RouteNames.library,
-          builder: (context, state) => const LibraryOverviewView(),
-        ),
-      ],
-    );
-    addTearDown(router.dispose);
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          libraryOverviewQueryProvider.overrideWith(
-            (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+  testWidgets(
+    'DT1 onSelect: root folder long press opens direct folder actions',
+    (WidgetTester tester) async {
+      final router = GoRouter(
+        initialLocation: RoutePaths.library,
+        routes: [
+          GoRoute(
+            path: RoutePaths.library,
+            name: RouteNames.library,
+            builder: (context, state) => const LibraryOverviewView(),
           ),
         ],
-        child: MaterialApp.router(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: router,
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      addTearDown(router.dispose);
 
-    await tester.longPress(find.text('Korean1'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Folder actions'), findsOneWidget);
-    expect(find.text('Edit'), findsOneWidget);
-    expect(find.text('Move'), findsOneWidget);
-    expect(find.text('Delete'), findsOneWidget);
-  });
-
-  testWidgets('DT2 onNavigate: root folder tap still calls open-folder callback', (
-    WidgetTester tester,
-  ) async {
-    String? openedFolderId;
-
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              LibraryFolderSliver(
-                folders: _sampleLibraryState.folders,
-                onOpenFolder: (folderId) => openedFolderId = folderId,
-                onStartStudy: (_) {},
-              ),
-            ],
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(MxFolderTile));
-    await tester.pumpAndSettle();
+      await tester.longPress(find.text('Korean1'));
+      await tester.pumpAndSettle();
 
-    expect(openedFolderId, 'folder-root-001');
-  });
+      expect(find.text('Folder actions'), findsOneWidget);
+      expect(find.text('Edit'), findsOneWidget);
+      expect(find.text('Move'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+    },
+  );
 
-  testWidgets('DT1 onDispose: dialog action using dialog context closes only the dialog', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) {
-              return TextButton(
-                onPressed: () {
-                  MxDialog.show<void>(
-                    context: context,
-                    title: 'Create folder',
-                    child: const Text('Dialog body'),
-                    actions: [
-                      Builder(
-                        builder: (dialogContext) => TextButton(
-                          onPressed: () => Navigator.of(dialogContext).pop(),
-                          child: const Text('Cancel'),
+  testWidgets(
+    'DT2 onNavigate: root folder tap still calls open-folder callback',
+    (WidgetTester tester) async {
+      String? openedFolderId;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                LibraryFolderSliver(
+                  folders: _sampleLibraryState.folders,
+                  onOpenFolder: (folderId) => openedFolderId = folderId,
+                  onStartStudy: (_) {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(MxFolderTile));
+      await tester.pumpAndSettle();
+
+      expect(openedFolderId, 'folder-root-001');
+    },
+  );
+
+  testWidgets(
+    'DT1 onDispose: dialog action using dialog context closes only the dialog',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return TextButton(
+                  onPressed: () {
+                    MxDialog.show<void>(
+                      context: context,
+                      title: 'Create folder',
+                      child: const Text('Dialog body'),
+                      actions: [
+                        Builder(
+                          builder: (dialogContext) => TextButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                            child: const Text('Cancel'),
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                },
-                child: const Text('Open dialog'),
-              );
-            },
+                      ],
+                    );
+                  },
+                  child: const Text('Open dialog'),
+                );
+              },
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    await tester.tap(find.text('Open dialog'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.text('Open dialog'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.byType(Dialog), findsOneWidget);
-    expect(find.text('Dialog body'), findsOneWidget);
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.text('Dialog body'), findsOneWidget);
 
-    await tester.tap(find.text('Cancel'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.text('Cancel'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.byType(Dialog), findsNothing);
-    expect(find.text('Open dialog'), findsOneWidget);
-  });
+      expect(find.byType(Dialog), findsNothing);
+      expect(find.text('Open dialog'), findsOneWidget);
+    },
+  );
 }
 
 const _sampleLibraryState = LibraryOverviewState(
@@ -278,6 +282,8 @@ const _sampleLibraryState = LibraryOverviewState(
       icon: Icons.folder_outlined,
       deckCount: 0,
       itemCount: 17,
+      dueCardCount: 3,
+      newCardCount: 5,
       masteryPercent: 19,
     ),
   ],

@@ -16,6 +16,8 @@ final class LibraryFolderReadModel {
     required this.breadcrumb,
     required this.deckCount,
     required this.itemCount,
+    required this.dueCardCount,
+    required this.newCardCount,
     required this.masteryPercent,
     required this.lastStudiedAt,
   });
@@ -24,17 +26,25 @@ final class LibraryFolderReadModel {
   final List<String> breadcrumb;
   final int deckCount;
   final int itemCount;
+  final int dueCardCount;
+  final int newCardCount;
   final int masteryPercent;
   final int? lastStudiedAt;
 }
 
 final class LibraryOverviewReadModel {
   const LibraryOverviewReadModel({
+    required this.overdueCount,
     required this.dueTodayCount,
+    required this.newCardCount,
+    required this.totalFolderCount,
     required this.folders,
   });
 
+  final int overdueCount;
   final int dueTodayCount;
+  final int newCardCount;
+  final int totalFolderCount;
   final List<LibraryFolderReadModel> folders;
 }
 

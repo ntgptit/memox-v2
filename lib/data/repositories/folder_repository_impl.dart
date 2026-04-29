@@ -56,9 +56,18 @@ final class FolderRepositoryImpl implements FolderRepository {
               .toList(growable: false)
         : await _folderDao.listRootFolders(query);
     final folderItems = <LibraryFolderReadModel>[];
+    final startOfToday = startOfTodayEpochMillis(_clock);
+    final endOfToday = endOfTodayEpochMillis(_clock);
     for (final folder in folders) {
       final deckCount = await _folderDao.countDecksInSubtree(folder.id);
       final itemCount = await _folderDao.countFlashcardsInSubtree(folder.id);
+      final dueCardCount = await _folderDao.countDueCardsInSubtree(
+        folderId: folder.id,
+        endOfTodayEpochMillis: endOfToday,
+      );
+      final newCardCount = await _folderDao.countNewFlashcardsInSubtree(
+        folder.id,
+      );
       final lastStudiedAt = await _folderDao.getLastStudiedAtInSubtree(
         folder.id,
       );
@@ -71,6 +80,8 @@ final class FolderRepositoryImpl implements FolderRepository {
           breadcrumb: await _folderDao.getBreadcrumbNames(folder.id),
           deckCount: deckCount,
           itemCount: itemCount,
+          dueCardCount: dueCardCount,
+          newCardCount: newCardCount,
           masteryPercent: masteryPercent,
           lastStudiedAt: lastStudiedAt,
         ),
@@ -79,9 +90,13 @@ final class FolderRepositoryImpl implements FolderRepository {
     _sortLibraryFolders(folderItems, query.sortMode);
 
     return LibraryOverviewReadModel(
+      overdueCount: await _folderDao.countOverdue(startOfToday),
       dueTodayCount: await _folderDao.countDueToday(
-        endOfTodayEpochMillis(_clock),
+        startOfTodayEpochMillis: startOfToday,
+        endOfTodayEpochMillis: endOfToday,
       ),
+      newCardCount: await _folderDao.countNewFlashcards(),
+      totalFolderCount: await _folderDao.countAllFolders(),
       folders: folderItems,
     );
   }

@@ -43,106 +43,140 @@ void main() {
     expect(find.byType(MxLoadingState), findsNothing);
   });
 
-  testWidgets('DT1 onRefreshRetry: keeps previous content and shows refresh bar while refetching', (
-    WidgetTester tester,
-  ) async {
-    final controller = _FutureController<String>(
-      Future<String>.value('Loaded value'),
-    );
-    final currentFutureProvider =
-        ChangeNotifierProvider<_FutureController<String>>((ref) => controller);
-    final queryProvider = FutureProvider<String>(
-      (ref) => ref.watch(currentFutureProvider).future,
-    );
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
+  testWidgets(
+    'DT1 onRefreshRetry: keeps previous content and shows refresh bar while refetching',
+    (WidgetTester tester) async {
+      final controller = _FutureController<String>(
+        Future<String>.value('Loaded value'),
+      );
+      final currentFutureProvider =
+          ChangeNotifierProvider<_FutureController<String>>(
+            (ref) => controller,
+          );
+      final queryProvider = FutureProvider<String>(
+        (ref) => ref.watch(currentFutureProvider).future,
+      );
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: _TestApp(
-          child: Consumer(
-            builder: (context, ref, _) {
-              final query = ref.watch(queryProvider);
-              return MxRetainedAsyncState<String>(
-                data: query.value,
-                isLoading: query.isLoading,
-                error: query.hasError ? query.error : null,
-                stackTrace: query.hasError ? query.stackTrace : null,
-                dataBuilder: _buildData,
-              );
-            },
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: _TestApp(
+            child: Consumer(
+              builder: (context, ref, _) {
+                final query = ref.watch(queryProvider);
+                return MxRetainedAsyncState<String>(
+                  data: query.value,
+                  isLoading: query.isLoading,
+                  error: query.hasError ? query.error : null,
+                  stackTrace: query.hasError ? query.stackTrace : null,
+                  dataBuilder: _buildData,
+                );
+              },
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Loaded value'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
-      findsNothing,
-    );
+      expect(find.text('Loaded value'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
+        findsNothing,
+      );
 
-    final refreshCompleter = Completer<String>();
-    controller.future = refreshCompleter.future;
-    await tester.pump();
+      final refreshCompleter = Completer<String>();
+      controller.future = refreshCompleter.future;
+      await tester.pump();
 
-    expect(find.text('Loaded value'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
-      findsOneWidget,
-    );
-  });
+      expect(find.text('Loaded value'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
+        findsOneWidget,
+      );
+    },
+  );
 
-  testWidgets('DT2 onRefreshRetry: keeps previous content and shows snackbar when refresh fails', (
-    WidgetTester tester,
-  ) async {
-    final controller = _FutureController<String>(
-      Future<String>.value('Loaded value'),
-    );
-    final currentFutureProvider =
-        ChangeNotifierProvider<_FutureController<String>>((ref) => controller);
-    final queryProvider = FutureProvider<String>(
-      (ref) => ref.watch(currentFutureProvider).future,
-    );
-    final container = ProviderContainer();
-    addTearDown(container.dispose);
+  testWidgets(
+    'DT2 onRefreshRetry: keeps previous content and shows snackbar when refresh fails',
+    (WidgetTester tester) async {
+      final controller = _FutureController<String>(
+        Future<String>.value('Loaded value'),
+      );
+      final currentFutureProvider =
+          ChangeNotifierProvider<_FutureController<String>>(
+            (ref) => controller,
+          );
+      final queryProvider = FutureProvider<String>(
+        (ref) => ref.watch(currentFutureProvider).future,
+      );
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: _TestApp(
-          child: Consumer(
-            builder: (context, ref, _) {
-              final query = ref.watch(queryProvider);
-              return MxRetainedAsyncState<String>(
-                data: query.value,
-                isLoading: query.isLoading,
-                error: query.hasError ? query.error : null,
-                stackTrace: query.hasError ? query.stackTrace : null,
-                dataBuilder: _buildData,
-              );
-            },
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: _TestApp(
+            child: Consumer(
+              builder: (context, ref, _) {
+                final query = ref.watch(queryProvider);
+                return MxRetainedAsyncState<String>(
+                  data: query.value,
+                  isLoading: query.isLoading,
+                  error: query.hasError ? query.error : null,
+                  stackTrace: query.hasError ? query.stackTrace : null,
+                  dataBuilder: _buildData,
+                );
+              },
+            ),
           ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    final refreshCompleter = Completer<String>();
-    controller.future = refreshCompleter.future;
-    await tester.pump();
+      final refreshCompleter = Completer<String>();
+      controller.future = refreshCompleter.future;
+      await tester.pump();
 
-    refreshCompleter.completeError(StateError('refresh failed'));
-    await tester.pump();
-    await tester.pump();
+      refreshCompleter.completeError(StateError('refresh failed'));
+      await tester.pump();
+      await tester.pump();
 
-    expect(find.text('Loaded value'), findsOneWidget);
-    expect(find.byType(MxErrorState), findsNothing);
-    expect(find.byType(SnackBar), findsOneWidget);
-    expect(find.text('Something went wrong.'), findsOneWidget);
-  });
+      expect(find.text('Loaded value'), findsOneWidget);
+      expect(find.byType(MxErrorState), findsNothing);
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('Something went wrong.'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT3 onRefreshRetry: expands retained content to bounded parent width',
+    (WidgetTester tester) async {
+      const contentKey = ValueKey('retained-content-width');
+      const hostWidth = 320.0;
+
+      await tester.pumpWidget(
+        _TestApp(
+          child: SizedBox(
+            width: hostWidth,
+            child: MxRetainedAsyncState<String>(
+              data: 'Loaded value',
+              isLoading: true,
+              dataBuilder: (_, data) =>
+                  SizedBox(key: contentKey, height: 24, child: Text(data)),
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.getSize(find.byKey(contentKey)).width, hostWidth);
+      expect(
+        find.byKey(const ValueKey('mx_retained_async_refresh_bar')),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets('DT3 onOpen: shows error state when first load fails', (
     WidgetTester tester,

@@ -232,6 +232,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     final targetDeckId = await MxDestinationPickerSheet.show<String>(
       context: context,
       title: l10n.flashcardsMoveTitle,
+      supportingText: l10n.flashcardsMoveProgressKeptNote,
       destinations: [
         for (final target in targets)
           MxDestinationOption<String>(

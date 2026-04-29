@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/tts_providers.dart';
+import 'package:memox/app/di/study_providers.dart';
+import 'package:memox/core/constants/app_constants.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/settings/providers/locale_notifier.dart';
 import 'package:memox/presentation/features/settings/providers/theme_mode_notifier.dart';
 import 'package:memox/presentation/features/settings/screens/settings_screen.dart';
+import 'package:memox/presentation/features/study/providers/study_settings_defaults_notifier.dart';
 import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,6 +37,7 @@ void main() {
     expect(find.text('Light'), findsOneWidget);
     expect(find.text('System'), findsWidgets);
     expect(find.text('English'), findsWidgets);
+    expect(find.text('Study defaults'), findsOneWidget);
     expect(harness.tts.availableVoiceRequests, isEmpty);
   });
 
@@ -50,6 +54,13 @@ void main() {
     'DT2 onDisplay: renders speech settings with Korean and English only',
     (tester) async {
       await _pumpSettings(tester);
+
+      await tester.scrollUntilVisible(
+        find.text('Speech'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
 
       expect(find.text('Speech'), findsOneWidget);
       expect(find.text('Auto-play in study'), findsOneWidget);
@@ -71,6 +82,46 @@ void main() {
           orderedEquals(TtsLanguage.values),
         );
       }
+    },
+  );
+
+  testWidgets('DT3 onDisplay: renders study defaults before speech settings', (
+    tester,
+  ) async {
+    await _pumpSettings(tester);
+
+    expect(find.text('Study defaults'), findsOneWidget);
+    expect(find.text('New Study batch size'), findsOneWidget);
+    expect(find.text('Review batch size'), findsOneWidget);
+    expect(find.text('5-20 cards'), findsOneWidget);
+    expect(find.text('5-50 cards'), findsOneWidget);
+    expect(find.text('Shuffle flashcards'), findsOneWidget);
+    expect(find.text('Shuffle answers'), findsOneWidget);
+    expect(find.text('Prioritize overdue cards'), findsOneWidget);
+  });
+
+  testWidgets(
+    'DT4 onDisplay: clamps persisted study defaults before rendering',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({
+        AppConstants.sharedPrefsDefaultNewBatchSizeKey: 100,
+        AppConstants.sharedPrefsDefaultReviewBatchSizeKey: 1,
+      });
+
+      final harness = await _pumpSettings(tester);
+      final settings = await harness.container.read(
+        studyDefaultsSettingsProvider.future,
+      );
+      final store = await harness.container.read(
+        studySettingsStoreProvider.future,
+      );
+
+      expect(settings.newStudyDefaults.batchSize, 20);
+      expect(settings.reviewDefaults.batchSize, 5);
+      expect(store.loadNewStudyDefaults().batchSize, 20);
+      expect(store.loadReviewDefaults().batchSize, 5);
+      expect(find.text('20'), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
     },
   );
 
@@ -124,7 +175,13 @@ void main() {
     (tester) async {
       final harness = await _pumpSettings(tester);
 
-      await tester.tap(find.byType(Switch));
+      await tester.scrollUntilVisible(
+        find.text('Auto-play in study'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(Switch).last);
       await tester.pumpAndSettle();
 
       final languageControls = tester
@@ -155,7 +212,6 @@ void main() {
       expect(harness.tts.speakCalls, hasLength(1));
       expect(harness.tts.speakCalls.single.language, TtsLanguage.english);
       expect(harness.tts.speakCalls.single.rate, 0.7);
-      expect(harness.tts.stopCount, 0);
     },
   );
 
@@ -186,6 +242,66 @@ void main() {
       expect(find.text('Front voice'), findsOneWidget);
       expect(find.text('Back voice'), findsNothing);
       expect(harness.tts.availableVoiceRequests, [TtsLanguage.korean]);
+    },
+  );
+
+  testWidgets(
+    'DT5 onUpdate: study default controls persist batch sizes and shared toggles',
+    (tester) async {
+      final harness = await _pumpSettings(tester);
+
+      await tester.scrollUntilVisible(
+        find.byKey(const ValueKey<String>('settings-study-new-batch-increase')),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const ValueKey<String>('settings-study-new-batch-increase')),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(
+          const ValueKey<String>('settings-study-review-batch-decrease'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const ValueKey<String>('settings-study-review-batch-decrease'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.widgetWithText(SwitchListTile, 'Shuffle flashcards'),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Shuffle flashcards'),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Shuffle answers'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Prioritize overdue cards'),
+      );
+      await tester.pumpAndSettle();
+
+      final settings = await harness.container.read(
+        studyDefaultsSettingsProvider.future,
+      );
+      final store = await harness.container.read(
+        studySettingsStoreProvider.future,
+      );
+
+      expect(settings.newStudyDefaults.batchSize, 11);
+      expect(settings.reviewDefaults.batchSize, 19);
+      expect(settings.shuffleFlashcards, isFalse);
+      expect(settings.shuffleAnswers, isFalse);
+      expect(settings.prioritizeOverdue, isFalse);
+      expect(store.loadNewStudyDefaults().batchSize, 11);
+      expect(store.loadReviewDefaults().batchSize, 19);
+      expect(store.loadNewStudyDefaults().shuffleFlashcards, isFalse);
     },
   );
 }

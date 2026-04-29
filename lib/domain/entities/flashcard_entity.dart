@@ -10,6 +10,7 @@ final class FlashcardEntity extends BaseEntity {
     required this.back,
     required this.note,
     required this.sortOrder,
+    this.hasLearningProgress = false,
   });
 
   final String deckId;
@@ -17,6 +18,7 @@ final class FlashcardEntity extends BaseEntity {
   final String back;
   final String? note;
   final int sortOrder;
+  final bool hasLearningProgress;
 
   String get displayName => front;
 }

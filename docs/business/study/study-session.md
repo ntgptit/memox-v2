@@ -58,6 +58,13 @@ Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rul
 - Trong New Study, thẻ bị bỏ qua không được xem là pass mode hiện tại
 - Thẻ bị bỏ qua được đưa về cuối queue của session hiện tại
 
+## Rule điều hướng trong màn Study Session
+
+- Back rời màn học hiện tại nhưng giữ session ở trạng thái có thể resume; không tự động hủy session và không commit các item còn pending
+- Cancel là hành động hủy sớm session; luôn cần xác nhận trước khi chuyển session sang `Cancelled`
+- Cancel trong mọi mode học phải dùng cùng confirmation và cùng commit boundary như rule hủy sớm session
+- Mode view chỉ xử lý tương tác học của mode đó; back/cancel/finalize thuộc control boundary chung của Study Session
+
 ## Rule huỷ sớm session
 
 - User có thể chuyển session sang `Cancelled` trước khi học hết queue
@@ -141,6 +148,9 @@ Cấu trúc attempt chi tiết: xem [Study Concepts — Attempt](./study-concept
 
 Hiển thị:
 - số thẻ đã học
+- số thẻ mastered trên tổng số thẻ trong session
+- attempt accuracy = số attempt đúng / tổng số attempt đã ghi
+- số retry cards = số flashcard từng có ít nhất một attempt sai trong session
 - số đúng / sai
 - số tăng box / giảm box
 - số flashcard đã pass đủ 5 mode nếu là New Study

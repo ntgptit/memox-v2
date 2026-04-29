@@ -21,13 +21,19 @@ class MatchModeSessionView extends StatefulWidget {
   const MatchModeSessionView({
     required this.snapshot,
     required this.isSubmitting,
+    required this.canCancel,
     required this.onSubmit,
+    required this.onCancel,
+    required this.onBack,
     super.key,
   });
 
   final StudySessionSnapshot snapshot;
   final bool isSubmitting;
+  final bool canCancel;
   final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
+  final VoidCallback onCancel;
+  final VoidCallback onBack;
 
   @override
   State<MatchModeSessionView> createState() => _MatchModeSessionViewState();
@@ -76,6 +82,10 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
 
     return StudyModeSessionScaffold(
       title: l10n.studyModeMatch,
+      canCancel: widget.canCancel,
+      isActionBusy: widget.isSubmitting,
+      onCancel: widget.onCancel,
+      onBack: widget.onBack,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

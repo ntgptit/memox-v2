@@ -27,6 +27,12 @@ Test file: `test/presentation/study_session_screen_test.dart`
 | DT13 | session is in progress and has a current fill-mode item | snapshot has `StudyMode.fill`, progress 80%, one current item with term `front 1` and meaning `back 1` | session screen renders active Fill branch | title `Fill`, toolbar actions, progress `80%`, prompt card shows `back 1`, borderless answer input expands across the input card, `Help` / `Check` actions are visible, `Check` starts disabled, and old `Continue` / `Skip card` controls are hidden | C0+C1 |
 | DT14 | Fill screen is focused while viewport height is reduced by keyboard insets | snapshot has `StudyMode.fill` and the test surface is short with a bottom view inset | Fill branch renders with the answer field focused | `resizeToAvoidBottomInset` keeps progress, prompt, input, and bottom actions in the widget tree without Flutter overflow exceptions | C0+C1 |
 
+## Decision table: onSelect
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | user requests cancel from an active mode-specific scaffold | snapshot has `SessionStatus.inProgress`, a current Fill item, and the mode view is rendered instead of the standard fallback scaffold | user taps `Cancel session` in the mode toolbar | cancel confirmation opens with the destructive session message before any repository mutation is confirmed | C0+C1 |
+
 ## Decision table: onUpdate
 
 | ID | Branch / condition | Given | When | Then | Coverage |

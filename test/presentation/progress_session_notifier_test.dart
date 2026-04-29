@@ -1,9 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/app/di/content_providers.dart';
 import 'package:memox/app/di/study_providers.dart';
+import 'package:memox/core/errors/result.dart';
+import 'package:memox/domain/entities/folder_entity.dart';
 import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/enums/folder_content_mode.dart';
+import 'package:memox/domain/repositories/folder_repository.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
+import 'package:memox/domain/usecases/content_query_usecases.dart';
+import 'package:memox/domain/value_objects/content_actions.dart';
+import 'package:memox/domain/value_objects/content_queries.dart';
+import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/presentation/features/progress/providers/progress_session_notifier.dart';
 import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +32,41 @@ void main() {
       );
 
       expect(sessions.map((snapshot) => snapshot.session.id), ['session-1']);
+    },
+  );
+
+  test(
+    'DT2 onDisplay: overview provider combines library analytics and session recovery counts',
+    () async {
+      final repo = _ProgressStudyRepo(
+        activeSessions: [
+          _snapshot(id: 'session-1'),
+          _snapshot(id: 'session-2', status: SessionStatus.readyToFinalize),
+          _snapshot(id: 'session-3', status: SessionStatus.failedToFinalize),
+        ],
+      );
+      final container = ProviderContainer(
+        overrides: [
+          contentDataRevisionProvider.overrideWith(
+            (ref) => Stream<int>.value(0),
+          ),
+          studyRepoProvider.overrideWithValue(repo),
+          watchLibraryOverviewUseCaseProvider.overrideWithValue(
+            WatchLibraryOverviewUseCase(_ProgressFolderRepo()),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final overview = await container.read(progressOverviewProvider.future);
+
+      expect(overview.reviewCount, 5);
+      expect(overview.newCardCount, 4);
+      expect(overview.cardCount, 10);
+      expect(overview.masteryPercent, 50);
+      expect(overview.activeSessionCount, 3);
+      expect(overview.readySessionCount, 1);
+      expect(overview.failedSessionCount, 1);
     },
   );
 
@@ -121,6 +165,104 @@ void main() {
   );
 }
 
+final class _ProgressFolderRepo implements FolderRepository {
+  @override
+  Future<LibraryOverviewReadModel> getLibraryOverview(
+    ContentQuery query,
+  ) async {
+    return LibraryOverviewReadModel(
+      overdueCount: 2,
+      dueTodayCount: 3,
+      newCardCount: 4,
+      totalFolderCount: 2,
+      folders: [
+        _folderReadModel(id: 'folder-1', itemCount: 4, masteryPercent: 25),
+        _folderReadModel(id: 'folder-2', itemCount: 6, masteryPercent: 67),
+      ],
+    );
+  }
+
+  @override
+  Future<Result<FolderEntity>> createRootFolder(String name) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<FolderEntity>> createSubfolder({
+    required String parentFolderId,
+    required String name,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<void>> deleteFolder(String folderId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<FolderDetailReadModel> getFolderDetail(
+    String folderId,
+    ContentQuery query,
+  ) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<FolderMoveTarget>> getFolderMoveTargets(String folderId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<void>> moveFolder({
+    required String folderId,
+    required String? targetParentId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<void>> reorderFolders({
+    required String? parentFolderId,
+    required List<String> orderedFolderIds,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<FolderEntity>> updateFolder({
+    required String folderId,
+    required String name,
+  }) {
+    throw UnimplementedError();
+  }
+}
+
+LibraryFolderReadModel _folderReadModel({
+  required String id,
+  required int itemCount,
+  required int masteryPercent,
+}) {
+  return LibraryFolderReadModel(
+    folder: FolderEntity(
+      id: id,
+      parentId: null,
+      name: id,
+      contentMode: FolderContentMode.decks,
+      sortOrder: 0,
+      createdAt: 0,
+      updatedAt: 0,
+    ),
+    breadcrumb: const [],
+    deckCount: 1,
+    itemCount: itemCount,
+    dueCardCount: 0,
+    newCardCount: 0,
+    masteryPercent: masteryPercent,
+    lastStudiedAt: null,
+  );
+}
+
 final class _ProgressStudyRepo implements StudyRepo {
   _ProgressStudyRepo({required this.activeSessions});
 
@@ -213,7 +355,8 @@ final class _ProgressStudyRepo implements StudyRepo {
   }) {
     throw UnimplementedError();
   }
-@override
+
+  @override
   Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
     required String sessionId,
     required Map<String, AttemptGrade> itemGrades,

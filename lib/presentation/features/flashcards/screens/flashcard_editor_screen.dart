@@ -4,12 +4,16 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/value_objects/content_actions.dart';
+import '../../../shared/dialogs/mx_dialog.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_secondary_button.dart';
 import '../widgets/flashcard_editor_form.dart';
 import '../widgets/flashcard_editor_header_section.dart';
 import '../viewmodels/flashcard_editor_viewmodel.dart';
@@ -119,28 +123,82 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
                       l10n.flashcardsSavedMessage,
                     );
                   },
-                  onSave: () async {
-                    final success = await actionController.save();
-                    if (!mounted || !success) {
-                      return;
-                    }
-                    MxSnackbar.success(
-                      this.context,
-                      draft.isEditing
-                          ? l10n.flashcardsUpdatedMessage
-                          : l10n.flashcardsCreatedMessage,
-                    );
-                    await this.context.popRoute(
-                      fallback: () =>
-                          this.context.goFlashcardList(widget.deckId),
-                    );
-                  },
+                  onSave: () => _save(
+                    draft: draft,
+                    actionController: actionController,
+                    l10n: l10n,
+                  ),
                 ),
               ],
             );
           },
         ),
       ),
+    );
+  }
+
+  Future<void> _save({
+    required FlashcardEditorDraftState draft,
+    required FlashcardEditorController actionController,
+    required AppLocalizations l10n,
+  }) async {
+    final progressPolicy = await _resolveProgressPolicy(
+      draft: draft,
+      l10n: l10n,
+    );
+    if (!mounted || progressPolicy == null) {
+      return;
+    }
+
+    final success = await actionController.save(progressPolicy: progressPolicy);
+    if (!mounted || !success) {
+      return;
+    }
+    MxSnackbar.success(
+      context,
+      draft.isEditing
+          ? l10n.flashcardsUpdatedMessage
+          : l10n.flashcardsCreatedMessage,
+    );
+    await context.popRoute(
+      fallback: () => context.goFlashcardList(widget.deckId),
+    );
+  }
+
+  Future<FlashcardProgressEditPolicy?> _resolveProgressPolicy({
+    required FlashcardEditorDraftState draft,
+    required AppLocalizations l10n,
+  }) {
+    if (!draft.requiresLearningProgressPolicy) {
+      return Future.value(FlashcardProgressEditPolicy.keepProgress);
+    }
+
+    return MxDialog.show<FlashcardProgressEditPolicy>(
+      context: context,
+      title: l10n.flashcardsLearningContentChangedTitle,
+      icon: Icons.school_outlined,
+      child: Text(l10n.flashcardsLearningContentChangedMessage),
+      actions: [
+        Builder(
+          builder: (ctx) => MxSecondaryButton(
+            label: l10n.flashcardsResetProgressAction,
+            leadingIcon: Icons.restart_alt_outlined,
+            variant: MxSecondaryVariant.text,
+            tone: MxSecondaryButtonTone.danger,
+            onPressed: () => Navigator.of(
+              ctx,
+            ).pop(FlashcardProgressEditPolicy.resetProgress),
+          ),
+        ),
+        Builder(
+          builder: (ctx) => MxPrimaryButton(
+            label: l10n.flashcardsKeepProgressAction,
+            leadingIcon: Icons.timeline_outlined,
+            onPressed: () =>
+                Navigator.of(ctx).pop(FlashcardProgressEditPolicy.keepProgress),
+          ),
+        ),
+      ],
     );
   }
 }

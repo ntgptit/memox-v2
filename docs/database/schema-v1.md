@@ -88,6 +88,7 @@ erDiagram
 - Mỗi flashcard có đúng 1 hàng progress
 - `move flashcard` không đổi progress row
 - `duplicate deck` và `import` tạo progress row mới
+- Khi edit `front` hoặc `back` của flashcard đã học, user chọn giữ progress thì không đổi progress row; user chọn reset thì giữ row nhưng đưa `current_box=1`, `review_count=0`, `lapse_count=0`, `last_result=null`, `last_studied_at=null`, `due_at=null`
 - Trạng thái `new`, `learning`, `due`, `overdue` là derived, không lưu cột riêng
 - New Study chỉ commit `flashcard_progress` khi New Study session chuyển sang `completed`
 - SRS Review chỉ commit `flashcard_progress` khi SRS Review session chuyển sang `completed`

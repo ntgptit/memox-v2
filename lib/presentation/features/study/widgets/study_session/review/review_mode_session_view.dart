@@ -23,13 +23,19 @@ class ReviewModeSessionView extends StatefulWidget {
   const ReviewModeSessionView({
     required this.snapshot,
     required this.isSubmitting,
+    required this.canCancel,
     required this.onSubmit,
+    required this.onCancel,
+    required this.onBack,
     super.key,
   });
 
   final StudySessionSnapshot snapshot;
   final bool isSubmitting;
+  final bool canCancel;
   final Future<bool> Function() onSubmit;
+  final VoidCallback onCancel;
+  final VoidCallback onBack;
 
   @override
   State<ReviewModeSessionView> createState() => _ReviewModeSessionViewState();
@@ -82,6 +88,10 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
 
     return StudyModeSessionScaffold(
       title: l10n.studyModeReview,
+      canCancel: widget.canCancel,
+      isActionBusy: widget.isSubmitting,
+      onCancel: widget.onCancel,
+      onBack: widget.onBack,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

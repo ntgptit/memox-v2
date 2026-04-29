@@ -53,6 +53,7 @@ Trình tự:
 | Tạo deck | validate parent, set `content_mode=decks` nếu parent đang `unlocked`, insert `decks` |
 | Tạo flashcard thủ công | insert `flashcards` + insert `flashcard_progress` mặc định trong cùng transaction |
 | Tạo nhiều flashcard liên tiếp | lặp transaction insert content + progress cho từng flashcard |
+| Sửa flashcard | update `flashcards.front/back/note`; nếu user chọn reset progress thì update cùng transaction để đưa `flashcard_progress` về trạng thái thẻ mới |
 | Move folder | validate không tạo cycle, update `folders.parent_id`, rồi kiểm tra parent nguồn có cần reset `content_mode` không |
 | Move deck | update `decks.folder_id`, không đụng progress, rồi kiểm tra folder nguồn có cần reset `content_mode` không |
 | Move flashcard | update `flashcards.deck_id`, không đụng progress |

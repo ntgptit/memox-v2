@@ -1631,6 +1631,7 @@ rules:
       source_scope: non_legacy_app_source
       test_roots:
         - "test"
+        - "integration_test"
       decision_table_roots:
         - "docs/decision-tables"
       exclude_source_paths:
@@ -1652,6 +1653,7 @@ rules:
       check_id: decision_table_case_coverage
       test_roots:
         - "test"
+        - "integration_test"
       decision_table_roots:
         - "docs/decision-tables"
 

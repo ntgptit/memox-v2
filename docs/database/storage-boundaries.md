@@ -18,10 +18,6 @@ SQLite là source of truth cho:
 | --- | --- |
 | `settings.theme_mode` | theme mode của app |
 | `settings.locale` | locale override của app |
-
-### Key nên bổ sung cho default study settings
-| Key | Ý nghĩa |
-| --- | --- |
 | `settings.study.default_new_batch_size` | batch mặc định cho học mới |
 | `settings.study.default_review_batch_size` | batch mặc định cho SRS Review |
 | `settings.study.shuffle_flashcards` | mặc định có trộn thẻ hay không |

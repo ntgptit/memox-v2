@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
@@ -27,59 +29,67 @@ class MxEmptyState extends StatelessWidget {
   final VoidCallback? onAction;
   final IconData? actionLeadingIcon;
 
+  static const double _maxWidth = 360;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
     return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 360, // guard:raw-size-reviewed empty-state column width
-        ),
-        child: Padding(
-          padding: AppSpacing.screen,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 72, // guard:raw-size-reviewed illustration circle
-                height: 72, // guard:raw-size-reviewed illustration circle
-                decoration: BoxDecoration(
-                  color: scheme.secondaryContainer,
-                  borderRadius: AppRadius.borderFull,
-                ),
-                alignment: Alignment.center,
-                child: Icon(
-                  icon,
-                  size: AppIconSizes.xl,
-                  color: scheme.onSecondaryContainer,
-                ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.hasBoundedWidth
+              ? math.min(constraints.maxWidth, _maxWidth)
+              : _maxWidth;
+
+          return SizedBox(
+            width: width,
+            child: Padding(
+              padding: AppSpacing.screen,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 72, // guard:raw-size-reviewed illustration circle
+                    height: 72, // guard:raw-size-reviewed illustration circle
+                    decoration: BoxDecoration(
+                      color: scheme.secondaryContainer,
+                      borderRadius: AppRadius.borderFull,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      icon,
+                      size: AppIconSizes.xl,
+                      color: scheme.onSecondaryContainer,
+                    ),
+                  ),
+                  const MxGap(AppSpacing.xl),
+                  MxText(
+                    title,
+                    role: MxTextRole.stateTitle,
+                    textAlign: TextAlign.center,
+                  ),
+                  if (message != null) ...[
+                    const MxGap(AppSpacing.sm),
+                    MxText(
+                      message!,
+                      role: MxTextRole.stateMessage,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  if (actionLabel != null && onAction != null) ...[
+                    const MxGap(AppSpacing.xl),
+                    MxPrimaryButton(
+                      label: actionLabel!,
+                      leadingIcon: actionLeadingIcon,
+                      onPressed: onAction,
+                    ),
+                  ],
+                ],
               ),
-              const MxGap(AppSpacing.xl),
-              MxText(
-                title,
-                role: MxTextRole.stateTitle,
-                textAlign: TextAlign.center,
-              ),
-              if (message != null) ...[
-                const MxGap(AppSpacing.sm),
-                MxText(
-                  message!,
-                  role: MxTextRole.stateMessage,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              if (actionLabel != null && onAction != null) ...[
-                const MxGap(AppSpacing.xl),
-                MxPrimaryButton(
-                  label: actionLabel!,
-                  leadingIcon: actionLeadingIcon,
-                  onPressed: onAction,
-                ),
-              ],
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

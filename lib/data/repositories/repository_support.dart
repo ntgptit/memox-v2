@@ -23,6 +23,16 @@ int computeMasteryPercent(Iterable<int> currentBoxes) {
   return (total / boxes.length).round();
 }
 
+int startOfTodayEpochMillis(Clock clock) {
+  final localNow = clock.nowUtc().toLocal();
+  final startOfTodayLocal = DateTime(
+    localNow.year,
+    localNow.month,
+    localNow.day,
+  );
+  return startOfTodayLocal.toUtc().millisecondsSinceEpoch;
+}
+
 int endOfTodayEpochMillis(Clock clock) {
   final localNow = clock.nowUtc().toLocal();
   final endOfTodayLocal = DateTime(

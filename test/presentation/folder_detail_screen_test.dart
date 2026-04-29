@@ -198,7 +198,100 @@ void main() {
     expect(find.text('This folder is empty'), findsOneWidget);
     expect(find.text('New subfolder'), findsOneWidget);
     expect(find.text('New deck'), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsOneWidget);
+    expect(find.byIcon(Icons.add), findsOneWidget);
   });
+
+  testWidgets('DT2 onInsert: unlocked folder FAB opens create choice sheet', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text('What do you want to create?'), findsOneWidget);
+    expect(find.text('New subfolder'), findsAtLeastNWidgets(2));
+    expect(find.text('New deck'), findsAtLeastNWidgets(2));
+  });
+
+  testWidgets(
+    'DT3 onInsert: unlocked folder create sheet can open subfolder dialog',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('New subfolder').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('New subfolder'), findsAtLeastNWidgets(1));
+      expect(find.text('Folder name'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT4 onInsert: unlocked folder create sheet can open deck dialog',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('New deck').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Create deck'), findsOneWidget);
+      expect(find.text('Deck name'), findsOneWidget);
+    },
+  );
 
   testWidgets(
     'DT2 onDisplay: empty subfolder mode renders only subfolder CTA',

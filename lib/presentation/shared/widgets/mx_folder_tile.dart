@@ -23,6 +23,7 @@ class MxFolderTile extends StatelessWidget {
     required this.name,
     required this.icon,
     this.caption,
+    this.supportingCaption,
     this.masteryPercent,
     this.tileColor,
     this.iconColor,
@@ -40,6 +41,9 @@ class MxFolderTile extends StatelessWidget {
 
   /// Single-line secondary line, e.g. `5 decks · 128 items`.
   final String? caption;
+
+  /// Optional extra secondary line for compact status detail.
+  final String? supportingCaption;
 
   /// Mastery in `[0, 100]`. `null` hides the trailing ring.
   final int? masteryPercent;
@@ -100,6 +104,15 @@ class MxFolderTile extends StatelessWidget {
                     const MxGap(AppSpacing.xxs),
                     MxText(
                       caption!,
+                      role: MxTextRole.tileMeta,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  if (supportingCaption != null) ...[
+                    const MxGap(AppSpacing.xxs),
+                    MxText(
+                      supportingCaption!,
                       role: MxTextRole.tileMeta,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

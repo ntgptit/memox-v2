@@ -6,7 +6,7 @@ Test file: `test/data/repositories/study_repository_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | new-study session uses five modes and all attempts are correct | deck has eligible new cards and session flow includes the five learning modes | repository starts the session, answers all queued items correctly, and finalizes | session completes and flashcard advances to SRS box 2 | C0+C1 |
+| DT1 | new-study session uses five modes and all attempts are correct | deck has eligible new cards and session flow includes the five learning modes | repository starts the session, answers all queued items correctly, and finalizes | session completes, both cards are counted as mastered, no retry cards are counted, and flashcard advances to SRS box 2 | C0+C1 |
 | DT2 | New Study is requested from the today entry point | today entry has only due cards available | start session is requested with `studyType=newStudy` and `entryType=today` | request fails because today supports SRS Review only in v1 | C0+C1 |
 | DT3 | SRS Review is requested from the today entry point | global pool contains a new card, a due card, and an overdue card | start session is requested with today SRS Review | session batch contains only due and overdue cards from the daily pool | C0+C1 |
 | DT4 | folder entry contains cards in nested deck folders | parent folder has a child folder that contains a deck with new cards | New Study starts from the parent folder | recursive folder scope loads cards from the child deck | C0+C1 |
@@ -33,7 +33,7 @@ Test file: `test/data/repositories/study_repository_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT1 | skip action is requested for the current item | session has a pending current item | repository skips that item | item is requeued without recording a passing attempt | C0+C1 |
 | DT2 | New Study answer fails in the current mode | new-study session has one pending Review item | repository records an incorrect answer | same flashcard is requeued in Review round 2 and no SRS progress is committed | C0+C1 |
-| DT3 | SRS Review answer is incorrect before later passing | due card starts in box 4 | repository records incorrect, then correct, and finalizes | review result is recovered, box decreases by one, and lapse count increments once | C0+C1 |
+| DT3 | SRS Review answer is incorrect before later passing | due card starts in box 4 | repository records incorrect, then correct, and finalizes | review result is recovered, the card is counted as mastered, one retry card is counted, box decreases by one, and lapse count increments once | C0+C1 |
 | DT4 | Review mode batch submit is requested for all pending items in the current Review round | new-study session has two pending Review items | repository batch answer runs with `grade=correct` | two correct attempts are inserted and both Review items become completed | C0+C1 |
 | DT5 | Review mode batch submit completes the first New Study mode | new-study session has one pending Review item and Match is the next configured mode | repository batch answer runs with `grade=correct` | session remains in progress and current item advances to `StudyMode.match` with `modeOrder=2` | C0+C1 |
 | DT6 | Review batch submit is called after the session has already advanced to Match | new-study session has passed Review and current item is Match | repository batch answer is requested again | request fails fast with validation instead of writing another batch | C0+C1 |

@@ -120,7 +120,75 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dashboardSubtitle =>
-      'Ôn các thẻ đến hạn và tiếp tục xây dựng thư viện của bạn.';
+      'Chọn hành động học hữu ích tiếp theo: ôn bài, học thẻ mới, tiếp tục phiên, hoặc xem sức khỏe thư viện.';
+
+  @override
+  String get dashboardTodayReviewTitle => 'Ôn hôm nay';
+
+  @override
+  String get dashboardOverdueLabel => 'Quá hạn';
+
+  @override
+  String dashboardReviewReadyMessage(int count) {
+    return '$count thẻ đã sẵn sàng để ôn SRS.';
+  }
+
+  @override
+  String get dashboardReviewEmptyMessage => 'Hiện không có thẻ cần ôn.';
+
+  @override
+  String get dashboardReviewNowAction => 'Ôn ngay';
+
+  @override
+  String get dashboardNewStudyTitle => 'Học mới';
+
+  @override
+  String get dashboardNewCardsLabel => 'Thẻ mới có thể học';
+
+  @override
+  String dashboardNewStudyMessage(int count) {
+    return '$count thẻ mới đã sẵn sàng cho phiên học theo deck hoặc folder.';
+  }
+
+  @override
+  String get dashboardNewStudyEmptyMessage =>
+      'Hãy thêm hoặc import thẻ trước khi bắt đầu phiên học mới.';
+
+  @override
+  String get dashboardStartNewStudyAction => 'Bắt đầu học mới';
+
+  @override
+  String get dashboardResumeTitle => 'Tiếp tục';
+
+  @override
+  String get dashboardActiveSessionsLabel => 'Phiên đang mở';
+
+  @override
+  String dashboardResumeMessage(int count) {
+    return '$count phiên có thể tiếp tục hoặc finalize.';
+  }
+
+  @override
+  String get dashboardResumeEmptyMessage =>
+      'Không có phiên học nào đang chờ tiếp tục.';
+
+  @override
+  String get dashboardContinueSessionAction => 'Tiếp tục phiên';
+
+  @override
+  String get dashboardLibraryHealthTitle => 'Sức khỏe thư viện';
+
+  @override
+  String dashboardLibraryHealthSummary(
+    int folderCount,
+    int deckCount,
+    int cardCount,
+  ) {
+    return '$folderCount thư mục · $deckCount bộ thẻ · $cardCount thẻ';
+  }
+
+  @override
+  String get dashboardMasteryLabel => 'Thành thạo';
 
   @override
   String get dashboardDueTodayTitle => 'Đến hạn hôm nay';
@@ -161,7 +229,17 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get progressActiveSessionsHeading => 'Phiên học';
+  String get progressOverviewHeading => 'Tổng quan tiến độ';
+
+  @override
+  String get progressOverviewSubtitle =>
+      'Theo dõi áp lực ôn tập, độ thành thạo thư viện và các phiên cần khôi phục.';
+
+  @override
+  String get progressReviewDueCount => 'Cần ôn';
+
+  @override
+  String get progressActiveSessionsHeading => 'Phiên học đang mở';
 
   @override
   String get progressActiveSessionsSubtitle =>
@@ -190,7 +268,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String progressSessionCardProgress(int completed, int total, int remaining) {
-    return 'Đã xong $completed/$total thẻ · còn $remaining';
+    return 'Đã xong $completed/$total bước học · còn $remaining';
   }
 
   @override
@@ -269,6 +347,22 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsLocaleVietnamese => 'Tiếng Việt';
+
+  @override
+  String get settingsStudyDefaultsTitle => 'Mặc định học';
+
+  @override
+  String get settingsStudyDefaultsSubtitle =>
+      'Cài đặt mặc định dùng khi tạo phiên học mới.';
+
+  @override
+  String get settingsStudyDefaultsLoading => 'Đang tải mặc định học';
+
+  @override
+  String get settingsNewStudyBatchSizeLabel => 'Số thẻ New Study';
+
+  @override
+  String get settingsReviewBatchSizeLabel => 'Số thẻ Review';
 
   @override
   String get settingsSpeechTitle => 'Giọng nói';
@@ -387,6 +481,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get foldersNewDeckTooltip => 'Bộ thẻ mới';
+
+  @override
+  String get foldersCreateChoiceTitle => 'Bạn muốn tạo gì?';
 
   @override
   String get foldersNewSubfolderTitle => 'Thư mục con mới';
@@ -542,6 +639,20 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String libraryFolderStudyStats(
+    int cardCount,
+    int dueCount,
+    int newCardCount,
+  ) {
+    return '$cardCount thẻ · $dueCount cần ôn · $newCardCount mới';
+  }
+
+  @override
+  String libraryFolderMastery(int percent) {
+    return '$percent% thành thạo';
+  }
+
+  @override
   String get libraryEmptyTitle => 'Chưa có thư mục nào';
 
   @override
@@ -670,6 +781,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flashcardsMoveTitle => 'Di chuyển flashcard';
 
   @override
+  String get flashcardsMoveProgressKeptNote =>
+      'Tiến độ học sẽ được giữ nguyên sau khi di chuyển.';
+
+  @override
   String get flashcardsMovedMessage => 'Đã di chuyển flashcard.';
 
   @override
@@ -727,6 +842,20 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flashcardsSaveAction => 'Lưu flashcard';
 
   @override
+  String get flashcardsLearningContentChangedTitle =>
+      'Bạn đã thay đổi nội dung học.';
+
+  @override
+  String get flashcardsLearningContentChangedMessage =>
+      'Giữ tiến độ hiện tại hay reset flashcard này?';
+
+  @override
+  String get flashcardsKeepProgressAction => 'Giữ tiến độ';
+
+  @override
+  String get flashcardsResetProgressAction => 'Reset tiến độ';
+
+  @override
   String get flashcardsUpdatedMessage => 'Đã cập nhật flashcard.';
 
   @override
@@ -746,6 +875,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyStartAction => 'Học ngay';
 
   @override
+  String get studyStartNewSessionAction => 'Bắt đầu phiên mới';
+
+  @override
+  String get studyStartNewSessionConfirmTitle => 'Bắt đầu phiên mới?';
+
+  @override
+  String get studyStartNewSessionConfirmMessage =>
+      'Bắt đầu phiên mới sẽ hủy phiên hiện tại còn dang dở.';
+
+  @override
   String get studyRestartAction => 'Bắt đầu lại';
 
   @override
@@ -753,6 +892,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get studyResumeAction => 'Tiếp tục';
+
+  @override
+  String get studyContinueSessionAction => 'Tiếp tục phiên';
 
   @override
   String get studyFlowTitle => 'Luồng học';
@@ -773,6 +915,11 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String studyBatchSizeLabel(int count) {
     return 'Số thẻ: $count';
+  }
+
+  @override
+  String studyBatchSizeRangeLabel(int min, int max) {
+    return '$min-$max thẻ';
   }
 
   @override
@@ -880,6 +1027,17 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get studyResultAccuracyLabel => 'Độ chính xác';
+
+  @override
+  String get studyResultAttemptAccuracyLabel => 'Độ chính xác lượt trả lời';
+
+  @override
+  String get studyResultRetryCardsLabel => 'Thẻ phải retry';
+
+  @override
+  String studyResultCardsMastered(int mastered, int total) {
+    return 'Thẻ mastered: $mastered/$total';
+  }
 
   @override
   String studyResultCardsCompleted(int completed, int total) {
@@ -1087,6 +1245,30 @@ class AppLocalizationsVi extends AppLocalizations {
   String get importSeparatorPipeDescription => 'thuật ngữ | định nghĩa';
 
   @override
+  String get importDuplicateHandlingTitle => 'Xử lý trùng lặp';
+
+  @override
+  String get importDuplicatePolicySkipExact => 'Bỏ qua trùng khớp hoàn toàn';
+
+  @override
+  String get importDuplicatePolicySkipExactDescription =>
+      'Cùng mặt trước nhưng mặt sau khác vẫn sẽ được import.';
+
+  @override
+  String get importDuplicatePolicyImportAnyway => 'Vẫn import';
+
+  @override
+  String get importDuplicatePolicyImportAnywayDescription =>
+      'Tùy chọn sau MVP: tạo mọi dòng hợp lệ, kể cả khi mặt trước và mặt sau trùng thẻ đã có.';
+
+  @override
+  String get importDuplicatePolicyUpdateExisting => 'Cập nhật thẻ đã có';
+
+  @override
+  String get importDuplicatePolicyUpdateExistingDescription =>
+      'Tùy chọn sau MVP: cập nhật thẻ khớp thay vì tạo duplicate mới.';
+
+  @override
   String get importPreviewAction => 'Xem trước';
 
   @override
@@ -1127,6 +1309,27 @@ class AppLocalizationsVi extends AppLocalizations {
   String importPreviewSummary(int valid, int invalid) {
     return '$valid hợp lệ · $invalid lỗi';
   }
+
+  @override
+  String importPreviewSummaryWithSkipped(int valid, int invalid, int skipped) {
+    return '$valid hợp lệ · $invalid lỗi · $skipped bỏ qua';
+  }
+
+  @override
+  String get importSkippedDuplicatesTitle => 'Duplicate bị bỏ qua';
+
+  @override
+  String importSkippedDuplicatesSubtitle(int count) {
+    return '$count duplicate trùng khớp hoàn toàn sẽ bị bỏ qua.';
+  }
+
+  @override
+  String get importSkippedDuplicateInFile =>
+      'Trùng khớp hoàn toàn trong file này';
+
+  @override
+  String get importSkippedDuplicateInDeck =>
+      'Trùng khớp hoàn toàn trong deck này';
 
   @override
   String get importNothingTitle => 'Không có dữ liệu để nhập';

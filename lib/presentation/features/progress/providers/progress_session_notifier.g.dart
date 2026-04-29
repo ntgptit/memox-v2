@@ -9,6 +9,47 @@ part of 'progress_session_notifier.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(progressOverview)
+final progressOverviewProvider = ProgressOverviewProvider._();
+
+final class ProgressOverviewProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<ProgressOverviewState>,
+          ProgressOverviewState,
+          FutureOr<ProgressOverviewState>
+        >
+    with
+        $FutureModifier<ProgressOverviewState>,
+        $FutureProvider<ProgressOverviewState> {
+  ProgressOverviewProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'progressOverviewProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$progressOverviewHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<ProgressOverviewState> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<ProgressOverviewState> create(Ref ref) {
+    return progressOverview(ref);
+  }
+}
+
+String _$progressOverviewHash() => r'70d7aad1afd7b9a38c8f3e6974cfd99457d957cb';
+
 @ProviderFor(progressStudySessions)
 final progressStudySessionsProvider = ProgressStudySessionsProvider._();
 

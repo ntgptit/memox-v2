@@ -102,7 +102,7 @@ final class LibraryOverviewQueryProvider
 }
 
 String _$libraryOverviewQueryHash() =>
-    r'84dcc181b3841a9ef5882caf9bcbd0337f45448a';
+    r'cacbb0f98b32cb241ab846123a6af33478b80685';
 
 @ProviderFor(LibraryOverviewActionController)
 final libraryOverviewActionControllerProvider =

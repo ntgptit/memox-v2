@@ -60,17 +60,26 @@ class _MxRetainedAsyncStateState<T extends Object>
       return const MxLoadingState();
     }
 
-    return Stack(
-      children: [
-        widget.dataBuilder(context, data),
-        if (widget.isLoading)
-          const Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(child: _MxRetainedAsyncRefreshBar()),
-          ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final content = widget.dataBuilder(context, data);
+        final boundedContent = constraints.hasBoundedWidth
+            ? SizedBox(width: constraints.maxWidth, child: content)
+            : content;
+
+        return Stack(
+          children: [
+            boundedContent,
+            if (widget.isLoading)
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: IgnorePointer(child: _MxRetainedAsyncRefreshBar()),
+              ),
+          ],
+        );
+      },
     );
   }
 

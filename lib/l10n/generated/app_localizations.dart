@@ -311,8 +311,120 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Review due cards and keep your library moving.'**
+  /// **'Choose the next useful study action: review, learn new cards, resume, or inspect library health.'**
   String get dashboardSubtitle;
+
+  /// No description provided for @dashboardTodayReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today Review'**
+  String get dashboardTodayReviewTitle;
+
+  /// No description provided for @dashboardOverdueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get dashboardOverdueLabel;
+
+  /// No description provided for @dashboardReviewReadyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} cards are ready for SRS review.'**
+  String dashboardReviewReadyMessage(int count);
+
+  /// No description provided for @dashboardReviewEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No review cards are due right now.'**
+  String get dashboardReviewEmptyMessage;
+
+  /// No description provided for @dashboardReviewNowAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Review now'**
+  String get dashboardReviewNowAction;
+
+  /// No description provided for @dashboardNewStudyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Study'**
+  String get dashboardNewStudyTitle;
+
+  /// No description provided for @dashboardNewCardsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New cards available'**
+  String get dashboardNewCardsLabel;
+
+  /// No description provided for @dashboardNewStudyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new cards are ready for a deck or folder session.'**
+  String dashboardNewStudyMessage(int count);
+
+  /// No description provided for @dashboardNewStudyEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Add or import cards before starting a new study session.'**
+  String get dashboardNewStudyEmptyMessage;
+
+  /// No description provided for @dashboardStartNewStudyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start new study'**
+  String get dashboardStartNewStudyAction;
+
+  /// No description provided for @dashboardResumeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get dashboardResumeTitle;
+
+  /// No description provided for @dashboardActiveSessionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Active sessions'**
+  String get dashboardActiveSessionsLabel;
+
+  /// No description provided for @dashboardResumeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sessions can be continued or finalized.'**
+  String dashboardResumeMessage(int count);
+
+  /// No description provided for @dashboardResumeEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No study session is waiting to resume.'**
+  String get dashboardResumeEmptyMessage;
+
+  /// No description provided for @dashboardContinueSessionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue session'**
+  String get dashboardContinueSessionAction;
+
+  /// No description provided for @dashboardLibraryHealthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Library health'**
+  String get dashboardLibraryHealthTitle;
+
+  /// No description provided for @dashboardLibraryHealthSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{folderCount} folders · {deckCount} decks · {cardCount} cards'**
+  String dashboardLibraryHealthSummary(
+    int folderCount,
+    int deckCount,
+    int cardCount,
+  );
+
+  /// No description provided for @dashboardMasteryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mastery'**
+  String get dashboardMasteryLabel;
 
   /// No description provided for @dashboardDueTodayTitle.
   ///
@@ -372,10 +484,28 @@ abstract class AppLocalizations {
     int cardCount,
   );
 
+  /// No description provided for @progressOverviewHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning overview'**
+  String get progressOverviewHeading;
+
+  /// No description provided for @progressOverviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track review pressure, library mastery, and open session recovery.'**
+  String get progressOverviewSubtitle;
+
+  /// No description provided for @progressReviewDueCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Due now'**
+  String get progressReviewDueCount;
+
   /// No description provided for @progressActiveSessionsHeading.
   ///
   /// In en, this message translates to:
-  /// **'Study sessions'**
+  /// **'Active sessions'**
   String get progressActiveSessionsHeading;
 
   /// No description provided for @progressActiveSessionsSubtitle.
@@ -423,7 +553,7 @@ abstract class AppLocalizations {
   /// No description provided for @progressSessionCardProgress.
   ///
   /// In en, this message translates to:
-  /// **'{completed} of {total} cards · {remaining} remaining'**
+  /// **'{completed} of {total} study steps · {remaining} remaining'**
   String progressSessionCardProgress(int completed, int total, int remaining);
 
   /// No description provided for @progressSessionCurrentCard.
@@ -569,6 +699,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vietnamese'**
   String get settingsLocaleVietnamese;
+
+  /// No description provided for @settingsStudyDefaultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Study defaults'**
+  String get settingsStudyDefaultsTitle;
+
+  /// No description provided for @settingsStudyDefaultsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Defaults used when a new study session is created.'**
+  String get settingsStudyDefaultsSubtitle;
+
+  /// No description provided for @settingsStudyDefaultsLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading study defaults'**
+  String get settingsStudyDefaultsLoading;
+
+  /// No description provided for @settingsNewStudyBatchSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New Study batch size'**
+  String get settingsNewStudyBatchSizeLabel;
+
+  /// No description provided for @settingsReviewBatchSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Review batch size'**
+  String get settingsReviewBatchSizeLabel;
 
   /// No description provided for @settingsSpeechTitle.
   ///
@@ -791,6 +951,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New deck'**
   String get foldersNewDeckTooltip;
+
+  /// No description provided for @foldersCreateChoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to create?'**
+  String get foldersCreateChoiceTitle;
 
   /// No description provided for @foldersNewSubfolderTitle.
   ///
@@ -1062,6 +1228,18 @@ abstract class AppLocalizations {
   /// **'{deckCount} decks · {itemCount} cards'**
   String libraryFolderStats(int deckCount, int itemCount);
 
+  /// No description provided for @libraryFolderStudyStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{cardCount} cards · {dueCount} due · {newCardCount} new'**
+  String libraryFolderStudyStats(int cardCount, int dueCount, int newCardCount);
+
+  /// No description provided for @libraryFolderMastery.
+  ///
+  /// In en, this message translates to:
+  /// **'Mastery {percent}%'**
+  String libraryFolderMastery(int percent);
+
   /// No description provided for @libraryEmptyTitle.
   ///
   /// In en, this message translates to:
@@ -1284,6 +1462,12 @@ abstract class AppLocalizations {
   /// **'Move flashcards'**
   String get flashcardsMoveTitle;
 
+  /// No description provided for @flashcardsMoveProgressKeptNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning progress will be kept after moving.'**
+  String get flashcardsMoveProgressKeptNote;
+
   /// No description provided for @flashcardsMovedMessage.
   ///
   /// In en, this message translates to:
@@ -1392,6 +1576,30 @@ abstract class AppLocalizations {
   /// **'Save flashcard'**
   String get flashcardsSaveAction;
 
+  /// No description provided for @flashcardsLearningContentChangedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You changed the learning content.'**
+  String get flashcardsLearningContentChangedTitle;
+
+  /// No description provided for @flashcardsLearningContentChangedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep existing progress or reset this card?'**
+  String get flashcardsLearningContentChangedMessage;
+
+  /// No description provided for @flashcardsKeepProgressAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep progress'**
+  String get flashcardsKeepProgressAction;
+
+  /// No description provided for @flashcardsResetProgressAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset progress'**
+  String get flashcardsResetProgressAction;
+
   /// No description provided for @flashcardsUpdatedMessage.
   ///
   /// In en, this message translates to:
@@ -1428,6 +1636,24 @@ abstract class AppLocalizations {
   /// **'Study now'**
   String get studyStartAction;
 
+  /// No description provided for @studyStartNewSessionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start new session'**
+  String get studyStartNewSessionAction;
+
+  /// No description provided for @studyStartNewSessionConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new session?'**
+  String get studyStartNewSessionConfirmTitle;
+
+  /// No description provided for @studyStartNewSessionConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting a new session will cancel the current unfinished session.'**
+  String get studyStartNewSessionConfirmMessage;
+
   /// No description provided for @studyRestartAction.
   ///
   /// In en, this message translates to:
@@ -1445,6 +1671,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue'**
   String get studyResumeAction;
+
+  /// No description provided for @studyContinueSessionAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue session'**
+  String get studyContinueSessionAction;
 
   /// No description provided for @studyFlowTitle.
   ///
@@ -1481,6 +1713,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Batch size: {count}'**
   String studyBatchSizeLabel(int count);
+
+  /// No description provided for @studyBatchSizeRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{min}-{max} cards'**
+  String studyBatchSizeRangeLabel(int min, int max);
 
   /// No description provided for @studyDecreaseBatch.
   ///
@@ -1685,6 +1923,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Accuracy'**
   String get studyResultAccuracyLabel;
+
+  /// No description provided for @studyResultAttemptAccuracyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempt accuracy'**
+  String get studyResultAttemptAccuracyLabel;
+
+  /// No description provided for @studyResultRetryCardsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry cards'**
+  String get studyResultRetryCardsLabel;
+
+  /// No description provided for @studyResultCardsMastered.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards mastered: {mastered}/{total}'**
+  String studyResultCardsMastered(int mastered, int total);
 
   /// No description provided for @studyResultCardsCompleted.
   ///
@@ -2070,6 +2326,48 @@ abstract class AppLocalizations {
   /// **'term | definition'**
   String get importSeparatorPipeDescription;
 
+  /// No description provided for @importDuplicateHandlingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate handling'**
+  String get importDuplicateHandlingTitle;
+
+  /// No description provided for @importDuplicatePolicySkipExact.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip exact duplicates'**
+  String get importDuplicatePolicySkipExact;
+
+  /// No description provided for @importDuplicatePolicySkipExactDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Same front with a different back will still be imported.'**
+  String get importDuplicatePolicySkipExactDescription;
+
+  /// No description provided for @importDuplicatePolicyImportAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Import anyway'**
+  String get importDuplicatePolicyImportAnyway;
+
+  /// No description provided for @importDuplicatePolicyImportAnywayDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Future option: create every valid row, even when front and back match an existing card.'**
+  String get importDuplicatePolicyImportAnywayDescription;
+
+  /// No description provided for @importDuplicatePolicyUpdateExisting.
+  ///
+  /// In en, this message translates to:
+  /// **'Update existing cards'**
+  String get importDuplicatePolicyUpdateExisting;
+
+  /// No description provided for @importDuplicatePolicyUpdateExistingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Future option: update matched cards instead of creating new duplicates.'**
+  String get importDuplicatePolicyUpdateExistingDescription;
+
   /// No description provided for @importPreviewAction.
   ///
   /// In en, this message translates to:
@@ -2129,6 +2427,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{valid} valid · {invalid} issues'**
   String importPreviewSummary(int valid, int invalid);
+
+  /// No description provided for @importPreviewSummaryWithSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{valid} valid · {invalid} issues · {skipped} skipped'**
+  String importPreviewSummaryWithSkipped(int valid, int invalid, int skipped);
+
+  /// No description provided for @importSkippedDuplicatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped duplicates'**
+  String get importSkippedDuplicatesTitle;
+
+  /// No description provided for @importSkippedDuplicatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} exact duplicates will be skipped.'**
+  String importSkippedDuplicatesSubtitle(int count);
+
+  /// No description provided for @importSkippedDuplicateInFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact duplicate in this file'**
+  String get importSkippedDuplicateInFile;
+
+  /// No description provided for @importSkippedDuplicateInDeck.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact duplicate in this deck'**
+  String get importSkippedDuplicateInDeck;
 
   /// No description provided for @importNothingTitle.
   ///

@@ -17,10 +17,16 @@ List<Widget> buildDeckImportPreviewSlivers({
   return [
     SliverToBoxAdapter(
       child: MxText(
-        l10n.importPreviewSummary(
-          preparation.previewItems.length,
-          preparation.issues.length,
-        ),
+        preparation.skippedDuplicateCount > 0
+            ? l10n.importPreviewSummaryWithSkipped(
+                preparation.previewItems.length,
+                preparation.issues.length,
+                preparation.skippedDuplicateCount,
+              )
+            : l10n.importPreviewSummary(
+                preparation.previewItems.length,
+                preparation.issues.length,
+              ),
         role: MxTextRole.formHelper,
       ),
     ),
@@ -41,6 +47,32 @@ List<Widget> buildDeckImportPreviewSlivers({
           return MxTermRow(
             term: l10n.importValidationIssueLine(issue.lineNumber),
             definition: issue.message,
+          );
+        },
+        separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
+      ),
+      const MxSliverGap(MxSpace.xl),
+    ],
+    if (preparation.skippedDuplicates.isNotEmpty) ...[
+      SliverToBoxAdapter(
+        child: _ImportPreviewHeader(
+          title: l10n.importSkippedDuplicatesTitle,
+          subtitle: l10n.importSkippedDuplicatesSubtitle(
+            preparation.skippedDuplicateCount,
+          ),
+        ),
+      ),
+      const MxSliverGap(MxSpace.md),
+      SliverList.separated(
+        key: const ValueKey('deck_import_skipped_duplicate_lazy_items'),
+        itemCount: preparation.skippedDuplicates.length,
+        itemBuilder: (context, index) {
+          final skipped = preparation.skippedDuplicates[index];
+          return MxTermRow(
+            term: skipped.draft.front,
+            definition: skipped.draft.back,
+            caption:
+                '${skipped.sourceLabel} · ${_skippedDuplicateReason(l10n, skipped.source)}',
           );
         },
         separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
@@ -103,4 +135,15 @@ class _ImportPreviewHeader extends StatelessWidget {
       ],
     );
   }
+}
+
+String _skippedDuplicateReason(
+  AppLocalizations l10n,
+  FlashcardImportDuplicateSource source,
+) {
+  return switch (source) {
+    FlashcardImportDuplicateSource.importFile =>
+      l10n.importSkippedDuplicateInFile,
+    FlashcardImportDuplicateSource.deck => l10n.importSkippedDuplicateInDeck,
+  };
 }

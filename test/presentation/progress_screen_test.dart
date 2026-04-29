@@ -17,8 +17,8 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          progressStudySessionsProvider.overrideWith(
-            (ref) => Future.value(const <StudySessionSnapshot>[]),
+          progressOverviewProvider.overrideWith(
+            (ref) => Future.value(_overview(sessions: const [])),
           ),
         ],
         child: const _TestApp(child: ProgressScreen()),
@@ -26,6 +26,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.text('Learning overview'), findsOneWidget);
+    expect(find.text('Due now'), findsOneWidget);
+    expect(find.text('Mastery'), findsOneWidget);
+    expect(find.text('Active sessions'), findsOneWidget);
     expect(find.text('No active study sessions'), findsOneWidget);
     expect(find.text('Open library'), findsOneWidget);
   });
@@ -36,15 +40,22 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          progressStudySessionsProvider.overrideWith(
-            (ref) => Future.value([
-              _snapshot(id: 'session-1'),
-              _snapshot(id: 'session-2', status: SessionStatus.readyToFinalize),
-              _snapshot(
-                id: 'session-3',
-                status: SessionStatus.failedToFinalize,
+          progressOverviewProvider.overrideWith(
+            (ref) => Future.value(
+              _overview(
+                sessions: [
+                  _snapshot(id: 'session-1'),
+                  _snapshot(
+                    id: 'session-2',
+                    status: SessionStatus.readyToFinalize,
+                  ),
+                  _snapshot(
+                    id: 'session-3',
+                    status: SessionStatus.failedToFinalize,
+                  ),
+                ],
               ),
-            ]),
+            ),
           ),
         ],
         child: const _TestApp(child: ProgressScreen()),
@@ -52,8 +63,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Study sessions'), findsOneWidget);
-    expect(find.text('Active'), findsOneWidget);
+    expect(find.text('Learning overview'), findsOneWidget);
+    expect(find.text('Due now'), findsOneWidget);
+    expect(find.text('New cards available'), findsOneWidget);
+    expect(find.text('Mastery'), findsOneWidget);
+    expect(find.text('Active sessions'), findsOneWidget);
+    expect(find.text('Active'), findsWidgets);
     expect(find.text('Ready'), findsOneWidget);
     expect(find.text('Needs retry'), findsOneWidget);
     expect(find.text('SRS Review · Deck'), findsWidgets);
@@ -87,15 +102,22 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          progressStudySessionsProvider.overrideWith(
-            (ref) => Future.value([
-              _snapshot(id: 'session-1'),
-              _snapshot(id: 'session-2', status: SessionStatus.readyToFinalize),
-              _snapshot(
-                id: 'session-3',
-                status: SessionStatus.failedToFinalize,
+          progressOverviewProvider.overrideWith(
+            (ref) => Future.value(
+              _overview(
+                sessions: [
+                  _snapshot(id: 'session-1'),
+                  _snapshot(
+                    id: 'session-2',
+                    status: SessionStatus.readyToFinalize,
+                  ),
+                  _snapshot(
+                    id: 'session-3',
+                    status: SessionStatus.failedToFinalize,
+                  ),
+                ],
               ),
-            ]),
+            ),
           ),
         ],
         child: const _TestApp(child: ProgressScreen()),
@@ -103,20 +125,69 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    final reviewRect = tester.getRect(
+      find.byKey(const ValueKey('progress_metric_review')),
+    );
+    final newCardsRect = tester.getRect(
+      find.byKey(const ValueKey('progress_metric_new_cards')),
+    );
+    final masteryRect = tester.getRect(
+      find.byKey(const ValueKey('progress_metric_mastery')),
+    );
     final activeRect = tester.getRect(
       find.byKey(const ValueKey('progress_metric_active')),
     );
-    final readyRect = tester.getRect(
-      find.byKey(const ValueKey('progress_metric_ready')),
+
+    expect(reviewRect.top, moreOrLessEquals(newCardsRect.top));
+    expect(reviewRect.top, moreOrLessEquals(masteryRect.top));
+    expect(reviewRect.top, moreOrLessEquals(activeRect.top));
+    expect(newCardsRect.left, greaterThan(reviewRect.right));
+    expect(masteryRect.left, greaterThan(newCardsRect.right));
+    expect(activeRect.left, greaterThan(masteryRect.right));
+  });
+
+  testWidgets('DT4 onDisplay: new study session progress uses study steps', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressOverviewProvider.overrideWith(
+            (ref) => Future.value(
+              _overview(
+                sessions: [
+                  _snapshot(
+                    studyType: StudyType.newStudy,
+                    studyFlow: StudyFlow.newFullCycle,
+                    totalCards: 10,
+                    totalModeCount: 5,
+                    completedAttempts: 10,
+                    remainingCount: 40,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        child: const _TestApp(child: ProgressScreen()),
+      ),
     );
-    final failedRect = tester.getRect(
-      find.byKey(const ValueKey('progress_metric_failed')),
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('10 of 50 study steps · 40 remaining'),
+      300,
+      scrollable: find.byType(Scrollable).first,
     );
 
-    expect(activeRect.top, moreOrLessEquals(readyRect.top));
-    expect(activeRect.top, moreOrLessEquals(failedRect.top));
-    expect(readyRect.left, greaterThan(activeRect.right));
-    expect(failedRect.left, greaterThan(readyRect.right));
+    final progressValues = tester
+        .widgetList<LinearProgressIndicator>(
+          find.byType(LinearProgressIndicator),
+        )
+        .map((indicator) => indicator.value)
+        .whereType<double>();
+
+    expect(progressValues, contains(moreOrLessEquals(0.2)));
   });
 
   testWidgets('DT1 onSelect: cancel confirms before mutating session', (
@@ -128,8 +199,8 @@ void main() {
       ProviderScope(
         overrides: [
           studyRepoProvider.overrideWithValue(repo),
-          progressStudySessionsProvider.overrideWith(
-            (ref) => Future.value([_snapshot()]),
+          progressOverviewProvider.overrideWith(
+            (ref) => Future.value(_overview(sessions: [_snapshot()])),
           ),
         ],
         child: const _TestApp(child: ProgressScreen()),
@@ -154,6 +225,24 @@ void main() {
 
     expect(repo.cancelCount, 1);
   });
+}
+
+ProgressOverviewState _overview({
+  required List<StudySessionSnapshot> sessions,
+  int overdueCount = 2,
+  int dueTodayCount = 5,
+  int newCardCount = 4,
+  int cardCount = 12,
+  int masteryPercent = 48,
+}) {
+  return ProgressOverviewState(
+    sessions: sessions,
+    overdueCount: overdueCount,
+    dueTodayCount: dueTodayCount,
+    newCardCount: newCardCount,
+    cardCount: cardCount,
+    masteryPercent: masteryPercent,
+  );
 }
 
 class _TestApp extends StatelessWidget {
@@ -260,15 +349,30 @@ final class _ProgressScreenStudyRepo implements StudyRepo {
 StudySessionSnapshot _snapshot({
   String id = 'session-1',
   SessionStatus status = SessionStatus.inProgress,
+  StudyType studyType = StudyType.srsReview,
+  StudyFlow studyFlow = StudyFlow.srsFillReview,
+  int totalCards = 1,
+  int totalModeCount = 1,
+  int? completedAttempts,
+  int? remainingCount,
 }) {
-  final card = _card();
+  final cards = [
+    for (var index = 1; index <= totalCards; index++) _card(index),
+  ];
+  final card = cards.firstOrNull;
+  final totalSteps = totalCards * totalModeCount;
+  final completed =
+      completedAttempts ??
+      (status == SessionStatus.inProgress ? 0 : totalSteps);
+  final remaining =
+      remainingCount ?? (status == SessionStatus.inProgress ? totalSteps : 0);
   return StudySessionSnapshot(
     session: StudySession(
       id: id,
       entryType: StudyEntryType.deck,
       entryRefId: 'deck-1',
-      studyType: StudyType.srsReview,
-      studyFlow: StudyFlow.srsFillReview,
+      studyType: studyType,
+      studyFlow: studyFlow,
       settings: const StudySettingsSnapshot(
         batchSize: 1,
         shuffleFlashcards: false,
@@ -280,29 +384,34 @@ StudySessionSnapshot _snapshot({
       endedAt: null,
       restartedFromSessionId: null,
     ),
-    currentItem: status == SessionStatus.inProgress
+    currentItem: status == SessionStatus.inProgress && card != null
         ? StudySessionItem(
             id: 'item-1',
             sessionId: id,
             flashcard: card,
-            studyMode: StudyMode.fill,
+            studyMode: studyType == StudyType.newStudy
+                ? StudyMode.review
+                : StudyMode.fill,
             modeOrder: 1,
             roundIndex: 1,
             queuePosition: 1,
-            sourcePool: SessionItemSourcePool.due,
+            sourcePool: studyType == StudyType.newStudy
+                ? SessionItemSourcePool.newCards
+                : SessionItemSourcePool.due,
             status: SessionItemStatus.pending,
             completedAt: null,
           )
         : null,
-    sessionFlashcards: [card],
+    sessionFlashcards: cards,
     summary: StudySummary(
-      totalCards: 1,
-      completedAttempts: status == SessionStatus.inProgress ? 0 : 1,
-      correctAttempts: status == SessionStatus.inProgress ? 0 : 1,
+      totalCards: totalCards,
+      totalModeCount: totalModeCount,
+      completedAttempts: completed,
+      correctAttempts: completed,
       incorrectAttempts: 0,
       increasedBoxCount: 0,
       decreasedBoxCount: 0,
-      remainingCount: status == SessionStatus.inProgress ? 1 : 0,
+      remainingCount: remaining,
     ),
     canFinalize:
         status == SessionStatus.readyToFinalize ||
@@ -310,12 +419,12 @@ StudySessionSnapshot _snapshot({
   );
 }
 
-StudyFlashcardRef _card() {
-  return const StudyFlashcardRef(
-    id: 'card-1',
+StudyFlashcardRef _card([int index = 1]) {
+  return StudyFlashcardRef(
+    id: 'card-$index',
     deckId: 'deck-1',
-    front: 'front 1',
-    back: 'back 1',
+    front: 'front $index',
+    back: 'back $index',
     sourcePool: SessionItemSourcePool.due,
   );
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../tokens/app_opacity.dart';
 import '../tokens/app_radius.dart';
+import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class InputThemeBuilder {
@@ -10,7 +11,10 @@ abstract final class InputThemeBuilder {
       filled: true,
       fillColor: scheme.surfaceContainerLow,
       isDense: false,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       hintStyle: AppTypography.bodyMedium.copyWith(
         color: scheme.onSurfaceVariant,
       ),

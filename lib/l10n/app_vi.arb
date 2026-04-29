@@ -42,7 +42,59 @@
   "appShellProgressPlaceholderDescription": "Phần nền cho Tiến độ chưa được nối xong.",
   "appShellSettingsPlaceholderDescription": "Phần nền cho Cài đặt chưa được nối xong.",
   "dashboardHeading": "Trọng tâm học hôm nay",
-  "dashboardSubtitle": "Ôn các thẻ đến hạn và tiếp tục xây dựng thư viện của bạn.",
+  "dashboardSubtitle": "Chọn hành động học hữu ích tiếp theo: ôn bài, học thẻ mới, tiếp tục phiên, hoặc xem sức khỏe thư viện.",
+  "dashboardTodayReviewTitle": "Ôn hôm nay",
+  "dashboardOverdueLabel": "Quá hạn",
+  "dashboardReviewReadyMessage": "{count} thẻ đã sẵn sàng để ôn SRS.",
+  "@dashboardReviewReadyMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardReviewEmptyMessage": "Hiện không có thẻ cần ôn.",
+  "dashboardReviewNowAction": "Ôn ngay",
+  "dashboardNewStudyTitle": "Học mới",
+  "dashboardNewCardsLabel": "Thẻ mới có thể học",
+  "dashboardNewStudyMessage": "{count} thẻ mới đã sẵn sàng cho phiên học theo deck hoặc folder.",
+  "@dashboardNewStudyMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardNewStudyEmptyMessage": "Hãy thêm hoặc import thẻ trước khi bắt đầu phiên học mới.",
+  "dashboardStartNewStudyAction": "Bắt đầu học mới",
+  "dashboardResumeTitle": "Tiếp tục",
+  "dashboardActiveSessionsLabel": "Phiên đang mở",
+  "dashboardResumeMessage": "{count} phiên có thể tiếp tục hoặc finalize.",
+  "@dashboardResumeMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardResumeEmptyMessage": "Không có phiên học nào đang chờ tiếp tục.",
+  "dashboardContinueSessionAction": "Tiếp tục phiên",
+  "dashboardLibraryHealthTitle": "Sức khỏe thư viện",
+  "dashboardLibraryHealthSummary": "{folderCount} thư mục · {deckCount} bộ thẻ · {cardCount} thẻ",
+  "@dashboardLibraryHealthSummary": {
+    "placeholders": {
+      "folderCount": {
+        "type": "int"
+      },
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardMasteryLabel": "Thành thạo",
   "dashboardDueTodayTitle": "Đến hạn hôm nay",
   "dashboardDueTodayMessage": "{count} thẻ sẵn sàng để ôn",
   "@dashboardDueTodayMessage": {
@@ -82,7 +134,10 @@
       }
     }
   },
-  "progressActiveSessionsHeading": "Phiên học",
+  "progressOverviewHeading": "Tổng quan tiến độ",
+  "progressOverviewSubtitle": "Theo dõi áp lực ôn tập, độ thành thạo thư viện và các phiên cần khôi phục.",
+  "progressReviewDueCount": "Cần ôn",
+  "progressActiveSessionsHeading": "Phiên học đang mở",
   "progressActiveSessionsSubtitle": "Tiếp tục, finalize, thử lại finalize hoặc hủy các phiên học vẫn đang mở.",
   "progressActiveSessionsCount": "Đang mở",
   "progressReadySessionsCount": "Sẵn sàng",
@@ -96,7 +151,7 @@
       "entryType": {}
     }
   },
-  "progressSessionCardProgress": "Đã xong {completed}/{total} thẻ · còn {remaining}",
+  "progressSessionCardProgress": "Đã xong {completed}/{total} bước học · còn {remaining}",
   "@progressSessionCardProgress": {
     "placeholders": {
       "completed": {
@@ -145,6 +200,11 @@
   "settingsLocaleSystem": "Theo hệ thống",
   "settingsLocaleEnglish": "Tiếng Anh",
   "settingsLocaleVietnamese": "Tiếng Việt",
+  "settingsStudyDefaultsTitle": "Mặc định học",
+  "settingsStudyDefaultsSubtitle": "Cài đặt mặc định dùng khi tạo phiên học mới.",
+  "settingsStudyDefaultsLoading": "Đang tải mặc định học",
+  "settingsNewStudyBatchSizeLabel": "Số thẻ New Study",
+  "settingsReviewBatchSizeLabel": "Số thẻ Review",
   "settingsSpeechTitle": "Giọng nói",
   "settingsSpeechLabel": "Hỗ trợ phát âm tiếng Hàn và tiếng Anh",
   "settingsSpeechLoading": "Đang tải cài đặt giọng nói",
@@ -194,6 +254,7 @@
   "errorUnexpected": "Đã xảy ra lỗi.",
   "foldersNewSubfolderTooltip": "Thư mục con mới",
   "foldersNewDeckTooltip": "Bộ thẻ mới",
+  "foldersCreateChoiceTitle": "Bạn muốn tạo gì?",
   "foldersNewSubfolderTitle": "Thư mục con mới",
   "foldersFolderNameLabel": "Tên thư mục",
   "foldersFolderNameHint": "ví dụ: Luyện nghe",
@@ -283,6 +344,28 @@
       }
     }
   },
+  "libraryFolderStudyStats": "{cardCount} thẻ · {dueCount} cần ôn · {newCardCount} mới",
+  "@libraryFolderStudyStats": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueCount": {
+        "type": "int"
+      },
+      "newCardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryFolderMastery": "{percent}% thành thạo",
+  "@libraryFolderMastery": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "libraryEmptyTitle": "Chưa có thư mục nào",
   "libraryEmptyMessage": "Tạo thư mục đầu tiên để bắt đầu xây dựng thư viện của bạn.",
   "decksCreateTitle": "Tạo bộ thẻ",
@@ -345,6 +428,7 @@
   "flashcardsEmptyTitle": "Chưa có flashcard nào",
   "flashcardsEmptyMessage": "Hãy thêm thẻ thủ công hoặc nhập chúng vào bộ thẻ này.",
   "flashcardsMoveTitle": "Di chuyển flashcard",
+  "flashcardsMoveProgressKeptNote": "Tiến độ học sẽ được giữ nguyên sau khi di chuyển.",
   "flashcardsMovedMessage": "Đã di chuyển flashcard.",
   "flashcardsDeleteTitle": "Xóa flashcard",
   "flashcardsDeleteMessage": "Thao tác này sẽ xóa vĩnh viễn các flashcard đã chọn.",
@@ -363,15 +447,23 @@
   "flashcardsSavedMessage": "Đã lưu flashcard.",
   "flashcardsSaveChanges": "Lưu thay đổi",
   "flashcardsSaveAction": "Lưu flashcard",
+  "flashcardsLearningContentChangedTitle": "Bạn đã thay đổi nội dung học.",
+  "flashcardsLearningContentChangedMessage": "Giữ tiến độ hiện tại hay reset flashcard này?",
+  "flashcardsKeepProgressAction": "Giữ tiến độ",
+  "flashcardsResetProgressAction": "Reset tiến độ",
   "flashcardsUpdatedMessage": "Đã cập nhật flashcard.",
   "flashcardsCreatedMessage": "Đã tạo flashcard.",
   "studyEntryTitle": "Học",
   "studyEntryHeading": "Bắt đầu phiên học",
   "studyEntrySubtitle": "Chọn luồng học và chốt thiết lập cho phiên này.",
   "studyStartAction": "Học ngay",
+  "studyStartNewSessionAction": "Bắt đầu phiên mới",
+  "studyStartNewSessionConfirmTitle": "Bắt đầu phiên mới?",
+  "studyStartNewSessionConfirmMessage": "Bắt đầu phiên mới sẽ hủy phiên hiện tại còn dang dở.",
   "studyRestartAction": "Bắt đầu lại",
   "studyResumeTitle": "Phiên học đang dở",
   "studyResumeAction": "Tiếp tục",
+  "studyContinueSessionAction": "Tiếp tục phiên",
   "studyFlowTitle": "Luồng học",
   "studyTypeNew": "Học mới",
   "studyTypeReview": "Ôn SRS",
@@ -381,6 +473,17 @@
   "@studyBatchSizeLabel": {
     "placeholders": {
       "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyBatchSizeRangeLabel": "{min}-{max} thẻ",
+  "@studyBatchSizeRangeLabel": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
         "type": "int"
       }
     }
@@ -434,6 +537,19 @@
   "studyResultBoxDown": "Giảm box",
   "studyResultRemaining": "Còn lại",
   "studyResultAccuracyLabel": "Độ chính xác",
+  "studyResultAttemptAccuracyLabel": "Độ chính xác lượt trả lời",
+  "studyResultRetryCardsLabel": "Thẻ phải retry",
+  "studyResultCardsMastered": "Thẻ mastered: {mastered}/{total}",
+  "@studyResultCardsMastered": {
+    "placeholders": {
+      "mastered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "studyResultCardsCompleted": "Đã hoàn thành {completed}/{total} thẻ",
   "@studyResultCardsCompleted": {
     "placeholders": {
@@ -525,6 +641,13 @@
   "importSeparatorSlashDescription": "thuật ngữ / định nghĩa",
   "importSeparatorSemicolonDescription": "thuật ngữ; định nghĩa",
   "importSeparatorPipeDescription": "thuật ngữ | định nghĩa",
+  "importDuplicateHandlingTitle": "Xử lý trùng lặp",
+  "importDuplicatePolicySkipExact": "Bỏ qua trùng khớp hoàn toàn",
+  "importDuplicatePolicySkipExactDescription": "Cùng mặt trước nhưng mặt sau khác vẫn sẽ được import.",
+  "importDuplicatePolicyImportAnyway": "Vẫn import",
+  "importDuplicatePolicyImportAnywayDescription": "Tùy chọn sau MVP: tạo mọi dòng hợp lệ, kể cả khi mặt trước và mặt sau trùng thẻ đã có.",
+  "importDuplicatePolicyUpdateExisting": "Cập nhật thẻ đã có",
+  "importDuplicatePolicyUpdateExistingDescription": "Tùy chọn sau MVP: cập nhật thẻ khớp thay vì tạo duplicate mới.",
   "importPreviewAction": "Xem trước",
   "importSuccessMessage": "Đã nhập {count} flashcard.",
   "@importSuccessMessage": {
@@ -571,6 +694,31 @@
       }
     }
   },
+  "importPreviewSummaryWithSkipped": "{valid} hợp lệ · {invalid} lỗi · {skipped} bỏ qua",
+  "@importPreviewSummaryWithSkipped": {
+    "placeholders": {
+      "valid": {
+        "type": "int"
+      },
+      "invalid": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "importSkippedDuplicatesTitle": "Duplicate bị bỏ qua",
+  "importSkippedDuplicatesSubtitle": "{count} duplicate trùng khớp hoàn toàn sẽ bị bỏ qua.",
+  "@importSkippedDuplicatesSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importSkippedDuplicateInFile": "Trùng khớp hoàn toàn trong file này",
+  "importSkippedDuplicateInDeck": "Trùng khớp hoàn toàn trong deck này",
   "importNothingTitle": "Không có dữ liệu để nhập",
   "importNothingMessage": "Không có dòng hoặc block hợp lệ nào được tạo từ nguồn dữ liệu.",
   "sharedErrorTitle": "Đã xảy ra lỗi",

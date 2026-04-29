@@ -730,7 +730,7 @@ final class StudyRepoImpl implements StudyRepo {
       currentItem: currentItem == null ? null : await _mapItem(currentItem),
       currentRoundItems: await _mapItems(currentRoundItems),
       sessionFlashcards: flashcards,
-      summary: _summary(items: items, attempts: attempts),
+      summary: _summary(session: session, items: items, attempts: attempts),
       canFinalize:
           session.status == SessionStatus.readyToFinalize.storageValue ||
           session.status == SessionStatus.failedToFinalize.storageValue,
@@ -738,6 +738,7 @@ final class StudyRepoImpl implements StudyRepo {
   }
 
   StudySummary _summary({
+    required local.StudySession session,
     required List<local.StudySessionItem> items,
     required List<local.StudyAttempt> attempts,
   }) {
@@ -746,13 +747,16 @@ final class StudyRepoImpl implements StudyRepo {
         .map((item) => item.flashcardId)
         .toSet();
     final pending = items.where((item) => item.status == 'pending').length;
-    final correct = attempts
-        .where(
-          (attempt) => DatabaseEnumCodecs.attemptGradeFromStorage(
-            attempt.result,
-          ).isPassing,
-        )
-        .length;
+    final failedAttemptCardIds = <String>{};
+    var correct = 0;
+    for (final attempt in attempts) {
+      final grade = DatabaseEnumCodecs.attemptGradeFromStorage(attempt.result);
+      if (grade.isPassing) {
+        correct += 1;
+        continue;
+      }
+      failedAttemptCardIds.add(attempt.flashcardId);
+    }
     final boxDeltas = <String, int>{};
     for (final attempt in attempts) {
       final oldBox = attempt.oldBox;
@@ -764,6 +768,12 @@ final class StudyRepoImpl implements StudyRepo {
     }
     return StudySummary(
       totalCards: originalCards.length,
+      masteredCardCount: _masteredCardCount(
+        originalCards: originalCards,
+        items: items,
+        requiredModeCount: _requiredModeCount(session),
+      ),
+      retryCardCount: failedAttemptCardIds.length,
       completedAttempts: attempts.length,
       correctAttempts: correct,
       incorrectAttempts: attempts.length - correct,
@@ -771,6 +781,41 @@ final class StudyRepoImpl implements StudyRepo {
       decreasedBoxCount: boxDeltas.values.where((delta) => delta < 0).length,
       remainingCount: pending,
     );
+  }
+
+  int _masteredCardCount({
+    required Set<String> originalCards,
+    required List<local.StudySessionItem> items,
+    required int requiredModeCount,
+  }) {
+    final completedModesByCard = <String, Set<int>>{};
+    final unfinishedCards = <String>{};
+    for (final item in items) {
+      if (!originalCards.contains(item.flashcardId)) {
+        continue;
+      }
+      if (item.status == SessionItemStatus.completed.storageValue) {
+        completedModesByCard
+            .putIfAbsent(item.flashcardId, () => <int>{})
+            .add(item.modeOrder);
+        continue;
+      }
+      unfinishedCards.add(item.flashcardId);
+    }
+
+    return originalCards.where((cardId) {
+      if (unfinishedCards.contains(cardId)) {
+        return false;
+      }
+      return (completedModesByCard[cardId]?.length ?? 0) >= requiredModeCount;
+    }).length;
+  }
+
+  int _requiredModeCount(local.StudySession session) {
+    return switch (DatabaseEnumCodecs.studyFlowFromStorage(session.studyFlow)) {
+      StudyFlow.newFullCycle => 5,
+      StudyFlow.srsFillReview => 1,
+    };
   }
 
   StudySession _mapSession(local.StudySession row) {

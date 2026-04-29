@@ -4,14 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memox/app/di/content_providers.dart';
 import 'package:memox/app/router/route_names.dart';
+import 'package:memox/core/errors/result.dart';
+import 'package:memox/domain/entities/flashcard_entity.dart';
 import 'package:memox/domain/enums/content_sort_mode.dart';
+import 'package:memox/domain/repositories/flashcard_repository.dart';
+import 'package:memox/domain/usecases/flashcard_usecases.dart';
+import 'package:memox/domain/value_objects/content_actions.dart';
+import 'package:memox/domain/value_objects/content_queries.dart';
 import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/flashcard_list_screen.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_term_row.dart';
 
 void main() {
@@ -312,6 +320,53 @@ void main() {
     expect(find.text('Flashcard actions'), findsNothing);
   });
 
+  testWidgets('DT1 onMove: move destination picker states progress is kept', (
+    WidgetTester tester,
+  ) async {
+    const deckId = 'deck-001';
+    final container = ProviderContainer(
+      overrides: [
+        flashcardListQueryProvider(deckId).overrideWith(
+          (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
+        ),
+        getFlashcardMoveTargetsUseCaseProvider.overrideWithValue(
+          GetFlashcardMoveTargetsUseCase(
+            const _MoveTargetsFlashcardRepository([
+              DeckMoveTarget(
+                id: 'deck-target-001',
+                name: 'Target deck',
+                breadcrumb: <String>['Korean', 'Target deck'],
+              ),
+            ]),
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('Front 1'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Select'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(MxSecondaryButton, 'Move'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Move flashcards'), findsOneWidget);
+    expect(
+      find.text('Learning progress will be kept after moving.'),
+      findsOneWidget,
+    );
+    expect(find.text('Target deck'), findsOneWidget);
+  });
+
   testWidgets(
     'DT1 onUpdate: flashcard edit action keeps direct editor navigation',
     (WidgetTester tester) async {
@@ -444,5 +499,97 @@ class _TestApp extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     );
+  }
+}
+
+final class _MoveTargetsFlashcardRepository implements FlashcardRepository {
+  const _MoveTargetsFlashcardRepository(this.targets);
+
+  final List<DeckMoveTarget> targets;
+
+  @override
+  Future<List<DeckMoveTarget>> getFlashcardMoveTargets({
+    required String deckId,
+    required List<String> flashcardIds,
+  }) async {
+    return targets;
+  }
+
+  @override
+  Future<FlashcardEntity> getFlashcard(String flashcardId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<FlashcardListReadModel> getFlashcards(
+    String deckId,
+    ContentQuery query,
+  ) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<FlashcardEntity>> createFlashcard({
+    required String deckId,
+    required FlashcardDraft draft,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<FlashcardEntity>> updateFlashcard({
+    required String flashcardId,
+    required FlashcardDraft draft,
+    FlashcardProgressEditPolicy progressPolicy =
+        FlashcardProgressEditPolicy.keepProgress,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<void>> deleteFlashcards(List<String> flashcardIds) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<void>> moveFlashcards({
+    required List<String> flashcardIds,
+    required String targetDeckId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<void>> reorderFlashcards({
+    required String deckId,
+    required List<String> orderedFlashcardIds,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<FlashcardImportPreparation>> prepareImport({
+    required String deckId,
+    required ImportSourceFormat format,
+    required String rawContent,
+    FlashcardImportDuplicatePolicy duplicatePolicy =
+        FlashcardImportDuplicatePolicy.skipExactDuplicates,
+    ImportStructuredTextSeparator structuredTextSeparator =
+        ImportStructuredTextSeparator.auto,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<int>> commitImport({
+    required String deckId,
+    required FlashcardImportPreparation preparation,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<ExportData>> exportFlashcards(List<String> flashcardIds) {
+    throw UnimplementedError();
   }
 }

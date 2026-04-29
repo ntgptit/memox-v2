@@ -4,6 +4,7 @@ import '../../../../app/di/study_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
+import 'study_settings_defaults_notifier.dart';
 import 'study_session_notifier.dart';
 
 part 'study_entry_notifier.g.dart';
@@ -42,6 +43,7 @@ Future<StudyEntryState> studyEntryState(
   String entryType,
   String? entryRefId,
 ) async {
+  ref.watch(studySettingsDataRevisionProvider);
   ref.watch(studySessionDataRevisionProvider);
   final parsedEntryType = _parseEntryType(entryType);
   final store = await ref.watch(studySettingsStoreProvider.future);

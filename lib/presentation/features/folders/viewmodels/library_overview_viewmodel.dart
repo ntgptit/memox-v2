@@ -79,6 +79,8 @@ Future<LibraryOverviewState> libraryOverviewQuery(Ref ref) async {
             icon: Icons.folder_outlined,
             deckCount: item.deckCount,
             itemCount: item.itemCount,
+            dueCardCount: item.dueCardCount,
+            newCardCount: item.newCardCount,
             masteryPercent: item.masteryPercent,
           ),
         )

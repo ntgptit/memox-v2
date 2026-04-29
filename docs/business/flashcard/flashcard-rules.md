@@ -9,6 +9,10 @@
 - Chỉ tạo flashcard trong context của 1 deck cụ thể
 - Sửa flashcard chỉ thay đổi nội dung hoặc metadata của chính flashcard
 - Sau khi sửa, flashcard vẫn phải thuộc đúng 1 deck
+- Nếu flashcard đã có tiến độ học và user sửa `front` hoặc `back`, UI phải hỏi user giữ tiến độ hiện tại hay reset tiến độ của flashcard đó
+- Nếu user chỉ sửa `note`, progress học hiện tại được giữ và không cần hỏi policy reset
+- Chọn giữ tiến độ khi sửa nội dung học không đổi `flashcard_progress`
+- Chọn reset tiến độ khi sửa nội dung học đưa `flashcard_progress` về trạng thái thẻ mới
 
 ## Rule tạo flashcard thủ công
 - User có thể tạo thủ công từng flashcard trong 1 deck cụ thể
@@ -31,6 +35,7 @@
 - Hỗ trợ bulk move nhiều flashcard sang cùng 1 deck đích
 - Sau khi move, mỗi flashcard vẫn chỉ thuộc đúng 1 deck
 - Move flashcard không làm thay đổi SRS, due date và lịch sử học của flashcard
+- UI move flashcard cần nói rõ rằng tiến độ học vẫn được giữ sau khi di chuyển
 
 ## Rule reorder flashcard
 - Hỗ trợ reorder thủ công flashcard trong cùng 1 deck

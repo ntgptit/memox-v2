@@ -18,7 +18,7 @@ DT_MD_EVENT_PATTERN = re.compile(
     r"^\s*#{2,6}\s*(?:Decision table:\s*)?(?P<event>[A-Za-z][A-Za-z0-9_]*)\s*$",
 )
 DT_DOC_TEST_FILE_PATTERN = re.compile(
-    r"^\s*Test file:\s*`(?P<test_path>test/[^`]+_test\.dart)`\s*$",
+    r"^\s*Test file:\s*`(?P<test_path>(?:test|integration_test)/[^`]+_test\.dart)`\s*$",
 )
 DT_HEADER_PATTERN = re.compile(r"^\s*\|[^|]*\bID\b[^|]*\|")
 DT_ROW_PATTERN = re.compile(r"^\s*\|\s*(?P<case_id>DT\d+)\s*\|(?P<cells>.*)$")
@@ -26,6 +26,9 @@ DT_TEST_PATTERN = re.compile(
     r"\btest(?:Widgets)?\s*\(\s*(?P<quote>['\"])(?P<case_id>DT\d+)\s+"
     r"(?P<event>[A-Za-z][A-Za-z0-9_]*):",
     re.S,
+)
+LOCAL_DART_IMPORT_PATTERN = re.compile(
+    r"(?m)^\s*import\s+(?P<quote>['\"])(?P<path>(?!dart:|package:)[^'\"]+\.dart)(?P=quote)"
 )
 BRANCH_PATTERN = re.compile(r"\b(?:if|switch|case|catch|try)\b")
 METHOD_PATTERN = re.compile(
@@ -184,7 +187,8 @@ def check_case_coverage(rule: Rule, scanner: FileScanner) -> list[Violation]:
                     {
                         "detail": (
                             "Decision Table markdown must declare its test file "
-                            "with `Test file: `test/..._test.dart``."
+                            "with `Test file: `test/..._test.dart`` or "
+                            "`Test file: `integration_test/..._test.dart``."
                         ),
                     },
                 )
@@ -500,7 +504,7 @@ def _read_test_infos(scanner: FileScanner, rule: Rule) -> list[TestFileInfo]:
             if _matches_any(rel_path, tuple(rule.params.get("exclude_test_paths", []))):
                 continue
 
-            content = _read_text(test_path)
+            content = _read_test_content(test_path, scanner.root)
             infos.append(
                 TestFileInfo(
                     path=test_path,
@@ -915,6 +919,33 @@ def _strip_comments_and_strings(content: str) -> str:
 
 def _read_text(path: Path) -> str:
     return path.read_text(encoding=UTF8_ENCODING)
+
+
+def _read_test_content(path: Path, root: Path) -> str:
+    content = _read_text(path)
+    if not _normalize(path, root).startswith("integration_test/"):
+        return content
+
+    module_contents: list[str] = []
+    for match in LOCAL_DART_IMPORT_PATTERN.finditer(content):
+        module_path = (path.parent / match.group("path")).resolve()
+        if not _is_inside(module_path, root):
+            continue
+        if not module_path.exists() or module_path.name.endswith("_test.dart"):
+            continue
+        module_contents.append(_read_text(module_path))
+
+    if not module_contents:
+        return content
+    return "\n".join([content, *module_contents])
+
+
+def _is_inside(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root.resolve())
+    except ValueError:
+        return False
+    return True
 
 
 def _normalize(path: Path, root: Path) -> str:

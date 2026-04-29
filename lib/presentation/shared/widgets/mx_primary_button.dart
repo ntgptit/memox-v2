@@ -55,27 +55,7 @@ class MxPrimaryButton extends StatelessWidget {
               color: spinnerColor,
             ),
           )
-        : Row(
-            mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (leadingIcon != null) ...[
-                Icon(leadingIcon, size: AppIconSizes.md),
-                const MxGap(AppSpacing.sm),
-              ],
-              Flexible(
-                child: Text(
-                  label,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-              if (trailingIcon != null) ...[
-                const MxGap(AppSpacing.sm),
-                Icon(trailingIcon, size: AppIconSizes.md),
-              ],
-            ],
-          );
+        : _buildLabel();
 
     final button = ElevatedButton(
       onPressed: effectiveOnPressed,
@@ -83,7 +63,29 @@ class MxPrimaryButton extends StatelessWidget {
       child: child,
     );
 
-    return fullWidth ? SizedBox(width: double.infinity, child: button) : button;
+    if (fullWidth) {
+      return SizedBox(width: double.infinity, child: button);
+    }
+    return IntrinsicWidth(child: button);
+  }
+
+  Widget _buildLabel() {
+    final labelText = Text(label, overflow: TextOverflow.ellipsis, maxLines: 1);
+    return Row(
+      mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (leadingIcon != null) ...[
+          Icon(leadingIcon, size: AppIconSizes.md),
+          const MxGap(AppSpacing.sm),
+        ],
+        Flexible(child: labelText),
+        if (trailingIcon != null) ...[
+          const MxGap(AppSpacing.sm),
+          Icon(trailingIcon, size: AppIconSizes.md),
+        ],
+      ],
+    );
   }
 
   ButtonStyle? _resolvedStyle(

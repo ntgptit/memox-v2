@@ -55,7 +55,7 @@ final class FlashcardEditorDraftProvider
 }
 
 String _$flashcardEditorDraftHash() =>
-    r'93b1efe08b92e045dd2790383dbf90ad748c50fa';
+    r'69c33c5fd17654c599a36ca3f53c315d77f20853';
 
 final class FlashcardEditorDraftFamily extends $Family
     with
@@ -155,7 +155,7 @@ final class FlashcardEditorControllerProvider
 }
 
 String _$flashcardEditorControllerHash() =>
-    r'03e427485581dd53563a95e95993784ec1bd1d6a';
+    r'94227e363e589ffbff9c7cf7c0b67f9b1389d0f9';
 
 final class FlashcardEditorControllerFamily extends $Family
     with

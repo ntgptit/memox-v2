@@ -31,6 +31,13 @@ final class FolderDao {
     return statement.get();
   }
 
+  Future<int> countAllFolders() async {
+    final row = await (_database.selectOnly(
+      _database.folders,
+    )..addColumns([_database.folders.id.count()])).getSingle();
+    return row.read(_database.folders.id.count()) ?? 0;
+  }
+
   Future<List<Folder>> listSubfolders({
     required String parentFolderId,
     required ContentQuery query,
@@ -263,6 +270,65 @@ final class FolderDao {
     return row.read<int>('item_count');
   }
 
+  Future<int> countDueCardsInSubtree({
+    required String folderId,
+    required int endOfTodayEpochMillis,
+  }) async {
+    final subtreeIds = await getSubtreeIds(folderId);
+    if (subtreeIds.isEmpty) {
+      return 0;
+    }
+    final row = await _database
+        .customSelect(
+          '''
+      SELECT COUNT(f.id) AS due_card_count
+      FROM flashcards f
+      INNER JOIN decks d ON d.id = f.deck_id
+      INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
+      WHERE d.folder_id IN (${_placeholders(subtreeIds.length)})
+        AND p.due_at IS NOT NULL
+        AND p.due_at <= ?${subtreeIds.length + 1}
+      ''',
+          variables: [
+            ...subtreeIds.map(Variable<String>.new),
+            Variable<int>(endOfTodayEpochMillis),
+          ],
+          readsFrom: {
+            _database.decks,
+            _database.flashcards,
+            _database.flashcardProgress,
+          },
+        )
+        .getSingle();
+    return row.read<int>('due_card_count');
+  }
+
+  Future<int> countNewFlashcardsInSubtree(String folderId) async {
+    final subtreeIds = await getSubtreeIds(folderId);
+    if (subtreeIds.isEmpty) {
+      return 0;
+    }
+    final row = await _database
+        .customSelect(
+          '''
+      SELECT COUNT(f.id) AS new_card_count
+      FROM flashcards f
+      INNER JOIN decks d ON d.id = f.deck_id
+      LEFT JOIN flashcard_progress p ON p.flashcard_id = f.id
+      WHERE d.folder_id IN (${_placeholders(subtreeIds.length)})
+        AND (p.flashcard_id IS NULL OR p.due_at IS NULL)
+      ''',
+          variables: subtreeIds.map(Variable<String>.new).toList(),
+          readsFrom: {
+            _database.decks,
+            _database.flashcards,
+            _database.flashcardProgress,
+          },
+        )
+        .getSingle();
+    return row.read<int>('new_card_count');
+  }
+
   Future<int?> getLastStudiedAtInSubtree(String folderId) async {
     final subtreeIds = await getSubtreeIds(folderId);
     if (subtreeIds.isEmpty) {
@@ -317,17 +383,51 @@ final class FolderDao {
         .toList(growable: false);
   }
 
-  Future<int> countDueToday(int endOfTodayEpochMillis) async {
+  Future<int> countOverdue(int startOfTodayEpochMillis) async {
     final row =
         await (_database.selectOnly(_database.flashcardProgress)
               ..addColumns([_database.flashcardProgress.flashcardId.count()])
               ..where(
-                _database.flashcardProgress.dueAt.isSmallerOrEqualValue(
-                  endOfTodayEpochMillis,
+                _database.flashcardProgress.dueAt.isSmallerThanValue(
+                  startOfTodayEpochMillis,
                 ),
               ))
             .getSingle();
     return row.read(_database.flashcardProgress.flashcardId.count()) ?? 0;
+  }
+
+  Future<int> countDueToday({
+    required int startOfTodayEpochMillis,
+    required int endOfTodayEpochMillis,
+  }) async {
+    final row =
+        await (_database.selectOnly(_database.flashcardProgress)
+              ..addColumns([_database.flashcardProgress.flashcardId.count()])
+              ..where(
+                _database.flashcardProgress.dueAt.isBiggerOrEqualValue(
+                      startOfTodayEpochMillis,
+                    ) &
+                    _database.flashcardProgress.dueAt.isSmallerOrEqualValue(
+                      endOfTodayEpochMillis,
+                    ),
+              ))
+            .getSingle();
+    return row.read(_database.flashcardProgress.flashcardId.count()) ?? 0;
+  }
+
+  Future<int> countNewFlashcards() async {
+    final row = await _database
+        .customSelect(
+          '''
+      SELECT COUNT(f.id) AS new_card_count
+      FROM flashcards f
+      LEFT JOIN flashcard_progress p ON p.flashcard_id = f.id
+      WHERE p.flashcard_id IS NULL OR p.due_at IS NULL
+      ''',
+          readsFrom: {_database.flashcards, _database.flashcardProgress},
+        )
+        .getSingle();
+    return row.read<int>('new_card_count');
   }
 
   void _applyFolderFilter(

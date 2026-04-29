@@ -27,9 +27,9 @@ class MxIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconWidget = Icon(icon, size: size);
+    final iconWidget = Icon(icon, size: size, semanticLabel: tooltip);
     final selectedIconWidget = selectedIcon != null
-        ? Icon(selectedIcon, size: size)
+        ? Icon(selectedIcon, size: size, semanticLabel: tooltip)
         : null;
 
     return switch (variant) {

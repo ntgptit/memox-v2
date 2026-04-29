@@ -38,30 +38,39 @@ void main() {
     expect(find.byType(MxLoadingState), findsOneWidget);
   });
 
-  testWidgets('DT1 onDisplay: completed result shows accuracy and next actions', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          studySessionStateProvider(
-            'session-001',
-          ).overrideWith((ref) => Future.value(_snapshot(SessionStatus.completed))),
-        ],
-        child: const _TestApp(
-          child: StudyResultScreen(sessionId: 'session-001'),
+  testWidgets(
+    'DT1 onDisplay: completed result separates card outcome and attempt accuracy',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider('session-001').overrideWith(
+              (ref) => Future.value(_snapshot(SessionStatus.completed)),
+            ),
+          ],
+          child: const _TestApp(
+            child: StudyResultScreen(sessionId: 'session-001'),
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Session summary'), findsOneWidget);
-    expect(find.text('Completed'), findsOneWidget);
-    expect(find.text('Accuracy'), findsOneWidget);
-    expect(find.text('50%'), findsOneWidget);
-    expect(find.text('Review more'), findsOneWidget);
-    expect(find.text('Study again'), findsOneWidget);
-  });
+      expect(find.text('Session summary'), findsOneWidget);
+      expect(find.text('Completed'), findsOneWidget);
+      expect(find.text('Cards mastered: 4/4'), findsOneWidget);
+      expect(find.text('Attempt accuracy'), findsOneWidget);
+      expect(find.text('83%'), findsOneWidget);
+      expect(find.text('Retry cards'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('Accuracy'), findsNothing);
+
+      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Review more'), findsOneWidget);
+      expect(find.text('Study again'), findsOneWidget);
+    },
+  );
 
   testWidgets('DT2 onDisplay: cancelled result keeps a distinct status label', (
     tester,
@@ -69,9 +78,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          studySessionStateProvider(
-            'session-001',
-          ).overrideWith((ref) => Future.value(_snapshot(SessionStatus.cancelled))),
+          studySessionStateProvider('session-001').overrideWith(
+            (ref) => Future.value(_snapshot(SessionStatus.cancelled)),
+          ),
         ],
         child: const _TestApp(
           child: StudyResultScreen(sessionId: 'session-001'),
@@ -108,11 +117,13 @@ StudySessionSnapshot _snapshot(SessionStatus status) {
     sessionFlashcards: const <StudyFlashcardRef>[],
     summary: const StudySummary(
       totalCards: 4,
-      completedAttempts: 4,
-      correctAttempts: 2,
-      incorrectAttempts: 2,
+      masteredCardCount: 4,
+      retryCardCount: 2,
+      completedAttempts: 6,
+      correctAttempts: 5,
+      incorrectAttempts: 1,
       increasedBoxCount: 1,
-      decreasedBoxCount: 1,
+      decreasedBoxCount: 0,
       remainingCount: 0,
     ),
     canFinalize: false,

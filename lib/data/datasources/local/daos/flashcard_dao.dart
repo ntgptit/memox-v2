@@ -56,6 +56,12 @@ final class FlashcardDao {
     };
   }
 
+  Future<FlashcardProgressData?> findProgressByFlashcardId(String flashcardId) {
+    return (_database.select(_database.flashcardProgress)
+          ..where((table) => table.flashcardId.equals(flashcardId)))
+        .getSingleOrNull();
+  }
+
   Future<int> nextSortOrder(String deckId) async {
     final row =
         await (_database.selectOnly(_database.flashcards)
@@ -114,6 +120,25 @@ final class FlashcardDao {
         front: Value(StringUtils.trimmed(draft.front)),
         back: Value(StringUtils.trimmed(draft.back)),
         note: Value(StringUtils.trimToNull(draft.note)),
+        updatedAt: Value(updatedAt),
+      ),
+    );
+  }
+
+  Future<void> resetFlashcardProgress({
+    required String flashcardId,
+    required int updatedAt,
+  }) {
+    return (_database.update(
+      _database.flashcardProgress,
+    )..where((table) => table.flashcardId.equals(flashcardId))).write(
+      FlashcardProgressCompanion(
+        currentBox: const Value(1),
+        reviewCount: const Value(0),
+        lapseCount: const Value(0),
+        lastResult: const Value<String?>(null),
+        lastStudiedAt: const Value<int?>(null),
+        dueAt: const Value<int?>(null),
         updatedAt: Value(updatedAt),
       ),
     );

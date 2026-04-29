@@ -59,6 +59,88 @@ void main() {
     },
   );
 
+  testWidgets('DT3 onDisplay: shows MVP duplicate handling policy choices', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _TestApp(
+        overrides: [
+          flashcardRepositoryProvider.overrideWithValue(
+            const _ImportOnlyFlashcardRepository(),
+          ),
+        ],
+        child: const DeckImportScreen(deckId: 'deck-001'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Duplicate handling'), findsOneWidget);
+    expect(find.text('Skip exact duplicates'), findsOneWidget);
+    expect(
+      find.text('Same front with a different back will still be imported.'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Skip exact duplicates'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Import anyway'), findsOneWidget);
+    expect(find.text('Update existing cards'), findsOneWidget);
+  });
+
+  testWidgets('DT4 onDisplay: preview shows skipped exact duplicates', (
+    WidgetTester tester,
+  ) async {
+    const deckId = 'deck-001';
+    final repository = _ImportOnlyFlashcardRepository(
+      prepareHandler:
+          ({
+            required deckId,
+            required format,
+            required rawContent,
+            required duplicatePolicy,
+            required structuredTextSeparator,
+          }) => Future.value(const Success(_preparationWithSkippedDuplicates)),
+    );
+
+    await tester.pumpWidget(
+      _TestApp(
+        overrides: [flashcardRepositoryProvider.overrideWithValue(repository)],
+        child: const DeckImportScreen(deckId: deckId),
+      ),
+    );
+
+    await tester.enterText(
+      find.byType(TextFormField),
+      'front,back\nHello,Xin chao\nHello,Xin chao\nExisting,Deck card',
+    );
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('deck_import_preview_action')),
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('deck_import_preview_action')));
+    await tester.pumpAndSettle();
+
+    for (var index = 0; index < 8; index++) {
+      if (find
+          .textContaining('Exact duplicate in this deck')
+          .evaluate()
+          .isNotEmpty) {
+        break;
+      }
+      await tester.drag(
+        find.byKey(const ValueKey('deck_import_content')),
+        const Offset(0, -360),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.text('1 valid · 0 issues · 2 skipped'), findsOneWidget);
+    expect(find.text('Skipped duplicates'), findsOneWidget);
+    expect(find.textContaining('Exact duplicate in this file'), findsOneWidget);
+    expect(find.textContaining('Exact duplicate in this deck'), findsOneWidget);
+  });
+
   test('DT1 onInsert: readDeckImportFileContent decodes UTF-8 bytes', () async {
     const content = 'front,back\nXin chào,Tiếng Việt có dấu: ă ê ô ư';
     final file = PlatformFile(
@@ -89,8 +171,10 @@ void main() {
       final repository = _ImportOnlyFlashcardRepository(
         prepareHandler:
             ({
+              required deckId,
               required format,
               required rawContent,
+              required duplicatePolicy,
               required structuredTextSeparator,
             }) => prepareCompleter.future,
       );
@@ -142,8 +226,10 @@ void main() {
     final repository = _ImportOnlyFlashcardRepository(
       prepareHandler:
           ({
+            required deckId,
             required format,
             required rawContent,
+            required duplicatePolicy,
             required structuredTextSeparator,
           }) => Future.value(const Success(_validPreparation)),
       commitHandler: ({required deckId, required preparation}) =>
@@ -187,8 +273,10 @@ void main() {
     final repository = _ImportOnlyFlashcardRepository(
       prepareHandler:
           ({
+            required deckId,
             required format,
             required rawContent,
+            required duplicatePolicy,
             required structuredTextSeparator,
           }) => Future.value(const Success(_preparationWithIssue)),
     );
@@ -235,8 +323,10 @@ void main() {
     final repository = _ImportOnlyFlashcardRepository(
       prepareHandler:
           ({
+            required deckId,
             required format,
             required rawContent,
+            required duplicatePolicy,
             required structuredTextSeparator,
           }) {
             prepareCallCount++;
@@ -310,8 +400,10 @@ void main() {
     final repository = _ImportOnlyFlashcardRepository(
       prepareHandler:
           ({
+            required deckId,
             required format,
             required rawContent,
+            required duplicatePolicy,
             required structuredTextSeparator,
           }) {
             capturedFormat = format;
@@ -385,6 +477,29 @@ const _preparationWithIssue = FlashcardImportPreparation(
   issues: [ImportValidationIssue(lineNumber: 3, message: 'Back is required.')],
 );
 
+const _preparationWithSkippedDuplicates = FlashcardImportPreparation(
+  format: ImportSourceFormat.csv,
+  previewItems: [
+    FlashcardImportPreviewItem(
+      sourceLabel: 'Line 2',
+      draft: FlashcardDraft(front: 'Hello', back: 'Xin chao'),
+    ),
+  ],
+  issues: [],
+  skippedDuplicates: [
+    FlashcardImportSkippedDuplicate(
+      sourceLabel: 'Line 3',
+      draft: FlashcardDraft(front: 'Hello', back: 'Xin chao'),
+      source: FlashcardImportDuplicateSource.importFile,
+    ),
+    FlashcardImportSkippedDuplicate(
+      sourceLabel: 'Line 4',
+      draft: FlashcardDraft(front: 'Existing', back: 'Deck card'),
+      source: FlashcardImportDuplicateSource.deck,
+    ),
+  ],
+);
+
 FlashcardImportPreparation _largePreparation() {
   return FlashcardImportPreparation(
     format: ImportSourceFormat.csv,
@@ -406,8 +521,10 @@ final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
   });
 
   final Future<Result<FlashcardImportPreparation>> Function({
+    required String deckId,
     required ImportSourceFormat format,
     required String rawContent,
+    required FlashcardImportDuplicatePolicy duplicatePolicy,
     required ImportStructuredTextSeparator structuredTextSeparator,
   })?
   prepareHandler;
@@ -420,14 +537,19 @@ final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
 
   @override
   Future<Result<FlashcardImportPreparation>> prepareImport({
+    required String deckId,
     required ImportSourceFormat format,
     required String rawContent,
+    FlashcardImportDuplicatePolicy duplicatePolicy =
+        FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
   }) {
     return prepareHandler?.call(
+          deckId: deckId,
           format: format,
           rawContent: rawContent,
+          duplicatePolicy: duplicatePolicy,
           structuredTextSeparator: structuredTextSeparator,
         ) ??
         Future.value(const Success(_validPreparation));

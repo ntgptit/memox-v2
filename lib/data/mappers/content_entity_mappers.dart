@@ -33,7 +33,7 @@ extension DeckDataMapper on Deck {
 }
 
 extension FlashcardDataMapper on Flashcard {
-  FlashcardEntity toDomain() {
+  FlashcardEntity toDomain({bool hasLearningProgress = false}) {
     return FlashcardEntity(
       id: id,
       deckId: deckId,
@@ -43,6 +43,7 @@ extension FlashcardDataMapper on Flashcard {
       sortOrder: sortOrder,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      hasLearningProgress: hasLearningProgress,
     );
   }
 }

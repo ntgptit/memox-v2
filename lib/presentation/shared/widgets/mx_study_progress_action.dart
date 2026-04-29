@@ -21,9 +21,9 @@ class MxStudyProgressAction extends StatelessWidget {
   // guard:raw-size-reviewed fixed-size action mirrors an icon button target
   // while leaving enough room for `100%` and a small count badge.
   static const double _pillWidth = 88;
-  static const double _pillHeight = 44;
+  static const double _pillHeight = 48;
   static const double _stackWidth = 98;
-  static const double _stackHeight = 52;
+  static const double _stackHeight = 56;
   static const double _strokeWidth = 3;
   static const double _badgeWidthFloor = 22;
   static const double _badgeHeight = 18;
@@ -79,10 +79,14 @@ class MxStudyProgressAction extends StatelessWidget {
                         color: progressColor,
                       ),
                       const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        '$clampedPercent%',
-                        style: textTheme.labelLarge?.copyWith(
-                          color: progressColor,
+                      Flexible(
+                        child: Text(
+                          '$clampedPercent%',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.labelLarge?.copyWith(
+                            color: progressColor,
+                          ),
                         ),
                       ),
                     ],
@@ -105,10 +109,14 @@ class MxStudyProgressAction extends StatelessWidget {
                   borderRadius: AppRadius.borderFull,
                   border: Border.all(color: scheme.surfaceContainerHigh),
                 ),
-                child: Text(
-                  badgeLabel,
-                  style: textTheme.labelSmall?.copyWith(
-                    color: mx.onWarningContainer,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    badgeLabel,
+                    maxLines: 1,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: mx.onWarningContainer,
+                    ),
                   ),
                 ),
               ),

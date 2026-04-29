@@ -37,7 +37,10 @@ Test file: `test/presentation/folder_detail_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | folder mode is unlocked and empty, so both creation choices are available | loaded folder state has `mode=unlocked` and no subfolders or decks | empty state renders creation options | `This folder is empty`, `New subfolder`, and `New deck` are visible | C0+C1 |
+| DT1 | folder mode is unlocked and empty, so both inline creation choices and the FAB entry point are available | loaded folder state has `mode=unlocked` and no subfolders or decks | folder detail renders the unlocked empty branch | `This folder is empty`, `New subfolder`, `New deck`, FloatingActionButton, and `Icons.add` are visible | C0+C1 |
+| DT2 | folder mode is unlocked and FAB is pressed | loaded folder state has `mode=unlocked` and no subfolders or decks | user taps the FloatingActionButton | bottom sheet title `What do you want to create?` appears with `New subfolder` and `New deck` choices | C0+C1 |
+| DT3 | unlocked create choice is subfolder | create choice bottom sheet is open for an unlocked folder | user taps the bottom-sheet `New subfolder` choice | `New subfolder` name dialog opens with `Folder name` field | C0+C1 |
+| DT4 | unlocked create choice is deck | create choice bottom sheet is open for an unlocked folder | user taps the bottom-sheet `New deck` choice | `Create deck` name dialog opens with `Deck name` field | C0+C1 |
 
 ## Decision table: onDelete
 

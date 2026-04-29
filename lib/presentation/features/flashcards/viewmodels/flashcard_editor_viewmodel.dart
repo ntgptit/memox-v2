@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../app/di/content_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 
 part 'flashcard_editor_viewmodel.g.dart';
@@ -38,6 +39,9 @@ class FlashcardEditorDraftState {
     required this.front,
     required this.back,
     required this.note,
+    required this.originalFront,
+    required this.originalBack,
+    required this.hasLearningProgress,
   });
 
   final String deckId;
@@ -45,8 +49,20 @@ class FlashcardEditorDraftState {
   final String front;
   final String back;
   final String note;
+  final String originalFront;
+  final String originalBack;
+  final bool hasLearningProgress;
 
   bool get isEditing => flashcardId != null;
+
+  bool get hasChangedLearningContent {
+    return StringUtils.trimmed(front) != StringUtils.trimmed(originalFront) ||
+        StringUtils.trimmed(back) != StringUtils.trimmed(originalBack);
+  }
+
+  bool get requiresLearningProgressPolicy {
+    return isEditing && hasLearningProgress && hasChangedLearningContent;
+  }
 
   FlashcardDraft toDraft() {
     return FlashcardDraft(front: front, back: back, note: note);
@@ -63,6 +79,9 @@ class FlashcardEditorDraftState {
       front: front ?? this.front,
       back: back ?? this.back,
       note: note ?? this.note,
+      originalFront: originalFront,
+      originalBack: originalBack,
+      hasLearningProgress: hasLearningProgress,
     );
   }
 }
@@ -78,6 +97,9 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
         front: '',
         back: '',
         note: '',
+        originalFront: '',
+        originalBack: '',
+        hasLearningProgress: false,
       );
     }
 
@@ -90,6 +112,9 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
       front: flashcard.front,
       back: flashcard.back,
       note: flashcard.note ?? '',
+      originalFront: flashcard.front,
+      originalBack: flashcard.back,
+      hasLearningProgress: flashcard.hasLearningProgress,
     );
   }
 
@@ -129,6 +154,9 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
         front: '',
         back: '',
         note: '',
+        originalFront: '',
+        originalBack: '',
+        hasLearningProgress: false,
       ),
     );
   }
@@ -139,7 +167,11 @@ class FlashcardEditorController extends _$FlashcardEditorController {
   @override
   FutureOr<void> build(FlashcardEditorArgs args) {}
 
-  Future<bool> save({bool keepCreating = false}) async {
+  Future<bool> save({
+    bool keepCreating = false,
+    FlashcardProgressEditPolicy progressPolicy =
+        FlashcardProgressEditPolicy.keepProgress,
+  }) async {
     // guard:retry-reviewed
     final draftState = _currentDraft(
       ref.read(flashcardEditorDraftProvider(args)),
@@ -152,7 +184,11 @@ class FlashcardEditorController extends _$FlashcardEditorController {
     if (args.isEditing) {
       final result = await ref
           .read(updateFlashcardUseCaseProvider)
-          .execute(flashcardId: args.flashcardId!, draft: draftState.toDraft());
+          .execute(
+            flashcardId: args.flashcardId!,
+            draft: draftState.toDraft(),
+            progressPolicy: progressPolicy,
+          );
       if (!ref.mounted) {
         return false;
       }

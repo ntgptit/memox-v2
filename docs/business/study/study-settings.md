@@ -5,6 +5,10 @@
 
 ## User cấu hình được
 
+Màn Settings phải expose nhóm **Study defaults** cho các default dưới đây.
+Study Entry vẫn có thể override từng session, nhưng override đó không ghi đè
+default đã lưu của user.
+
 - số flashcard cho batch học mới (`newStudyBatchSize`)
 - số flashcard cho batch review (`reviewBatchSize`)
 - bật hoặc tắt shuffle flashcard
@@ -21,6 +25,10 @@
 - không thay đổi session đang học dở
 - batch size áp dụng sau bước filter và random
 - nếu số flashcard hợp lệ ít hơn batch size, lấy toàn bộ
+- Study Entry phải giới hạn batch size theo study type:
+  - New Study: tối thiểu 5, tối đa 20
+  - SRS Review: tối thiểu 5, tối đa 50
+- UI phải disable nút giảm/tăng khi chạm min/max tương ứng và clamp default cũ nếu vượt ngoài khoảng hợp lệ
 
 ## Shuffle
 

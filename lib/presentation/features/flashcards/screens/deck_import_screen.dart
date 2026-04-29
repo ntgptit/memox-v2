@@ -137,6 +137,18 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
                       ),
                     ],
                     const MxGap(MxSpace.lg),
+                    MxText(
+                      l10n.importDuplicateHandlingTitle,
+                      role: MxTextRole.formLabel,
+                    ),
+                    const MxGap(MxSpace.xs),
+                    _ImportDuplicatePolicyCard(
+                      policy: draft.duplicatePolicy,
+                      enabled: !isImportBusy,
+                      onTap: () =>
+                          _chooseDuplicatePolicy(draft.duplicatePolicy),
+                    ),
+                    const MxGap(MxSpace.lg),
                     Wrap(
                       spacing: MxSpace.sm,
                       runSpacing: MxSpace.sm,
@@ -266,6 +278,29 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     MxSnackbar.success(context, l10n.importLoadedFileMessage(file.name));
   }
 
+  Future<void> _chooseDuplicatePolicy(
+    FlashcardImportDuplicatePolicy current,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final selected = await MxBottomSheet.show<_ImportDuplicatePolicyChoice>(
+      context: context,
+      title: l10n.importDuplicateHandlingTitle,
+      child: MxActionSheetList<_ImportDuplicatePolicyChoice>(
+        items: _buildImportDuplicatePolicyActions(l10n),
+        selectedValue: _duplicatePolicyChoice(current),
+      ),
+    );
+    if (!mounted || selected == null) {
+      return;
+    }
+    if (selected != _ImportDuplicatePolicyChoice.skipExactDuplicates) {
+      return;
+    }
+    ref
+        .read(flashcardImportDraftProvider(widget.deckId).notifier)
+        .setDuplicatePolicy(FlashcardImportDuplicatePolicy.skipExactDuplicates);
+  }
+
   Future<void> _chooseStructuredTextSeparator(
     ImportStructuredTextSeparator current,
   ) async {
@@ -288,6 +323,41 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
 }
 
 enum _ImportPendingAction { preview, commit }
+
+enum _ImportDuplicatePolicyChoice {
+  skipExactDuplicates,
+  importAnyway,
+  updateExistingCards,
+}
+
+class _ImportDuplicatePolicyCard extends StatelessWidget {
+  const _ImportDuplicatePolicyCard({
+    required this.policy,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final FlashcardImportDuplicatePolicy policy;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return MxCard(
+      variant: MxCardVariant.outlined,
+      padding: EdgeInsets.zero,
+      child: MxListTile(
+        leadingIcon: Icons.rule_outlined,
+        title: _duplicatePolicyLabel(l10n, policy),
+        subtitle: _duplicatePolicyDescription(l10n, policy),
+        showChevron: enabled,
+        onTap: enabled ? onTap : null,
+      ),
+    );
+  }
+}
 
 class _ImportSubmitRow extends StatelessWidget {
   const _ImportSubmitRow({
@@ -368,6 +438,61 @@ class _ImportSubmitRow extends StatelessWidget {
       ],
     );
   }
+}
+
+String _duplicatePolicyLabel(
+  AppLocalizations l10n,
+  FlashcardImportDuplicatePolicy policy,
+) {
+  return switch (policy) {
+    FlashcardImportDuplicatePolicy.skipExactDuplicates =>
+      l10n.importDuplicatePolicySkipExact,
+  };
+}
+
+String _duplicatePolicyDescription(
+  AppLocalizations l10n,
+  FlashcardImportDuplicatePolicy policy,
+) {
+  return switch (policy) {
+    FlashcardImportDuplicatePolicy.skipExactDuplicates =>
+      l10n.importDuplicatePolicySkipExactDescription,
+  };
+}
+
+List<MxActionSheetItem<_ImportDuplicatePolicyChoice>>
+_buildImportDuplicatePolicyActions(AppLocalizations l10n) {
+  return [
+    MxActionSheetItem<_ImportDuplicatePolicyChoice>(
+      value: _ImportDuplicatePolicyChoice.skipExactDuplicates,
+      label: l10n.importDuplicatePolicySkipExact,
+      subtitle: l10n.importDuplicatePolicySkipExactDescription,
+      icon: Icons.filter_alt_outlined,
+    ),
+    MxActionSheetItem<_ImportDuplicatePolicyChoice>(
+      value: _ImportDuplicatePolicyChoice.importAnyway,
+      label: l10n.importDuplicatePolicyImportAnyway,
+      subtitle: l10n.importDuplicatePolicyImportAnywayDescription,
+      icon: Icons.playlist_add_outlined,
+      enabled: false,
+    ),
+    MxActionSheetItem<_ImportDuplicatePolicyChoice>(
+      value: _ImportDuplicatePolicyChoice.updateExistingCards,
+      label: l10n.importDuplicatePolicyUpdateExisting,
+      subtitle: l10n.importDuplicatePolicyUpdateExistingDescription,
+      icon: Icons.update_outlined,
+      enabled: false,
+    ),
+  ];
+}
+
+_ImportDuplicatePolicyChoice _duplicatePolicyChoice(
+  FlashcardImportDuplicatePolicy policy,
+) {
+  return switch (policy) {
+    FlashcardImportDuplicatePolicy.skipExactDuplicates =>
+      _ImportDuplicatePolicyChoice.skipExactDuplicates,
+  };
 }
 
 class _ImportSeparatorSelector extends StatelessWidget {

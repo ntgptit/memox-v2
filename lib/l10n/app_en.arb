@@ -42,7 +42,59 @@
   "appShellProgressPlaceholderDescription": "Progress foundation is not wired yet.",
   "appShellSettingsPlaceholderDescription": "Settings foundation is not wired yet.",
   "dashboardHeading": "Today's study focus",
-  "dashboardSubtitle": "Review due cards and keep your library moving.",
+  "dashboardSubtitle": "Choose the next useful study action: review, learn new cards, resume, or inspect library health.",
+  "dashboardTodayReviewTitle": "Today Review",
+  "dashboardOverdueLabel": "Overdue",
+  "dashboardReviewReadyMessage": "{count} cards are ready for SRS review.",
+  "@dashboardReviewReadyMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardReviewEmptyMessage": "No review cards are due right now.",
+  "dashboardReviewNowAction": "Review now",
+  "dashboardNewStudyTitle": "New Study",
+  "dashboardNewCardsLabel": "New cards available",
+  "dashboardNewStudyMessage": "{count} new cards are ready for a deck or folder session.",
+  "@dashboardNewStudyMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardNewStudyEmptyMessage": "Add or import cards before starting a new study session.",
+  "dashboardStartNewStudyAction": "Start new study",
+  "dashboardResumeTitle": "Resume",
+  "dashboardActiveSessionsLabel": "Active sessions",
+  "dashboardResumeMessage": "{count} sessions can be continued or finalized.",
+  "@dashboardResumeMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardResumeEmptyMessage": "No study session is waiting to resume.",
+  "dashboardContinueSessionAction": "Continue session",
+  "dashboardLibraryHealthTitle": "Library health",
+  "dashboardLibraryHealthSummary": "{folderCount} folders · {deckCount} decks · {cardCount} cards",
+  "@dashboardLibraryHealthSummary": {
+    "placeholders": {
+      "folderCount": {
+        "type": "int"
+      },
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardMasteryLabel": "Mastery",
   "dashboardDueTodayTitle": "Due today",
   "dashboardDueTodayMessage": "{count} cards ready to review",
   "@dashboardDueTodayMessage": {
@@ -82,7 +134,10 @@
       }
     }
   },
-  "progressActiveSessionsHeading": "Study sessions",
+  "progressOverviewHeading": "Learning overview",
+  "progressOverviewSubtitle": "Track review pressure, library mastery, and open session recovery.",
+  "progressReviewDueCount": "Due now",
+  "progressActiveSessionsHeading": "Active sessions",
   "progressActiveSessionsSubtitle": "Resume, finalize, retry, or cancel the study sessions that are still open.",
   "progressActiveSessionsCount": "Active",
   "progressReadySessionsCount": "Ready",
@@ -96,7 +151,7 @@
       "entryType": {}
     }
   },
-  "progressSessionCardProgress": "{completed} of {total} cards · {remaining} remaining",
+  "progressSessionCardProgress": "{completed} of {total} study steps · {remaining} remaining",
   "@progressSessionCardProgress": {
     "placeholders": {
       "completed": {
@@ -145,6 +200,11 @@
   "settingsLocaleSystem": "System",
   "settingsLocaleEnglish": "English",
   "settingsLocaleVietnamese": "Vietnamese",
+  "settingsStudyDefaultsTitle": "Study defaults",
+  "settingsStudyDefaultsSubtitle": "Defaults used when a new study session is created.",
+  "settingsStudyDefaultsLoading": "Loading study defaults",
+  "settingsNewStudyBatchSizeLabel": "New Study batch size",
+  "settingsReviewBatchSizeLabel": "Review batch size",
   "settingsSpeechTitle": "Speech",
   "settingsSpeechLabel": "Korean and English pronunciation support",
   "settingsSpeechLoading": "Loading speech settings",
@@ -194,6 +254,7 @@
   "errorUnexpected": "Something went wrong.",
   "foldersNewSubfolderTooltip": "New subfolder",
   "foldersNewDeckTooltip": "New deck",
+  "foldersCreateChoiceTitle": "What do you want to create?",
   "foldersNewSubfolderTitle": "New subfolder",
   "foldersFolderNameLabel": "Folder name",
   "foldersFolderNameHint": "e.g. Listening practice",
@@ -283,6 +344,28 @@
       }
     }
   },
+  "libraryFolderStudyStats": "{cardCount} cards · {dueCount} due · {newCardCount} new",
+  "@libraryFolderStudyStats": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueCount": {
+        "type": "int"
+      },
+      "newCardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryFolderMastery": "Mastery {percent}%",
+  "@libraryFolderMastery": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "libraryEmptyTitle": "No folders yet",
   "libraryEmptyMessage": "Create your first folder to start building your library.",
   "decksCreateTitle": "Create deck",
@@ -345,6 +428,7 @@
   "flashcardsEmptyTitle": "No flashcards yet",
   "flashcardsEmptyMessage": "Add cards manually or import them into this deck.",
   "flashcardsMoveTitle": "Move flashcards",
+  "flashcardsMoveProgressKeptNote": "Learning progress will be kept after moving.",
   "flashcardsMovedMessage": "Flashcards moved.",
   "flashcardsDeleteTitle": "Delete flashcards",
   "flashcardsDeleteMessage": "This will permanently delete the selected flashcards.",
@@ -363,15 +447,23 @@
   "flashcardsSavedMessage": "Flashcard saved.",
   "flashcardsSaveChanges": "Save changes",
   "flashcardsSaveAction": "Save flashcard",
+  "flashcardsLearningContentChangedTitle": "You changed the learning content.",
+  "flashcardsLearningContentChangedMessage": "Keep existing progress or reset this card?",
+  "flashcardsKeepProgressAction": "Keep progress",
+  "flashcardsResetProgressAction": "Reset progress",
   "flashcardsUpdatedMessage": "Flashcard updated.",
   "flashcardsCreatedMessage": "Flashcard created.",
   "studyEntryTitle": "Study",
   "studyEntryHeading": "Start a study session",
   "studyEntrySubtitle": "Choose a flow and snapshot settings for this session.",
   "studyStartAction": "Study now",
+  "studyStartNewSessionAction": "Start new session",
+  "studyStartNewSessionConfirmTitle": "Start a new session?",
+  "studyStartNewSessionConfirmMessage": "Starting a new session will cancel the current unfinished session.",
   "studyRestartAction": "Restart",
   "studyResumeTitle": "Session in progress",
   "studyResumeAction": "Continue",
+  "studyContinueSessionAction": "Continue session",
   "studyFlowTitle": "Study flow",
   "studyTypeNew": "New Study",
   "studyTypeReview": "SRS Review",
@@ -381,6 +473,17 @@
   "@studyBatchSizeLabel": {
     "placeholders": {
       "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyBatchSizeRangeLabel": "{min}-{max} cards",
+  "@studyBatchSizeRangeLabel": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
         "type": "int"
       }
     }
@@ -434,6 +537,19 @@
   "studyResultBoxDown": "Box decreased",
   "studyResultRemaining": "Remaining",
   "studyResultAccuracyLabel": "Accuracy",
+  "studyResultAttemptAccuracyLabel": "Attempt accuracy",
+  "studyResultRetryCardsLabel": "Retry cards",
+  "studyResultCardsMastered": "Cards mastered: {mastered}/{total}",
+  "@studyResultCardsMastered": {
+    "placeholders": {
+      "mastered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "studyResultCardsCompleted": "{completed} of {total} cards completed",
   "@studyResultCardsCompleted": {
     "placeholders": {
@@ -525,6 +641,13 @@
   "importSeparatorSlashDescription": "term / definition",
   "importSeparatorSemicolonDescription": "term; definition",
   "importSeparatorPipeDescription": "term | definition",
+  "importDuplicateHandlingTitle": "Duplicate handling",
+  "importDuplicatePolicySkipExact": "Skip exact duplicates",
+  "importDuplicatePolicySkipExactDescription": "Same front with a different back will still be imported.",
+  "importDuplicatePolicyImportAnyway": "Import anyway",
+  "importDuplicatePolicyImportAnywayDescription": "Future option: create every valid row, even when front and back match an existing card.",
+  "importDuplicatePolicyUpdateExisting": "Update existing cards",
+  "importDuplicatePolicyUpdateExistingDescription": "Future option: update matched cards instead of creating new duplicates.",
   "importPreviewAction": "Preview",
   "importSuccessMessage": "Imported {count} flashcards.",
   "@importSuccessMessage": {
@@ -571,6 +694,31 @@
       }
     }
   },
+  "importPreviewSummaryWithSkipped": "{valid} valid · {invalid} issues · {skipped} skipped",
+  "@importPreviewSummaryWithSkipped": {
+    "placeholders": {
+      "valid": {
+        "type": "int"
+      },
+      "invalid": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "importSkippedDuplicatesTitle": "Skipped duplicates",
+  "importSkippedDuplicatesSubtitle": "{count} exact duplicates will be skipped.",
+  "@importSkippedDuplicatesSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importSkippedDuplicateInFile": "Exact duplicate in this file",
+  "importSkippedDuplicateInDeck": "Exact duplicate in this deck",
   "importNothingTitle": "Nothing to import",
   "importNothingMessage": "No valid rows or blocks were produced from the source.",
   "sharedErrorTitle": "Something went wrong",

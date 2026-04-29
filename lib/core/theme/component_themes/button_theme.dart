@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 
 import '../tokens/app_elevation.dart';
+import '../tokens/app_icon_sizes.dart';
 import '../tokens/app_opacity.dart';
 import '../tokens/app_radius.dart';
+import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 import 'focus_theme.dart';
 
 abstract final class ButtonThemeBuilder {
-  static const double _minHeight = 44;
+  static const double _minHeight = kMinInteractiveDimension;
   static const EdgeInsetsGeometry _padding = EdgeInsets.symmetric(
-    horizontal: 20,
-    vertical: 12,
+    horizontal: AppSpacing.xl,
+    vertical: AppSpacing.md,
+  );
+  static const EdgeInsetsGeometry _textPadding = EdgeInsets.symmetric(
+    horizontal: AppSpacing.md,
+    vertical: AppSpacing.sm,
   );
 
   static ElevatedButtonThemeData filled(ColorScheme scheme) {
@@ -80,7 +86,7 @@ abstract final class ButtonThemeBuilder {
           alpha: AppOpacity.disabled,
         ),
         minimumSize: const Size(0, _minHeight),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: _textPadding,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
         textStyle: AppTypography.labelLarge,
       ),
@@ -94,9 +100,9 @@ abstract final class ButtonThemeBuilder {
         disabledForegroundColor: scheme.onSurface.withValues(
           alpha: AppOpacity.disabled,
         ),
-        minimumSize: const Size(40, 40),
-        fixedSize: const Size(40, 40),
-        iconSize: 20,
+        minimumSize: const Size.square(_minHeight),
+        fixedSize: const Size.square(_minHeight),
+        iconSize: AppIconSizes.md,
         backgroundColor: scheme.surfaceContainerLow,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
       ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onSurface)),

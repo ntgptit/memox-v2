@@ -135,12 +135,14 @@ class _ResultProgressSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final completed = snapshot.summary.completedAttempts;
-    final total = completed + snapshot.summary.remainingCount;
     final accuracy = _progressValue(
       snapshot.summary.correctAttempts,
       completed,
     );
-    final cardsCompleted = _progressValue(completed, total);
+    final cardsMastered = _progressValue(
+      snapshot.summary.masteredCardCount,
+      snapshot.summary.totalCards,
+    );
 
     return MxCard(
       child: Column(
@@ -155,7 +157,7 @@ class _ResultProgressSummary extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     MxText(
-                      l10n.studyResultAccuracyLabel,
+                      l10n.studyResultAttemptAccuracyLabel,
                       role: MxTextRole.sectionTitle,
                     ),
                     const MxGap(MxSpace.xs),
@@ -170,9 +172,16 @@ class _ResultProgressSummary extends StatelessWidget {
           ),
           const MxGap(MxSpace.lg),
           MxLinearProgress(
-            value: cardsCompleted,
-            label: l10n.studyResultCardsCompleted(completed, total),
-            showPercentage: true,
+            value: cardsMastered,
+            label: l10n.studyResultCardsMastered(
+              snapshot.summary.masteredCardCount,
+              snapshot.summary.totalCards,
+            ),
+          ),
+          const MxGap(MxSpace.md),
+          _MetricRow(
+            label: l10n.studyResultRetryCardsLabel,
+            value: '${snapshot.summary.retryCardCount}',
           ),
         ],
       ),

@@ -19,7 +19,7 @@ abstract final class AppColors {
   // ---------------------------------------------------------------------------
 
   static const Color lightPrimary10 = Color(0xFF000C57);
-  static const Color lightPrimary40 = Color(0xFF5569FF);
+  static const Color lightPrimary40 = Color(0xFF5265F5);
   static const Color lightPrimary80 = Color(0xFFAAB5FF);
   static const Color lightPrimary90 = Color(0xFFEFF2FF);
   static const Color lightPrimary100 = Color(0xFFFFFFFF);
@@ -33,7 +33,7 @@ abstract final class AppColors {
   static const Color lightTertiary90 = Color(0xFFE3F7FF);
 
   static const Color lightError10 = Color(0xFF5B0011);
-  static const Color lightError40 = Color(0xFFFF1943);
+  static const Color lightError40 = Color(0xFFE5163C);
   static const Color lightError90 = Color(0xFFFFE6EB);
 
   static const Color lightSurface = Color(0xFFF2F5F9);

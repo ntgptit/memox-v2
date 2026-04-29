@@ -35,6 +35,12 @@ Test file: `test/presentation/flashcard_list_screen_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT1 | Select action enters bulk mode, then long-pressing the selected row toggles it off instead of reopening the sheet | loaded list has `card-001` and `card-002` with no initial selection | user long-presses `Front 1`, taps `Select`, then long-presses `Front 1` again | `1 selected` appears after Select, then disappears and `Flashcard actions` stays closed after toggle-off | C0+C1 |
 
+## Decision table: onMove
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | selected flashcards are moved and learning progress must remain attached | loaded list has `card-001` selected and one valid target deck named `Target deck` | user taps bulk `Move` | destination picker shows `Move flashcards`, `Learning progress will be kept after moving.`, and `Target deck` | C0+C1 |
+
 ## Decision table: onUpdate
 
 | ID | Branch / condition | Given | When | Then | Coverage |

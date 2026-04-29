@@ -120,7 +120,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardSubtitle =>
-      'Review due cards and keep your library moving.';
+      'Choose the next useful study action: review, learn new cards, resume, or inspect library health.';
+
+  @override
+  String get dashboardTodayReviewTitle => 'Today Review';
+
+  @override
+  String get dashboardOverdueLabel => 'Overdue';
+
+  @override
+  String dashboardReviewReadyMessage(int count) {
+    return '$count cards are ready for SRS review.';
+  }
+
+  @override
+  String get dashboardReviewEmptyMessage =>
+      'No review cards are due right now.';
+
+  @override
+  String get dashboardReviewNowAction => 'Review now';
+
+  @override
+  String get dashboardNewStudyTitle => 'New Study';
+
+  @override
+  String get dashboardNewCardsLabel => 'New cards available';
+
+  @override
+  String dashboardNewStudyMessage(int count) {
+    return '$count new cards are ready for a deck or folder session.';
+  }
+
+  @override
+  String get dashboardNewStudyEmptyMessage =>
+      'Add or import cards before starting a new study session.';
+
+  @override
+  String get dashboardStartNewStudyAction => 'Start new study';
+
+  @override
+  String get dashboardResumeTitle => 'Resume';
+
+  @override
+  String get dashboardActiveSessionsLabel => 'Active sessions';
+
+  @override
+  String dashboardResumeMessage(int count) {
+    return '$count sessions can be continued or finalized.';
+  }
+
+  @override
+  String get dashboardResumeEmptyMessage =>
+      'No study session is waiting to resume.';
+
+  @override
+  String get dashboardContinueSessionAction => 'Continue session';
+
+  @override
+  String get dashboardLibraryHealthTitle => 'Library health';
+
+  @override
+  String dashboardLibraryHealthSummary(
+    int folderCount,
+    int deckCount,
+    int cardCount,
+  ) {
+    return '$folderCount folders · $deckCount decks · $cardCount cards';
+  }
+
+  @override
+  String get dashboardMasteryLabel => 'Mastery';
 
   @override
   String get dashboardDueTodayTitle => 'Due today';
@@ -161,7 +230,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get progressActiveSessionsHeading => 'Study sessions';
+  String get progressOverviewHeading => 'Learning overview';
+
+  @override
+  String get progressOverviewSubtitle =>
+      'Track review pressure, library mastery, and open session recovery.';
+
+  @override
+  String get progressReviewDueCount => 'Due now';
+
+  @override
+  String get progressActiveSessionsHeading => 'Active sessions';
 
   @override
   String get progressActiveSessionsSubtitle =>
@@ -190,7 +269,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String progressSessionCardProgress(int completed, int total, int remaining) {
-    return '$completed of $total cards · $remaining remaining';
+    return '$completed of $total study steps · $remaining remaining';
   }
 
   @override
@@ -269,6 +348,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLocaleVietnamese => 'Vietnamese';
+
+  @override
+  String get settingsStudyDefaultsTitle => 'Study defaults';
+
+  @override
+  String get settingsStudyDefaultsSubtitle =>
+      'Defaults used when a new study session is created.';
+
+  @override
+  String get settingsStudyDefaultsLoading => 'Loading study defaults';
+
+  @override
+  String get settingsNewStudyBatchSizeLabel => 'New Study batch size';
+
+  @override
+  String get settingsReviewBatchSizeLabel => 'Review batch size';
 
   @override
   String get settingsSpeechTitle => 'Speech';
@@ -388,6 +483,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get foldersNewDeckTooltip => 'New deck';
+
+  @override
+  String get foldersCreateChoiceTitle => 'What do you want to create?';
 
   @override
   String get foldersNewSubfolderTitle => 'New subfolder';
@@ -543,6 +641,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String libraryFolderStudyStats(
+    int cardCount,
+    int dueCount,
+    int newCardCount,
+  ) {
+    return '$cardCount cards · $dueCount due · $newCardCount new';
+  }
+
+  @override
+  String libraryFolderMastery(int percent) {
+    return 'Mastery $percent%';
+  }
+
+  @override
   String get libraryEmptyTitle => 'No folders yet';
 
   @override
@@ -671,6 +783,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsMoveTitle => 'Move flashcards';
 
   @override
+  String get flashcardsMoveProgressKeptNote =>
+      'Learning progress will be kept after moving.';
+
+  @override
   String get flashcardsMovedMessage => 'Flashcards moved.';
 
   @override
@@ -728,6 +844,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsSaveAction => 'Save flashcard';
 
   @override
+  String get flashcardsLearningContentChangedTitle =>
+      'You changed the learning content.';
+
+  @override
+  String get flashcardsLearningContentChangedMessage =>
+      'Keep existing progress or reset this card?';
+
+  @override
+  String get flashcardsKeepProgressAction => 'Keep progress';
+
+  @override
+  String get flashcardsResetProgressAction => 'Reset progress';
+
+  @override
   String get flashcardsUpdatedMessage => 'Flashcard updated.';
 
   @override
@@ -747,6 +877,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyStartAction => 'Study now';
 
   @override
+  String get studyStartNewSessionAction => 'Start new session';
+
+  @override
+  String get studyStartNewSessionConfirmTitle => 'Start a new session?';
+
+  @override
+  String get studyStartNewSessionConfirmMessage =>
+      'Starting a new session will cancel the current unfinished session.';
+
+  @override
   String get studyRestartAction => 'Restart';
 
   @override
@@ -754,6 +894,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studyResumeAction => 'Continue';
+
+  @override
+  String get studyContinueSessionAction => 'Continue session';
 
   @override
   String get studyFlowTitle => 'Study flow';
@@ -774,6 +917,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String studyBatchSizeLabel(int count) {
     return 'Batch size: $count';
+  }
+
+  @override
+  String studyBatchSizeRangeLabel(int min, int max) {
+    return '$min-$max cards';
   }
 
   @override
@@ -881,6 +1029,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studyResultAccuracyLabel => 'Accuracy';
+
+  @override
+  String get studyResultAttemptAccuracyLabel => 'Attempt accuracy';
+
+  @override
+  String get studyResultRetryCardsLabel => 'Retry cards';
+
+  @override
+  String studyResultCardsMastered(int mastered, int total) {
+    return 'Cards mastered: $mastered/$total';
+  }
 
   @override
   String studyResultCardsCompleted(int completed, int total) {
@@ -1088,6 +1247,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importSeparatorPipeDescription => 'term | definition';
 
   @override
+  String get importDuplicateHandlingTitle => 'Duplicate handling';
+
+  @override
+  String get importDuplicatePolicySkipExact => 'Skip exact duplicates';
+
+  @override
+  String get importDuplicatePolicySkipExactDescription =>
+      'Same front with a different back will still be imported.';
+
+  @override
+  String get importDuplicatePolicyImportAnyway => 'Import anyway';
+
+  @override
+  String get importDuplicatePolicyImportAnywayDescription =>
+      'Future option: create every valid row, even when front and back match an existing card.';
+
+  @override
+  String get importDuplicatePolicyUpdateExisting => 'Update existing cards';
+
+  @override
+  String get importDuplicatePolicyUpdateExistingDescription =>
+      'Future option: update matched cards instead of creating new duplicates.';
+
+  @override
   String get importPreviewAction => 'Preview';
 
   @override
@@ -1128,6 +1311,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String importPreviewSummary(int valid, int invalid) {
     return '$valid valid · $invalid issues';
   }
+
+  @override
+  String importPreviewSummaryWithSkipped(int valid, int invalid, int skipped) {
+    return '$valid valid · $invalid issues · $skipped skipped';
+  }
+
+  @override
+  String get importSkippedDuplicatesTitle => 'Skipped duplicates';
+
+  @override
+  String importSkippedDuplicatesSubtitle(int count) {
+    return '$count exact duplicates will be skipped.';
+  }
+
+  @override
+  String get importSkippedDuplicateInFile => 'Exact duplicate in this file';
+
+  @override
+  String get importSkippedDuplicateInDeck => 'Exact duplicate in this deck';
 
   @override
   String get importNothingTitle => 'Nothing to import';

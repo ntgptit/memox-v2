@@ -74,7 +74,7 @@ class MxBottomSheet extends StatelessWidget {
                 ),
                 const MxGap(AppSpacing.lg),
               ],
-              Flexible(child: child),
+              Flexible(child: SingleChildScrollView(child: child)),
             ],
           ),
         ),

@@ -44,12 +44,17 @@ Deck chỉ được tạo trong:
 - Hỗ trợ import từ text theo format được hệ thống hỗ trợ
 - Không import trực tiếp vào folder
 - Flashcard được import bắt đầu như flashcard mới, không có box SRS, due date hay lịch sử học sẵn
+- Import phải expose chính sách xử lý duplicate ở màn import
+- MVP dùng policy `Skip exact duplicates`: nếu `front + back` trùng trong chính file import hoặc trùng với flashcard đã có trong deck đích thì bỏ qua dòng/block đó
+- Nếu chỉ trùng `front` nhưng `back` khác thì vẫn import như một flashcard mới
+- Các policy `Import anyway` và `Update existing cards` là hướng mở rộng sau MVP, có thể được hiển thị như lựa chọn chưa khả dụng nhưng chưa phải hành vi mặc định
 
 ## Rule preview trước khi import
 - Dữ liệu import phải được parse và preview trước khi ghi thật vào hệ thống
 - Preview phải cho user thấy dữ liệu sẽ được tạo thành flashcard như thế nào trong deck đích
 - Preview phải giữ mapping với nguồn import để user biết từng dòng hoặc từng block sẽ tạo ra dữ liệu gì
 - Nếu còn lỗi validation thì không được xác nhận import
+- Preview phải cho user thấy số duplicate exact bị skip theo policy hiện tại
 
 ## Rule validate import
 - Validate chạy trên toàn bộ dữ liệu import trước khi ghi

@@ -128,7 +128,7 @@ void main() {
 
       expect(find.text('Review · round 1'), findsOneWidget);
 
-      await _tapText(tester, 'Continue');
+      await _tapText(tester, 'Continue session');
       await _pumpUntilFound(tester, find.text('Review'));
 
       expect(find.text(_alphaFront), findsOneWidget);
@@ -617,11 +617,18 @@ void main() {
       await _pumpUntilFound(tester, find.text('Session in progress'));
 
       await tester.scrollUntilVisible(
-        find.text('Restart'),
+        find.text('Start new session'),
         300,
         scrollable: find.byType(Scrollable),
       );
-      await tester.tap(find.text('Restart'));
+      await tester.tap(find.text('Start new session'));
+      await _pumpUntilFound(
+        tester,
+        find.text(
+          'Starting a new session will cancel the current unfinished session.',
+        ),
+      );
+      await tester.tap(find.text('Start new session').last);
       await _pumpUntilFound(tester, find.text('Review'));
 
       expect(await harness.sessionStatus(oldSession.session.id), 'cancelled');
@@ -1283,7 +1290,7 @@ Future<void> _openStudyEntryAndContinue(
   _goToLocation(tester, _studyEntryLocation(StudyEntryType.deck));
   await tester.pump(const Duration(milliseconds: 100));
   await _pumpUntilFound(tester, find.text('Session in progress'));
-  await _tapText(tester, 'Continue');
+  await _tapText(tester, 'Continue session');
 }
 
 Future<void> _openProgressAndContinueAtMode(
@@ -1306,11 +1313,18 @@ Future<String> _openStudyEntryAndRestart(
   await tester.pump(const Duration(milliseconds: 100));
   await _pumpUntilFound(tester, find.text('Session in progress'));
   await tester.scrollUntilVisible(
-    find.text('Restart'),
+    find.text('Start new session'),
     300,
     scrollable: find.byType(Scrollable),
   );
-  await tester.tap(find.text('Restart'));
+  await tester.tap(find.text('Start new session'));
+  await _pumpUntilFound(
+    tester,
+    find.text(
+      'Starting a new session will cancel the current unfinished session.',
+    ),
+  );
+  await tester.tap(find.text('Start new session').last);
   await _pumpUntilFound(tester, find.text('Review'));
   return harness.singleActiveSessionId();
 }

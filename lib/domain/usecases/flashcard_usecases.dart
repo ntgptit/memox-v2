@@ -50,8 +50,14 @@ final class UpdateFlashcardUseCase {
   Future<Result<FlashcardEntity>> execute({
     required String flashcardId,
     required FlashcardDraft draft,
+    FlashcardProgressEditPolicy progressPolicy =
+        FlashcardProgressEditPolicy.keepProgress,
   }) {
-    return _repository.updateFlashcard(flashcardId: flashcardId, draft: draft);
+    return _repository.updateFlashcard(
+      flashcardId: flashcardId,
+      draft: draft,
+      progressPolicy: progressPolicy,
+    );
   }
 }
 
@@ -103,14 +109,19 @@ final class PrepareFlashcardImportUseCase {
   final FlashcardRepository _repository;
 
   Future<Result<FlashcardImportPreparation>> execute({
+    required String deckId,
     required ImportSourceFormat format,
     required String rawContent,
+    FlashcardImportDuplicatePolicy duplicatePolicy =
+        FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
   }) {
     return _repository.prepareImport(
+      deckId: deckId,
       format: format,
       rawContent: rawContent,
+      duplicatePolicy: duplicatePolicy,
       structuredTextSeparator: structuredTextSeparator,
     );
   }

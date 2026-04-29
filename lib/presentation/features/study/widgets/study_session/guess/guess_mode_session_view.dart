@@ -24,13 +24,19 @@ class GuessModeSessionView extends StatefulWidget {
   const GuessModeSessionView({
     required this.snapshot,
     required this.isSubmitting,
+    required this.canCancel,
     required this.onSubmit,
+    required this.onCancel,
+    required this.onBack,
     super.key,
   });
 
   final StudySessionSnapshot snapshot;
   final bool isSubmitting;
+  final bool canCancel;
   final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
+  final VoidCallback onCancel;
+  final VoidCallback onBack;
 
   @override
   State<GuessModeSessionView> createState() => _GuessModeSessionViewState();
@@ -73,12 +79,20 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     if (item == null) {
       return StudyModeSessionScaffold(
         title: l10n.studyModeGuess,
+        canCancel: widget.canCancel,
+        isActionBusy: widget.isSubmitting,
+        onCancel: widget.onCancel,
+        onBack: widget.onBack,
         child: const SizedBox.shrink(),
       );
     }
 
     return StudyModeSessionScaffold(
       title: l10n.studyModeGuess,
+      canCancel: widget.canCancel,
+      isActionBusy: widget.isSubmitting,
+      onCancel: widget.onCancel,
+      onBack: widget.onBack,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
