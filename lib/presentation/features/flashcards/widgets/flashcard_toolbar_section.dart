@@ -141,13 +141,19 @@ class _DeckActionGroup extends StatelessWidget {
         const MxGap(MxSpace.md),
         Row(
           children: [
-            Flexible(child: _buildSortChip()),
-            const Spacer(),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _buildSortChip(),
+              ),
+            ),
+            const MxGap(MxSpace.sm),
             MxIconButton(
               icon: Icons.file_upload_outlined,
               tooltip: importLabel,
               onPressed: onImport,
             ),
+            const MxGap(MxSpace.sm),
             MxIconButton(
               icon: Icons.reorder_rounded,
               tooltip: reorderLabel,

@@ -100,6 +100,14 @@ void main() {
       promptStyle.fontSize,
       lessThan(promptTheme.textTheme.displayMedium!.fontSize!),
     );
+    final termCardHeight = tester
+        .getSize(find.byKey(const ValueKey<String>('guess-target-card')))
+        .height;
+    final answerOptionHeight = _cardHeightForKey(
+      tester,
+      'guess-option-card-001',
+    );
+    expect(termCardHeight, greaterThan(answerOptionHeight * 2.2));
     expect(find.text('Correct'), findsNothing);
     expect(find.text('Incorrect'), findsNothing);
     expect(find.text('Continue'), findsNothing);
@@ -242,6 +250,14 @@ void main() {
     expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
     expect(find.text('20%'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('match-front-speak-item-001')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey<String>('match-front-speak-item-002')),
+      findsNothing,
+    );
     expect(
       find.descendant(
         of: find.byKey(const ValueKey('match-left-item-001')),

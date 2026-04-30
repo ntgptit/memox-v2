@@ -167,6 +167,49 @@ void main() {
     },
   );
 
+  testWidgets(
+    'DT4 onDisplay: compact toolbar keeps import and reorder anchored right',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(390, 844));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
+
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final studyButtonRect = tester.getRect(
+        find.widgetWithText(ElevatedButton, 'Study now'),
+      );
+      final reorderButtonRect = tester.getRect(
+        find.ancestor(
+          of: find.byIcon(Icons.reorder_rounded),
+          matching: find.byType(IconButton),
+        ),
+      );
+
+      expect(
+        (studyButtonRect.right - reorderButtonRect.right).abs(),
+        lessThanOrEqualTo(1),
+      );
+    },
+  );
+
   testWidgets('DT1 onNavigate: starts deck study from flashcard management', (
     WidgetTester tester,
   ) async {

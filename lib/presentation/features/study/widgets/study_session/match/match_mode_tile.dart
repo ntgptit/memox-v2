@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../../../domain/services/tts_service.dart';
 import '../../../../../../domain/study/entities/study_models.dart';
 import '../../../../../shared/layouts/mx_space.dart';
 import '../../../../../shared/widgets/mx_card.dart';
 import '../../../../../shared/widgets/mx_shake_transition.dart';
 import '../../../../../shared/widgets/mx_text.dart';
-import '../study_speak_button.dart';
 import 'match_motion.dart';
 import 'match_tile_models.dart';
 
@@ -64,7 +61,6 @@ class _MatchModeTileState extends State<MatchModeTile>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final visual = MatchTileVisual.resolve(context, widget.state, widget.side);
     final isMatched = widget.state == MatchTileState.matched;
     final isResolved =
@@ -94,43 +90,25 @@ class _MatchModeTileState extends State<MatchModeTile>
               borderColor: visual.borderColor,
               padding: const EdgeInsets.all(MxSpace.md),
               onTap: canTap ? widget.onTap : null,
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Center(
-                          child: SizedBox(
-                            width: constraints.maxWidth,
-                            child: MxText(
-                              text,
-                              role: isTerm
-                                  ? MxTextRole.tileTitle
-                                  : MxTextRole.contentBody,
-                              color: visual.foregroundColor,
-                              maxLines: isTerm ? 3 : 4,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                              softWrap: true,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  if (isTerm)
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: StudySpeakButton(
-                        key: ValueKey<String>(
-                          'match-front-speak-${widget.item.id}',
-                        ),
-                        tooltip: l10n.studyCardAudioTooltip,
-                        text: text,
-                        side: TtsTextSide.front,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return Center(
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      child: MxText(
+                        text,
+                        role: isTerm
+                            ? MxTextRole.tileTitle
+                            : MxTextRole.contentBody,
+                        color: visual.foregroundColor,
+                        maxLines: isTerm ? 3 : 4,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        softWrap: true,
                       ),
                     ),
-                ],
+                  );
+                },
               ),
             ),
           ),

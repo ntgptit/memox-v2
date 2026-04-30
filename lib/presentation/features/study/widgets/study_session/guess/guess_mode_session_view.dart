@@ -20,6 +20,9 @@ import 'guess_motion.dart';
 import 'guess_option_models.dart';
 import 'guess_option_tile.dart';
 
+const _guessTermFlex = 9;
+const _guessOptionsFlex = 16;
+
 class GuessModeSessionView extends StatefulWidget {
   const GuessModeSessionView({
     required this.snapshot,
@@ -106,10 +109,13 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
             label: l10n.commonPercentValue(percent),
           ),
           const MxGap(MxSpace.md),
-          Expanded(flex: 2, child: _GuessTargetCard(item: item)),
+          Expanded(
+            flex: _guessTermFlex,
+            child: _GuessTargetCard(item: item),
+          ),
           const MxGap(MxSpace.md),
           Expanded(
-            flex: 5,
+            flex: _guessOptionsFlex,
             child: _GuessOptionsList(
               options: _options,
               isLocked: _isLocked,
@@ -334,6 +340,7 @@ class _GuessTargetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return MxCard(
+      key: const ValueKey<String>('guess-target-card'),
       variant: MxCardVariant.outlined,
       padding: const EdgeInsets.all(MxSpace.sm),
       child: Stack(
