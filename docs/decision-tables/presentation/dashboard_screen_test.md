@@ -18,8 +18,8 @@ Test file: `test/presentation/dashboard_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | loaded overview has overdue reviews, due-today reviews, new cards, one active session, and library health metrics | `DashboardOverviewState` has `overdueCount=3`, `dueTodayCount=2`, `newCardCount=7`, `activeSessionCount=1`, `folderCount=2`, `deckCount=3`, `cardCount=20`, and `masteryPercent=30` | dashboard renders the loaded data branch | Today Review, New Study, Resume, Library health, separated counts, and `30%` are visible | C0+C1 |
-| DT2 | loaded overview has no review cards, no new cards, and no active sessions | `DashboardOverviewState` has zero counts for review, new study, and resume actions | dashboard renders the loaded data branch | Review now, Start new study, and Continue session actions are disabled while Library health remains visible | C0+C1 |
+| DT1 | loaded overview has overdue reviews, due-today reviews, new cards, one active session, and library progress metrics | `DashboardOverviewState` has `overdueCount=3`, `dueTodayCount=2`, `newCardCount=7`, `activeSessionCount=1`, `folderCount=2`, `deckCount=3`, `cardCount=20`, and `masteryPercent=30` | dashboard renders the loaded data branch | `PieChart`, Library progress, `30%`, compact Today Review, New Study, Resume rows, and their labeled counts are visible | C0+C1 |
+| DT2 | loaded overview has no review cards, no new cards, and no active sessions | `DashboardOverviewState` has zero counts for review, new study, and resume actions | dashboard renders the loaded data branch | Review now, Start new study, and Continue session actions are disabled while the Library progress chart remains visible | C0+C1 |
 
 ## Decision table: onNavigate
 

@@ -107,7 +107,7 @@ void main() {
       tester,
       'guess-option-card-001',
     );
-    expect(termCardHeight, greaterThan(answerOptionHeight * 2.2));
+    expect(termCardHeight, greaterThan(answerOptionHeight * 3.5));
     expect(find.text('Correct'), findsNothing);
     expect(find.text('Incorrect'), findsNothing);
     expect(find.text('Continue'), findsNothing);

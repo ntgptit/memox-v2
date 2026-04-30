@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,23 +59,25 @@ void main() {
     },
   );
 
-  testWidgets('DT1 onDisplay: renders study-first dashboard decision blocks', (
+  testWidgets('DT1 onDisplay: renders compact dashboard with progress chart', (
     tester,
   ) async {
     await _pumpDashboard(tester, _studyReadyDashboardState);
 
     expect(find.text('Today\'s study focus'), findsOneWidget);
-    expect(find.text('Today Review'), findsOneWidget);
-    expect(find.text('Overdue'), findsOneWidget);
-    expect(find.text('Due today'), findsOneWidget);
-    expect(find.text('New Study'), findsOneWidget);
-    expect(find.text('New cards available'), findsOneWidget);
-    expect(find.text('Resume'), findsOneWidget);
-    expect(find.text('Active sessions'), findsOneWidget);
-    expect(find.text('Library health'), findsOneWidget);
+    expect(find.byType(PieChart), findsOneWidget);
+    expect(find.text('Library progress'), findsOneWidget);
+    expect(find.text('30% mastery · 2 folders · 20 cards'), findsOneWidget);
     expect(find.text('2 folders · 3 decks · 20 cards'), findsOneWidget);
     expect(find.text('Mastery'), findsOneWidget);
-    expect(find.text('30%'), findsWidgets);
+    expect(find.text('30%'), findsOneWidget);
+    expect(find.text('Today Review'), findsOneWidget);
+    expect(find.text('Overdue: 3'), findsOneWidget);
+    expect(find.text('Due today: 2'), findsOneWidget);
+    expect(find.text('New Study'), findsOneWidget);
+    expect(find.text('New cards available: 7'), findsOneWidget);
+    expect(find.text('Resume'), findsOneWidget);
+    expect(find.text('Active sessions: 1'), findsOneWidget);
   });
 
   testWidgets(
@@ -97,7 +100,8 @@ void main() {
         key: const ValueKey('dashboard_continue_session_action'),
         isEnabled: false,
       );
-      expect(find.text('Library health'), findsOneWidget);
+      expect(find.byType(PieChart), findsOneWidget);
+      expect(find.text('Library progress'), findsOneWidget);
     },
   );
 

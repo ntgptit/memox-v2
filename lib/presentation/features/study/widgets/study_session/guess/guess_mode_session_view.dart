@@ -20,8 +20,8 @@ import 'guess_motion.dart';
 import 'guess_option_models.dart';
 import 'guess_option_tile.dart';
 
-const _guessTermFlex = 9;
-const _guessOptionsFlex = 16;
+const _guessTermFlex = 54;
+const _guessOptionsFlex = 71;
 
 class GuessModeSessionView extends StatefulWidget {
   const GuessModeSessionView({

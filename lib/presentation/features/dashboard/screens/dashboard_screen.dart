@@ -1,8 +1,10 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../core/theme/extensions/theme_extensions.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_gap.dart';
@@ -10,11 +12,30 @@ import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
-import '../../../shared/widgets/mx_progress_indicator.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
+
+const _dashboardChartSize =
+    132.0; // guard:raw-size-reviewed fixed dashboard chart diameter
+const _dashboardChartSectionRadius =
+    16.0; // guard:raw-size-reviewed donut ring thickness
+const _dashboardChartCenterRadius =
+    42.0; // guard:raw-size-reviewed donut center label clearance
+const _dashboardChartSectionSpacing =
+    2.0; // guard:raw-size-reviewed visual separation between slices
+const _dashboardChartInlineMinWidth =
+    420.0; // guard:raw-size-reviewed switch point for chart details layout
+const _dashboardActionInlineMinWidth =
+    460.0; // guard:raw-size-reviewed switch point for action button layout
+const _dashboardPercentMax = 100;
+const _dashboardChartStartDegree =
+    -90.0; // guard:raw-size-reviewed start donut chart at the top
+const _dashboardChartAnimationDuration = Duration(
+  milliseconds: 150,
+); // guard:raw-size-reviewed chart transition
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -50,9 +71,8 @@ class _DashboardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final cards = [
-      _DashboardActionCard(
-        key: const ValueKey('dashboard_today_review_card'),
+    final actions = [
+      _DashboardActionSpec(
         icon: Icons.event_available_outlined,
         title: l10n.dashboardTodayReviewTitle,
         message: state.hasReviewCards
@@ -73,8 +93,7 @@ class _DashboardContent extends StatelessWidget {
         actionIcon: Icons.play_arrow_rounded,
         onAction: state.hasReviewCards ? () => context.goStudyToday() : null,
       ),
-      _DashboardActionCard(
-        key: const ValueKey('dashboard_new_study_card'),
+      _DashboardActionSpec(
         icon: Icons.auto_stories_outlined,
         title: l10n.dashboardNewStudyTitle,
         message: state.hasNewCards
@@ -91,8 +110,7 @@ class _DashboardContent extends StatelessWidget {
         actionIcon: Icons.school_outlined,
         onAction: state.hasNewCards ? () => context.goLibrary() : null,
       ),
-      _DashboardActionCard(
-        key: const ValueKey('dashboard_resume_card'),
+      _DashboardActionSpec(
         icon: Icons.play_circle_outline,
         title: l10n.dashboardResumeTitle,
         message: state.hasActiveSessions
@@ -111,7 +129,6 @@ class _DashboardContent extends StatelessWidget {
             ? () => _continueSession(context, state)
             : null,
       ),
-      _DashboardLibraryHealthCard(state: state),
     ];
 
     return ListView(
@@ -121,40 +138,11 @@ class _DashboardContent extends StatelessWidget {
         const MxGap(MxSpace.sm),
         MxText(l10n.dashboardSubtitle, role: MxTextRole.contentBody),
         const MxGap(MxSpace.xl),
-        ..._cardLayout(context, cards),
+        _DashboardLibraryProgressCard(state: state),
+        const MxGap(MxSpace.lg),
+        _DashboardActionList(actions: actions),
       ],
     );
-  }
-
-  List<Widget> _cardLayout(BuildContext context, List<Widget> cards) {
-    if (context.gridColumns() <= 1) {
-      return [
-        for (var index = 0; index < cards.length; index++) ...[
-          cards[index],
-          if (index != cards.length - 1) const MxGap(MxSpace.lg),
-        ],
-      ];
-    }
-
-    return [
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: cards[0]),
-          const MxGap(MxSpace.lg),
-          Expanded(child: cards[1]),
-        ],
-      ),
-      const MxGap(MxSpace.lg),
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(child: cards[2]),
-          const MxGap(MxSpace.lg),
-          Expanded(child: cards[3]),
-        ],
-      ),
-    ];
   }
 
   void _continueSession(BuildContext context, DashboardOverviewState state) {
@@ -167,15 +155,8 @@ class _DashboardContent extends StatelessWidget {
   }
 }
 
-class _DashboardMetric {
-  const _DashboardMetric({required this.label, required this.value});
-
-  final String label;
-  final String value;
-}
-
-class _DashboardActionCard extends StatelessWidget {
-  const _DashboardActionCard({
+class _DashboardActionSpec {
+  const _DashboardActionSpec({
     required this.icon,
     required this.title,
     required this.message,
@@ -184,7 +165,6 @@ class _DashboardActionCard extends StatelessWidget {
     required this.actionKey,
     required this.actionIcon,
     required this.onAction,
-    super.key,
   });
 
   final IconData icon;
@@ -195,39 +175,324 @@ class _DashboardActionCard extends StatelessWidget {
   final Key actionKey;
   final IconData actionIcon;
   final VoidCallback? onAction;
+}
+
+class _DashboardMetric {
+  const _DashboardMetric({required this.label, required this.value});
+
+  final String label;
+  final String value;
+}
+
+class _DashboardLibraryProgressCard extends StatelessWidget {
+  const _DashboardLibraryProgressCard({required this.state});
+
+  final DashboardOverviewState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final masteryPercent = state.masteryPercent
+        .clamp(0, _dashboardPercentMax)
+        .toInt();
+
+    return MxCard(
+      key: const ValueKey('dashboard_library_progress_card'),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final chart = _DashboardMasteryChart(percent: masteryPercent);
+          final details = _DashboardLibraryProgressDetails(
+            state: state,
+            percent: masteryPercent,
+          );
+
+          if (constraints.maxWidth < _dashboardChartInlineMinWidth) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(child: chart),
+                const MxGap(MxSpace.lg),
+                details,
+              ],
+            );
+          }
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              chart,
+              const MxGap(MxSpace.xl),
+              Expanded(child: details),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _DashboardMasteryChart extends StatelessWidget {
+  const _DashboardMasteryChart({required this.percent});
+
+  final int percent;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final customColors = context.mxColors;
+    final masteryColor = customColors.masteryProgress(
+      percent / _dashboardPercentMax,
+    );
+    final remainingColor = scheme.surfaceContainerHighest;
+
+    return SizedBox.square(
+      dimension: _dashboardChartSize,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          PieChart(
+            PieChartData(
+              centerSpaceColor: scheme.surfaceContainerLow,
+              centerSpaceRadius: _dashboardChartCenterRadius,
+              pieTouchData: PieTouchData(enabled: false),
+              sections: _chartSections(
+                percent: percent,
+                masteryColor: masteryColor,
+                remainingColor: remainingColor,
+              ),
+              sectionsSpace: _dashboardChartSectionSpacing,
+              startDegreeOffset: _dashboardChartStartDegree,
+            ),
+            duration: _dashboardChartAnimationDuration,
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              MxText(
+                l10n.commonPercentValue(percent),
+                role: MxTextRole.sectionTitle,
+                textAlign: TextAlign.center,
+              ),
+              MxText(
+                l10n.dashboardMasteryLabel,
+                role: MxTextRole.tileMeta,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<PieChartSectionData> _chartSections({
+    required int percent,
+    required Color masteryColor,
+    required Color remainingColor,
+  }) {
+    if (percent == 0) {
+      return [
+        PieChartSectionData(
+          color: remainingColor,
+          radius: _dashboardChartSectionRadius,
+          showTitle: false,
+          value: _dashboardPercentMax.toDouble(),
+        ),
+      ];
+    }
+
+    final remainingPercent = _dashboardPercentMax - percent;
+    return [
+      PieChartSectionData(
+        color: masteryColor,
+        radius: _dashboardChartSectionRadius,
+        showTitle: false,
+        value: percent.toDouble(),
+      ),
+      if (remainingPercent > 0)
+        PieChartSectionData(
+          color: remainingColor,
+          radius: _dashboardChartSectionRadius,
+          showTitle: false,
+          value: remainingPercent.toDouble(),
+        ),
+    ];
+  }
+}
+
+class _DashboardLibraryProgressDetails extends StatelessWidget {
+  const _DashboardLibraryProgressDetails({
+    required this.state,
+    required this.percent,
+  });
+
+  final DashboardOverviewState state;
+  final int percent;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.query_stats_outlined, color: scheme.primary),
+            const MxGap(MxSpace.md),
+            Expanded(
+              child: MxText(
+                l10n.dashboardLibraryProgressTitle,
+                role: MxTextRole.sectionTitle,
+              ),
+            ),
+          ],
+        ),
+        const MxGap(MxSpace.xs),
+        MxText(
+          l10n.dashboardLibraryProgressMessage(
+            percent,
+            state.folderCount,
+            state.cardCount,
+          ),
+          role: MxTextRole.contentBody,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const MxGap(MxSpace.xs),
+        MxText(
+          l10n.dashboardLibraryHealthSummary(
+            state.folderCount,
+            state.deckCount,
+            state.cardCount,
+          ),
+          role: MxTextRole.tileMeta,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const MxGap(MxSpace.md),
+        MxSecondaryButton(
+          key: const ValueKey('dashboard_open_library_action'),
+          label: l10n.dashboardOpenLibraryAction,
+          leadingIcon: Icons.folder_open_outlined,
+          size: MxButtonSize.small,
+          variant: MxSecondaryVariant.text,
+          onPressed: () => context.goLibrary(),
+        ),
+      ],
+    );
+  }
+}
+
+class _DashboardActionList extends StatelessWidget {
+  const _DashboardActionList({required this.actions});
+
+  final List<_DashboardActionSpec> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return MxCard(
+      key: const ValueKey('dashboard_action_list_card'),
+      padding: const EdgeInsets.symmetric(
+        horizontal: MxSpace.lg,
+        vertical: MxSpace.sm,
+      ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: actions.length,
+        itemBuilder: (context, index) =>
+            _DashboardActionRow(action: actions[index]),
+        separatorBuilder: (context, index) => const MxDivider(),
+      ),
+    );
+  }
+}
+
+class _DashboardActionRow extends StatelessWidget {
+  const _DashboardActionRow({required this.action});
+
+  final _DashboardActionSpec action;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final button = MxPrimaryButton(
+      key: action.actionKey,
+      label: action.actionLabel,
+      leadingIcon: action.actionIcon,
+      size: MxButtonSize.small,
+      onPressed: action.onAction,
+    );
 
-    return MxCard(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: scheme.primary),
-          const MxGap(MxSpace.md),
-          Expanded(
-            child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: MxSpace.sm),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final details = _DashboardActionDetails(action: action);
+
+          if (constraints.maxWidth < _dashboardActionInlineMinWidth) {
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MxText(title, role: MxTextRole.sectionTitle),
-                const MxGap(MxSpace.xs),
-                MxText(message, role: MxTextRole.contentBody),
-                const MxGap(MxSpace.md),
-                _MetricList(metrics: metrics),
-                const MxGap(MxSpace.md),
-                MxPrimaryButton(
-                  key: actionKey,
-                  label: actionLabel,
-                  leadingIcon: actionIcon,
-                  fullWidth: true,
-                  onPressed: onAction,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(action.icon, color: scheme.primary),
+                    const MxGap(MxSpace.md),
+                    Expanded(child: details),
+                  ],
+                ),
+                const MxGap(MxSpace.sm),
+                Padding(
+                  padding: const EdgeInsets.only(left: MxSpace.xxl),
+                  child: button,
                 ),
               ],
-            ),
-          ),
-        ],
+            );
+          }
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(action.icon, color: scheme.primary),
+              const MxGap(MxSpace.md),
+              Expanded(child: details),
+              const MxGap(MxSpace.md),
+              button,
+            ],
+          );
+        },
       ),
+    );
+  }
+}
+
+class _DashboardActionDetails extends StatelessWidget {
+  const _DashboardActionDetails({required this.action});
+
+  final _DashboardActionSpec action;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxText(action.title, role: MxTextRole.sectionTitle),
+        const MxGap(MxSpace.xs),
+        MxText(
+          action.message,
+          role: MxTextRole.contentBody,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const MxGap(MxSpace.xs),
+        _MetricList(metrics: action.metrics),
+      ],
     );
   }
 }
@@ -239,12 +504,10 @@ class _MetricList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: metrics.length,
-      itemBuilder: (context, index) => _MetricLine(metric: metrics[index]),
-      separatorBuilder: (context, index) => const MxGap(MxSpace.xs),
+    return Wrap(
+      spacing: MxSpace.md,
+      runSpacing: MxSpace.xs,
+      children: [for (final metric in metrics) _MetricLine(metric: metric)],
     );
   }
 }
@@ -256,79 +519,11 @@ class _MetricLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: MxText(metric.label, role: MxTextRole.tileMeta)),
-        const MxGap(MxSpace.md),
-        MxText(metric.value, role: MxTextRole.sectionTitle),
-      ],
-    );
-  }
-}
-
-class _DashboardLibraryHealthCard extends StatelessWidget {
-  const _DashboardLibraryHealthCard({required this.state});
-
-  final DashboardOverviewState state;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
-
-    return MxCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(Icons.health_and_safety_outlined, color: scheme.primary),
-              const MxGap(MxSpace.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MxText(
-                      l10n.dashboardLibraryHealthTitle,
-                      role: MxTextRole.sectionTitle,
-                    ),
-                    const MxGap(MxSpace.xs),
-                    MxText(
-                      l10n.dashboardLibraryHealthSummary(
-                        state.folderCount,
-                        state.deckCount,
-                        state.cardCount,
-                      ),
-                      role: MxTextRole.contentBody,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const MxGap(MxSpace.md),
-          _MetricLine(
-            metric: _DashboardMetric(
-              label: l10n.dashboardMasteryLabel,
-              value: '${state.masteryPercent}%',
-            ),
-          ),
-          const MxGap(MxSpace.md),
-          MxLinearProgress(
-            value: state.masteryPercent / 100,
-            showPercentage: true,
-          ),
-          const MxGap(MxSpace.md),
-          MxSecondaryButton(
-            key: const ValueKey('dashboard_open_library_action'),
-            label: l10n.dashboardOpenLibraryAction,
-            leadingIcon: Icons.folder_open_outlined,
-            fullWidth: true,
-            onPressed: () => context.goLibrary(),
-          ),
-        ],
-      ),
+    return MxText(
+      '${metric.label}: ${metric.value}',
+      role: MxTextRole.tileMeta,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
