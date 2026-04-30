@@ -19,6 +19,12 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 
 - Use Vietnamese for discussion with the user.
 - Use English for code, comments, identifiers, and commit messages.
+- Do not rubber-stamp user proposals. If a user suggestion is technically,
+  architecturally, product-wise, or UX-wise wrong, respectfully challenge it,
+  explain the concrete risk, and propose a better alternative.
+- Agree with user suggestions only when the agreement is defensible from repo
+  context, business docs, product behavior, or implementation constraints. If
+  uncertain, state the uncertainty and verify before accepting the proposal.
 - Prefer minimal, structurally correct changes over broad refactors.
 - Do not edit generated files manually:
   - `**/*.g.dart`
@@ -108,6 +114,8 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 
 - UI code should consume colors from `Theme.of(context).colorScheme` or theme extensions, not raw palette files.
 - UI code should consume typography from `Theme.of(context).textTheme`, not custom inline `TextStyle(...)` unless there is a strong repo-local reason.
+- Shared widgets should own semantic typography through internal `MxText`/`MxTextRole` usage. Only typography primitives such as `MxText` and `MxTextField` may expose `MxTextRole` as public API; other shared widgets should expose semantic variants or component-specific props instead.
+- App bar and header actions should use toolbar icon styling. Do not use filled, outlined, or card-like buttons for normal Back, Close, More, settings, or audio actions unless the action is explicitly selected/active/destructive.
 - Prefer shared layout primitives such as `MxAdaptiveScaffold`, `MxScaffold`, and `MxContentShell`.
 - Use spacing, radius, and sizing tokens from `lib/core/theme/**` instead of raw literals when a token already exists.
 

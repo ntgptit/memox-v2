@@ -105,6 +105,17 @@ scopes:
       - "lib/presentation/shared/states"
     include: ["**/*.dart"]
     exclude: *generated
+  shared_widget_component_api_files:
+    roots: ["."]
+    include:
+      - "lib/presentation/shared/**/*.dart"
+    exclude:
+      - "**/*.g.dart"
+      - "**/*.freezed.dart"
+      - "**/*.config.dart"
+      - "**/gen/**"
+      - "lib/presentation/shared/widgets/mx_text.dart"
+      - "lib/presentation/shared/widgets/mx_text_field.dart"
   shared_layout_files:
     roots:
       - "lib/presentation/shared/layouts"
@@ -122,6 +133,19 @@ scopes:
     include:
       - "lib/presentation/features/**/widgets/*.dart"
       - "lib/presentation/features/**/widgets/**/*.dart"
+    exclude: *generated
+  app_bar_header_files:
+    roots: ["."]
+    include:
+      - "lib/presentation/features/**/*_header_section.dart"
+      - "lib/presentation/features/study/screens/study_session_screen.dart"
+      - "lib/presentation/features/study/widgets/study_session/study_mode_session_scaffold.dart"
+    exclude: *generated
+  app_bar_header_framed_button_files:
+    roots: ["."]
+    include:
+      - "lib/presentation/features/**/*_header_section.dart"
+      - "lib/presentation/features/study/widgets/study_session/study_mode_session_scaffold.dart"
     exclude: *generated
   feature_ui:
     roots: ["."]

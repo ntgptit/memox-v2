@@ -206,7 +206,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       title: l10n.studySessionTitle,
       actions: [
         if (canCancel)
-          MxIconButton(
+          MxIconButton.toolbar(
             tooltip: l10n.studyCancelAction,
             onPressed: actionState.isLoading
                 ? null

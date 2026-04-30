@@ -141,6 +141,57 @@ void main() {
     },
   );
 
+  testWidgets('DT5 onUpdate: MxText resolves sheet roles below page title', (
+    tester,
+  ) async {
+    late TextStyle expectedSheetTitle;
+    late TextStyle expectedActionItem;
+    late TextStyle expectedActionSubtitle;
+    late double pageTitleFontSize;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              final theme = Theme.of(context);
+              expectedSheetTitle = theme.textTheme.titleMedium!.copyWith(
+                color: theme.colorScheme.onSurface,
+              );
+              expectedActionItem = theme.textTheme.bodyLarge!.copyWith(
+                color: theme.colorScheme.onSurface,
+              );
+              expectedActionSubtitle = theme.textTheme.bodyMedium!.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              );
+              pageTitleFontSize = theme.textTheme.titleLarge!.fontSize!;
+
+              return const Column(
+                children: [
+                  MxText('Create', role: MxTextRole.sheetTitle),
+                  MxText('New deck', role: MxTextRole.actionSheetItem),
+                  MxText('Choose cards', role: MxTextRole.actionSheetSubtitle),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    final sheetTitle = tester.widget<Text>(find.text('Create'));
+    final actionItem = tester.widget<Text>(find.text('New deck'));
+    final actionSubtitle = tester.widget<Text>(find.text('Choose cards'));
+
+    expect(sheetTitle.style?.fontSize, expectedSheetTitle.fontSize);
+    expect(sheetTitle.style?.fontSize, lessThan(pageTitleFontSize));
+    expect(sheetTitle.style?.color, expectedSheetTitle.color);
+    expect(actionItem.style?.fontSize, expectedActionItem.fontSize);
+    expect(actionItem.style?.color, expectedActionItem.color);
+    expect(actionSubtitle.style?.fontSize, expectedActionSubtitle.fontSize);
+    expect(actionSubtitle.style?.color, expectedActionSubtitle.color);
+  });
+
   testWidgets('DT1 onDisplay: MxText applies semantic role color override', (
     tester,
   ) async {

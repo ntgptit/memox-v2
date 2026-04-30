@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/component_themes/focus_theme.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
 
-enum MxIconButtonVariant { standard, filled, filledTonal, outlined }
+enum MxIconButtonVariant { standard, toolbar, filled, filledTonal, outlined }
 
 /// Themed icon button with tooltip-friendly API and four M3 variants.
 class MxIconButton extends StatelessWidget {
@@ -17,6 +19,16 @@ class MxIconButton extends StatelessWidget {
     super.key,
   });
 
+  const MxIconButton.toolbar({
+    required this.icon,
+    required this.onPressed,
+    this.tooltip,
+    this.size = AppIconSizes.lg,
+    this.isSelected = false,
+    this.selectedIcon,
+    super.key,
+  }) : variant = MxIconButtonVariant.toolbar;
+
   final IconData icon;
   final IconData? selectedIcon;
   final VoidCallback? onPressed;
@@ -24,6 +36,37 @@ class MxIconButton extends StatelessWidget {
   final MxIconButtonVariant variant;
   final double size;
   final bool isSelected;
+
+  static IconButtonThemeData toolbarTheme(BuildContext context) {
+    return IconButtonThemeData(style: toolbarStyle(context));
+  }
+
+  static ButtonStyle toolbarStyle(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final transparent = scheme.surface.withValues(
+      alpha: AppOpacity.transparent,
+    );
+
+    return ButtonStyle(
+      foregroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
+        }
+        return scheme.onSurfaceVariant;
+      }),
+      backgroundColor: WidgetStatePropertyAll(transparent),
+      overlayColor: AppFocus.overlayProperty(scheme.onSurface),
+      side: const WidgetStatePropertyAll(BorderSide.none),
+      minimumSize: const WidgetStatePropertyAll(
+        Size.square(kMinInteractiveDimension),
+      ),
+      fixedSize: const WidgetStatePropertyAll(
+        Size.square(kMinInteractiveDimension),
+      ),
+      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+      shape: const WidgetStatePropertyAll(CircleBorder()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +82,14 @@ class MxIconButton extends StatelessWidget {
         isSelected: isSelected,
         tooltip: tooltip,
         onPressed: onPressed,
+      ),
+      MxIconButtonVariant.toolbar => IconButton(
+        icon: iconWidget,
+        selectedIcon: selectedIconWidget,
+        isSelected: isSelected,
+        tooltip: tooltip,
+        onPressed: onPressed,
+        style: toolbarStyle(context),
       ),
       MxIconButtonVariant.filled => IconButton.filled(
         icon: iconWidget,

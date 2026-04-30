@@ -381,6 +381,50 @@ rules:
         - "import\\s+'package:memox/presentation/features/"
         - "import\\s+'package:go_router/go_router\\.dart';"
 
+  - id: shared_widget_no_public_mx_text_role_api
+    type: forbidden_pattern
+    name: "Shared Widget No Public MxTextRole API"
+    description: "Shared components should own typography semantics internally instead of exposing arbitrary `MxTextRole` parameters."
+    message_code: shared_widget_no_public_mx_text_role_api
+    severity: error
+    impact: design_system
+    scope: shared_widget_component_api_files
+    fix_hint_code: keep_text_roles_internal_to_shared_widgets
+    params:
+      patterns:
+        - "\\bMxTextRole\\??\\s+[A-Za-z_][A-Za-z0-9_]*"
+      skip_comments: true
+
+  - id: app_bar_header_requires_toolbar_icon_buttons
+    type: forbidden_pattern
+    name: "App Bar Header Requires Toolbar Icon Buttons"
+    description: "App bar and feature header icon actions must use `MxIconButton.toolbar(...)` so normal Back/More actions stay visually quiet."
+    message_code: app_bar_header_requires_toolbar_icon_buttons
+    severity: error
+    impact: design_system
+    scope: app_bar_header_files
+    fix_hint_code: use_toolbar_icon_buttons_in_headers
+    params:
+      patterns:
+        - "\\bMxIconButton\\s*\\("
+      skip_comments: true
+
+  - id: app_bar_header_no_framed_buttons
+    type: forbidden_pattern
+    name: "App Bar Header No Framed Buttons"
+    description: "App bar and feature header actions should not use framed button surfaces unless the state is explicitly selected, active, or destructive."
+    message_code: app_bar_header_no_framed_buttons
+    severity: error
+    impact: design_system
+    scope: app_bar_header_framed_button_files
+    fix_hint_code: use_toolbar_icon_buttons_in_headers
+    params:
+      patterns:
+        - "\\bMxPrimaryButton\\s*\\("
+        - "\\bMxSecondaryButton\\s*\\("
+        - "\\bMxIconButton\\.(?:filled|filledTonal|outlined)\\s*\\("
+      skip_comments: true
+
   - id: no_raw_ink_surface
     type: forbidden_pattern
     name: "No Raw Ink Surface"

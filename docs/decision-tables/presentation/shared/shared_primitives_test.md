@@ -2,6 +2,13 @@
 
 Test file: `test/presentation/shared/shared_primitives_test.dart`
 
+## Decision table: onDisplay
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | action sheet item has label and subtitle text | `MxActionSheetList` contains one item with label `New deck` and subtitle `Create cards in this folder` | action sheet list renders | label uses `MxTextRole.actionSheetItem` and subtitle uses `MxTextRole.actionSheetSubtitle` | C0+C1 |
+| DT2 | toolbar icon button is used for app bar actions | `MxIconButton.toolbar` is built with tooltip `Back` and a non-null callback | toolbar icon button renders | background resolves fully transparent, border side is none, fixed size is the Material minimum touch target, and tooltip semantics remain visible | C0+C1 |
+
 ## Decision table: onSelect
 
 | ID | Branch / condition | Given | When | Then | Coverage |

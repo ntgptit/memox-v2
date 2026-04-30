@@ -7,6 +7,9 @@ enum MxTextRole {
   heroAccent,
   sectionTitle,
   sectionSubtitle,
+  sheetTitle,
+  actionSheetItem,
+  actionSheetSubtitle,
   tileTitle,
   tileMeta,
   tileTrailing,
@@ -55,6 +58,15 @@ abstract final class MxTextStyles {
         color: scheme.onSurface,
       ),
       MxTextRole.sectionSubtitle => textTheme.bodyMedium!.copyWith(
+        color: scheme.onSurfaceVariant,
+      ),
+      MxTextRole.sheetTitle => textTheme.titleMedium!.copyWith(
+        color: scheme.onSurface,
+      ),
+      MxTextRole.actionSheetItem => textTheme.bodyLarge!.copyWith(
+        color: scheme.onSurface,
+      ),
+      MxTextRole.actionSheetSubtitle => textTheme.bodyMedium!.copyWith(
         color: scheme.onSurfaceVariant,
       ),
       MxTextRole.tileTitle => textTheme.titleMedium!.copyWith(

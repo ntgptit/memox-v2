@@ -32,29 +32,29 @@ class StudyModeSessionScaffold extends StatelessWidget {
     return MxScaffold(
       title: title,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-      leading: MxIconButton(
+      leading: MxIconButton.toolbar(
         tooltip: MaterialLocalizations.of(context).backButtonTooltip,
         icon: Icons.arrow_back,
         onPressed: onBack,
       ),
       actions: [
         if (canCancel)
-          MxIconButton(
+          MxIconButton.toolbar(
             tooltip: l10n.studyCancelAction,
             icon: Icons.close_rounded,
             onPressed: isActionBusy ? null : onCancel,
           ),
-        MxIconButton(
+        MxIconButton.toolbar(
           tooltip: l10n.studyTextSettingsTooltip,
           icon: Icons.text_fields,
           onPressed: null,
         ),
-        MxIconButton(
+        MxIconButton.toolbar(
           tooltip: l10n.studyAudioTooltip,
           icon: Icons.volume_up_outlined,
           onPressed: null,
         ),
-        MxIconButton(
+        MxIconButton.toolbar(
           tooltip: l10n.studyMoreActionsTooltip,
           icon: Icons.more_vert,
           onPressed: null,

@@ -5,7 +5,6 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_empty_state.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
-import '../../../shared/widgets/mx_secondary_button.dart';
 
 enum FolderEmptyStateMode { unlocked, subfolders, decks, noResults }
 
@@ -27,6 +26,7 @@ class FolderEmptyStateSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final content = _resolveContent(l10n);
+    final actions = _buildActions(l10n);
     return Column(
       children: [
         MxEmptyState(
@@ -34,13 +34,15 @@ class FolderEmptyStateSection extends StatelessWidget {
           message: content.message,
           icon: content.icon,
         ),
-        const MxGap(MxSpace.lg),
-        Wrap(
-          spacing: MxSpace.sm,
-          runSpacing: MxSpace.sm,
-          alignment: WrapAlignment.center,
-          children: _buildActions(l10n),
-        ),
+        if (actions.isNotEmpty) ...[
+          const MxGap(MxSpace.lg),
+          Wrap(
+            spacing: MxSpace.sm,
+            runSpacing: MxSpace.sm,
+            alignment: WrapAlignment.center,
+            children: actions,
+          ),
+        ],
       ],
     );
   }
@@ -72,19 +74,7 @@ class FolderEmptyStateSection extends StatelessWidget {
 
   List<Widget> _buildActions(AppLocalizations l10n) {
     return switch (mode) {
-      FolderEmptyStateMode.unlocked => [
-        MxPrimaryButton(
-          label: l10n.foldersNewSubfolderTooltip,
-          leadingIcon: Icons.create_new_folder_outlined,
-          onPressed: onCreateSubfolder,
-        ),
-        MxSecondaryButton(
-          label: l10n.foldersNewDeckTooltip,
-          leadingIcon: Icons.style_outlined,
-          variant: MxSecondaryVariant.outlined,
-          onPressed: onCreateDeck,
-        ),
-      ],
+      FolderEmptyStateMode.unlocked => const <Widget>[],
       FolderEmptyStateMode.subfolders => [
         MxPrimaryButton(
           label: l10n.foldersNewSubfolderTooltip,

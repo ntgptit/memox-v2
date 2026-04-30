@@ -22,7 +22,7 @@ class FlashcardEditorHeaderSection extends StatelessWidget {
 
     return Row(
       children: [
-        MxIconButton(
+        MxIconButton.toolbar(
           icon: Icons.arrow_back,
           tooltip: l10n.commonBack,
           onPressed: onBack,

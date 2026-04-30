@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/responsive/app_layout.dart';
+import '../widgets/mx_icon_button.dart';
 import 'mx_content_shell.dart';
 
 /// Thin wrapper over [Scaffold] that sets MemoX defaults:
@@ -60,28 +61,26 @@ class MxScaffold extends StatelessWidget {
           )
         : body;
 
+    final appBar = _hasAppBar
+        ? AppBar(
+            leading: leading,
+            automaticallyImplyLeading: automaticallyImplyLeading,
+            title:
+                titleWidget ??
+                (title != null
+                    ? Text(title!, maxLines: 1, overflow: TextOverflow.ellipsis)
+                    : null),
+            actions: actions,
+            bottom: bottom,
+          )
+        : null;
+
     return Scaffold(
       backgroundColor: backgroundColor,
       extendBody: extendBody,
       extendBodyBehindAppBar: extendBodyBehindAppBar,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-      appBar: _hasAppBar
-          ? AppBar(
-              leading: leading,
-              automaticallyImplyLeading: automaticallyImplyLeading,
-              title:
-                  titleWidget ??
-                  (title != null
-                      ? Text(
-                          title!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      : null),
-              actions: actions,
-              bottom: bottom,
-            )
-          : null,
+      appBar: appBar == null ? null : _MxToolbarAppBar(child: appBar),
       body: SafeArea(
         top: !_hasAppBar,
         bottom: bottomNavigationBar == null,
@@ -92,6 +91,23 @@ class MxScaffold extends StatelessWidget {
       bottomNavigationBar: bottomNavigationBar,
       drawer: drawer,
       endDrawer: endDrawer,
+    );
+  }
+}
+
+class _MxToolbarAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _MxToolbarAppBar({required this.child});
+
+  final PreferredSizeWidget child;
+
+  @override
+  Size get preferredSize => child.preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButtonTheme(
+      data: MxIconButton.toolbarTheme(context),
+      child: child,
     );
   }
 }

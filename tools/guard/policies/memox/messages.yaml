@@ -143,6 +143,12 @@ messages:
     en: "Public types in widget-bearing shared files must start with `Mx`."
   shared_widget_app_wiring:
     en: "Shared widgets must stay render-only; remove provider or app wiring from this file."
+  shared_widget_no_public_mx_text_role_api:
+    en: "Shared components must own typography roles internally. Do not expose `MxTextRole` as public API outside approved typography primitives."
+  app_bar_header_requires_toolbar_icon_buttons:
+    en: "App bar and header icon actions must use `MxIconButton.toolbar(...)` so normal Back, Close, More, settings, and audio actions do not render with a framed background."
+  app_bar_header_no_framed_buttons:
+    en: "App bar and header actions must not use framed button surfaces unless the action is explicitly selected, active, or destructive."
   no_raw_ink_surface:
     en: "Do not hand-roll `InkWell`, `InkResponse`, or tap-only `GestureDetector` on UI surfaces. Route shaped interaction overlays through `MxTappable` or a Material component that already owns its shape."
   ink_must_have_shape:
@@ -441,6 +447,12 @@ fix_hints:
   keep_shared_widgets_render_only:
     text:
       en: "Move provider, router, or app-shell wiring out of `lib/presentation/shared/**` and keep only render-only shared widget APIs here."
+  keep_text_roles_internal_to_shared_widgets:
+    text:
+      en: "Use `MxText(role: ...)` inside the shared component, or expose a component-specific variant/tone instead of accepting an arbitrary `MxTextRole` parameter."
+  use_toolbar_icon_buttons_in_headers:
+    text:
+      en: "Replace normal header/app-bar icon actions with `MxIconButton.toolbar(...)`. Move prominent filled, outlined, or destructive actions out of the header unless they represent an explicit active or destructive state."
   move_shared_support_out_of_shared:
     text:
       en: "Move non-widget helpers into `lib/core/**` or the owning feature instead of `lib/presentation/shared/**`."

@@ -32,12 +32,13 @@ Test file: `test/presentation/folder_detail_screen_test.dart`
 | DT1 | subfolder mode has active subfolders with subtree deck and card stats | folder detail state contains subfolder `Vocabulary` with one deck and two cards | folder detail renders loaded subfolder mode | `1 decks · 2 cards` is visible | C0+C1 |
 | DT2 | subfolder mode has no subfolders and no search term | folder detail state has `mode=subfolders`, no items, and empty `searchTerm` | folder detail renders empty subfolder branch | `No subfolders yet` and `New subfolder` are visible, while `New deck` is hidden | C0+C1 |
 | DT3 | deck mode has no decks and no search term | folder detail state has `mode=decks`, no items, and empty `searchTerm` | folder detail renders empty deck branch | `No decks yet` and `New deck` are visible, while `New subfolder` is hidden | C0+C1 |
+| DT4 | folder header has normal back and more actions | loaded folder detail state renders header actions | folder detail renders loaded data | the back and more actions are both `MxIconButtonVariant.toolbar` buttons, not framed default icon buttons | C0+C1 |
 
 ## Decision table: onInsert
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | folder mode is unlocked and empty, so both inline creation choices and the FAB entry point are available | loaded folder state has `mode=unlocked` and no subfolders or decks | folder detail renders the unlocked empty branch | `This folder is empty`, `New subfolder`, `New deck`, FloatingActionButton, and `Icons.add` are visible | C0+C1 |
+| DT1 | folder mode is unlocked and empty, so creation is routed through the FAB sheet instead of duplicate inline choices | loaded folder state has `mode=unlocked` and no subfolders or decks | folder detail renders the unlocked empty branch | `This folder is empty`, FloatingActionButton, and `Icons.add` are visible, while inline `New subfolder` and `New deck` actions are absent | C0+C1 |
 | DT2 | folder mode is unlocked and FAB is pressed | loaded folder state has `mode=unlocked` and no subfolders or decks | user taps the FloatingActionButton | bottom sheet title `What do you want to create?` appears with `New subfolder` and `New deck` choices | C0+C1 |
 | DT3 | unlocked create choice is subfolder | create choice bottom sheet is open for an unlocked folder | user taps the bottom-sheet `New subfolder` choice | `New subfolder` name dialog opens with `Folder name` field | C0+C1 |
 | DT4 | unlocked create choice is deck | create choice bottom sheet is open for an unlocked folder | user taps the bottom-sheet `New deck` choice | `Create deck` name dialog opens with `Deck name` field | C0+C1 |

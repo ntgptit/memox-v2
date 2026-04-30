@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
+import '../widgets/mx_text.dart';
 
 /// Themed modal bottom sheet with a centered drag handle, a title row, and
 /// an optional action area.
@@ -43,7 +44,6 @@ class MxBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return AnimatedPadding(
@@ -62,9 +62,9 @@ class MxBottomSheet extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
+                      child: MxText(
                         title!,
-                        style: textTheme.titleLarge,
+                        role: MxTextRole.sheetTitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

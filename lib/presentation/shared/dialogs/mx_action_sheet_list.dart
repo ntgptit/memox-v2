@@ -6,6 +6,7 @@ import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
 import '../widgets/mx_tappable.dart';
+import '../widgets/mx_text.dart';
 
 enum MxActionSheetItemTone { neutral, destructive }
 
@@ -93,7 +94,6 @@ class _MxActionSheetTile<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final isDestructive = item.tone == MxActionSheetItemTone.destructive;
 
     final backgroundColor = switch ((isSelected, isDestructive)) {
@@ -143,21 +143,19 @@ class _MxActionSheetTile<T> extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    MxText(
                       item.label,
-                      style: textTheme.bodyLarge?.copyWith(
-                        color: foregroundColor,
-                      ),
+                      role: MxTextRole.actionSheetItem,
+                      color: foregroundColor,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (item.subtitle != null) ...[
                       const MxGap(AppSpacing.xxs),
-                      Text(
+                      MxText(
                         item.subtitle!,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: subtitleColor,
-                        ),
+                        role: MxTextRole.actionSheetSubtitle,
+                        color: subtitleColor,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),

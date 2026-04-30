@@ -32,7 +32,7 @@ class FolderHeaderSection extends StatelessWidget {
       children: [
         Row(
           children: [
-            MxIconButton(
+            MxIconButton.toolbar(
               icon: Icons.arrow_back,
               tooltip: l10n.commonBack,
               onPressed: onBack,
@@ -41,7 +41,7 @@ class FolderHeaderSection extends StatelessWidget {
             Expanded(
               child: MxText(state.header.name, role: MxTextRole.pageTitle),
             ),
-            MxIconButton(
+            MxIconButton.toolbar(
               icon: Icons.more_horiz_rounded,
               tooltip: l10n.foldersMoreActionsTooltip,
               onPressed: onOpenActions,

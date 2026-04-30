@@ -12,6 +12,7 @@ import 'package:memox/presentation/shared/widgets/mx_reorderable_list.dart';
 import 'package:memox/presentation/shared/widgets/mx_search_sort_toolbar.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_flashcard.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_inline_toggle.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:memox/presentation/shared/widgets/mx_speak_button.dart';
@@ -20,6 +21,75 @@ import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/presentation/shared/widgets/mx_text_field.dart';
 
 void main() {
+  testWidgets('DT1 onDisplay: MxActionSheetList renders semantic text roles', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const _TestApp(
+        child: MxActionSheetList<String>(
+          items: [
+            MxActionSheetItem<String>(
+              value: 'new-deck',
+              label: 'New deck',
+              subtitle: 'Create cards in this folder',
+              icon: Icons.style_outlined,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is MxText &&
+            widget.data == 'New deck' &&
+            widget.role == MxTextRole.actionSheetItem,
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is MxText &&
+            widget.data == 'Create cards in this folder' &&
+            widget.role == MxTextRole.actionSheetSubtitle,
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+    'DT2 onDisplay: MxIconButton toolbar variant stays visually quiet',
+    (tester) async {
+      await tester.pumpWidget(
+        _TestApp(
+          child: MxIconButton.toolbar(
+            icon: Icons.arrow_back,
+            tooltip: 'Back',
+            onPressed: () {},
+          ),
+        ),
+      );
+
+      final iconButton = tester.widget<IconButton>(find.byType(IconButton));
+      final normalStates = <WidgetState>{};
+      final background = iconButton.style?.backgroundColor?.resolve(
+        normalStates,
+      );
+      final side = iconButton.style?.side?.resolve(normalStates);
+      final fixedSize = iconButton.style?.fixedSize?.resolve(normalStates);
+      final targetSize = tester.getSize(find.byType(IconButton));
+
+      expect(find.byTooltip('Back'), findsOneWidget);
+      expect(background?.a, 0);
+      expect(side, BorderSide.none);
+      expect(fixedSize, const Size.square(kMinInteractiveDimension));
+      expect(targetSize.width, greaterThanOrEqualTo(kMinInteractiveDimension));
+      expect(targetSize.height, greaterThanOrEqualTo(kMinInteractiveDimension));
+    },
+  );
+
   testWidgets('DT1 onSelect: MxActionSheetList pops the selected value', (
     tester,
   ) async {

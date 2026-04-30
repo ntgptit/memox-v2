@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/responsive/app_breakpoints.dart';
 import '../../../core/theme/responsive/app_layout.dart';
+import '../widgets/mx_icon_button.dart';
 import 'mx_content_shell.dart';
 
 /// Destination descriptor used by [MxAdaptiveScaffold] to render the right
@@ -65,7 +66,7 @@ class MxAdaptiveScaffold extends StatelessWidget {
     final wrappedBody = constrainBody
         ? MxContentShell(width: contentWidth, child: body)
         : body;
-    final appBar = (title != null || actions != null)
+    final rawAppBar = (title != null || actions != null)
         ? AppBar(
             title: title != null
                 ? Text(title!, maxLines: 1, overflow: TextOverflow.ellipsis)
@@ -73,6 +74,9 @@ class MxAdaptiveScaffold extends StatelessWidget {
             actions: actions,
           )
         : null;
+    final appBar = rawAppBar == null
+        ? null
+        : _MxAdaptiveToolbarAppBar(child: rawAppBar);
 
     return switch (context.windowSize) {
       WindowSize.compact => Scaffold(
@@ -150,5 +154,23 @@ class MxAdaptiveScaffold extends StatelessWidget {
         ),
       ),
     };
+  }
+}
+
+class _MxAdaptiveToolbarAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  const _MxAdaptiveToolbarAppBar({required this.child});
+
+  final PreferredSizeWidget child;
+
+  @override
+  Size get preferredSize => child.preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButtonTheme(
+      data: MxIconButton.toolbarTheme(context),
+      child: child,
+    );
   }
 }

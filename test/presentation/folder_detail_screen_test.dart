@@ -12,6 +12,7 @@ import 'package:memox/app/router/route_names.dart';
 import 'package:memox/presentation/features/folders/screens/folder_detail_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
 
 void main() {
@@ -174,33 +175,74 @@ void main() {
     },
   );
 
-  testWidgets('DT1 onInsert: unlocked folder renders both create choices', (
-    WidgetTester tester,
-  ) async {
-    const folderId = 'folder-001';
-    final container = ProviderContainer(
-      overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
-          (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+  testWidgets(
+    'DT4 onDisplay: header back and more actions use toolbar icon buttons',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
         ),
-      ],
-    );
-    addTearDown(container.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
-      ),
-    );
-    await tester.pumpAndSettle();
+      final headerButtons = tester
+          .widgetList<MxIconButton>(find.byType(MxIconButton))
+          .where(
+            (button) =>
+                button.icon == Icons.arrow_back ||
+                button.icon == Icons.more_horiz_rounded,
+          )
+          .toList();
 
-    expect(find.text('This folder is empty'), findsOneWidget);
-    expect(find.text('New subfolder'), findsOneWidget);
-    expect(find.text('New deck'), findsOneWidget);
-    expect(find.byType(FloatingActionButton), findsOneWidget);
-    expect(find.byIcon(Icons.add), findsOneWidget);
-  });
+      expect(headerButtons, hasLength(2));
+      expect(
+        headerButtons.every(
+          (button) => button.variant == MxIconButtonVariant.toolbar,
+        ),
+        isTrue,
+      );
+    },
+  );
+
+  testWidgets(
+    'DT1 onInsert: unlocked folder uses FAB instead of inline choices',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('This folder is empty'), findsOneWidget);
+      expect(find.text('New subfolder'), findsNothing);
+      expect(find.text('New deck'), findsNothing);
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+      expect(find.byIcon(Icons.add), findsOneWidget);
+    },
+  );
 
   testWidgets('DT2 onInsert: unlocked folder FAB opens create choice sheet', (
     WidgetTester tester,
@@ -227,8 +269,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('What do you want to create?'), findsOneWidget);
-    expect(find.text('New subfolder'), findsAtLeastNWidgets(2));
-    expect(find.text('New deck'), findsAtLeastNWidgets(2));
+    expect(find.text('New subfolder'), findsOneWidget);
+    expect(find.text('New deck'), findsOneWidget);
   });
 
   testWidgets(

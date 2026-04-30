@@ -1,8 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/presentation/shared/dialogs/mx_bottom_sheet.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 
 void main() {
+  testWidgets('DT1 onDisplay: MxBottomSheet title uses sheet title role', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const _TestApp(
+        child: MxBottomSheet(
+          title: 'Import cards',
+          child: SizedBox(height: 80, child: Text('Sheet content')),
+        ),
+      ),
+    );
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is MxText &&
+            widget.data == 'Import cards' &&
+            widget.role == MxTextRole.sheetTitle,
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets(
     'DT1 onBehavior: MxBottomSheet applies bottom viewInsets outside content padding',
     (tester) async {

@@ -31,14 +31,14 @@ class DeckHeaderSection extends StatelessWidget {
       children: [
         Row(
           children: [
-            MxIconButton(
+            MxIconButton.toolbar(
               icon: Icons.arrow_back,
               tooltip: l10n.commonBack,
               onPressed: onBack,
             ),
             const MxGap(MxSpace.sm),
             Expanded(child: MxText(state.name, role: MxTextRole.pageTitle)),
-            MxIconButton(
+            MxIconButton.toolbar(
               icon: Icons.more_horiz_rounded,
               tooltip: l10n.decksMoreActionsTooltip,
               onPressed: onOpenActions,

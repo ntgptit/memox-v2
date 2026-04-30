@@ -31,7 +31,7 @@ class FlashcardHeaderSection extends StatelessWidget {
       children: [
         Row(
           children: [
-            MxIconButton(
+            MxIconButton.toolbar(
               icon: Icons.arrow_back,
               tooltip: l10n.commonBack,
               onPressed: onBack,
@@ -40,7 +40,7 @@ class FlashcardHeaderSection extends StatelessWidget {
             Expanded(child: MxText(state.deckName, role: MxTextRole.pageTitle)),
             if (onOpenActions != null) ...[
               const MxGap(MxSpace.sm),
-              MxIconButton(
+              MxIconButton.toolbar(
                 icon: Icons.more_horiz_rounded,
                 tooltip: l10n.decksMoreActionsTooltip,
                 onPressed: onOpenActions,
