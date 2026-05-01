@@ -32,6 +32,7 @@
   - flashcard được xem là đã học
   - stage box ban đầu là box 2
   - stage ngày ôn tiếp theo là `now + 1 day`
+  - stage review result chính thức là `initial_passed`; retry history vẫn nằm trong `study_attempts`
 - Với SRS Review, khi Fill mode kết thúc và retry batch rỗng:
   - stage box mới
   - stage ngày ôn tiếp theo
@@ -63,7 +64,7 @@ Danh sách hằng ngày gồm:
   - bắt retry trong Fill cho tới khi retry batch rỗng
 
 ## Rule mapping kết quả chấm sang nhánh SRS
-- Với New Study, mapping dưới đây chỉ áp dụng khi flashcard đã pass đủ 5 mode trong session
+- Với New Study, sau khi flashcard đã pass đủ 5 mode trong session, review result chính thức là `initial_passed` để phân biệt với SRS Review `perfect`
 - Với SRS Review, mapping dưới đây áp dụng khi Fill mode kết thúc
 - Nếu SRS Review flashcard từng sai trong Fill mode:
   - review result là `recovered`
@@ -105,6 +106,7 @@ Danh sách hằng ngày gồm:
 - Retry round trong mode không tạo nhánh SRS riêng
 - Mỗi lượt chấm thật trong round đầu hoặc retry round vẫn được ghi vào session history
 - New Study chỉ cập nhật SRS chính thức khi flashcard pass đủ `Review`, `Match`, `Guess`, `Recall`, `Fill` trong session
+- New Study finalize không dùng `perfect`; các lượt sai rồi retry pass vẫn được lưu bằng attempt history, còn `last_result=initial_passed`
 - SRS Review stage SRS khi Fill mode kết thúc và retry batch rỗng
 - SRS Review flashcard từng sai trong Fill mode được stage giảm box hoặc due sớm hơn
 - SRS Review không cập nhật SRS nhiều lần theo từng attempt sai

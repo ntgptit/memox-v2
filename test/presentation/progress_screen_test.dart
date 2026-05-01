@@ -31,7 +31,7 @@ void main() {
     expect(find.text('Mastery'), findsOneWidget);
     expect(find.text('Active sessions'), findsOneWidget);
     expect(find.text('No active study sessions'), findsOneWidget);
-    expect(find.text('Open'), findsOneWidget);
+    expect(find.text('View library'), findsOneWidget);
   });
 
   testWidgets('DT2 onDisplay: active sessions show overview and actions', (

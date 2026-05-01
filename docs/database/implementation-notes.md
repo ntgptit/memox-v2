@@ -43,6 +43,8 @@ Trình tự:
 ## Drift Migration Notes
 - App `schemaVersion=2` là migration tương thích cho local DB đã được tạo khi `study_session_items.study_mode` chưa tồn tại.
 - Migration thêm `study_mode`, map `srs_review` về `fill`, map New Study `mode_order` 1..5 lần lượt về `review`, `match`, `guess`, `recall`, `fill`, rồi tạo lại index idempotent.
+- App `schemaVersion=5` cho phép `flashcard_progress.last_result=initial_passed` để tách nghĩa New Study completion khỏi SRS Review `perfect`, đồng thời convert các row legacy `perfect` có thể đối chiếu an toàn với completed New Study attempt.
+- App `schemaVersion=6` repair flashcard thiếu `flashcard_progress` để giữ invariant mỗi flashcard có đúng một progress row; New Study query dựa vào progress row có `due_at=null`.
 - Target schema sau migration vẫn khớp `schema-v1.md`; đây là sửa tương thích dữ liệu local cũ, không đổi nghĩa business của DB v1.
 
 ## Core Write Flows
@@ -76,7 +78,7 @@ Trình tự:
 | Retry SRS Review incorrect | sau khi hết queue của Fill round hiện tại, insert thêm `study_session_items` với `source_pool=retry`, `study_mode=fill`, `mode_order=1`, và `round_index` lớn hơn; lặp đến khi retry batch rỗng |
 | Advance New Study mode | khi toàn bộ batch pass mode hiện tại, insert queue cho mode tiếp theo từ batch flashcard gốc của session |
 | Mark ready to finalize | khi đã pass đủ điều kiện hoàn thành của flow (New Study pass 5 mode / SRS Review retry batch rỗng), transition `status` sang `ready_to_finalize` |
-| Commit New Study SRS | khi session ở `ready_to_finalize`, trong cùng transaction: update `flashcard_progress`, ghi `old_box`, `new_box`, `next_due_at` cho các flashcard pass đủ 5 mode, rồi chuyển `status=completed` |
+| Commit New Study SRS | khi session ở `ready_to_finalize`, trong cùng transaction: update `flashcard_progress` với `last_result=initial_passed`, ghi `old_box`, `new_box`, `next_due_at` cho các flashcard pass đủ 5 mode, rồi chuyển `status=completed`; retry history vẫn nằm trong `study_attempts` |
 | Commit SRS Review SRS | khi session ở `ready_to_finalize`, trong cùng transaction: tổng hợp attempt toàn batch, tính `perfect` hoặc `recovered`, update `flashcard_progress`, rồi chuyển `status=completed` |
 | Finalize rollback | nếu transaction finalize lỗi, rollback cập nhật SRS và chuyển `status=failed_to_finalize` |
 | Retry finalize | với session `failed_to_finalize`, chạy lại pipeline finalize; nếu thành công chuyển `completed` |

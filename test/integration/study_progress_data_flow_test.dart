@@ -13,6 +13,7 @@ import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/router/app_router.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/core/constants/app_constants.dart';
+import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/data/datasources/local/app_database.dart';
 import 'package:memox/data/datasources/local/daos/folder_dao.dart';
@@ -246,7 +247,7 @@ void main() {
     await harness.pumpApp(tester, RoutePaths.progress);
     await _pumpUntilFound(tester, find.text('No active study sessions'));
 
-    await _tapText(tester, 'Open');
+    await _tapText(tester, 'View library');
     await _pumpUntilFound(tester, find.text('Folders'));
 
     expect(find.text('Integration Folder'), findsOneWidget);
@@ -903,7 +904,7 @@ void main() {
     await harness.pumpApp(tester, RoutePaths.progress);
     await _pumpUntilFound(tester, find.text('No active study sessions'));
 
-    expect(find.text('Open'), findsOneWidget);
+    expect(find.text('View library'), findsOneWidget);
     expect(find.text('Active sessions'), findsOneWidget);
   });
 
@@ -1472,9 +1473,9 @@ class _IntegrationHarness {
     required String front,
     required String back,
     required int sortOrder,
-  }) {
+  }) async {
     final now = clock.nowEpochMillis();
-    return database
+    await database
         .into(database.flashcards)
         .insert(
           FlashcardsCompanion.insert(
@@ -1483,6 +1484,18 @@ class _IntegrationHarness {
             front: front,
             back: back,
             sortOrder: sortOrder,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+    await database
+        .into(database.flashcardProgress)
+        .insert(
+          FlashcardProgressCompanion.insert(
+            flashcardId: id,
+            currentBox: 1,
+            reviewCount: 0,
+            lapseCount: 0,
             createdAt: now,
             updatedAt: now,
           ),
@@ -1749,6 +1762,7 @@ class _StudyDriver {
       clock: clock,
       idGenerator: ids,
       shuffleRandom: Random(7),
+      logger: const NoopAppLogger(),
     );
   }
 

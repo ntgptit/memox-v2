@@ -93,6 +93,7 @@ Ngoài ra, session cũ có thể được đánh dấu **đã restart** (xem Rul
 - box mới
 - ngày ôn tiếp theo chính thức
 - thời điểm hoàn thành New Study của flashcard
+- review result: `initial_passed`; retry history vẫn derive từ `study_attempts`
 
 ### SRS Review commit
 - box cũ

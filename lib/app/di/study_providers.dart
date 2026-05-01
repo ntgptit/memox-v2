@@ -14,6 +14,7 @@ import '../../domain/study/strategy/study_strategy.dart';
 import '../../domain/study/strategy/study_strategy_factory.dart';
 import '../../domain/study/usecases/study_usecases.dart';
 import 'content_providers.dart';
+import '../logging/app_talker.dart';
 import 'providers.dart';
 
 part 'study_providers.g.dart';
@@ -79,6 +80,7 @@ StudyRepo studyRepo(Ref ref) {
     clock: ref.watch(clockProvider),
     idGenerator: ref.watch(idGeneratorProvider),
     shuffleRandom: ref.watch(studyShuffleRandomProvider),
+    logger: TalkerAppLogger(ref.watch(talkerProvider)),
   );
 }
 

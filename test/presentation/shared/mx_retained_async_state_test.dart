@@ -196,6 +196,26 @@ void main() {
     expect(find.byType(MxErrorState), findsOneWidget);
     expect(find.byType(MxLoadingState), findsNothing);
   });
+
+  testWidgets('DT4 onOpen: uses custom error builder when first load fails', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _TestApp(
+        child: MxRetainedAsyncState<String>(
+          isLoading: false,
+          error: StateError('boom'),
+          stackTrace: StackTrace.empty,
+          errorBuilder: (_, _, _) => const Text('Custom error'),
+          dataBuilder: _buildData,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Custom error'), findsOneWidget);
+    expect(find.byType(MxErrorState), findsNothing);
+  });
 }
 
 Widget _buildData(BuildContext context, String data) => Text(data);

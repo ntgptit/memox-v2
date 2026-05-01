@@ -97,6 +97,7 @@ enum AttemptGrade {
 }
 
 enum ReviewResult {
+  initialPassed('initial_passed'),
   perfect('perfect'),
   recovered('recovered'),
   forgot('forgot');

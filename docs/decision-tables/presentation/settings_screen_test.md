@@ -7,6 +7,8 @@ Test file: `test/presentation/settings_screen_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | settings opens with default theme, locale, study defaults, and collapsed speech voice options | fresh `ProviderContainer` has default `themeModeProvider`, `localeProvider`, study settings in SharedPreferences, and collapsed speech voice options | settings screen settles | `Settings`, `Light`, `System`, `English`, and `Study defaults` are visible, and no TTS voice lookup runs before voice options are opened | C0+C1 |
+| DT2 | study defaults provider is still loading on first render | `studySettingsStoreProvider` is held by a pending future while other settings dependencies are available | settings screen pumps the first frame | `Study defaults`, `Loading study defaults`, and one shared loading state are visible | C0+C1 |
+| DT3 | speech settings provider is still loading on first render | `ttsSettingsStoreProvider` is held by a pending future while other settings dependencies are available | settings screen pumps the first frame and scrolls to the speech section | `Speech`, `Loading speech settings`, and one shared loading state are visible | C0+C1 |
 
 ## Decision table: onDisplay
 

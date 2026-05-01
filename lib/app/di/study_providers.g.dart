@@ -401,7 +401,7 @@ final class StudyRepoProvider
   }
 }
 
-String _$studyRepoHash() => r'2da83aa2b3ba77892667c05d1f402440d00690da';
+String _$studyRepoHash() => r'77108272ad95669ea654c69b2fe30cb6fe7a087d';
 
 @ProviderFor(startStudySessionUseCase)
 final startStudySessionUseCaseProvider = StartStudySessionUseCaseProvider._();

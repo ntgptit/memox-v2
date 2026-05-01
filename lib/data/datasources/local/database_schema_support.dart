@@ -50,12 +50,10 @@ abstract final class DatabaseEnumValues {
     'abandoned',
   ];
 
-  static const List<String> rawStudyResults = <String>[
-    'correct',
-    'incorrect',
-  ];
+  static const List<String> rawStudyResults = <String>['correct', 'incorrect'];
 
   static const List<String> reviewResults = <String>[
+    'initial_passed',
     'perfect',
     'recovered',
     'forgot',

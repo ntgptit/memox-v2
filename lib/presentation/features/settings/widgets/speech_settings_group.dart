@@ -10,6 +10,7 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_inline_toggle.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
@@ -38,18 +39,23 @@ class SpeechSettingsGroup extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final ttsSettings = ref.watch(ttsSettingsProvider);
 
-    return ttsSettings.when(
-      data: (settings) => _SpeechSettingsContent(settings: settings),
-      loading: () => SettingsGroup(
+    return MxRetainedAsyncState<TtsSettings>(
+      data: ttsSettings.value,
+      isLoading: ttsSettings.isLoading,
+      error: ttsSettings.hasError ? ttsSettings.error : null,
+      stackTrace: ttsSettings.hasError ? ttsSettings.stackTrace : null,
+      onRetry: () => ref.invalidate(ttsSettingsProvider),
+      skeletonBuilder: (_) => SettingsGroup(
         title: l10n.settingsSpeechTitle,
         subtitle: l10n.settingsSpeechLoading,
         child: const MxLoadingState(),
       ),
-      error: (_, _) => SettingsGroup(
+      errorBuilder: (_, _, _) => SettingsGroup(
         title: l10n.settingsSpeechTitle,
         subtitle: l10n.sharedErrorTitle,
         child: MxText(l10n.errorUnexpected, role: MxTextRole.formHelper),
       ),
+      dataBuilder: (_, settings) => _SpeechSettingsContent(settings: settings),
     );
   }
 }
@@ -411,23 +417,18 @@ class _VoiceSelect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final voiceItems = voices.when(
-      data: (items) => items,
-      loading: () => const <TtsVoice>[],
-      error: (_, _) => const <TtsVoice>[],
-    );
+    final voiceItems = voices.value ?? const <TtsVoice>[];
     final hasSelectedVoice = voiceItems.any(
       (voice) => voice.name == selectedVoiceName,
     );
     final selectedValue = hasSelectedVoice
         ? selectedVoiceName!
         : _SpeechSettingsContent.systemVoiceValue;
-    final helper = voices.when<String?>(
-      data: (items) => items.isEmpty
-          ? l10n.settingsSpeechNoVoices(_languageLabel(l10n, language))
-          : null,
-      loading: () => l10n.settingsSpeechLoadingVoices,
-      error: (_, _) => l10n.errorUnexpected,
+    final helper = _voiceSelectHelperText(
+      l10n: l10n,
+      language: language,
+      voices: voices,
+      voiceItems: voiceItems,
     );
     return MxSelectField<String>(
       label: label,
@@ -444,6 +445,24 @@ class _VoiceSelect extends StatelessWidget {
       onChanged: onChanged,
     );
   }
+}
+
+String? _voiceSelectHelperText({
+  required AppLocalizations l10n,
+  required TtsLanguage language,
+  required AsyncValue<List<TtsVoice>> voices,
+  required List<TtsVoice> voiceItems,
+}) {
+  if (voices.isLoading && !voices.hasValue) {
+    return l10n.settingsSpeechLoadingVoices;
+  }
+  if (voices.hasError && !voices.hasValue) {
+    return l10n.errorUnexpected;
+  }
+  if (voiceItems.isEmpty) {
+    return l10n.settingsSpeechNoVoices(_languageLabel(l10n, language));
+  }
+  return null;
 }
 
 String _languageLabel(AppLocalizations l10n, TtsLanguage language) {

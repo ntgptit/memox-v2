@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/app/di/study_providers.dart';
 import 'package:memox/core/constants/app_constants.dart';
+import 'package:memox/data/settings/study_settings_store.dart';
+import 'package:memox/data/settings/tts_settings_store.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/settings/providers/locale_notifier.dart';
@@ -13,6 +15,7 @@ import 'package:memox/presentation/features/settings/providers/theme_mode_notifi
 import 'package:memox/presentation/features/settings/screens/settings_screen.dart';
 import 'package:memox/presentation/features/study/providers/study_settings_defaults_notifier.dart';
 import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.dart';
+import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -40,6 +43,59 @@ void main() {
     expect(find.text('Study defaults'), findsOneWidget);
     expect(harness.tts.availableVoiceRequests, isEmpty);
   });
+
+  testWidgets(
+    'DT2 onOpen: renders study defaults through shared loading state',
+    (tester) async {
+      final completer = Completer<StudySettingsStore>();
+      addTearDown(() async {
+        if (!completer.isCompleted) {
+          completer.complete(
+            StudySettingsStore(await SharedPreferences.getInstance()),
+          );
+        }
+      });
+
+      await _pumpSettings(
+        tester,
+        settle: false,
+        studySettingsStoreFuture: completer.future,
+      );
+
+      expect(find.text('Study defaults'), findsOneWidget);
+      expect(find.text('Loading study defaults'), findsOneWidget);
+      expect(find.byType(MxLoadingState), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT3 onOpen: renders speech settings through shared loading state',
+    (tester) async {
+      final completer = Completer<TtsSettingsStore>();
+      addTearDown(() async {
+        if (!completer.isCompleted) {
+          completer.complete(
+            TtsSettingsStore(await SharedPreferences.getInstance()),
+          );
+        }
+      });
+
+      await _pumpSettings(
+        tester,
+        settle: false,
+        ttsSettingsStoreFuture: completer.future,
+      );
+      await tester.scrollUntilVisible(
+        find.text('Loading speech settings'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      expect(find.text('Speech'), findsOneWidget);
+      expect(find.text('Loading speech settings'), findsOneWidget);
+      expect(find.byType(MxLoadingState), findsOneWidget);
+    },
+  );
 
   testWidgets('DT1 onDisplay: shows theme and language sections', (
     tester,
@@ -309,10 +365,21 @@ void main() {
 Future<_SettingsHarness> _pumpSettings(
   WidgetTester tester, {
   MediaQueryData? mediaQueryData,
+  Future<StudySettingsStore>? studySettingsStoreFuture,
+  Future<TtsSettingsStore>? ttsSettingsStoreFuture,
+  bool settle = true,
 }) async {
   final fakeTts = _FakeTtsService();
   final container = ProviderContainer(
-    overrides: [ttsServiceProvider.overrideWithValue(fakeTts)],
+    overrides: [
+      ttsServiceProvider.overrideWithValue(fakeTts),
+      if (studySettingsStoreFuture != null)
+        studySettingsStoreProvider.overrideWith(
+          (ref) => studySettingsStoreFuture,
+        ),
+      if (ttsSettingsStoreFuture != null)
+        ttsSettingsStoreProvider.overrideWith((ref) => ttsSettingsStoreFuture),
+    ],
   );
   addTearDown(container.dispose);
   addTearDown(fakeTts.dispose);
@@ -327,7 +394,11 @@ Future<_SettingsHarness> _pumpSettings(
       child: _TestApp(child: child),
     ),
   );
-  await tester.pumpAndSettle();
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+  }
 
   return _SettingsHarness(container: container, tts: fakeTts);
 }

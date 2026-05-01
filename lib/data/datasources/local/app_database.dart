@@ -28,7 +28,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -46,6 +46,12 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 4) {
         await _normalizeStudyAttemptResultsForSchemaV4(migrator);
+      }
+      if (from < 5) {
+        await _allowInitialPassedReviewResultForSchemaV5(migrator);
+      }
+      if (from < 6) {
+        await _repairMissingFlashcardProgressForSchemaV6(migrator);
       }
       await _createIndexes();
     },
@@ -179,8 +185,7 @@ class AppDatabase extends _$AppDatabase {
     }
 
     final tableSql = await _tableSql('study_attempts') ?? '';
-    if (!tableSql.contains("'remembered'") &&
-        !tableSql.contains("'forgot'")) {
+    if (!tableSql.contains("'remembered'") && !tableSql.contains("'forgot'")) {
       await customStatement('''
         UPDATE study_attempts
         SET result = CASE result
@@ -229,6 +234,140 @@ class AppDatabase extends _$AppDatabase {
       ''');
     await customStatement('DROP TABLE study_attempts_legacy');
     await customStatement('PRAGMA foreign_keys = ON');
+  }
+
+  Future<void> _allowInitialPassedReviewResultForSchemaV5(
+    Migrator migrator,
+  ) async {
+    if (!await _hasTable('flashcard_progress')) {
+      await migrator.createTable(flashcardProgress);
+      return;
+    }
+
+    final tableSql = await _tableSql('flashcard_progress') ?? '';
+    if (!tableSql.contains("'initial_passed'")) {
+      await customStatement(
+        'DROP INDEX IF EXISTS idx_flashcard_progress_due_at',
+      );
+      await customStatement(
+        'DROP INDEX IF EXISTS idx_flashcard_progress_last_studied_at',
+      );
+      await customStatement(
+        'ALTER TABLE flashcard_progress RENAME TO flashcard_progress_legacy',
+      );
+      await migrator.createTable(flashcardProgress);
+      await customStatement('''
+        INSERT INTO flashcard_progress (
+          flashcard_id,
+          current_box,
+          review_count,
+          lapse_count,
+          last_result,
+          last_studied_at,
+          due_at,
+          created_at,
+          updated_at
+        )
+        SELECT
+          flashcard_id,
+          current_box,
+          review_count,
+          lapse_count,
+          last_result,
+          last_studied_at,
+          due_at,
+          created_at,
+          updated_at
+        FROM flashcard_progress_legacy
+        ''');
+      await customStatement('DROP TABLE flashcard_progress_legacy');
+    }
+    await _migrateLegacyNewStudyPerfectResultsForSchemaV5();
+  }
+
+  Future<void> _migrateLegacyNewStudyPerfectResultsForSchemaV5() async {
+    if (!await _hasTable('study_sessions') ||
+        !await _hasTable('study_attempts') ||
+        !await _hasColumn('study_sessions', 'study_type') ||
+        !await _hasColumn('study_sessions', 'status') ||
+        !await _hasColumn('study_attempts', 'flashcard_id') ||
+        !await _hasColumn('study_attempts', 'new_box') ||
+        !await _hasColumn('study_attempts', 'next_due_at')) {
+      return;
+    }
+
+    await customStatement('''
+      UPDATE flashcard_progress
+      SET last_result = 'initial_passed'
+      WHERE last_result = 'perfect'
+        AND current_box = 2
+        AND due_at IS NOT NULL
+        AND EXISTS (
+          SELECT 1
+          FROM study_attempts AS attempts
+          INNER JOIN study_sessions AS sessions
+            ON sessions.id = attempts.session_id
+          WHERE attempts.flashcard_id = flashcard_progress.flashcard_id
+            AND sessions.study_type = 'new'
+            AND sessions.status = 'completed'
+            AND attempts.new_box = flashcard_progress.current_box
+            AND attempts.next_due_at = flashcard_progress.due_at
+        )
+        AND NOT EXISTS (
+          SELECT 1
+          FROM study_attempts AS attempts
+          INNER JOIN study_sessions AS sessions
+            ON sessions.id = attempts.session_id
+          WHERE attempts.flashcard_id = flashcard_progress.flashcard_id
+            AND sessions.study_type = 'srs_review'
+            AND sessions.status = 'completed'
+            AND attempts.new_box = flashcard_progress.current_box
+            AND attempts.next_due_at = flashcard_progress.due_at
+        )
+      ''');
+  }
+
+  Future<void> _repairMissingFlashcardProgressForSchemaV6(
+    Migrator migrator,
+  ) async {
+    if (!await _hasTable('flashcards')) {
+      return;
+    }
+    if (!await _hasTable('flashcard_progress')) {
+      await migrator.createTable(flashcardProgress);
+    }
+    if (!await _hasColumn('flashcards', 'created_at') ||
+        !await _hasColumn('flashcards', 'updated_at')) {
+      return;
+    }
+
+    await customStatement('''
+      INSERT INTO flashcard_progress (
+        flashcard_id,
+        current_box,
+        review_count,
+        lapse_count,
+        last_result,
+        last_studied_at,
+        due_at,
+        created_at,
+        updated_at
+      )
+      SELECT
+        flashcards.id,
+        1,
+        0,
+        0,
+        NULL,
+        NULL,
+        NULL,
+        flashcards.created_at,
+        flashcards.updated_at
+      FROM flashcards
+      LEFT JOIN flashcard_progress
+        ON flashcard_progress.flashcard_id = flashcards.id
+      WHERE flashcard_progress.flashcard_id IS NULL
+      ''');
   }
 
   Future<bool> _needsStudyTableReset() async {

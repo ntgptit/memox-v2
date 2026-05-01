@@ -15,6 +15,7 @@ import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_error_state.dart';
 import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
@@ -71,16 +72,20 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
       body: MxContentShell(
         width: MxContentWidth.reading,
         applyVerticalPadding: true,
-        child: entryState.when(
-          loading: () => const _StudyEntryLoadingView(),
-          error: (error, stackTrace) => MxErrorState(
+        child: MxRetainedAsyncState<StudyEntryState>(
+          data: entryState.value,
+          isLoading: entryState.isLoading,
+          error: entryState.hasError ? entryState.error : null,
+          stackTrace: entryState.hasError ? entryState.stackTrace : null,
+          skeletonBuilder: (_) => const _StudyEntryLoadingView(),
+          errorBuilder: (_, error, _) => MxErrorState(
             title: l10n.sharedErrorTitle,
             message: studyErrorMessage(error),
             onRetry: () => ref.invalidate(
               studyEntryStateProvider(widget.entryType, widget.entryRefId),
             ),
           ),
-          data: (state) => ListView(
+          dataBuilder: (context, state) => ListView(
             children: [
               MxText(l10n.studyEntryHeading, role: MxTextRole.pageTitle),
               const MxGap(MxSpace.sm),

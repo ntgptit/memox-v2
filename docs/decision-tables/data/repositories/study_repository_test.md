@@ -6,7 +6,7 @@ Test file: `test/data/repositories/study_repository_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | new-study session uses five modes and all attempts are correct | deck has eligible new cards and session flow includes the five learning modes | repository starts the session, answers all queued items correctly, and finalizes | session completes, both cards are counted as mastered, no retry cards are counted, and flashcard advances to SRS box 2 | C0+C1 |
+| DT1 | new-study session uses five modes and all attempts are correct | deck has eligible new cards and session flow includes the five learning modes | repository starts the session, answers all queued items correctly, and finalizes | session completes, both cards are counted as mastered, no retry cards are counted, and flashcard advances to SRS box 2 with `last_result=initial_passed` | C0+C1 |
 | DT2 | New Study is requested from the today entry point | today entry has only due cards available | start session is requested with `studyType=newStudy` and `entryType=today` | request fails because today supports SRS Review only in v1 | C0+C1 |
 | DT3 | SRS Review is requested from the today entry point | global pool contains a new card, a due card, and an overdue card | start session is requested with today SRS Review | session batch contains only due and overdue cards from the daily pool | C0+C1 |
 | DT4 | folder entry contains cards in nested deck folders | parent folder has a child folder that contains a deck with new cards | New Study starts from the parent folder | recursive folder scope loads cards from the child deck | C0+C1 |
@@ -18,6 +18,7 @@ Test file: `test/data/repositories/study_repository_test.dart`
 | DT1 | flashcard shuffle is disabled | deck has four eligible new cards with ascending sort order and batch size two | New Study loads the batch | first two sorted cards are selected in query order | C0+C1 |
 | DT2 | flashcard shuffle is enabled for New Study | deck has eight eligible new cards and the repository RNG has advancing state | New Study loads two batches with the same deck and settings | second ordered batch differs from the first because shuffle uses RNG state instead of a stable entry seed | C0+C1 |
 | DT3 | SRS Review keeps overdue priority while shuffling | deck has two overdue cards, two due cards, batch size three, shuffle enabled, and overdue priority enabled | SRS Review loads the batch | overdue cards occupy the first two selected positions and one due card follows | C0+C1 |
+| DT4 | New Study eligibility uses the progress-row invariant | deck has one flashcard with `flashcard_progress.due_at=null` and one direct database flashcard without a progress row | New Study loads the batch | only the flashcard with an existing progress row is selected as a new card | C0+C1 |
 
 ## Decision table: onInsert
 
@@ -63,6 +64,8 @@ Test file: `test/data/repositories/study_repository_test.dart`
 | DT4 | SRS Review answer is correct on first attempt | due card starts in box 4 and no failing attempts are recorded | repository finalizes the review session | `study_sessions`, `study_session_items`, `study_attempts`, and `flashcard_progress` store every final field for a perfect review: completed status, completed item timestamp, attempt SRS summary, box 5, perfect result, and box 5 due date | C0+C1 |
 | DT5 | due pool exceeds review batch size and overdue priority is enabled | daily pool has one due card and one overdue card with batch size 1 | repository starts SRS Review | overdue card is selected before due card | C0+C1 |
 | DT6 | cancel is requested for an in-progress session | session has pending items and recorded attempts may be absent | repository cancels the session | `study_sessions` stores cancelled status and ended timestamp, and each pending `study_session_items` row stores abandoned status with all queue fields unchanged | C0+C1 |
+| DT7 | finalize transaction throws an unexpected storage error | ready-to-finalize session has a persisted progress row that causes the SRS commit write to fail | repository finalizes the session | technical error is logged once, session is marked `failed_to_finalize` for retry, and the failed SRS write is not committed | C0+C1 |
+| DT8 | New Study card has retry history before passing all required modes | flashcard has at least one incorrect New Study attempt and later passes every required mode | repository finalizes the ready-to-finalize New Study session | `flashcard_progress.last_result` stores `initial_passed` rather than `perfect`, deterministic initial SRS box 2 is committed, and the earlier incorrect attempt remains in `study_attempts` | C0+C1 |
 
 ## Decision table: onRefreshRetry
 

@@ -6,7 +6,7 @@ Test file: `test/presentation/study_entry_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | `studyEntryStateProvider(entryType, entryRefId)` is unresolved and entry screen enters loading branch | deck study entry opens with a pending `Completer<StudyEntryState>` | the first frame is pumped before the future completes | `MxLoadingState` is rendered exactly once | C0+C1 |
+| DT1 | `studyEntryStateProvider(entryType, entryRefId)` is unresolved and the shared async state enters first-load loading | deck study entry opens with a pending `Completer<StudyEntryState>` | the first frame is pumped before the future completes | `MxLoadingState` is rendered exactly once | C0+C1 |
 
 ## Decision table: onDisplay
 

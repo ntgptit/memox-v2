@@ -6,7 +6,7 @@ Test file: `test/presentation/study_session_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | `studySessionStateProvider(sessionId)` is unresolved and session screen enters loading branch | study session route opens with a pending `Completer<StudySessionSnapshot>` | the first frame is pumped before the future completes | `MxLoadingState` is rendered exactly once | C0+C1 |
+| DT1 | `studySessionStateProvider(sessionId)` is unresolved and the shared async state enters first-load loading | study session route opens with a pending `Completer<StudySessionSnapshot>` | the first frame is pumped before the future completes | `MxLoadingState` is rendered exactly once | C0+C1 |
 
 ## Decision table: onDisplay
 

@@ -14,6 +14,7 @@ import '../../../shared/layouts/mx_space.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/states/mx_error_state.dart';
 import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_progress_indicator.dart';
@@ -45,13 +46,11 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     final actionState = ref.watch(
       studySessionActionControllerProvider(widget.sessionId),
     );
+    final currentSnapshot = sessionState.value;
     final canCancel =
-        sessionState.whenOrNull(
-          data: (snapshot) =>
-              snapshot.session.status != SessionStatus.completed &&
-              snapshot.session.status != SessionStatus.cancelled,
-        ) ??
-        false;
+        currentSnapshot != null &&
+        currentSnapshot.session.status != SessionStatus.completed &&
+        currentSnapshot.session.status != SessionStatus.cancelled;
 
     ref.listen<AsyncValue<void>>(
       studySessionActionControllerProvider(widget.sessionId),
@@ -63,19 +62,21 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     );
     ref.listen<AsyncValue<StudySessionSnapshot>>(
       studySessionStateProvider(widget.sessionId),
-      (_, next) => _clearFeedbackForNextItem(
-        next.whenOrNull(data: (snapshot) => snapshot.currentItem?.id),
-      ),
+      (_, next) => _clearFeedbackForNextItem(next.value?.currentItem?.id),
     );
 
-    return sessionState.when(
-      loading: () => _buildStandardScaffold(
+    return MxRetainedAsyncState<StudySessionSnapshot>(
+      data: currentSnapshot,
+      isLoading: sessionState.isLoading,
+      error: sessionState.hasError ? sessionState.error : null,
+      stackTrace: sessionState.hasError ? sessionState.stackTrace : null,
+      skeletonBuilder: (_) => _buildStandardScaffold(
         context: context,
         canCancel: canCancel,
         actionState: actionState,
         child: const _StudySessionLoadingView(),
       ),
-      error: (error, stackTrace) => _buildStandardScaffold(
+      errorBuilder: (_, error, _) => _buildStandardScaffold(
         context: context,
         canCancel: canCancel,
         actionState: actionState,
@@ -86,7 +87,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
               ref.invalidate(studySessionStateProvider(widget.sessionId)),
         ),
       ),
-      data: (snapshot) => _buildSessionView(
+      dataBuilder: (context, snapshot) => _buildSessionView(
         context: context,
         snapshot: snapshot,
         actionState: actionState,

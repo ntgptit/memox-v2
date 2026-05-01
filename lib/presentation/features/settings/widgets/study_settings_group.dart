@@ -10,6 +10,7 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_text.dart';
@@ -38,18 +39,23 @@ class StudySettingsGroup extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final settings = ref.watch(studyDefaultsSettingsProvider);
 
-    return settings.when(
-      data: (state) => _StudySettingsContent(state: state),
-      loading: () => SettingsGroup(
+    return MxRetainedAsyncState<StudyDefaultsSettingsState>(
+      data: settings.value,
+      isLoading: settings.isLoading,
+      error: settings.hasError ? settings.error : null,
+      stackTrace: settings.hasError ? settings.stackTrace : null,
+      onRetry: () => ref.invalidate(studyDefaultsSettingsProvider),
+      skeletonBuilder: (_) => SettingsGroup(
         title: l10n.settingsStudyDefaultsTitle,
         subtitle: l10n.settingsStudyDefaultsLoading,
         child: const MxLoadingState(),
       ),
-      error: (_, _) => SettingsGroup(
+      errorBuilder: (_, _, _) => SettingsGroup(
         title: l10n.settingsStudyDefaultsTitle,
         subtitle: l10n.sharedErrorTitle,
         child: MxText(l10n.errorUnexpected, role: MxTextRole.formHelper),
       ),
+      dataBuilder: (_, state) => _StudySettingsContent(state: state),
     );
   }
 }

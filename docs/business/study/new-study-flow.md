@@ -125,6 +125,7 @@ Sau khi hoàn thành:
 - đánh dấu flashcard là đã học
 - tạo/cập nhật progress SRS ban đầu với `initial_box = 2`
 - tính due date đầu tiên là `now + 1 day`
+- lưu `last_result = initial_passed`, không dùng `perfect` vì retry history đã được lưu riêng trong `study_attempts`
 - cập nhật session status = `Completed`
 
 Commit SRS chính thức chỉ xảy ra khi session chuyển sang `Completed` — xem [Study Session](./study-session.md#rule-commit-srs-cuối-session).

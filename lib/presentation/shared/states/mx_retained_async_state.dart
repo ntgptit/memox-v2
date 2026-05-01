@@ -6,6 +6,9 @@ import '../feedback/mx_snackbar.dart';
 import 'mx_error_state.dart';
 import 'mx_loading_state.dart';
 
+typedef MxAsyncErrorBuilder =
+    Widget Function(BuildContext context, Object error, StackTrace? stackTrace);
+
 /// Keeps the last successful content visible while a query refreshes.
 class MxRetainedAsyncState<T extends Object> extends StatefulWidget {
   const MxRetainedAsyncState({
@@ -15,6 +18,7 @@ class MxRetainedAsyncState<T extends Object> extends StatefulWidget {
     this.stackTrace,
     required this.dataBuilder,
     this.skeletonBuilder,
+    this.errorBuilder,
     this.onRetry,
     super.key,
   });
@@ -25,6 +29,7 @@ class MxRetainedAsyncState<T extends Object> extends StatefulWidget {
   final StackTrace? stackTrace;
   final Widget Function(BuildContext context, T data) dataBuilder;
   final WidgetBuilder? skeletonBuilder;
+  final MxAsyncErrorBuilder? errorBuilder;
   final VoidCallback? onRetry;
 
   @override
@@ -46,8 +51,13 @@ class _MxRetainedAsyncStateState<T extends Object>
   Widget build(BuildContext context) {
     final data = widget.data;
     if (data == null) {
-      if (widget.error != null) {
-        final failure = ErrorMapper.map(widget.error, widget.stackTrace);
+      final error = widget.error;
+      if (error != null) {
+        final errorBuilder = widget.errorBuilder;
+        if (errorBuilder != null) {
+          return errorBuilder(context, error, widget.stackTrace);
+        }
+        final failure = ErrorMapper.map(error, widget.stackTrace);
         return MxErrorState(
           message: failure.message,
           details: failure.technicalDetails,

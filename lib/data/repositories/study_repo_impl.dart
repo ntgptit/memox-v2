@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:drift/drift.dart';
 
 import '../../core/errors/app_exception.dart';
+import '../../core/logging/app_logger.dart';
 import '../../core/services/clock.dart';
 import '../../core/services/id_generator.dart';
 import '../../domain/enums/study_enums.dart';
@@ -27,6 +28,7 @@ final class StudyRepoImpl implements StudyRepo {
     required Clock clock,
     required IdGenerator idGenerator,
     required Random shuffleRandom,
+    required AppLogger logger,
   }) : _database = database,
        _studySessionDao = studySessionDao,
        _studySessionItemDao = studySessionItemDao,
@@ -35,7 +37,8 @@ final class StudyRepoImpl implements StudyRepo {
        _transactionRunner = transactionRunner,
        _clock = clock,
        _idGenerator = idGenerator,
-       _shuffleRandom = shuffleRandom;
+       _shuffleRandom = shuffleRandom,
+       _logger = logger;
 
   final local.AppDatabase _database;
   final StudySessionDao _studySessionDao;
@@ -46,13 +49,13 @@ final class StudyRepoImpl implements StudyRepo {
   final Clock _clock;
   final IdGenerator _idGenerator;
   final Random _shuffleRandom;
+  final AppLogger _logger;
 
   @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
     final rows = await _eligibleFlashcards(
       context: context,
-      whereProgress: '(p.flashcard_id IS NULL OR p.due_at IS NULL)',
-      readsProgress: true,
+      whereProgress: 'p.due_at IS NULL',
       dueOnly: false,
     );
     final cards = rows
@@ -74,7 +77,6 @@ final class StudyRepoImpl implements StudyRepo {
     final rows = await _eligibleFlashcards(
       context: context,
       whereProgress: 'p.due_at IS NOT NULL AND p.due_at <= ?',
-      readsProgress: true,
       dueOnly: true,
       extraVariables: [Variable<int>(endOfToday)],
     );
@@ -438,7 +440,7 @@ final class StudyRepoImpl implements StudyRepo {
     } on NotFoundException {
       rethrow;
     } catch (error, stackTrace) {
-      Object.hash(error, stackTrace);
+      _logger.error('Failed to finalize study session.', error, stackTrace);
       await _markFailedToFinalize(sessionId);
     }
     return _loadSnapshot(sessionId);
@@ -460,7 +462,6 @@ final class StudyRepoImpl implements StudyRepo {
   Future<List<QueryRow>> _eligibleFlashcards({
     required StudyContext context,
     required String whereProgress,
-    required bool readsProgress,
     required bool dueOnly,
     List<Variable> extraVariables = const <Variable>[],
   }) async {
@@ -474,7 +475,7 @@ final class StudyRepoImpl implements StudyRepo {
       SELECT f.id, f.deck_id, f.front, f.back, p.due_at
       FROM flashcards f
       INNER JOIN decks d ON d.id = f.deck_id
-      LEFT JOIN flashcard_progress p ON p.flashcard_id = f.id
+      INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
       WHERE ${scope.whereClause}
         AND $whereProgress
       $orderBy
@@ -483,7 +484,7 @@ final class StudyRepoImpl implements StudyRepo {
           readsFrom: {
             _database.flashcards,
             _database.decks,
-            if (readsProgress) _database.flashcardProgress,
+            _database.flashcardProgress,
           },
         )
         .get();
@@ -603,8 +604,10 @@ final class StudyRepoImpl implements StudyRepo {
       final cardAttempts =
           attemptsByCard[card.id] ?? const <local.StudyAttempt>[];
       final outcome = switch (finalizePolicy) {
+        // New Study means the card passed every required learning mode.
+        // Retry history remains in study_attempts; initial SRS placement is deterministic.
         StudyFinalizePolicy.newStudy => _SrsOutcome(
-          result: ReviewResult.perfect,
+          result: ReviewResult.initialPassed,
           oldBox: oldBox,
           newBox: 2,
           nextDueAt: now + const Duration(days: 1).inMilliseconds,

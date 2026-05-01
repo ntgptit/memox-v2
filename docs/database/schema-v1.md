@@ -78,7 +78,7 @@ erDiagram
 | `current_box` | INTEGER | no | box SRS hiện tại, từ `1` đến `8`, mặc định `1` cho thẻ mới |
 | `review_count` | INTEGER | no | số lần cập nhật SRS chính thức |
 | `lapse_count` | INTEGER | no | số lần quên hoặc tụt box trong các lượt SRS chính thức |
-| `last_result` | TEXT | yes | kết quả SRS chính thức gần nhất; với SRS Review dùng `perfect`, `recovered`, hoặc `forgot` |
+| `last_result` | TEXT | yes | kết quả SRS chính thức gần nhất; New Study dùng `initial_passed`, SRS Review dùng `perfect`, `recovered`, hoặc `forgot` |
 | `last_studied_at` | INTEGER | yes | UTC epoch ms của lần cập nhật SRS chính thức gần nhất |
 | `due_at` | INTEGER | yes | UTC epoch ms chính thức, null khi chưa pass New Study đủ 5 mode |
 | `created_at` | INTEGER | no | UTC epoch ms |
@@ -86,11 +86,14 @@ erDiagram
 
 ### Rule
 - Mỗi flashcard có đúng 1 hàng progress
+- Nếu dữ liệu cũ thiếu progress row, migration phải tạo lại progress mặc định thay vì để query học suy luận từ `flashcards` trần
 - `move flashcard` không đổi progress row
 - `duplicate deck` và `import` tạo progress row mới
 - Khi edit `front` hoặc `back` của flashcard đã học, user chọn giữ progress thì không đổi progress row; user chọn reset thì giữ row nhưng đưa `current_box=1`, `review_count=0`, `lapse_count=0`, `last_result=null`, `last_studied_at=null`, `due_at=null`
 - Trạng thái `new`, `learning`, `due`, `overdue` là derived, không lưu cột riêng
+- New Study chỉ chọn flashcard có progress row tồn tại và `due_at=null`
 - New Study chỉ commit `flashcard_progress` khi New Study session chuyển sang `completed`
+- New Study hoàn thành đủ 5 mode commit `last_result=initial_passed`; retry history không bị mất vì vẫn nằm trong `study_attempts`
 - SRS Review chỉ commit `flashcard_progress` khi SRS Review session chuyển sang `completed`
 - Khi session còn đang chạy, thay đổi box và `due_at` chỉ được stage từ `study_attempts` và `study_session_items`
 - Khi SRS Review còn đang chạy, không cập nhật `current_box`, `due_at`, `review_count`, `last_result`, hoặc trạng thái SRS cuối cùng
@@ -187,6 +190,7 @@ erDiagram
 - SRS Review flashcard từng sai trong Fill mode bằng `incorrect` có review result `recovered` và được commit theo nhánh giảm box hoặc due sớm hơn
 - Current v1 không persist `forgot` trong `study_attempts`; `ReviewResult.forgot` chỉ còn là legacy/future SRS result, không sinh từ attempt `correct/incorrect`
 - SRS Review flashcard pass Fill mà không sai có review result `perfect` và được commit theo nhánh làm tốt
+- New Study flashcard pass đủ 5 mode có review result `initial_passed`, kể cả khi từng sai rồi pass retry trong session
 - `old_box`, `new_box`, `next_due_at` chỉ được ghi khi session chuyển sang `completed`
 - Commit cuối session phải cập nhật `study_attempts` và `flashcard_progress` trong cùng transaction nghiệp vụ
 - SRS Review finalize phải tổng hợp attempt của từng flashcard trước khi tính review result cuối cùng

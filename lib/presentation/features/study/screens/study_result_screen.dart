@@ -12,6 +12,7 @@ import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_error_state.dart';
 import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_progress_indicator.dart';
@@ -38,14 +39,18 @@ class StudyResultScreen extends ConsumerWidget {
       body: MxContentShell(
         width: MxContentWidth.reading,
         applyVerticalPadding: true,
-        child: sessionState.when(
-          loading: () => const _StudyResultLoadingView(),
-          error: (error, stackTrace) => MxErrorState(
+        child: MxRetainedAsyncState<StudySessionSnapshot>(
+          data: sessionState.value,
+          isLoading: sessionState.isLoading,
+          error: sessionState.hasError ? sessionState.error : null,
+          stackTrace: sessionState.hasError ? sessionState.stackTrace : null,
+          skeletonBuilder: (_) => const _StudyResultLoadingView(),
+          errorBuilder: (_, error, _) => MxErrorState(
             title: l10n.sharedErrorTitle,
             message: studyErrorMessage(error),
             onRetry: () => ref.invalidate(studySessionStateProvider(sessionId)),
           ),
-          data: (snapshot) => ListView(
+          dataBuilder: (context, snapshot) => ListView(
             children: [
               MxText(l10n.studyResultHeading, role: MxTextRole.pageTitle),
               const MxGap(MxSpace.sm),

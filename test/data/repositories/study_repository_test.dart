@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/errors/app_exception.dart';
+import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/data/datasources/local/app_database.dart';
 import 'package:memox/data/datasources/local/daos/folder_dao.dart';
 import 'package:memox/data/datasources/local/daos/study_attempt_dao.dart';
@@ -73,6 +74,10 @@ void main() {
             .select(harness.database.flashcardProgress)
             .get();
         expect(progressRows.map((row) => row.currentBox), everyElement(2));
+        expect(
+          progressRows.map((row) => row.lastResult),
+          everyElement(ReviewResult.initialPassed.storageValue),
+        );
         expect(progressRows.map((row) => row.dueAt), everyElement(isNotNull));
       },
     );
@@ -340,6 +345,44 @@ void main() {
           SessionItemSourcePool.overdue,
           SessionItemSourcePool.overdue,
           SessionItemSourcePool.due,
+        ]);
+      },
+    );
+
+    test(
+      'DT4 loadBatch: New Study requires a progress row with no due date',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+        await harness.database
+            .into(harness.database.flashcards)
+            .insert(
+              FlashcardsCompanion.insert(
+                id: 'card-without-progress',
+                deckId: 'deck-1',
+                front: 'orphan front',
+                back: 'orphan back',
+                sortOrder: 1,
+                createdAt: _studyNow,
+                updatedAt: _studyNow,
+              ),
+            );
+
+        final snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 5,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        expect(snapshot.sessionFlashcards.map((card) => card.id), <String>[
+          'card-1',
         ]);
       },
     );
@@ -1557,6 +1600,107 @@ void main() {
       },
     );
 
+    test(
+      'DT7 onUpdate: logs finalize commit failure and keeps retryable failed status',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        var snapshot = await harness.startOneCardNewStudy();
+        while (snapshot.currentItem != null) {
+          snapshot = await harness.answer.execute(
+            sessionId: snapshot.session.id,
+            studyType: snapshot.session.studyType,
+            grade: AttemptGrade.correct,
+          );
+        }
+
+        await (harness.database.update(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-1'))).write(
+          const FlashcardProgressCompanion(reviewCount: Value(_sqliteMaxInt)),
+        );
+
+        final finalized = await harness.finalize.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+        );
+
+        expect(finalized.session.status, SessionStatus.failedToFinalize);
+        expect(harness.logger.errors, hasLength(1));
+        expect(
+          harness.logger.errors.single.message,
+          _finalizeFailureLogMessage,
+        );
+        expect(harness.logger.errors.single.error, isNot(isA<AppException>()));
+        expect(harness.logger.errors.single.stackTrace, isNotNull);
+
+        final persistedSession = await (harness.database.select(
+          harness.database.studySessions,
+        )..where((table) => table.id.equals(snapshot.session.id))).getSingle();
+        expect(
+          persistedSession.status,
+          SessionStatus.failedToFinalize.storageValue,
+        );
+
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
+        expect(progress.reviewCount, _sqliteMaxInt);
+      },
+    );
+
+    test(
+      'DT8 onUpdate: New Study retry history finalizes as initial passed rather than perfect',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        var snapshot = await harness.startOneCardNewStudy();
+        snapshot = await harness.answer.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+          grade: AttemptGrade.incorrect,
+        );
+
+        expect(snapshot.currentItem?.studyMode, StudyMode.review);
+        expect(snapshot.currentItem?.roundIndex, 2);
+
+        while (snapshot.currentItem != null) {
+          snapshot = await harness.answer.execute(
+            sessionId: snapshot.session.id,
+            studyType: snapshot.session.studyType,
+            grade: AttemptGrade.correct,
+          );
+        }
+
+        expect(snapshot.session.status, SessionStatus.readyToFinalize);
+        expect(snapshot.summary.retryCardCount, 1);
+
+        final finalized = await harness.finalize.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+        );
+
+        expect(finalized.session.status, SessionStatus.completed);
+
+        final progress = await (harness.database.select(
+          harness.database.flashcardProgress,
+        )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
+
+        expect(progress.lastResult, ReviewResult.initialPassed.storageValue);
+        expect(progress.currentBox, 2);
+        expect(progress.reviewCount, 1);
+        expect(progress.lapseCount, 0);
+
+        final attempts = await harness.database
+            .select(harness.database.studyAttempts)
+            .get();
+        expect(
+          attempts.map((attempt) => attempt.result),
+          contains(AttemptGrade.incorrect.storageValue),
+        );
+      },
+    );
+
     test('DT2 onUpdate: does not cancel a completed session', () async {
       await harness.seedDeckWithCards(cardCount: 1);
 
@@ -2019,6 +2163,8 @@ void main() {
 }
 
 final _studyNow = DateTime.utc(2026, 4, 24, 9).millisecondsSinceEpoch;
+const int _sqliteMaxInt = 9223372036854775807;
+const String _finalizeFailureLogMessage = 'Failed to finalize study session.';
 
 Future<void> _expectSessionRow(
   _StudyHarness harness, {
@@ -2147,6 +2293,29 @@ Future<void> _expectAttemptCount(_StudyHarness harness, int expected) async {
   expect(rows, hasLength(expected));
 }
 
+final class _RecordingAppLogger implements AppLogger {
+  final errors = <_RecordedLogError>[];
+
+  @override
+  void error(String message, Object error, StackTrace stackTrace) {
+    errors.add(
+      _RecordedLogError(message: message, error: error, stackTrace: stackTrace),
+    );
+  }
+}
+
+final class _RecordedLogError {
+  const _RecordedLogError({
+    required this.message,
+    required this.error,
+    required this.stackTrace,
+  });
+
+  final String message;
+  final Object error;
+  final StackTrace stackTrace;
+}
+
 final class _StudyHarness {
   _StudyHarness._({
     required this.database,
@@ -2161,6 +2330,7 @@ final class _StudyHarness {
     required this.cancel,
     required this.restart,
     required this.finalize,
+    required this.logger,
   });
 
   factory _StudyHarness.create() {
@@ -2168,6 +2338,7 @@ final class _StudyHarness {
     final clock = TestClock(DateTime.utc(2026, 4, 24, 9));
     final idGenerator = SequenceIdGenerator();
     final transactionRunner = LocalTransactionRunner(database);
+    final logger = _RecordingAppLogger();
     final repo = StudyRepoImpl(
       database: database,
       studySessionDao: StudySessionDao(database),
@@ -2178,6 +2349,7 @@ final class _StudyHarness {
       clock: clock,
       idGenerator: idGenerator,
       shuffleRandom: Random(7),
+      logger: logger,
     );
     final factory = StudyStrategyFactory(const <StudyStrategy>[
       NewStudyStrategy(),
@@ -2230,6 +2402,7 @@ final class _StudyHarness {
         repository: repo,
         strategyFactory: factory,
       ),
+      logger: logger,
     );
   }
 
@@ -2245,6 +2418,7 @@ final class _StudyHarness {
   final CancelStudySessionUseCase cancel;
   final RestartStudySessionUseCase restart;
   final FinalizeStudySessionUseCase finalize;
+  final _RecordingAppLogger logger;
 
   Future<void> seedDeckWithCards({
     required int cardCount,
