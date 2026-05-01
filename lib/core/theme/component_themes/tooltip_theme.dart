@@ -9,7 +9,7 @@ abstract final class TooltipThemeBuilder {
     return TooltipThemeData(
       decoration: BoxDecoration(
         color: scheme.inverseSurface.withValues(alpha: 0.92),
-        borderRadius: AppRadius.borderSm,
+        borderRadius: AppRadius.borderMd,
       ),
       textStyle: AppTypography.bodySmall.copyWith(
         color: scheme.onInverseSurface,

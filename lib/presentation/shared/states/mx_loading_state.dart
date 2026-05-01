@@ -39,7 +39,7 @@ class MxSkeleton extends StatefulWidget {
   const MxSkeleton({
     this.width,
     this.height = 14,
-    this.borderRadius = AppRadius.borderSm,
+    this.borderRadius = AppRadius.borderMd,
     super.key,
   });
 

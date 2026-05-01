@@ -435,6 +435,9 @@ void main() {
       const cardKey = ValueKey('visual-card');
       const iconButtonKey = ValueKey('visual-icon-button');
       const dividerKey = ValueKey('visual-divider');
+      const answerKey = ValueKey('visual-answer-option');
+      const tileKey = ValueKey('visual-study-set-tile');
+      const skeletonKey = ValueKey('visual-skeleton');
 
       await _pumpLayoutWidget(
         tester,
@@ -452,6 +455,19 @@ void main() {
               onPressed: _noop,
             ),
             const MxDivider(key: dividerKey),
+            MxAnswerOptionCard(
+              key: answerKey,
+              label: 'Answer option',
+              onPressed: _noop,
+            ),
+            MxStudySetTile(
+              key: tileKey,
+              title: 'Study set',
+              icon: Icons.style_outlined,
+              metaLine: '12 cards',
+              onTap: _noop,
+            ),
+            const MxSkeleton(key: skeletonKey, width: 96, height: 20),
           ],
         ),
       );
@@ -476,6 +492,40 @@ void main() {
           matching: find.byType(Divider),
         ),
       );
+      final answerMaterial = tester
+          .widgetList<Material>(
+            find.descendant(
+              of: find.byKey(answerKey),
+              matching: find.byType(Material),
+            ),
+          )
+          .first;
+      final answerShape = answerMaterial.shape! as RoundedRectangleBorder;
+      final tileMaterial = tester
+          .widgetList<Material>(
+            find.descendant(
+              of: find.byKey(tileKey),
+              matching: find.byType(Material),
+            ),
+          )
+          .first;
+      final tileShape = tileMaterial.shape! as RoundedRectangleBorder;
+      final tileIconContainer = tester
+          .widgetList<Container>(
+            find.descendant(
+              of: find.byKey(tileKey),
+              matching: find.byType(Container),
+            ),
+          )
+          .first;
+      final tileIconDecoration = tileIconContainer.decoration! as BoxDecoration;
+      final skeleton = tester.widget<Container>(
+        find.descendant(
+          of: find.byKey(skeletonKey),
+          matching: find.byType(Container),
+        ),
+      );
+      final skeletonDecoration = skeleton.decoration! as BoxDecoration;
 
       expect(card.color, scheme.surfaceContainerLow);
       expect(card.elevation, AppElevation.card);
@@ -488,6 +538,10 @@ void main() {
       expect(divider.thickness, isNull);
       expect(theme.dividerTheme.color, scheme.outlineVariant);
       expect(theme.dividerTheme.thickness, isNotNull);
+      expect(answerShape.borderRadius, AppRadius.card);
+      expect(tileShape.borderRadius, AppRadius.card);
+      expect(tileIconDecoration.borderRadius, AppRadius.borderLg);
+      expect(skeletonDecoration.borderRadius, AppRadius.borderMd);
     },
   );
 
@@ -1581,6 +1635,26 @@ void main() {
     expect(controller.text, isEmpty);
     expect(changedValue, isEmpty);
     expect(clearCalls, 1);
+  });
+
+  testWidgets('DT9 onTextField: search field uses input radius token', (
+    tester,
+  ) async {
+    const searchKey = ValueKey('text-field-search-radius');
+
+    await _pumpLayoutWidget(
+      tester,
+      const MxSearchField(key: searchKey, hintText: 'Search cards'),
+    );
+
+    final decoration = _sharedTextField(tester, searchKey).decoration!;
+    final border = _outlineInputBorder(decoration.border);
+    final enabledBorder = _outlineInputBorder(decoration.enabledBorder);
+    final focusedBorder = _outlineInputBorder(decoration.focusedBorder);
+
+    expect(border.borderRadius, AppRadius.input);
+    expect(enabledBorder.borderRadius, AppRadius.input);
+    expect(focusedBorder.borderRadius, AppRadius.input);
   });
 
   testWidgets('DT6 onTextField: passes password keyboard and action config', (

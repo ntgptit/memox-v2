@@ -86,15 +86,15 @@ class _MxSearchFieldState extends State<MxSearchField> {
         filled: true,
         fillColor: scheme.surfaceContainerLow,
         border: OutlineInputBorder(
-          borderRadius: AppRadius.borderFull,
+          borderRadius: AppRadius.input,
           borderSide: BorderSide(color: scheme.outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: AppRadius.borderFull,
+          borderRadius: AppRadius.input,
           borderSide: BorderSide(color: scheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: AppRadius.borderFull,
+          borderRadius: AppRadius.input,
           borderSide: BorderSide(color: scheme.primary, width: focusedWidth),
         ),
         contentPadding:

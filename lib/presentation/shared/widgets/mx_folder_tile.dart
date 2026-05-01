@@ -78,7 +78,7 @@ class MxFolderTile extends StatelessWidget {
               height: AppIconSizes.xxxl,
               decoration: BoxDecoration(
                 color: tileColor ?? scheme.primaryContainer,
-                borderRadius: AppRadius.borderMd,
+                borderRadius: AppRadius.borderLg,
               ),
               alignment: Alignment.center,
               child: Icon(

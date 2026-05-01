@@ -34,6 +34,6 @@ abstract final class MxFeatureSizes {
 
 abstract final class MxFeatureRadii {
   static const BorderRadius heroPanel = AppRadius.card;
-  static const BorderRadius md = AppRadius.borderMd;
+  static const BorderRadius md = AppRadius.borderLg;
   static const BorderRadius full = AppRadius.borderFull;
 }

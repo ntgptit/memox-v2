@@ -117,7 +117,7 @@ abstract final class ButtonThemeBuilder {
       focusElevation: 6,
       hoverElevation: 6,
       highlightElevation: 8,
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSemi),
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.cardLarge),
     );
   }
 }

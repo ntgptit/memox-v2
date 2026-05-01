@@ -37,7 +37,7 @@ class MxAnswerOptionCard extends StatelessWidget {
     final optionIcon = selected ? Icons.check_circle_rounded : leadingIcon;
 
     final shape = RoundedRectangleBorder(
-      borderRadius: AppRadius.borderMd,
+      borderRadius: AppRadius.card,
       side: BorderSide(color: _borderColor(scheme)),
     );
 

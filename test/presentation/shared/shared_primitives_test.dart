@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/core/theme/extensions/theme_extensions.dart';
+import 'package:memox/core/theme/tokens/app_radius.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/dialogs/mx_action_sheet_list.dart';
 import 'package:memox/presentation/shared/dialogs/mx_destination_picker_sheet.dart';
@@ -198,15 +200,21 @@ void main() {
 
       await tester.pumpWidget(
         _TestApp(
-          child: MxSearchSortToolbar<String>(
-            searchHintText: 'Search cards',
-            onSearchChanged: (value) => searchQuery = value,
-            sortLabel: 'Sort',
-            sortOptions: const [
-              MxSortOption<String>(value: 'alpha', label: 'A-Z'),
-              MxSortOption<String>(value: 'recent', label: 'Recently updated'),
-            ],
-            onSortSelected: (value) => sortValue = value,
+          child: Theme(
+            data: AppTheme.dark(),
+            child: MxSearchSortToolbar<String>(
+              searchHintText: 'Search cards',
+              onSearchChanged: (value) => searchQuery = value,
+              sortLabel: 'Sort',
+              sortOptions: const [
+                MxSortOption<String>(value: 'alpha', label: 'A-Z'),
+                MxSortOption<String>(
+                  value: 'recent',
+                  label: 'Recently updated',
+                ),
+              ],
+              onSortSelected: (value) => sortValue = value,
+            ),
           ),
         ),
       );
@@ -216,7 +224,21 @@ void main() {
 
       expect(searchQuery, 'kanji');
       expect(find.byType(MenuAnchor), findsOneWidget);
-      expect(find.byType(FilterChip), findsOneWidget);
+      expect(find.byType(FilterChip), findsNothing);
+      expect(find.byType(OutlinedButton), findsOneWidget);
+      final sortButton = tester.widget<OutlinedButton>(
+        find.byType(OutlinedButton),
+      );
+      final sortShape = sortButton.style?.shape?.resolve(<WidgetState>{});
+      final sortMinimumSize = sortButton.style?.minimumSize?.resolve(
+        <WidgetState>{},
+      );
+      expect(sortShape, isA<RoundedRectangleBorder>());
+      expect(
+        (sortShape! as RoundedRectangleBorder).borderRadius,
+        AppRadius.button,
+      );
+      expect(sortMinimumSize, const Size(0, 36));
       expect(
         find.byWidgetPredicate((widget) => widget is PopupMenuButton),
         findsNothing,
@@ -485,30 +507,43 @@ void main() {
   );
 
   testWidgets(
-    'DT3 onSelect: MxSearchSortToolbar keeps selected sort icon without checkmark',
+    'DT3 onSelect: MxSearchSortToolbar renders selected sort button with icon',
     (tester) async {
       await tester.pumpWidget(
         _TestApp(
-          child: MxSearchSortToolbar<String>(
-            sortLabel: 'Sort',
-            selectedSort: 'recent',
-            sortOptions: const [
-              MxSortOption<String>(
-                value: 'recent',
-                label: 'Newest',
-                icon: Icons.schedule_rounded,
-              ),
-            ],
-            onSortSelected: (_) {},
+          child: Theme(
+            data: AppTheme.dark(),
+            child: MxSearchSortToolbar<String>(
+              sortLabel: 'Sort',
+              selectedSort: 'recent',
+              sortOptions: const [
+                MxSortOption<String>(
+                  value: 'recent',
+                  label: 'Newest',
+                  icon: Icons.schedule_rounded,
+                ),
+              ],
+              onSortSelected: (_) {},
+            ),
           ),
         ),
       );
 
-      final chip = tester.widget<FilterChip>(find.byType(FilterChip));
+      final button = tester.widget<FilledButton>(find.byType(FilledButton));
+      final shape = button.style?.shape?.resolve(<WidgetState>{});
+      final minimumSize = button.style?.minimumSize?.resolve(<WidgetState>{});
 
-      expect(chip.selected, isTrue);
-      expect(chip.showCheckmark, isFalse);
-      expect(chip.avatar, isA<Icon>());
+      expect(find.byType(FilterChip), findsNothing);
+      expect(shape, isA<RoundedRectangleBorder>());
+      expect((shape! as RoundedRectangleBorder).borderRadius, AppRadius.button);
+      expect(minimumSize, const Size(0, 36));
+      expect(
+        find.descendant(
+          of: find.byType(FilledButton),
+          matching: find.byIcon(Icons.schedule_rounded),
+        ),
+        findsOneWidget,
+      );
     },
   );
 

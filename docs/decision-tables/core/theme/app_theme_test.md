@@ -15,4 +15,4 @@ Test file: `test/core/theme/app_theme_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | component theme builders should use compact Tokyo radius values | app theme is built with shared component themes | test reads button, card, input, and dialog shapes | component radii match compact Tokyo-adapted shape tokens | C0+C1 |
+| DT1 | component theme builders should use the soft MemoX radius language | app theme is built with shared component themes | test reads semantic radius mappings plus button, card, input, dialog, bottom sheet, FAB, snackbar, menu, and tooltip shapes | component radii match the shared soft shape tokens without introducing new radius tokens | C0+C1 |

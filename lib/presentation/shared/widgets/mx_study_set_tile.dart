@@ -63,7 +63,7 @@ class MxStudySetTile extends StatelessWidget {
             height: AppIconSizes.xxl, // guard:raw-size-reviewed icon tile token
             decoration: BoxDecoration(
               color: iconBackground ?? scheme.primaryContainer,
-              borderRadius: AppRadius.borderMd,
+              borderRadius: AppRadius.borderLg,
             ),
             alignment: Alignment.center,
             child: Icon(

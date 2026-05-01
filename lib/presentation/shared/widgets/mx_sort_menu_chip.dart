@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
-import 'mx_chip.dart';
+import 'mx_primary_button.dart';
+import 'mx_secondary_button.dart';
 import 'mx_search_sort_toolbar.dart' show MxSortOption;
 
-/// Compact menu trigger that pairs an [MxChip] with a [MenuAnchor] so feature
-/// code can offer a sort or filter dropdown without instantiating raw Material
-/// menu widgets.
+/// Compact menu trigger backed by a shared secondary button and [MenuAnchor] so
+/// feature code can offer a sort or filter dropdown without instantiating raw
+/// Material menu widgets.
 ///
-/// Matches the visual contract of the sort chip embedded in
-/// [MxSearchSortToolbar] so screens that want the chip placed elsewhere stay
+/// Matches the visual contract of the sort trigger embedded in
+/// [MxSearchSortToolbar] so screens that want the trigger placed elsewhere stay
 /// visually consistent.
 class MxSortMenuChip<T> extends StatelessWidget {
   const MxSortMenuChip({
@@ -38,12 +39,14 @@ class MxSortMenuChip<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final selected = _selectedOption;
     return MenuAnchor(
-      builder: (context, controller, _) => MxChip(
+      builder: (context, controller, _) => MxSecondaryButton(
         label: selected?.label ?? fallbackLabel,
-        icon: selected?.icon ?? fallbackIcon,
-        selected: selected != null,
-        tone: selected != null ? MxChipTone.primary : MxChipTone.neutral,
-        onTap: () =>
+        leadingIcon: selected?.icon ?? fallbackIcon,
+        size: MxButtonSize.small,
+        variant: selected != null
+            ? MxSecondaryVariant.tonal
+            : MxSecondaryVariant.outlined,
+        onPressed: () =>
             controller.isOpen ? controller.close() : controller.open(),
       ),
       menuChildren: [

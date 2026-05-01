@@ -54,7 +54,7 @@ abstract final class DialogThemeBuilder {
       behavior: SnackBarBehavior.floating,
       elevation: AppElevation.snackbar,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.banner),
       showCloseIcon: false,
     );
   }

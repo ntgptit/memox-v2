@@ -15,7 +15,7 @@ Test file: `test/presentation/shared/shared_primitives_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT1 | action sheet item with value `delete` is tapped | bottom sheet contains Edit and Delete actions and `selectedAction` starts null | user opens sheet and taps `Delete` | bottom sheet closes and selected value becomes `delete` | C0+C1 |
 | DT2 | adaptive segmented control is too narrow for segmented buttons | segmented control width is 180 with three options and selected value `{1}` | user taps `Three` in fallback list | `SegmentedButton` is absent, three `RadioListTile<int>` controls are visible, and selected value becomes `{3}` | C0+C1 |
-| DT3 | search-sort toolbar has a selected sort option with icon | toolbar selected sort is `recent` and option icon is schedule | toolbar renders selected chip | `FilterChip.selected` is true, checkmark is hidden, and avatar is an icon | C0+C1 |
+| DT3 | search-sort toolbar has a selected sort option with icon | toolbar selected sort is `recent` and option icon is schedule | toolbar renders selected sort trigger | trigger is a compact tonal secondary button using `AppRadius.button`, no `FilterChip` is rendered, and the selected icon is visible | C0+C1 |
 | DT4 | bulk action bar has label, subtitle, secondary action, and primary action | action bar label is `3 selected` and actions mutate `moveTapped` and `archiveTapped` | user taps `Move` and `Archive` | label and subtitle are visible, and both callbacks are called | C0+C1 |
 | DT5 | term row is selected and has a tap callback | row has term `Hello`, definition `Xin chao`, caption `2 examples`, and selected state true | user taps the term text | row text and selected icon are visible, and tap callback is called | C0+C1 |
 
@@ -24,7 +24,7 @@ Test file: `test/presentation/shared/shared_primitives_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | destination picker search narrows options and selected option should be returned | destinations are Algebra and Biology | user opens picker, enters `alg`, and taps `Algebra` | `Algebra` remains visible, `Biology` is hidden, and selected destination becomes `folder-a` | C0+C1 |
-| DT2 | search-sort toolbar receives search input and sort menu selection | toolbar has search callback and sort options A-Z and Recently updated | user enters `kanji`, opens Sort, and selects `Recently updated` | search callback receives `kanji`, no legacy popup menu exists, and sort callback receives `recent` | C0+C1 |
+| DT2 | search-sort toolbar receives search input and sort menu selection | toolbar has search callback and sort options A-Z and Recently updated | user enters `kanji`, opens Sort, and selects `Recently updated` | search callback receives `kanji`, sort trigger is compact button-shaped instead of chip-shaped, no legacy popup menu exists, and sort callback receives `recent` | C0+C1 |
 
 ## Decision table: onUpdate
 

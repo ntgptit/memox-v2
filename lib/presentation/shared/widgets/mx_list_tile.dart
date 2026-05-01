@@ -48,7 +48,7 @@ class MxListTile extends StatelessWidget {
                 height: AppSpacing.xxxxl, // 40
                 decoration: BoxDecoration(
                   color: scheme.primaryContainer,
-                  borderRadius: AppRadius.borderSm,
+                  borderRadius: AppRadius.borderLg,
                 ),
                 alignment: Alignment.center,
                 child: Icon(

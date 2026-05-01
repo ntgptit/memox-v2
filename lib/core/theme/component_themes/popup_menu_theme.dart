@@ -44,7 +44,7 @@ abstract final class PopupMenuThemeBuilder {
         ),
         overlayColor: AppFocus.overlayProperty(scheme.onSurface),
         shape: const WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+          RoundedRectangleBorder(borderRadius: AppRadius.buttonSmall),
         ),
       ),
     );

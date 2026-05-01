@@ -163,6 +163,7 @@ class MxPrimaryButton extends StatelessWidget {
 
   ButtonStyle? _mergeButtonStyles(ButtonStyle? base, ButtonStyle? overrides) {
     if (base == null) return overrides;
-    return base.merge(overrides);
+    if (overrides == null) return base;
+    return overrides.merge(base);
   }
 }
