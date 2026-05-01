@@ -59,6 +59,8 @@ Sau khi lọc theo daily pool, flow tạo batch vẫn đi qua đúng rule của 
 
 Dashboard là entry point chính để trả lời câu hỏi user nên học gì trong ngày.
 Dashboard không được ưu tiên Library summary hơn hành động học.
+Home header phải đóng vai trò chào hỏi ngắn gọn; tiêu đề `Home` vẫn thuộc
+bottom navigation, không phải headline chính trong nội dung dashboard.
 
 Dashboard phải tách rõ bốn khối nghiệp vụ chính:
 - Today Review:
@@ -76,6 +78,10 @@ Dashboard phải tách rõ bốn khối nghiệp vụ chính:
   - tổng số deck
   - tổng số thẻ
   - mastery toàn thư viện
+
+Khi New Study có thẻ mới, CTA `Start` là hành động primary duy nhất trong
+khối hành động học. Review và Resume vẫn hiển thị để giải thích trạng thái hiện
+tại, nhưng dùng mức nhấn thấp hơn hoặc disabled khi không có nội dung khả dụng.
 
 Dashboard cũng hiển thị section gợi ý deck:
 - Recent decks:

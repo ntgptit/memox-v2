@@ -1,10 +1,8 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/extensions/theme_extensions.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_gap.dart';
@@ -15,6 +13,7 @@ import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_progress_ring.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_study_progress_action.dart';
 import '../../../shared/widgets/mx_study_set_tile.dart';
@@ -23,35 +22,22 @@ import '../viewmodels/dashboard_overview_viewmodel.dart';
 
 const _dashboardChartSize =
     132.0; // guard:raw-size-reviewed fixed dashboard chart diameter
-const _dashboardChartSectionRadius =
-    16.0; // guard:raw-size-reviewed donut ring thickness
-const _dashboardChartCenterRadius =
-    42.0; // guard:raw-size-reviewed donut center label clearance
-const _dashboardChartSectionSpacing =
-    2.0; // guard:raw-size-reviewed visual separation between slices
-const _dashboardChartInlineMinWidth =
-    420.0; // guard:raw-size-reviewed switch point for chart details layout
+const _dashboardChartStrokeWidth =
+    16.0; // guard:raw-size-reviewed dashboard mastery ring thickness
 const _dashboardActionInlineMinWidth =
     460.0; // guard:raw-size-reviewed switch point for action button layout
 const _dashboardActionButtonWidth =
     152.0; // guard:raw-size-reviewed aligns concise dashboard action CTAs
 const _dashboardPercentMax = 100;
-const _dashboardChartStartDegree =
-    -90.0; // guard:raw-size-reviewed start donut chart at the top
-const _dashboardChartAnimationDuration = Duration(
-  milliseconds: 150,
-); // guard:raw-size-reviewed chart transition
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
     final queryState = ref.watch(dashboardOverviewProvider);
 
     return MxScaffold(
-      title: l10n.homeTitle,
       body: MxContentShell(
         width: MxContentWidth.reading,
         applyVerticalPadding: true,
@@ -96,6 +82,7 @@ class _DashboardContent extends StatelessWidget {
         actionLabel: l10n.dashboardReviewNowAction,
         actionKey: const ValueKey('dashboard_review_now_action'),
         actionIcon: Icons.play_arrow_rounded,
+        isPrimary: false,
         onAction: state.hasReviewCards ? () => context.goStudyToday() : null,
       ),
       _DashboardActionSpec(
@@ -113,6 +100,7 @@ class _DashboardContent extends StatelessWidget {
         actionLabel: l10n.dashboardStartNewStudyAction,
         actionKey: const ValueKey('dashboard_start_new_study_action'),
         actionIcon: Icons.school_outlined,
+        isPrimary: true,
         onAction: state.hasNewCards ? () => context.goLibrary() : null,
       ),
       _DashboardActionSpec(
@@ -130,6 +118,7 @@ class _DashboardContent extends StatelessWidget {
         actionLabel: l10n.dashboardContinueSessionAction,
         actionKey: const ValueKey('dashboard_continue_session_action'),
         actionIcon: Icons.play_arrow_rounded,
+        isPrimary: false,
         onAction: state.hasActiveSessions
             ? () => _continueSession(context, state)
             : null,
@@ -139,10 +128,10 @@ class _DashboardContent extends StatelessWidget {
     return ListView(
       key: const ValueKey('dashboard_content'),
       children: [
-        MxText(l10n.dashboardHeading, role: MxTextRole.pageTitle),
-        const MxGap(MxSpace.sm),
-        MxText(l10n.dashboardSubtitle, role: MxTextRole.contentBody),
-        const MxGap(MxSpace.xl),
+        const _DashboardGreetingHeader(),
+        const MxGap(MxSpace.lg),
+        const _DashboardFocusHeader(),
+        const MxGap(MxSpace.lg),
         _DashboardLibraryProgressCard(state: state),
         const MxGap(MxSpace.lg),
         _DashboardActionList(actions: actions),
@@ -164,6 +153,42 @@ class _DashboardContent extends StatelessWidget {
   }
 }
 
+class _DashboardGreetingHeader extends StatelessWidget {
+  const _DashboardGreetingHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxText(l10n.dashboardGreetingTitle, role: MxTextRole.pageTitle),
+        const MxGap(MxSpace.xs),
+        MxText(l10n.dashboardGreetingSubtitle, role: MxTextRole.pageGreeting),
+      ],
+    );
+  }
+}
+
+class _DashboardFocusHeader extends StatelessWidget {
+  const _DashboardFocusHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxText(l10n.dashboardHeading, role: MxTextRole.sectionTitle),
+        const MxGap(MxSpace.xs),
+        MxText(l10n.dashboardSubtitle, role: MxTextRole.sectionSubtitle),
+      ],
+    );
+  }
+}
+
 class _DashboardActionSpec {
   const _DashboardActionSpec({
     required this.icon,
@@ -173,6 +198,7 @@ class _DashboardActionSpec {
     required this.actionLabel,
     required this.actionKey,
     required this.actionIcon,
+    required this.isPrimary,
     required this.onAction,
   });
 
@@ -183,6 +209,7 @@ class _DashboardActionSpec {
   final String actionLabel;
   final Key actionKey;
   final IconData actionIcon;
+  final bool isPrimary;
   final VoidCallback? onAction;
 }
 
@@ -206,34 +233,18 @@ class _DashboardLibraryProgressCard extends StatelessWidget {
 
     return MxCard(
       key: const ValueKey('dashboard_library_progress_card'),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final chart = _DashboardMasteryChart(percent: masteryPercent);
-          final details = _DashboardLibraryProgressDetails(
-            state: state,
-            percent: masteryPercent,
-          );
-
-          if (constraints.maxWidth < _dashboardChartInlineMinWidth) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(child: chart),
-                const MxGap(MxSpace.lg),
-                details,
-              ],
-            );
-          }
-
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              chart,
-              const MxGap(MxSpace.xl),
-              Expanded(child: details),
-            ],
-          );
-        },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _DashboardMasteryChart(percent: masteryPercent),
+          const MxGap(MxSpace.xl),
+          Expanded(
+            child: _DashboardLibraryProgressDetails(
+              state: state,
+              percent: masteryPercent,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -248,86 +259,46 @@ class _DashboardMasteryChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final customColors = context.mxColors;
-    final masteryColor = customColors.masteryProgress(
-      percent / _dashboardPercentMax,
-    );
-    final remainingColor = scheme.surfaceContainerHighest;
+    final progress = percent / _dashboardPercentMax;
 
-    return SizedBox.square(
-      dimension: _dashboardChartSize,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          PieChart(
-            PieChartData(
-              centerSpaceColor: scheme.surfaceContainerLow,
-              centerSpaceRadius: _dashboardChartCenterRadius,
-              pieTouchData: PieTouchData(enabled: false),
-              sections: _chartSections(
-                percent: percent,
-                masteryColor: masteryColor,
-                remainingColor: remainingColor,
-              ),
-              sectionsSpace: _dashboardChartSectionSpacing,
-              startDegreeOffset: _dashboardChartStartDegree,
-            ),
-            duration: _dashboardChartAnimationDuration,
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
+    return Semantics(
+      container: true,
+      label: l10n.dashboardLibraryProgressMessage(percent),
+      child: ExcludeSemantics(
+        child: SizedBox.square(
+          dimension: _dashboardChartSize,
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              MxText(
-                l10n.commonPercentValue(percent),
-                role: MxTextRole.sectionTitle,
-                textAlign: TextAlign.center,
+              MxProgressRing(
+                value: progress,
+                size: _dashboardChartSize,
+                strokeWidth: _dashboardChartStrokeWidth,
+                showLabel: false,
+                trackColor: scheme.surfaceContainerHighest,
               ),
-              MxText(
-                l10n.dashboardMasteryLabel,
-                role: MxTextRole.tileMeta,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  MxText(
+                    l10n.commonPercentValue(percent),
+                    role: MxTextRole.sectionTitle,
+                    textAlign: TextAlign.center,
+                  ),
+                  MxText(
+                    l10n.dashboardMasteryLabel,
+                    role: MxTextRole.tileMeta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
-  }
-
-  List<PieChartSectionData> _chartSections({
-    required int percent,
-    required Color masteryColor,
-    required Color remainingColor,
-  }) {
-    if (percent == 0) {
-      return [
-        PieChartSectionData(
-          color: remainingColor,
-          radius: _dashboardChartSectionRadius,
-          showTitle: false,
-          value: _dashboardPercentMax.toDouble(),
-        ),
-      ];
-    }
-
-    final remainingPercent = _dashboardPercentMax - percent;
-    return [
-      PieChartSectionData(
-        color: masteryColor,
-        radius: _dashboardChartSectionRadius,
-        showTitle: false,
-        value: percent.toDouble(),
-      ),
-      if (remainingPercent > 0)
-        PieChartSectionData(
-          color: remainingColor,
-          radius: _dashboardChartSectionRadius,
-          showTitle: false,
-          value: remainingPercent.toDouble(),
-        ),
-    ];
   }
 }
 
@@ -482,16 +453,28 @@ class _DashboardActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final iconColor = action.isPrimary && action.onAction != null
+        ? scheme.primary
+        : scheme.onSurfaceVariant;
     final button = SizedBox(
       key: action.actionKey,
       width: _dashboardActionButtonWidth,
-      child: MxPrimaryButton(
-        label: action.actionLabel,
-        leadingIcon: action.actionIcon,
-        size: MxButtonSize.small,
-        fullWidth: true,
-        onPressed: action.onAction,
-      ),
+      child: action.isPrimary
+          ? MxPrimaryButton(
+              label: action.actionLabel,
+              leadingIcon: action.actionIcon,
+              size: MxButtonSize.small,
+              fullWidth: true,
+              onPressed: action.onAction,
+            )
+          : MxSecondaryButton(
+              label: action.actionLabel,
+              leadingIcon: action.actionIcon,
+              size: MxButtonSize.small,
+              variant: MxSecondaryVariant.outlined,
+              fullWidth: true,
+              onPressed: action.onAction,
+            ),
     );
 
     return Padding(
@@ -507,7 +490,7 @@ class _DashboardActionRow extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(action.icon, color: scheme.primary),
+                    Icon(action.icon, color: iconColor),
                     const MxGap(MxSpace.md),
                     Expanded(child: details),
                   ],
@@ -524,7 +507,7 @@ class _DashboardActionRow extends StatelessWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(action.icon, color: scheme.primary),
+              Icon(action.icon, color: iconColor),
               const MxGap(MxSpace.md),
               Expanded(child: details),
               const MxGap(MxSpace.md),

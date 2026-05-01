@@ -116,6 +116,12 @@ class AppLocalizationsVi extends AppLocalizations {
       'Phần nền cho Cài đặt chưa được nối xong.';
 
   @override
+  String get dashboardGreetingTitle => 'Xin chào 👋';
+
+  @override
+  String get dashboardGreetingSubtitle => 'Sẵn sàng học hôm nay chưa?';
+
+  @override
   String get dashboardHeading => 'Trọng tâm học hôm nay';
 
   @override
@@ -146,7 +152,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String dashboardNewStudyMessage(int count) {
-    return '$count thẻ mới đã sẵn sàng cho phiên học theo deck hoặc folder.';
+    return '$count thẻ mới đã sẵn sàng.';
   }
 
   @override
@@ -169,7 +175,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dashboardResumeEmptyMessage =>
-      'Không có phiên học nào đang chờ tiếp tục.';
+      'Hiện không có phiên học nào đang mở.';
 
   @override
   String get dashboardContinueSessionAction => 'Tiếp tục';
@@ -213,7 +219,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dashboardStudyTodayAction => 'Học';
 
   @override
-  String get dashboardOpenLibraryAction => 'Mở';
+  String get dashboardOpenLibraryAction => 'Xem thư viện';
 
   @override
   String get dashboardLibraryProgressTitle => 'Tiến độ thư viện';

@@ -302,6 +302,18 @@ abstract class AppLocalizations {
   /// **'Settings foundation is not wired yet.'**
   String get appShellSettingsPlaceholderDescription;
 
+  /// No description provided for @dashboardGreetingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello 👋'**
+  String get dashboardGreetingTitle;
+
+  /// No description provided for @dashboardGreetingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to study today?'**
+  String get dashboardGreetingSubtitle;
+
   /// No description provided for @dashboardHeading.
   ///
   /// In en, this message translates to:
@@ -359,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardNewStudyMessage.
   ///
   /// In en, this message translates to:
-  /// **'{count} new cards are ready for a deck or folder session.'**
+  /// **'{count} new cards are ready.'**
   String dashboardNewStudyMessage(int count);
 
   /// No description provided for @dashboardNewStudyEmptyMessage.
@@ -395,7 +407,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardResumeEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'No study session is waiting to resume.'**
+  /// **'No active study session right now.'**
   String get dashboardResumeEmptyMessage;
 
   /// No description provided for @dashboardContinueSessionAction.
@@ -465,7 +477,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardOpenLibraryAction.
   ///
   /// In en, this message translates to:
-  /// **'Open'**
+  /// **'View library'**
   String get dashboardOpenLibraryAction;
 
   /// No description provided for @dashboardLibraryProgressTitle.

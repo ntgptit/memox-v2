@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +10,7 @@ import 'package:memox/presentation/features/dashboard/screens/dashboard_screen.d
 import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
 import 'package:memox/presentation/shared/states/mx_error_state.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
 
 const _maximumCompactDashboardActionButtonWidth = 160.0;
 
@@ -66,22 +66,31 @@ void main() {
   ) async {
     await _pumpDashboard(tester, _studyReadyDashboardState);
 
+    expect(find.text('Hello 👋'), findsOneWidget);
+    expect(find.text('Ready to study today?'), findsOneWidget);
+    expect(find.text('Home'), findsNothing);
     expect(find.text('Today\'s study focus'), findsOneWidget);
     expect(
       find.text('Review, study new cards, or continue a session.'),
       findsOneWidget,
     );
-    expect(find.byType(PieChart), findsOneWidget);
+    expect(find.byType(MxProgressRing), findsOneWidget);
     expect(find.text('Library progress'), findsOneWidget);
     expect(find.text('30% mastery'), findsOneWidget);
     expect(find.text('30% mastery · 2 folders · 20 cards'), findsNothing);
     expect(find.text('2 folders · 3 decks · 20 cards'), findsOneWidget);
+    expect(find.text('View library'), findsOneWidget);
     expect(find.text('Mastery'), findsOneWidget);
     expect(find.text('30%'), findsOneWidget);
     expect(find.text('Today Review'), findsOneWidget);
     expect(find.text('Overdue: 3'), findsOneWidget);
     expect(find.text('Due today: 2'), findsOneWidget);
     expect(find.text('New Study'), findsOneWidget);
+    expect(find.text('7 new cards are ready.'), findsOneWidget);
+    expect(
+      find.text('7 new cards are ready for a deck or folder session.'),
+      findsNothing,
+    );
     expect(find.text('New cards available: 7'), findsOneWidget);
     expect(find.text('Resume'), findsWidgets);
     expect(find.text('Active sessions: 1'), findsOneWidget);
@@ -92,23 +101,24 @@ void main() {
     (tester) async {
       await _pumpDashboard(tester, _idleDashboardState);
 
-      _expectElevatedButtonEnabled(
+      _expectSecondaryButtonEnabled(
         tester,
         key: const ValueKey('dashboard_review_now_action'),
         isEnabled: false,
       );
-      _expectElevatedButtonEnabled(
+      _expectPrimaryButtonEnabled(
         tester,
         key: const ValueKey('dashboard_start_new_study_action'),
         isEnabled: false,
       );
-      _expectElevatedButtonEnabled(
+      _expectSecondaryButtonEnabled(
         tester,
         key: const ValueKey('dashboard_continue_session_action'),
         isEnabled: false,
       );
-      expect(find.byType(PieChart), findsOneWidget);
+      expect(find.byType(MxProgressRing), findsOneWidget);
       expect(find.text('Library progress'), findsOneWidget);
+      expect(find.text('No active study session right now.'), findsOneWidget);
     },
   );
 
@@ -127,6 +137,9 @@ void main() {
       expect(find.text('Review now'), findsNothing);
       expect(find.text('Start new study'), findsNothing);
       expect(find.text('Continue session'), findsNothing);
+      _expectSecondaryButtonSurface(reviewKey);
+      _expectPrimaryButtonSurface(startKey);
+      _expectSecondaryButtonSurface(resumeKey);
 
       final buttonWidths = [
         _dashboardActionButtonSize(tester, reviewKey).width,
@@ -367,7 +380,7 @@ Future<void> _scrollDashboardToDeckHighlights(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-void _expectElevatedButtonEnabled(
+void _expectPrimaryButtonEnabled(
   WidgetTester tester, {
   required Key key,
   required bool isEnabled,
@@ -378,6 +391,41 @@ void _expectElevatedButtonEnabled(
   );
   final button = tester.widget<ElevatedButton>(finder);
   expect(button.onPressed, isEnabled ? isNotNull : isNull);
+}
+
+void _expectSecondaryButtonEnabled(
+  WidgetTester tester, {
+  required Key key,
+  required bool isEnabled,
+}) {
+  final finder = find.descendant(
+    of: find.byKey(key),
+    matching: find.byType(OutlinedButton),
+  );
+  final button = tester.widget<OutlinedButton>(finder);
+  expect(button.onPressed, isEnabled ? isNotNull : isNull);
+}
+
+void _expectPrimaryButtonSurface(Key key) {
+  expect(
+    find.descendant(of: find.byKey(key), matching: find.byType(ElevatedButton)),
+    findsOneWidget,
+  );
+  expect(
+    find.descendant(of: find.byKey(key), matching: find.byType(OutlinedButton)),
+    findsNothing,
+  );
+}
+
+void _expectSecondaryButtonSurface(Key key) {
+  expect(
+    find.descendant(of: find.byKey(key), matching: find.byType(OutlinedButton)),
+    findsOneWidget,
+  );
+  expect(
+    find.descendant(of: find.byKey(key), matching: find.byType(ElevatedButton)),
+    findsNothing,
+  );
 }
 
 Size _dashboardActionButtonSize(WidgetTester tester, Key key) {

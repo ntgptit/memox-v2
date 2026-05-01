@@ -116,6 +116,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Settings foundation is not wired yet.';
 
   @override
+  String get dashboardGreetingTitle => 'Hello 👋';
+
+  @override
+  String get dashboardGreetingSubtitle => 'Ready to study today?';
+
+  @override
   String get dashboardHeading => 'Today\'s study focus';
 
   @override
@@ -148,7 +154,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String dashboardNewStudyMessage(int count) {
-    return '$count new cards are ready for a deck or folder session.';
+    return '$count new cards are ready.';
   }
 
   @override
@@ -171,7 +177,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardResumeEmptyMessage =>
-      'No study session is waiting to resume.';
+      'No active study session right now.';
 
   @override
   String get dashboardContinueSessionAction => 'Resume';
@@ -236,7 +242,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardStudyTodayAction => 'Study';
 
   @override
-  String get dashboardOpenLibraryAction => 'Open';
+  String get dashboardOpenLibraryAction => 'View library';
 
   @override
   String get dashboardLibraryProgressTitle => 'Library progress';

@@ -41,6 +41,8 @@
   "appShellHomePlaceholderDescription": "Phần nền cho Trang chủ chưa được nối xong.",
   "appShellProgressPlaceholderDescription": "Phần nền cho Tiến độ chưa được nối xong.",
   "appShellSettingsPlaceholderDescription": "Phần nền cho Cài đặt chưa được nối xong.",
+  "dashboardGreetingTitle": "Xin chào 👋",
+  "dashboardGreetingSubtitle": "Sẵn sàng học hôm nay chưa?",
   "dashboardHeading": "Trọng tâm học hôm nay",
   "dashboardSubtitle": "Ôn bài, học thẻ mới hoặc tiếp tục phiên.",
   "dashboardTodayReviewTitle": "Ôn hôm nay",
@@ -57,7 +59,7 @@
   "dashboardReviewNowAction": "Ôn",
   "dashboardNewStudyTitle": "Học mới",
   "dashboardNewCardsLabel": "Thẻ mới có thể học",
-  "dashboardNewStudyMessage": "{count} thẻ mới đã sẵn sàng cho phiên học theo deck hoặc folder.",
+  "dashboardNewStudyMessage": "{count} thẻ mới đã sẵn sàng.",
   "@dashboardNewStudyMessage": {
     "placeholders": {
       "count": {
@@ -77,7 +79,7 @@
       }
     }
   },
-  "dashboardResumeEmptyMessage": "Không có phiên học nào đang chờ tiếp tục.",
+  "dashboardResumeEmptyMessage": "Hiện không có phiên học nào đang mở.",
   "dashboardContinueSessionAction": "Tiếp tục",
   "dashboardLibraryHealthTitle": "Sức khỏe thư viện",
   "dashboardLibraryHealthSummary": "{folderCount} thư mục · {deckCount} bộ thẻ · {cardCount} thẻ",
@@ -118,7 +120,7 @@
   "dashboardNoDueTitle": "Hiện không có thẻ đến hạn",
   "dashboardNoDueMessage": "Mở thư viện để thêm thẻ hoặc bắt đầu học một bộ thẻ cụ thể.",
   "dashboardStudyTodayAction": "Học",
-  "dashboardOpenLibraryAction": "Mở",
+  "dashboardOpenLibraryAction": "Xem thư viện",
   "dashboardLibraryProgressTitle": "Tiến độ thư viện",
   "dashboardLibraryProgressMessage": "{percent}% thành thạo",
   "@dashboardLibraryProgressMessage": {
