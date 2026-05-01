@@ -42,7 +42,7 @@
   "appShellProgressPlaceholderDescription": "Phần nền cho Tiến độ chưa được nối xong.",
   "appShellSettingsPlaceholderDescription": "Phần nền cho Cài đặt chưa được nối xong.",
   "dashboardHeading": "Trọng tâm học hôm nay",
-  "dashboardSubtitle": "Chọn hành động học hữu ích tiếp theo: ôn bài, học thẻ mới, tiếp tục phiên, hoặc xem sức khỏe thư viện.",
+  "dashboardSubtitle": "Ôn bài, học thẻ mới hoặc tiếp tục phiên.",
   "dashboardTodayReviewTitle": "Ôn hôm nay",
   "dashboardOverdueLabel": "Quá hạn",
   "dashboardReviewReadyMessage": "{count} thẻ đã sẵn sàng để ôn SRS.",
@@ -120,15 +120,19 @@
   "dashboardStudyTodayAction": "Học",
   "dashboardOpenLibraryAction": "Mở",
   "dashboardLibraryProgressTitle": "Tiến độ thư viện",
-  "dashboardLibraryProgressMessage": "{percent}% thành thạo · {folderCount} thư mục · {cardCount} thẻ",
+  "dashboardLibraryProgressMessage": "{percent}% thành thạo",
   "@dashboardLibraryProgressMessage": {
     "placeholders": {
       "percent": {
         "type": "int"
-      },
-      "folderCount": {
-        "type": "int"
-      },
+      }
+    }
+  },
+  "dashboardRecentDecksTitle": "Deck gần đây",
+  "dashboardStartDeckTitle": "Bắt đầu với deck",
+  "dashboardDeckStats": "{cardCount} thẻ",
+  "@dashboardDeckStats": {
+    "placeholders": {
       "cardCount": {
         "type": "int"
       }
@@ -284,13 +288,10 @@
   "foldersSegmentSubfolders": "Thư mục con",
   "foldersSegmentDecks": "Bộ thẻ",
   "foldersSubfolderDeckHint": "Để thêm bộ thẻ ở đây, hãy sắp xếp chúng trong một thư mục con.",
-  "foldersDeckCardProgress": "{cardCount} thẻ · {dueToday} thẻ đến hạn hôm nay",
-  "@foldersDeckCardProgress": {
+  "foldersDeckStats": "{cardCount} thẻ",
+  "@foldersDeckStats": {
     "placeholders": {
       "cardCount": {
-        "type": "int"
-      },
-      "dueToday": {
         "type": "int"
       }
     }

@@ -42,7 +42,7 @@
   "appShellProgressPlaceholderDescription": "Progress foundation is not wired yet.",
   "appShellSettingsPlaceholderDescription": "Settings foundation is not wired yet.",
   "dashboardHeading": "Today's study focus",
-  "dashboardSubtitle": "Choose the next useful study action: review, learn new cards, resume, or inspect library health.",
+  "dashboardSubtitle": "Review, study new cards, or continue a session.",
   "dashboardTodayReviewTitle": "Today Review",
   "dashboardOverdueLabel": "Overdue",
   "dashboardReviewReadyMessage": "{count} cards are ready for SRS review.",
@@ -80,7 +80,7 @@
   "dashboardResumeEmptyMessage": "No study session is waiting to resume.",
   "dashboardContinueSessionAction": "Resume",
   "dashboardLibraryHealthTitle": "Library health",
-  "dashboardLibraryHealthSummary": "{folderCount} folders · {deckCount} decks · {cardCount} cards",
+  "dashboardLibraryHealthSummary": "{folderCount, plural, =0{0 folders} =1{1 folder} other{{folderCount} folders}} · {deckCount, plural, =0{0 decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}",
   "@dashboardLibraryHealthSummary": {
     "placeholders": {
       "folderCount": {
@@ -120,15 +120,19 @@
   "dashboardStudyTodayAction": "Study",
   "dashboardOpenLibraryAction": "Open",
   "dashboardLibraryProgressTitle": "Library progress",
-  "dashboardLibraryProgressMessage": "{percent}% mastery · {folderCount} folders · {cardCount} cards",
+  "dashboardLibraryProgressMessage": "{percent}% mastery",
   "@dashboardLibraryProgressMessage": {
     "placeholders": {
       "percent": {
         "type": "int"
-      },
-      "folderCount": {
-        "type": "int"
-      },
+      }
+    }
+  },
+  "dashboardRecentDecksTitle": "Recent decks",
+  "dashboardStartDeckTitle": "Start a deck",
+  "dashboardDeckStats": "{cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}",
+  "@dashboardDeckStats": {
+    "placeholders": {
       "cardCount": {
         "type": "int"
       }
@@ -284,13 +288,10 @@
   "foldersSegmentSubfolders": "Subfolders",
   "foldersSegmentDecks": "Decks",
   "foldersSubfolderDeckHint": "To add decks here, organize them in a subfolder.",
-  "foldersDeckCardProgress": "{cardCount} cards · {dueToday} due today",
-  "@foldersDeckCardProgress": {
+  "foldersDeckStats": "{cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}",
+  "@foldersDeckStats": {
     "placeholders": {
       "cardCount": {
-        "type": "int"
-      },
-      "dueToday": {
         "type": "int"
       }
     }

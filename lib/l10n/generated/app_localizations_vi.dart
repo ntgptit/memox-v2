@@ -119,8 +119,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dashboardHeading => 'Trọng tâm học hôm nay';
 
   @override
-  String get dashboardSubtitle =>
-      'Chọn hành động học hữu ích tiếp theo: ôn bài, học thẻ mới, tiếp tục phiên, hoặc xem sức khỏe thư viện.';
+  String get dashboardSubtitle => 'Ôn bài, học thẻ mới hoặc tiếp tục phiên.';
 
   @override
   String get dashboardTodayReviewTitle => 'Ôn hôm nay';
@@ -220,12 +219,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dashboardLibraryProgressTitle => 'Tiến độ thư viện';
 
   @override
-  String dashboardLibraryProgressMessage(
-    int percent,
-    int folderCount,
-    int cardCount,
-  ) {
-    return '$percent% thành thạo · $folderCount thư mục · $cardCount thẻ';
+  String dashboardLibraryProgressMessage(int percent) {
+    return '$percent% thành thạo';
+  }
+
+  @override
+  String get dashboardRecentDecksTitle => 'Deck gần đây';
+
+  @override
+  String get dashboardStartDeckTitle => 'Bắt đầu với deck';
+
+  @override
+  String dashboardDeckStats(int cardCount) {
+    return '$cardCount thẻ';
   }
 
   @override
@@ -528,8 +534,8 @@ class AppLocalizationsVi extends AppLocalizations {
       'Để thêm bộ thẻ ở đây, hãy sắp xếp chúng trong một thư mục con.';
 
   @override
-  String foldersDeckCardProgress(int cardCount, int dueToday) {
-    return '$cardCount thẻ · $dueToday thẻ đến hạn hôm nay';
+  String foldersDeckStats(int cardCount) {
+    return '$cardCount thẻ';
   }
 
   @override

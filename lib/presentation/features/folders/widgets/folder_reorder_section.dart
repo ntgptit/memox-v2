@@ -63,7 +63,7 @@ class FolderReorderSection extends StatelessWidget {
               icon: Icons.style_outlined,
               metaLine: AppLocalizations.of(
                 context,
-              ).foldersDeckCardProgress(item.cardCount, item.dueToday),
+              ).foldersDeckStats(item.cardCount),
               trailing: MxText(
                 AppLocalizations.of(
                   context,

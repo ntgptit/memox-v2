@@ -1020,6 +1020,95 @@ void main() {
     );
 
     test(
+      'DT1 getDeckHighlights: returns recent decks before fallback decks',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final rootId = root.valueOrNull!.id;
+
+        final recentOlder = await harness.deckRepository.createDeck(
+          folderId: rootId,
+          name: 'Recent older',
+        );
+        final recentOlderCard = await harness.flashcardRepository
+            .createFlashcard(
+              deckId: recentOlder.valueOrNull!.id,
+              draft: const FlashcardDraft(front: 'old', back: 'cu'),
+            );
+
+        harness.clock.advance(const Duration(minutes: 1));
+        final fallbackOlder = await harness.deckRepository.createDeck(
+          folderId: rootId,
+          name: 'Fallback older',
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: fallbackOlder.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'fallback old', back: 'cu'),
+        );
+
+        harness.clock.advance(const Duration(minutes: 1));
+        final fallbackNewest = await harness.deckRepository.createDeck(
+          folderId: rootId,
+          name: 'Fallback newest',
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: fallbackNewest.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'fallback new', back: 'moi'),
+        );
+
+        harness.clock.advance(const Duration(minutes: 1));
+        final recentNewest = await harness.deckRepository.createDeck(
+          folderId: rootId,
+          name: 'Recent newest',
+        );
+        final recentNewestCard = await harness.flashcardRepository
+            .createFlashcard(
+              deckId: recentNewest.valueOrNull!.id,
+              draft: const FlashcardDraft(front: 'new', back: 'moi'),
+            );
+
+        harness.clock.advance(const Duration(minutes: 1));
+        await harness.deckRepository.createDeck(
+          folderId: rootId,
+          name: 'Empty deck',
+        );
+
+        await _setHighlightProgress(
+          harness,
+          flashcardId: recentOlderCard.valueOrNull!.id,
+          lastStudiedAt: 2000,
+          currentBox: 2,
+          dueAt: harness.clock.nowEpochMillis() + Duration.millisecondsPerDay,
+        );
+        await _setHighlightProgress(
+          harness,
+          flashcardId: recentNewestCard.valueOrNull!.id,
+          lastStudiedAt: 5000,
+          currentBox: 4,
+          dueAt: harness.clock.nowEpochMillis(),
+        );
+
+        final highlights = await harness.deckRepository.getDeckHighlights(
+          limit: 3,
+        );
+
+        expect(highlights, hasLength(3));
+        expect(highlights.map((item) => item.deck.name), <String>[
+          'Recent newest',
+          'Recent older',
+          'Fallback newest',
+        ]);
+        expect(
+          highlights.map((item) => item.deck.name),
+          isNot(contains('Empty deck')),
+        );
+        expect(highlights.first.dueTodayCount, 1);
+        expect(highlights.first.masteryPercent, 43);
+      },
+    );
+
+    test(
       'DT3 onSearchFilterSort: sort by last studied pushes never-studied decks to the end',
       () async {
         final folder = await harness.folderRepository.createRootFolder(
@@ -1309,6 +1398,27 @@ Future<void> _setProgressDueAt(
     FlashcardProgressCompanion(
       currentBox: const Value(2),
       reviewCount: const Value(1),
+      dueAt: Value(dueAt),
+      updatedAt: Value(now),
+    ),
+  );
+}
+
+Future<void> _setHighlightProgress(
+  ContentRepositoryHarness harness, {
+  required String flashcardId,
+  required int lastStudiedAt,
+  required int currentBox,
+  required int dueAt,
+}) {
+  final now = harness.clock.nowEpochMillis();
+  return (harness.database.update(
+    harness.database.flashcardProgress,
+  )..where((table) => table.flashcardId.equals(flashcardId))).write(
+    FlashcardProgressCompanion(
+      currentBox: Value(currentBox),
+      reviewCount: const Value(1),
+      lastStudiedAt: Value(lastStudiedAt),
       dueAt: Value(dueAt),
       updatedAt: Value(now),
     ),

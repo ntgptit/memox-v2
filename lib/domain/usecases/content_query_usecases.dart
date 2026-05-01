@@ -34,6 +34,16 @@ final class GetDeckActionContextUseCase {
   }
 }
 
+final class GetDeckHighlightsUseCase {
+  const GetDeckHighlightsUseCase(this._repository);
+
+  final DeckRepository _repository;
+
+  Future<List<DeckHighlightReadModel>> execute({required int limit}) {
+    return _repository.getDeckHighlights(limit: limit);
+  }
+}
+
 final class WatchFlashcardListUseCase {
   const WatchFlashcardListUseCase(this._repository);
 

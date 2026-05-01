@@ -60,6 +60,40 @@ final class DeckRepositoryImpl implements DeckRepository {
   }
 
   @override
+  Future<List<DeckHighlightReadModel>> getDeckHighlights({
+    required int limit,
+  }) async {
+    if (limit <= 0) {
+      return const <DeckHighlightReadModel>[];
+    }
+
+    final items = <DeckHighlightReadModel>[];
+    for (final deck in await _deckDao.listAllDecks()) {
+      final cardCount = await _deckDao.countFlashcardsInDeck(deck.id);
+      if (cardCount == 0) {
+        continue;
+      }
+      items.add(
+        DeckHighlightReadModel(
+          deck: deck.toDomain(),
+          cardCount: cardCount,
+          dueTodayCount: await _deckDao.countDueTodayInDeck(
+            deckId: deck.id,
+            endOfTodayEpochMillis: endOfTodayEpochMillis(_clock),
+          ),
+          masteryPercent: computeMasteryPercent(
+            await _deckDao.getCurrentBoxesInDeck(deck.id),
+          ),
+          lastStudiedAt: await _deckDao.getLastStudiedAtInDeck(deck.id),
+        ),
+      );
+    }
+
+    _sortDeckHighlights(items);
+    return items.take(limit).toList(growable: false);
+  }
+
+  @override
   Future<List<FolderDeckReadModel>> getDecksInFolder(
     String folderId,
     ContentQuery query,
@@ -363,6 +397,23 @@ final class DeckRepositoryImpl implements DeckRepository {
       throw const ValidationException(message: 'The name is required.');
     }
     return trimmed;
+  }
+
+  void _sortDeckHighlights(List<DeckHighlightReadModel> items) {
+    items.sort((a, b) {
+      final left = a.lastStudiedAt;
+      final right = b.lastStudiedAt;
+      if (left != null && right != null) {
+        return right.compareTo(left);
+      }
+      if (left != null) {
+        return -1;
+      }
+      if (right != null) {
+        return 1;
+      }
+      return b.deck.createdAt.compareTo(a.deck.createdAt);
+    });
   }
 
   void _sortDeckReadModels(

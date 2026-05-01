@@ -60,7 +60,7 @@ Sau khi lọc theo daily pool, flow tạo batch vẫn đi qua đúng rule của 
 Dashboard là entry point chính để trả lời câu hỏi user nên học gì trong ngày.
 Dashboard không được ưu tiên Library summary hơn hành động học.
 
-Dashboard phải tách rõ bốn khối nghiệp vụ:
+Dashboard phải tách rõ bốn khối nghiệp vụ chính:
 - Today Review:
   - số thẻ quá hạn
   - số thẻ due trong hôm nay
@@ -76,6 +76,16 @@ Dashboard phải tách rõ bốn khối nghiệp vụ:
   - tổng số deck
   - tổng số thẻ
   - mastery toàn thư viện
+
+Dashboard cũng hiển thị section gợi ý deck:
+- Recent decks:
+  - tối đa 3 deck có flashcard
+  - ưu tiên deck đã học gần nhất
+  - nếu chưa có deck từng học, fallback sang deck có flashcard mới tạo gần nhất với title Start a deck
+  - metadata deck chỉ hiển thị số flashcard
+  - số thẻ đến hạn nằm ở badge trên action học, không nằm trong metadata
+  - tap row mở danh sách flashcard của deck
+  - tap action học mở Study Entry cho deck đó
 
 Today Review chỉ tính thẻ đã học có `due_at` nằm trong hôm nay hoặc trước hôm nay.
 New Study chỉ tính thẻ chưa có tiến độ học hoàn chỉnh theo rule New Study hiện hành.

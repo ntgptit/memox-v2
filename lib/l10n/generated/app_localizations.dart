@@ -311,7 +311,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Choose the next useful study action: review, learn new cards, resume, or inspect library health.'**
+  /// **'Review, study new cards, or continue a session.'**
   String get dashboardSubtitle;
 
   /// No description provided for @dashboardTodayReviewTitle.
@@ -413,7 +413,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardLibraryHealthSummary.
   ///
   /// In en, this message translates to:
-  /// **'{folderCount} folders · {deckCount} decks · {cardCount} cards'**
+  /// **'{folderCount, plural, =0{0 folders} =1{1 folder} other{{folderCount} folders}} · {deckCount, plural, =0{0 decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}'**
   String dashboardLibraryHealthSummary(
     int folderCount,
     int deckCount,
@@ -477,12 +477,26 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardLibraryProgressMessage.
   ///
   /// In en, this message translates to:
-  /// **'{percent}% mastery · {folderCount} folders · {cardCount} cards'**
-  String dashboardLibraryProgressMessage(
-    int percent,
-    int folderCount,
-    int cardCount,
-  );
+  /// **'{percent}% mastery'**
+  String dashboardLibraryProgressMessage(int percent);
+
+  /// No description provided for @dashboardRecentDecksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent decks'**
+  String get dashboardRecentDecksTitle;
+
+  /// No description provided for @dashboardStartDeckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a deck'**
+  String get dashboardStartDeckTitle;
+
+  /// No description provided for @dashboardDeckStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}'**
+  String dashboardDeckStats(int cardCount);
 
   /// No description provided for @progressOverviewHeading.
   ///
@@ -1030,11 +1044,11 @@ abstract class AppLocalizations {
   /// **'To add decks here, organize them in a subfolder.'**
   String get foldersSubfolderDeckHint;
 
-  /// No description provided for @foldersDeckCardProgress.
+  /// No description provided for @foldersDeckStats.
   ///
   /// In en, this message translates to:
-  /// **'{cardCount} cards · {dueToday} due today'**
-  String foldersDeckCardProgress(int cardCount, int dueToday);
+  /// **'{cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}'**
+  String foldersDeckStats(int cardCount);
 
   /// No description provided for @foldersSubfolderCreatedMessage.
   ///

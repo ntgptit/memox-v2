@@ -48,4 +48,4 @@ final class DashboardOverviewProvider
   }
 }
 
-String _$dashboardOverviewHash() => r'0bdf09f8c910460894df3edfbf77c6583ff48f3b';
+String _$dashboardOverviewHash() => r'7652cb6af41739894396230a9b608bb063742217';

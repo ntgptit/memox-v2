@@ -7,6 +7,8 @@ import '../value_objects/content_read_models.dart';
 abstract interface class DeckRepository {
   Future<DeckActionContextReadModel> getDeckActionContext(String deckId);
 
+  Future<List<DeckHighlightReadModel>> getDeckHighlights({required int limit});
+
   Future<List<FolderDeckReadModel>> getDecksInFolder(
     String folderId,
     ContentQuery query,

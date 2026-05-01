@@ -215,6 +215,33 @@ void main() {
     },
   );
 
+  testWidgets('DT5 onDisplay: renders deck metadata without due status', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_deckFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Vitamin B1'), findsOneWidget);
+    expect(find.text('1 card'), findsOneWidget);
+    expect(find.text('1 cards · 1 due today'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
+  });
+
   testWidgets(
     'DT1 onInsert: unlocked folder uses FAB instead of inline choices',
     (WidgetTester tester) async {

@@ -67,9 +67,14 @@ void main() {
     await _pumpDashboard(tester, _studyReadyDashboardState);
 
     expect(find.text('Today\'s study focus'), findsOneWidget);
+    expect(
+      find.text('Review, study new cards, or continue a session.'),
+      findsOneWidget,
+    );
     expect(find.byType(PieChart), findsOneWidget);
     expect(find.text('Library progress'), findsOneWidget);
-    expect(find.text('30% mastery · 2 folders · 20 cards'), findsOneWidget);
+    expect(find.text('30% mastery'), findsOneWidget);
+    expect(find.text('30% mastery · 2 folders · 20 cards'), findsNothing);
     expect(find.text('2 folders · 3 decks · 20 cards'), findsOneWidget);
     expect(find.text('Mastery'), findsOneWidget);
     expect(find.text('30%'), findsOneWidget);
@@ -134,6 +139,65 @@ void main() {
         buttonWidths.first,
         lessThanOrEqualTo(_maximumCompactDashboardActionButtonWidth),
       );
+    },
+  );
+
+  testWidgets(
+    'DT4 onDisplay: renders singular library health without duplicated metadata',
+    (tester) async {
+      await _pumpDashboard(tester, _singleItemDashboardState);
+
+      expect(find.text('1% mastery'), findsOneWidget);
+      expect(find.text('1 folder · 1 deck · 1 card'), findsOneWidget);
+      expect(find.text('1% mastery · 1 folders · 1 cards'), findsNothing);
+      expect(find.textContaining('1 folders'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'DT5 onDisplay: renders recent deck highlights with content-only metadata',
+    (tester) async {
+      await _pumpDashboard(tester, _recentDecksDashboardState);
+      await _scrollDashboardToDeckHighlights(tester);
+
+      expect(find.text('Recent decks'), findsOneWidget);
+      expect(find.text('Start a deck'), findsNothing);
+      expect(find.text('Grammar'), findsOneWidget);
+      expect(find.text('Vocabulary'), findsOneWidget);
+      expect(find.text('Reading'), findsOneWidget);
+      expect(find.text('Writing'), findsNothing);
+      expect(find.text('12 cards'), findsOneWidget);
+      expect(find.text('12 cards · 4 due today'), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('dashboard_deck_study_deck-grammar')),
+          matching: find.text('4'),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'DT6 onDisplay: renders start deck title for fallback deck highlights',
+    (tester) async {
+      await _pumpDashboard(tester, _fallbackDecksDashboardState);
+      await _scrollDashboardToDeckHighlights(tester);
+
+      expect(find.text('Start a deck'), findsOneWidget);
+      expect(find.text('Recent decks'), findsNothing);
+      expect(find.text('Starter'), findsOneWidget);
+      expect(find.text('1 card'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT7 onDisplay: hides deck highlight section without suggested decks',
+    (tester) async {
+      await _pumpDashboard(tester, _idleDashboardState);
+
+      expect(find.text('Recent decks'), findsNothing);
+      expect(find.text('Start a deck'), findsNothing);
     },
   );
 
@@ -206,6 +270,47 @@ void main() {
       expect(router.routeInformationProvider.value.uri.path, '/progress');
     },
   );
+
+  testWidgets('DT5 onNavigate: tapping a recent deck row opens flashcards', (
+    tester,
+  ) async {
+    final router = _dashboardRouter();
+    addTearDown(router.dispose);
+    await _pumpDashboardRouter(tester, router, _recentDecksDashboardState);
+    await _scrollDashboardToDeckHighlights(tester);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('dashboard_deck_deck-grammar')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('dashboard_deck_deck-grammar')));
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/library/deck/deck-grammar/flashcards',
+    );
+  });
+
+  testWidgets(
+    'DT6 onNavigate: tapping a recent deck study action opens study',
+    (tester) async {
+      final router = _dashboardRouter();
+      addTearDown(router.dispose);
+      await _pumpDashboardRouter(tester, router, _recentDecksDashboardState);
+      await _scrollDashboardToDeckHighlights(tester);
+
+      await _tapDashboardButton(
+        tester,
+        const ValueKey('dashboard_deck_study_deck-grammar'),
+      );
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/library/study/deck/deck-grammar',
+      );
+    },
+  );
 }
 
 Future<void> _pumpDashboard(
@@ -254,6 +359,14 @@ Future<void> _tapDashboardButton(WidgetTester tester, Key key) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _scrollDashboardToDeckHighlights(WidgetTester tester) async {
+  await tester.drag(
+    find.byKey(const ValueKey('dashboard_content')),
+    const Offset(0, -900),
+  );
+  await tester.pumpAndSettle();
+}
+
 void _expectElevatedButtonEnabled(
   WidgetTester tester, {
   required Key key,
@@ -293,6 +406,12 @@ GoRouter _dashboardRouter() {
         builder: (context, state) => const SizedBox.shrink(),
         routes: [
           GoRoute(
+            path: RoutePaths.flashcardListSegment,
+            name: RouteNames.flashcardList,
+            builder: (context, state) =>
+                const SizedBox(key: ValueKey('flashcard_list_destination')),
+          ),
+          GoRoute(
             path: RoutePaths.studyTodaySegment,
             name: RouteNames.studyToday,
             builder: (context, state) => const SizedBox.shrink(),
@@ -301,6 +420,12 @@ GoRouter _dashboardRouter() {
             path: RoutePaths.studySessionSegment,
             name: RouteNames.studySession,
             builder: (context, state) => const SizedBox.shrink(),
+          ),
+          GoRoute(
+            path: RoutePaths.studyEntrySegment,
+            name: RouteNames.studyEntry,
+            builder: (context, state) =>
+                const SizedBox(key: ValueKey('study_entry_destination')),
           ),
         ],
       ),
@@ -338,6 +463,7 @@ const _studyReadyDashboardState = DashboardOverviewState(
   cardCount: 20,
   masteryPercent: 30,
   resumeSessionId: 'session-001',
+  deckHighlights: <DashboardDeckHighlightItem>[],
 );
 
 const _multipleSessionsDashboardState = DashboardOverviewState(
@@ -350,6 +476,7 @@ const _multipleSessionsDashboardState = DashboardOverviewState(
   cardCount: 20,
   masteryPercent: 30,
   resumeSessionId: null,
+  deckHighlights: <DashboardDeckHighlightItem>[],
 );
 
 const _newCardsOnlyDashboardState = DashboardOverviewState(
@@ -362,6 +489,7 @@ const _newCardsOnlyDashboardState = DashboardOverviewState(
   cardCount: 20,
   masteryPercent: 30,
   resumeSessionId: null,
+  deckHighlights: <DashboardDeckHighlightItem>[],
 );
 
 const _idleDashboardState = DashboardOverviewState(
@@ -374,4 +502,86 @@ const _idleDashboardState = DashboardOverviewState(
   cardCount: 0,
   masteryPercent: 0,
   resumeSessionId: null,
+  deckHighlights: <DashboardDeckHighlightItem>[],
+);
+
+const _singleItemDashboardState = DashboardOverviewState(
+  overdueCount: 0,
+  dueTodayCount: 0,
+  newCardCount: 0,
+  activeSessionCount: 0,
+  folderCount: 1,
+  deckCount: 1,
+  cardCount: 1,
+  masteryPercent: 1,
+  resumeSessionId: null,
+  deckHighlights: <DashboardDeckHighlightItem>[],
+);
+
+const _recentDecksDashboardState = DashboardOverviewState(
+  overdueCount: 0,
+  dueTodayCount: 0,
+  newCardCount: 0,
+  activeSessionCount: 0,
+  folderCount: 1,
+  deckCount: 4,
+  cardCount: 32,
+  masteryPercent: 25,
+  resumeSessionId: null,
+  deckHighlights: <DashboardDeckHighlightItem>[
+    DashboardDeckHighlightItem(
+      id: 'deck-grammar',
+      name: 'Grammar',
+      cardCount: 12,
+      dueTodayCount: 4,
+      masteryPercent: 43,
+      lastStudiedAt: 5000,
+    ),
+    DashboardDeckHighlightItem(
+      id: 'deck-vocabulary',
+      name: 'Vocabulary',
+      cardCount: 9,
+      dueTodayCount: 0,
+      masteryPercent: 29,
+      lastStudiedAt: 3000,
+    ),
+    DashboardDeckHighlightItem(
+      id: 'deck-reading',
+      name: 'Reading',
+      cardCount: 7,
+      dueTodayCount: 1,
+      masteryPercent: 14,
+      lastStudiedAt: null,
+    ),
+    DashboardDeckHighlightItem(
+      id: 'deck-writing',
+      name: 'Writing',
+      cardCount: 4,
+      dueTodayCount: 0,
+      masteryPercent: 0,
+      lastStudiedAt: null,
+    ),
+  ],
+);
+
+const _fallbackDecksDashboardState = DashboardOverviewState(
+  overdueCount: 0,
+  dueTodayCount: 0,
+  newCardCount: 0,
+  activeSessionCount: 0,
+  folderCount: 1,
+  deckCount: 1,
+  cardCount: 1,
+  masteryPercent: 0,
+  resumeSessionId: null,
+  deckHighlights: <DashboardDeckHighlightItem>[
+    DashboardDeckHighlightItem(
+      id: 'deck-starter',
+      name: 'Starter',
+      cardCount: 1,
+      dueTodayCount: 0,
+      masteryPercent: 0,
+      lastStudiedAt: null,
+    ),
+  ],
 );

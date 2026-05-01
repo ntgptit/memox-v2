@@ -132,6 +132,11 @@ GetDeckActionContextUseCase getDeckActionContextUseCase(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+GetDeckHighlightsUseCase getDeckHighlightsUseCase(Ref ref) {
+  return GetDeckHighlightsUseCase(ref.watch(deckRepositoryProvider));
+}
+
+@Riverpod(keepAlive: true)
 CreateFolderUseCase createFolderUseCase(Ref ref) {
   return CreateFolderUseCase(ref.watch(folderRepositoryProvider));
 }

@@ -120,7 +120,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardSubtitle =>
-      'Choose the next useful study action: review, learn new cards, resume, or inspect library health.';
+      'Review, study new cards, or continue a session.';
 
   @override
   String get dashboardTodayReviewTitle => 'Today Review';
@@ -185,7 +185,28 @@ class AppLocalizationsEn extends AppLocalizations {
     int deckCount,
     int cardCount,
   ) {
-    return '$folderCount folders · $deckCount decks · $cardCount cards';
+    String _temp0 = intl.Intl.pluralLogic(
+      folderCount,
+      locale: localeName,
+      other: '$folderCount folders',
+      one: '1 folder',
+      zero: '0 folders',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      deckCount,
+      locale: localeName,
+      other: '$deckCount decks',
+      one: '1 deck',
+      zero: '0 decks',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+      zero: '0 cards',
+    );
+    return '$_temp0 · $_temp1 · $_temp2';
   }
 
   @override
@@ -221,12 +242,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardLibraryProgressTitle => 'Library progress';
 
   @override
-  String dashboardLibraryProgressMessage(
-    int percent,
-    int folderCount,
-    int cardCount,
-  ) {
-    return '$percent% mastery · $folderCount folders · $cardCount cards';
+  String dashboardLibraryProgressMessage(int percent) {
+    return '$percent% mastery';
+  }
+
+  @override
+  String get dashboardRecentDecksTitle => 'Recent decks';
+
+  @override
+  String get dashboardStartDeckTitle => 'Start a deck';
+
+  @override
+  String dashboardDeckStats(int cardCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+      zero: '0 cards',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -530,8 +565,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'To add decks here, organize them in a subfolder.';
 
   @override
-  String foldersDeckCardProgress(int cardCount, int dueToday) {
-    return '$cardCount cards · $dueToday due today';
+  String foldersDeckStats(int cardCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+      zero: '0 cards',
+    );
+    return '$_temp0';
   }
 
   @override

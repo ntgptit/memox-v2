@@ -9,12 +9,15 @@ import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
+import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
+import '../../../shared/widgets/mx_study_progress_action.dart';
+import '../../../shared/widgets/mx_study_set_tile.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
 
@@ -143,6 +146,10 @@ class _DashboardContent extends StatelessWidget {
         _DashboardLibraryProgressCard(state: state),
         const MxGap(MxSpace.lg),
         _DashboardActionList(actions: actions),
+        if (state.deckHighlights.isNotEmpty) ...[
+          const MxGap(MxSpace.lg),
+          _DashboardDeckHighlightsSection(items: state.deckHighlights),
+        ],
       ],
     );
   }
@@ -356,11 +363,7 @@ class _DashboardLibraryProgressDetails extends StatelessWidget {
         ),
         const MxGap(MxSpace.xs),
         MxText(
-          l10n.dashboardLibraryProgressMessage(
-            percent,
-            state.folderCount,
-            state.cardCount,
-          ),
+          l10n.dashboardLibraryProgressMessage(percent),
           role: MxTextRole.contentBody,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -386,6 +389,62 @@ class _DashboardLibraryProgressDetails extends StatelessWidget {
           onPressed: () => context.goLibrary(),
         ),
       ],
+    );
+  }
+}
+
+class _DashboardDeckHighlightsSection extends StatelessWidget {
+  const _DashboardDeckHighlightsSection({required this.items});
+
+  final List<DashboardDeckHighlightItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final visibleItems = items
+        .take(dashboardDeckHighlightLimit)
+        .toList(growable: false);
+    final hasRecentDecks = visibleItems.any((item) => item.hasBeenStudied);
+
+    return MxSection(
+      title: hasRecentDecks
+          ? l10n.dashboardRecentDecksTitle
+          : l10n.dashboardStartDeckTitle,
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: visibleItems.length,
+        itemBuilder: (context, index) =>
+            _DashboardDeckHighlightTile(item: visibleItems[index]),
+        separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
+      ),
+    );
+  }
+}
+
+class _DashboardDeckHighlightTile extends StatelessWidget {
+  const _DashboardDeckHighlightTile({required this.item});
+
+  final DashboardDeckHighlightItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return MxStudySetTile(
+      key: ValueKey('dashboard_deck_${item.id}'),
+      title: item.name,
+      icon: Icons.style_outlined,
+      metaLine: l10n.dashboardDeckStats(item.cardCount),
+      onTap: () => context.goFlashcardList(item.id),
+      trailing: MxStudyProgressAction(
+        key: ValueKey('dashboard_deck_study_${item.id}'),
+        masteryPercent: item.masteryPercent,
+        badgeCount: item.dueTodayCount,
+        tooltip: l10n.studyStartAction,
+        onPressed: () =>
+            context.goStudyEntry(entryType: 'deck', entryRefId: item.id),
+      ),
     );
   }
 }

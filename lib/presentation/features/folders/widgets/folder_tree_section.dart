@@ -100,7 +100,7 @@ class _DeckRow extends StatelessWidget {
     return MxStudySetTile(
       title: item.name,
       icon: Icons.style_outlined,
-      metaLine: l10n.foldersDeckCardProgress(item.cardCount, item.dueToday),
+      metaLine: l10n.foldersDeckStats(item.cardCount),
       onTap: () => context.pushFlashcardList(item.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
       trailing: MxStudyProgressAction(

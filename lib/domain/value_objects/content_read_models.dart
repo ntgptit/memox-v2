@@ -66,6 +66,22 @@ final class FolderDeckReadModel {
   final int? lastStudiedAt;
 }
 
+final class DeckHighlightReadModel {
+  const DeckHighlightReadModel({
+    required this.deck,
+    required this.cardCount,
+    required this.dueTodayCount,
+    required this.masteryPercent,
+    required this.lastStudiedAt,
+  });
+
+  final DeckEntity deck;
+  final int cardCount;
+  final int dueTodayCount;
+  final int masteryPercent;
+  final int? lastStudiedAt;
+}
+
 final class FolderSubfolderReadModel {
   const FolderSubfolderReadModel({
     required this.folder,

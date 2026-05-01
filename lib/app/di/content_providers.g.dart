@@ -672,6 +672,54 @@ final class GetDeckActionContextUseCaseProvider
 String _$getDeckActionContextUseCaseHash() =>
     r'd0a448e75592f5229460be6911bf434c88ae1a5e';
 
+@ProviderFor(getDeckHighlightsUseCase)
+final getDeckHighlightsUseCaseProvider = GetDeckHighlightsUseCaseProvider._();
+
+final class GetDeckHighlightsUseCaseProvider
+    extends
+        $FunctionalProvider<
+          GetDeckHighlightsUseCase,
+          GetDeckHighlightsUseCase,
+          GetDeckHighlightsUseCase
+        >
+    with $Provider<GetDeckHighlightsUseCase> {
+  GetDeckHighlightsUseCaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getDeckHighlightsUseCaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getDeckHighlightsUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetDeckHighlightsUseCase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetDeckHighlightsUseCase create(Ref ref) {
+    return getDeckHighlightsUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetDeckHighlightsUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetDeckHighlightsUseCase>(value),
+    );
+  }
+}
+
+String _$getDeckHighlightsUseCaseHash() =>
+    r'd6300cbf5fef4d4a1dabf539f75942a57578ac86';
+
 @ProviderFor(createFolderUseCase)
 final createFolderUseCaseProvider = CreateFolderUseCaseProvider._();
 

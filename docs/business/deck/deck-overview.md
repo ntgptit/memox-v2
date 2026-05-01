@@ -12,6 +12,8 @@ Deck là đơn vị chứa flashcard và là đơn vị học cụ thể nhất.
 - Hỗ trợ export toàn bộ deck
 - Hỗ trợ tìm kiếm và sắp xếp danh sách deck
 - Khi mở deck từ folder, user đi thẳng vào danh sách flashcard của deck
+- Metadata deck trong cây folder chỉ mô tả nội dung tĩnh của deck, trước mắt là số flashcard
+- Số flashcard đến hạn của deck thuộc về badge trên action học, không nằm trong metadata
 
 ## Khi học từ deck
 - Chỉ lấy flashcard trong deck đó

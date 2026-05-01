@@ -31,7 +31,7 @@ MemoX là hệ thống học tập cá nhân dùng flashcard và spaced repetiti
 - Sắp xếp theo tên, mới nhất, học gần nhất
 - Tổ chức bộ thẻ để học
 - Hỗ trợ học từ deck, folder hoặc danh sách hôm nay
-- Dashboard định hướng học hằng ngày theo Today Review, New Study, Resume và Library health
+- Dashboard định hướng học hằng ngày theo Today Review, New Study, Resume, Library health và gợi ý deck gần đây
 - Điều phối phiên học
 - Lập lịch ôn theo SRS 8 box
 - Nhắc học
