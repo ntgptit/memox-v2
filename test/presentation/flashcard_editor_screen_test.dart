@@ -24,8 +24,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('New flashcard'), findsOneWidget);
-    expect(find.text('Save & add next'), findsOneWidget);
-    expect(find.text('Save flashcard'), findsOneWidget);
+    expect(find.text('Save + next'), findsOneWidget);
+    expect(find.text('Save'), findsOneWidget);
   });
 
   testWidgets('DT1 onDisplay: renders multiline front back and note fields', (
@@ -75,7 +75,7 @@ void main() {
 
       await tester.enterText(find.byType(TextFormField).at(0), 'Changed front');
       await tester.pump();
-      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save changes'));
+      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save'));
       await tester.pumpAndSettle();
 
       expect(find.text('You changed the learning content.'), findsOneWidget);
@@ -83,12 +83,10 @@ void main() {
         find.text('Keep existing progress or reset this card?'),
         findsOneWidget,
       );
-      expect(find.text('Keep progress'), findsOneWidget);
-      expect(find.text('Reset progress'), findsOneWidget);
+      expect(find.text('Keep'), findsOneWidget);
+      expect(find.text('Reset'), findsOneWidget);
 
-      await tester.tap(
-        find.widgetWithText(MxSecondaryButton, 'Reset progress'),
-      );
+      await tester.tap(find.widgetWithText(MxSecondaryButton, 'Reset'));
       await tester.pumpAndSettle();
 
       expect(
@@ -130,7 +128,7 @@ void main() {
 
       await tester.enterText(find.byType(TextFormField).at(2), 'Updated note');
       await tester.pump();
-      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save changes'));
+      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save'));
       await tester.pumpAndSettle();
 
       expect(find.text('You changed the learning content.'), findsNothing);

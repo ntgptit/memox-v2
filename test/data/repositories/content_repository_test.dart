@@ -958,7 +958,7 @@ void main() {
     );
 
     test(
-      'DT2 getLibraryOverview: returns folder study availability counts',
+      'DT2 getLibraryOverview: returns folder structural and study availability counts',
       () async {
         final root = await harness.folderRepository.createRootFolder(
           'Languages',
@@ -1011,6 +1011,8 @@ void main() {
           (item) => item.folder.id == root.valueOrNull!.id,
         );
 
+        expect(folder.subfolderCount, 1);
+        expect(folder.deckCount, 1);
         expect(folder.itemCount, 4);
         expect(folder.dueCardCount, 2);
         expect(folder.newCardCount, 1);

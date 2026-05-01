@@ -28,6 +28,8 @@ import 'package:memox/domain/study/strategy/study_strategy.dart';
 import 'package:memox/domain/study/strategy/study_strategy_factory.dart';
 import 'package:memox/domain/study/usecases/study_usecases.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
+import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../support/content_repository_harness.dart';
@@ -41,7 +43,7 @@ void main() {
       await harness.driver.startNewStudy();
 
       await harness.pumpApp(tester, RoutePaths.progress);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
       expect(find.text('In progress'), findsOneWidget);
       expect(find.text('Current card: $_alphaFront'), findsOneWidget);
@@ -75,7 +77,7 @@ void main() {
       await harness.pumpApp(tester, _studyEntryLocation(StudyEntryType.deck));
       await _pumpUntilFound(tester, find.text('Start a study session'));
 
-      expect(find.text('Study now'), findsOneWidget);
+      expect(find.widgetWithText(MxPrimaryButton, 'Study'), findsOneWidget);
       expect(find.text('Session in progress'), findsNothing);
       expect(find.text('Restart'), findsNothing);
     },
@@ -92,21 +94,21 @@ void main() {
       expect(find.text(_alphaFront), findsOneWidget);
       expect(find.text(_alphaBack), findsOneWidget);
 
-      await _tapText(tester, 'Study now');
+      await _tapText(tester, 'Study');
       await _pumpUntilFound(tester, find.text('Start a study session'));
 
-      await _tapText(tester, 'Study now');
+      await _tapText(tester, 'Study');
       await _pumpUntilFound(tester, find.text('Review'));
 
       expect(find.text(_alphaFront), findsOneWidget);
       expect(find.text(_alphaBack), findsOneWidget);
 
       await tester.tap(find.text('Progress').last);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
       expect(find.text('New Study · Deck'), findsOneWidget);
       expect(find.text('Current card: $_alphaFront'), findsOneWidget);
-      expect(find.text('0 of 2 cards · 2 remaining'), findsOneWidget);
+      expect(find.text('0 of 10 study steps · 2 remaining'), findsOneWidget);
 
       await _tapText(tester, 'Continue');
       await _pumpUntilFound(tester, find.text('Review'));
@@ -128,7 +130,7 @@ void main() {
 
       expect(find.text('Review · round 1'), findsOneWidget);
 
-      await _tapText(tester, 'Continue session');
+      await _tapText(tester, 'Continue');
       await _pumpUntilFound(tester, find.text('Review'));
 
       expect(find.text(_alphaFront), findsOneWidget);
@@ -145,13 +147,13 @@ void main() {
       await harness.pumpApp(tester, _studyEntryLocation(StudyEntryType.folder));
       await _pumpUntilFound(tester, find.text('Start a study session'));
 
-      await _tapText(tester, 'Study now');
+      await _tapText(tester, 'Study');
       await _pumpUntilFound(tester, find.text('Review'));
 
       expect(find.text(_alphaFront), findsOneWidget);
 
       await tester.tap(find.text('Progress').last);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
       expect(find.text('New Study · Folder'), findsOneWidget);
       expect(find.text('Current card: $_alphaFront'), findsOneWidget);
@@ -166,7 +168,7 @@ void main() {
       await harness.driver.startNewStudy();
 
       await harness.pumpApp(tester, RoutePaths.progress);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
       await _tapText(tester, 'Continue');
       await _pumpUntilFound(tester, find.text('Review'));
@@ -225,13 +227,13 @@ void main() {
       await harness.driver.finalize(ready);
 
       await harness.pumpApp(tester, _studyResultLocation(ready.session.id));
-      await _pumpUntilFound(tester, find.text('Study again'));
+      await _pumpUntilFound(tester, find.text('Study'));
 
-      await _tapText(tester, 'Study again');
+      await _tapText(tester, 'Study');
       await _pumpUntilFound(tester, find.text('Start a study session'));
 
       expect(find.text('Session in progress'), findsNothing);
-      expect(find.text('Study now'), findsOneWidget);
+      expect(find.widgetWithText(MxPrimaryButton, 'Study'), findsOneWidget);
     },
   );
 
@@ -244,7 +246,7 @@ void main() {
     await harness.pumpApp(tester, RoutePaths.progress);
     await _pumpUntilFound(tester, find.text('No active study sessions'));
 
-    await _tapText(tester, 'Open library');
+    await _tapText(tester, 'Open');
     await _pumpUntilFound(tester, find.text('Folders'));
 
     expect(find.text('Integration Folder'), findsOneWidget);
@@ -434,7 +436,7 @@ void main() {
 
       await harness.pumpApp(tester, _studyEntryLocation(StudyEntryType.deck));
       await _pumpUntilFound(tester, find.text('Start a study session'));
-      await _tapText(tester, 'Study now');
+      await _tapText(tester, 'Study');
       await _pumpUntilFound(tester, find.text('Review'));
       final sessionId = await harness.singleActiveSessionId();
 
@@ -457,11 +459,11 @@ void main() {
       final session = await harness.driver.startNewStudy();
 
       await harness.pumpApp(tester, RoutePaths.progress);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
-      await _tapText(tester, 'Cancel session');
+      await _tapText(tester, 'Cancel');
       await _pumpUntilFound(tester, find.text('Cancel this study session?'));
-      await tester.tap(find.text('Cancel session').last);
+      await tester.tap(find.text('Cancel').last);
       await _pumpUntilFound(tester, find.text('No active study sessions'));
 
       expect(await harness.sessionStatus(session.session.id), 'cancelled');
@@ -471,7 +473,7 @@ void main() {
 
       expect(find.text('Session in progress'), findsNothing);
       expect(find.text('Restart'), findsNothing);
-      expect(find.text('Study now'), findsOneWidget);
+      expect(find.widgetWithText(MxPrimaryButton, 'Study'), findsOneWidget);
     },
   );
 
@@ -513,9 +515,9 @@ void main() {
       await harness.pumpApp(tester, RoutePaths.progress);
       await _pumpUntilFound(tester, find.text('Finalize failed'));
 
-      expect(find.text('Retry finalize'), findsOneWidget);
+      expect(find.text('Retry'), findsOneWidget);
 
-      await _tapText(tester, 'Retry finalize');
+      await _tapText(tester, 'Retry');
       await _pumpUntilFound(tester, find.text('No active study sessions'));
 
       expect(await harness.sessionStatus(session.session.id), 'completed');
@@ -536,11 +538,11 @@ void main() {
       final session = await harness.driver.startNewStudy();
 
       await harness.pumpApp(tester, RoutePaths.progress);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
-      await _tapText(tester, 'Cancel session');
+      await _tapText(tester, 'Cancel');
       await _pumpUntilFound(tester, find.text('Cancel this study session?'));
-      await tester.tap(find.text('Cancel'));
+      await tester.tap(find.widgetWithText(MxSecondaryButton, 'Cancel').last);
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(await harness.sessionStatus(session.session.id), 'in_progress');
@@ -560,7 +562,7 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.close_rounded).first);
       await _pumpUntilFound(tester, find.text('Cancel this session?'));
-      await tester.tap(find.text('Cancel session').last);
+      await tester.tap(find.text('Cancel').last);
       await _pumpUntilFound(tester, find.text('Session summary'));
 
       expect(await harness.sessionStatus(ready.session.id), 'cancelled');
@@ -599,7 +601,7 @@ void main() {
       await _pumpUntilFound(tester, find.text('Match'));
 
       await harness.pumpApp(tester, RoutePaths.progress);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
       expect(find.text('Match · round 1'), findsOneWidget);
       expect(find.text('Current card: $_alphaFront'), findsOneWidget);
@@ -617,18 +619,18 @@ void main() {
       await _pumpUntilFound(tester, find.text('Session in progress'));
 
       await tester.scrollUntilVisible(
-        find.text('Start new session'),
+        find.text('Start'),
         300,
         scrollable: find.byType(Scrollable),
       );
-      await tester.tap(find.text('Start new session'));
+      await tester.tap(find.text('Start'));
       await _pumpUntilFound(
         tester,
         find.text(
           'Starting a new session will cancel the current unfinished session.',
         ),
       );
-      await tester.tap(find.text('Start new session').last);
+      await tester.tap(find.text('Start').last);
       await _pumpUntilFound(tester, find.text('Review'));
 
       expect(await harness.sessionStatus(oldSession.session.id), 'cancelled');
@@ -864,7 +866,7 @@ void main() {
       await _pumpUntilFound(tester, find.text('Start a study session'));
 
       expect(find.text('Session in progress'), findsNothing);
-      expect(find.text('Study now'), findsOneWidget);
+      expect(find.widgetWithText(MxPrimaryButton, 'Study'), findsOneWidget);
     },
   );
 
@@ -901,8 +903,8 @@ void main() {
     await harness.pumpApp(tester, RoutePaths.progress);
     await _pumpUntilFound(tester, find.text('No active study sessions'));
 
-    expect(find.text('Open library'), findsOneWidget);
-    expect(find.text('Study sessions'), findsNothing);
+    expect(find.text('Open'), findsOneWidget);
+    expect(find.text('Active sessions'), findsOneWidget);
   });
 
   testWidgets(
@@ -920,9 +922,9 @@ void main() {
       );
 
       await harness.pumpApp(tester, RoutePaths.progress);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
-      expect(find.text('Active'), findsOneWidget);
+      expect(find.text('Active'), findsWidgets);
       expect(find.text('Ready'), findsOneWidget);
       expect(find.text('Needs retry'), findsOneWidget);
       expect(find.text('Finalize failed'), findsWidgets);
@@ -941,7 +943,7 @@ void main() {
       await harness.driver.startNewStudy();
 
       await harness.pumpApp(tester, RoutePaths.progress);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
       expect(find.text('Review · round 1'), findsOneWidget);
       expect(find.text('Current card: $_alphaFront'), findsOneWidget);
@@ -961,7 +963,7 @@ void main() {
 
       expect(find.text('Finalize'), findsOneWidget);
       expect(find.text('Continue'), findsOneWidget);
-      expect(find.text('1 of 1 cards · 0 remaining'), findsOneWidget);
+      expect(find.text('1 of 1 study steps · 0 remaining'), findsOneWidget);
     },
   );
 
@@ -979,8 +981,8 @@ void main() {
       await harness.pumpApp(tester, RoutePaths.progress);
       await _pumpUntilFound(tester, find.text('Finalize failed'));
 
-      expect(find.text('Retry finalize'), findsOneWidget);
-      expect(find.text('Cancel session'), findsOneWidget);
+      expect(find.text('Retry'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
       expect(find.text('Finalize'), findsNothing);
     },
   );
@@ -1030,9 +1032,9 @@ void main() {
       final session = await harness.driver.startNewStudy();
 
       await harness.pumpApp(tester, RoutePaths.progress);
-      await _pumpUntilFound(tester, find.text('Study sessions'));
+      await _pumpUntilFound(tester, find.text('Active sessions'));
 
-      await _tapText(tester, 'Cancel session');
+      await _tapText(tester, 'Cancel');
       await _pumpUntilFound(tester, find.text('Cancel this study session?'));
 
       expect(await harness.sessionStatus(session.session.id), 'in_progress');
@@ -1057,7 +1059,7 @@ void main() {
 
       expect(find.text('Finalize'), findsOneWidget);
       expect(find.text('Continue'), findsOneWidget);
-      expect(find.text('Retry finalize'), findsNothing);
+      expect(find.text('Retry'), findsNothing);
     },
   );
 
@@ -1075,8 +1077,8 @@ void main() {
       await harness.pumpApp(tester, RoutePaths.progress);
       await _pumpUntilFound(tester, find.text('Finalize failed'));
 
-      expect(find.text('Retry finalize'), findsOneWidget);
-      expect(find.text('Cancel session'), findsOneWidget);
+      expect(find.text('Retry'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
       expect(find.text('Finalize'), findsNothing);
     },
   );
@@ -1097,10 +1099,25 @@ Future<void> _tapText(
   String text, {
   bool last = false,
 }) async {
-  final finder = last ? find.text(text).last : find.text(text);
+  final finder = _buttonTextFinder(text, last: last);
   await tester.ensureVisible(finder);
   await tester.pump(const Duration(milliseconds: 100));
   await tester.tap(finder);
+}
+
+Finder _buttonTextFinder(String text, {required bool last}) {
+  final buttonFinders = [
+    find.widgetWithText(MxPrimaryButton, text),
+    find.widgetWithText(MxSecondaryButton, text),
+  ];
+
+  for (final finder in buttonFinders) {
+    if (finder.evaluate().isNotEmpty) {
+      return last ? finder.last : finder.first;
+    }
+  }
+
+  return last ? find.text(text).last : find.text(text);
 }
 
 Future<void> _scrollUntilAnyFound(WidgetTester tester, Finder finder) async {
@@ -1122,7 +1139,7 @@ Future<String> _startStudyAndStopAtMode(
   await harness.pumpApp(tester, _studyEntryLocation(StudyEntryType.deck));
   await _pumpUntilFound(tester, find.text('Start a study session'));
 
-  await _tapText(tester, 'Study now');
+  await _tapText(tester, 'Study');
   await _pumpUntilFound(tester, find.text('Review'));
   final sessionId = await harness.singleActiveSessionId();
 
@@ -1157,7 +1174,7 @@ Future<String> _startStudyWithCachedProgressAndStopAtMode(
   await harness.pumpApp(tester, _studyEntryLocation(StudyEntryType.deck));
   await _pumpUntilFound(tester, find.text('Start a study session'));
 
-  await _tapText(tester, 'Study now');
+  await _tapText(tester, 'Study');
   await _pumpUntilFound(tester, find.text('Review'));
   final sessionId = await harness.singleActiveSessionId();
 
@@ -1209,7 +1226,7 @@ Future<String> _startStudyAndLeaveMatchRetry(
   await harness.pumpApp(tester, _studyEntryLocation(StudyEntryType.deck));
   await _pumpUntilFound(tester, find.text('Start a study session'));
 
-  await _tapText(tester, 'Study now');
+  await _tapText(tester, 'Study');
   await _pumpUntilFound(tester, find.text('Review'));
   final sessionId = await harness.singleActiveSessionId();
 
@@ -1290,7 +1307,7 @@ Future<void> _openStudyEntryAndContinue(
   _goToLocation(tester, _studyEntryLocation(StudyEntryType.deck));
   await tester.pump(const Duration(milliseconds: 100));
   await _pumpUntilFound(tester, find.text('Session in progress'));
-  await _tapText(tester, 'Continue session');
+  await _tapText(tester, 'Continue');
 }
 
 Future<void> _openProgressAndContinueAtMode(
@@ -1299,7 +1316,7 @@ Future<void> _openProgressAndContinueAtMode(
   required String modeTitle,
 }) async {
   await tester.tap(find.text('Progress').last);
-  await _pumpUntilFound(tester, find.text('Study sessions'));
+  await _pumpUntilFound(tester, find.text('Active sessions'));
   await _pumpUntilFound(tester, find.text(modeRoundLabel));
   await _tapText(tester, 'Continue');
   await _pumpUntilFound(tester, find.text(modeTitle));
@@ -1313,18 +1330,18 @@ Future<String> _openStudyEntryAndRestart(
   await tester.pump(const Duration(milliseconds: 100));
   await _pumpUntilFound(tester, find.text('Session in progress'));
   await tester.scrollUntilVisible(
-    find.text('Start new session'),
+    find.text('Start'),
     300,
     scrollable: find.byType(Scrollable),
   );
-  await tester.tap(find.text('Start new session'));
+  await tester.tap(find.text('Start'));
   await _pumpUntilFound(
     tester,
     find.text(
       'Starting a new session will cancel the current unfinished session.',
     ),
   );
-  await tester.tap(find.text('Start new session').last);
+  await tester.tap(find.text('Start').last);
   await _pumpUntilFound(tester, find.text('Review'));
   return harness.singleActiveSessionId();
 }

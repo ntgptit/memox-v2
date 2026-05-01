@@ -151,7 +151,7 @@ void main() {
   );
 
   testWidgets(
-    'DT1 onDisplay: renders subtree deck and card stats for subfolders',
+    'DT1 onDisplay: renders structural subtree metadata for subfolders',
     (WidgetTester tester) async {
       const folderId = 'folder-001';
       final container = ProviderContainer(
@@ -171,7 +171,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('1 decks · 2 cards'), findsOneWidget);
+      expect(find.text('0 subfolders · 1 deck · 2 cards'), findsOneWidget);
     },
   );
 
@@ -410,7 +410,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No matching items'), findsOneWidget);
-      expect(find.text('Clear search'), findsOneWidget);
+      expect(find.text('Clear'), findsOneWidget);
       expect(find.text('New deck'), findsNothing);
       expect(find.byType(FloatingActionButton), findsNothing);
     },
@@ -443,7 +443,7 @@ void main() {
   );
 
   testWidgets(
-    'DT3 onNavigate: opens recursive folder study from the subfolder card icon',
+    'DT3 onNavigate: opens recursive folder study from the subfolder card icon with due badge',
     (WidgetTester tester) async {
       const folderId = 'folder-001';
       const subfolderId = 'folder-002';
@@ -491,7 +491,7 @@ void main() {
         const ValueKey('folder_recursive_study_$subfolderId'),
       );
 
-      expect(find.text('Study now'), findsNothing);
+      expect(find.text('Study'), findsNothing);
       expect(studyButton, findsOneWidget);
       expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
       expect(find.text('19%'), findsOneWidget);
@@ -688,7 +688,7 @@ void main() {
     expect(find.text('Deck actions'), findsOneWidget);
     expect(find.text('Edit'), findsOneWidget);
     expect(find.text('Move'), findsOneWidget);
-    expect(find.text('Duplicate deck'), findsOneWidget);
+    expect(find.text('Duplicate'), findsOneWidget);
     expect(find.text('Export CSV'), findsOneWidget);
     expect(find.text('Delete'), findsOneWidget);
   });
@@ -711,8 +711,10 @@ const _sampleFolderState = FolderDetailState(
       id: 'folder-002',
       name: 'Vocabulary',
       icon: Icons.folder_copy_outlined,
+      subfolderCount: 0,
       deckCount: 1,
       itemCount: 2,
+      dueCardCount: 2,
       masteryPercent: 19,
     ),
   ],
@@ -735,8 +737,10 @@ const _parentFolderState = FolderDetailState(
       id: 'folder-001',
       name: 'Japanese N5',
       icon: Icons.folder_copy_outlined,
+      subfolderCount: 0,
       deckCount: 1,
       itemCount: 2,
+      dueCardCount: 0,
       masteryPercent: 19,
     ),
   ],
@@ -759,8 +763,10 @@ const _legacyFolderState = FolderDetailState(
       id: 'folder-legacy',
       name: 'Legacy',
       icon: Icons.folder_copy_outlined,
+      subfolderCount: 0,
       deckCount: 0,
       itemCount: 1,
+      dueCardCount: 0,
       masteryPercent: null,
     ),
   ],
@@ -785,7 +791,7 @@ const _deckFolderState = FolderDetailState(
       id: 'deck-001',
       name: 'Vitamin B1',
       cardCount: 1,
-      dueToday: 0,
+      dueToday: 1,
       masteryPercent: 42,
       lastStudiedAt: null,
     ),

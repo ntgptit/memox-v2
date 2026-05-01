@@ -57,7 +57,7 @@ Test file: `test/data/repositories/content_repository_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | daily study pool contains one overdue learned card, one due-today learned card, one future learned card, and one new card | library has two folders, one deck, four flashcards, and progress rows with overdue, today, and future `due_at` values | repository builds the library overview | `overdueCount=1`, `dueTodayCount=1`, `newCardCount=1`, and `totalFolderCount=2` are returned | C0+C1 |
-| DT2 | root folder subtree contains overdue, due-today, future, and new cards | root folder contains a nested child folder with one deck, four flashcards, and progress rows with overdue, today, future, and null `due_at` values | repository builds the library overview | the root folder item returns `itemCount=4`, `dueCardCount=2`, and `newCardCount=1` | C0+C1 |
+| DT2 | root folder subtree contains a child folder, one deck, overdue, due-today, future, and new cards | root folder contains a nested child folder with one deck, four flashcards, and progress rows with overdue, today, future, and null `due_at` values | repository builds the library overview | the root folder item returns `subfolderCount=1`, `deckCount=1`, `itemCount=4`, `dueCardCount=2`, and `newCardCount=1` | C0+C1 |
 
 ## Decision table: onMove
 

@@ -341,7 +341,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardReviewNowAction.
   ///
   /// In en, this message translates to:
-  /// **'Review now'**
+  /// **'Review'**
   String get dashboardReviewNowAction;
 
   /// No description provided for @dashboardNewStudyTitle.
@@ -371,7 +371,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardStartNewStudyAction.
   ///
   /// In en, this message translates to:
-  /// **'Start new study'**
+  /// **'Start'**
   String get dashboardStartNewStudyAction;
 
   /// No description provided for @dashboardResumeTitle.
@@ -401,7 +401,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardContinueSessionAction.
   ///
   /// In en, this message translates to:
-  /// **'Continue session'**
+  /// **'Resume'**
   String get dashboardContinueSessionAction;
 
   /// No description provided for @dashboardLibraryHealthTitle.
@@ -459,13 +459,13 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardStudyTodayAction.
   ///
   /// In en, this message translates to:
-  /// **'Study today'**
+  /// **'Study'**
   String get dashboardStudyTodayAction;
 
   /// No description provided for @dashboardOpenLibraryAction.
   ///
   /// In en, this message translates to:
-  /// **'Open library'**
+  /// **'Open'**
   String get dashboardOpenLibraryAction;
 
   /// No description provided for @dashboardLibraryProgressTitle.
@@ -1159,7 +1159,7 @@ abstract class AppLocalizations {
   /// No description provided for @foldersClearSearchAction.
   ///
   /// In en, this message translates to:
-  /// **'Clear search'**
+  /// **'Clear'**
   String get foldersClearSearchAction;
 
   /// No description provided for @libraryCreateFolderTooltip.
@@ -1225,14 +1225,8 @@ abstract class AppLocalizations {
   /// No description provided for @libraryFolderStats.
   ///
   /// In en, this message translates to:
-  /// **'{deckCount} decks · {itemCount} cards'**
-  String libraryFolderStats(int deckCount, int itemCount);
-
-  /// No description provided for @libraryFolderStudyStats.
-  ///
-  /// In en, this message translates to:
-  /// **'{cardCount} cards · {dueCount} due · {newCardCount} new'**
-  String libraryFolderStudyStats(int cardCount, int dueCount, int newCardCount);
+  /// **'{subfolderCount, plural, =0{0 subfolders} =1{1 subfolder} other{{subfolderCount} subfolders}} · {deckCount, plural, =0{0 decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}'**
+  String libraryFolderStats(int subfolderCount, int deckCount, int cardCount);
 
   /// No description provided for @libraryFolderMastery.
   ///
@@ -1291,7 +1285,7 @@ abstract class AppLocalizations {
   /// No description provided for @decksDuplicateAction.
   ///
   /// In en, this message translates to:
-  /// **'Duplicate deck'**
+  /// **'Duplicate'**
   String get decksDuplicateAction;
 
   /// No description provided for @decksExportCsvAction.
@@ -1405,13 +1399,13 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsOpenListAction.
   ///
   /// In en, this message translates to:
-  /// **'Open flashcards'**
+  /// **'Open'**
   String get flashcardsOpenListAction;
 
   /// No description provided for @flashcardsAddAction.
   ///
   /// In en, this message translates to:
-  /// **'Add flashcard'**
+  /// **'Add'**
   String get flashcardsAddAction;
 
   /// No description provided for @flashcardsAddTooltip.
@@ -1555,7 +1549,7 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsSaveAndAddNext.
   ///
   /// In en, this message translates to:
-  /// **'Save & add next'**
+  /// **'Save + next'**
   String get flashcardsSaveAndAddNext;
 
   /// No description provided for @flashcardsSavedMessage.
@@ -1567,13 +1561,13 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsSaveChanges.
   ///
   /// In en, this message translates to:
-  /// **'Save changes'**
+  /// **'Save'**
   String get flashcardsSaveChanges;
 
   /// No description provided for @flashcardsSaveAction.
   ///
   /// In en, this message translates to:
-  /// **'Save flashcard'**
+  /// **'Save'**
   String get flashcardsSaveAction;
 
   /// No description provided for @flashcardsLearningContentChangedTitle.
@@ -1591,13 +1585,13 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsKeepProgressAction.
   ///
   /// In en, this message translates to:
-  /// **'Keep progress'**
+  /// **'Keep'**
   String get flashcardsKeepProgressAction;
 
   /// No description provided for @flashcardsResetProgressAction.
   ///
   /// In en, this message translates to:
-  /// **'Reset progress'**
+  /// **'Reset'**
   String get flashcardsResetProgressAction;
 
   /// No description provided for @flashcardsUpdatedMessage.
@@ -1633,13 +1627,13 @@ abstract class AppLocalizations {
   /// No description provided for @studyStartAction.
   ///
   /// In en, this message translates to:
-  /// **'Study now'**
+  /// **'Study'**
   String get studyStartAction;
 
   /// No description provided for @studyStartNewSessionAction.
   ///
   /// In en, this message translates to:
-  /// **'Start new session'**
+  /// **'Start'**
   String get studyStartNewSessionAction;
 
   /// No description provided for @studyStartNewSessionConfirmTitle.
@@ -1675,7 +1669,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyContinueSessionAction.
   ///
   /// In en, this message translates to:
-  /// **'Continue session'**
+  /// **'Continue'**
   String get studyContinueSessionAction;
 
   /// No description provided for @studyFlowTitle.
@@ -1759,7 +1753,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyCancelAction.
   ///
   /// In en, this message translates to:
-  /// **'Cancel session'**
+  /// **'Cancel'**
   String get studyCancelAction;
 
   /// No description provided for @studyFinalizeAction.
@@ -1771,7 +1765,7 @@ abstract class AppLocalizations {
   /// No description provided for @studySkipAction.
   ///
   /// In en, this message translates to:
-  /// **'Skip card'**
+  /// **'Skip'**
   String get studySkipAction;
 
   /// No description provided for @studyTextSettingsTooltip.
@@ -1855,7 +1849,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyViewResultAction.
   ///
   /// In en, this message translates to:
-  /// **'View result'**
+  /// **'View'**
   String get studyViewResultAction;
 
   /// No description provided for @studyProgressModeRound.
@@ -1951,19 +1945,19 @@ abstract class AppLocalizations {
   /// No description provided for @studyResultReviewMoreAction.
   ///
   /// In en, this message translates to:
-  /// **'Review more'**
+  /// **'Review'**
   String get studyResultReviewMoreAction;
 
   /// No description provided for @studyResultStudyAgainAction.
   ///
   /// In en, this message translates to:
-  /// **'Study again'**
+  /// **'Study'**
   String get studyResultStudyAgainAction;
 
   /// No description provided for @studyRetryFinalizeAction.
   ///
   /// In en, this message translates to:
-  /// **'Retry finalize'**
+  /// **'Retry'**
   String get studyRetryFinalizeAction;
 
   /// No description provided for @studyResultCompleted.
@@ -2185,7 +2179,7 @@ abstract class AppLocalizations {
   /// No description provided for @studyCancelConfirmAction.
   ///
   /// In en, this message translates to:
-  /// **'Cancel session'**
+  /// **'Cancel'**
   String get studyCancelConfirmAction;
 
   /// No description provided for @flashcardsImportTitle.

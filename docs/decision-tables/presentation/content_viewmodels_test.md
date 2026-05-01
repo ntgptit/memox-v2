@@ -8,7 +8,7 @@ Test file: `test/presentation/content_viewmodels_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT1 | library overview query listens to content revisions and should refresh after root folder creation | repository starts empty and `libraryOverviewQueryProvider` is actively listened to | `libraryOverviewActionControllerProvider.createFolder('Japanese N5')` succeeds and provider pump flushes | subscription now contains folder `Japanese N5` with `Icons.folder_outlined` | C0+C1 |
 | DT2 | folder detail query listens to content revisions and should refresh after subfolder creation | root folder exists in unlocked mode and `folderDetailQueryProvider(root.id)` is actively listened to | `folderActionControllerProvider(root.id).createSubfolder('Vocabulary')` succeeds and provider pump flushes | state switches to subfolder mode and contains `Vocabulary` with `Icons.folder_copy_outlined` | C0+C1 |
-| DT3 | folder detail presenter aggregates descendant deck and flashcard counts for subfolder rows | root folder has child folder, the child has one deck, and that deck has two flashcards | `folderDetailQueryProvider(root.id)` resolves | subfolder item for child has `deckCount=1` and `itemCount=2` | C0+C1 |
+| DT3 | folder detail presenter aggregates descendant subfolder, deck, and flashcard counts for subfolder rows | root folder has child folder, the child has one nested subfolder, that nested subfolder has one deck, and that deck has two flashcards | `folderDetailQueryProvider(root.id)` resolves | subfolder item for child has `subfolderCount=1`, `deckCount=1`, and `itemCount=2` | C0+C1 |
 
 ## Decision table: onUpdate
 

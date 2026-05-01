@@ -17,7 +17,7 @@ Test file: `integration_test/app_test.dart`
 | DT17 | compact viewport opens a flashcard-list route whose deck id is missing | the app starts at `/library/deck/e2e-compact-missing/flashcards` on compact viewport | the flashcard list provider loads the route id | `Something went wrong` and `Deck not found.` are visible | C0+C1 |
 | DT18 | compact viewport opens an unknown route | the app starts at `/unknown-compact-route` on compact viewport | the router resolves the initial location | `Navigation error` and `Something went wrong.` are visible | C0+C1 |
 | DT19 | direct Today route opens study entry with review mode available | the app starts at `/library/study/today` | the study entry screen loads default settings | `Start a study session` and `SRS Review` are visible | C0+C1 |
-| DT20 | create-flashcard route opens for an existing empty deck | `E2E Create Route Deck` exists and the app starts at its `/flashcards/new` route | the editor draft provider builds a new-card draft | `New flashcard` and `Save flashcard` are visible | C0+C1 |
+| DT20 | create-flashcard route opens for an existing empty deck | `E2E Create Route Deck` exists and the app starts at its `/flashcards/new` route | the editor draft provider builds a new-card draft | `New flashcard` and `Save` are visible | C0+C1 |
 
 ## Decision table: onDisplay
 
@@ -35,7 +35,7 @@ Test file: `integration_test/app_test.dart`
 | DT17 | unlocked folder body exposes both content-direction actions | `E2E Unlocked Display Folder` exists and has no children | the user opens the folder detail route | `New subfolder` and `New deck` are visible | C0+C1 |
 | DT18 | subfolder-mode folder header displays child count | `E2E Subfolder Count Parent` contains one child folder | the parent folder detail rerenders after child creation | `Contains 1 subfolders` is visible | C0+C1 |
 | DT19 | flashcard list renders the empty deck state | `E2E Empty Overview Deck` exists with no flashcards | the flashcard-list route opens | `E2E Empty Overview Deck` and `No flashcards yet` are visible | C0+C1 |
-| DT20 | flashcard list keeps creation and import entry points for an empty deck | `E2E Never Studied Deck` exists with no flashcards | the flashcard-list route opens | `E2E Never Studied Deck`, `Add flashcard`, and `Import` are visible | C0+C1 |
+| DT20 | flashcard list keeps creation and import entry points for an empty deck | `E2E Never Studied Deck` exists with no flashcards | the flashcard-list route opens | `E2E Never Studied Deck`, `Add`, and `Import` are visible | C0+C1 |
 | DT21 | flashcard list route renders seeded card text | `E2E Seeded List Deck` contains one flashcard | the flashcard list route opens | `E2E Seeded List Front` and `E2E Seeded List Back` are visible | C0+C1 |
 | DT22 | study entry screen renders explanatory subtitle | `E2E Study Subtitle Front` is visible in a seeded deck | the user opens the study entry screen | `Choose a flow and snapshot settings for this session.` is visible | C0+C1 |
 | DT23 | Today study entry explains review-only v1 scope | the app starts at `/library/study/today` | the study entry screen renders the flow section | `Today supports SRS Review due and overdue cards in v1.` is visible | C0+C1 |
@@ -44,8 +44,8 @@ Test file: `integration_test/app_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT3 | dashboard primary action navigates to Library when no cards are due | the Home branch shows `Open library` because due count is zero | the user taps `Open library` | the Library branch opens and `No folders yet` is visible | C0+C1 |
-| DT4 | progress empty-state action navigates to Library | the Progress branch shows `Open library` in the empty state | the user taps `Open library` | the Library branch opens and `No folders yet` is visible | C0+C1 |
+| DT3 | dashboard primary action navigates to Library when no cards are due | the Home branch shows `Open` because due count is zero | the user taps `Open` | the Library branch opens and `No folders yet` is visible | C0+C1 |
+| DT4 | progress empty-state action navigates to Library | the Progress branch shows `Open` in the empty state | the user taps `Open` | the Library branch opens and `No folders yet` is visible | C0+C1 |
 | DT5 | Settings shell destination can return to Library | the app starts on Settings with shell navigation visible | the user taps `Library` | the Library branch opens and `No folders yet` is visible | C0+C1 |
 | DT6 | Library shell destination can open Home | the app starts on Library with shell navigation visible | the user taps `Home` | the Home branch opens and `Today's study focus` is visible | C0+C1 |
 | DT7 | Library shell destination can open Settings | the app starts on Library with shell navigation visible | the user taps `Settings` | the Settings branch opens and `Appearance` is visible | C0+C1 |
@@ -56,7 +56,7 @@ Test file: `integration_test/app_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT12 | library search trims surrounding whitespace before matching | `E2E Trim Alpha Folder` and `E2E Trim Beta Folder` both exist | the user searches for `  Beta  ` | only `E2E Trim Beta Folder` remains visible | C0+C1 |
-| DT13 | folder no-result clear action restores filtered rows | `E2E Clear Button Folder` exists and search has no matches | the user taps `Clear search` from the no-results state | `E2E Clear Button Folder` becomes visible again | C0+C1 |
+| DT13 | folder no-result clear action restores filtered rows | `E2E Clear Button Folder` exists and search has no matches | the user taps `Clear` from the no-results state | `E2E Clear Button Folder` becomes visible again | C0+C1 |
 | DT14 | deck search trims surrounding whitespace before matching | `E2E Search Alpha Deck` and `E2E Search Beta Deck` both exist in one folder | the user searches for `  Beta  ` | only `E2E Search Beta Deck` remains visible | C0+C1 |
 | DT15 | flashcard back-text search trims surrounding whitespace before matching | `E2E Search Alpha` has unrelated back text and `E2E Search Beta` has back text containing `Needle` | the user searches for `  Needle  ` | only `E2E Search Beta` remains visible | C0+C1 |
 | DT16 | unmatched flashcard search renders empty state instead of stale rows | `E2E Search Alpha` and `E2E Search Beta` exist in the opened deck | the user searches for `missing flashcard term` | `No flashcards yet` is visible and `E2E Search Alpha` is absent | C0+C1 |

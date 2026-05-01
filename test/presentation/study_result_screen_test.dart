@@ -67,8 +67,8 @@ void main() {
       await tester.drag(find.byType(ListView), const Offset(0, -500));
       await tester.pumpAndSettle();
 
-      expect(find.text('Review more'), findsOneWidget);
-      expect(find.text('Study again'), findsOneWidget);
+      expect(find.text('Review'), findsOneWidget);
+      expect(find.text('Study'), findsOneWidget);
     },
   );
 

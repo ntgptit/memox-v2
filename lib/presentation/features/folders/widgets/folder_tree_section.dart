@@ -69,13 +69,17 @@ class _SubfolderRow extends StatelessWidget {
     return MxFolderTile(
       name: item.name,
       icon: item.icon,
-      caption: l10n.libraryFolderStats(item.deckCount, item.itemCount),
+      caption: l10n.libraryFolderStats(
+        item.subfolderCount,
+        item.deckCount,
+        item.itemCount,
+      ),
       onTap: () => onOpenSubfolder(item.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
       trailing: MxStudyProgressAction(
         key: ValueKey('folder_recursive_study_${item.id}'),
         masteryPercent: item.masteryPercent,
-        cardCount: item.itemCount,
+        badgeCount: item.dueCardCount,
         tooltip: l10n.studyStartAction,
         onPressed: () =>
             context.goStudyEntry(entryType: 'folder', entryRefId: item.id),
@@ -102,7 +106,7 @@ class _DeckRow extends StatelessWidget {
       trailing: MxStudyProgressAction(
         key: ValueKey('deck_study_${item.id}'),
         masteryPercent: item.masteryPercent,
-        cardCount: item.cardCount,
+        badgeCount: item.dueToday,
         tooltip: l10n.studyStartAction,
         onPressed: () =>
             context.goStudyEntry(entryType: 'deck', entryRefId: item.id),

@@ -54,7 +54,7 @@
     }
   },
   "dashboardReviewEmptyMessage": "No review cards are due right now.",
-  "dashboardReviewNowAction": "Review now",
+  "dashboardReviewNowAction": "Review",
   "dashboardNewStudyTitle": "New Study",
   "dashboardNewCardsLabel": "New cards available",
   "dashboardNewStudyMessage": "{count} new cards are ready for a deck or folder session.",
@@ -66,7 +66,7 @@
     }
   },
   "dashboardNewStudyEmptyMessage": "Add or import cards before starting a new study session.",
-  "dashboardStartNewStudyAction": "Start new study",
+  "dashboardStartNewStudyAction": "Start",
   "dashboardResumeTitle": "Resume",
   "dashboardActiveSessionsLabel": "Active sessions",
   "dashboardResumeMessage": "{count} sessions can be continued or finalized.",
@@ -78,7 +78,7 @@
     }
   },
   "dashboardResumeEmptyMessage": "No study session is waiting to resume.",
-  "dashboardContinueSessionAction": "Continue session",
+  "dashboardContinueSessionAction": "Resume",
   "dashboardLibraryHealthTitle": "Library health",
   "dashboardLibraryHealthSummary": "{folderCount} folders · {deckCount} decks · {cardCount} cards",
   "@dashboardLibraryHealthSummary": {
@@ -117,8 +117,8 @@
   },
   "dashboardNoDueTitle": "No cards due now",
   "dashboardNoDueMessage": "Open your library to add cards or start a focused deck session.",
-  "dashboardStudyTodayAction": "Study today",
-  "dashboardOpenLibraryAction": "Open library",
+  "dashboardStudyTodayAction": "Study",
+  "dashboardOpenLibraryAction": "Open",
   "dashboardLibraryProgressTitle": "Library progress",
   "dashboardLibraryProgressMessage": "{percent}% mastery · {folderCount} folders · {cardCount} cards",
   "@dashboardLibraryProgressMessage": {
@@ -315,7 +315,7 @@
   "foldersEmptyDecksMessage": "Create a deck to start adding flashcards here.",
   "foldersNoResultsTitle": "No matching items",
   "foldersNoResultsMessage": "Clear search or try a different term.",
-  "foldersClearSearchAction": "Clear search",
+  "foldersClearSearchAction": "Clear",
   "libraryCreateFolderTooltip": "Create folder",
   "libraryCreateFolderDialogTitle": "Create folder",
   "libraryFolderCreatedMessage": "Folder created.",
@@ -333,27 +333,16 @@
       }
     }
   },
-  "libraryFolderStats": "{deckCount} decks · {itemCount} cards",
+  "libraryFolderStats": "{subfolderCount, plural, =0{0 subfolders} =1{1 subfolder} other{{subfolderCount} subfolders}} · {deckCount, plural, =0{0 decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}",
   "@libraryFolderStats": {
     "placeholders": {
+      "subfolderCount": {
+        "type": "int"
+      },
       "deckCount": {
         "type": "int"
       },
-      "itemCount": {
-        "type": "int"
-      }
-    }
-  },
-  "libraryFolderStudyStats": "{cardCount} cards · {dueCount} due · {newCardCount} new",
-  "@libraryFolderStudyStats": {
-    "placeholders": {
       "cardCount": {
-        "type": "int"
-      },
-      "dueCount": {
-        "type": "int"
-      },
-      "newCardCount": {
         "type": "int"
       }
     }
@@ -374,7 +363,7 @@
   "decksCreatedMessage": "Deck created.",
   "decksMoreActionsTooltip": "More actions",
   "decksActionsTitle": "Deck actions",
-  "decksDuplicateAction": "Duplicate deck",
+  "decksDuplicateAction": "Duplicate",
   "decksExportCsvAction": "Export CSV",
   "decksOverviewSubtitle": "{cardCount} cards · {dueToday} due today · {masteryPercent}% mastery",
   "@decksOverviewSubtitle": {
@@ -411,8 +400,8 @@
   "decksDeleteTitle": "Delete deck",
   "decksDeleteMessage": "This will delete the entire deck and all flashcards inside it.",
   "decksDeletedMessage": "Deck deleted.",
-  "flashcardsOpenListAction": "Open flashcards",
-  "flashcardsAddAction": "Add flashcard",
+  "flashcardsOpenListAction": "Open",
+  "flashcardsAddAction": "Add",
   "flashcardsAddTooltip": "Add flashcard",
   "flashcardsActionsTitle": "Flashcard actions",
   "flashcardsSearchHint": "Search flashcards",
@@ -443,27 +432,27 @@
   "flashcardsFieldNoteHint": "Optional extra note",
   "flashcardsLongContentHelper": "Supports multiple lines. Keep the full answer readable during study.",
   "flashcardsNoteHelper": "Optional context, examples, or memory hints.",
-  "flashcardsSaveAndAddNext": "Save & add next",
+  "flashcardsSaveAndAddNext": "Save + next",
   "flashcardsSavedMessage": "Flashcard saved.",
-  "flashcardsSaveChanges": "Save changes",
-  "flashcardsSaveAction": "Save flashcard",
+  "flashcardsSaveChanges": "Save",
+  "flashcardsSaveAction": "Save",
   "flashcardsLearningContentChangedTitle": "You changed the learning content.",
   "flashcardsLearningContentChangedMessage": "Keep existing progress or reset this card?",
-  "flashcardsKeepProgressAction": "Keep progress",
-  "flashcardsResetProgressAction": "Reset progress",
+  "flashcardsKeepProgressAction": "Keep",
+  "flashcardsResetProgressAction": "Reset",
   "flashcardsUpdatedMessage": "Flashcard updated.",
   "flashcardsCreatedMessage": "Flashcard created.",
   "studyEntryTitle": "Study",
   "studyEntryHeading": "Start a study session",
   "studyEntrySubtitle": "Choose a flow and snapshot settings for this session.",
-  "studyStartAction": "Study now",
-  "studyStartNewSessionAction": "Start new session",
+  "studyStartAction": "Study",
+  "studyStartNewSessionAction": "Start",
   "studyStartNewSessionConfirmTitle": "Start a new session?",
   "studyStartNewSessionConfirmMessage": "Starting a new session will cancel the current unfinished session.",
   "studyRestartAction": "Restart",
   "studyResumeTitle": "Session in progress",
   "studyResumeAction": "Continue",
-  "studyContinueSessionAction": "Continue session",
+  "studyContinueSessionAction": "Continue",
   "studyFlowTitle": "Study flow",
   "studyTypeNew": "New Study",
   "studyTypeReview": "SRS Review",
@@ -494,9 +483,9 @@
   "studyShuffleAnswers": "Shuffle answers",
   "studyPrioritizeOverdue": "Prioritize overdue cards",
   "studySessionTitle": "Study session",
-  "studyCancelAction": "Cancel session",
+  "studyCancelAction": "Cancel",
   "studyFinalizeAction": "Finalize",
-  "studySkipAction": "Skip card",
+  "studySkipAction": "Skip",
   "studyTextSettingsTooltip": "Text settings",
   "studyAudioTooltip": "Audio",
   "studyMoreActionsTooltip": "More actions",
@@ -517,7 +506,7 @@
     }
   },
   "studySessionEnded": "This session has ended.",
-  "studyViewResultAction": "View result",
+  "studyViewResultAction": "View",
   "studyProgressModeRound": "{mode} · round {round}",
   "@studyProgressModeRound": {
     "placeholders": {
@@ -561,9 +550,9 @@
       }
     }
   },
-  "studyResultReviewMoreAction": "Review more",
-  "studyResultStudyAgainAction": "Study again",
-  "studyRetryFinalizeAction": "Retry finalize",
+  "studyResultReviewMoreAction": "Review",
+  "studyResultStudyAgainAction": "Study",
+  "studyRetryFinalizeAction": "Retry",
   "studyResultCompleted": "Completed",
   "studyResultCancelled": "Cancelled",
   "studyResultFailedFinalize": "Finalize failed. Retry when ready.",
@@ -617,7 +606,7 @@
   "studyEmptyAnswerMessage": "Enter an answer before submitting.",
   "studyCancelConfirmTitle": "Cancel this session?",
   "studyCancelConfirmMessage": "Your current study session will stop and you will be taken to the result screen.",
-  "studyCancelConfirmAction": "Cancel session",
+  "studyCancelConfirmAction": "Cancel",
   "flashcardsImportTitle": "Import flashcards",
   "importSourceTitle": "Source",
   "importSourceSubtitle": "Import is preview-first and atomic. Any invalid line blocks the entire write.",

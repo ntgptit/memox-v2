@@ -97,12 +97,13 @@ void main() {
     );
 
     test(
-      'DT3 onSearchFilterSort: folder detail query exposes subtree deck and card stats for subfolders',
+      'DT3 onSearchFilterSort: folder detail query exposes structural subtree counts for subfolders',
       () async {
         final harness = ContentRepositoryHarness.create(
           ids: [
             'folder-root',
             'folder-child',
+            'folder-grandchild',
             'deck-child',
             'flashcard-001',
             'flashcard-002',
@@ -128,8 +129,12 @@ void main() {
           parentFolderId: root.id,
           name: 'Topik I',
         )).valueOrNull!;
+        final grandchild = (await harness.folderRepository.createSubfolder(
+          parentFolderId: child.id,
+          name: 'Grammar',
+        )).valueOrNull!;
         final deck = (await harness.deckRepository.createDeck(
-          folderId: child.id,
+          folderId: grandchild.id,
           name: 'Vitamin B1',
         )).valueOrNull!;
 
@@ -150,6 +155,7 @@ void main() {
         );
 
         expect(state.isSubfolderMode, isTrue);
+        expect(subfolder.subfolderCount, 1);
         expect(subfolder.deckCount, 1);
         expect(subfolder.itemCount, 2);
       },

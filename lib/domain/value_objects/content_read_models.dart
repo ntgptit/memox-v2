@@ -14,6 +14,7 @@ final class LibraryFolderReadModel {
   const LibraryFolderReadModel({
     required this.folder,
     required this.breadcrumb,
+    required this.subfolderCount,
     required this.deckCount,
     required this.itemCount,
     required this.dueCardCount,
@@ -24,6 +25,7 @@ final class LibraryFolderReadModel {
 
   final FolderEntity folder;
   final List<String> breadcrumb;
+  final int subfolderCount;
   final int deckCount;
   final int itemCount;
   final int dueCardCount;
@@ -67,14 +69,18 @@ final class FolderDeckReadModel {
 final class FolderSubfolderReadModel {
   const FolderSubfolderReadModel({
     required this.folder,
+    required this.subfolderCount,
     required this.deckCount,
     required this.itemCount,
+    required this.dueCardCount,
     required int? masteryPercent,
   }) : _masteryPercent = masteryPercent;
 
   final FolderEntity folder;
+  final int subfolderCount;
   final int deckCount;
   final int itemCount;
+  final int dueCardCount;
   final int? _masteryPercent;
 
   int get masteryPercent => _masteryPercent ?? 0;

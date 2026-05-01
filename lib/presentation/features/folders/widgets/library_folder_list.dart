@@ -57,10 +57,10 @@ class _LibraryFolderRow extends StatelessWidget {
     return MxFolderTile(
       name: folder.name,
       icon: folder.icon,
-      caption: l10n.libraryFolderStudyStats(
+      caption: l10n.libraryFolderStats(
+        folder.subfolderCount,
+        folder.deckCount,
         folder.itemCount,
-        folder.dueCardCount,
-        folder.newCardCount,
       ),
       supportingCaption: l10n.libraryFolderMastery(folder.masteryPercent),
       onTap: () => onOpenFolder(folder.id),
@@ -68,7 +68,7 @@ class _LibraryFolderRow extends StatelessWidget {
       trailing: MxStudyProgressAction(
         key: ValueKey('library_folder_recursive_study_${folder.id}'),
         masteryPercent: folder.masteryPercent,
-        cardCount: folder.itemCount,
+        badgeCount: folder.dueCardCount,
         tooltip: l10n.studyStartAction,
         onPressed: () => onStartStudy(folder.id),
       ),

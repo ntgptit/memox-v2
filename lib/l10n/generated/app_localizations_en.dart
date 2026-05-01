@@ -138,7 +138,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'No review cards are due right now.';
 
   @override
-  String get dashboardReviewNowAction => 'Review now';
+  String get dashboardReviewNowAction => 'Review';
 
   @override
   String get dashboardNewStudyTitle => 'New Study';
@@ -156,7 +156,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add or import cards before starting a new study session.';
 
   @override
-  String get dashboardStartNewStudyAction => 'Start new study';
+  String get dashboardStartNewStudyAction => 'Start';
 
   @override
   String get dashboardResumeTitle => 'Resume';
@@ -174,7 +174,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'No study session is waiting to resume.';
 
   @override
-  String get dashboardContinueSessionAction => 'Continue session';
+  String get dashboardContinueSessionAction => 'Resume';
 
   @override
   String get dashboardLibraryHealthTitle => 'Library health';
@@ -212,10 +212,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Open your library to add cards or start a focused deck session.';
 
   @override
-  String get dashboardStudyTodayAction => 'Study today';
+  String get dashboardStudyTodayAction => 'Study';
 
   @override
-  String get dashboardOpenLibraryAction => 'Open library';
+  String get dashboardOpenLibraryAction => 'Open';
 
   @override
   String get dashboardLibraryProgressTitle => 'Library progress';
@@ -601,7 +601,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get foldersNoResultsMessage => 'Clear search or try a different term.';
 
   @override
-  String get foldersClearSearchAction => 'Clear search';
+  String get foldersClearSearchAction => 'Clear';
 
   @override
   String get libraryCreateFolderTooltip => 'Create folder';
@@ -636,17 +636,29 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String libraryFolderStats(int deckCount, int itemCount) {
-    return '$deckCount decks · $itemCount cards';
-  }
-
-  @override
-  String libraryFolderStudyStats(
-    int cardCount,
-    int dueCount,
-    int newCardCount,
-  ) {
-    return '$cardCount cards · $dueCount due · $newCardCount new';
+  String libraryFolderStats(int subfolderCount, int deckCount, int cardCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      subfolderCount,
+      locale: localeName,
+      other: '$subfolderCount subfolders',
+      one: '1 subfolder',
+      zero: '0 subfolders',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      deckCount,
+      locale: localeName,
+      other: '$deckCount decks',
+      one: '1 deck',
+      zero: '0 decks',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+      zero: '0 cards',
+    );
+    return '$_temp0 · $_temp1 · $_temp2';
   }
 
   @override
@@ -680,7 +692,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get decksActionsTitle => 'Deck actions';
 
   @override
-  String get decksDuplicateAction => 'Duplicate deck';
+  String get decksDuplicateAction => 'Duplicate';
 
   @override
   String get decksExportCsvAction => 'Export CSV';
@@ -749,10 +761,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get decksDeletedMessage => 'Deck deleted.';
 
   @override
-  String get flashcardsOpenListAction => 'Open flashcards';
+  String get flashcardsOpenListAction => 'Open';
 
   @override
-  String get flashcardsAddAction => 'Add flashcard';
+  String get flashcardsAddAction => 'Add';
 
   @override
   String get flashcardsAddTooltip => 'Add flashcard';
@@ -832,16 +844,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Optional context, examples, or memory hints.';
 
   @override
-  String get flashcardsSaveAndAddNext => 'Save & add next';
+  String get flashcardsSaveAndAddNext => 'Save + next';
 
   @override
   String get flashcardsSavedMessage => 'Flashcard saved.';
 
   @override
-  String get flashcardsSaveChanges => 'Save changes';
+  String get flashcardsSaveChanges => 'Save';
 
   @override
-  String get flashcardsSaveAction => 'Save flashcard';
+  String get flashcardsSaveAction => 'Save';
 
   @override
   String get flashcardsLearningContentChangedTitle =>
@@ -852,10 +864,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Keep existing progress or reset this card?';
 
   @override
-  String get flashcardsKeepProgressAction => 'Keep progress';
+  String get flashcardsKeepProgressAction => 'Keep';
 
   @override
-  String get flashcardsResetProgressAction => 'Reset progress';
+  String get flashcardsResetProgressAction => 'Reset';
 
   @override
   String get flashcardsUpdatedMessage => 'Flashcard updated.';
@@ -874,10 +886,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose a flow and snapshot settings for this session.';
 
   @override
-  String get studyStartAction => 'Study now';
+  String get studyStartAction => 'Study';
 
   @override
-  String get studyStartNewSessionAction => 'Start new session';
+  String get studyStartNewSessionAction => 'Start';
 
   @override
   String get studyStartNewSessionConfirmTitle => 'Start a new session?';
@@ -896,7 +908,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyResumeAction => 'Continue';
 
   @override
-  String get studyContinueSessionAction => 'Continue session';
+  String get studyContinueSessionAction => 'Continue';
 
   @override
   String get studyFlowTitle => 'Study flow';
@@ -943,13 +955,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studySessionTitle => 'Study session';
 
   @override
-  String get studyCancelAction => 'Cancel session';
+  String get studyCancelAction => 'Cancel';
 
   @override
   String get studyFinalizeAction => 'Finalize';
 
   @override
-  String get studySkipAction => 'Skip card';
+  String get studySkipAction => 'Skip';
 
   @override
   String get studyTextSettingsTooltip => 'Text settings';
@@ -993,7 +1005,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studySessionEnded => 'This session has ended.';
 
   @override
-  String get studyViewResultAction => 'View result';
+  String get studyViewResultAction => 'View';
 
   @override
   String studyProgressModeRound(Object mode, int round) {
@@ -1047,13 +1059,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get studyResultReviewMoreAction => 'Review more';
+  String get studyResultReviewMoreAction => 'Review';
 
   @override
-  String get studyResultStudyAgainAction => 'Study again';
+  String get studyResultStudyAgainAction => 'Study';
 
   @override
-  String get studyRetryFinalizeAction => 'Retry finalize';
+  String get studyRetryFinalizeAction => 'Retry';
 
   @override
   String get studyResultCompleted => 'Completed';
@@ -1172,7 +1184,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your current study session will stop and you will be taken to the result screen.';
 
   @override
-  String get studyCancelConfirmAction => 'Cancel session';
+  String get studyCancelConfirmAction => 'Cancel';
 
   @override
   String get flashcardsImportTitle => 'Import flashcards';

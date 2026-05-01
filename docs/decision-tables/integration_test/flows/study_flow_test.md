@@ -12,8 +12,8 @@ Test file: `integration_test/app_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT4 | study entry renders default flow and session settings before a session is created | the seeded deck route contains `E2E Entry Prompt` and the flashcard list exposes `Study now` | the user opens the study entry screen but does not confirm the start action | `Start a study session`, `New Study`, `SRS Review`, `Batch size: 10`, and all session toggles are visible | C0+C1 |
-| DT7 | seeded flashcard list displays the study entry action before navigation | the seeded deck route contains `E2E Action Prompt` and at least one flashcard exists | the flashcard list route renders | the flashcard front and `Study now` action are visible without widget exceptions | C0+C1 |
+| DT4 | study entry renders default flow and session settings before a session is created | the seeded deck route contains `E2E Entry Prompt` and the flashcard list exposes `Study` | the user opens the study entry screen but does not confirm the start action | `Start a study session`, `New Study`, `SRS Review`, `Batch size: 10`, and all session toggles are visible | C0+C1 |
+| DT7 | seeded flashcard list displays the study entry action before navigation | the seeded deck route contains `E2E Action Prompt` and at least one flashcard exists | the flashcard list route renders | the flashcard front and `Study` action are visible without widget exceptions | C0+C1 |
 
 ## Decision table: onUpdate
 
@@ -27,4 +27,4 @@ Test file: `integration_test/app_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | flashcard list has at least one card, so `Study now` is enabled and starts a new-study session | the in-memory database contains `E2E Study Deck` with flashcard front `E2E Prompt` and back `E2E Answer` | the robot opens the seeded flashcard list, taps `Study now`, confirms the study entry action, and waits for the session | review mode shows `Review`, `E2E Prompt`, and `E2E Answer`, with no widget exception recorded | C0+C1 |
+| DT1 | flashcard list has at least one card, so `Study` is enabled and starts a new-study session | the in-memory database contains `E2E Study Deck` with flashcard front `E2E Prompt` and back `E2E Answer` | the robot opens the seeded flashcard list, taps `Study`, confirms the study entry action, and waits for the session | review mode shows `Review`, `E2E Prompt`, and `E2E Answer`, with no widget exception recorded | C0+C1 |

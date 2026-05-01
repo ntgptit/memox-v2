@@ -59,6 +59,9 @@ final class FolderRepositoryImpl implements FolderRepository {
     final startOfToday = startOfTodayEpochMillis(_clock);
     final endOfToday = endOfTodayEpochMillis(_clock);
     for (final folder in folders) {
+      final subfolderCount = await _folderDao.countSubfoldersInSubtree(
+        folder.id,
+      );
       final deckCount = await _folderDao.countDecksInSubtree(folder.id);
       final itemCount = await _folderDao.countFlashcardsInSubtree(folder.id);
       final dueCardCount = await _folderDao.countDueCardsInSubtree(
@@ -78,6 +81,7 @@ final class FolderRepositoryImpl implements FolderRepository {
         LibraryFolderReadModel(
           folder: folder.toDomain(),
           breadcrumb: await _folderDao.getBreadcrumbNames(folder.id),
+          subfolderCount: subfolderCount,
           deckCount: deckCount,
           itemCount: itemCount,
           dueCardCount: dueCardCount,
@@ -163,8 +167,15 @@ final class FolderRepositoryImpl implements FolderRepository {
       subfolderItems.add(
         FolderSubfolderReadModel(
           folder: subfolder,
+          subfolderCount: await _folderDao.countSubfoldersInSubtree(
+            subfolder.id,
+          ),
           deckCount: await _folderDao.countDecksInSubtree(subfolder.id),
           itemCount: await _folderDao.countFlashcardsInSubtree(subfolder.id),
+          dueCardCount: await _folderDao.countDueCardsInSubtree(
+            folderId: subfolder.id,
+            endOfTodayEpochMillis: endOfTodayEpochMillis(_clock),
+          ),
           masteryPercent: computeMasteryPercent(
             await _folderDao.getCurrentBoxesInSubtree(subfolder.id),
           ),

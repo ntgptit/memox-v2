@@ -13,16 +13,16 @@ Test file: `test/presentation/flashcard_list_screen_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | loaded deck has two flashcard rows and manual sort mode | `FlashcardListState` contains deck name `Korean deck` and two items | flashcard list renders loaded data | deck name, `Front 1`, `Back 1`, and `Front 2` are visible | C0+C1 |
-| DT2 | loaded deck has no flashcards and study must be disabled while creation/import remain available | `FlashcardListState` contains no items and manual sort mode | flashcard list renders the empty deck branch | `No flashcards yet`, `Add flashcard`, and `Import` are visible, while primary `Study now` has `onPressed == null` | C0+C1 |
+| DT2 | loaded deck has no flashcards and study must be disabled while creation/import remain available | `FlashcardListState` contains no items and manual sort mode | flashcard list renders the empty deck branch | `No flashcards yet`, `Add`, and `Import` are visible, while primary `Study` has `onPressed == null` | C0+C1 |
 | DT3 | loaded deck has many flashcards and list rendering must stay lazy instead of building every row on entry | `FlashcardListState` contains eighty items and a mobile viewport | flashcard list first renders, then user scrolls to the final item | `CustomScrollView` and `flashcard_lazy_items` are used, initially built rows are fewer than total items, `Front 79` is absent before scrolling, then `Front 79` and `Back 79` appear after scroll | C0+C1 |
-| DT4 | compact toolbar lays out sort chip plus trailing import/reorder actions | `FlashcardListState` contains two items and the viewport is compact width | flashcard list renders the toolbar | the `Reorder` action right edge aligns with the full-width `Study now` action right edge, keeping import/reorder anchored to the content edge | C0+C1 |
+| DT4 | compact toolbar lays out sort chip plus trailing import/reorder actions | `FlashcardListState` contains two items and the viewport is compact width | flashcard list renders the toolbar | the `Reorder` action right edge aligns with the full-width `Study` action right edge, keeping import/reorder anchored to the content edge | C0+C1 |
 
 ## Decision table: onNavigate
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | flashcard management owns the deck study entry point for non-empty decks | loaded deck has two flashcards and is routed at `/deck/deck-001/flashcards` | user taps `Study now` in the toolbar | route path becomes `/study/deck/deck-001` | C0+C1 |
-| DT2 | flashcard management header exposes deck-level actions without a separate deck screen | loaded deck has two flashcards and header more action is present | user taps tooltip `More actions` | `Deck actions`, `Edit`, `Move`, `Duplicate deck`, `Export CSV`, and `Delete` are visible | C0+C1 |
+| DT1 | flashcard management owns the deck study entry point for non-empty decks | loaded deck has two flashcards and is routed at `/deck/deck-001/flashcards` | user taps `Study` in the toolbar | route path becomes `/study/deck/deck-001` | C0+C1 |
+| DT2 | flashcard management header exposes deck-level actions without a separate deck screen | loaded deck has two flashcards and header more action is present | user taps tooltip `More actions` | `Deck actions`, `Edit`, `Move`, `Duplicate`, `Export CSV`, and `Delete` are visible | C0+C1 |
 
 ## Decision table: onDelete
 

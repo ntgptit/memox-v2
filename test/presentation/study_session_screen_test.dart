@@ -111,7 +111,7 @@ void main() {
     expect(find.text('Correct'), findsNothing);
     expect(find.text('Incorrect'), findsNothing);
     expect(find.text('Continue'), findsNothing);
-    expect(find.text('Skip card'), findsNothing);
+    expect(find.text('Skip'), findsNothing);
   });
 
   testWidgets(
@@ -188,7 +188,7 @@ void main() {
 
     expect(find.text('Forgot'), findsNothing);
     expect(find.text('Remembered'), findsNothing);
-    expect(find.text('Skip card'), findsNothing);
+    expect(find.text('Skip'), findsNothing);
   });
 
   testWidgets(
@@ -328,7 +328,7 @@ void main() {
       expect(longMeaning.style!.fontWeight, shortMeaning.style!.fontWeight);
       expect(longMeaning.maxLines, 4);
       expect(longMeaning.overflow, TextOverflow.ellipsis);
-      expect(find.text('Skip card'), findsNothing);
+      expect(find.text('Skip'), findsNothing);
     },
   );
 
@@ -502,7 +502,7 @@ void main() {
     expect(find.text('Correct'), findsNothing);
     expect(find.text('Incorrect'), findsNothing);
     expect(find.text('Continue'), findsNothing);
-    expect(find.text('Skip card'), findsNothing);
+    expect(find.text('Skip'), findsNothing);
     expect(questionHeight.height, closeTo(answerHeight.height, 0.1));
   });
 
@@ -552,7 +552,7 @@ void main() {
     expect(inputTextField.maxLines, isNull);
     expect(inputTextField.minLines, isNull);
     expect(find.text('Continue'), findsNothing);
-    expect(find.text('Skip card'), findsNothing);
+    expect(find.text('Skip'), findsNothing);
   });
 
   testWidgets(
@@ -614,9 +614,9 @@ void main() {
       await _pumpStudyScreenData(tester);
 
       expect(find.text('Fill'), findsOneWidget);
-      expect(find.byTooltip('Cancel session'), findsOneWidget);
+      expect(find.byTooltip('Cancel'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Cancel session'));
+      await tester.tap(find.byTooltip('Cancel'));
       await tester.pumpAndSettle();
 
       expect(find.text('Cancel this session?'), findsOneWidget);
@@ -1631,7 +1631,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('This session has ended.'), findsOneWidget);
-    expect(find.text('View result'), findsOneWidget);
+    expect(find.text('View'), findsOneWidget);
   });
 }
 

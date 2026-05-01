@@ -250,6 +250,14 @@ final class FolderDao {
     return row.read(_database.decks.id.count()) ?? 0;
   }
 
+  Future<int> countSubfoldersInSubtree(String folderId) async {
+    final subtreeIds = await getSubtreeIds(folderId);
+    if (subtreeIds.isEmpty) {
+      return 0;
+    }
+    return subtreeIds.length - 1;
+  }
+
   Future<int> countFlashcardsInSubtree(String folderId) async {
     final subtreeIds = await getSubtreeIds(folderId);
     if (subtreeIds.isEmpty) {

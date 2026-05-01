@@ -209,7 +209,7 @@ void main() {
   );
 
   testWidgets(
-    'DT3 onUpdate: mode-specific scaffold does not expose cancel action',
+    'DT3 onUpdate: mode-specific scaffold confirms before cancel action',
     (tester) async {
       final repo = _CancelOnlyStudyRepo();
 
@@ -225,7 +225,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byTooltip('Cancel session'), findsNothing);
+      await tester.tap(find.byTooltip('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cancel this session?'), findsOneWidget);
       expect(repo.cancelCount, 0);
     },
   );

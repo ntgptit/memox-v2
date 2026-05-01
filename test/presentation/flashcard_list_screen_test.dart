@@ -151,13 +151,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final studyButtonFinder = find.widgetWithText(
-        MxPrimaryButton,
-        'Study now',
-      );
+      final studyButtonFinder = find.widgetWithText(MxPrimaryButton, 'Study');
 
       expect(find.text('No flashcards yet'), findsOneWidget);
-      expect(find.text('Add flashcard'), findsOneWidget);
+      expect(find.text('Add'), findsOneWidget);
       expect(find.text('Import'), findsOneWidget);
       expect(studyButtonFinder, findsOneWidget);
       expect(
@@ -194,7 +191,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final studyButtonRect = tester.getRect(
-        find.widgetWithText(ElevatedButton, 'Study now'),
+        find.widgetWithText(ElevatedButton, 'Study'),
       );
       final reorderButtonRect = tester.getRect(
         find.ancestor(
@@ -254,7 +251,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Study now'));
+    await tester.tap(find.text('Study'));
     await tester.pumpAndSettle();
 
     expect(
@@ -290,7 +287,7 @@ void main() {
       expect(find.text('Deck actions'), findsOneWidget);
       expect(find.text('Edit'), findsOneWidget);
       expect(find.text('Move'), findsOneWidget);
-      expect(find.text('Duplicate deck'), findsOneWidget);
+      expect(find.text('Duplicate'), findsOneWidget);
       expect(find.text('Export CSV'), findsOneWidget);
       expect(find.text('Delete'), findsOneWidget);
     },

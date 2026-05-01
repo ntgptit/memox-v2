@@ -12,7 +12,8 @@ Test file: `test/presentation/library_overview_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | loaded library overview has greeting data and one root folder with study availability counts | state contains greeting `Good morning, Lan` and folder `Korean1` with seventeen cards, three due cards, five new cards, and nineteen percent mastery | library overview renders loaded branch | greeting, `Folders`, folder title, `17 cards · 3 due · 5 new`, and `Mastery 19%` are visible | C0+C1 |
+| DT1 | loaded library overview has greeting data and one root folder with structural metadata | state contains greeting `Good morning, Lan` and folder `Korean1` with one subfolder, one deck, seventeen cards, three due cards, five new cards, and nineteen percent mastery | library overview renders loaded branch | greeting, `Folders`, folder title, `1 subfolder · 1 deck · 17 cards`, and `Mastery 19%` are visible, while `17 cards · 3 due · 5 new` is absent | C0+C1 |
+| DT2 | loaded library overview receives a legacy folder object whose new `subfolderCount` field is null | state contains folder `Korean1` with null subfolder count, one deck, and seventeen cards | library overview renders loaded branch | folder title is visible and metadata falls back to `0 subfolders · 1 deck · 17 cards` without throwing | C0+C1 |
 
 ## Decision table: onInsert
 
@@ -24,7 +25,7 @@ Test file: `test/presentation/library_overview_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | root folder row exposes recursive study icon and routes to folder study entry | root folder `folder-root-001` has seventeen cards, three due cards, five new cards, and nineteen percent mastery | user taps `library_folder_recursive_study_folder-root-001` | route path becomes `/study/folder/folder-root-001`, `17 cards · 3 due · 5 new`, `Mastery 19%`, `19%`, and the card-count badge remain visible before navigation | C0+C1 |
+| DT1 | root folder row exposes recursive study icon and routes to folder study entry | root folder `folder-root-001` has one subfolder, one deck, seventeen cards, three due cards, five new cards, and nineteen percent mastery | user taps `library_folder_recursive_study_folder-root-001` | route path becomes `/study/folder/folder-root-001`, `1 subfolder · 1 deck · 17 cards`, `Mastery 19%`, `19%`, and the due-count badge remain visible before navigation | C0+C1 |
 | DT2 | normal folder tap still calls the open-folder callback instead of the direct action sheet | `LibraryFolderSliver` is rendered with `onOpenFolder` callback | user taps `MxFolderTile` | callback receives `folder-root-001` | C0+C1 |
 
 ## Decision table: onSelect

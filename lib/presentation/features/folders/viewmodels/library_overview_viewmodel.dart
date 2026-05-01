@@ -77,6 +77,7 @@ Future<LibraryOverviewState> libraryOverviewQuery(Ref ref) async {
             id: item.folder.id,
             name: item.folder.name,
             icon: Icons.folder_outlined,
+            subfolderCount: item.subfolderCount,
             deckCount: item.deckCount,
             itemCount: item.itemCount,
             dueCardCount: item.dueCardCount,

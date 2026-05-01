@@ -12,6 +12,8 @@ import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overv
 import 'package:memox/presentation/shared/states/mx_error_state.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 
+const _maximumCompactDashboardActionButtonWidth = 160.0;
+
 void main() {
   testWidgets(
     'DT1 onOpen: shows loading state while dashboard overview loads',
@@ -76,7 +78,7 @@ void main() {
     expect(find.text('Due today: 2'), findsOneWidget);
     expect(find.text('New Study'), findsOneWidget);
     expect(find.text('New cards available: 7'), findsOneWidget);
-    expect(find.text('Resume'), findsOneWidget);
+    expect(find.text('Resume'), findsWidgets);
     expect(find.text('Active sessions: 1'), findsOneWidget);
   });
 
@@ -106,7 +108,37 @@ void main() {
   );
 
   testWidgets(
-    'DT1 onNavigate: Review now opens Today study entry when review cards exist',
+    'DT3 onDisplay: keeps dashboard action buttons concise and equal width',
+    (tester) async {
+      const reviewKey = ValueKey('dashboard_review_now_action');
+      const startKey = ValueKey('dashboard_start_new_study_action');
+      const resumeKey = ValueKey('dashboard_continue_session_action');
+
+      await _pumpDashboard(tester, _newCardsOnlyDashboardState);
+
+      _expectDashboardActionLabel(reviewKey, 'Review');
+      _expectDashboardActionLabel(startKey, 'Start');
+      _expectDashboardActionLabel(resumeKey, 'Resume');
+      expect(find.text('Review now'), findsNothing);
+      expect(find.text('Start new study'), findsNothing);
+      expect(find.text('Continue session'), findsNothing);
+
+      final buttonWidths = [
+        _dashboardActionButtonSize(tester, reviewKey).width,
+        _dashboardActionButtonSize(tester, startKey).width,
+        _dashboardActionButtonSize(tester, resumeKey).width,
+      ];
+
+      expect(buttonWidths.toSet(), hasLength(1));
+      expect(
+        buttonWidths.first,
+        lessThanOrEqualTo(_maximumCompactDashboardActionButtonWidth),
+      );
+    },
+  );
+
+  testWidgets(
+    'DT1 onNavigate: Review opens Today study entry when review cards exist',
     (tester) async {
       final router = _dashboardRouter();
       addTearDown(router.dispose);
@@ -124,9 +156,7 @@ void main() {
     },
   );
 
-  testWidgets('DT2 onNavigate: Start new study opens Library selection', (
-    tester,
-  ) async {
+  testWidgets('DT2 onNavigate: Start opens Library selection', (tester) async {
     final router = _dashboardRouter();
     addTearDown(router.dispose);
     await _pumpDashboardRouter(tester, router, _studyReadyDashboardState);
@@ -139,27 +169,26 @@ void main() {
     expect(router.routeInformationProvider.value.uri.path, '/library');
   });
 
+  testWidgets('DT3 onNavigate: Resume opens single resumable session', (
+    tester,
+  ) async {
+    final router = _dashboardRouter();
+    addTearDown(router.dispose);
+    await _pumpDashboardRouter(tester, router, _studyReadyDashboardState);
+
+    await _tapDashboardButton(
+      tester,
+      const ValueKey('dashboard_continue_session_action'),
+    );
+
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/library/study/session/session-001',
+    );
+  });
+
   testWidgets(
-    'DT3 onNavigate: Continue session opens single resumable session',
-    (tester) async {
-      final router = _dashboardRouter();
-      addTearDown(router.dispose);
-      await _pumpDashboardRouter(tester, router, _studyReadyDashboardState);
-
-      await _tapDashboardButton(
-        tester,
-        const ValueKey('dashboard_continue_session_action'),
-      );
-
-      expect(
-        router.routeInformationProvider.value.uri.path,
-        '/library/study/session/session-001',
-      );
-    },
-  );
-
-  testWidgets(
-    'DT4 onNavigate: Continue session opens Progress when multiple sessions exist',
+    'DT4 onNavigate: Resume opens Progress when multiple sessions exist',
     (tester) async {
       final router = _dashboardRouter();
       addTearDown(router.dispose);
@@ -238,6 +267,17 @@ void _expectElevatedButtonEnabled(
   expect(button.onPressed, isEnabled ? isNotNull : isNull);
 }
 
+Size _dashboardActionButtonSize(WidgetTester tester, Key key) {
+  return tester.getSize(find.byKey(key));
+}
+
+void _expectDashboardActionLabel(Key key, String label) {
+  expect(
+    find.descendant(of: find.byKey(key), matching: find.text(label)),
+    findsOneWidget,
+  );
+}
+
 GoRouter _dashboardRouter() {
   return GoRouter(
     initialLocation: RoutePaths.home,
@@ -305,6 +345,18 @@ const _multipleSessionsDashboardState = DashboardOverviewState(
   dueTodayCount: 2,
   newCardCount: 7,
   activeSessionCount: 2,
+  folderCount: 2,
+  deckCount: 3,
+  cardCount: 20,
+  masteryPercent: 30,
+  resumeSessionId: null,
+);
+
+const _newCardsOnlyDashboardState = DashboardOverviewState(
+  overdueCount: 0,
+  dueTodayCount: 0,
+  newCardCount: 7,
+  activeSessionCount: 0,
   folderCount: 2,
   deckCount: 3,
   cardCount: 20,

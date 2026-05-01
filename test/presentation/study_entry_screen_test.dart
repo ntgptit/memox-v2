@@ -108,13 +108,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Session in progress'), findsOneWidget);
-      expect(find.text('Continue session'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
       await tester.scrollUntilVisible(
-        find.text('Start new session'),
+        find.text('Start'),
         300,
         scrollable: find.byType(Scrollable),
       );
-      expect(find.text('Start new session'), findsOneWidget);
+      expect(find.text('Start'), findsOneWidget);
       expect(find.text('Restart'), findsNothing);
     },
   );
@@ -200,11 +200,11 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.scrollUntilVisible(
-        find.text('Start new session'),
+        find.text('Start'),
         300,
         scrollable: find.byType(Scrollable),
       );
-      await tester.tap(find.text('Start new session'));
+      await tester.tap(find.text('Start'));
       await tester.pumpAndSettle();
 
       expect(find.text('Start a new session?'), findsOneWidget);

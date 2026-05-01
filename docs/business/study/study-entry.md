@@ -28,9 +28,9 @@ Rule của mỗi flow: xem [New Study Flow](./new-study-flow.md) và [SRS Review
 ## Rule resume và bắt đầu phiên mới
 
 - Nếu entry point đang có session dang dở có thể resume, Study Entry phải tách rõ 2 CTA:
-  - `Continue session`: mở đúng session đang dang dở, không tạo batch mới và không thay đổi session history
-  - `Start new session`: tạo session mới từ entry point hiện tại
-- Khi user chọn `Start new session` trong lúc còn session dang dở, app phải confirm trước:
+  - `Continue`: mở đúng session đang dang dở, không tạo batch mới và không thay đổi session history
+  - `Start`: tạo session mới từ entry point hiện tại
+- Khi user chọn `Start` trong lúc còn session dang dở, app phải confirm trước:
   - `Starting a new session will cancel the current unfinished session.`
 - Nếu user confirm, session cũ đi theo rule restart/supersede trong [Study Session](./study-session.md#rule-restart-session):
   - session cũ không còn dùng để resume
@@ -64,13 +64,13 @@ Dashboard phải tách rõ bốn khối nghiệp vụ:
 - Today Review:
   - số thẻ quá hạn
   - số thẻ due trong hôm nay
-  - CTA Review now mở entry point danh sách hôm nay
+  - CTA Review mở entry point danh sách hôm nay
 - New Study:
   - số thẻ mới đang có trong thư viện
-  - CTA Start new study đưa user tới Library để chọn deck hoặc folder vì New Study từ danh sách hôm nay chưa hỗ trợ trong v1
+  - CTA Start đưa user tới Library để chọn deck hoặc folder vì New Study từ danh sách hôm nay chưa hỗ trợ trong v1
 - Resume:
   - số session đang mở hoặc có thể tiếp tục
-  - CTA Continue session mở session duy nhất nếu chỉ có một session, hoặc mở Progress nếu có nhiều session
+  - CTA Continue mở session duy nhất nếu chỉ có một session, hoặc mở Progress nếu có nhiều session
 - Library health:
   - tổng số folder
   - tổng số deck

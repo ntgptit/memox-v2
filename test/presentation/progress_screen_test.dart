@@ -31,7 +31,7 @@ void main() {
     expect(find.text('Mastery'), findsOneWidget);
     expect(find.text('Active sessions'), findsOneWidget);
     expect(find.text('No active study sessions'), findsOneWidget);
-    expect(find.text('Open library'), findsOneWidget);
+    expect(find.text('Open'), findsOneWidget);
   });
 
   testWidgets('DT2 onDisplay: active sessions show overview and actions', (
@@ -84,13 +84,13 @@ void main() {
     expect(find.text('Finalize'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.text('Retry finalize'),
+      find.text('Retry'),
       300,
       scrollable: find.byType(Scrollable),
     );
     expect(find.text('Finalize failed'), findsWidgets);
-    expect(find.text('Retry finalize'), findsOneWidget);
-    expect(find.text('Cancel session'), findsWidgets);
+    expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('Cancel'), findsWidgets);
   });
 
   testWidgets('DT3 onDisplay: medium overview metrics share one row', (
@@ -208,10 +208,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final cancelButton = find.widgetWithText(
-      MxSecondaryButton,
-      'Cancel session',
-    );
+    final cancelButton = find.widgetWithText(MxSecondaryButton, 'Cancel');
     await tester.ensureVisible(cancelButton);
     await tester.pumpAndSettle();
     await tester.tap(cancelButton);
@@ -220,7 +217,7 @@ void main() {
     expect(find.text('Cancel this study session?'), findsOneWidget);
     expect(repo.cancelCount, 0);
 
-    await tester.tap(find.text('Cancel session').last);
+    await tester.tap(find.text('Cancel').last);
     await tester.pumpAndSettle();
 
     expect(repo.cancelCount, 1);

@@ -254,6 +254,7 @@ LibraryFolderReadModel _folderReadModel({
       updatedAt: 0,
     ),
     breadcrumb: const [],
+    subfolderCount: 0,
     deckCount: 1,
     itemCount: itemCount,
     dueCardCount: 0,

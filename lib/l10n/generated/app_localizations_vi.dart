@@ -137,7 +137,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dashboardReviewEmptyMessage => 'Hiện không có thẻ cần ôn.';
 
   @override
-  String get dashboardReviewNowAction => 'Ôn ngay';
+  String get dashboardReviewNowAction => 'Ôn';
 
   @override
   String get dashboardNewStudyTitle => 'Học mới';
@@ -155,7 +155,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Hãy thêm hoặc import thẻ trước khi bắt đầu phiên học mới.';
 
   @override
-  String get dashboardStartNewStudyAction => 'Bắt đầu học mới';
+  String get dashboardStartNewStudyAction => 'Bắt đầu';
 
   @override
   String get dashboardResumeTitle => 'Tiếp tục';
@@ -173,7 +173,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không có phiên học nào đang chờ tiếp tục.';
 
   @override
-  String get dashboardContinueSessionAction => 'Tiếp tục phiên';
+  String get dashboardContinueSessionAction => 'Tiếp tục';
 
   @override
   String get dashboardLibraryHealthTitle => 'Sức khỏe thư viện';
@@ -211,10 +211,10 @@ class AppLocalizationsVi extends AppLocalizations {
       'Mở thư viện để thêm thẻ hoặc bắt đầu học một bộ thẻ cụ thể.';
 
   @override
-  String get dashboardStudyTodayAction => 'Học hôm nay';
+  String get dashboardStudyTodayAction => 'Học';
 
   @override
-  String get dashboardOpenLibraryAction => 'Mở thư viện';
+  String get dashboardOpenLibraryAction => 'Mở';
 
   @override
   String get dashboardLibraryProgressTitle => 'Tiến độ thư viện';
@@ -599,7 +599,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get foldersNoResultsMessage => 'Xóa tìm kiếm hoặc thử từ khóa khác.';
 
   @override
-  String get foldersClearSearchAction => 'Xóa tìm kiếm';
+  String get foldersClearSearchAction => 'Xóa';
 
   @override
   String get libraryCreateFolderTooltip => 'Tạo thư mục';
@@ -634,17 +634,8 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String libraryFolderStats(int deckCount, int itemCount) {
-    return '$deckCount bộ thẻ · $itemCount thẻ';
-  }
-
-  @override
-  String libraryFolderStudyStats(
-    int cardCount,
-    int dueCount,
-    int newCardCount,
-  ) {
-    return '$cardCount thẻ · $dueCount cần ôn · $newCardCount mới';
+  String libraryFolderStats(int subfolderCount, int deckCount, int cardCount) {
+    return '$subfolderCount thư mục con · $deckCount bộ thẻ · $cardCount thẻ';
   }
 
   @override
@@ -678,7 +669,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get decksActionsTitle => 'Thao tác bộ thẻ';
 
   @override
-  String get decksDuplicateAction => 'Nhân bản bộ thẻ';
+  String get decksDuplicateAction => 'Nhân bản';
 
   @override
   String get decksExportCsvAction => 'Xuất CSV';
@@ -747,10 +738,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get decksDeletedMessage => 'Đã xóa bộ thẻ.';
 
   @override
-  String get flashcardsOpenListAction => 'Mở danh sách flashcard';
+  String get flashcardsOpenListAction => 'Mở';
 
   @override
-  String get flashcardsAddAction => 'Thêm flashcard';
+  String get flashcardsAddAction => 'Thêm';
 
   @override
   String get flashcardsAddTooltip => 'Thêm flashcard';
@@ -830,16 +821,16 @@ class AppLocalizationsVi extends AppLocalizations {
       'Ngữ cảnh, ví dụ hoặc gợi ý ghi nhớ tùy chọn.';
 
   @override
-  String get flashcardsSaveAndAddNext => 'Lưu và thêm tiếp';
+  String get flashcardsSaveAndAddNext => 'Lưu + tiếp';
 
   @override
   String get flashcardsSavedMessage => 'Đã lưu flashcard.';
 
   @override
-  String get flashcardsSaveChanges => 'Lưu thay đổi';
+  String get flashcardsSaveChanges => 'Lưu';
 
   @override
-  String get flashcardsSaveAction => 'Lưu flashcard';
+  String get flashcardsSaveAction => 'Lưu';
 
   @override
   String get flashcardsLearningContentChangedTitle =>
@@ -850,10 +841,10 @@ class AppLocalizationsVi extends AppLocalizations {
       'Giữ tiến độ hiện tại hay reset flashcard này?';
 
   @override
-  String get flashcardsKeepProgressAction => 'Giữ tiến độ';
+  String get flashcardsKeepProgressAction => 'Giữ';
 
   @override
-  String get flashcardsResetProgressAction => 'Reset tiến độ';
+  String get flashcardsResetProgressAction => 'Reset';
 
   @override
   String get flashcardsUpdatedMessage => 'Đã cập nhật flashcard.';
@@ -872,10 +863,10 @@ class AppLocalizationsVi extends AppLocalizations {
       'Chọn luồng học và chốt thiết lập cho phiên này.';
 
   @override
-  String get studyStartAction => 'Học ngay';
+  String get studyStartAction => 'Học';
 
   @override
-  String get studyStartNewSessionAction => 'Bắt đầu phiên mới';
+  String get studyStartNewSessionAction => 'Bắt đầu';
 
   @override
   String get studyStartNewSessionConfirmTitle => 'Bắt đầu phiên mới?';
@@ -894,7 +885,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyResumeAction => 'Tiếp tục';
 
   @override
-  String get studyContinueSessionAction => 'Tiếp tục phiên';
+  String get studyContinueSessionAction => 'Tiếp tục';
 
   @override
   String get studyFlowTitle => 'Luồng học';
@@ -941,13 +932,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studySessionTitle => 'Phiên học';
 
   @override
-  String get studyCancelAction => 'Hủy phiên học';
+  String get studyCancelAction => 'Hủy';
 
   @override
   String get studyFinalizeAction => 'Finalize';
 
   @override
-  String get studySkipAction => 'Bỏ qua thẻ';
+  String get studySkipAction => 'Bỏ qua';
 
   @override
   String get studyTextSettingsTooltip => 'Tùy chỉnh chữ';
@@ -991,7 +982,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studySessionEnded => 'Phiên học này đã kết thúc.';
 
   @override
-  String get studyViewResultAction => 'Xem kết quả';
+  String get studyViewResultAction => 'Xem';
 
   @override
   String studyProgressModeRound(Object mode, int round) {
@@ -1045,13 +1036,13 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get studyResultReviewMoreAction => 'Ôn tiếp';
+  String get studyResultReviewMoreAction => 'Ôn';
 
   @override
-  String get studyResultStudyAgainAction => 'Học lại';
+  String get studyResultStudyAgainAction => 'Học';
 
   @override
-  String get studyRetryFinalizeAction => 'Thử finalize lại';
+  String get studyRetryFinalizeAction => 'Thử lại';
 
   @override
   String get studyResultCompleted => 'Đã hoàn thành';
@@ -1170,7 +1161,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Phiên học hiện tại sẽ dừng lại và bạn sẽ được đưa đến màn hình kết quả.';
 
   @override
-  String get studyCancelConfirmAction => 'Hủy phiên học';
+  String get studyCancelConfirmAction => 'Hủy';
 
   @override
   String get flashcardsImportTitle => 'Nhập flashcard';

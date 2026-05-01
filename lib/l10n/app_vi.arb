@@ -54,7 +54,7 @@
     }
   },
   "dashboardReviewEmptyMessage": "Hiện không có thẻ cần ôn.",
-  "dashboardReviewNowAction": "Ôn ngay",
+  "dashboardReviewNowAction": "Ôn",
   "dashboardNewStudyTitle": "Học mới",
   "dashboardNewCardsLabel": "Thẻ mới có thể học",
   "dashboardNewStudyMessage": "{count} thẻ mới đã sẵn sàng cho phiên học theo deck hoặc folder.",
@@ -66,7 +66,7 @@
     }
   },
   "dashboardNewStudyEmptyMessage": "Hãy thêm hoặc import thẻ trước khi bắt đầu phiên học mới.",
-  "dashboardStartNewStudyAction": "Bắt đầu học mới",
+  "dashboardStartNewStudyAction": "Bắt đầu",
   "dashboardResumeTitle": "Tiếp tục",
   "dashboardActiveSessionsLabel": "Phiên đang mở",
   "dashboardResumeMessage": "{count} phiên có thể tiếp tục hoặc finalize.",
@@ -78,7 +78,7 @@
     }
   },
   "dashboardResumeEmptyMessage": "Không có phiên học nào đang chờ tiếp tục.",
-  "dashboardContinueSessionAction": "Tiếp tục phiên",
+  "dashboardContinueSessionAction": "Tiếp tục",
   "dashboardLibraryHealthTitle": "Sức khỏe thư viện",
   "dashboardLibraryHealthSummary": "{folderCount} thư mục · {deckCount} bộ thẻ · {cardCount} thẻ",
   "@dashboardLibraryHealthSummary": {
@@ -117,8 +117,8 @@
   },
   "dashboardNoDueTitle": "Hiện không có thẻ đến hạn",
   "dashboardNoDueMessage": "Mở thư viện để thêm thẻ hoặc bắt đầu học một bộ thẻ cụ thể.",
-  "dashboardStudyTodayAction": "Học hôm nay",
-  "dashboardOpenLibraryAction": "Mở thư viện",
+  "dashboardStudyTodayAction": "Học",
+  "dashboardOpenLibraryAction": "Mở",
   "dashboardLibraryProgressTitle": "Tiến độ thư viện",
   "dashboardLibraryProgressMessage": "{percent}% thành thạo · {folderCount} thư mục · {cardCount} thẻ",
   "@dashboardLibraryProgressMessage": {
@@ -315,7 +315,7 @@
   "foldersEmptyDecksMessage": "Tạo bộ thẻ để bắt đầu thêm flashcard tại đây.",
   "foldersNoResultsTitle": "Không có mục phù hợp",
   "foldersNoResultsMessage": "Xóa tìm kiếm hoặc thử từ khóa khác.",
-  "foldersClearSearchAction": "Xóa tìm kiếm",
+  "foldersClearSearchAction": "Xóa",
   "libraryCreateFolderTooltip": "Tạo thư mục",
   "libraryCreateFolderDialogTitle": "Tạo thư mục",
   "libraryFolderCreatedMessage": "Đã tạo thư mục.",
@@ -333,27 +333,16 @@
       }
     }
   },
-  "libraryFolderStats": "{deckCount} bộ thẻ · {itemCount} thẻ",
+  "libraryFolderStats": "{subfolderCount} thư mục con · {deckCount} bộ thẻ · {cardCount} thẻ",
   "@libraryFolderStats": {
     "placeholders": {
+      "subfolderCount": {
+        "type": "int"
+      },
       "deckCount": {
         "type": "int"
       },
-      "itemCount": {
-        "type": "int"
-      }
-    }
-  },
-  "libraryFolderStudyStats": "{cardCount} thẻ · {dueCount} cần ôn · {newCardCount} mới",
-  "@libraryFolderStudyStats": {
-    "placeholders": {
       "cardCount": {
-        "type": "int"
-      },
-      "dueCount": {
-        "type": "int"
-      },
-      "newCardCount": {
         "type": "int"
       }
     }
@@ -374,7 +363,7 @@
   "decksCreatedMessage": "Đã tạo bộ thẻ.",
   "decksMoreActionsTooltip": "Thêm thao tác",
   "decksActionsTitle": "Thao tác bộ thẻ",
-  "decksDuplicateAction": "Nhân bản bộ thẻ",
+  "decksDuplicateAction": "Nhân bản",
   "decksExportCsvAction": "Xuất CSV",
   "decksOverviewSubtitle": "{cardCount} thẻ · {dueToday} thẻ đến hạn hôm nay · {masteryPercent}% thành thạo",
   "@decksOverviewSubtitle": {
@@ -411,8 +400,8 @@
   "decksDeleteTitle": "Xóa bộ thẻ",
   "decksDeleteMessage": "Thao tác này sẽ xóa toàn bộ bộ thẻ và tất cả flashcard bên trong.",
   "decksDeletedMessage": "Đã xóa bộ thẻ.",
-  "flashcardsOpenListAction": "Mở danh sách flashcard",
-  "flashcardsAddAction": "Thêm flashcard",
+  "flashcardsOpenListAction": "Mở",
+  "flashcardsAddAction": "Thêm",
   "flashcardsAddTooltip": "Thêm flashcard",
   "flashcardsActionsTitle": "Thao tác flashcard",
   "flashcardsSearchHint": "Tìm flashcard",
@@ -443,27 +432,27 @@
   "flashcardsFieldNoteHint": "Ghi chú bổ sung tùy chọn",
   "flashcardsLongContentHelper": "Hỗ trợ nhiều dòng. Hãy giữ đáp án đầy đủ và dễ đọc khi học.",
   "flashcardsNoteHelper": "Ngữ cảnh, ví dụ hoặc gợi ý ghi nhớ tùy chọn.",
-  "flashcardsSaveAndAddNext": "Lưu và thêm tiếp",
+  "flashcardsSaveAndAddNext": "Lưu + tiếp",
   "flashcardsSavedMessage": "Đã lưu flashcard.",
-  "flashcardsSaveChanges": "Lưu thay đổi",
-  "flashcardsSaveAction": "Lưu flashcard",
+  "flashcardsSaveChanges": "Lưu",
+  "flashcardsSaveAction": "Lưu",
   "flashcardsLearningContentChangedTitle": "Bạn đã thay đổi nội dung học.",
   "flashcardsLearningContentChangedMessage": "Giữ tiến độ hiện tại hay reset flashcard này?",
-  "flashcardsKeepProgressAction": "Giữ tiến độ",
-  "flashcardsResetProgressAction": "Reset tiến độ",
+  "flashcardsKeepProgressAction": "Giữ",
+  "flashcardsResetProgressAction": "Reset",
   "flashcardsUpdatedMessage": "Đã cập nhật flashcard.",
   "flashcardsCreatedMessage": "Đã tạo flashcard.",
   "studyEntryTitle": "Học",
   "studyEntryHeading": "Bắt đầu phiên học",
   "studyEntrySubtitle": "Chọn luồng học và chốt thiết lập cho phiên này.",
-  "studyStartAction": "Học ngay",
-  "studyStartNewSessionAction": "Bắt đầu phiên mới",
+  "studyStartAction": "Học",
+  "studyStartNewSessionAction": "Bắt đầu",
   "studyStartNewSessionConfirmTitle": "Bắt đầu phiên mới?",
   "studyStartNewSessionConfirmMessage": "Bắt đầu phiên mới sẽ hủy phiên hiện tại còn dang dở.",
   "studyRestartAction": "Bắt đầu lại",
   "studyResumeTitle": "Phiên học đang dở",
   "studyResumeAction": "Tiếp tục",
-  "studyContinueSessionAction": "Tiếp tục phiên",
+  "studyContinueSessionAction": "Tiếp tục",
   "studyFlowTitle": "Luồng học",
   "studyTypeNew": "Học mới",
   "studyTypeReview": "Ôn SRS",
@@ -494,9 +483,9 @@
   "studyShuffleAnswers": "Trộn đáp án",
   "studyPrioritizeOverdue": "Ưu tiên thẻ quá hạn",
   "studySessionTitle": "Phiên học",
-  "studyCancelAction": "Hủy phiên học",
+  "studyCancelAction": "Hủy",
   "studyFinalizeAction": "Finalize",
-  "studySkipAction": "Bỏ qua thẻ",
+  "studySkipAction": "Bỏ qua",
   "studyTextSettingsTooltip": "Tùy chỉnh chữ",
   "studyAudioTooltip": "Âm thanh",
   "studyMoreActionsTooltip": "Thêm thao tác",
@@ -517,7 +506,7 @@
     }
   },
   "studySessionEnded": "Phiên học này đã kết thúc.",
-  "studyViewResultAction": "Xem kết quả",
+  "studyViewResultAction": "Xem",
   "studyProgressModeRound": "{mode} · lượt {round}",
   "@studyProgressModeRound": {
     "placeholders": {
@@ -561,9 +550,9 @@
       }
     }
   },
-  "studyResultReviewMoreAction": "Ôn tiếp",
-  "studyResultStudyAgainAction": "Học lại",
-  "studyRetryFinalizeAction": "Thử finalize lại",
+  "studyResultReviewMoreAction": "Ôn",
+  "studyResultStudyAgainAction": "Học",
+  "studyRetryFinalizeAction": "Thử lại",
   "studyResultCompleted": "Đã hoàn thành",
   "studyResultCancelled": "Đã hủy",
   "studyResultFailedFinalize": "Finalize lỗi. Có thể thử lại.",
@@ -617,7 +606,7 @@
   "studyEmptyAnswerMessage": "Hãy nhập đáp án trước khi gửi.",
   "studyCancelConfirmTitle": "Hủy phiên học này?",
   "studyCancelConfirmMessage": "Phiên học hiện tại sẽ dừng lại và bạn sẽ được đưa đến màn hình kết quả.",
-  "studyCancelConfirmAction": "Hủy phiên học",
+  "studyCancelConfirmAction": "Hủy",
   "flashcardsImportTitle": "Nhập flashcard",
   "importSourceTitle": "Nguồn dữ liệu",
   "importSourceSubtitle": "Luồng import luôn preview trước và ghi atomically. Chỉ cần một dòng lỗi là chặn toàn bộ lần ghi.",

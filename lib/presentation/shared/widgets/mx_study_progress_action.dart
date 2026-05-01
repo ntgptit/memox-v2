@@ -8,11 +8,11 @@ import '../../../core/theme/tokens/app_spacing.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
 import 'mx_tappable.dart';
 
-/// Compact study action that combines start, mastery progress, and card count.
+/// Compact study action that combines start, mastery progress, and a count badge.
 class MxStudyProgressAction extends StatelessWidget {
   const MxStudyProgressAction({
     required this.masteryPercent,
-    required this.cardCount,
+    required this.badgeCount,
     required this.onPressed,
     required this.tooltip,
     super.key,
@@ -29,7 +29,7 @@ class MxStudyProgressAction extends StatelessWidget {
   static const double _badgeHeight = 18;
 
   final int? masteryPercent;
-  final int? cardCount;
+  final int? badgeCount;
   final VoidCallback onPressed;
   final String tooltip;
 
@@ -39,11 +39,11 @@ class MxStudyProgressAction extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final mx = context.mxColors;
     final safeMasteryPercent = masteryPercent ?? 0;
-    final safeCardCount = cardCount ?? 0;
+    final safeBadgeCount = badgeCount ?? 0;
     final clampedPercent = safeMasteryPercent.clamp(0, 100);
     final progress = clampedPercent / 100;
     final progressColor = mx.masteryProgress(progress);
-    final badgeLabel = safeCardCount > 99 ? '99+' : '$safeCardCount';
+    final badgeLabel = safeBadgeCount > 99 ? '99+' : '$safeBadgeCount';
 
     return SizedBox(
       width: _stackWidth,
@@ -95,7 +95,7 @@ class MxStudyProgressAction extends StatelessWidget {
               ),
             ),
           ),
-          if (safeCardCount > 0)
+          if (safeBadgeCount > 0)
             Positioned(
               top: 0,
               right: 0,

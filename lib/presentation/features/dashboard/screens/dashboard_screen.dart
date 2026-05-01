@@ -30,6 +30,8 @@ const _dashboardChartInlineMinWidth =
     420.0; // guard:raw-size-reviewed switch point for chart details layout
 const _dashboardActionInlineMinWidth =
     460.0; // guard:raw-size-reviewed switch point for action button layout
+const _dashboardActionButtonWidth =
+    152.0; // guard:raw-size-reviewed aligns concise dashboard action CTAs
 const _dashboardPercentMax = 100;
 const _dashboardChartStartDegree =
     -90.0; // guard:raw-size-reviewed start donut chart at the top
@@ -421,12 +423,16 @@ class _DashboardActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final button = MxPrimaryButton(
+    final button = SizedBox(
       key: action.actionKey,
-      label: action.actionLabel,
-      leadingIcon: action.actionIcon,
-      size: MxButtonSize.small,
-      onPressed: action.onAction,
+      width: _dashboardActionButtonWidth,
+      child: MxPrimaryButton(
+        label: action.actionLabel,
+        leadingIcon: action.actionIcon,
+        size: MxButtonSize.small,
+        fullWidth: true,
+        onPressed: action.onAction,
+      ),
     );
 
     return Padding(

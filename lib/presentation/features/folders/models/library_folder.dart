@@ -12,20 +12,24 @@ class LibraryFolder {
     required this.id,
     required this.name,
     required this.icon,
+    required int? subfolderCount,
     required this.deckCount,
     required this.itemCount,
     required this.dueCardCount,
     required this.newCardCount,
     required this.masteryPercent,
-  });
+  }) : _subfolderCount = subfolderCount;
 
   final String id;
   final String name;
   final IconData icon;
+  final int? _subfolderCount;
   final int deckCount;
   final int itemCount;
   final int dueCardCount;
   final int newCardCount;
+
+  int get subfolderCount => _subfolderCount ?? 0;
 
   /// Mastery in `[0, 100]`.
   final int masteryPercent;

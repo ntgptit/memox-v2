@@ -36,22 +36,30 @@ class FolderSubfolderItem {
     required this.id,
     required this.name,
     required this.icon,
+    required int subfolderCount,
     required int deckCount,
     required int itemCount,
+    required int dueCardCount,
     required int? masteryPercent,
-  }) : _deckCount = deckCount,
+  }) : _subfolderCount = subfolderCount,
+       _deckCount = deckCount,
        _itemCount = itemCount,
+       _dueCardCount = dueCardCount,
        _masteryPercent = masteryPercent;
 
   final String id;
   final String name;
   final IconData icon;
   final int? _masteryPercent;
+  final int? _subfolderCount;
   final int? _deckCount;
   final int? _itemCount;
+  final int? _dueCardCount;
 
+  int get subfolderCount => _subfolderCount ?? 0;
   int get deckCount => _deckCount ?? 0;
   int get itemCount => _itemCount ?? 0;
+  int get dueCardCount => _dueCardCount ?? 0;
   int get masteryPercent => _masteryPercent ?? 0;
 }
 
@@ -279,8 +287,10 @@ FolderDetailState _mapFolderDetailState(
             id: item.folder.id,
             name: item.folder.name,
             icon: Icons.folder_copy_outlined,
+            subfolderCount: item.subfolderCount,
             deckCount: item.deckCount,
             itemCount: item.itemCount,
+            dueCardCount: item.dueCardCount,
             masteryPercent: item.masteryPercent,
           ),
         )

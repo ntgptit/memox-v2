@@ -40,7 +40,7 @@ void main() {
   });
 
   testWidgets(
-    'DT1 onDisplay: renders greeting search toolbar and root folders',
+    'DT1 onDisplay: renders greeting search toolbar and structural folder metadata',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -57,8 +57,29 @@ void main() {
       expect(find.text('Good morning, Lan'), findsOneWidget);
       expect(find.text('Folders'), findsOneWidget);
       expect(find.text('Korean1'), findsOneWidget);
-      expect(find.text('17 cards · 3 due · 5 new'), findsOneWidget);
+      expect(find.text('1 subfolder · 1 deck · 17 cards'), findsOneWidget);
+      expect(find.text('17 cards · 3 due · 5 new'), findsNothing);
       expect(find.text('Mastery 19%'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT2 onDisplay: falls back to zero subfolders for legacy folder count',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_legacyLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Korean1'), findsOneWidget);
+      expect(find.text('0 subfolders · 1 deck · 17 cards'), findsOneWidget);
     },
   );
 
@@ -85,7 +106,7 @@ void main() {
   });
 
   testWidgets(
-    'DT1 onNavigate: root folder cards expose recursive study action',
+    'DT1 onNavigate: root folder cards expose recursive study action with due badge',
     (WidgetTester tester) async {
       const folderId = 'folder-root-001';
       final router = GoRouter(
@@ -134,9 +155,9 @@ void main() {
       expect(studyButton, findsOneWidget);
       expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
       expect(find.text('19%'), findsOneWidget);
-      expect(find.text('17 cards · 3 due · 5 new'), findsOneWidget);
+      expect(find.text('1 subfolder · 1 deck · 17 cards'), findsOneWidget);
       expect(find.text('Mastery 19%'), findsOneWidget);
-      expect(find.text('17'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
 
       await tester.tap(studyButton);
       await tester.pumpAndSettle();
@@ -280,7 +301,29 @@ const _sampleLibraryState = LibraryOverviewState(
       id: 'folder-root-001',
       name: 'Korean1',
       icon: Icons.folder_outlined,
-      deckCount: 0,
+      subfolderCount: 1,
+      deckCount: 1,
+      itemCount: 17,
+      dueCardCount: 3,
+      newCardCount: 5,
+      masteryPercent: 19,
+    ),
+  ],
+);
+
+const _legacyLibraryState = LibraryOverviewState(
+  greeting: LibraryOverviewGreeting(
+    salutation: 'Good morning',
+    userName: 'Lan',
+  ),
+  dueToday: 0,
+  folders: <LibraryFolder>[
+    LibraryFolder(
+      id: 'folder-root-001',
+      name: 'Korean1',
+      icon: Icons.folder_outlined,
+      subfolderCount: null,
+      deckCount: 1,
       itemCount: 17,
       dueCardCount: 3,
       newCardCount: 5,

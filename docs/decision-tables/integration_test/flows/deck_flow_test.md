@@ -27,7 +27,7 @@ Test file: `integration_test/app_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT3 | opened deck accepts a non-blank rename through its action sheet | `E2E Deck Before` is open on the deck flashcard-list route | the user opens `More actions`, chooses `Edit`, enters `E2E Deck After`, and saves | `E2E Deck After` replaces the old deck title without widget exceptions | C0+C1 |
-| DT4 | duplicate deck copies the source flashcards into a new deck in a valid target folder | `E2E Source Deck` contains one flashcard and is open on the flashcard-list route | the user chooses `Duplicate deck` and selects `Current folder` as the target | `E2E Source Deck Copy` opens on its flashcard-list route and renders the copied front/back text | C0+C1 |
+| DT4 | duplicate deck copies the source flashcards into a new deck in a valid target folder | `E2E Source Deck` contains one flashcard and is open on the flashcard-list route | the user chooses `Duplicate` and selects `Current folder` as the target | `E2E Source Deck Copy` opens on its flashcard-list route and renders the copied front/back text | C0+C1 |
 | DT5 | rename cancellation must preserve the current deck metadata | `E2E Stable Deck` is open on the deck flashcard-list route | the user opens `Rename deck`, enters `E2E Ignored Deck`, and presses `Cancel` | `E2E Stable Deck` remains visible and `E2E Ignored Deck` is absent | C0+C1 |
 
 ## Decision table: onDelete

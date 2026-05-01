@@ -2367,7 +2367,7 @@ void main() {
     const actionKey = ValueKey('state-size-study-action');
     late StateSetter updateState;
     var masteryPercent = 12;
-    var cardCount = 9;
+    var badgeCount = 9;
 
     await _pumpLayoutWidget(
       tester,
@@ -2377,7 +2377,7 @@ void main() {
           return MxStudyProgressAction(
             key: actionKey,
             masteryPercent: masteryPercent,
-            cardCount: cardCount,
+            badgeCount: badgeCount,
             tooltip: 'Study',
             onPressed: _noop,
           );
@@ -2388,7 +2388,7 @@ void main() {
 
     updateState(() {
       masteryPercent = 100;
-      cardCount = 120;
+      badgeCount = 120;
     });
     await tester.pump();
     final after = tester.getSize(find.byKey(actionKey));
@@ -5036,14 +5036,14 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
     minimal: (key) => MxStudyProgressAction(
       key: key,
       masteryPercent: null,
-      cardCount: null,
+      badgeCount: null,
       tooltip: 'Study',
       onPressed: _noop,
     ),
     full: (key) => MxStudyProgressAction(
       key: key,
       masteryPercent: 87,
-      cardCount: 120,
+      badgeCount: 120,
       tooltip: 'Study due cards',
       onPressed: _noop,
     ),
@@ -5213,7 +5213,7 @@ final List<_LayoutCase> _touchTargetCases = [
     (key) => MxStudyProgressAction(
       key: key,
       masteryPercent: 64,
-      cardCount: 12,
+      badgeCount: 12,
       tooltip: 'Study',
       onPressed: _noop,
     ),
@@ -5316,7 +5316,7 @@ final List<_InteractionCase> _tapCallbackCases = [
     (key, onAction) => MxStudyProgressAction(
       key: key,
       masteryPercent: 72,
-      cardCount: 12,
+      badgeCount: 12,
       tooltip: 'Study',
       onPressed: onAction,
     ),
@@ -5530,7 +5530,7 @@ final List<_HitAreaCase> _hitAreaCases = [
     (key) => MxStudyProgressAction(
       key: key,
       masteryPercent: 64,
-      cardCount: 12,
+      badgeCount: 12,
       tooltip: 'Study',
       onPressed: _noop,
     ),

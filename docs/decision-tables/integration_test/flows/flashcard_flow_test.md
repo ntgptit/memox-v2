@@ -13,9 +13,9 @@ Test file: `integration_test/app_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT7 | opened empty deck accepts a flashcard with front and back text | `E2E Card Deck` is open and renders `No flashcards yet` | the user opens `Add flashcard`, enters `E2E Card Front` and `E2E Card Back`, then saves | the flashcard list renders both texts without widget exceptions | C0+C1 |
-| DT8 | create-next flow keeps the current deck context after saving a card | `E2E Card Deck` is open and the user starts creating the first card | the user saves `E2E First Next Front` with `Save & add next`, then creates `E2E Second Next Front` | both flashcards are visible in the same deck list and no route context is lost | C0+C1 |
-| DT9 | blank front and back are rejected before a flashcard is created | `E2E Card Deck` is open and the new-flashcard editor has empty front and back fields | the user presses `Save flashcard` without entering text | the validation message `front and back are required.` is shown and the user remains on the editor | C0+C1 |
+| DT7 | opened empty deck accepts a flashcard with front and back text | `E2E Card Deck` is open and renders `No flashcards yet` | the user opens `Add`, enters `E2E Card Front` and `E2E Card Back`, then saves | the flashcard list renders both texts without widget exceptions | C0+C1 |
+| DT8 | create-next flow keeps the current deck context after saving a card | `E2E Card Deck` is open and the user starts creating the first card | the user saves `E2E First Next Front` with `Save + next`, then creates `E2E Second Next Front` | both flashcards are visible in the same deck list and no route context is lost | C0+C1 |
+| DT9 | blank front and back are rejected before a flashcard is created | `E2E Card Deck` is open and the new-flashcard editor has empty front and back fields | the user presses `Save` without entering text | the validation message `front and back are required.` is shown and the user remains on the editor | C0+C1 |
 
 ## Decision table: onDisplay
 
