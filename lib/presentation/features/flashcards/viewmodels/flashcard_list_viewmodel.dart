@@ -35,6 +35,7 @@ class FlashcardListItemState {
 class FlashcardListState {
   const FlashcardListState({
     required this.deckId,
+    required this.folderId,
     required this.deckName,
     required this.breadcrumb,
     required this.sortMode,
@@ -43,6 +44,7 @@ class FlashcardListState {
   });
 
   final String deckId;
+  final String folderId;
   final String deckName;
   final List<BreadcrumbSegmentReadModel> breadcrumb;
   final ContentSortMode sortMode;
@@ -82,6 +84,7 @@ Future<FlashcardListState> flashcardListQuery(Ref ref, String deckId) async {
   final data = await useCase.execute(deckId, query);
   return FlashcardListState(
     deckId: data.deck.id,
+    folderId: data.deck.folderId,
     deckName: data.deck.name,
     breadcrumb: data.breadcrumb,
     sortMode: query.sortMode,

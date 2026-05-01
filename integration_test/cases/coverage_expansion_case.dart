@@ -106,7 +106,8 @@ void coverageExpansionTests() {
     ) async {
       await _expectInitialError(
         tester,
-        initialLocation: '${RoutePaths.library}/deck/e2e-compact-missing',
+        initialLocation:
+            '${RoutePaths.library}/deck/e2e-compact-missing/flashcards',
         surfaceSize: integrationTestCompactSurfaceSize,
         title: 'Something went wrong',
         message: 'Deck not found.',
@@ -276,39 +277,40 @@ void coverageExpansionTests() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('DT19 onDisplay: deck detail shows zero-card overview', (
+    testWidgets('DT19 onDisplay: flashcard list shows empty deck state', (
       tester,
     ) async {
       const deckId = 'e2e-empty-overview-deck';
       await _expectInitialTexts(
         tester,
-        initialLocation: '${RoutePaths.library}/deck/$deckId',
+        initialLocation: '${RoutePaths.library}/deck/$deckId/flashcards',
         seedData: (app) => app.seedDeckWithoutFlashcards(
           folderId: 'e2e-empty-overview-folder',
           deckId: deckId,
           folderName: 'E2E Empty Overview Folder',
           deckName: 'E2E Empty Overview Deck',
         ),
-        texts: ['Overview', '0 cards · 0 due today · 0% mastery'],
+        texts: ['E2E Empty Overview Deck', 'No flashcards yet'],
       );
     });
 
-    testWidgets('DT20 onDisplay: deck detail shows never-studied metadata', (
-      tester,
-    ) async {
-      const deckId = 'e2e-never-studied-deck';
-      await _expectInitialTexts(
-        tester,
-        initialLocation: '${RoutePaths.library}/deck/$deckId',
-        seedData: (app) => app.seedDeckWithoutFlashcards(
-          folderId: 'e2e-never-studied-folder',
-          deckId: deckId,
-          folderName: 'E2E Never Studied Folder',
-          deckName: 'E2E Never Studied Deck',
-        ),
-        texts: ['E2E Never Studied Deck', 'Last studied: Never'],
-      );
-    });
+    testWidgets(
+      'DT20 onDisplay: flashcard list keeps empty deck entry points',
+      (tester) async {
+        const deckId = 'e2e-never-studied-deck';
+        await _expectInitialTexts(
+          tester,
+          initialLocation: '${RoutePaths.library}/deck/$deckId/flashcards',
+          seedData: (app) => app.seedDeckWithoutFlashcards(
+            folderId: 'e2e-never-studied-folder',
+            deckId: deckId,
+            folderName: 'E2E Never Studied Folder',
+            deckName: 'E2E Never Studied Deck',
+          ),
+          texts: ['E2E Never Studied Deck', 'Add flashcard', 'Import'],
+        );
+      },
+    );
 
     testWidgets('DT21 onDisplay: flashcard list shows seeded front and back', (
       tester,

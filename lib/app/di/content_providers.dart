@@ -122,13 +122,13 @@ WatchFolderDetailUseCase watchFolderDetailUseCase(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-WatchDeckDetailUseCase watchDeckDetailUseCase(Ref ref) {
-  return WatchDeckDetailUseCase(ref.watch(deckRepositoryProvider));
+WatchFlashcardListUseCase watchFlashcardListUseCase(Ref ref) {
+  return WatchFlashcardListUseCase(ref.watch(flashcardRepositoryProvider));
 }
 
 @Riverpod(keepAlive: true)
-WatchFlashcardListUseCase watchFlashcardListUseCase(Ref ref) {
-  return WatchFlashcardListUseCase(ref.watch(flashcardRepositoryProvider));
+GetDeckActionContextUseCase getDeckActionContextUseCase(Ref ref) {
+  return GetDeckActionContextUseCase(ref.watch(deckRepositoryProvider));
 }
 
 @Riverpod(keepAlive: true)

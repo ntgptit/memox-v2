@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'deck_detail_viewmodel.dart';
+part of 'deck_action_viewmodel.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,53 +9,55 @@ part of 'deck_detail_viewmodel.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(deckDetailQuery)
-final deckDetailQueryProvider = DeckDetailQueryFamily._();
+@ProviderFor(deckActionContext)
+final deckActionContextProvider = DeckActionContextFamily._();
 
-final class DeckDetailQueryProvider
+final class DeckActionContextProvider
     extends
         $FunctionalProvider<
-          AsyncValue<DeckDetailState>,
-          DeckDetailState,
-          FutureOr<DeckDetailState>
+          AsyncValue<DeckActionContext>,
+          DeckActionContext,
+          FutureOr<DeckActionContext>
         >
-    with $FutureModifier<DeckDetailState>, $FutureProvider<DeckDetailState> {
-  DeckDetailQueryProvider._({
-    required DeckDetailQueryFamily super.from,
+    with
+        $FutureModifier<DeckActionContext>,
+        $FutureProvider<DeckActionContext> {
+  DeckActionContextProvider._({
+    required DeckActionContextFamily super.from,
     required String super.argument,
   }) : super(
          retry: null,
-         name: r'deckDetailQueryProvider',
+         name: r'deckActionContextProvider',
          isAutoDispose: false,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$deckDetailQueryHash();
+  String debugGetCreateSourceHash() => _$deckActionContextHash();
 
   @override
   String toString() {
-    return r'deckDetailQueryProvider'
+    return r'deckActionContextProvider'
         ''
         '($argument)';
   }
 
   @$internal
   @override
-  $FutureProviderElement<DeckDetailState> $createElement(
+  $FutureProviderElement<DeckActionContext> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<DeckDetailState> create(Ref ref) {
+  FutureOr<DeckActionContext> create(Ref ref) {
     final argument = this.argument as String;
-    return deckDetailQuery(ref, argument);
+    return deckActionContext(ref, argument);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is DeckDetailQueryProvider && other.argument == argument;
+    return other is DeckActionContextProvider && other.argument == argument;
   }
 
   @override
@@ -64,24 +66,24 @@ final class DeckDetailQueryProvider
   }
 }
 
-String _$deckDetailQueryHash() => r'82a5eae679729ef4eb44f3b97e3d194a4134ec86';
+String _$deckActionContextHash() => r'950d4117e1b738ec42c7f998cfe0f9988dfae14e';
 
-final class DeckDetailQueryFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<DeckDetailState>, String> {
-  DeckDetailQueryFamily._()
+final class DeckActionContextFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<DeckActionContext>, String> {
+  DeckActionContextFamily._()
     : super(
         retry: null,
-        name: r'deckDetailQueryProvider',
+        name: r'deckActionContextProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: false,
       );
 
-  DeckDetailQueryProvider call(String deckId) =>
-      DeckDetailQueryProvider._(argument: deckId, from: this);
+  DeckActionContextProvider call(String deckId) =>
+      DeckActionContextProvider._(argument: deckId, from: this);
 
   @override
-  String toString() => r'deckDetailQueryProvider';
+  String toString() => r'deckActionContextProvider';
 }
 
 @ProviderFor(deckMovePicker)
@@ -99,7 +101,7 @@ final class DeckMovePickerProvider
         $FutureProvider<List<DeckMoveTarget>> {
   DeckMovePickerProvider._({
     required DeckMovePickerFamily super.from,
-    required String super.argument,
+    required (String, String) super.argument,
   }) : super(
          retry: null,
          name: r'deckMovePickerProvider',
@@ -115,7 +117,7 @@ final class DeckMovePickerProvider
   String toString() {
     return r'deckMovePickerProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -126,8 +128,8 @@ final class DeckMovePickerProvider
 
   @override
   FutureOr<List<DeckMoveTarget>> create(Ref ref) {
-    final argument = this.argument as String;
-    return deckMovePicker(ref, argument);
+    final argument = this.argument as (String, String);
+    return deckMovePicker(ref, argument.$1, argument.$2);
   }
 
   @override
@@ -141,10 +143,14 @@ final class DeckMovePickerProvider
   }
 }
 
-String _$deckMovePickerHash() => r'c97c045c6145694a488765571e846ed566111284';
+String _$deckMovePickerHash() => r'd026ae8ae4c69c53e5edc9ee85aa040f4aadabff';
 
 final class DeckMovePickerFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<DeckMoveTarget>>, String> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<List<DeckMoveTarget>>,
+          (String, String)
+        > {
   DeckMovePickerFamily._()
     : super(
         retry: null,
@@ -154,8 +160,11 @@ final class DeckMovePickerFamily extends $Family
         isAutoDispose: true,
       );
 
-  DeckMovePickerProvider call(String deckId) =>
-      DeckMovePickerProvider._(argument: deckId, from: this);
+  DeckMovePickerProvider call(String deckId, String excludingFolderId) =>
+      DeckMovePickerProvider._(
+        argument: (deckId, excludingFolderId),
+        from: this,
+      );
 
   @override
   String toString() => r'deckMovePickerProvider';

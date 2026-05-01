@@ -246,7 +246,9 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
       return;
     }
     MxSnackbar.success(context, l10n.importSuccessMessage(count));
-    await context.popRoute(fallback: () => context.goDeckDetail(widget.deckId));
+    await context.popRoute(
+      fallback: () => context.goFlashcardList(widget.deckId),
+    );
     if (mounted) {
       setState(() => _pendingAction = null);
     }

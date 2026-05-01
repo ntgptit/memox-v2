@@ -165,7 +165,7 @@ final class FlashcardListQueryProvider
 }
 
 String _$flashcardListQueryHash() =>
-    r'2865cf6a437431051000a8e9dd60b8500888dd01';
+    r'e495c7e97f30882d07d036e24515a815cb3743c6';
 
 final class FlashcardListQueryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<FlashcardListState>, String> {

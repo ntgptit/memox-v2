@@ -470,6 +470,7 @@ void main() {
 
 const _sampleFlashcardState = FlashcardListState(
   deckId: 'deck-001',
+  folderId: 'folder-001',
   deckName: 'Korean deck',
   breadcrumb: <BreadcrumbSegmentReadModel>[
     BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
@@ -497,6 +498,7 @@ const _sampleFlashcardState = FlashcardListState(
 
 const _emptyFlashcardState = FlashcardListState(
   deckId: 'deck-001',
+  folderId: 'folder-001',
   deckName: 'Korean deck',
   breadcrumb: <BreadcrumbSegmentReadModel>[
     BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
@@ -510,6 +512,7 @@ const _emptyFlashcardState = FlashcardListState(
 FlashcardListState _largeFlashcardState() {
   return FlashcardListState(
     deckId: 'deck-001',
+    folderId: 'folder-001',
     deckName: 'Korean deck',
     breadcrumb: const <BreadcrumbSegmentReadModel>[
       BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),

@@ -22,7 +22,7 @@ Test file: `test/presentation/flashcard_list_screen_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | flashcard management owns the deck study entry point for non-empty decks | loaded deck has two flashcards and is routed at `/deck/deck-001/flashcards` | user taps `Study now` in the toolbar | route path becomes `/study/deck/deck-001` | C0+C1 |
-| DT2 | flashcard management header exposes deck-level actions without entering deck detail | loaded deck has two flashcards and header more action is present | user taps tooltip `More actions` | `Deck actions`, `Edit`, `Move`, `Duplicate deck`, `Export CSV`, and `Delete` are visible | C0+C1 |
+| DT2 | flashcard management header exposes deck-level actions without a separate deck screen | loaded deck has two flashcards and header more action is present | user taps tooltip `More actions` | `Deck actions`, `Edit`, `Move`, `Duplicate deck`, `Export CSV`, and `Delete` are visible | C0+C1 |
 
 ## Decision table: onDelete
 

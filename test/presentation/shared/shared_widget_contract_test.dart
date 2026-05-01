@@ -2583,6 +2583,7 @@ void main() {
             key: key,
             title: 'Action unavailable',
             message: 'Please try again.',
+            details: 'Technical detail hidden until requested.',
             retryLabel: 'Retry',
             onRetry: _noop,
           ),
@@ -2597,11 +2598,12 @@ void main() {
           entry.build(key),
           scenario: _RenderScenario(
             label: 'feedback-compact-${entry.name}',
-            surfaceSize: const Size(320, 360),
+            surfaceSize: const Size(320, 380),
           ),
           scrollableHost: false,
         );
 
+        expect(tester.takeException(), isNull, reason: entry.name);
         expect(
           _stateContentColumnSize(tester, key).height,
           lessThanOrEqualTo(320),

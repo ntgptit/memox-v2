@@ -9,55 +9,46 @@ import '../../../../core/errors/failures.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
 
-part 'deck_detail_viewmodel.g.dart';
+part 'deck_action_viewmodel.g.dart';
 
 @immutable
-class DeckDetailState {
-  const DeckDetailState({
-    required this.id,
+class DeckActionContext {
+  const DeckActionContext({
+    required this.deckId,
+    required this.deckName,
     required this.folderId,
-    required this.name,
     required this.breadcrumb,
-    required this.cardCount,
-    required this.dueTodayCount,
-    required this.masteryPercent,
-    required this.lastStudiedAt,
   });
 
-  final String id;
+  final String deckId;
+  final String deckName;
   final String folderId;
-  final String name;
   final List<BreadcrumbSegmentReadModel> breadcrumb;
-  final int cardCount;
-  final int dueTodayCount;
-  final int masteryPercent;
-  final int? lastStudiedAt;
 }
 
 @Riverpod(keepAlive: true)
-Future<DeckDetailState> deckDetailQuery(Ref ref, String deckId) async {
-  final useCase = ref.watch(watchDeckDetailUseCaseProvider);
+Future<DeckActionContext> deckActionContext(Ref ref, String deckId) async {
+  final useCase = ref.watch(getDeckActionContextUseCaseProvider);
   ref.watch(contentDataRevisionProvider);
 
   final data = await useCase.execute(deckId);
-  return DeckDetailState(
-    id: data.deck.id,
+  return DeckActionContext(
+    deckId: data.deck.id,
+    deckName: data.deck.name,
     folderId: data.deck.folderId,
-    name: data.deck.name,
     breadcrumb: data.breadcrumb,
-    cardCount: data.cardCount,
-    dueTodayCount: data.dueTodayCount,
-    masteryPercent: data.masteryPercent,
-    lastStudiedAt: data.lastStudiedAt,
   );
 }
 
 @riverpod
-Future<List<DeckMoveTarget>> deckMovePicker(Ref ref, String deckId) async {
-  final detail = await ref.watch(deckDetailQueryProvider(deckId).future);
+Future<List<DeckMoveTarget>> deckMovePicker(
+  Ref ref,
+  String deckId,
+  String excludingFolderId,
+) {
   return ref
       .watch(getDeckMoveTargetsUseCaseProvider)
-      .execute(deckId: deckId, excludingFolderId: detail.folderId);
+      .execute(deckId: deckId, excludingFolderId: excludingFolderId);
 }
 
 @riverpod

@@ -45,26 +45,17 @@ final class DeckRepositoryImpl implements DeckRepository {
   final IdGenerator _idGenerator;
 
   @override
-  Future<DeckDetailReadModel> getDeckDetail(String deckId) async {
+  Future<DeckActionContextReadModel> getDeckActionContext(String deckId) async {
     final deck = await _requireDeck(deckId);
     final folderBreadcrumb = await _folderDao.getBreadcrumbSegments(
       deck.folderId,
     );
-    return DeckDetailReadModel(
+    return DeckActionContextReadModel(
       deck: deck.toDomain(),
       breadcrumb: [
         ...folderBreadcrumb,
         BreadcrumbSegmentReadModel(label: deck.name),
       ],
-      cardCount: await _deckDao.countFlashcardsInDeck(deck.id),
-      dueTodayCount: await _deckDao.countDueTodayInDeck(
-        deckId: deck.id,
-        endOfTodayEpochMillis: endOfTodayEpochMillis(_clock),
-      ),
-      masteryPercent: computeMasteryPercent(
-        await _deckDao.getCurrentBoxesInDeck(deck.id),
-      ),
-      lastStudiedAt: await _deckDao.getLastStudiedAtInDeck(deck.id),
     );
   }
 

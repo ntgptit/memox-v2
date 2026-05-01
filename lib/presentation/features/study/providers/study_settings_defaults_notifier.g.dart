@@ -91,7 +91,7 @@ final class StudyDefaultsSettingsProvider
 }
 
 String _$studyDefaultsSettingsHash() =>
-    r'2274eaeb3229386e92a25f4c1347b680815b02b4';
+    r'ba3cf46aeea89f8a743d566ce79133351fe397d0';
 
 abstract class _$StudyDefaultsSettings
     extends $AsyncNotifier<StudyDefaultsSettingsState> {

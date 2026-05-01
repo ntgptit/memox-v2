@@ -27,13 +27,6 @@ extension AppNavigation on BuildContext {
     );
   }
 
-  void goDeckDetail(String deckId) {
-    goNamed(
-      RouteNames.deckDetail,
-      pathParameters: {RoutePaths.deckIdParam: deckId},
-    );
-  }
-
   void goFlashcardList(String deckId) {
     goNamed(
       RouteNames.flashcardList,
@@ -51,13 +44,6 @@ extension AppNavigation on BuildContext {
     pushNamed(
       RouteNames.folderDetail,
       pathParameters: {RoutePaths.folderIdParam: folderId},
-    );
-  }
-
-  void pushDeckDetail(String deckId) {
-    pushNamed(
-      RouteNames.deckDetail,
-      pathParameters: {RoutePaths.deckIdParam: deckId},
     );
   }
 

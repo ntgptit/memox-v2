@@ -35,6 +35,7 @@ class MxErrorState extends StatefulWidget {
 
 class _MxErrorStateState extends State<MxErrorState> {
   static const double _maxWidth = 420;
+  static const double _stackedActionsWidth = 320;
 
   bool _showDetails = false;
 
@@ -86,27 +87,51 @@ class _MxErrorStateState extends State<MxErrorState> {
                     ),
                   ],
                   const MxGap(AppSpacing.xl),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      if (widget.onRetry != null)
-                        MxSecondaryButton(
-                          label: widget.retryLabel ?? l10n.sharedTryAgain,
-                          variant: MxSecondaryVariant.outlined,
-                          leadingIcon: Icons.refresh,
-                          onPressed: widget.onRetry,
-                        ),
-                      if (widget.details != null)
-                        MxSecondaryButton(
-                          label: _showDetails
-                              ? l10n.sharedHideDetails
-                              : l10n.sharedShowDetails,
-                          variant: MxSecondaryVariant.text,
-                          onPressed: () =>
-                              setState(() => _showDetails = !_showDetails),
-                        ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final stackActions =
+                          constraints.maxWidth < _stackedActionsWidth;
+                      final actions = [
+                        if (widget.onRetry != null)
+                          MxSecondaryButton(
+                            label: widget.retryLabel ?? l10n.sharedTryAgain,
+                            variant: MxSecondaryVariant.outlined,
+                            leadingIcon: stackActions ? null : Icons.refresh,
+                            fullWidth: stackActions,
+                            onPressed: widget.onRetry,
+                          ),
+                        if (widget.details != null)
+                          MxSecondaryButton(
+                            label: _showDetails
+                                ? l10n.sharedHideDetails
+                                : l10n.sharedShowDetails,
+                            variant: MxSecondaryVariant.text,
+                            fullWidth: stackActions,
+                            onPressed: () =>
+                                setState(() => _showDetails = !_showDetails),
+                          ),
+                      ];
+                      if (stackActions) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (
+                              var index = 0;
+                              index < actions.length;
+                              index++
+                            ) ...[
+                              if (index > 0) const MxGap(AppSpacing.sm),
+                              actions[index],
+                            ],
+                          ],
+                        );
+                      }
+                      return Wrap(
+                        spacing: AppSpacing.sm,
+                        alignment: WrapAlignment.center,
+                        children: actions,
+                      );
+                    },
                   ),
                   if (_showDetails && widget.details != null) ...[
                     const MxGap(AppSpacing.lg),

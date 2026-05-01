@@ -7,7 +7,6 @@ import 'package:talker_flutter/talker_flutter.dart';
 import '../../core/errors/error_mapper.dart';
 import '../../core/errors/failures.dart';
 import '../../presentation/features/dashboard/screens/dashboard_screen.dart';
-import '../../presentation/features/decks/screens/deck_detail_screen.dart';
 import '../../presentation/features/flashcards/screens/deck_import_screen.dart';
 import '../../presentation/features/flashcards/screens/flashcard_editor_screen.dart';
 import '../../presentation/features/flashcards/screens/flashcard_list_screen.dart';
@@ -149,15 +148,6 @@ GoRouter appRouter(Ref ref) {
                             .pathParameters[RoutePaths.studyEntryTypeParam]!,
                         entryRefId: state
                             .pathParameters[RoutePaths.studyEntryRefIdParam],
-                      ),
-                    ),
-                  ),
-                  GoRoute(
-                    path: RoutePaths.deckDetailSegment,
-                    name: RouteNames.deckDetail,
-                    pageBuilder: (_, state) => NoTransitionPage(
-                      child: DeckDetailScreen(
-                        deckId: state.pathParameters[RoutePaths.deckIdParam]!,
                       ),
                     ),
                   ),

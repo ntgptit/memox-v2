@@ -13,7 +13,7 @@ import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
-import '../viewmodels/deck_detail_viewmodel.dart';
+import '../viewmodels/deck_action_viewmodel.dart';
 
 enum DeckQuickAction { edit, move, duplicate, export, delete }
 
@@ -22,7 +22,7 @@ Future<void> showDeckActions({
   required WidgetRef ref,
   required String deckId,
   required String deckName,
-  DeckDetailState? state,
+  DeckActionContext? actionContext,
   Future<void> Function()? onDeleted,
 }) async {
   final l10n = AppLocalizations.of(context);
@@ -68,9 +68,9 @@ Future<void> showDeckActions({
     case DeckQuickAction.edit:
       await _renameDeck(context, ref, deckId, deckName);
     case DeckQuickAction.move:
-      await _moveDeck(context, ref, deckId);
+      await _moveDeck(context, ref, deckId, actionContext);
     case DeckQuickAction.duplicate:
-      await _duplicateDeck(context, ref, deckId, state);
+      await _duplicateDeck(context, ref, deckId, actionContext);
     case DeckQuickAction.export:
       await _exportDeck(context, ref, deckId);
     case DeckQuickAction.delete:
@@ -110,9 +110,17 @@ Future<void> _moveDeck(
   BuildContext context,
   WidgetRef ref,
   String deckId,
+  DeckActionContext? actionContext,
 ) async {
+  final detail = await _resolveDeckActionContext(ref, deckId, actionContext);
+  if (!context.mounted) {
+    return;
+  }
+
   final l10n = AppLocalizations.of(context);
-  final targets = await ref.read(deckMovePickerProvider(deckId).future);
+  final targets = await ref.read(
+    deckMovePickerProvider(deckId, detail.folderId).future,
+  );
   if (!context.mounted) {
     return;
   }
@@ -149,16 +157,17 @@ Future<void> _duplicateDeck(
   BuildContext context,
   WidgetRef ref,
   String deckId,
-  DeckDetailState? state,
+  DeckActionContext? actionContext,
 ) async {
-  final DeckDetailState detail =
-      state ?? await ref.read(deckDetailQueryProvider(deckId).future);
+  final detail = await _resolveDeckActionContext(ref, deckId, actionContext);
   if (!context.mounted) {
     return;
   }
 
   final l10n = AppLocalizations.of(context);
-  final targets = await ref.read(deckMovePickerProvider(deckId).future);
+  final targets = await ref.read(
+    deckMovePickerProvider(deckId, detail.folderId).future,
+  );
   if (!context.mounted) {
     return;
   }
@@ -199,7 +208,18 @@ Future<void> _duplicateDeck(
     return;
   }
   MxSnackbar.success(context, l10n.decksDuplicatedMessage);
-  context.pushDeckDetail(duplicatedId);
+  context.pushFlashcardList(duplicatedId);
+}
+
+Future<DeckActionContext> _resolveDeckActionContext(
+  WidgetRef ref,
+  String deckId,
+  DeckActionContext? actionContext,
+) {
+  if (actionContext != null) {
+    return Future<DeckActionContext>.value(actionContext);
+  }
+  return ref.read(deckActionContextProvider(deckId).future);
 }
 
 Future<void> _exportDeck(

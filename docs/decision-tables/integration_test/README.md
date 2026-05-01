@@ -68,8 +68,8 @@ the UI, not only the CRUD happy path.
 - Create first deck in an unlocked folder.
 - Create another deck in a deck-mode folder.
 - Cancel deck creation.
-- Render the deck detail error state when a deep link references a missing deck
-  id.
+- Render the flashcard-list error state when a deep link references a missing
+  deck id.
 - Open deck flashcard list.
 - Rename deck.
 - Duplicate deck and verify copied card count.

@@ -107,22 +107,14 @@ final class FolderDetailReadModel {
   }
 }
 
-final class DeckDetailReadModel {
-  const DeckDetailReadModel({
+final class DeckActionContextReadModel {
+  const DeckActionContextReadModel({
     required this.deck,
     required this.breadcrumb,
-    required this.cardCount,
-    required this.dueTodayCount,
-    required this.masteryPercent,
-    required this.lastStudiedAt,
   });
 
   final DeckEntity deck;
   final List<BreadcrumbSegmentReadModel> breadcrumb;
-  final int cardCount;
-  final int dueTodayCount;
-  final int masteryPercent;
-  final int? lastStudiedAt;
 }
 
 final class FlashcardListItemReadModel {

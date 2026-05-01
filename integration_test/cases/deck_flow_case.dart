@@ -9,21 +9,23 @@ import '../test_app.dart';
 
 void deckFlowTests() {
   group('Deck flow', () {
-    testWidgets('DT4 onOpen: renders not-found error for missing deck detail', (
-      tester,
-    ) async {
-      await pumpTestApp(
-        tester,
-        initialLocation: '${RoutePaths.library}/deck/e2e-missing-deck',
-      );
+    testWidgets(
+      'DT4 onOpen: renders not-found error for missing flashcard list deck',
+      (tester) async {
+        await pumpTestApp(
+          tester,
+          initialLocation:
+              '${RoutePaths.library}/deck/e2e-missing-deck/flashcards',
+        );
 
-      await MemoxRobot(tester).expectErrorState(
-        title: 'Something went wrong',
-        message: 'Deck not found.',
-      );
+        await MemoxRobot(tester).expectErrorState(
+          title: 'Something went wrong',
+          message: 'Deck not found.',
+        );
 
-      expect(tester.takeException(), isNull);
-    });
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets('DT4 onInsert: creates a deck inside an unlocked folder flow', (
       tester,
@@ -119,26 +121,29 @@ void deckFlowTests() {
     testWidgets('DT4 onUpdate: duplicates deck content into current folder', (
       tester,
     ) async {
-      await pumpTestApp(tester);
-
-      final folder = FolderRobot(tester);
-      await folder.createRootFolder('E2E Duplicate Folder');
-      await folder.openFolder('E2E Duplicate Folder');
+      const deckId = 'e2e-duplicate-source-deck';
+      await pumpTestApp(
+        tester,
+        initialLocation: '${RoutePaths.library}/deck/$deckId/flashcards',
+        seedData: (app) => app.seedDeckWithFlashcard(
+          folderId: 'e2e-duplicate-folder',
+          deckId: deckId,
+          flashcardId: 'e2e-duplicate-card',
+          folderName: 'E2E Duplicate Folder',
+          deckName: 'E2E Source Deck',
+          front: 'E2E Duplicate Front',
+          back: 'E2E Duplicate Back',
+        ),
+      );
 
       final deck = DeckRobot(tester);
-      await deck.createDeck('E2E Source Deck');
-      await deck.openDeck('E2E Source Deck');
-
-      await FlashcardRobot(tester).createFlashcard(
-        front: 'E2E Duplicate Front',
-        back: 'E2E Duplicate Back',
-      );
       await deck.duplicateCurrentDeckToCurrentFolder(
         sourceName: 'E2E Source Deck',
         duplicatedName: 'E2E Source Deck Copy',
       );
 
-      expect(find.text('1 cards · 0 due today · 0% mastery'), findsOneWidget);
+      expect(find.text('E2E Duplicate Front'), findsOneWidget);
+      expect(find.text('E2E Duplicate Back'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 

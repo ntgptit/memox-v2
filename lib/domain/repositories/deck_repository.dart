@@ -5,7 +5,7 @@ import '../value_objects/content_queries.dart';
 import '../value_objects/content_read_models.dart';
 
 abstract interface class DeckRepository {
-  Future<DeckDetailReadModel> getDeckDetail(String deckId);
+  Future<DeckActionContextReadModel> getDeckActionContext(String deckId);
 
   Future<List<FolderDeckReadModel>> getDecksInFolder(
     String folderId,

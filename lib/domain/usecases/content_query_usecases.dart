@@ -24,13 +24,13 @@ final class WatchFolderDetailUseCase {
   }
 }
 
-final class WatchDeckDetailUseCase {
-  const WatchDeckDetailUseCase(this._repository);
+final class GetDeckActionContextUseCase {
+  const GetDeckActionContextUseCase(this._repository);
 
   final DeckRepository _repository;
 
-  Future<DeckDetailReadModel> execute(String deckId) {
-    return _repository.getDeckDetail(deckId);
+  Future<DeckActionContextReadModel> execute(String deckId) {
+    return _repository.getDeckActionContext(deckId);
   }
 }
 

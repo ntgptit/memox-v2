@@ -22,7 +22,7 @@ class DeckImportHeaderSection extends StatelessWidget {
           icon: Icons.arrow_back,
           tooltip: l10n.commonBack,
           onPressed: () =>
-              context.popRoute(fallback: () => context.goDeckDetail(deckId)),
+              context.popRoute(fallback: () => context.goFlashcardList(deckId)),
         ),
         const MxGap(MxSpace.sm),
         Expanded(

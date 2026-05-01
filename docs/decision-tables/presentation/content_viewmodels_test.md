@@ -14,7 +14,7 @@ Test file: `test/presentation/content_viewmodels_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | deck action controller update succeeds and must not leave provider in error state | root folder and deck `Core vocabulary` exist | `deckActionControllerProvider(deck.id).updateDeck('Core vocabulary updated')` is called | result is true, controller state has no error, and repository deck name is updated | C0+C1 |
+| DT1 | deck action controller update succeeds and must not leave provider in error state | root folder and deck `Core vocabulary` exist | `deckActionControllerProvider(deck.id).updateDeck('Core vocabulary updated')` is called | result is true, controller state has no error, and `getDeckActionContext(deck.id)` returns the updated deck name | C0+C1 |
 
 ## Decision table: onRefreshRetry
 

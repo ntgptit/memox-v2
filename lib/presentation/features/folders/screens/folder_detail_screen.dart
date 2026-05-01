@@ -4,6 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/value_objects/content_read_models.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
@@ -21,7 +22,7 @@ import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../decks/actions/deck_quick_actions.dart';
-import '../../decks/viewmodels/deck_detail_viewmodel.dart';
+import '../../decks/viewmodels/deck_action_viewmodel.dart';
 import '../actions/folder_quick_actions.dart';
 import '../widgets/folder_detail_skeleton.dart';
 import '../widgets/folder_empty_state_section.dart';
@@ -208,7 +209,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
           state: state,
           onOpenSubfolder: _openSubfolder,
           onOpenSubfolderActions: _openSubfolderActions,
-          onOpenDeckActions: _openDeckActions,
+          onOpenDeckActions: (item) => _openDeckActions(state, item),
         ),
       ],
       _FolderBodyMode.empty => [
@@ -425,12 +426,21 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     );
   }
 
-  Future<void> _openDeckActions(FolderDeckItem item) {
+  Future<void> _openDeckActions(FolderDetailState state, FolderDeckItem item) {
     return showDeckActions(
       context: context,
       ref: ref,
       deckId: item.id,
       deckName: item.name,
+      actionContext: DeckActionContext(
+        deckId: item.id,
+        deckName: item.name,
+        folderId: state.header.id,
+        breadcrumb: <BreadcrumbSegmentReadModel>[
+          ...state.header.breadcrumb,
+          BreadcrumbSegmentReadModel(label: item.name),
+        ],
+      ),
     );
   }
 

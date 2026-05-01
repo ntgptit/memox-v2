@@ -6,7 +6,7 @@ import 'package:memox/app/di/content_providers.dart';
 import 'package:memox/app/di/providers.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
 import 'package:memox/domain/value_objects/content_queries.dart';
-import 'package:memox/presentation/features/decks/viewmodels/deck_detail_viewmodel.dart';
+import 'package:memox/presentation/features/decks/viewmodels/deck_action_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_editor_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_import_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
@@ -17,75 +17,84 @@ import '../support/content_repository_harness.dart';
 
 void main() {
   group('content viewmodels', () {
-    test('DT1 onSearchFilterSort: library overview query refreshes after creating a folder', () async {
-      final harness = ContentRepositoryHarness.create(ids: ['folder-root']);
-      final container = _createContainer(harness);
-      addTearDown(container.dispose);
-      addTearDown(harness.dispose);
+    test(
+      'DT1 onSearchFilterSort: library overview query refreshes after creating a folder',
+      () async {
+        final harness = ContentRepositoryHarness.create(ids: ['folder-root']);
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
 
-      final subscription = container.listen(
-        libraryOverviewQueryProvider,
-        (_, _) {},
-        fireImmediately: true,
-      );
+        final subscription = container.listen(
+          libraryOverviewQueryProvider,
+          (_, _) {},
+          fireImmediately: true,
+        );
 
-      expect(
-        (await container.read(libraryOverviewQueryProvider.future)).folders,
-        isEmpty,
-      );
+        expect(
+          (await container.read(libraryOverviewQueryProvider.future)).folders,
+          isEmpty,
+        );
 
-      final success = await container
-          .read(libraryOverviewActionControllerProvider.notifier)
-          .createFolder('Japanese N5');
+        final success = await container
+            .read(libraryOverviewActionControllerProvider.notifier)
+            .createFolder('Japanese N5');
 
-      expect(success, isTrue);
-      await _flush(container);
+        expect(success, isTrue);
+        await _flush(container);
 
-      expect(
-        subscription.read().requireValue.folders.map((item) => item.name),
-        contains('Japanese N5'),
-      );
-      expect(
-        subscription.read().requireValue.folders.single.icon,
-        Icons.folder_outlined,
-      );
-    });
+        expect(
+          subscription.read().requireValue.folders.map((item) => item.name),
+          contains('Japanese N5'),
+        );
+        expect(
+          subscription.read().requireValue.folders.single.icon,
+          Icons.folder_outlined,
+        );
+      },
+    );
 
-    test('DT2 onSearchFilterSort: folder detail query refreshes after creating a subfolder', () async {
-      final harness = ContentRepositoryHarness.create(ids: ['folder-root']);
-      final container = _createContainer(harness);
-      addTearDown(container.dispose);
-      addTearDown(harness.dispose);
+    test(
+      'DT2 onSearchFilterSort: folder detail query refreshes after creating a subfolder',
+      () async {
+        final harness = ContentRepositoryHarness.create(ids: ['folder-root']);
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
 
-      final root = (await harness.folderRepository.createRootFolder(
-        'Japanese N5',
-      )).valueOrNull!;
+        final root = (await harness.folderRepository.createRootFolder(
+          'Japanese N5',
+        )).valueOrNull!;
 
-      final subscription = container.listen(
-        folderDetailQueryProvider(root.id),
-        (_, _) {},
-        fireImmediately: true,
-      );
+        final subscription = container.listen(
+          folderDetailQueryProvider(root.id),
+          (_, _) {},
+          fireImmediately: true,
+        );
 
-      expect(
-        (await container.read(
-          folderDetailQueryProvider(root.id).future,
-        )).isUnlocked,
-        isTrue,
-      );
+        expect(
+          (await container.read(
+            folderDetailQueryProvider(root.id).future,
+          )).isUnlocked,
+          isTrue,
+        );
 
-      final success = await container
-          .read(folderActionControllerProvider(root.id).notifier)
-          .createSubfolder('Vocabulary');
+        final success = await container
+            .read(folderActionControllerProvider(root.id).notifier)
+            .createSubfolder('Vocabulary');
 
-      expect(success, isTrue);
-      await _flush(container);
+        expect(success, isTrue);
+        await _flush(container);
 
-      final state = subscription.read().requireValue;
-      expect(state.isSubfolderMode, isTrue);
-      expect(state.subfolders.map((item) => item.name), contains('Vocabulary'));
-      expect(state.subfolders.single.icon, Icons.folder_copy_outlined);
-    });
+        final state = subscription.read().requireValue;
+        expect(state.isSubfolderMode, isTrue);
+        expect(
+          state.subfolders.map((item) => item.name),
+          contains('Vocabulary'),
+        );
+        expect(state.subfolders.single.icon, Icons.folder_copy_outlined);
+      },
+    );
 
     test(
       'DT3 onSearchFilterSort: folder detail query exposes subtree deck and card stats for subfolders',
@@ -174,7 +183,9 @@ void main() {
           isFalse,
         );
 
-        final updated = await harness.deckRepository.getDeckDetail(deck.id);
+        final updated = await harness.deckRepository.getDeckActionContext(
+          deck.id,
+        );
         expect(updated.deck.name, 'Core vocabulary updated');
       },
     );

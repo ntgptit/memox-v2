@@ -536,11 +536,6 @@ void main() {
             ),
           ),
           GoRoute(
-            path: '/${RoutePaths.deckDetailSegment}',
-            name: RouteNames.deckDetail,
-            builder: (context, state) => const SizedBox.shrink(),
-          ),
-          GoRoute(
             path: '/${RoutePaths.studyEntrySegment}',
             name: RouteNames.studyEntry,
             builder: (context, state) => const SizedBox.shrink(),

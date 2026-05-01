@@ -23,7 +23,7 @@ Test file: `test/presentation/folder_detail_screen_test.dart`
 | DT2 | legacy subfolder read model has `masteryPercent=null` and UI must fall back to zero progress | loaded subfolder item `Legacy` has `masteryPercent=null` | folder detail renders the subfolder row | `Legacy` and `0%` are visible | C0+C1 |
 | DT3 | subfolder card exposes recursive study icon instead of a full `Study now` text action | subfolder mode has `folder-002` with two cards and nineteen percent mastery | user taps `folder_recursive_study_folder-002` | route path becomes `/study/folder/folder-002` and progress/icon metadata stays aligned with the row | C0+C1 |
 | DT4 | deck card progress action starts study for that deck | deck mode has deck `deck-001` named `Vitamin B1` with one card and forty-two percent mastery | user taps `deck_study_deck-001` | route path becomes `/study/deck/deck-001` | C0+C1 |
-| DT5 | deck row tap opens flashcard management instead of the optional deck detail overview | deck mode has deck `deck-001` named `Vitamin B1` | user taps the `Vitamin B1` row body | flashcard management destination renders from the `flashcardList` route | C0+C1 |
+| DT5 | deck row tap opens flashcard management directly | deck mode has deck `deck-001` named `Vitamin B1` | user taps the `Vitamin B1` row body | flashcard management destination renders from the `flashcardList` route | C0+C1 |
 
 ## Decision table: onDisplay
 

@@ -11,6 +11,7 @@ Deck là đơn vị chứa flashcard và là đơn vị học cụ thể nhất.
 - Hỗ trợ import flashcard vào deck
 - Hỗ trợ export toàn bộ deck
 - Hỗ trợ tìm kiếm và sắp xếp danh sách deck
+- Khi mở deck từ folder, user đi thẳng vào danh sách flashcard của deck
 
 ## Khi học từ deck
 - Chỉ lấy flashcard trong deck đó

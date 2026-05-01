@@ -20,7 +20,7 @@ import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../decks/actions/deck_quick_actions.dart';
-import '../../decks/viewmodels/deck_detail_viewmodel.dart';
+import '../../decks/viewmodels/deck_action_viewmodel.dart';
 import '../widgets/flashcard_bulk_action_section.dart';
 import '../widgets/flashcard_empty_state_section.dart';
 import '../widgets/flashcard_header_section.dart';
@@ -114,6 +114,12 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                       ref: ref,
                       deckId: state.deckId,
                       deckName: state.deckName,
+                      actionContext: DeckActionContext(
+                        deckId: state.deckId,
+                        deckName: state.deckName,
+                        folderId: state.folderId,
+                        breadcrumb: state.breadcrumb,
+                      ),
                       onDeleted: () async {
                         await context.popRoute(
                           fallback: () => _goToDeckParent(context, state),
