@@ -6,10 +6,26 @@ import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../app_database.dart';
 
+final class FlashcardDeckProgressSummary {
+  const FlashcardDeckProgressSummary({
+    required this.newCount,
+    required this.learningCount,
+    required this.masteredCount,
+    required this.currentBoxes,
+  });
+
+  final int newCount;
+  final int learningCount;
+  final int masteredCount;
+  final List<int> currentBoxes;
+}
+
 final class FlashcardDao {
   const FlashcardDao(this._database);
 
   final AppDatabase _database;
+  static const int _initialSrsBox = 1;
+  static const int _masteredSrsBox = 8;
 
   Future<Flashcard?> findById(String flashcardId) {
     return (_database.select(
@@ -41,6 +57,50 @@ final class FlashcardDao {
         statement.orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
     }
     return statement.get();
+  }
+
+  Future<FlashcardDeckProgressSummary> getDeckProgressSummary(
+    String deckId,
+  ) async {
+    final rows = await _database
+        .customSelect(
+          '''
+      SELECT p.current_box, p.due_at
+      FROM flashcards f
+      LEFT JOIN flashcard_progress p ON p.flashcard_id = f.id
+      WHERE f.deck_id = ?1
+      ''',
+          variables: [Variable<String>(deckId)],
+          readsFrom: {_database.flashcards, _database.flashcardProgress},
+        )
+        .get();
+
+    var newCount = 0;
+    var learningCount = 0;
+    var masteredCount = 0;
+    final currentBoxes = <int>[];
+
+    for (final row in rows) {
+      final currentBox = row.read<int?>('current_box');
+      final dueAt = row.read<int?>('due_at');
+      currentBoxes.add(currentBox ?? _initialSrsBox);
+      if (currentBox == null || dueAt == null) {
+        newCount += 1;
+        continue;
+      }
+      if (currentBox >= _masteredSrsBox) {
+        masteredCount += 1;
+        continue;
+      }
+      learningCount += 1;
+    }
+
+    return FlashcardDeckProgressSummary(
+      newCount: newCount,
+      learningCount: learningCount,
+      masteredCount: masteredCount,
+      currentBoxes: currentBoxes,
+    );
   }
 
   Future<Map<String, int?>> getLastStudiedMap(List<String> flashcardIds) async {

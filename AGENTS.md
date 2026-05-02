@@ -32,6 +32,14 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
   - `lib/l10n/generated/**`
   - platform-generated Flutter files unless the task explicitly requires it
 
+## MemoX Planning Contract
+
+- Any non-trivial MemoX plan must start with a `5Why` analysis before implementation details.
+- For Flutter/UI work, the `5Why` must explicitly address theme/token impact, shared widget reuse, Decision Table coverage, data source ownership, and verification gates.
+- Plans must list the docs, Decision Table files, executable tests, generated files, and verification commands that the change needs.
+- If a change intentionally does not touch schema, theme tokens, generated files, or business docs, state that directly and explain why.
+- File-level implementation maps must say whether each file is edited or created, what content changes, where the change belongs, and why it is necessary.
+
 ## Repo Routing
 
 ### `docs/business/**`

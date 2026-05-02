@@ -149,14 +149,30 @@ final class FlashcardListItemReadModel {
   final int? lastStudiedAt;
 }
 
+final class FlashcardDeckProgressReadModel {
+  const FlashcardDeckProgressReadModel({
+    required this.newCount,
+    required this.learningCount,
+    required this.masteredCount,
+    required this.masteryPercent,
+  });
+
+  final int newCount;
+  final int learningCount;
+  final int masteredCount;
+  final int masteryPercent;
+}
+
 final class FlashcardListReadModel {
   const FlashcardListReadModel({
     required this.deck,
     required this.breadcrumb,
+    required this.progress,
     required this.items,
   });
 
   final DeckEntity deck;
   final List<BreadcrumbSegmentReadModel> breadcrumb;
+  final FlashcardDeckProgressReadModel progress;
   final List<FlashcardListItemReadModel> items;
 }

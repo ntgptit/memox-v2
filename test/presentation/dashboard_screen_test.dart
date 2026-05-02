@@ -284,26 +284,34 @@ void main() {
     },
   );
 
-  testWidgets('DT5 onNavigate: tapping a recent deck row opens flashcards', (
-    tester,
-  ) async {
-    final router = _dashboardRouter();
-    addTearDown(router.dispose);
-    await _pumpDashboardRouter(tester, router, _recentDecksDashboardState);
-    await _scrollDashboardToDeckHighlights(tester);
+  testWidgets(
+    'DT5 onNavigate: tapping a recent deck row opens flashcards and preserves back stack',
+    (tester) async {
+      final router = _dashboardRouter();
+      addTearDown(router.dispose);
+      await _pumpDashboardRouter(tester, router, _recentDecksDashboardState);
+      await _scrollDashboardToDeckHighlights(tester);
 
-    await tester.ensureVisible(
-      find.byKey(const ValueKey('dashboard_deck_deck-grammar')),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('dashboard_deck_deck-grammar')));
-    await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('dashboard_deck_deck-grammar')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Grammar'));
+      await tester.pumpAndSettle();
 
-    expect(
-      router.routeInformationProvider.value.uri.path,
-      '/library/deck/deck-grammar/flashcards',
-    );
-  });
+      expect(
+        find.byKey(const ValueKey('flashcard_list_destination')),
+        findsOneWidget,
+      );
+      expect(router.canPop(), isTrue);
+
+      router.pop();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Recent decks'), findsOneWidget);
+      expect(find.text('Grammar'), findsOneWidget);
+    },
+  );
 
   testWidgets(
     'DT6 onNavigate: tapping a recent deck study action opens study',

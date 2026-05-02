@@ -63,6 +63,7 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       deckId: deckId,
       query: query,
     );
+    final progress = await _flashcardDao.getDeckProgressSummary(deckId);
     final lastStudiedMap = await _flashcardDao.getLastStudiedMap(
       flashcards.map((item) => item.id).toList(growable: false),
     );
@@ -81,6 +82,12 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
         ...folderBreadcrumb,
         BreadcrumbSegmentReadModel(label: deck.name),
       ],
+      progress: FlashcardDeckProgressReadModel(
+        newCount: progress.newCount,
+        learningCount: progress.learningCount,
+        masteredCount: progress.masteredCount,
+        masteryPercent: computeMasteryPercent(progress.currentBoxes),
+      ),
       items: items,
     );
   }

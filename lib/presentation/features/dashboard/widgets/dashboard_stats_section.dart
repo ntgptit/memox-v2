@@ -52,7 +52,7 @@ class _DashboardDeckHighlightTile extends StatelessWidget {
       title: item.name,
       icon: Icons.style_outlined,
       metaLine: l10n.dashboardDeckStats(item.cardCount),
-      onTap: () => context.goFlashcardList(item.id),
+      onTap: () => context.pushFlashcardList(item.id),
       trailing: MxStudyProgressAction(
         key: ValueKey('dashboard_deck_study_${item.id}'),
         masteryPercent: item.masteryPercent,

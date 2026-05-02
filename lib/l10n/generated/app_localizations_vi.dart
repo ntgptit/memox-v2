@@ -765,6 +765,44 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flashcardsSearchHint => 'Tìm flashcard';
 
   @override
+  String get flashcardsPreviewDialogTitle => 'Xem trước thẻ';
+
+  @override
+  String flashcardsDeckSummary(int cardCount, int masteryPercent) {
+    return '$cardCount thẻ · $masteryPercent% thành thạo';
+  }
+
+  @override
+  String get flashcardsStudyModesTitle => 'Chế độ học';
+
+  @override
+  String get flashcardsProgressTitle => 'Tiến độ của bạn';
+
+  @override
+  String get flashcardsProgressSubtitle =>
+      'Tiến độ được tính từ trạng thái SRS của bộ thẻ này.';
+
+  @override
+  String get flashcardsProgressNew => 'Chưa học';
+
+  @override
+  String get flashcardsProgressLearning => 'Đang học';
+
+  @override
+  String get flashcardsProgressMastered => 'Thành thạo';
+
+  @override
+  String flashcardsProgressCountValue(int count) {
+    return '$count';
+  }
+
+  @override
+  String get flashcardsCardsSectionTitle => 'Thẻ';
+
+  @override
+  String get flashcardsLearnDeckAction => 'Học bộ thẻ này';
+
+  @override
   String flashcardsBulkSelected(int count) {
     return 'Đã chọn $count';
   }

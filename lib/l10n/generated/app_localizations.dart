@@ -1452,6 +1452,72 @@ abstract class AppLocalizations {
   /// **'Search flashcards'**
   String get flashcardsSearchHint;
 
+  /// No description provided for @flashcardsPreviewDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview card'**
+  String get flashcardsPreviewDialogTitle;
+
+  /// No description provided for @flashcardsDeckSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}} · {masteryPercent}% mastery'**
+  String flashcardsDeckSummary(int cardCount, int masteryPercent);
+
+  /// No description provided for @flashcardsStudyModesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Study modes'**
+  String get flashcardsStudyModesTitle;
+
+  /// No description provided for @flashcardsProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress'**
+  String get flashcardsProgressTitle;
+
+  /// No description provided for @flashcardsProgressSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress is derived from this deck\'s SRS state.'**
+  String get flashcardsProgressSubtitle;
+
+  /// No description provided for @flashcardsProgressNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get flashcardsProgressNew;
+
+  /// No description provided for @flashcardsProgressLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning'**
+  String get flashcardsProgressLearning;
+
+  /// No description provided for @flashcardsProgressMastered.
+  ///
+  /// In en, this message translates to:
+  /// **'Mastered'**
+  String get flashcardsProgressMastered;
+
+  /// No description provided for @flashcardsProgressCountValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}'**
+  String flashcardsProgressCountValue(int count);
+
+  /// No description provided for @flashcardsCardsSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards'**
+  String get flashcardsCardsSectionTitle;
+
+  /// No description provided for @flashcardsLearnDeckAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Study this deck'**
+  String get flashcardsLearnDeckAction;
+
   /// No description provided for @flashcardsBulkSelected.
   ///
   /// In en, this message translates to:

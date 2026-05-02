@@ -52,6 +52,12 @@ Test file: `test/data/repositories/content_repository_test.dart`
 | DT3 | deck sort mode is last studied and some decks have never been studied | folder contains studied and never-studied decks | repository queries decks sorted by last studied | studied deck is ordered first and never-studied deck is placed at the end | C0+C1 |
 | DT4 | flashcard search matches back text | deck contains cards whose back values differ | repository queries flashcards by a term found only in back text | matching flashcard is returned with the deck breadcrumb | C0+C1 |
 
+## Decision table: getFlashcards
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | deck progress aggregate contains new, learning, and mastered SRS branches | deck has one card with null `due_at`, one card at box 4 with `due_at`, and one card at box 8 with `due_at` | repository queries flashcards for the deck | progress returns `newCount=1`, `learningCount=1`, `masteredCount=1`, and `masteryPercent=48` | C0+C1 |
+
 ## Decision table: getLibraryOverview
 
 | ID | Branch / condition | Given | When | Then | Coverage |

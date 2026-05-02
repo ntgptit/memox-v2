@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -8,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/services/tts_service.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
@@ -21,12 +23,19 @@ import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../decks/actions/deck_quick_actions.dart';
 import '../../decks/viewmodels/deck_action_viewmodel.dart';
+import '../../tts/providers/tts_controller_notifier.dart';
+import '../widgets/flashcard_card_list_header.dart';
 import '../widgets/flashcard_bulk_action_section.dart';
+import '../widgets/flashcard_deck_summary_section.dart';
 import '../widgets/flashcard_empty_state_section.dart';
 import '../widgets/flashcard_header_section.dart';
 import '../widgets/flashcard_items_section.dart';
 import '../widgets/flashcard_list_skeleton.dart';
+import '../widgets/flashcard_preview_section.dart';
+import '../widgets/flashcard_progress_section.dart';
 import '../widgets/flashcard_reorder_list.dart';
+import '../widgets/flashcard_study_action_section.dart';
+import '../widgets/flashcard_study_modes_section.dart';
 import '../widgets/flashcard_toolbar_section.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
 
@@ -105,10 +114,10 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: FlashcardHeaderSection(
-                    state: state,
                     onBack: () => context.popRoute(
                       fallback: () => _goToDeckParent(context, state),
                     ),
+                    onShare: _exportDeck,
                     onOpenActions: () => showDeckActions(
                       context: context,
                       ref: ref,
@@ -126,8 +135,34 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                         );
                       },
                     ),
+                  ),
+                ),
+                const MxSliverGap(MxSpace.xl),
+                if (state.previewItems.isNotEmpty) ...[
+                  SliverToBoxAdapter(
+                    child: FlashcardPreviewSection(items: state.previewItems),
+                  ),
+                  const MxSliverGap(MxSpace.xl),
+                ],
+                SliverToBoxAdapter(
+                  child: FlashcardDeckSummarySection(
+                    state: state,
                     onOpenBreadcrumb: (folderId) =>
                         context.goFolderDetail(folderId),
+                  ),
+                ),
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: FlashcardStudyModesSection(
+                    enabled: state.items.isNotEmpty,
+                    onStartStudy: () => _goStudyEntry(state),
+                  ),
+                ),
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: FlashcardProgressSection(
+                    progress: state.progress,
+                    totalCount: state.totalCount,
                   ),
                 ),
                 const MxSliverGap(MxSpace.xl),
@@ -136,16 +171,11 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                     selectedSort: toolbarState.sortMode,
                     isReorderMode: _isReorderMode,
                     canManualReorder: state.canManualReorder,
-                    canStartStudy: state.items.isNotEmpty,
                     onSearchChanged: toolbarNotifier.setSearchTerm,
                     onSearchClear: () => toolbarNotifier.setSearchTerm(''),
                     onSortSelected: toolbarNotifier.setSortMode,
                     onCancelReorder: _cancelReorder,
                     onSaveReorder: _saveReorder,
-                    onStartStudy: () => context.goStudyEntry(
-                      entryType: 'deck',
-                      entryRefId: state.deckId,
-                    ),
                     onImport: () => context.pushDeckImport(widget.deckId),
                     onStartReorder: () => _enterReorderMode(state),
                   ),
@@ -282,6 +312,24 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     );
   }
 
+  Future<void> _exportDeck() async {
+    final export = await ref
+        .read(deckActionControllerProvider(widget.deckId).notifier)
+        .exportDeck();
+    if (!mounted || export == null) {
+      return;
+    }
+
+    final bytes = Uint8List.fromList(utf8.encode(export.content));
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile.fromData(bytes, mimeType: export.mimeType)],
+        fileNameOverrides: [export.fileName],
+        subject: export.fileName,
+      ),
+    );
+  }
+
   Future<void> _deleteSelected(List<String> flashcardIds) async {
     final l10n = AppLocalizations.of(context);
     final confirmed = await MxConfirmationDialog.show(
@@ -377,22 +425,54 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
         ),
       ];
     }
+    final header = <Widget>[
+      SliverToBoxAdapter(
+        child: FlashcardCardListHeader(sortMode: state.sortMode),
+      ),
+      const MxSliverGap(MxSpace.md),
+    ];
+    final cta = <Widget>[
+      const MxSliverGap(MxSpace.xl),
+      SliverToBoxAdapter(
+        child: FlashcardStudyActionSection(
+          enabled: state.items.isNotEmpty,
+          onStartStudy: () => _goStudyEntry(state),
+        ),
+      ),
+    ];
     if (state.items.isEmpty) {
       return [
+        ...header,
         SliverToBoxAdapter(
           child: FlashcardEmptyStateSection(deckId: widget.deckId),
         ),
+        ...cta,
       ];
     }
     return [
+      ...header,
       FlashcardItemsSection(
         state: state,
         deckId: widget.deckId,
         selection: selection,
         onToggleSelection: onToggleSelection,
         onOpenActions: _openFlashcardActions,
+        onSpeak: _speakFront,
       ),
+      ...cta,
     ];
+  }
+
+  void _goStudyEntry(FlashcardListState state) {
+    context.goStudyEntry(entryType: 'deck', entryRefId: state.deckId);
+  }
+
+  void _speakFront(FlashcardListItemState item) {
+    unawaited(
+      ref
+          .read(ttsControllerProvider.notifier)
+          .speakTextSide(text: item.front, side: TtsTextSide.front),
+    );
   }
 
   void _goToDeckParent(BuildContext context, FlashcardListState state) {

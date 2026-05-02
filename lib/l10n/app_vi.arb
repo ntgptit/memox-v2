@@ -408,6 +408,34 @@
   "flashcardsAddTooltip": "Thêm flashcard",
   "flashcardsActionsTitle": "Thao tác flashcard",
   "flashcardsSearchHint": "Tìm flashcard",
+  "flashcardsPreviewDialogTitle": "Xem trước thẻ",
+  "flashcardsDeckSummary": "{cardCount} thẻ · {masteryPercent}% thành thạo",
+  "@flashcardsDeckSummary": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "masteryPercent": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsStudyModesTitle": "Chế độ học",
+  "flashcardsProgressTitle": "Tiến độ của bạn",
+  "flashcardsProgressSubtitle": "Tiến độ được tính từ trạng thái SRS của bộ thẻ này.",
+  "flashcardsProgressNew": "Chưa học",
+  "flashcardsProgressLearning": "Đang học",
+  "flashcardsProgressMastered": "Thành thạo",
+  "flashcardsProgressCountValue": "{count}",
+  "@flashcardsProgressCountValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsCardsSectionTitle": "Thẻ",
+  "flashcardsLearnDeckAction": "Học bộ thẻ này",
   "flashcardsBulkSelected": "Đã chọn {count}",
   "@flashcardsBulkSelected": {
     "placeholders": {

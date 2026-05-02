@@ -824,6 +824,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsSearchHint => 'Search flashcards';
 
   @override
+  String get flashcardsPreviewDialogTitle => 'Preview card';
+
+  @override
+  String flashcardsDeckSummary(int cardCount, int masteryPercent) {
+    String _temp0 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+      zero: '0 cards',
+    );
+    return '$_temp0 · $masteryPercent% mastery';
+  }
+
+  @override
+  String get flashcardsStudyModesTitle => 'Study modes';
+
+  @override
+  String get flashcardsProgressTitle => 'Your progress';
+
+  @override
+  String get flashcardsProgressSubtitle =>
+      'Progress is derived from this deck\'s SRS state.';
+
+  @override
+  String get flashcardsProgressNew => 'New';
+
+  @override
+  String get flashcardsProgressLearning => 'Learning';
+
+  @override
+  String get flashcardsProgressMastered => 'Mastered';
+
+  @override
+  String flashcardsProgressCountValue(int count) {
+    return '$count';
+  }
+
+  @override
+  String get flashcardsCardsSectionTitle => 'Cards';
+
+  @override
+  String get flashcardsLearnDeckAction => 'Study this deck';
+
+  @override
   String flashcardsBulkSelected(int count) {
     return '$count selected';
   }

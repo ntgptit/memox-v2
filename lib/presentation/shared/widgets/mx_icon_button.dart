@@ -4,7 +4,14 @@ import '../../../core/theme/component_themes/focus_theme.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 
-enum MxIconButtonVariant { standard, toolbar, filled, filledTonal, outlined }
+enum MxIconButtonVariant {
+  standard,
+  toolbar,
+  compact,
+  filled,
+  filledTonal,
+  outlined,
+}
 
 /// Themed icon button with tooltip-friendly API and four M3 variants.
 class MxIconButton extends StatelessWidget {
@@ -28,6 +35,16 @@ class MxIconButton extends StatelessWidget {
     this.selectedIcon,
     super.key,
   }) : variant = MxIconButtonVariant.toolbar;
+
+  const MxIconButton.compact({
+    required this.icon,
+    required this.onPressed,
+    this.tooltip,
+    this.size = AppIconSizes.lg,
+    this.isSelected = false,
+    this.selectedIcon,
+    super.key,
+  }) : variant = MxIconButtonVariant.compact;
 
   final IconData icon;
   final IconData? selectedIcon;
@@ -68,6 +85,30 @@ class MxIconButton extends StatelessWidget {
     );
   }
 
+  static ButtonStyle compactStyle(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final transparent = scheme.surface.withValues(
+      alpha: AppOpacity.transparent,
+    );
+
+    return ButtonStyle(
+      foregroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
+        }
+        return scheme.onSurfaceVariant;
+      }),
+      backgroundColor: WidgetStatePropertyAll(transparent),
+      overlayColor: AppFocus.overlayProperty(scheme.onSurface),
+      side: const WidgetStatePropertyAll(BorderSide.none),
+      minimumSize: const WidgetStatePropertyAll(Size.square(AppIconSizes.xl)),
+      fixedSize: const WidgetStatePropertyAll(Size.square(AppIconSizes.xl)),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+      shape: const WidgetStatePropertyAll(CircleBorder()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final iconWidget = Icon(icon, size: size, semanticLabel: tooltip);
@@ -90,6 +131,14 @@ class MxIconButton extends StatelessWidget {
         tooltip: tooltip,
         onPressed: onPressed,
         style: toolbarStyle(context),
+      ),
+      MxIconButtonVariant.compact => IconButton(
+        icon: iconWidget,
+        selectedIcon: selectedIconWidget,
+        isSelected: isSelected,
+        tooltip: tooltip,
+        onPressed: onPressed,
+        style: compactStyle(context),
       ),
       MxIconButtonVariant.filled => IconButton.filled(
         icon: iconWidget,

@@ -48,9 +48,11 @@ extension AppNavigation on BuildContext {
   }
 
   void pushFlashcardList(String deckId) {
-    pushNamed(
-      RouteNames.flashcardList,
-      pathParameters: {RoutePaths.deckIdParam: deckId},
+    push(
+      namedLocation(
+        RouteNames.flashcardList,
+        pathParameters: {RoutePaths.deckIdParam: deckId},
+      ),
     );
   }
 

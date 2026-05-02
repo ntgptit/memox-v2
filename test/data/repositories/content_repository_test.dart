@@ -1188,6 +1188,65 @@ void main() {
     );
 
     test(
+      'DT1 getFlashcards: returns deck progress aggregate for flashcard list',
+      () async {
+        final folder = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final deck = await harness.deckRepository.createDeck(
+          folderId: folder.valueOrNull!.id,
+          name: 'Deck A',
+        );
+        final deckId = deck.valueOrNull!.id;
+        await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'new', back: 'fresh'),
+        );
+        final learning = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'learning', back: 'active'),
+        );
+        final mastered = await harness.flashcardRepository.createFlashcard(
+          deckId: deckId,
+          draft: const FlashcardDraft(front: 'mastered', back: 'known'),
+        );
+        final now = harness.clock.nowEpochMillis();
+        await (harness.database.update(harness.database.flashcardProgress)
+              ..where(
+                (table) => table.flashcardId.equals(learning.valueOrNull!.id),
+              ))
+            .write(
+              FlashcardProgressCompanion(
+                currentBox: const Value(4),
+                reviewCount: const Value(3),
+                dueAt: Value(now),
+              ),
+            );
+        await (harness.database.update(harness.database.flashcardProgress)
+              ..where(
+                (table) => table.flashcardId.equals(mastered.valueOrNull!.id),
+              ))
+            .write(
+              FlashcardProgressCompanion(
+                currentBox: const Value(8),
+                reviewCount: const Value(7),
+                dueAt: Value(now + Duration.millisecondsPerDay),
+              ),
+            );
+
+        final list = await harness.flashcardRepository.getFlashcards(
+          deckId,
+          const ContentQuery(),
+        );
+
+        expect(list.progress.newCount, 1);
+        expect(list.progress.learningCount, 1);
+        expect(list.progress.masteredCount, 1);
+        expect(list.progress.masteryPercent, 48);
+      },
+    );
+
+    test(
       'DT3 onInsert: import with mixed valid and invalid lines does not write any flashcards',
       () async {
         final folder = await harness.folderRepository.createRootFolder(

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_term_row.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
+import 'flashcard_detail_card_row.dart';
 
 class FlashcardItemsSection extends StatelessWidget {
   const FlashcardItemsSection({
@@ -13,6 +13,7 @@ class FlashcardItemsSection extends StatelessWidget {
     required this.selection,
     required this.onToggleSelection,
     required this.onOpenActions,
+    required this.onSpeak,
     super.key,
   });
 
@@ -21,6 +22,7 @@ class FlashcardItemsSection extends StatelessWidget {
   final Set<String> selection;
   final ValueChanged<String> onToggleSelection;
   final ValueChanged<FlashcardListItemState> onOpenActions;
+  final ValueChanged<FlashcardListItemState> onSpeak;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class FlashcardItemsSection extends StatelessWidget {
         selection: selection,
         onToggleSelection: onToggleSelection,
         onOpenActions: onOpenActions,
+        onSpeak: onSpeak,
       ),
       separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
     );
@@ -46,6 +49,7 @@ class _FlashcardItemRow extends StatelessWidget {
     required this.selection,
     required this.onToggleSelection,
     required this.onOpenActions,
+    required this.onSpeak,
   });
 
   final FlashcardListItemState item;
@@ -53,13 +57,12 @@ class _FlashcardItemRow extends StatelessWidget {
   final Set<String> selection;
   final ValueChanged<String> onToggleSelection;
   final ValueChanged<FlashcardListItemState> onOpenActions;
+  final ValueChanged<FlashcardListItemState> onSpeak;
 
   @override
   Widget build(BuildContext context) {
-    return MxTermRow(
-      term: item.front,
-      definition: item.back,
-      caption: item.note,
+    return FlashcardDetailCardRow(
+      item: item,
       selected: selection.contains(item.id),
       onTap: () {
         if (selection.isNotEmpty) {
@@ -75,6 +78,8 @@ class _FlashcardItemRow extends StatelessWidget {
         }
         onOpenActions(item);
       },
+      onSpeak: () => onSpeak(item),
+      onSelect: () => onToggleSelection(item.id),
     );
   }
 }

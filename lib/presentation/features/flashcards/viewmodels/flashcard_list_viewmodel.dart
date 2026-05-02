@@ -32,6 +32,21 @@ class FlashcardListItemState {
 }
 
 @immutable
+class FlashcardDeckProgressState {
+  const FlashcardDeckProgressState({
+    required this.newCount,
+    required this.learningCount,
+    required this.masteredCount,
+    required this.masteryPercent,
+  });
+
+  final int newCount;
+  final int learningCount;
+  final int masteredCount;
+  final int masteryPercent;
+}
+
+@immutable
 class FlashcardListState {
   const FlashcardListState({
     required this.deckId,
@@ -40,8 +55,11 @@ class FlashcardListState {
     required this.breadcrumb,
     required this.sortMode,
     required this.searchTerm,
+    required this.progress,
     required this.items,
   });
+
+  static const int previewLimit = 5;
 
   final String deckId;
   final String folderId;
@@ -49,9 +67,14 @@ class FlashcardListState {
   final List<BreadcrumbSegmentReadModel> breadcrumb;
   final ContentSortMode sortMode;
   final String searchTerm;
+  final FlashcardDeckProgressState progress;
   final List<FlashcardListItemState> items;
 
   bool get canManualReorder => sortMode.allowsManualReorder;
+  int get totalCount =>
+      progress.newCount + progress.learningCount + progress.masteredCount;
+  List<FlashcardListItemState> get previewItems =>
+      items.take(previewLimit).toList(growable: false);
 }
 
 @riverpod
@@ -89,6 +112,12 @@ Future<FlashcardListState> flashcardListQuery(Ref ref, String deckId) async {
     breadcrumb: data.breadcrumb,
     sortMode: query.sortMode,
     searchTerm: query.searchTerm,
+    progress: FlashcardDeckProgressState(
+      newCount: data.progress.newCount,
+      learningCount: data.progress.learningCount,
+      masteredCount: data.progress.masteredCount,
+      masteryPercent: data.progress.masteryPercent,
+    ),
     items: data.items
         .map(
           (item) => FlashcardListItemState(

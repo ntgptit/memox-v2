@@ -408,6 +408,34 @@
   "flashcardsAddTooltip": "Add flashcard",
   "flashcardsActionsTitle": "Flashcard actions",
   "flashcardsSearchHint": "Search flashcards",
+  "flashcardsPreviewDialogTitle": "Preview card",
+  "flashcardsDeckSummary": "{cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}} · {masteryPercent}% mastery",
+  "@flashcardsDeckSummary": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "masteryPercent": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsStudyModesTitle": "Study modes",
+  "flashcardsProgressTitle": "Your progress",
+  "flashcardsProgressSubtitle": "Progress is derived from this deck's SRS state.",
+  "flashcardsProgressNew": "New",
+  "flashcardsProgressLearning": "Learning",
+  "flashcardsProgressMastered": "Mastered",
+  "flashcardsProgressCountValue": "{count}",
+  "@flashcardsProgressCountValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "flashcardsCardsSectionTitle": "Cards",
+  "flashcardsLearnDeckAction": "Study this deck",
   "flashcardsBulkSelected": "{count} selected",
   "@flashcardsBulkSelected": {
     "placeholders": {
