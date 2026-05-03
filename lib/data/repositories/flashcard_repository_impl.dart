@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../core/errors/app_exception.dart';
 import '../../core/errors/result.dart';
 import '../../core/services/clock.dart';
@@ -241,6 +243,8 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     required String deckId,
     required ImportSourceFormat format,
     required String rawContent,
+    Uint8List? sourceBytes,
+    bool excelHasHeader = true,
     FlashcardImportDuplicatePolicy duplicatePolicy =
         FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =
@@ -251,6 +255,8 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       final preparation = FlashcardImportSupport.parse(
         format: format,
         rawContent: rawContent,
+        sourceBytes: sourceBytes,
+        excelHasHeader: excelHasHeader,
         structuredTextSeparator: structuredTextSeparator,
       );
       return _applyImportDuplicatePolicy(

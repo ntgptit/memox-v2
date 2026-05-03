@@ -6,6 +6,7 @@ import 'package:memox/app/router/route_guards.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
+import 'package:memox/presentation/features/flashcards/screens/deck_import_screen.dart';
 import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_entry_screen.dart';
@@ -38,6 +39,28 @@ void main() {
 
     expect(find.byType(StudySessionScreen), findsOneWidget);
     expect(find.byType(StudyEntryScreen), findsNothing);
+  });
+
+  testWidgets('DT2 onNavigate: deck import path hides shell navigation', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appRouteGuardsProvider.overrideWith(
+            (ref) => const AppRouteGuards(
+              initialLocation: '/library/deck/deck-001/import',
+            ),
+          ),
+        ],
+        child: const _RouterApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DeckImportScreen), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byType(NavigationRail), findsNothing);
   });
 }
 

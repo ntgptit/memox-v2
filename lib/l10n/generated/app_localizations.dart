@@ -672,6 +672,324 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get settingsAppearanceTitle;
 
+  /// No description provided for @settingsAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get settingsAccountTitle;
+
+  /// No description provided for @settingsAccountLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading account'**
+  String get settingsAccountLoading;
+
+  /// No description provided for @settingsAccountSubtitleSignedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Google now so Drive sync can be enabled later.'**
+  String get settingsAccountSubtitleSignedOut;
+
+  /// No description provided for @settingsAccountSubtitleReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive app data access is ready for future sync.'**
+  String get settingsAccountSubtitleReady;
+
+  /// No description provided for @settingsAccountSubtitleReconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect Drive access before sync can run.'**
+  String get settingsAccountSubtitleReconnect;
+
+  /// No description provided for @settingsAccountSubtitleConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in is not configured for this build.'**
+  String get settingsAccountSubtitleConfig;
+
+  /// No description provided for @settingsAccountSubtitleUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in is not available on this platform.'**
+  String get settingsAccountSubtitleUnsupported;
+
+  /// No description provided for @settingsAccountSubtitleError.
+  ///
+  /// In en, this message translates to:
+  /// **'Google account could not be updated.'**
+  String get settingsAccountSubtitleError;
+
+  /// No description provided for @settingsAccountSignedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'No Google account is linked.'**
+  String get settingsAccountSignedOut;
+
+  /// No description provided for @settingsAccountMissingConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Google OAuth client IDs to enable account linking.'**
+  String get settingsAccountMissingConfig;
+
+  /// No description provided for @settingsAccountUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Android, iOS, or web to link Google account.'**
+  String get settingsAccountUnsupported;
+
+  /// No description provided for @settingsAccountDriveReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive ready'**
+  String get settingsAccountDriveReady;
+
+  /// No description provided for @settingsAccountDriveReconnectRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive reconnect required'**
+  String get settingsAccountDriveReconnectRequired;
+
+  /// No description provided for @settingsAccountDriveAuthorizationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Grant Google Drive app data access to prepare sync.'**
+  String get settingsAccountDriveAuthorizationRequired;
+
+  /// No description provided for @settingsAccountSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get settingsAccountSignIn;
+
+  /// No description provided for @settingsAccountReconnectDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect Google Drive'**
+  String get settingsAccountReconnectDrive;
+
+  /// No description provided for @settingsAccountSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get settingsAccountSignOut;
+
+  /// No description provided for @settingsAccountSignInCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in was canceled.'**
+  String get settingsAccountSignInCanceled;
+
+  /// No description provided for @settingsAccountSignInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in failed. Try again.'**
+  String get settingsAccountSignInFailed;
+
+  /// No description provided for @settingsAccountSignedOutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed out. Local flashcards stay on this device.'**
+  String get settingsAccountSignedOutMessage;
+
+  /// No description provided for @settingsDriveSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive sync'**
+  String get settingsDriveSyncTitle;
+
+  /// No description provided for @settingsDriveSyncLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading sync state'**
+  String get settingsDriveSyncLoading;
+
+  /// No description provided for @settingsDriveSyncSubtitleSignedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Google account before syncing.'**
+  String get settingsDriveSyncSubtitleSignedOut;
+
+  /// No description provided for @settingsDriveSyncSubtitleUnconfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in is not configured for this build.'**
+  String get settingsDriveSyncSubtitleUnconfigured;
+
+  /// No description provided for @settingsDriveSyncSubtitleReconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect Drive access before sync can run.'**
+  String get settingsDriveSyncSubtitleReconnect;
+
+  /// No description provided for @settingsDriveSyncSubtitleNoRemote.
+  ///
+  /// In en, this message translates to:
+  /// **'Create the first Drive backup from this device.'**
+  String get settingsDriveSyncSubtitleNoRemote;
+
+  /// No description provided for @settingsDriveSyncSubtitleSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data matches the latest Drive snapshot.'**
+  String get settingsDriveSyncSubtitleSynced;
+
+  /// No description provided for @settingsDriveSyncSubtitleReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual sync is ready.'**
+  String get settingsDriveSyncSubtitleReady;
+
+  /// No description provided for @settingsDriveSyncSubtitleConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which copy should win.'**
+  String get settingsDriveSyncSubtitleConflict;
+
+  /// No description provided for @settingsDriveSyncSubtitleUnsupportedSchema.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the app before restoring this Drive copy.'**
+  String get settingsDriveSyncSubtitleUnsupportedSchema;
+
+  /// No description provided for @settingsDriveSyncSubtitleError.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive sync could not complete.'**
+  String get settingsDriveSyncSubtitleError;
+
+  /// No description provided for @settingsDriveSyncSignedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google to sync the local database with Drive.'**
+  String get settingsDriveSyncSignedOut;
+
+  /// No description provided for @settingsDriveSyncUnconfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Google OAuth client IDs to enable Drive sync.'**
+  String get settingsDriveSyncUnconfigured;
+
+  /// No description provided for @settingsDriveSyncReconnectRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect Google Drive in Account first.'**
+  String get settingsDriveSyncReconnectRequired;
+
+  /// No description provided for @settingsDriveSyncNoRemote.
+  ///
+  /// In en, this message translates to:
+  /// **'No Drive snapshot exists yet.'**
+  String get settingsDriveSyncNoRemote;
+
+  /// No description provided for @settingsDriveSyncSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Drive is up to date.'**
+  String get settingsDriveSyncSynced;
+
+  /// No description provided for @settingsDriveSyncReady.
+  ///
+  /// In en, this message translates to:
+  /// **'A Drive snapshot is available.'**
+  String get settingsDriveSyncReady;
+
+  /// No description provided for @settingsDriveSyncConflictStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Local and Drive data both changed.'**
+  String get settingsDriveSyncConflictStatus;
+
+  /// No description provided for @settingsDriveSyncUnsupportedSchema.
+  ///
+  /// In en, this message translates to:
+  /// **'The Drive copy was created by a newer database schema.'**
+  String get settingsDriveSyncUnsupportedSchema;
+
+  /// No description provided for @settingsDriveSyncLastSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Last synced: {value}'**
+  String settingsDriveSyncLastSynced(Object value);
+
+  /// No description provided for @settingsDriveSyncRemoteDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive copy from: {device}'**
+  String settingsDriveSyncRemoteDevice(Object device);
+
+  /// No description provided for @settingsDriveSyncAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync now'**
+  String get settingsDriveSyncAction;
+
+  /// No description provided for @settingsDriveSyncUploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data backed up to Google Drive.'**
+  String get settingsDriveSyncUploaded;
+
+  /// No description provided for @settingsDriveSyncRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive copy restored.'**
+  String get settingsDriveSyncRestored;
+
+  /// No description provided for @settingsDriveSyncNoChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Already up to date.'**
+  String get settingsDriveSyncNoChanges;
+
+  /// No description provided for @settingsDriveSyncCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync canceled.'**
+  String get settingsDriveSyncCanceled;
+
+  /// No description provided for @settingsDriveSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive sync failed. Try again.'**
+  String get settingsDriveSyncFailed;
+
+  /// No description provided for @settingsDriveSyncConflictTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolve sync conflict'**
+  String get settingsDriveSyncConflictTitle;
+
+  /// No description provided for @settingsDriveSyncConflictMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data and the Drive copy both changed since the last sync.'**
+  String get settingsDriveSyncConflictMessage;
+
+  /// No description provided for @settingsDriveSyncKeepLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep local data'**
+  String get settingsDriveSyncKeepLocal;
+
+  /// No description provided for @settingsDriveSyncKeepLocalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload this device\'s database and replace the Drive snapshot.'**
+  String get settingsDriveSyncKeepLocalSubtitle;
+
+  /// No description provided for @settingsDriveSyncUseDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Drive copy'**
+  String get settingsDriveSyncUseDrive;
+
+  /// No description provided for @settingsDriveSyncUseDriveSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore the Drive snapshot over this device\'s local database.'**
+  String get settingsDriveSyncUseDriveSubtitle;
+
   /// No description provided for @settingsThemeModeLabel.
   ///
   /// In en, this message translates to:
@@ -1025,6 +1343,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch sort back to manual to reorder.'**
   String get foldersReorderManualOnlyHint;
+
+  /// No description provided for @foldersImportChoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import flashcards'**
+  String get foldersImportChoiceTitle;
+
+  /// No description provided for @foldersImportCreateDeckAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create new deck'**
+  String get foldersImportCreateDeckAction;
+
+  /// No description provided for @foldersImportExistingDeckAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to existing deck'**
+  String get foldersImportExistingDeckAction;
+
+  /// No description provided for @foldersImportChooseDeckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose deck'**
+  String get foldersImportChooseDeckTitle;
+
+  /// No description provided for @foldersImportNoDecksHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No decks in this folder yet.'**
+  String get foldersImportNoDecksHint;
 
   /// No description provided for @foldersStatusSubfolders.
   ///
@@ -2283,7 +2631,7 @@ abstract class AppLocalizations {
   /// No description provided for @importSourceTitle.
   ///
   /// In en, this message translates to:
-  /// **'Source'**
+  /// **'Import from'**
   String get importSourceTitle;
 
   /// No description provided for @importSourceSubtitle.
@@ -2298,10 +2646,16 @@ abstract class AppLocalizations {
   /// **'CSV'**
   String get importCsvLabel;
 
+  /// No description provided for @importExcelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel'**
+  String get importExcelLabel;
+
   /// No description provided for @importTextFormatLabel.
   ///
   /// In en, this message translates to:
-  /// **'Text format'**
+  /// **'Text'**
   String get importTextFormatLabel;
 
   /// No description provided for @importLoadFile.
@@ -2310,11 +2664,77 @@ abstract class AppLocalizations {
   /// **'Load file'**
   String get importLoadFile;
 
+  /// No description provided for @importSelectExcelFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Excel file'**
+  String get importSelectExcelFile;
+
+  /// No description provided for @importChangeFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get importChangeFile;
+
+  /// No description provided for @importRemoveFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get importRemoveFile;
+
+  /// No description provided for @importFileReadyToPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to preview'**
+  String get importFileReadyToPreview;
+
+  /// No description provided for @importDetectedRowsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 row detected} other{{count} rows detected}}'**
+  String importDetectedRowsLabel(int count);
+
   /// No description provided for @importCsvContentLabel.
   ///
   /// In en, this message translates to:
   /// **'CSV content'**
   String get importCsvContentLabel;
+
+  /// No description provided for @importExcelFileLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel file'**
+  String get importExcelFileLabel;
+
+  /// No description provided for @importExcelNoFileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No Excel file loaded'**
+  String get importExcelNoFileTitle;
+
+  /// No description provided for @importExcelNoFileDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Load a .xlsx file. Column A is front, column B is back, and column C is optional note.'**
+  String get importExcelNoFileDescription;
+
+  /// No description provided for @importExcelLoadedFileDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview reads the first sheet from A1. Use the header option if row 1 contains labels.'**
+  String get importExcelLoadedFileDescription;
+
+  /// No description provided for @importExcelHasHeaderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'First row is header'**
+  String get importExcelHasHeaderLabel;
+
+  /// No description provided for @importExcelHasHeaderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Data starts at row 2.'**
+  String get importExcelHasHeaderDescription;
 
   /// No description provided for @importTextContentLabel.
   ///
@@ -2333,6 +2753,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Front: ...\nBack: ...\nNote: ...\nOr one card per line: term / definition'**
   String get importTextHint;
+
+  /// No description provided for @importCsvRulesText.
+  ///
+  /// In en, this message translates to:
+  /// **'Use front, back, and optional note columns.'**
+  String get importCsvRulesText;
+
+  /// No description provided for @importExcelRulesText.
+  ///
+  /// In en, this message translates to:
+  /// **'Column A = front, Column B = back, Column C = note.'**
+  String get importExcelRulesText;
+
+  /// No description provided for @importTextRulesText.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Front:, Back:, and optional Note: lines.'**
+  String get importTextRulesText;
 
   /// No description provided for @importSeparatorLabel.
   ///
@@ -2457,8 +2895,14 @@ abstract class AppLocalizations {
   /// No description provided for @importPreviewAction.
   ///
   /// In en, this message translates to:
-  /// **'Preview'**
+  /// **'Preview import'**
   String get importPreviewAction;
+
+  /// No description provided for @importCommitCardsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Import 1 card} other{Import {count} cards}}'**
+  String importCommitCardsAction(int count);
 
   /// No description provided for @importSuccessMessage.
   ///
@@ -2475,7 +2919,7 @@ abstract class AppLocalizations {
   /// No description provided for @importFileUnavailableMessage.
   ///
   /// In en, this message translates to:
-  /// **'This file cannot be read. Choose another CSV or text file.'**
+  /// **'This file cannot be read. Choose another CSV, text, or .xlsx file.'**
   String get importFileUnavailableMessage;
 
   /// No description provided for @importValidationIssuesTitle.

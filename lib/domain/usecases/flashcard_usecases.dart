@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../core/errors/result.dart';
 import '../entities/flashcard_entity.dart';
 import '../repositories/flashcard_repository.dart';
@@ -112,6 +114,8 @@ final class PrepareFlashcardImportUseCase {
     required String deckId,
     required ImportSourceFormat format,
     required String rawContent,
+    Uint8List? sourceBytes,
+    bool excelHasHeader = true,
     FlashcardImportDuplicatePolicy duplicatePolicy =
         FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =
@@ -121,6 +125,8 @@ final class PrepareFlashcardImportUseCase {
       deckId: deckId,
       format: format,
       rawContent: rawContent,
+      sourceBytes: sourceBytes,
+      excelHasHeader: excelHasHeader,
       duplicatePolicy: duplicatePolicy,
       structuredTextSeparator: structuredTextSeparator,
     );

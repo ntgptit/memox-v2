@@ -32,7 +32,8 @@ Test file: `test/presentation/library_overview_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | root folder long-press opens direct folder actions | library overview has root folder `Korean1` and no modal is open | user long-presses `Korean1` | `Folder actions`, `Edit`, `Move`, and `Delete` are visible | C0+C1 |
+| DT1 | deck-capable root folder long-press opens direct folder actions with import | library overview has root folder `Korean1` that can accept deck imports and no modal is open | user long-presses `Korean1` | `Folder actions`, `Edit`, `Move`, `Import flashcards`, and `Delete` are visible | C0+C1 |
+| DT2 | subfolder-mode root folder long-press hides import | library overview has root folder `Korean1` that is locked to subfolders and no modal is open | user long-presses `Korean1` | `Folder actions` is visible and `Import flashcards` is absent | C0+C1 |
 
 ## Decision table: onDispose
 

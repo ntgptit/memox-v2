@@ -162,6 +162,63 @@ void main() {
     );
 
     test(
+      'DT4 onSearchFilterSort: folder import targets ignore active folder search',
+      () async {
+        final harness = ContentRepositoryHarness.create(
+          ids: ['folder-root', 'deck-import-target'],
+        );
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
+
+        final root = (await harness.folderRepository.createRootFolder(
+          'Korean',
+        )).valueOrNull!;
+        final deck = (await harness.deckRepository.createDeck(
+          folderId: root.id,
+          name: 'Import target',
+        )).valueOrNull!;
+
+        container
+            .read(folderChildrenToolbarStateProvider(root.id).notifier)
+            .setSearchTerm('not matching');
+
+        final targets = await container
+            .read(folderActionControllerProvider(root.id).notifier)
+            .loadImportDeckTargets();
+
+        expect(targets.map((item) => item.id), contains(deck.id));
+        expect(targets.single.name, 'Import target');
+      },
+    );
+
+    test(
+      'DT1 onInsert: folder action create deck returns id for import routing',
+      () async {
+        final harness = ContentRepositoryHarness.create(
+          ids: ['folder-root', 'deck-import-new'],
+        );
+        final container = _createContainer(harness);
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
+
+        final root = (await harness.folderRepository.createRootFolder(
+          'Korean',
+        )).valueOrNull!;
+
+        final deckId = await container
+            .read(folderActionControllerProvider(root.id).notifier)
+            .createDeck('Imported deck');
+
+        expect(deckId, 'deck-import-new');
+        expect(
+          container.read(folderActionControllerProvider(root.id)).hasError,
+          isFalse,
+        );
+      },
+    );
+
+    test(
       'DT1 onUpdate: deck action controller updates deck without provider error',
       () async {
         final harness = ContentRepositoryHarness.create(
@@ -325,6 +382,7 @@ void main() {
           flashcardImportControllerProvider(deck.id).notifier,
         );
 
+        draftNotifier.setFormat(ImportSourceFormat.csv);
         draftNotifier.setRawContent('front,back\nHello,');
         final invalidPreparation = await controller.preparePreview();
 

@@ -197,6 +197,69 @@
   "progressSessionRetryFinalizeMessage": "Đã thử finalize lại.",
   "progressSessionActionFailed": "Thao tác với phiên học thất bại.",
   "settingsAppearanceTitle": "Giao diện",
+  "settingsAccountTitle": "Tài khoản",
+  "settingsAccountLoading": "Đang tải tài khoản",
+  "settingsAccountSubtitleSignedOut": "Liên kết Google ngay để có thể bật đồng bộ Drive sau này.",
+  "settingsAccountSubtitleReady": "Quyền truy cập dữ liệu ứng dụng trên Google Drive đã sẵn sàng cho đồng bộ sau này.",
+  "settingsAccountSubtitleReconnect": "Cần kết nối lại quyền Drive trước khi chạy đồng bộ.",
+  "settingsAccountSubtitleConfig": "Bản build này chưa cấu hình Google sign-in.",
+  "settingsAccountSubtitleUnsupported": "Nền tảng này chưa hỗ trợ Google sign-in.",
+  "settingsAccountSubtitleError": "Không thể cập nhật tài khoản Google.",
+  "settingsAccountSignedOut": "Chưa liên kết tài khoản Google.",
+  "settingsAccountMissingConfig": "Thêm Google OAuth client ID để bật liên kết tài khoản.",
+  "settingsAccountUnsupported": "Hãy dùng Android, iOS hoặc web để liên kết tài khoản Google.",
+  "settingsAccountDriveReady": "Google Drive đã sẵn sàng",
+  "settingsAccountDriveReconnectRequired": "Cần kết nối lại Google Drive",
+  "settingsAccountDriveAuthorizationRequired": "Cấp quyền dữ liệu ứng dụng Google Drive để chuẩn bị đồng bộ.",
+  "settingsAccountSignIn": "Đăng nhập bằng Google",
+  "settingsAccountReconnectDrive": "Kết nối lại Google Drive",
+  "settingsAccountSignOut": "Đăng xuất",
+  "settingsAccountSignInCanceled": "Đã hủy đăng nhập Google.",
+  "settingsAccountSignInFailed": "Đăng nhập Google thất bại. Hãy thử lại.",
+  "settingsAccountSignedOutMessage": "Đã đăng xuất. Flashcard cục bộ vẫn ở trên thiết bị này.",
+  "settingsDriveSyncTitle": "Đồng bộ Drive",
+  "settingsDriveSyncLoading": "Đang tải trạng thái đồng bộ",
+  "settingsDriveSyncSubtitleSignedOut": "Liên kết tài khoản Google trước khi đồng bộ.",
+  "settingsDriveSyncSubtitleUnconfigured": "Bản build này chưa cấu hình Google sign-in.",
+  "settingsDriveSyncSubtitleReconnect": "Cần kết nối lại quyền Drive trước khi chạy đồng bộ.",
+  "settingsDriveSyncSubtitleNoRemote": "Tạo bản sao Drive đầu tiên từ thiết bị này.",
+  "settingsDriveSyncSubtitleSynced": "Dữ liệu cục bộ khớp với snapshot mới nhất trên Drive.",
+  "settingsDriveSyncSubtitleReady": "Có thể đồng bộ thủ công.",
+  "settingsDriveSyncSubtitleConflict": "Chọn bản dữ liệu được giữ lại.",
+  "settingsDriveSyncSubtitleUnsupportedSchema": "Cập nhật app trước khi khôi phục bản Drive này.",
+  "settingsDriveSyncSubtitleError": "Không thể hoàn tất đồng bộ Drive.",
+  "settingsDriveSyncSignedOut": "Đăng nhập Google để đồng bộ DB cục bộ với Drive.",
+  "settingsDriveSyncUnconfigured": "Thêm Google OAuth client ID để bật đồng bộ Drive.",
+  "settingsDriveSyncReconnectRequired": "Hãy kết nối lại Google Drive trong mục Tài khoản trước.",
+  "settingsDriveSyncNoRemote": "Chưa có snapshot nào trên Drive.",
+  "settingsDriveSyncSynced": "Google Drive đã được cập nhật.",
+  "settingsDriveSyncReady": "Đã có snapshot trên Drive.",
+  "settingsDriveSyncConflictStatus": "Dữ liệu cục bộ và Drive đều đã thay đổi.",
+  "settingsDriveSyncUnsupportedSchema": "Bản Drive được tạo bởi schema DB mới hơn.",
+  "settingsDriveSyncLastSynced": "Đồng bộ lần cuối: {value}",
+  "@settingsDriveSyncLastSynced": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "settingsDriveSyncRemoteDevice": "Bản Drive từ: {device}",
+  "@settingsDriveSyncRemoteDevice": {
+    "placeholders": {
+      "device": {}
+    }
+  },
+  "settingsDriveSyncAction": "Đồng bộ ngay",
+  "settingsDriveSyncUploaded": "Đã sao lưu dữ liệu cục bộ lên Google Drive.",
+  "settingsDriveSyncRestored": "Đã khôi phục bản Drive.",
+  "settingsDriveSyncNoChanges": "Dữ liệu đã được cập nhật.",
+  "settingsDriveSyncCanceled": "Đã hủy đồng bộ.",
+  "settingsDriveSyncFailed": "Đồng bộ Drive thất bại. Hãy thử lại.",
+  "settingsDriveSyncConflictTitle": "Xử lý xung đột đồng bộ",
+  "settingsDriveSyncConflictMessage": "Dữ liệu cục bộ và bản Drive đều đã thay đổi từ lần đồng bộ trước.",
+  "settingsDriveSyncKeepLocal": "Giữ dữ liệu cục bộ",
+  "settingsDriveSyncKeepLocalSubtitle": "Tải DB của thiết bị này lên và thay snapshot trên Drive.",
+  "settingsDriveSyncUseDrive": "Dùng bản Drive",
+  "settingsDriveSyncUseDriveSubtitle": "Khôi phục snapshot Drive đè lên DB cục bộ của thiết bị này.",
   "settingsThemeModeLabel": "Chế độ giao diện",
   "settingsThemeSystem": "Theo hệ thống",
   "settingsThemeLight": "Sáng",
@@ -268,6 +331,11 @@
   "foldersActionsTitle": "Thao tác thư mục",
   "foldersReorder": "Sắp xếp lại",
   "foldersReorderManualOnlyHint": "Hãy chuyển sắp xếp về chế độ thủ công để sắp xếp lại.",
+  "foldersImportChoiceTitle": "Nhập flashcard",
+  "foldersImportCreateDeckAction": "Tạo bộ thẻ mới",
+  "foldersImportExistingDeckAction": "Thêm vào bộ thẻ có sẵn",
+  "foldersImportChooseDeckTitle": "Chọn bộ thẻ",
+  "foldersImportNoDecksHint": "Chưa có bộ thẻ nào trong thư mục này.",
   "foldersStatusSubfolders": "Có {subfolderCount} thư mục con",
   "@foldersStatusSubfolders": {
     "placeholders": {
@@ -639,15 +707,37 @@
   "studyCancelConfirmMessage": "Phiên học hiện tại sẽ dừng lại và bạn sẽ được đưa đến màn hình kết quả.",
   "studyCancelConfirmAction": "Hủy",
   "flashcardsImportTitle": "Nhập flashcard",
-  "importSourceTitle": "Nguồn dữ liệu",
+  "importSourceTitle": "Nhập từ",
   "importSourceSubtitle": "Luồng import luôn preview trước và ghi atomically. Chỉ cần một dòng lỗi là chặn toàn bộ lần ghi.",
   "importCsvLabel": "CSV",
-  "importTextFormatLabel": "Định dạng text",
+  "importExcelLabel": "Excel",
+  "importTextFormatLabel": "Text",
   "importLoadFile": "Tải file",
+  "importSelectExcelFile": "Chọn file Excel",
+  "importChangeFile": "Đổi",
+  "importRemoveFile": "Xóa",
+  "importFileReadyToPreview": "Sẵn sàng xem trước",
+  "importDetectedRowsLabel": "{count, plural, =1{Đã nhận diện 1 dòng} other{Đã nhận diện {count} dòng}}",
+  "@importDetectedRowsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "importCsvContentLabel": "Nội dung CSV",
+  "importExcelFileLabel": "File Excel",
+  "importExcelNoFileTitle": "Chưa tải file Excel",
+  "importExcelNoFileDescription": "Tải file .xlsx. Cột A là mặt trước, cột B là mặt sau, cột C là ghi chú tùy chọn.",
+  "importExcelLoadedFileDescription": "Preview đọc sheet đầu tiên từ A1. Bật tùy chọn header nếu dòng 1 là nhãn cột.",
+  "importExcelHasHeaderLabel": "Dòng đầu là header",
+  "importExcelHasHeaderDescription": "Dữ liệu bắt đầu từ dòng 2.",
   "importTextContentLabel": "Text có cấu trúc",
   "importCsvHint": "front,back,note",
   "importTextHint": "Front: ...\nBack: ...\nNote: ...\nHoặc mỗi dòng một thẻ: thuật ngữ / định nghĩa",
+  "importCsvRulesText": "Dùng các cột front, back và note tùy chọn.",
+  "importExcelRulesText": "Cột A = mặt trước, cột B = mặt sau, cột C = ghi chú.",
+  "importTextRulesText": "Dùng các dòng Front:, Back: và Note: tùy chọn.",
   "importSeparatorLabel": "Dấu tách",
   "importSeparatorAuto": "Tự động",
   "importSeparatorTab": "Tab",
@@ -668,7 +758,15 @@
   "importDuplicatePolicyImportAnywayDescription": "Tùy chọn sau MVP: tạo mọi dòng hợp lệ, kể cả khi mặt trước và mặt sau trùng thẻ đã có.",
   "importDuplicatePolicyUpdateExisting": "Cập nhật thẻ đã có",
   "importDuplicatePolicyUpdateExistingDescription": "Tùy chọn sau MVP: cập nhật thẻ khớp thay vì tạo duplicate mới.",
-  "importPreviewAction": "Xem trước",
+  "importPreviewAction": "Xem trước import",
+  "importCommitCardsAction": "{count, plural, =1{Nhập 1 thẻ} other{Nhập {count} thẻ}}",
+  "@importCommitCardsAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "importSuccessMessage": "Đã nhập {count} flashcard.",
   "@importSuccessMessage": {
     "placeholders": {
@@ -683,7 +781,7 @@
       "fileName": {}
     }
   },
-  "importFileUnavailableMessage": "Không thể đọc file này. Hãy chọn một file CSV hoặc text khác.",
+  "importFileUnavailableMessage": "Không thể đọc file này. Hãy chọn một file CSV, text hoặc .xlsx khác.",
   "importValidationIssuesTitle": "Lỗi xác thực",
   "importValidationIssuesSubtitle": "Hãy sửa toàn bộ lỗi trước khi nhập.",
   "importValidationIssueLine": "Dòng {line}",

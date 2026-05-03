@@ -3,11 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/app/di/account_providers.dart';
+import 'package:memox/app/di/sync_providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/app/di/study_providers.dart';
+import 'package:memox/app/services/drive_sync_runtime_effects.dart';
+import 'package:memox/core/config/google_oauth_config.dart';
 import 'package:memox/core/constants/app_constants.dart';
+import 'package:memox/data/settings/cloud_account_store.dart';
 import 'package:memox/data/settings/study_settings_store.dart';
 import 'package:memox/data/settings/tts_settings_store.dart';
+import 'package:memox/domain/entities/cloud_account_link.dart';
+import 'package:memox/domain/entities/drive_sync_models.dart';
+import 'package:memox/domain/repositories/drive_sync_repository.dart';
+import 'package:memox/domain/services/google_account_auth_service.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/settings/providers/locale_notifier.dart';
@@ -37,9 +46,26 @@ void main() {
     final harness = await _pumpSettings(tester);
 
     expect(find.text('Settings'), findsWidgets);
+    expect(find.text('Account'), findsOneWidget);
+    expect(
+      find.text('Google sign-in is not configured for this build.'),
+      findsOneWidget,
+    );
     expect(find.text('Light'), findsOneWidget);
     expect(find.text('System'), findsWidgets);
+    await tester.scrollUntilVisible(
+      find.text('English'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('English'), findsWidgets);
+    await tester.scrollUntilVisible(
+      find.text('Study defaults'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Study defaults'), findsOneWidget);
     expect(harness.tts.availableVoiceRequests, isEmpty);
   });
@@ -60,6 +86,11 @@ void main() {
         tester,
         settle: false,
         studySettingsStoreFuture: completer.future,
+      );
+      await tester.scrollUntilVisible(
+        find.text('Study defaults'),
+        300,
+        scrollable: find.byType(Scrollable).first,
       );
 
       expect(find.text('Study defaults'), findsOneWidget);
@@ -103,8 +134,123 @@ void main() {
     await _pumpSettings(tester);
 
     expect(find.text('Appearance'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Language'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.text('Language'), findsOneWidget);
   });
+
+  testWidgets(
+    'DT5 onDisplay: disables Google sign-in when OAuth config is missing',
+    (tester) async {
+      await _pumpSettings(tester);
+
+      final signInButton = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Sign in with Google'),
+      );
+
+      expect(
+        find.text('Add Google OAuth client IDs to enable account linking.'),
+        findsOneWidget,
+      );
+      expect(signInButton.onPressed, isNull);
+    },
+  );
+
+  testWidgets('DT6 onDisplay: shows linked Google account with Drive ready', (
+    tester,
+  ) async {
+    final preferences = await SharedPreferences.getInstance();
+    final store = CloudAccountStore(preferences);
+    await store.save(_driveReadyLink);
+
+    await _pumpSettings(
+      tester,
+      googleConfig: _configuredGoogle,
+      googleAuth: _FakeGoogleAccountAuthService(
+        restoreResult: GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('MemoX User'), findsOneWidget);
+    expect(find.text('user@example.com'), findsOneWidget);
+    expect(find.text('Google Drive ready'), findsOneWidget);
+    expect(find.text('Sign out'), findsOneWidget);
+  });
+
+  testWidgets(
+    'DT7 onDisplay: shows reconnect state when Drive scope is missing',
+    (tester) async {
+      final preferences = await SharedPreferences.getInstance();
+      final store = CloudAccountStore(preferences);
+      await store.save(_driveMissingLink);
+
+      await _pumpSettings(
+        tester,
+        googleConfig: _configuredGoogle,
+        googleAuth: _FakeGoogleAccountAuthService(
+          restoreResult: GoogleAccountAuthResult.driveAuthorizationRequired(
+            _session(
+              grantedScopes: const <String>{},
+              driveAuthorizationState:
+                  DriveAuthorizationState.authorizationRequired,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('MemoX User'), findsOneWidget);
+      expect(find.text('Google Drive reconnect required'), findsOneWidget);
+      expect(find.text('Reconnect Google Drive'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT8 onDisplay: shows Drive sync group disabled while signed out',
+    (tester) async {
+      await _pumpSettings(tester);
+
+      expect(find.text('Drive sync'), findsOneWidget);
+      expect(find.text('Link Google account before syncing.'), findsOneWidget);
+      expect(
+        find.text('Sign in with Google to sync the local database with Drive.'),
+        findsOneWidget,
+      );
+      final syncButton = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Sync now'),
+      );
+      expect(syncButton.onPressed, isNull);
+    },
+  );
+
+  testWidgets(
+    'DT9 onDisplay: shows Drive sync action when Google Drive is ready',
+    (tester) async {
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+      );
+
+      await _pumpSettings(tester, driveSyncRepository: repository);
+
+      expect(find.text('Drive sync'), findsOneWidget);
+      expect(
+        find.text('Create the first Drive backup from this device.'),
+        findsOneWidget,
+      );
+      final syncButton = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Sync now'),
+      );
+      expect(syncButton.onPressed, isNotNull);
+    },
+  );
 
   testWidgets(
     'DT2 onDisplay: renders speech settings with Korean and English only',
@@ -146,6 +292,13 @@ void main() {
   ) async {
     await _pumpSettings(tester);
 
+    await tester.scrollUntilVisible(
+      find.text('Study defaults'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
     expect(find.text('Study defaults'), findsOneWidget);
     expect(find.text('New Study batch size'), findsOneWidget);
     expect(find.text('Review batch size'), findsOneWidget);
@@ -176,6 +329,12 @@ void main() {
       expect(settings.reviewDefaults.batchSize, 5);
       expect(store.loadNewStudyDefaults().batchSize, 20);
       expect(store.loadReviewDefaults().batchSize, 5);
+      await tester.scrollUntilVisible(
+        find.text('Study defaults'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
       expect(find.text('20'), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
     },
@@ -186,12 +345,16 @@ void main() {
     (tester) async {
       final harness = await _pumpSettings(tester);
 
+      await tester.ensureVisible(find.text('Dark'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
 
       expect(harness.container.read(themeModeProvider), ThemeMode.dark);
       expect(find.text('Settings updated.'), findsOneWidget);
 
+      await tester.ensureVisible(find.text('Vietnamese'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Vietnamese'));
       await tester.pumpAndSettle();
 
@@ -210,8 +373,16 @@ void main() {
         ),
       );
 
+      await tester.scrollUntilVisible(
+        find.text('Appearance'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
       expect(find.byType(RadioListTile<ThemeMode>), findsNWidgets(3));
 
+      await tester.ensureVisible(find.text('Dark'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
 
@@ -360,6 +531,138 @@ void main() {
       expect(store.loadNewStudyDefaults().shuffleFlashcards, isFalse);
     },
   );
+
+  testWidgets(
+    'DT6 onUpdate: Google sign-in persists account and Drive appdata scope',
+    (tester) async {
+      final googleAuth = _FakeGoogleAccountAuthService(
+        signInResult: GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      );
+      final harness = await _pumpSettings(
+        tester,
+        googleConfig: _configuredGoogle,
+        googleAuth: googleAuth,
+      );
+
+      await tester.tap(find.text('Sign in with Google'));
+      await tester.pumpAndSettle();
+
+      final repository = await harness.container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+      final link = await repository.load();
+
+      expect(link?.email, 'user@example.com');
+      expect(link?.driveAppDataAuthorized, isTrue);
+      expect(find.text('Google Drive ready'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT7 onUpdate: canceled Google sign-in keeps account signed out',
+    (tester) async {
+      final harness = await _pumpSettings(
+        tester,
+        googleConfig: _configuredGoogle,
+        googleAuth: _FakeGoogleAccountAuthService(
+          signInResult: const GoogleAccountAuthResult.canceled(),
+        ),
+      );
+
+      await tester.tap(find.text('Sign in with Google'));
+      await tester.pumpAndSettle();
+
+      final repository = await harness.container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+
+      expect(await repository.load(), isNull);
+      expect(find.text('Google sign-in was canceled.'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT8 onUpdate: denied Drive scope stores account and asks reconnect',
+    (tester) async {
+      final harness = await _pumpSettings(
+        tester,
+        googleConfig: _configuredGoogle,
+        googleAuth: _FakeGoogleAccountAuthService(
+          signInResult: GoogleAccountAuthResult.driveAuthorizationRequired(
+            _session(
+              grantedScopes: const <String>{},
+              driveAuthorizationState: DriveAuthorizationState.denied,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Sign in with Google'));
+      await tester.pumpAndSettle();
+
+      final repository = await harness.container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+      final link = await repository.load();
+      final preferences = await SharedPreferences.getInstance();
+      final rawAccount = preferences.getString(
+        AppConstants.sharedPrefsCloudAccountLinkKey,
+      );
+
+      expect(link?.email, 'user@example.com');
+      expect(link?.driveAppDataAuthorized, isFalse);
+      expect(rawAccount, isNot(contains('accessToken')));
+      expect(find.text('Google Drive reconnect required'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT9 onUpdate: local sign out clears account and preserves study defaults',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({
+        AppConstants.sharedPrefsDefaultNewBatchSizeKey: 12,
+      });
+      final preferences = await SharedPreferences.getInstance();
+      final store = CloudAccountStore(preferences);
+      await store.save(_driveReadyLink);
+      final googleAuth = _FakeGoogleAccountAuthService(
+        restoreResult: GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      );
+      final harness = await _pumpSettings(
+        tester,
+        googleConfig: _configuredGoogle,
+        googleAuth: googleAuth,
+      );
+
+      await tester.tap(find.text('Sign out'));
+      await tester.pumpAndSettle();
+
+      final repository = await harness.container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+      final studyStore = await harness.container.read(
+        studySettingsStoreProvider.future,
+      );
+
+      expect(await repository.load(), isNull);
+      expect(googleAuth.signOutCount, 1);
+      expect(studyStore.loadNewStudyDefaults().batchSize, 12);
+      expect(
+        find.text('Signed out. Local flashcards stay on this device.'),
+        findsOneWidget,
+      );
+    },
+  );
 }
 
 Future<_SettingsHarness> _pumpSettings(
@@ -367,12 +670,30 @@ Future<_SettingsHarness> _pumpSettings(
   MediaQueryData? mediaQueryData,
   Future<StudySettingsStore>? studySettingsStoreFuture,
   Future<TtsSettingsStore>? ttsSettingsStoreFuture,
+  GoogleOAuthConfig? googleConfig,
+  GoogleAccountAuthService? googleAuth,
+  DriveSyncRepository? driveSyncRepository,
   bool settle = true,
 }) async {
   final fakeTts = _FakeTtsService();
+  final effectiveGoogleAuth = googleAuth ?? _FakeGoogleAccountAuthService();
+  final effectiveDriveSyncRepository =
+      driveSyncRepository ??
+      _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.signedOut(),
+      );
   final container = ProviderContainer(
     overrides: [
       ttsServiceProvider.overrideWithValue(fakeTts),
+      driveSyncRepositoryProvider.overrideWith(
+        (ref) async => effectiveDriveSyncRepository,
+      ),
+      driveSyncRuntimeEffectsProvider.overrideWithValue(
+        _FakeDriveSyncRuntimeEffects(),
+      ),
+      if (googleConfig != null)
+        googleOAuthConfigProvider.overrideWithValue(googleConfig),
+      googleAccountAuthServiceProvider.overrideWithValue(effectiveGoogleAuth),
       if (studySettingsStoreFuture != null)
         studySettingsStoreProvider.overrideWith(
           (ref) => studySettingsStoreFuture,
@@ -383,6 +704,9 @@ Future<_SettingsHarness> _pumpSettings(
   );
   addTearDown(container.dispose);
   addTearDown(fakeTts.dispose);
+  if (effectiveGoogleAuth is _FakeGoogleAccountAuthService) {
+    addTearDown(effectiveGoogleAuth.dispose);
+  }
 
   final child = mediaQueryData == null
       ? const SettingsScreen()
@@ -408,6 +732,157 @@ final class _SettingsHarness {
 
   final ProviderContainer container;
   final _FakeTtsService tts;
+}
+
+final class _FakeDriveSyncRepository implements DriveSyncRepository {
+  _FakeDriveSyncRepository({
+    DriveSyncStatus? loadStatusResult,
+    DriveSyncRunResult? syncResult,
+    DriveSyncRunResult? resolveResult,
+  }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
+       syncResult =
+           syncResult ??
+           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+       resolveResult =
+           resolveResult ??
+           DriveSyncRunResult.canceled(const DriveSyncStatus.ready());
+
+  final DriveSyncStatus loadStatusResult;
+  final DriveSyncRunResult syncResult;
+  final DriveSyncRunResult resolveResult;
+  int syncNowCount = 0;
+
+  @override
+  Future<DriveSyncStatus> loadStatus() async {
+    return loadStatusResult;
+  }
+
+  @override
+  Future<DriveSyncRunResult> syncNow() async {
+    syncNowCount += 1;
+    return syncResult;
+  }
+
+  @override
+  Future<DriveSyncRunResult> resolveConflict(
+    DriveSyncConflict conflict,
+    DriveSyncConflictChoice choice,
+  ) async {
+    return resolveResult;
+  }
+}
+
+final class _FakeDriveSyncRuntimeEffects implements DriveSyncRuntimeEffects {
+  @override
+  Future<void> apply(DriveSyncRestoreEffect effect) async {}
+}
+
+final _configuredGoogle = GoogleOAuthConfig.fromValues(
+  webClientId: 'web-client-id.apps.googleusercontent.com',
+  serverClientId: 'server-client-id.apps.googleusercontent.com',
+);
+
+const _driveReadyLink = CloudAccountLink(
+  provider: CloudProvider.google,
+  subjectId: 'google-user-001',
+  email: 'user@example.com',
+  displayName: 'MemoX User',
+  photoUrl: null,
+  grantedScopes: <String>{googleDriveAppDataScope},
+  driveAuthorizationState: DriveAuthorizationState.authorized,
+  linkedAt: 1,
+  lastSignedInAt: 1,
+);
+
+const _driveMissingLink = CloudAccountLink(
+  provider: CloudProvider.google,
+  subjectId: 'google-user-001',
+  email: 'user@example.com',
+  displayName: 'MemoX User',
+  photoUrl: null,
+  grantedScopes: <String>{},
+  driveAuthorizationState: DriveAuthorizationState.authorizationRequired,
+  linkedAt: 1,
+  lastSignedInAt: 1,
+);
+
+GoogleAccountAuthSession _session({
+  required Set<String> grantedScopes,
+  required DriveAuthorizationState driveAuthorizationState,
+}) {
+  return GoogleAccountAuthSession(
+    profile: const GoogleAccountProfile(
+      subjectId: 'google-user-001',
+      email: 'user@example.com',
+      displayName: 'MemoX User',
+      photoUrl: null,
+    ),
+    grantedScopes: grantedScopes,
+    driveAuthorizationState: driveAuthorizationState,
+  );
+}
+
+final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
+  _FakeGoogleAccountAuthService({
+    this.restoreResult = const GoogleAccountAuthResult.signedOut(),
+    this.signInResult = const GoogleAccountAuthResult.signedOut(),
+  });
+
+  final StreamController<GoogleAccountAuthResult> _events =
+      StreamController<GoogleAccountAuthResult>.broadcast();
+
+  GoogleAccountAuthResult restoreResult;
+  GoogleAccountAuthResult signInResult;
+  int signOutCount = 0;
+
+  @override
+  Stream<GoogleAccountAuthResult> get authenticationEvents => _events.stream;
+
+  @override
+  bool get supportsInteractiveSignIn => true;
+
+  @override
+  bool get requiresPlatformSignInButton => false;
+
+  @override
+  Future<void> initialize(GoogleOAuthConfig config) async {}
+
+  @override
+  Future<GoogleAccountAuthResult> restoreLightweightSession(
+    GoogleOAuthConfig config,
+  ) async {
+    return restoreResult;
+  }
+
+  @override
+  Future<GoogleAccountAuthResult> signInAndAuthorizeDriveAppData(
+    GoogleOAuthConfig config,
+  ) async {
+    return signInResult;
+  }
+
+  @override
+  Future<GoogleAccountAuthResult> authorizeDriveAppData(
+    GoogleOAuthConfig config,
+    CloudAccountLink link,
+  ) async {
+    return signInResult;
+  }
+
+  @override
+  Future<DriveAccessTokenResult> getDriveAppDataAccessToken(
+    GoogleOAuthConfig config,
+    CloudAccountLink link,
+  ) async {
+    return const DriveAccessTokenResult.reauthorizationRequired();
+  }
+
+  @override
+  Future<void> signOutLocal() async {
+    signOutCount += 1;
+  }
+
+  Future<void> dispose() => _events.close();
 }
 
 final class _SpeakCall {

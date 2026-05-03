@@ -12,6 +12,7 @@ import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/app/logging/app_talker.dart';
 import 'package:memox/app/router/route_names.dart';
+import 'package:memox/core/config/google_oauth_config.dart';
 import 'package:memox/core/constants/app_constants.dart';
 import 'package:memox/core/services/clock.dart';
 import 'package:memox/core/services/id_generator.dart';
@@ -94,6 +95,7 @@ AppConfig integrationTestConfig({required String initialLocation}) {
     enableTalkerRouteLogging: false,
     enableRiverpodDiagnostics: false,
     exposeInternalErrorDetails: true,
+    googleOAuthConfig: GoogleOAuthConfig.fromValues(),
   );
 }
 

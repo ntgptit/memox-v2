@@ -15,7 +15,7 @@ import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../viewmodels/deck_action_viewmodel.dart';
 
-enum DeckQuickAction { edit, move, duplicate, export, delete }
+enum DeckQuickAction { edit, move, duplicate, import, export, delete }
 
 Future<void> showDeckActions({
   required BuildContext context,
@@ -47,6 +47,11 @@ Future<void> showDeckActions({
           icon: Icons.copy_outlined,
         ),
         MxActionSheetItem(
+          value: DeckQuickAction.import,
+          label: l10n.flashcardsImportTitle,
+          icon: Icons.file_upload_outlined,
+        ),
+        MxActionSheetItem(
           value: DeckQuickAction.export,
           label: l10n.decksExportCsvAction,
           icon: Icons.file_download_outlined,
@@ -71,6 +76,8 @@ Future<void> showDeckActions({
       await _moveDeck(context, ref, deckId, actionContext);
     case DeckQuickAction.duplicate:
       await _duplicateDeck(context, ref, deckId, actionContext);
+    case DeckQuickAction.import:
+      context.pushDeckImport(deckId);
     case DeckQuickAction.export:
       await _exportDeck(context, ref, deckId);
     case DeckQuickAction.delete:

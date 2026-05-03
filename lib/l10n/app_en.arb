@@ -197,6 +197,69 @@
   "progressSessionRetryFinalizeMessage": "Finalize retried.",
   "progressSessionActionFailed": "Session action failed.",
   "settingsAppearanceTitle": "Appearance",
+  "settingsAccountTitle": "Account",
+  "settingsAccountLoading": "Loading account",
+  "settingsAccountSubtitleSignedOut": "Link Google now so Drive sync can be enabled later.",
+  "settingsAccountSubtitleReady": "Google Drive app data access is ready for future sync.",
+  "settingsAccountSubtitleReconnect": "Reconnect Drive access before sync can run.",
+  "settingsAccountSubtitleConfig": "Google sign-in is not configured for this build.",
+  "settingsAccountSubtitleUnsupported": "Google sign-in is not available on this platform.",
+  "settingsAccountSubtitleError": "Google account could not be updated.",
+  "settingsAccountSignedOut": "No Google account is linked.",
+  "settingsAccountMissingConfig": "Add Google OAuth client IDs to enable account linking.",
+  "settingsAccountUnsupported": "Use Android, iOS, or web to link Google account.",
+  "settingsAccountDriveReady": "Google Drive ready",
+  "settingsAccountDriveReconnectRequired": "Google Drive reconnect required",
+  "settingsAccountDriveAuthorizationRequired": "Grant Google Drive app data access to prepare sync.",
+  "settingsAccountSignIn": "Sign in with Google",
+  "settingsAccountReconnectDrive": "Reconnect Google Drive",
+  "settingsAccountSignOut": "Sign out",
+  "settingsAccountSignInCanceled": "Google sign-in was canceled.",
+  "settingsAccountSignInFailed": "Google sign-in failed. Try again.",
+  "settingsAccountSignedOutMessage": "Signed out. Local flashcards stay on this device.",
+  "settingsDriveSyncTitle": "Drive sync",
+  "settingsDriveSyncLoading": "Loading sync state",
+  "settingsDriveSyncSubtitleSignedOut": "Link Google account before syncing.",
+  "settingsDriveSyncSubtitleUnconfigured": "Google sign-in is not configured for this build.",
+  "settingsDriveSyncSubtitleReconnect": "Reconnect Drive access before sync can run.",
+  "settingsDriveSyncSubtitleNoRemote": "Create the first Drive backup from this device.",
+  "settingsDriveSyncSubtitleSynced": "Local data matches the latest Drive snapshot.",
+  "settingsDriveSyncSubtitleReady": "Manual sync is ready.",
+  "settingsDriveSyncSubtitleConflict": "Choose which copy should win.",
+  "settingsDriveSyncSubtitleUnsupportedSchema": "Update the app before restoring this Drive copy.",
+  "settingsDriveSyncSubtitleError": "Drive sync could not complete.",
+  "settingsDriveSyncSignedOut": "Sign in with Google to sync the local database with Drive.",
+  "settingsDriveSyncUnconfigured": "Add Google OAuth client IDs to enable Drive sync.",
+  "settingsDriveSyncReconnectRequired": "Reconnect Google Drive in Account first.",
+  "settingsDriveSyncNoRemote": "No Drive snapshot exists yet.",
+  "settingsDriveSyncSynced": "Google Drive is up to date.",
+  "settingsDriveSyncReady": "A Drive snapshot is available.",
+  "settingsDriveSyncConflictStatus": "Local and Drive data both changed.",
+  "settingsDriveSyncUnsupportedSchema": "The Drive copy was created by a newer database schema.",
+  "settingsDriveSyncLastSynced": "Last synced: {value}",
+  "@settingsDriveSyncLastSynced": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "settingsDriveSyncRemoteDevice": "Drive copy from: {device}",
+  "@settingsDriveSyncRemoteDevice": {
+    "placeholders": {
+      "device": {}
+    }
+  },
+  "settingsDriveSyncAction": "Sync now",
+  "settingsDriveSyncUploaded": "Local data backed up to Google Drive.",
+  "settingsDriveSyncRestored": "Drive copy restored.",
+  "settingsDriveSyncNoChanges": "Already up to date.",
+  "settingsDriveSyncCanceled": "Sync canceled.",
+  "settingsDriveSyncFailed": "Drive sync failed. Try again.",
+  "settingsDriveSyncConflictTitle": "Resolve sync conflict",
+  "settingsDriveSyncConflictMessage": "Local data and the Drive copy both changed since the last sync.",
+  "settingsDriveSyncKeepLocal": "Keep local data",
+  "settingsDriveSyncKeepLocalSubtitle": "Upload this device's database and replace the Drive snapshot.",
+  "settingsDriveSyncUseDrive": "Use Drive copy",
+  "settingsDriveSyncUseDriveSubtitle": "Restore the Drive snapshot over this device's local database.",
   "settingsThemeModeLabel": "Theme mode",
   "settingsThemeSystem": "System",
   "settingsThemeLight": "Light",
@@ -268,6 +331,11 @@
   "foldersActionsTitle": "Folder actions",
   "foldersReorder": "Reorder",
   "foldersReorderManualOnlyHint": "Switch sort back to manual to reorder.",
+  "foldersImportChoiceTitle": "Import flashcards",
+  "foldersImportCreateDeckAction": "Create new deck",
+  "foldersImportExistingDeckAction": "Add to existing deck",
+  "foldersImportChooseDeckTitle": "Choose deck",
+  "foldersImportNoDecksHint": "No decks in this folder yet.",
   "foldersStatusSubfolders": "Contains {subfolderCount} subfolders",
   "@foldersStatusSubfolders": {
     "placeholders": {
@@ -639,15 +707,37 @@
   "studyCancelConfirmMessage": "Your current study session will stop and you will be taken to the result screen.",
   "studyCancelConfirmAction": "Cancel",
   "flashcardsImportTitle": "Import flashcards",
-  "importSourceTitle": "Source",
+  "importSourceTitle": "Import from",
   "importSourceSubtitle": "Import is preview-first and atomic. Any invalid line blocks the entire write.",
   "importCsvLabel": "CSV",
-  "importTextFormatLabel": "Text format",
+  "importExcelLabel": "Excel",
+  "importTextFormatLabel": "Text",
   "importLoadFile": "Load file",
+  "importSelectExcelFile": "Select Excel file",
+  "importChangeFile": "Change",
+  "importRemoveFile": "Remove",
+  "importFileReadyToPreview": "Ready to preview",
+  "importDetectedRowsLabel": "{count, plural, =1{1 row detected} other{{count} rows detected}}",
+  "@importDetectedRowsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "importCsvContentLabel": "CSV content",
+  "importExcelFileLabel": "Excel file",
+  "importExcelNoFileTitle": "No Excel file loaded",
+  "importExcelNoFileDescription": "Load a .xlsx file. Column A is front, column B is back, and column C is optional note.",
+  "importExcelLoadedFileDescription": "Preview reads the first sheet from A1. Use the header option if row 1 contains labels.",
+  "importExcelHasHeaderLabel": "First row is header",
+  "importExcelHasHeaderDescription": "Data starts at row 2.",
   "importTextContentLabel": "Structured text",
   "importCsvHint": "front,back,note",
   "importTextHint": "Front: ...\nBack: ...\nNote: ...\nOr one card per line: term / definition",
+  "importCsvRulesText": "Use front, back, and optional note columns.",
+  "importExcelRulesText": "Column A = front, Column B = back, Column C = note.",
+  "importTextRulesText": "Use Front:, Back:, and optional Note: lines.",
   "importSeparatorLabel": "Separator",
   "importSeparatorAuto": "Auto",
   "importSeparatorTab": "Tab",
@@ -668,7 +758,15 @@
   "importDuplicatePolicyImportAnywayDescription": "Future option: create every valid row, even when front and back match an existing card.",
   "importDuplicatePolicyUpdateExisting": "Update existing cards",
   "importDuplicatePolicyUpdateExistingDescription": "Future option: update matched cards instead of creating new duplicates.",
-  "importPreviewAction": "Preview",
+  "importPreviewAction": "Preview import",
+  "importCommitCardsAction": "{count, plural, =1{Import 1 card} other{Import {count} cards}}",
+  "@importCommitCardsAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "importSuccessMessage": "Imported {count} flashcards.",
   "@importSuccessMessage": {
     "placeholders": {
@@ -683,7 +781,7 @@
       "fileName": {}
     }
   },
-  "importFileUnavailableMessage": "This file cannot be read. Choose another CSV or text file.",
+  "importFileUnavailableMessage": "This file cannot be read. Choose another CSV, text, or .xlsx file.",
   "importValidationIssuesTitle": "Validation issues",
   "importValidationIssuesSubtitle": "Fix every issue before importing.",
   "importValidationIssueLine": "Line {line}",

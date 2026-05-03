@@ -11,12 +11,21 @@ import '../presentation/shared/layouts/mx_adaptive_scaffold.dart';
 /// adaptive nav surface — bottom bar on compact, rail on medium+, extended
 /// rail on large+.
 class AppShell extends StatelessWidget {
-  const AppShell({required this.navigationShell, super.key});
+  const AppShell({
+    required this.navigationShell,
+    this.hideNavigation = false,
+    super.key,
+  });
 
   final StatefulNavigationShell navigationShell;
+  final bool hideNavigation;
 
   @override
   Widget build(BuildContext context) {
+    if (hideNavigation) {
+      return navigationShell;
+    }
+
     final l10n = AppLocalizations.of(context);
     final selectedIndex = navigationShell.currentIndex;
 

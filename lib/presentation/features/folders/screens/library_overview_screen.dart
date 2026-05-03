@@ -144,6 +144,7 @@ List<Widget> _buildFolderListSlivers(
         folderId: folder.id,
         folderName: folder.name,
         allowRootDestination: false,
+        canImportFlashcards: folder.canImportFlashcards,
       ),
       onStartStudy: (folderId) =>
           context.goStudyEntry(entryType: 'folder', entryRefId: folderId),

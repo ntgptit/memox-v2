@@ -17,6 +17,9 @@ class FlashcardImportDraftState {
     required this.structuredTextSeparator,
     required this.duplicatePolicy,
     required this.rawContent,
+    this.excelHasHeader = true,
+    this.sourceBytes,
+    this.loadedFileName,
     this.preparation,
   });
 
@@ -24,6 +27,9 @@ class FlashcardImportDraftState {
   final ImportStructuredTextSeparator structuredTextSeparator;
   final FlashcardImportDuplicatePolicy duplicatePolicy;
   final String rawContent;
+  final bool excelHasHeader;
+  final Uint8List? sourceBytes;
+  final String? loadedFileName;
   final FlashcardImportPreparation? preparation;
 
   FlashcardImportDraftState copyWith({
@@ -31,8 +37,13 @@ class FlashcardImportDraftState {
     ImportStructuredTextSeparator? structuredTextSeparator,
     FlashcardImportDuplicatePolicy? duplicatePolicy,
     String? rawContent,
+    bool? excelHasHeader,
+    Uint8List? sourceBytes,
+    String? loadedFileName,
     FlashcardImportPreparation? preparation,
     bool clearPreparation = false,
+    bool clearSourceBytes = false,
+    bool clearLoadedFileName = false,
   }) {
     return FlashcardImportDraftState(
       format: format ?? this.format,
@@ -40,6 +51,11 @@ class FlashcardImportDraftState {
           structuredTextSeparator ?? this.structuredTextSeparator,
       duplicatePolicy: duplicatePolicy ?? this.duplicatePolicy,
       rawContent: rawContent ?? this.rawContent,
+      excelHasHeader: excelHasHeader ?? this.excelHasHeader,
+      sourceBytes: clearSourceBytes ? null : (sourceBytes ?? this.sourceBytes),
+      loadedFileName: clearLoadedFileName
+          ? null
+          : (loadedFileName ?? this.loadedFileName),
       preparation: clearPreparation ? null : (preparation ?? this.preparation),
     );
   }
@@ -50,7 +66,7 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
   @override
   FlashcardImportDraftState build(String deckId) {
     return const FlashcardImportDraftState(
-      format: ImportSourceFormat.csv,
+      format: ImportSourceFormat.excel,
       structuredTextSeparator: ImportStructuredTextSeparator.auto,
       duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
       rawContent: '',
@@ -61,7 +77,13 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
     if (state.format == format) {
       return;
     }
-    state = state.copyWith(format: format, clearPreparation: true);
+    state = state.copyWith(
+      format: format,
+      rawContent: '',
+      clearPreparation: true,
+      clearSourceBytes: true,
+      clearLoadedFileName: true,
+    );
   }
 
   void setStructuredTextSeparator(
@@ -90,7 +112,45 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
     if (state.rawContent == rawContent) {
       return;
     }
-    state = state.copyWith(rawContent: rawContent, clearPreparation: true);
+    state = state.copyWith(
+      rawContent: rawContent,
+      clearPreparation: true,
+      clearSourceBytes: true,
+      clearLoadedFileName: true,
+    );
+  }
+
+  void setExcelHasHeader(bool excelHasHeader) {
+    if (state.excelHasHeader == excelHasHeader) {
+      return;
+    }
+    state = state.copyWith(
+      excelHasHeader: excelHasHeader,
+      clearPreparation: true,
+    );
+  }
+
+  void setSourceFile({
+    required Uint8List sourceBytes,
+    required String loadedFileName,
+  }) {
+    state = state.copyWith(
+      rawContent: '',
+      sourceBytes: sourceBytes,
+      loadedFileName: loadedFileName,
+      clearPreparation: true,
+    );
+  }
+
+  void clearSourceFile() {
+    if (state.sourceBytes == null && state.loadedFileName == null) {
+      return;
+    }
+    state = state.copyWith(
+      clearPreparation: true,
+      clearSourceBytes: true,
+      clearLoadedFileName: true,
+    );
   }
 
   void setPreparation(FlashcardImportPreparation preparation) {
@@ -99,7 +159,7 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
 
   void reset() {
     state = const FlashcardImportDraftState(
-      format: ImportSourceFormat.csv,
+      format: ImportSourceFormat.excel,
       structuredTextSeparator: ImportStructuredTextSeparator.auto,
       duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
       rawContent: '',
@@ -122,6 +182,8 @@ class FlashcardImportController extends _$FlashcardImportController {
           deckId: deckId,
           format: draft.format,
           rawContent: draft.rawContent,
+          sourceBytes: draft.sourceBytes,
+          excelHasHeader: draft.excelHasHeader,
           duplicatePolicy: draft.duplicatePolicy,
           structuredTextSeparator: draft.structuredTextSeparator,
         );

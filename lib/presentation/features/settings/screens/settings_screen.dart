@@ -7,7 +7,9 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_text.dart';
+import '../widgets/account_settings_group.dart';
 import '../widgets/appearance_settings_group.dart';
+import '../widgets/drive_sync_settings_group.dart';
 import '../widgets/language_settings_group.dart';
 import '../widgets/speech_settings_group.dart';
 import '../widgets/study_settings_group.dart';
@@ -29,6 +31,10 @@ class SettingsScreen extends StatelessWidget {
           children: [
             MxText(l10n.settingsTitle, role: MxTextRole.pageTitle),
             const MxGap(MxSpace.xl),
+            const AccountSettingsGroup(),
+            const MxGap(MxSpace.lg),
+            const DriveSyncSettingsGroup(),
+            const MxGap(MxSpace.lg),
             const AppearanceSettingsGroup(),
             const MxGap(MxSpace.lg),
             const LanguageSettingsGroup(),

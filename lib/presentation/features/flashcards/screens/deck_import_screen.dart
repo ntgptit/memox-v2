@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -7,26 +8,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../core/utils/string_utils.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
-import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
-import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/layouts/mx_section.dart';
+import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_divider.dart';
+import '../../../shared/widgets/mx_icon_button.dart';
+import '../../../shared/widgets/mx_inline_toggle.dart';
 import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../../../shared/widgets/mx_text_field.dart';
-import '../widgets/deck_import_header_section.dart';
-import '../widgets/deck_import_preview_section.dart';
 import '../viewmodels/flashcard_import_viewmodel.dart';
+import '../widgets/deck_import_preview_section.dart';
 
 class DeckImportScreen extends ConsumerStatefulWidget {
   const DeckImportScreen({required this.deckId, super.key});
@@ -67,8 +71,12 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
       flashcardImportControllerProvider(widget.deckId),
     );
     final isImportBusy = importActionState.isLoading || _pendingAction != null;
+    final isExcelImport = draft.format == ImportSourceFormat.excel;
+    final hasImportSource = _hasImportSource(draft);
+    final preparation = draft.preparation;
+    final canCommit = preparation?.canCommit == true;
 
-    if (_rawContentController.text != draft.rawContent) {
+    if (!isExcelImport && _rawContentController.text != draft.rawContent) {
       _rawContentController.value = TextEditingValue(
         text: draft.rawContent,
         selection: TextSelection.collapsed(offset: draft.rawContent.length),
@@ -76,6 +84,15 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     }
 
     return MxScaffold(
+      title: l10n.flashcardsImportTitle,
+      automaticallyImplyLeading: false,
+      leading: MxIconButton.toolbar(
+        icon: Icons.arrow_back,
+        tooltip: l10n.commonBack,
+        onPressed: () => context.popRoute(
+          fallback: () => context.goFlashcardList(widget.deckId),
+        ),
+      ),
       body: MxContentShell(
         width: MxContentWidth.wide,
         applyVerticalPadding: true,
@@ -83,137 +100,71 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
           key: const ValueKey('deck_import_content'),
           slivers: [
             SliverToBoxAdapter(
-              child: DeckImportHeaderSection(deckId: widget.deckId),
-            ),
-            const MxSliverGap(MxSpace.xl),
-            SliverToBoxAdapter(
-              child: MxSection(
-                title: l10n.importSourceTitle,
-                subtitle: l10n.importSourceSubtitle,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Semantics(
-                      enabled: !isImportBusy,
-                      child: IgnorePointer(
-                        ignoring: isImportBusy,
-                        child: MxSegmentedControl<ImportSourceFormat>(
-                          segments: [
-                            MxSegment(
-                              value: ImportSourceFormat.csv,
-                              label: l10n.importCsvLabel,
-                              icon: Icons.table_chart_outlined,
-                            ),
-                            MxSegment(
-                              value: ImportSourceFormat.structuredText,
-                              label: l10n.importTextFormatLabel,
-                              icon: Icons.notes_outlined,
-                            ),
-                          ],
-                          selected: <ImportSourceFormat>{draft.format},
-                          onChanged: (selection) => ref
-                              .read(
-                                flashcardImportDraftProvider(
-                                  widget.deckId,
-                                ).notifier,
-                              )
-                              .setFormat(selection.first),
-                        ),
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _ImportSourceSection(
+                    format: draft.format,
+                    enabled: !isImportBusy,
+                    onChanged: (format) => ref
+                        .read(
+                          flashcardImportDraftProvider(widget.deckId).notifier,
+                        )
+                        .setFormat(format),
+                  ),
+                  const MxGap(MxSpace.lg),
+                  _buildImportSourceInput(
+                    draft: draft,
+                    enabled: !isImportBusy,
+                    l10n: l10n,
+                  ),
+                  const MxGap(MxSpace.lg),
+                  _ImportOptionsSection(
+                    format: draft.format,
+                    duplicatePolicy: draft.duplicatePolicy,
+                    excelHasHeader: draft.excelHasHeader,
+                    structuredTextSeparator: draft.structuredTextSeparator,
+                    enabled: !isImportBusy,
+                    onDuplicateTap: () =>
+                        _chooseDuplicatePolicy(draft.duplicatePolicy),
+                    onSeparatorTap: () => _chooseStructuredTextSeparator(
+                      draft.structuredTextSeparator,
                     ),
-                    if (draft.format == ImportSourceFormat.structuredText) ...[
-                      const MxGap(MxSpace.lg),
-                      MxText(
-                        l10n.importSeparatorLabel,
-                        role: MxTextRole.formLabel,
-                      ),
-                      const MxGap(MxSpace.xs),
-                      _ImportSeparatorSelector(
-                        value: draft.structuredTextSeparator,
-                        enabled: !isImportBusy,
-                        onTap: () => _chooseStructuredTextSeparator(
-                          draft.structuredTextSeparator,
-                        ),
-                      ),
-                    ],
+                    onHeaderChanged: (value) => ref
+                        .read(
+                          flashcardImportDraftProvider(widget.deckId).notifier,
+                        )
+                        .setExcelHasHeader(value),
+                  ),
+                  const MxGap(MxSpace.sm),
+                  MxText(
+                    _rulesText(l10n, draft.format),
+                    role: MxTextRole.formHelper,
+                  ),
+                  if (hasImportSource) ...[
                     const MxGap(MxSpace.lg),
-                    MxText(
-                      l10n.importDuplicateHandlingTitle,
-                      role: MxTextRole.formLabel,
-                    ),
-                    const MxGap(MxSpace.xs),
-                    _ImportDuplicatePolicyCard(
-                      policy: draft.duplicatePolicy,
-                      enabled: !isImportBusy,
-                      onTap: () =>
-                          _chooseDuplicatePolicy(draft.duplicatePolicy),
-                    ),
-                    const MxGap(MxSpace.lg),
-                    Wrap(
-                      spacing: MxSpace.sm,
-                      runSpacing: MxSpace.sm,
-                      children: [
-                        MxSecondaryButton(
-                          label: l10n.importLoadFile,
-                          leadingIcon: Icons.file_open_outlined,
-                          variant: MxSecondaryVariant.outlined,
-                          onPressed: isImportBusy
-                              ? null
-                              : () => _pickFile(context),
-                        ),
-                        MxSecondaryButton(
-                          label: l10n.commonClear,
-                          variant: MxSecondaryVariant.text,
-                          onPressed: isImportBusy
-                              ? null
-                              : () => ref
-                                    .read(
-                                      flashcardImportDraftProvider(
-                                        widget.deckId,
-                                      ).notifier,
-                                    )
-                                    .reset(),
-                        ),
-                      ],
-                    ),
-                    const MxGap(MxSpace.lg),
-                    MxTextField(
-                      controller: _rawContentController,
-                      label: draft.format == ImportSourceFormat.csv
-                          ? l10n.importCsvContentLabel
-                          : l10n.importTextContentLabel,
-                      hintText: draft.format == ImportSourceFormat.csv
-                          ? l10n.importCsvHint
-                          : l10n.importTextHint,
-                      minLines: 10,
-                      maxLines: 18,
-                      onChanged: (value) => ref
-                          .read(
-                            flashcardImportDraftProvider(
-                              widget.deckId,
-                            ).notifier,
-                          )
-                          .setRawContent(value),
-                    ),
-                    const MxGap(MxSpace.xl),
-                    _ImportSubmitRow(
+                    _ImportActionButton(
                       previewLabel: l10n.importPreviewAction,
-                      importLabel: l10n.commonImport,
+                      importLabel: canCommit
+                          ? l10n.importCommitCardsAction(
+                              preparation!.previewItems.length,
+                            )
+                          : null,
+                      canCommit: canCommit,
                       isBusy: isImportBusy,
-                      canCommit: draft.preparation?.canCommit == true,
                       pendingAction: _pendingAction,
                       onPreview: _preparePreview,
                       onCommit: () => _commitImport(context),
                     ),
                   ],
-                ),
+                ],
               ),
             ),
-            if (draft.preparation != null) ...[
-              const MxSliverGap(MxSpace.xl),
+            if (preparation != null) ...[
+              const MxSliverGap(MxSpace.lg),
               ...buildDeckImportPreviewSlivers(
                 context: context,
-                preparation: draft.preparation!,
+                preparation: preparation,
               ),
             ],
           ],
@@ -254,11 +205,41 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     }
   }
 
+  Widget _buildImportSourceInput({
+    required FlashcardImportDraftState draft,
+    required bool enabled,
+    required AppLocalizations l10n,
+  }) {
+    return switch (draft.format) {
+      ImportSourceFormat.excel => _ImportExcelSource(
+        fileName: draft.loadedFileName,
+        fileSummary: _fileSummary(l10n, draft.preparation),
+        enabled: enabled,
+        onSelect: () => _pickFile(context),
+        onChange: () => _pickFile(context),
+        onRemove: () => ref
+            .read(flashcardImportDraftProvider(widget.deckId).notifier)
+            .clearSourceFile(),
+      ),
+      ImportSourceFormat.csv ||
+      ImportSourceFormat.structuredText => _ImportTextSource(
+        controller: _rawContentController,
+        format: draft.format,
+        enabled: enabled,
+        onLoadFile: () => _pickFile(context),
+        onChanged: (value) => ref
+            .read(flashcardImportDraftProvider(widget.deckId).notifier)
+            .setRawContent(value),
+      ),
+    };
+  }
+
   Future<void> _pickFile(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
+    final draft = ref.read(flashcardImportDraftProvider(widget.deckId));
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
-      allowedExtensions: const ['csv', 'txt'],
+      allowedExtensions: _allowedImportFileExtensions(draft.format),
       withData: true,
     );
     if (!context.mounted || result == null || result.files.isEmpty) {
@@ -266,6 +247,22 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     }
 
     final file = result.files.single;
+    if (draft.format == ImportSourceFormat.excel) {
+      final bytes = await readDeckImportFileBytes(file);
+      if (!context.mounted) {
+        return;
+      }
+      if (bytes == null) {
+        MxSnackbar.error(context, l10n.importFileUnavailableMessage);
+        return;
+      }
+      ref
+          .read(flashcardImportDraftProvider(widget.deckId).notifier)
+          .setSourceFile(sourceBytes: bytes, loadedFileName: file.name);
+      MxSnackbar.success(context, l10n.importLoadedFileMessage(file.name));
+      return;
+    }
+
     final content = await readDeckImportFileContent(file);
     if (!context.mounted) {
       return;
@@ -293,9 +290,6 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
       ),
     );
     if (!mounted || selected == null) {
-      return;
-    }
-    if (selected != _ImportDuplicatePolicyChoice.skipExactDuplicates) {
       return;
     }
     ref
@@ -326,14 +320,284 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
 
 enum _ImportPendingAction { preview, commit }
 
-enum _ImportDuplicatePolicyChoice {
-  skipExactDuplicates,
-  importAnyway,
-  updateExistingCards,
+enum _ImportDuplicatePolicyChoice { skipExactDuplicates }
+
+class _ImportSourceSection extends StatelessWidget {
+  const _ImportSourceSection({
+    required this.format,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final ImportSourceFormat format;
+  final bool enabled;
+  final ValueChanged<ImportSourceFormat> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return MxSection(
+      title: l10n.importSourceTitle,
+      spacing: MxSpace.sm,
+      child: Semantics(
+        enabled: enabled,
+        child: IgnorePointer(
+          ignoring: !enabled,
+          child: MxSegmentedControl<ImportSourceFormat>(
+            density: MxSegmentedControlDensity.compact,
+            segments: [
+              MxSegment(
+                value: ImportSourceFormat.csv,
+                label: l10n.importCsvLabel,
+                icon: Icons.table_chart_outlined,
+              ),
+              MxSegment(
+                value: ImportSourceFormat.excel,
+                label: l10n.importExcelLabel,
+                icon: Icons.grid_on_outlined,
+              ),
+              MxSegment(
+                value: ImportSourceFormat.structuredText,
+                label: l10n.importTextFormatLabel,
+                icon: Icons.notes_outlined,
+              ),
+            ],
+            selected: <ImportSourceFormat>{format},
+            adaptive: true,
+            onChanged: (selection) => onChanged(selection.first),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _ImportDuplicatePolicyCard extends StatelessWidget {
-  const _ImportDuplicatePolicyCard({
+class _ImportExcelSource extends StatelessWidget {
+  const _ImportExcelSource({
+    required this.fileName,
+    required this.fileSummary,
+    required this.enabled,
+    required this.onSelect,
+    required this.onChange,
+    required this.onRemove,
+  });
+
+  final String? fileName;
+  final String fileSummary;
+  final bool enabled;
+  final VoidCallback onSelect;
+  final VoidCallback onChange;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final selectedFileName = fileName;
+    if (selectedFileName == null) {
+      return MxPrimaryButton(
+        key: const ValueKey('deck_import_select_file_action'),
+        label: l10n.importSelectExcelFile,
+        leadingIcon: Icons.file_open_outlined,
+        size: MxButtonSize.medium,
+        fullWidth: true,
+        onPressed: enabled ? onSelect : null,
+      );
+    }
+
+    return _ImportFileRow(
+      fileName: selectedFileName,
+      summary: fileSummary,
+      enabled: enabled,
+      onChange: onChange,
+      onRemove: onRemove,
+    );
+  }
+}
+
+class _ImportFileRow extends StatelessWidget {
+  const _ImportFileRow({
+    required this.fileName,
+    required this.summary,
+    required this.enabled,
+    required this.onChange,
+    required this.onRemove,
+  });
+
+  final String fileName;
+  final String summary;
+  final bool enabled;
+  final VoidCallback onChange;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+
+    return MxCard(
+      key: const ValueKey('deck_import_file_row'),
+      padding: const EdgeInsets.symmetric(
+        horizontal: MxSpace.md,
+        vertical: MxSpace.sm,
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.description_outlined, color: scheme.onSurfaceVariant),
+          const MxGap(MxSpace.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MxText(
+                  fileName,
+                  role: MxTextRole.formLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const MxGap(MxSpace.xs),
+                MxText(summary, role: MxTextRole.formHelper),
+              ],
+            ),
+          ),
+          const MxGap(MxSpace.sm),
+          MxSecondaryButton(
+            label: l10n.importChangeFile,
+            size: MxButtonSize.small,
+            variant: MxSecondaryVariant.text,
+            onPressed: enabled ? onChange : null,
+          ),
+          MxSecondaryButton(
+            key: const ValueKey('deck_import_remove_file_action'),
+            label: l10n.importRemoveFile,
+            size: MxButtonSize.small,
+            variant: MxSecondaryVariant.text,
+            onPressed: enabled ? onRemove : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ImportTextSource extends StatelessWidget {
+  const _ImportTextSource({
+    required this.controller,
+    required this.format,
+    required this.enabled,
+    required this.onLoadFile,
+    required this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final ImportSourceFormat format;
+  final bool enabled;
+  final VoidCallback onLoadFile;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        MxTextField(
+          controller: controller,
+          label: _contentLabel(l10n, format),
+          hintText: _contentHint(l10n, format),
+          enabled: enabled,
+          minLines: 5,
+          maxLines: 5,
+          onChanged: onChanged,
+        ),
+        const MxGap(MxSpace.sm),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: MxSecondaryButton(
+            label: l10n.importLoadFile,
+            leadingIcon: Icons.file_open_outlined,
+            size: MxButtonSize.small,
+            variant: MxSecondaryVariant.text,
+            onPressed: enabled ? onLoadFile : null,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ImportOptionsSection extends StatelessWidget {
+  const _ImportOptionsSection({
+    required this.format,
+    required this.duplicatePolicy,
+    required this.excelHasHeader,
+    required this.structuredTextSeparator,
+    required this.enabled,
+    required this.onDuplicateTap,
+    required this.onSeparatorTap,
+    required this.onHeaderChanged,
+  });
+
+  final ImportSourceFormat format;
+  final FlashcardImportDuplicatePolicy duplicatePolicy;
+  final bool excelHasHeader;
+  final ImportStructuredTextSeparator structuredTextSeparator;
+  final bool enabled;
+  final VoidCallback onDuplicateTap;
+  final VoidCallback onSeparatorTap;
+  final ValueChanged<bool> onHeaderChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return MxCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (format == ImportSourceFormat.excel) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: MxSpace.lg,
+                vertical: MxSpace.sm,
+              ),
+              child: IgnorePointer(
+                ignoring: !enabled,
+                child: MxInlineToggle(
+                  key: const ValueKey('deck_import_excel_has_header_toggle'),
+                  label: l10n.importExcelHasHeaderLabel,
+                  subtitle: l10n.importExcelHasHeaderDescription,
+                  value: excelHasHeader,
+                  onChanged: onHeaderChanged,
+                ),
+              ),
+            ),
+            const MxDivider(),
+          ],
+          if (format == ImportSourceFormat.structuredText) ...[
+            _ImportSeparatorRow(
+              separator: structuredTextSeparator,
+              enabled: enabled,
+              onTap: onSeparatorTap,
+            ),
+            const MxDivider(),
+          ],
+          _ImportDuplicatePolicyRow(
+            policy: duplicatePolicy,
+            enabled: enabled,
+            onTap: onDuplicateTap,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ImportDuplicatePolicyRow extends StatelessWidget {
+  const _ImportDuplicatePolicyRow({
     required this.policy,
     required this.enabled,
     required this.onTap,
@@ -347,97 +611,55 @@ class _ImportDuplicatePolicyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return MxCard(
-      variant: MxCardVariant.outlined,
-      padding: EdgeInsets.zero,
-      child: MxListTile(
-        leadingIcon: Icons.rule_outlined,
-        title: _duplicatePolicyLabel(l10n, policy),
-        subtitle: _duplicatePolicyDescription(l10n, policy),
-        showChevron: enabled,
-        onTap: enabled ? onTap : null,
-      ),
+    return MxListTile(
+      dense: true,
+      title: l10n.importDuplicateHandlingTitle,
+      subtitle: _duplicatePolicyLabel(l10n, policy),
+      showChevron: enabled,
+      onTap: enabled ? onTap : null,
     );
   }
 }
 
-class _ImportSubmitRow extends StatelessWidget {
-  const _ImportSubmitRow({
+class _ImportActionButton extends StatelessWidget {
+  const _ImportActionButton({
     required this.previewLabel,
     required this.importLabel,
-    required this.isBusy,
     required this.canCommit,
+    required this.isBusy,
     required this.pendingAction,
     required this.onPreview,
     required this.onCommit,
   });
 
   final String previewLabel;
-  final String importLabel;
-  final bool isBusy;
+  final String? importLabel;
   final bool canCommit;
+  final bool isBusy;
   final _ImportPendingAction? pendingAction;
   final VoidCallback onPreview;
   final VoidCallback onCommit;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 600) {
-          return _buildCompact();
-        }
-        return _buildWide();
-      },
-    );
-  }
+    if (canCommit) {
+      return MxPrimaryButton(
+        key: const ValueKey('deck_import_commit_action'),
+        label: importLabel!,
+        leadingIcon: Icons.file_upload_outlined,
+        fullWidth: true,
+        isLoading: pendingAction == _ImportPendingAction.commit,
+        onPressed: isBusy ? null : onCommit,
+      );
+    }
 
-  Widget _buildCompact() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        MxSecondaryButton(
-          key: const ValueKey('deck_import_preview_action'),
-          label: previewLabel,
-          leadingIcon: Icons.preview_outlined,
-          variant: MxSecondaryVariant.outlined,
-          fullWidth: true,
-          isLoading: pendingAction == _ImportPendingAction.preview,
-          onPressed: isBusy ? null : onPreview,
-        ),
-        const MxGap(MxSpace.sm),
-        MxPrimaryButton(
-          label: importLabel,
-          leadingIcon: Icons.file_upload_outlined,
-          size: MxButtonSize.large,
-          fullWidth: true,
-          isLoading: pendingAction == _ImportPendingAction.commit,
-          onPressed: isBusy || !canCommit ? null : onCommit,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWide() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        MxSecondaryButton(
-          key: const ValueKey('deck_import_preview_action'),
-          label: previewLabel,
-          leadingIcon: Icons.preview_outlined,
-          variant: MxSecondaryVariant.outlined,
-          isLoading: pendingAction == _ImportPendingAction.preview,
-          onPressed: isBusy ? null : onPreview,
-        ),
-        const MxGap(MxSpace.md),
-        MxPrimaryButton(
-          label: importLabel,
-          leadingIcon: Icons.file_upload_outlined,
-          isLoading: pendingAction == _ImportPendingAction.commit,
-          onPressed: isBusy || !canCommit ? null : onCommit,
-        ),
-      ],
+    return MxPrimaryButton(
+      key: const ValueKey('deck_import_preview_action'),
+      label: previewLabel,
+      leadingIcon: Icons.preview_outlined,
+      fullWidth: true,
+      isLoading: pendingAction == _ImportPendingAction.preview,
+      onPressed: isBusy ? null : onPreview,
     );
   }
 }
@@ -452,16 +674,6 @@ String _duplicatePolicyLabel(
   };
 }
 
-String _duplicatePolicyDescription(
-  AppLocalizations l10n,
-  FlashcardImportDuplicatePolicy policy,
-) {
-  return switch (policy) {
-    FlashcardImportDuplicatePolicy.skipExactDuplicates =>
-      l10n.importDuplicatePolicySkipExactDescription,
-  };
-}
-
 List<MxActionSheetItem<_ImportDuplicatePolicyChoice>>
 _buildImportDuplicatePolicyActions(AppLocalizations l10n) {
   return [
@@ -470,20 +682,6 @@ _buildImportDuplicatePolicyActions(AppLocalizations l10n) {
       label: l10n.importDuplicatePolicySkipExact,
       subtitle: l10n.importDuplicatePolicySkipExactDescription,
       icon: Icons.filter_alt_outlined,
-    ),
-    MxActionSheetItem<_ImportDuplicatePolicyChoice>(
-      value: _ImportDuplicatePolicyChoice.importAnyway,
-      label: l10n.importDuplicatePolicyImportAnyway,
-      subtitle: l10n.importDuplicatePolicyImportAnywayDescription,
-      icon: Icons.playlist_add_outlined,
-      enabled: false,
-    ),
-    MxActionSheetItem<_ImportDuplicatePolicyChoice>(
-      value: _ImportDuplicatePolicyChoice.updateExistingCards,
-      label: l10n.importDuplicatePolicyUpdateExisting,
-      subtitle: l10n.importDuplicatePolicyUpdateExistingDescription,
-      icon: Icons.update_outlined,
-      enabled: false,
     ),
   ];
 }
@@ -497,14 +695,14 @@ _ImportDuplicatePolicyChoice _duplicatePolicyChoice(
   };
 }
 
-class _ImportSeparatorSelector extends StatelessWidget {
-  const _ImportSeparatorSelector({
-    required this.value,
+class _ImportSeparatorRow extends StatelessWidget {
+  const _ImportSeparatorRow({
+    required this.separator,
     required this.enabled,
     required this.onTap,
   });
 
-  final ImportStructuredTextSeparator value;
+  final ImportStructuredTextSeparator separator;
   final bool enabled;
   final VoidCallback onTap;
 
@@ -512,16 +710,12 @@ class _ImportSeparatorSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return MxCard(
-      variant: MxCardVariant.outlined,
-      padding: EdgeInsets.zero,
+    return MxListTile(
+      dense: true,
+      title: l10n.importSeparatorLabel,
+      subtitle: _separatorLabel(l10n, separator),
+      showChevron: enabled,
       onTap: enabled ? onTap : null,
-      child: MxListTile(
-        leadingIcon: _separatorIcon(value),
-        title: _separatorLabel(l10n, value),
-        subtitle: _separatorDescription(l10n, value),
-        showChevron: enabled,
-      ),
     );
   }
 }
@@ -579,6 +773,60 @@ IconData _separatorIcon(ImportStructuredTextSeparator separator) {
   };
 }
 
+bool _hasImportSource(FlashcardImportDraftState draft) {
+  return switch (draft.format) {
+    ImportSourceFormat.excel => draft.sourceBytes != null,
+    ImportSourceFormat.csv || ImportSourceFormat.structuredText =>
+      StringUtils.isNotBlank(draft.rawContent),
+  };
+}
+
+String _fileSummary(
+  AppLocalizations l10n,
+  FlashcardImportPreparation? preparation,
+) {
+  if (preparation == null) {
+    return l10n.importFileReadyToPreview;
+  }
+  final rowCount =
+      preparation.previewItems.length +
+      preparation.issues.length +
+      preparation.skippedDuplicateCount;
+  return l10n.importDetectedRowsLabel(rowCount);
+}
+
+String _rulesText(AppLocalizations l10n, ImportSourceFormat format) {
+  return switch (format) {
+    ImportSourceFormat.csv => l10n.importCsvRulesText,
+    ImportSourceFormat.excel => l10n.importExcelRulesText,
+    ImportSourceFormat.structuredText => l10n.importTextRulesText,
+  };
+}
+
+List<String> _allowedImportFileExtensions(ImportSourceFormat format) {
+  return switch (format) {
+    ImportSourceFormat.csv => const <String>['csv'],
+    ImportSourceFormat.excel => const <String>['xlsx'],
+    ImportSourceFormat.structuredText => const <String>['txt'],
+  };
+}
+
+String _contentLabel(AppLocalizations l10n, ImportSourceFormat format) {
+  return switch (format) {
+    ImportSourceFormat.csv => l10n.importCsvContentLabel,
+    ImportSourceFormat.excel => l10n.importExcelFileLabel,
+    ImportSourceFormat.structuredText => l10n.importTextContentLabel,
+  };
+}
+
+String _contentHint(AppLocalizations l10n, ImportSourceFormat format) {
+  return switch (format) {
+    ImportSourceFormat.csv => l10n.importCsvHint,
+    ImportSourceFormat.excel => l10n.importExcelRulesText,
+    ImportSourceFormat.structuredText => l10n.importTextHint,
+  };
+}
+
 @visibleForTesting
 Future<String?> readDeckImportFileContent(PlatformFile file) async {
   final bytes = file.bytes;
@@ -592,4 +840,19 @@ Future<String?> readDeckImportFileContent(PlatformFile file) async {
   }
 
   return File(path).readAsString(encoding: utf8);
+}
+
+@visibleForTesting
+Future<Uint8List?> readDeckImportFileBytes(PlatformFile file) async {
+  final bytes = file.bytes;
+  if (bytes != null) {
+    return Uint8List.fromList(bytes);
+  }
+
+  final path = file.path;
+  if (path == null) {
+    return null;
+  }
+
+  return File(path).readAsBytes();
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_spacing.dart';
+
 /// A thin wrapper around [SegmentedButton] that takes typed options and
 /// exposes a simpler callback.
 class MxSegment<T> {
@@ -8,6 +11,8 @@ class MxSegment<T> {
   final String label;
   final IconData? icon;
 }
+
+enum MxSegmentedControlDensity { regular, compact }
 
 class MxSegmentedControl<T> extends StatelessWidget {
   const MxSegmentedControl({
@@ -18,11 +23,16 @@ class MxSegmentedControl<T> extends StatelessWidget {
     this.emptySelectionAllowed = false,
     this.showSelectedIcon = false,
     this.adaptive = false,
+    this.density = MxSegmentedControlDensity.regular,
     super.key,
   });
 
-  /// guard:raw-size-reviewed fallback threshold for compact segmented labels.
+  /// guard:raw-size-reviewed fallback threshold for regular segmented labels.
   static const double _minimumSegmentWidth = 112;
+
+  /// guard:raw-size-reviewed compact segmented labels fit three options on phones.
+  static const double _compactMinimumSegmentWidth = 88;
+
   static const double _largeTextScale = 1.3;
 
   final List<MxSegment<T>> segments;
@@ -32,6 +42,7 @@ class MxSegmentedControl<T> extends StatelessWidget {
   final bool emptySelectionAllowed;
   final bool showSelectedIcon;
   final bool adaptive;
+  final MxSegmentedControlDensity density;
 
   @override
   Widget build(BuildContext context) {
@@ -45,25 +56,34 @@ class MxSegmentedControl<T> extends StatelessWidget {
               onChanged: onChanged,
               multiSelectionEnabled: multiSelectionEnabled,
               emptySelectionAllowed: emptySelectionAllowed,
+              density: density,
             );
           }
 
-          return _buildSegmentedButton();
+          return _buildSegmentedButton(context);
         },
       );
     }
 
-    return _buildSegmentedButton();
+    return _buildSegmentedButton(context);
   }
 
-  Widget _buildSegmentedButton() {
+  Widget _buildSegmentedButton(BuildContext context) {
     return SegmentedButton<T>(
+      style: _style(context),
       segments: segments
           .map(
             (s) => ButtonSegment<T>(
               value: s.value,
               label: Text(s.label),
-              icon: s.icon != null ? Icon(s.icon) : null,
+              icon: s.icon != null
+                  ? Icon(
+                      s.icon,
+                      size: density == MxSegmentedControlDensity.compact
+                          ? AppIconSizes.sm
+                          : null,
+                    )
+                  : null,
             ),
           )
           .toList(growable: false),
@@ -75,6 +95,28 @@ class MxSegmentedControl<T> extends StatelessWidget {
     );
   }
 
+  ButtonStyle? _style(BuildContext context) {
+    if (density != MxSegmentedControlDensity.compact) {
+      return null;
+    }
+
+    final compactStyle = ButtonStyle(
+      iconSize: const WidgetStatePropertyAll(AppIconSizes.sm),
+      padding: const WidgetStatePropertyAll(
+        EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs,
+        ),
+      ),
+      minimumSize: const WidgetStatePropertyAll(Size(0, AppSpacing.xxxxl)),
+      visualDensity: VisualDensity.compact,
+    );
+
+    final theme = Theme.of(context);
+    final baseStyle = theme.segmentedButtonTheme.style;
+    return baseStyle == null ? compactStyle : baseStyle.merge(compactStyle);
+  }
+
   bool _shouldUseListFallback(
     BuildContext context,
     BoxConstraints constraints,
@@ -83,7 +125,10 @@ class MxSegmentedControl<T> extends StatelessWidget {
     if (!constraints.hasBoundedWidth) {
       return true;
     }
-    final preferredWidth = segments.length * _minimumSegmentWidth;
+    final minimumSegmentWidth = density == MxSegmentedControlDensity.compact
+        ? _compactMinimumSegmentWidth
+        : _minimumSegmentWidth;
+    final preferredWidth = segments.length * minimumSegmentWidth;
 
     return constraints.maxWidth < preferredWidth ||
         textScale >= _largeTextScale;
@@ -97,6 +142,7 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
     required this.onChanged,
     required this.multiSelectionEnabled,
     required this.emptySelectionAllowed,
+    required this.density,
   });
 
   final List<MxSegment<T>> segments;
@@ -104,6 +150,7 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
   final ValueChanged<Set<T>> onChanged;
   final bool multiSelectionEnabled;
   final bool emptySelectionAllowed;
+  final MxSegmentedControlDensity density;
 
   @override
   Widget build(BuildContext context) {
@@ -137,8 +184,16 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
       value: segment.value,
       toggleable: emptySelectionAllowed,
       title: Text(segment.label),
-      secondary: segment.icon != null ? Icon(segment.icon) : null,
+      secondary: segment.icon != null
+          ? Icon(
+              segment.icon,
+              size: density == MxSegmentedControlDensity.compact
+                  ? AppIconSizes.sm
+                  : null,
+            )
+          : null,
       selected: selected.contains(segment.value),
+      dense: density == MxSegmentedControlDensity.compact,
     );
   }
 
@@ -146,7 +201,15 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
     return CheckboxListTile(
       value: selected.contains(segment.value),
       title: Text(segment.label),
-      secondary: segment.icon != null ? Icon(segment.icon) : null,
+      secondary: segment.icon != null
+          ? Icon(
+              segment.icon,
+              size: density == MxSegmentedControlDensity.compact
+                  ? AppIconSizes.sm
+                  : null,
+            )
+          : null,
+      dense: density == MxSegmentedControlDensity.compact,
       onChanged: (checked) {
         final next = Set<T>.of(selected);
         if (checked ?? false) {

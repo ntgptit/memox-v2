@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -383,10 +384,72 @@ void main() {
       expect(find.text('Edit'), findsOneWidget);
       expect(find.text('Move'), findsOneWidget);
       expect(find.text('Duplicate'), findsOneWidget);
+      expect(find.text('Import flashcards'), findsOneWidget);
       expect(find.text('Export CSV'), findsOneWidget);
       expect(find.text('Delete'), findsOneWidget);
     },
   );
+
+  testWidgets('DT3 onNavigate: deck action import opens deck import route', (
+    WidgetTester tester,
+  ) async {
+    const deckId = 'deck-001';
+    final container = ProviderContainer(
+      overrides: [
+        flashcardListQueryProvider(deckId).overrideWith(
+          (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final router = GoRouter(
+      initialLocation: '/deck/$deckId/flashcards',
+      routes: [
+        GoRoute(
+          path: '/${RoutePaths.flashcardListSegment}',
+          name: RouteNames.flashcardList,
+          builder: (context, state) => FlashcardListScreen(
+            deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+          ),
+        ),
+        GoRoute(
+          path: '/library/${RoutePaths.deckImportSegment}',
+          name: RouteNames.deckImport,
+          builder: (context, state) => SizedBox(
+            key: ValueKey(
+              'deck_import_${state.pathParameters[RoutePaths.deckIdParam]}',
+            ),
+          ),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('More actions'));
+    await tester.pumpAndSettle();
+    final importAction = find.ancestor(
+      of: find.text('Import flashcards'),
+      matching: find.byType(InkWell),
+    );
+    expect(importAction, findsOneWidget);
+    await tester.tap(importAction);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('deck_import_$deckId')), findsOneWidget);
+  });
 
   testWidgets('DT1 onDelete: long pressing a flashcard opens row actions', (
     WidgetTester tester,
@@ -812,6 +875,8 @@ final class _MoveTargetsFlashcardRepository implements FlashcardRepository {
     required String deckId,
     required ImportSourceFormat format,
     required String rawContent,
+    Uint8List? sourceBytes,
+    bool excelHasHeader = true,
     FlashcardImportDuplicatePolicy duplicatePolicy =
         FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =

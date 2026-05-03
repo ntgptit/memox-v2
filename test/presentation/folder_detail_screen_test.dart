@@ -658,6 +658,200 @@ void main() {
   });
 
   testWidgets(
+    'DT6 onNavigate: folder import existing deck opens deck import route',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      const deckId = 'deck-existing';
+
+      final router = GoRouter(
+        initialLocation: '/folder/$folderId',
+        routes: [
+          GoRoute(
+            path: '/${RoutePaths.folderDetailSegment}',
+            name: RouteNames.folderDetail,
+            builder: (context, state) => FolderDetailScreen(
+              folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+            ),
+          ),
+          GoRoute(
+            path: '/library/${RoutePaths.deckImportSegment}',
+            name: RouteNames.deckImport,
+            builder: (context, state) => SizedBox(
+              key: ValueKey(
+                'deck_import_${state.pathParameters[RoutePaths.deckIdParam]}',
+              ),
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_deckFolderState),
+          ),
+          folderActionControllerProvider(folderId).overrideWith(
+            () => _FakeFolderActionController(
+              importTargets: <FolderDeckItem>[
+                FolderDeckItem(
+                  id: deckId,
+                  name: 'Existing deck',
+                  cardCount: 3,
+                  dueToday: 0,
+                  masteryPercent: 0,
+                  lastStudiedAt: null,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('More actions'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Import flashcards'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Create new deck'), findsOneWidget);
+      expect(find.text('Add to existing deck'), findsOneWidget);
+
+      await tester.tap(find.text('Add to existing deck'));
+      await tester.pumpAndSettle();
+      final existingDeckAction = find.ancestor(
+        of: find.text('Existing deck').last,
+        matching: find.byType(InkWell),
+      );
+      expect(existingDeckAction, findsOneWidget);
+      await tester.tap(existingDeckAction);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.byKey(const ValueKey('deck_import_$deckId')), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT7 onNavigate: folder import creates deck before opening import route',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final createdNames = <String>[];
+
+      final router = GoRouter(
+        initialLocation: '/folder/$folderId',
+        routes: [
+          GoRoute(
+            path: '/${RoutePaths.folderDetailSegment}',
+            name: RouteNames.folderDetail,
+            builder: (context, state) => FolderDetailScreen(
+              folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+            ),
+          ),
+          GoRoute(
+            path: '/library/${RoutePaths.deckImportSegment}',
+            name: RouteNames.deckImport,
+            builder: (context, state) => SizedBox(
+              key: ValueKey(
+                'deck_import_${state.pathParameters[RoutePaths.deckIdParam]}',
+              ),
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+          ),
+          folderActionControllerProvider(folderId).overrideWith(
+            () => _FakeFolderActionController(
+              onCreateDeck: (name) {
+                createdNames.add(name);
+                return 'deck-new';
+              },
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('More actions'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Import flashcards'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('No decks in this folder yet.'), findsOneWidget);
+
+      await tester.tap(find.text('Create new deck'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'Imported deck');
+      await tester.pump();
+      await tester.tap(find.text('Create').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(
+        find.byKey(const ValueKey('deck_import_deck-new')),
+        findsOneWidget,
+      );
+      expect(createdNames, <String>['Imported deck']);
+    },
+  );
+
+  testWidgets('DT3 onDelete: subfolder-mode folder actions hide import', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_sampleFolderState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('More actions'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Folder actions'), findsOneWidget);
+    expect(find.text('Import flashcards'), findsNothing);
+  });
+
+  testWidgets(
     'DT1 onDelete: long pressing a subfolder opens direct folder actions',
     (WidgetTester tester) async {
       const folderId = 'folder-001';
@@ -684,6 +878,7 @@ void main() {
       expect(find.text('Folder actions'), findsOneWidget);
       expect(find.text('Edit'), findsOneWidget);
       expect(find.text('Move'), findsOneWidget);
+      expect(find.text('Import flashcards'), findsOneWidget);
       expect(find.text('Delete'), findsOneWidget);
     },
   );
@@ -716,6 +911,7 @@ void main() {
     expect(find.text('Edit'), findsOneWidget);
     expect(find.text('Move'), findsOneWidget);
     expect(find.text('Duplicate'), findsOneWidget);
+    expect(find.text('Import flashcards'), findsOneWidget);
     expect(find.text('Export CSV'), findsOneWidget);
     expect(find.text('Delete'), findsOneWidget);
   });
@@ -743,6 +939,7 @@ const _sampleFolderState = FolderDetailState(
       itemCount: 2,
       dueCardCount: 2,
       masteryPercent: 19,
+      canImportFlashcards: true,
     ),
   ],
   decks: <FolderDeckItem>[],
@@ -769,6 +966,7 @@ const _parentFolderState = FolderDetailState(
       itemCount: 2,
       dueCardCount: 0,
       masteryPercent: 19,
+      canImportFlashcards: true,
     ),
   ],
   decks: <FolderDeckItem>[],
@@ -795,6 +993,7 @@ const _legacyFolderState = FolderDetailState(
       itemCount: 1,
       dueCardCount: 0,
       masteryPercent: null,
+      canImportFlashcards: false,
     ),
   ],
   decks: <FolderDeckItem>[],
@@ -896,6 +1095,27 @@ class _FutureController<T> extends ChangeNotifier {
     _future = value;
     notifyListeners();
   }
+}
+
+typedef _CreateDeckCallback = FutureOr<String?> Function(String name);
+
+class _FakeFolderActionController extends FolderActionController {
+  _FakeFolderActionController({
+    this.importTargets = const <FolderDeckItem>[],
+    this.onCreateDeck,
+  });
+
+  final List<FolderDeckItem> importTargets;
+  final _CreateDeckCallback? onCreateDeck;
+
+  @override
+  FutureOr<void> build(String folderId) {}
+
+  @override
+  Future<List<FolderDeckItem>> loadImportDeckTargets() async => importTargets;
+
+  @override
+  Future<String?> createDeck(String name) async => onCreateDeck?.call(name);
 }
 
 class _TestApp extends StatelessWidget {

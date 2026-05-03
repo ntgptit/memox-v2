@@ -334,6 +334,198 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsAppearanceTitle => 'Giao diện';
 
   @override
+  String get settingsAccountTitle => 'Tài khoản';
+
+  @override
+  String get settingsAccountLoading => 'Đang tải tài khoản';
+
+  @override
+  String get settingsAccountSubtitleSignedOut =>
+      'Liên kết Google ngay để có thể bật đồng bộ Drive sau này.';
+
+  @override
+  String get settingsAccountSubtitleReady =>
+      'Quyền truy cập dữ liệu ứng dụng trên Google Drive đã sẵn sàng cho đồng bộ sau này.';
+
+  @override
+  String get settingsAccountSubtitleReconnect =>
+      'Cần kết nối lại quyền Drive trước khi chạy đồng bộ.';
+
+  @override
+  String get settingsAccountSubtitleConfig =>
+      'Bản build này chưa cấu hình Google sign-in.';
+
+  @override
+  String get settingsAccountSubtitleUnsupported =>
+      'Nền tảng này chưa hỗ trợ Google sign-in.';
+
+  @override
+  String get settingsAccountSubtitleError =>
+      'Không thể cập nhật tài khoản Google.';
+
+  @override
+  String get settingsAccountSignedOut => 'Chưa liên kết tài khoản Google.';
+
+  @override
+  String get settingsAccountMissingConfig =>
+      'Thêm Google OAuth client ID để bật liên kết tài khoản.';
+
+  @override
+  String get settingsAccountUnsupported =>
+      'Hãy dùng Android, iOS hoặc web để liên kết tài khoản Google.';
+
+  @override
+  String get settingsAccountDriveReady => 'Google Drive đã sẵn sàng';
+
+  @override
+  String get settingsAccountDriveReconnectRequired =>
+      'Cần kết nối lại Google Drive';
+
+  @override
+  String get settingsAccountDriveAuthorizationRequired =>
+      'Cấp quyền dữ liệu ứng dụng Google Drive để chuẩn bị đồng bộ.';
+
+  @override
+  String get settingsAccountSignIn => 'Đăng nhập bằng Google';
+
+  @override
+  String get settingsAccountReconnectDrive => 'Kết nối lại Google Drive';
+
+  @override
+  String get settingsAccountSignOut => 'Đăng xuất';
+
+  @override
+  String get settingsAccountSignInCanceled => 'Đã hủy đăng nhập Google.';
+
+  @override
+  String get settingsAccountSignInFailed =>
+      'Đăng nhập Google thất bại. Hãy thử lại.';
+
+  @override
+  String get settingsAccountSignedOutMessage =>
+      'Đã đăng xuất. Flashcard cục bộ vẫn ở trên thiết bị này.';
+
+  @override
+  String get settingsDriveSyncTitle => 'Đồng bộ Drive';
+
+  @override
+  String get settingsDriveSyncLoading => 'Đang tải trạng thái đồng bộ';
+
+  @override
+  String get settingsDriveSyncSubtitleSignedOut =>
+      'Liên kết tài khoản Google trước khi đồng bộ.';
+
+  @override
+  String get settingsDriveSyncSubtitleUnconfigured =>
+      'Bản build này chưa cấu hình Google sign-in.';
+
+  @override
+  String get settingsDriveSyncSubtitleReconnect =>
+      'Cần kết nối lại quyền Drive trước khi chạy đồng bộ.';
+
+  @override
+  String get settingsDriveSyncSubtitleNoRemote =>
+      'Tạo bản sao Drive đầu tiên từ thiết bị này.';
+
+  @override
+  String get settingsDriveSyncSubtitleSynced =>
+      'Dữ liệu cục bộ khớp với snapshot mới nhất trên Drive.';
+
+  @override
+  String get settingsDriveSyncSubtitleReady => 'Có thể đồng bộ thủ công.';
+
+  @override
+  String get settingsDriveSyncSubtitleConflict =>
+      'Chọn bản dữ liệu được giữ lại.';
+
+  @override
+  String get settingsDriveSyncSubtitleUnsupportedSchema =>
+      'Cập nhật app trước khi khôi phục bản Drive này.';
+
+  @override
+  String get settingsDriveSyncSubtitleError =>
+      'Không thể hoàn tất đồng bộ Drive.';
+
+  @override
+  String get settingsDriveSyncSignedOut =>
+      'Đăng nhập Google để đồng bộ DB cục bộ với Drive.';
+
+  @override
+  String get settingsDriveSyncUnconfigured =>
+      'Thêm Google OAuth client ID để bật đồng bộ Drive.';
+
+  @override
+  String get settingsDriveSyncReconnectRequired =>
+      'Hãy kết nối lại Google Drive trong mục Tài khoản trước.';
+
+  @override
+  String get settingsDriveSyncNoRemote => 'Chưa có snapshot nào trên Drive.';
+
+  @override
+  String get settingsDriveSyncSynced => 'Google Drive đã được cập nhật.';
+
+  @override
+  String get settingsDriveSyncReady => 'Đã có snapshot trên Drive.';
+
+  @override
+  String get settingsDriveSyncConflictStatus =>
+      'Dữ liệu cục bộ và Drive đều đã thay đổi.';
+
+  @override
+  String get settingsDriveSyncUnsupportedSchema =>
+      'Bản Drive được tạo bởi schema DB mới hơn.';
+
+  @override
+  String settingsDriveSyncLastSynced(Object value) {
+    return 'Đồng bộ lần cuối: $value';
+  }
+
+  @override
+  String settingsDriveSyncRemoteDevice(Object device) {
+    return 'Bản Drive từ: $device';
+  }
+
+  @override
+  String get settingsDriveSyncAction => 'Đồng bộ ngay';
+
+  @override
+  String get settingsDriveSyncUploaded =>
+      'Đã sao lưu dữ liệu cục bộ lên Google Drive.';
+
+  @override
+  String get settingsDriveSyncRestored => 'Đã khôi phục bản Drive.';
+
+  @override
+  String get settingsDriveSyncNoChanges => 'Dữ liệu đã được cập nhật.';
+
+  @override
+  String get settingsDriveSyncCanceled => 'Đã hủy đồng bộ.';
+
+  @override
+  String get settingsDriveSyncFailed => 'Đồng bộ Drive thất bại. Hãy thử lại.';
+
+  @override
+  String get settingsDriveSyncConflictTitle => 'Xử lý xung đột đồng bộ';
+
+  @override
+  String get settingsDriveSyncConflictMessage =>
+      'Dữ liệu cục bộ và bản Drive đều đã thay đổi từ lần đồng bộ trước.';
+
+  @override
+  String get settingsDriveSyncKeepLocal => 'Giữ dữ liệu cục bộ';
+
+  @override
+  String get settingsDriveSyncKeepLocalSubtitle =>
+      'Tải DB của thiết bị này lên và thay snapshot trên Drive.';
+
+  @override
+  String get settingsDriveSyncUseDrive => 'Dùng bản Drive';
+
+  @override
+  String get settingsDriveSyncUseDriveSubtitle =>
+      'Khôi phục snapshot Drive đè lên DB cục bộ của thiết bị này.';
+
+  @override
   String get settingsThemeModeLabel => 'Chế độ giao diện';
 
   @override
@@ -518,6 +710,22 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get foldersReorderManualOnlyHint =>
       'Hãy chuyển sắp xếp về chế độ thủ công để sắp xếp lại.';
+
+  @override
+  String get foldersImportChoiceTitle => 'Nhập flashcard';
+
+  @override
+  String get foldersImportCreateDeckAction => 'Tạo bộ thẻ mới';
+
+  @override
+  String get foldersImportExistingDeckAction => 'Thêm vào bộ thẻ có sẵn';
+
+  @override
+  String get foldersImportChooseDeckTitle => 'Chọn bộ thẻ';
+
+  @override
+  String get foldersImportNoDecksHint =>
+      'Chưa có bộ thẻ nào trong thư mục này.';
 
   @override
   String foldersStatusSubfolders(int subfolderCount) {
@@ -1217,7 +1425,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flashcardsImportTitle => 'Nhập flashcard';
 
   @override
-  String get importSourceTitle => 'Nguồn dữ liệu';
+  String get importSourceTitle => 'Nhập từ';
 
   @override
   String get importSourceSubtitle =>
@@ -1227,13 +1435,59 @@ class AppLocalizationsVi extends AppLocalizations {
   String get importCsvLabel => 'CSV';
 
   @override
-  String get importTextFormatLabel => 'Định dạng text';
+  String get importExcelLabel => 'Excel';
+
+  @override
+  String get importTextFormatLabel => 'Text';
 
   @override
   String get importLoadFile => 'Tải file';
 
   @override
+  String get importSelectExcelFile => 'Chọn file Excel';
+
+  @override
+  String get importChangeFile => 'Đổi';
+
+  @override
+  String get importRemoveFile => 'Xóa';
+
+  @override
+  String get importFileReadyToPreview => 'Sẵn sàng xem trước';
+
+  @override
+  String importDetectedRowsLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Đã nhận diện $count dòng',
+      one: 'Đã nhận diện 1 dòng',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get importCsvContentLabel => 'Nội dung CSV';
+
+  @override
+  String get importExcelFileLabel => 'File Excel';
+
+  @override
+  String get importExcelNoFileTitle => 'Chưa tải file Excel';
+
+  @override
+  String get importExcelNoFileDescription =>
+      'Tải file .xlsx. Cột A là mặt trước, cột B là mặt sau, cột C là ghi chú tùy chọn.';
+
+  @override
+  String get importExcelLoadedFileDescription =>
+      'Preview đọc sheet đầu tiên từ A1. Bật tùy chọn header nếu dòng 1 là nhãn cột.';
+
+  @override
+  String get importExcelHasHeaderLabel => 'Dòng đầu là header';
+
+  @override
+  String get importExcelHasHeaderDescription => 'Dữ liệu bắt đầu từ dòng 2.';
 
   @override
   String get importTextContentLabel => 'Text có cấu trúc';
@@ -1244,6 +1498,17 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get importTextHint =>
       'Front: ...\nBack: ...\nNote: ...\nHoặc mỗi dòng một thẻ: thuật ngữ / định nghĩa';
+
+  @override
+  String get importCsvRulesText => 'Dùng các cột front, back và note tùy chọn.';
+
+  @override
+  String get importExcelRulesText =>
+      'Cột A = mặt trước, cột B = mặt sau, cột C = ghi chú.';
+
+  @override
+  String get importTextRulesText =>
+      'Dùng các dòng Front:, Back: và Note: tùy chọn.';
 
   @override
   String get importSeparatorLabel => 'Dấu tách';
@@ -1310,7 +1575,18 @@ class AppLocalizationsVi extends AppLocalizations {
       'Tùy chọn sau MVP: cập nhật thẻ khớp thay vì tạo duplicate mới.';
 
   @override
-  String get importPreviewAction => 'Xem trước';
+  String get importPreviewAction => 'Xem trước import';
+
+  @override
+  String importCommitCardsAction(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Nhập $count thẻ',
+      one: 'Nhập 1 thẻ',
+    );
+    return '$_temp0';
+  }
 
   @override
   String importSuccessMessage(int count) {
@@ -1324,7 +1600,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get importFileUnavailableMessage =>
-      'Không thể đọc file này. Hãy chọn một file CSV hoặc text khác.';
+      'Không thể đọc file này. Hãy chọn một file CSV, text hoặc .xlsx khác.';
 
   @override
   String get importValidationIssuesTitle => 'Lỗi xác thực';

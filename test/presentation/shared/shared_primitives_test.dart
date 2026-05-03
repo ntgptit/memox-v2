@@ -507,6 +507,67 @@ void main() {
   );
 
   testWidgets(
+    'DT6 onSelect: MxSegmentedControl compact density keeps three options inline',
+    (tester) async {
+      var selected = <int>{1};
+
+      await tester.pumpWidget(
+        _TestApp(
+          child: Theme(
+            data: AppTheme.light(),
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                return SizedBox(
+                  width: 320,
+                  child: MxSegmentedControl<int>(
+                    adaptive: true,
+                    density: MxSegmentedControlDensity.compact,
+                    segments: const [
+                      MxSegment(
+                        value: 1,
+                        label: 'CSV',
+                        icon: Icons.table_chart,
+                      ),
+                      MxSegment(value: 2, label: 'Excel', icon: Icons.grid_on),
+                      MxSegment(value: 3, label: 'Text', icon: Icons.notes),
+                    ],
+                    selected: selected,
+                    onChanged: (value) => setState(() => selected = value),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(SegmentedButton<int>), findsOneWidget);
+      expect(find.byType(RadioListTile<int>), findsNothing);
+      expect(
+        tester.getSize(find.byType(SegmentedButton<int>)).height,
+        inInclusiveRange(40, 48),
+      );
+
+      await tester.tap(find.text('Text'));
+      await tester.pump();
+
+      expect(selected, {3});
+      final control = tester.widget<SegmentedButton<int>>(
+        find.byType(SegmentedButton<int>),
+      );
+      final selectedColor = control.style?.backgroundColor?.resolve({
+        WidgetState.selected,
+      });
+      expect(
+        selectedColor,
+        Theme.of(
+          tester.element(find.byType(SegmentedButton<int>)),
+        ).colorScheme.primary,
+      );
+    },
+  );
+
+  testWidgets(
     'DT3 onSelect: MxSearchSortToolbar renders selected sort button with icon',
     (tester) async {
       await tester.pumpWidget(

@@ -12,6 +12,8 @@ Test file: `test/data/repositories/flashcard_import_support_test.dart`
 | DT4 | CSV header omits required front/back columns | raw CSV header lacks one required column | import support parses CSV rows | preview is empty and validation issue points to line 1 with header reason | C0+C1 |
 | DT5 | CSV row is missing a required side | CSV header is valid and one data row has blank back value | import support parses CSV rows | valid rows remain in preview and issue points to the invalid source line | C0+C1 |
 | DT6 | structured block is missing `Back:` | raw structured block starts at line 1 and has only front text | import support parses block format | preview is empty and issue points to the block starting line | C0+C1 |
+| DT7 | `.xlsx` source has a header row and fixed A/B/C columns | OpenXML workbook bytes contain row 1 labels with arbitrary text, row 2 valid A/B/C values, and row 3 missing column B | import support parses Excel rows with `excelHasHeader` enabled | row 1 is skipped without text validation, row 2 becomes a preview card, note comes from column C, and row 3 reports the Excel row number | C0+C1 |
+| DT8 | `.xlsx` source has no header row and data starts at A1 | OpenXML workbook bytes contain valid A1/B1/C1 values and row 2 is missing column B | import support parses Excel rows with `excelHasHeader` disabled | row 1 becomes the first preview card, note comes from C1, and row 2 reports the Excel row number | C0+C1 |
 
 ## Decision table: onUpdate
 

@@ -36,7 +36,7 @@ final class ExportData {
   final String content;
 }
 
-enum ImportSourceFormat { csv, structuredText }
+enum ImportSourceFormat { csv, excel, structuredText }
 
 enum ImportStructuredTextSeparator { auto, tab, colon, slash, semicolon, pipe }
 

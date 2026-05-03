@@ -27,6 +27,7 @@ Folder là đơn vị tổ chức nội dung theo cây.
 - Tile folder vẫn hiển thị mức mastery của subtree như trạng thái tiến độ riêng
 - Nút học trên tile chỉ đưa user vào Study Entry; Study Entry vẫn là nơi chọn New Study hoặc SRS Review
 - Với folder còn `unlocked`, màn Folder Detail vẫn hiển thị FAB tạo mới; FAB mở lựa chọn tạo subfolder hoặc deck trước khi chạy form tạo tương ứng
+- Import từ bottom sheet của folder chỉ là shortcut để tạo deck mới hoặc chọn deck có sẵn làm deck đích; dữ liệu import vẫn luôn ghi vào một deck, không ghi trực tiếp vào folder
 
 ## Tài liệu liên quan
 - [Folder Rules](./folder-rules.md)

@@ -24,6 +24,8 @@ Test file: `test/presentation/folder_detail_screen_test.dart`
 | DT3 | subfolder card exposes recursive study icon instead of a full `Study` text action | subfolder mode has `folder-002` with two cards, two due cards, and nineteen percent mastery | user taps `folder_recursive_study_folder-002` | route path becomes `/study/folder/folder-002` and progress/icon metadata stays aligned with the row while the badge shows the due count | C0+C1 |
 | DT4 | deck card progress action starts study for that deck | deck mode has deck `deck-001` named `Vitamin B1` with one due card and forty-two percent mastery | user taps `deck_study_deck-001` | route path becomes `/study/deck/deck-001` and the badge shows the due count | C0+C1 |
 | DT5 | deck row tap opens flashcard management directly | deck mode has deck `deck-001` named `Vitamin B1` | user taps the `Vitamin B1` row body | flashcard management destination renders from the `flashcardList` route | C0+C1 |
+| DT6 | folder import into an existing deck must keep import deck-scoped | deck-mode folder `Topik I` has direct deck `Existing deck` and deck import route is registered | user opens folder actions, taps `Import flashcards`, chooses `Add to existing deck`, then selects `Existing deck` | deck import destination renders with path parameter `deck-existing` | C0+C1 |
+| DT7 | folder import can create a deck before opening import | unlocked folder `New branch` has no direct decks and deck import route is registered | user opens folder actions, taps `Import flashcards`, chooses `Create new deck`, enters `Imported deck`, and confirms | new deck id `deck-new` is created and deck import destination renders with path parameter `deck-new` | C0+C1 |
 
 ## Decision table: onDisplay
 
@@ -48,5 +50,6 @@ Test file: `test/presentation/folder_detail_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | no reorder mode is active and subfolder long-press opens direct folder actions | subfolder mode contains `Vocabulary` | user long-presses `Vocabulary` | `Folder actions`, `Edit`, `Move`, and `Delete` are visible | C0+C1 |
-| DT2 | no reorder mode is active and deck long-press opens direct deck actions | deck mode contains `Vitamin B1` | user long-presses `Vitamin B1` | `Deck actions`, `Edit`, `Move`, `Duplicate`, `Export CSV`, and `Delete` are visible | C0+C1 |
+| DT1 | no reorder mode is active and deck-capable subfolder long-press opens direct folder actions with import | subfolder mode contains `Vocabulary`, whose folder can accept deck imports | user long-presses `Vocabulary` | `Folder actions`, `Edit`, `Move`, `Import flashcards`, and `Delete` are visible | C0+C1 |
+| DT2 | no reorder mode is active and deck long-press opens direct deck actions with import | deck mode contains `Vitamin B1` | user long-presses `Vitamin B1` | `Deck actions`, `Edit`, `Move`, `Duplicate`, `Import flashcards`, `Export CSV`, and `Delete` are visible | C0+C1 |
+| DT3 | current folder is locked to subfolders and must not offer deck import from its own action sheet | folder detail state is `subfolders` mode and header more action is present | user taps tooltip `More actions` | `Folder actions` is visible and `Import flashcards` is absent | C0+C1 |

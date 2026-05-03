@@ -18,6 +18,7 @@ class LibraryFolder {
     required this.dueCardCount,
     required this.newCardCount,
     required this.masteryPercent,
+    required this.canImportFlashcards,
   }) : _subfolderCount = subfolderCount;
 
   final String id;
@@ -28,6 +29,7 @@ class LibraryFolder {
   final int itemCount;
   final int dueCardCount;
   final int newCardCount;
+  final bool canImportFlashcards;
 
   int get subfolderCount => _subfolderCount ?? 0;
 

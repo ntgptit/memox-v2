@@ -8,6 +8,7 @@ import '../../../../core/errors/failures.dart';
 import '../../../../core/services/clock.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
+import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../models/library_folder.dart';
 
@@ -83,6 +84,8 @@ Future<LibraryOverviewState> libraryOverviewQuery(Ref ref) async {
             dueCardCount: item.dueCardCount,
             newCardCount: item.newCardCount,
             masteryPercent: item.masteryPercent,
+            canImportFlashcards:
+                item.folder.contentMode != FolderContentMode.subfolders,
           ),
         )
         .toList(growable: false),

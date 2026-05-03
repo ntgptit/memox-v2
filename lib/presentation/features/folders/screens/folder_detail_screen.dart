@@ -139,6 +139,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                       includeReorder: true,
                       canReorder: state.canManualReorder,
                       isUnlocked: state.isUnlocked,
+                      canImportFlashcards: state.canImportFlashcards,
                       onReorder: () => _enterReorderMode(state),
                       onDeleted: () async {
                         await context.popRoute(fallback: context.goLibrary);
@@ -371,10 +372,10 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     if (!mounted || name == null) {
       return;
     }
-    final success = await ref
+    final deckId = await ref
         .read(folderActionControllerProvider(widget.folderId).notifier)
         .createDeck(name);
-    if (!mounted || !success) {
+    if (!mounted || deckId == null) {
       return;
     }
     MxSnackbar.success(context, l10n.decksCreatedMessage);
@@ -423,6 +424,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       ref: ref,
       folderId: item.id,
       folderName: item.name,
+      canImportFlashcards: item.canImportFlashcards,
     );
   }
 

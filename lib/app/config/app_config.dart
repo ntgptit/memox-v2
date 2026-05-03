@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/config/google_oauth_config.dart';
 import '../router/route_names.dart';
 import 'env.dart';
 
@@ -18,7 +19,8 @@ class AppConfig {
     required this.enableTalkerRouteLogging,
     required this.enableRiverpodDiagnostics,
     required this.exposeInternalErrorDetails,
-  });
+    GoogleOAuthConfig? googleOAuthConfig,
+  }) : _googleOAuthConfig = googleOAuthConfig;
 
   final AppEnv env;
   final String initialLocation;
@@ -28,6 +30,11 @@ class AppConfig {
   final bool enableTalkerRouteLogging;
   final bool enableRiverpodDiagnostics;
   final bool exposeInternalErrorDetails;
+  final GoogleOAuthConfig? _googleOAuthConfig;
+
+  GoogleOAuthConfig get googleOAuthConfig {
+    return _googleOAuthConfig ?? GoogleOAuthConfig.empty;
+  }
 
   factory AppConfig.fromEnv(AppEnv env) {
     final enableLocalDiagnostics = env.isLocalLike;
@@ -40,6 +47,7 @@ class AppConfig {
       enableTalkerRouteLogging: enableLocalDiagnostics,
       enableRiverpodDiagnostics: enableLocalDiagnostics,
       exposeInternalErrorDetails: enableLocalDiagnostics,
+      googleOAuthConfig: GoogleOAuthConfig.fromEnvironment(),
     );
   }
 }

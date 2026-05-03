@@ -4,6 +4,14 @@
 
 - [System Overview](./system/overview.md)
 
+## Account
+
+- [Google Account And Drive Sync Foundation](./account/google-account.md)
+
+## Sync
+
+- [Google Drive Sync](./sync/google-drive-sync.md)
+
 ## Folder
 
 - [Folder Overview](./folder/folder-overview.md)

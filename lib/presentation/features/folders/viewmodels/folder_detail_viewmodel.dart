@@ -41,6 +41,7 @@ class FolderSubfolderItem {
     required int itemCount,
     required int dueCardCount,
     required int? masteryPercent,
+    required this.canImportFlashcards,
   }) : _subfolderCount = subfolderCount,
        _deckCount = deckCount,
        _itemCount = itemCount,
@@ -55,6 +56,7 @@ class FolderSubfolderItem {
   final int? _deckCount;
   final int? _itemCount;
   final int? _dueCardCount;
+  final bool canImportFlashcards;
 
   int get subfolderCount => _subfolderCount ?? 0;
   int get deckCount => _deckCount ?? 0;
@@ -104,6 +106,7 @@ class FolderDetailState {
   bool get isSubfolderMode => mode == FolderDetailMode.subfolders;
   bool get isDeckMode => mode == FolderDetailMode.decks;
   bool get canManualReorder => sortMode.allowsManualReorder;
+  bool get canImportFlashcards => isUnlocked || isDeckMode;
 }
 
 @riverpod
@@ -165,21 +168,28 @@ class FolderActionController extends _$FolderActionController {
     return true;
   }
 
-  Future<bool> createDeck(String name) async {
+  Future<String?> createDeck(String name) async {
     state = const AsyncLoading<void>();
     final result = await ref
         .read(createDeckUseCaseProvider)
         .execute(folderId: folderId, name: name);
     if (!ref.mounted) {
-      return false;
+      return null;
     }
     final failure = result.failureOrNull;
     if (failure != null) {
       state = AsyncError<void>(failure, StackTrace.current);
-      return false;
+      return null;
     }
     state = const AsyncData<void>(null);
-    return true;
+    return result.valueOrNull!.id;
+  }
+
+  Future<List<FolderDeckItem>> loadImportDeckTargets() async {
+    final data = await ref
+        .read(watchFolderDetailUseCaseProvider)
+        .execute(folderId, const ContentQuery());
+    return data.decks.map(_mapFolderDeckItem).toList(growable: false);
   }
 
   Future<bool> updateFolder(String name) async {
@@ -292,22 +302,29 @@ FolderDetailState _mapFolderDetailState(
             itemCount: item.itemCount,
             dueCardCount: item.dueCardCount,
             masteryPercent: item.masteryPercent,
+            canImportFlashcards: _canImportFlashcardsInto(
+              item.folder.contentMode,
+            ),
           ),
         )
         .toList(growable: false),
-    decks: readModel.decks
-        .map(
-          (item) => FolderDeckItem(
-            id: item.deck.id,
-            name: item.deck.name,
-            cardCount: item.cardCount,
-            dueToday: item.dueTodayCount,
-            masteryPercent: item.masteryPercent,
-            lastStudiedAt: item.lastStudiedAt,
-          ),
-        )
-        .toList(growable: false),
+    decks: readModel.decks.map(_mapFolderDeckItem).toList(growable: false),
   );
+}
+
+FolderDeckItem _mapFolderDeckItem(FolderDeckReadModel item) {
+  return FolderDeckItem(
+    id: item.deck.id,
+    name: item.deck.name,
+    cardCount: item.cardCount,
+    dueToday: item.dueTodayCount,
+    masteryPercent: item.masteryPercent,
+    lastStudiedAt: item.lastStudiedAt,
+  );
+}
+
+bool _canImportFlashcardsInto(FolderContentMode mode) {
+  return mode != FolderContentMode.subfolders;
 }
 
 FolderDetailMode _toDetailMode(FolderContentMode mode) {

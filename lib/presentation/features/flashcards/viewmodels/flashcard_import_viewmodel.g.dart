@@ -59,7 +59,7 @@ final class FlashcardImportDraftProvider
 }
 
 String _$flashcardImportDraftHash() =>
-    r'7fefd7085dd3153efe5d6c51818fc825da71657f';
+    r'ee65eab5f7468217ab84e3bf0fe96ebee4d47edc';
 
 final class FlashcardImportDraftFamily extends $Family
     with
@@ -152,7 +152,7 @@ final class FlashcardImportControllerProvider
 }
 
 String _$flashcardImportControllerHash() =>
-    r'c4acc6475621ced18dbff08955cbd381f27dff33';
+    r'63f7fa13d41d82067df0bd134055d59dda24e30f';
 
 final class FlashcardImportControllerFamily extends $Family
     with

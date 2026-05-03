@@ -305,7 +305,7 @@ final class FolderActionControllerProvider
 }
 
 String _$folderActionControllerHash() =>
-    r'8933e96f4172af9e9b0e47ba390bc7a944777e07';
+    r'587612e3126520e1723568d43b0c2a6e8c7f68ff';
 
 final class FolderActionControllerFamily extends $Family
     with

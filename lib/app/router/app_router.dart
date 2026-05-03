@@ -40,8 +40,11 @@ GoRouter appRouter(Ref ref) {
     routes: [
       GoRoute(path: '/', redirect: guards.rootRedirect),
       StatefulShellRoute.indexedStack(
-        builder: (context, _, navigationShell) {
-          return AppShell(navigationShell: navigationShell);
+        builder: (context, state, navigationShell) {
+          return AppShell(
+            navigationShell: navigationShell,
+            hideNavigation: _shouldHideShellNavigation(state),
+          );
         },
         branches: [
           StatefulShellBranch(
@@ -196,6 +199,11 @@ GoRouter appRouter(Ref ref) {
       );
     },
   );
+}
+
+bool _shouldHideShellNavigation(GoRouterState state) {
+  return state.topRoute?.name == RouteNames.deckImport ||
+      state.name == RouteNames.deckImport;
 }
 
 class _RouterErrorView extends StatelessWidget {

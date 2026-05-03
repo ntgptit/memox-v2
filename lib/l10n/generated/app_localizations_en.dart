@@ -364,6 +364,196 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearanceTitle => 'Appearance';
 
   @override
+  String get settingsAccountTitle => 'Account';
+
+  @override
+  String get settingsAccountLoading => 'Loading account';
+
+  @override
+  String get settingsAccountSubtitleSignedOut =>
+      'Link Google now so Drive sync can be enabled later.';
+
+  @override
+  String get settingsAccountSubtitleReady =>
+      'Google Drive app data access is ready for future sync.';
+
+  @override
+  String get settingsAccountSubtitleReconnect =>
+      'Reconnect Drive access before sync can run.';
+
+  @override
+  String get settingsAccountSubtitleConfig =>
+      'Google sign-in is not configured for this build.';
+
+  @override
+  String get settingsAccountSubtitleUnsupported =>
+      'Google sign-in is not available on this platform.';
+
+  @override
+  String get settingsAccountSubtitleError =>
+      'Google account could not be updated.';
+
+  @override
+  String get settingsAccountSignedOut => 'No Google account is linked.';
+
+  @override
+  String get settingsAccountMissingConfig =>
+      'Add Google OAuth client IDs to enable account linking.';
+
+  @override
+  String get settingsAccountUnsupported =>
+      'Use Android, iOS, or web to link Google account.';
+
+  @override
+  String get settingsAccountDriveReady => 'Google Drive ready';
+
+  @override
+  String get settingsAccountDriveReconnectRequired =>
+      'Google Drive reconnect required';
+
+  @override
+  String get settingsAccountDriveAuthorizationRequired =>
+      'Grant Google Drive app data access to prepare sync.';
+
+  @override
+  String get settingsAccountSignIn => 'Sign in with Google';
+
+  @override
+  String get settingsAccountReconnectDrive => 'Reconnect Google Drive';
+
+  @override
+  String get settingsAccountSignOut => 'Sign out';
+
+  @override
+  String get settingsAccountSignInCanceled => 'Google sign-in was canceled.';
+
+  @override
+  String get settingsAccountSignInFailed => 'Google sign-in failed. Try again.';
+
+  @override
+  String get settingsAccountSignedOutMessage =>
+      'Signed out. Local flashcards stay on this device.';
+
+  @override
+  String get settingsDriveSyncTitle => 'Drive sync';
+
+  @override
+  String get settingsDriveSyncLoading => 'Loading sync state';
+
+  @override
+  String get settingsDriveSyncSubtitleSignedOut =>
+      'Link Google account before syncing.';
+
+  @override
+  String get settingsDriveSyncSubtitleUnconfigured =>
+      'Google sign-in is not configured for this build.';
+
+  @override
+  String get settingsDriveSyncSubtitleReconnect =>
+      'Reconnect Drive access before sync can run.';
+
+  @override
+  String get settingsDriveSyncSubtitleNoRemote =>
+      'Create the first Drive backup from this device.';
+
+  @override
+  String get settingsDriveSyncSubtitleSynced =>
+      'Local data matches the latest Drive snapshot.';
+
+  @override
+  String get settingsDriveSyncSubtitleReady => 'Manual sync is ready.';
+
+  @override
+  String get settingsDriveSyncSubtitleConflict =>
+      'Choose which copy should win.';
+
+  @override
+  String get settingsDriveSyncSubtitleUnsupportedSchema =>
+      'Update the app before restoring this Drive copy.';
+
+  @override
+  String get settingsDriveSyncSubtitleError => 'Drive sync could not complete.';
+
+  @override
+  String get settingsDriveSyncSignedOut =>
+      'Sign in with Google to sync the local database with Drive.';
+
+  @override
+  String get settingsDriveSyncUnconfigured =>
+      'Add Google OAuth client IDs to enable Drive sync.';
+
+  @override
+  String get settingsDriveSyncReconnectRequired =>
+      'Reconnect Google Drive in Account first.';
+
+  @override
+  String get settingsDriveSyncNoRemote => 'No Drive snapshot exists yet.';
+
+  @override
+  String get settingsDriveSyncSynced => 'Google Drive is up to date.';
+
+  @override
+  String get settingsDriveSyncReady => 'A Drive snapshot is available.';
+
+  @override
+  String get settingsDriveSyncConflictStatus =>
+      'Local and Drive data both changed.';
+
+  @override
+  String get settingsDriveSyncUnsupportedSchema =>
+      'The Drive copy was created by a newer database schema.';
+
+  @override
+  String settingsDriveSyncLastSynced(Object value) {
+    return 'Last synced: $value';
+  }
+
+  @override
+  String settingsDriveSyncRemoteDevice(Object device) {
+    return 'Drive copy from: $device';
+  }
+
+  @override
+  String get settingsDriveSyncAction => 'Sync now';
+
+  @override
+  String get settingsDriveSyncUploaded =>
+      'Local data backed up to Google Drive.';
+
+  @override
+  String get settingsDriveSyncRestored => 'Drive copy restored.';
+
+  @override
+  String get settingsDriveSyncNoChanges => 'Already up to date.';
+
+  @override
+  String get settingsDriveSyncCanceled => 'Sync canceled.';
+
+  @override
+  String get settingsDriveSyncFailed => 'Drive sync failed. Try again.';
+
+  @override
+  String get settingsDriveSyncConflictTitle => 'Resolve sync conflict';
+
+  @override
+  String get settingsDriveSyncConflictMessage =>
+      'Local data and the Drive copy both changed since the last sync.';
+
+  @override
+  String get settingsDriveSyncKeepLocal => 'Keep local data';
+
+  @override
+  String get settingsDriveSyncKeepLocalSubtitle =>
+      'Upload this device\'s database and replace the Drive snapshot.';
+
+  @override
+  String get settingsDriveSyncUseDrive => 'Use Drive copy';
+
+  @override
+  String get settingsDriveSyncUseDriveSubtitle =>
+      'Restore the Drive snapshot over this device\'s local database.';
+
+  @override
   String get settingsThemeModeLabel => 'Theme mode';
 
   @override
@@ -549,6 +739,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get foldersReorderManualOnlyHint =>
       'Switch sort back to manual to reorder.';
+
+  @override
+  String get foldersImportChoiceTitle => 'Import flashcards';
+
+  @override
+  String get foldersImportCreateDeckAction => 'Create new deck';
+
+  @override
+  String get foldersImportExistingDeckAction => 'Add to existing deck';
+
+  @override
+  String get foldersImportChooseDeckTitle => 'Choose deck';
+
+  @override
+  String get foldersImportNoDecksHint => 'No decks in this folder yet.';
 
   @override
   String foldersStatusSubfolders(int subfolderCount) {
@@ -1283,7 +1488,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsImportTitle => 'Import flashcards';
 
   @override
-  String get importSourceTitle => 'Source';
+  String get importSourceTitle => 'Import from';
 
   @override
   String get importSourceSubtitle =>
@@ -1293,13 +1498,59 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importCsvLabel => 'CSV';
 
   @override
-  String get importTextFormatLabel => 'Text format';
+  String get importExcelLabel => 'Excel';
+
+  @override
+  String get importTextFormatLabel => 'Text';
 
   @override
   String get importLoadFile => 'Load file';
 
   @override
+  String get importSelectExcelFile => 'Select Excel file';
+
+  @override
+  String get importChangeFile => 'Change';
+
+  @override
+  String get importRemoveFile => 'Remove';
+
+  @override
+  String get importFileReadyToPreview => 'Ready to preview';
+
+  @override
+  String importDetectedRowsLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rows detected',
+      one: '1 row detected',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get importCsvContentLabel => 'CSV content';
+
+  @override
+  String get importExcelFileLabel => 'Excel file';
+
+  @override
+  String get importExcelNoFileTitle => 'No Excel file loaded';
+
+  @override
+  String get importExcelNoFileDescription =>
+      'Load a .xlsx file. Column A is front, column B is back, and column C is optional note.';
+
+  @override
+  String get importExcelLoadedFileDescription =>
+      'Preview reads the first sheet from A1. Use the header option if row 1 contains labels.';
+
+  @override
+  String get importExcelHasHeaderLabel => 'First row is header';
+
+  @override
+  String get importExcelHasHeaderDescription => 'Data starts at row 2.';
 
   @override
   String get importTextContentLabel => 'Structured text';
@@ -1310,6 +1561,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get importTextHint =>
       'Front: ...\nBack: ...\nNote: ...\nOr one card per line: term / definition';
+
+  @override
+  String get importCsvRulesText =>
+      'Use front, back, and optional note columns.';
+
+  @override
+  String get importExcelRulesText =>
+      'Column A = front, Column B = back, Column C = note.';
+
+  @override
+  String get importTextRulesText =>
+      'Use Front:, Back:, and optional Note: lines.';
 
   @override
   String get importSeparatorLabel => 'Separator';
@@ -1376,7 +1639,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Future option: update matched cards instead of creating new duplicates.';
 
   @override
-  String get importPreviewAction => 'Preview';
+  String get importPreviewAction => 'Preview import';
+
+  @override
+  String importCommitCardsAction(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Import $count cards',
+      one: 'Import 1 card',
+    );
+    return '$_temp0';
+  }
 
   @override
   String importSuccessMessage(int count) {
@@ -1390,7 +1664,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importFileUnavailableMessage =>
-      'This file cannot be read. Choose another CSV or text file.';
+      'This file cannot be read. Choose another CSV, text, or .xlsx file.';
 
   @override
   String get importValidationIssuesTitle => 'Validation issues';

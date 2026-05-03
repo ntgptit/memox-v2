@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import '../../core/errors/app_exception.dart';
 import '../../core/utils/string_utils.dart';
 import '../../domain/value_objects/content_actions.dart';
+import 'flashcard_excel_import_parser.dart';
 
 final class FlashcardImportSupport {
   const FlashcardImportSupport._();
@@ -8,11 +11,17 @@ final class FlashcardImportSupport {
   static FlashcardImportPreparation parse({
     required ImportSourceFormat format,
     required String rawContent,
+    Uint8List? sourceBytes,
+    bool excelHasHeader = true,
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
   }) {
     return switch (format) {
       ImportSourceFormat.csv => _parseCsv(rawContent),
+      ImportSourceFormat.excel => FlashcardExcelImportParser.parse(
+        sourceBytes,
+        hasHeader: excelHasHeader,
+      ),
       ImportSourceFormat.structuredText => _parseStructuredText(
         rawContent,
         structuredTextSeparator,

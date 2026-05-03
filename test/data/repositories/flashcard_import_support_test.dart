@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/data/repositories/flashcard_import_support.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
@@ -115,6 +118,78 @@ void main() {
   );
 
   test(
+    'DT7 parseRows: Excel with header reads fixed A B C columns after row one',
+    () {
+      final preparation = FlashcardImportSupport.parse(
+        format: ImportSourceFormat.excel,
+        rawContent: '',
+        sourceBytes: _xlsxBytes(
+          worksheetRows: '''
+<row r="1">
+  <c r="A1" t="inlineStr"><is><t>Korean</t></is></c>
+  <c r="B1" t="inlineStr"><is><t>Meaning</t></is></c>
+  <c r="C1" t="inlineStr"><is><t>Memo</t></is></c>
+</row>
+<row r="2">
+  <c r="A2" t="inlineStr"><is><t>개다</t></is></c>
+  <c r="B2" t="inlineStr"><is><t>Clear up</t></is></c>
+  <c r="C2" t="inlineStr"><is><t>weather phrase</t></is></c>
+</row>
+<row r="3">
+  <c r="A3" t="inlineStr"><is><t>고민하다</t></is></c>
+  <c r="B3" t="inlineStr"><is><t></t></is></c>
+</row>
+''',
+        ),
+        excelHasHeader: true,
+      );
+
+      expect(preparation.format, ImportSourceFormat.excel);
+      expect(preparation.previewItems, hasLength(1));
+      expect(preparation.previewItems.single.sourceLabel, 'Row 2');
+      expect(preparation.previewItems.single.draft.front, '개다');
+      expect(preparation.previewItems.single.draft.back, 'Clear up');
+      expect(preparation.previewItems.single.draft.note, 'weather phrase');
+      expect(preparation.issues, hasLength(1));
+      expect(preparation.issues.single.lineNumber, 3);
+      expect(preparation.issues.single.message, 'front and back are required.');
+      expect(preparation.canCommit, isFalse);
+    },
+  );
+
+  test('DT8 parseRows: Excel without header imports A1 as the first front', () {
+    final preparation = FlashcardImportSupport.parse(
+      format: ImportSourceFormat.excel,
+      rawContent: '',
+      sourceBytes: _xlsxBytes(
+        worksheetRows: '''
+<row r="1">
+  <c r="A1" t="inlineStr"><is><t>개다</t></is></c>
+  <c r="B1" t="inlineStr"><is><t>Clear up</t></is></c>
+  <c r="C1" t="inlineStr"><is><t>weather phrase</t></is></c>
+</row>
+<row r="2">
+  <c r="A2" t="inlineStr"><is><t>고민하다</t></is></c>
+  <c r="B2" t="inlineStr"><is><t></t></is></c>
+</row>
+''',
+      ),
+      excelHasHeader: false,
+    );
+
+    expect(preparation.format, ImportSourceFormat.excel);
+    expect(preparation.previewItems, hasLength(1));
+    expect(preparation.previewItems.single.sourceLabel, 'Row 1');
+    expect(preparation.previewItems.single.draft.front, '개다');
+    expect(preparation.previewItems.single.draft.back, 'Clear up');
+    expect(preparation.previewItems.single.draft.note, 'weather phrase');
+    expect(preparation.issues, hasLength(1));
+    expect(preparation.issues.single.lineNumber, 2);
+    expect(preparation.issues.single.message, 'front and back are required.');
+    expect(preparation.canCommit, isFalse);
+  });
+
+  test(
     'DT1 onUpdate: explicit colon separator preserves later colons in the answer',
     () {
       final preparation = FlashcardImportSupport.parse(
@@ -170,4 +245,38 @@ void main() {
       ]);
     },
   );
+}
+
+Uint8List _xlsxBytes({required String worksheetRows}) {
+  final archive = Archive()
+    ..addFile(
+      ArchiveFile.string('xl/workbook.xml', '''
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Sheet1" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>
+'''),
+    )
+    ..addFile(
+      ArchiveFile.string('xl/_rels/workbook.xml.rels', '''
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1"
+    Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"
+    Target="worksheets/sheet1.xml"/>
+</Relationships>
+'''),
+    )
+    ..addFile(
+      ArchiveFile.string('xl/worksheets/sheet1.xml', '''
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>
+    $worksheetRows
+  </sheetData>
+</worksheet>
+'''),
+    );
+
+  return ZipEncoder().encodeBytes(archive);
 }

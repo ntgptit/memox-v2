@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../core/errors/result.dart';
 import '../entities/flashcard_entity.dart';
 import '../value_objects/content_actions.dart';
@@ -45,6 +47,8 @@ abstract interface class FlashcardRepository {
     required String deckId,
     required ImportSourceFormat format,
     required String rawContent,
+    Uint8List? sourceBytes,
+    bool excelHasHeader = true,
     FlashcardImportDuplicatePolicy duplicatePolicy =
         FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =

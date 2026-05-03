@@ -18,6 +18,7 @@ Test file: `test/presentation/shared/shared_primitives_test.dart`
 | DT3 | search-sort toolbar has a selected sort option with icon | toolbar selected sort is `recent` and option icon is schedule | toolbar renders selected sort trigger | trigger is a compact tonal secondary button using `AppRadius.button`, no `FilterChip` is rendered, and the selected icon is visible | C0+C1 |
 | DT4 | bulk action bar has label, subtitle, secondary action, and primary action | action bar label is `3 selected` and actions mutate `moveTapped` and `archiveTapped` | user taps `Move` and `Archive` | label and subtitle are visible, and both callbacks are called | C0+C1 |
 | DT5 | term row is selected and has a tap callback | row has term `Hello`, definition `Xin chao`, caption `2 examples`, and selected state true | user taps the term text | row text and selected icon are visible, and tap callback is called | C0+C1 |
+| DT6 | compact segmented control should keep three short options inline while inheriting theme colors | `MxSegmentedControl` has `density: compact`, three short options, width `320`, and selected value `{1}` | user taps `Text` | `SegmentedButton<int>` is used instead of radio fallback, control height stays in the compact theme range, selected value becomes `{3}`, and selected background resolves from the common segmented theme | C0+C1 |
 
 ## Decision table: onSearchFilterSort
 

@@ -206,9 +206,33 @@ void main() {
       expect(find.text('Folder actions'), findsOneWidget);
       expect(find.text('Edit'), findsOneWidget);
       expect(find.text('Move'), findsOneWidget);
+      expect(find.text('Import flashcards'), findsOneWidget);
       expect(find.text('Delete'), findsOneWidget);
     },
   );
+
+  testWidgets('DT2 onSelect: subfolder-mode root folder actions hide import', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith(
+            (ref) =>
+                Future<LibraryOverviewState>.value(_subfolderModeLibraryState),
+          ),
+        ],
+        child: const _TestApp(child: LibraryOverviewView()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.longPress(find.text('Korean1'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Folder actions'), findsOneWidget);
+    expect(find.text('Import flashcards'), findsNothing);
+  });
 
   testWidgets(
     'DT2 onNavigate: root folder tap still calls open-folder callback',
@@ -307,6 +331,7 @@ const _sampleLibraryState = LibraryOverviewState(
       dueCardCount: 3,
       newCardCount: 5,
       masteryPercent: 19,
+      canImportFlashcards: true,
     ),
   ],
 );
@@ -328,6 +353,29 @@ const _legacyLibraryState = LibraryOverviewState(
       dueCardCount: 3,
       newCardCount: 5,
       masteryPercent: 19,
+      canImportFlashcards: true,
+    ),
+  ],
+);
+
+const _subfolderModeLibraryState = LibraryOverviewState(
+  greeting: LibraryOverviewGreeting(
+    salutation: 'Good morning',
+    userName: 'Lan',
+  ),
+  dueToday: 0,
+  folders: <LibraryFolder>[
+    LibraryFolder(
+      id: 'folder-root-001',
+      name: 'Korean1',
+      icon: Icons.folder_outlined,
+      subfolderCount: 1,
+      deckCount: 0,
+      itemCount: 0,
+      dueCardCount: 0,
+      newCardCount: 0,
+      masteryPercent: 0,
+      canImportFlashcards: false,
     ),
   ],
 );

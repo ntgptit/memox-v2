@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../app/router/app_navigation.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/dialogs/mx_confirmation_dialog.dart';
@@ -10,7 +11,9 @@ import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 
-enum FolderQuickAction { edit, move, reorder, delete }
+enum FolderQuickAction { edit, move, import, reorder, delete }
+
+enum _FolderImportChoice { createDeck, existingDeck }
 
 final class _FolderMoveDestination {
   const _FolderMoveDestination(this.parentId);
@@ -27,6 +30,7 @@ Future<void> showFolderActions({
   bool includeReorder = false,
   bool canReorder = false,
   bool isUnlocked = false,
+  bool canImportFlashcards = false,
   VoidCallback? onReorder,
   Future<void> Function()? onDeleted,
 }) async {
@@ -46,6 +50,12 @@ Future<void> showFolderActions({
           label: l10n.commonMove,
           icon: Icons.drive_file_move_outline,
         ),
+        if (canImportFlashcards)
+          MxActionSheetItem(
+            value: FolderQuickAction.import,
+            label: l10n.flashcardsImportTitle,
+            icon: Icons.file_upload_outlined,
+          ),
         if (includeReorder)
           MxActionSheetItem(
             value: FolderQuickAction.reorder,
@@ -77,6 +87,8 @@ Future<void> showFolderActions({
         folderId,
         allowRootDestination: allowRootDestination,
       );
+    case FolderQuickAction.import:
+      await _importIntoFolder(context, ref, folderId);
     case FolderQuickAction.reorder:
       if (!canReorder || isUnlocked || onReorder == null) {
         MxSnackbar.warning(context, l10n.foldersManualReorderWarning);
@@ -86,6 +98,102 @@ Future<void> showFolderActions({
     case FolderQuickAction.delete:
       await _deleteFolder(context, ref, folderId, onDeleted: onDeleted);
   }
+}
+
+Future<void> _importIntoFolder(
+  BuildContext context,
+  WidgetRef ref,
+  String folderId,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final targets = await ref
+      .read(folderActionControllerProvider(folderId).notifier)
+      .loadImportDeckTargets();
+  if (!context.mounted) {
+    return;
+  }
+
+  final choice = await MxBottomSheet.show<_FolderImportChoice>(
+    context: context,
+    title: l10n.foldersImportChoiceTitle,
+    child: MxActionSheetList<_FolderImportChoice>(
+      items: [
+        MxActionSheetItem(
+          value: _FolderImportChoice.createDeck,
+          label: l10n.foldersImportCreateDeckAction,
+          icon: Icons.add_box_outlined,
+        ),
+        MxActionSheetItem(
+          value: _FolderImportChoice.existingDeck,
+          label: l10n.foldersImportExistingDeckAction,
+          subtitle: targets.isEmpty ? l10n.foldersImportNoDecksHint : null,
+          icon: Icons.style_outlined,
+          enabled: targets.isNotEmpty,
+        ),
+      ],
+    ),
+  );
+  if (!context.mounted || choice == null) {
+    return;
+  }
+
+  switch (choice) {
+    case _FolderImportChoice.createDeck:
+      await _createDeckForImport(context, ref, folderId);
+    case _FolderImportChoice.existingDeck:
+      await _chooseExistingDeckForImport(context, targets);
+  }
+}
+
+Future<void> _createDeckForImport(
+  BuildContext context,
+  WidgetRef ref,
+  String folderId,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final name = await MxNameDialog.show(
+    context: context,
+    title: l10n.decksCreateTitle,
+    label: l10n.decksNameLabel,
+    hintText: l10n.decksNameHint,
+    confirmLabel: l10n.commonCreate,
+  );
+  if (!context.mounted || name == null) {
+    return;
+  }
+
+  final deckId = await ref
+      .read(folderActionControllerProvider(folderId).notifier)
+      .createDeck(name);
+  if (!context.mounted || deckId == null) {
+    return;
+  }
+  context.pushDeckImport(deckId);
+}
+
+Future<void> _chooseExistingDeckForImport(
+  BuildContext context,
+  List<FolderDeckItem> targets,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final deckId = await MxDestinationPickerSheet.show<String>(
+    context: context,
+    title: l10n.foldersImportChooseDeckTitle,
+    destinations: [
+      for (final target in targets)
+        MxDestinationOption<String>(
+          value: target.id,
+          title: target.name,
+          subtitle: l10n.foldersDeckStats(target.cardCount),
+          icon: Icons.style_outlined,
+        ),
+    ],
+    emptyLabel: l10n.foldersImportNoDecksHint,
+  );
+  if (!context.mounted || deckId == null) {
+    return;
+  }
+  context.pushDeckImport(deckId);
 }
 
 Future<void> _renameFolder(

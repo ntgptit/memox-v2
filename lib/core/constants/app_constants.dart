@@ -30,6 +30,19 @@ abstract final class AppConstants {
       'settings.tts.front_voice_name';
   static const String sharedPrefsTtsBackVoiceNameKey =
       'settings.tts.back_voice_name';
+  static const String sharedPrefsCloudAccountLinkKey =
+      'settings.account.cloud_link';
+  static const String sharedPrefsDriveSyncMetadataKey =
+      'settings.sync.google_drive.metadata';
+  static const String sharedPrefsDriveSyncDeviceIdKey =
+      'settings.sync.google_drive.device_id';
+  static const String driveSyncManifestFileName = 'memox.sync.manifest.json';
+  static const String driveSyncSnapshotFileName = 'memox.sync.snapshot.zip';
+  static const String driveSyncManifestEntryName = 'manifest.json';
+  static const String driveSyncDatabaseEntryName = 'memox.sqlite';
+  static const String driveSyncSettingsEntryName = 'settings.json';
+  static const String driveSyncMimeType = 'application/octet-stream';
+  static const String driveSyncManifestMimeType = 'application/json';
   static const String localDatabaseName = 'memox';
 
   static const Duration connectivityDebounce = Duration(milliseconds: 250);
