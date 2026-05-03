@@ -214,15 +214,42 @@ void main() {
   );
 
   testWidgets(
-    'DT8 onDisplay: shows Drive sync group disabled while signed out',
+    'DT8 onDisplay: renders platform Google button for web reconnect state',
+    (tester) async {
+      final preferences = await SharedPreferences.getInstance();
+      final store = CloudAccountStore(preferences);
+      await store.save(_driveMissingLink);
+
+      await _pumpSettings(
+        tester,
+        googleConfig: _configuredGoogle,
+        googleAuth: _FakeGoogleAccountAuthService(
+          requiresPlatformSignInButton: true,
+          restoreResult: GoogleAccountAuthResult.driveAuthorizationRequired(
+            _session(
+              grantedScopes: const <String>{},
+              driveAuthorizationState:
+                  DriveAuthorizationState.authorizationRequired,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Google Drive reconnect required'), findsOneWidget);
+      expect(find.text('Reconnect Google Drive'), findsNothing);
+      expect(find.text('Sign out'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT9 onDisplay: shows Drive sync group disabled while signed out',
     (tester) async {
       await _pumpSettings(tester);
 
       expect(find.text('Drive sync'), findsOneWidget);
-      expect(find.text('Link Google account before syncing.'), findsOneWidget);
       expect(
         find.text('Sign in with Google to sync the local database with Drive.'),
-        findsOneWidget,
+        findsNothing,
       );
       final syncButton = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, 'Sync now'),
@@ -232,7 +259,7 @@ void main() {
   );
 
   testWidgets(
-    'DT9 onDisplay: shows Drive sync action when Google Drive is ready',
+    'DT10 onDisplay: shows Drive sync action when Google Drive is ready',
     (tester) async {
       final repository = _FakeDriveSyncRepository(
         loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
@@ -243,12 +270,55 @@ void main() {
       expect(find.text('Drive sync'), findsOneWidget);
       expect(
         find.text('Create the first Drive backup from this device.'),
-        findsOneWidget,
+        findsNothing,
       );
       final syncButton = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, 'Sync now'),
       );
       expect(syncButton.onPressed, isNotNull);
+    },
+  );
+
+  testWidgets(
+    'DT11 onDisplay: compact top settings groups fit first phone viewport',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 844);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
+      final preferences = await SharedPreferences.getInstance();
+      final store = CloudAccountStore(preferences);
+      await store.save(_driveReadyLink);
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+      );
+
+      await _pumpSettings(
+        tester,
+        googleConfig: _configuredGoogle,
+        googleAuth: _FakeGoogleAccountAuthService(
+          restoreResult: GoogleAccountAuthResult.success(
+            _session(
+              grantedScopes: const <String>{googleDriveAppDataScope},
+              driveAuthorizationState: DriveAuthorizationState.authorized,
+            ),
+          ),
+        ),
+        driveSyncRepository: repository,
+      );
+
+      final viewportHeight =
+          tester.view.physicalSize.height / tester.view.devicePixelRatio;
+
+      expect(find.text('Account'), findsOneWidget);
+      expect(find.text('Drive sync'), findsOneWidget);
+      expect(find.text('Appearance'), findsOneWidget);
+      expect(find.text('Language'), findsOneWidget);
+      expect(
+        tester.getRect(find.text('Language')).bottom,
+        lessThanOrEqualTo(viewportHeight),
+      );
     },
   );
 
@@ -826,6 +896,7 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   _FakeGoogleAccountAuthService({
     this.restoreResult = const GoogleAccountAuthResult.signedOut(),
     this.signInResult = const GoogleAccountAuthResult.signedOut(),
+    this.requiresPlatformSignInButton = false,
   });
 
   final StreamController<GoogleAccountAuthResult> _events =
@@ -833,6 +904,8 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   GoogleAccountAuthResult restoreResult;
   GoogleAccountAuthResult signInResult;
+  @override
+  final bool requiresPlatformSignInButton;
   int signOutCount = 0;
 
   @override
@@ -840,9 +913,6 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   @override
   bool get supportsInteractiveSignIn => true;
-
-  @override
-  bool get requiresPlatformSignInButton => false;
 
   @override
   Future<void> initialize(GoogleOAuthConfig config) async {}

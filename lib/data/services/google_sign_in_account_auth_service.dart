@@ -161,7 +161,9 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
   ) async {
     switch (event) {
       case GoogleSignInAuthenticationEventSignIn():
-        _events.add(await _authorizeExistingScopes(event.user));
+        _events.add(
+          await _authorizeDriveAppData(event.user, promptIfNecessary: true),
+        );
       case GoogleSignInAuthenticationEventSignOut():
         _events.add(const GoogleAccountAuthResult.signedOut());
     }

@@ -20,6 +20,7 @@ class AppearanceSettingsGroup extends ConsumerWidget {
       subtitle: l10n.settingsThemeModeLabel,
       child: MxSegmentedControl<ThemeMode>(
         adaptive: true,
+        density: MxSegmentedControlDensity.compact,
         segments: [
           MxSegment(
             value: ThemeMode.system,

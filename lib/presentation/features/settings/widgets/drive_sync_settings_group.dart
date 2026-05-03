@@ -83,102 +83,14 @@ class _DriveSyncContent extends ConsumerWidget {
 
     return SettingsGroup(
       title: l10n.settingsDriveSyncTitle,
-      subtitle: _subtitle(l10n),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          MxText(_statusText(l10n), role: MxTextRole.formHelper),
-          if (state.lastSyncedAt != null) ...[
-            const MxGap(MxSpace.sm),
-            MxText(
-              l10n.settingsDriveSyncLastSynced(
-                _formatDateTime(context, state.lastSyncedAt!),
-              ),
-              role: MxTextRole.formHelper,
-            ),
-          ],
-          if (state.remoteDeviceLabel != null) ...[
-            const MxGap(MxSpace.xs),
-            MxText(
-              l10n.settingsDriveSyncRemoteDevice(state.remoteDeviceLabel!),
-              role: MxTextRole.formHelper,
-            ),
-          ],
-          if (_message(l10n) case final message?) ...[
-            const MxGap(MxSpace.sm),
-            MxText(message, role: MxTextRole.formHelper),
-          ],
-          const MxGap(MxSpace.md),
-          MxPrimaryButton(
-            label: l10n.settingsDriveSyncAction,
-            onPressed: state.canSync
-                ? () => unawaited(controller.syncNow())
-                : null,
-            leadingIcon: Icons.cloud_sync_outlined,
-            isLoading: state.isBusy,
-            fullWidth: true,
-          ),
-        ],
+      child: MxPrimaryButton(
+        label: l10n.settingsDriveSyncAction,
+        onPressed: state.canSync ? () => unawaited(controller.syncNow()) : null,
+        leadingIcon: Icons.cloud_sync_outlined,
+        isLoading: state.isBusy,
+        fullWidth: true,
       ),
     );
-  }
-
-  String _subtitle(AppLocalizations l10n) {
-    return switch (state.kind) {
-      DriveSyncStatusKind.signedOut => l10n.settingsDriveSyncSubtitleSignedOut,
-      DriveSyncStatusKind.unconfigured =>
-        l10n.settingsDriveSyncSubtitleUnconfigured,
-      DriveSyncStatusKind.needsDriveAuthorization =>
-        l10n.settingsDriveSyncSubtitleReconnect,
-      DriveSyncStatusKind.noRemoteSnapshot =>
-        l10n.settingsDriveSyncSubtitleNoRemote,
-      DriveSyncStatusKind.synced => l10n.settingsDriveSyncSubtitleSynced,
-      DriveSyncStatusKind.conflict => l10n.settingsDriveSyncSubtitleConflict,
-      DriveSyncStatusKind.unsupportedSchema =>
-        l10n.settingsDriveSyncSubtitleUnsupportedSchema,
-      DriveSyncStatusKind.failure => l10n.settingsDriveSyncSubtitleError,
-      DriveSyncStatusKind.ready ||
-      DriveSyncStatusKind.localChanges ||
-      DriveSyncStatusKind.remoteChanges => l10n.settingsDriveSyncSubtitleReady,
-    };
-  }
-
-  String _statusText(AppLocalizations l10n) {
-    return switch (state.kind) {
-      DriveSyncStatusKind.signedOut => l10n.settingsDriveSyncSignedOut,
-      DriveSyncStatusKind.unconfigured => l10n.settingsDriveSyncUnconfigured,
-      DriveSyncStatusKind.needsDriveAuthorization =>
-        l10n.settingsDriveSyncReconnectRequired,
-      DriveSyncStatusKind.noRemoteSnapshot => l10n.settingsDriveSyncNoRemote,
-      DriveSyncStatusKind.synced => l10n.settingsDriveSyncSynced,
-      DriveSyncStatusKind.conflict => l10n.settingsDriveSyncConflictStatus,
-      DriveSyncStatusKind.unsupportedSchema =>
-        l10n.settingsDriveSyncUnsupportedSchema,
-      DriveSyncStatusKind.failure =>
-        state.technicalMessage ?? l10n.errorUnexpected,
-      DriveSyncStatusKind.ready ||
-      DriveSyncStatusKind.localChanges ||
-      DriveSyncStatusKind.remoteChanges => l10n.settingsDriveSyncReady,
-    };
-  }
-
-  String? _message(AppLocalizations l10n) {
-    return switch (state.message) {
-      DriveSyncSettingsMessage.none => null,
-      DriveSyncSettingsMessage.uploaded => l10n.settingsDriveSyncUploaded,
-      DriveSyncSettingsMessage.restored => l10n.settingsDriveSyncRestored,
-      DriveSyncSettingsMessage.noChanges => l10n.settingsDriveSyncNoChanges,
-      DriveSyncSettingsMessage.canceled => l10n.settingsDriveSyncCanceled,
-      DriveSyncSettingsMessage.failed =>
-        state.technicalMessage ?? l10n.settingsDriveSyncFailed,
-    };
-  }
-
-  String _formatDateTime(BuildContext context, int epochMillis) {
-    final dateTime = DateTime.fromMillisecondsSinceEpoch(epochMillis).toLocal();
-    final materialL10n = MaterialLocalizations.of(context);
-    return '${materialL10n.formatShortDate(dateTime)} '
-        '${materialL10n.formatTimeOfDay(TimeOfDay.fromDateTime(dateTime))}';
   }
 }
 

@@ -4,12 +4,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/account_providers.dart';
 import 'package:memox/app/di/content_providers.dart';
+import 'package:memox/app/di/sync_providers.dart';
 import 'package:memox/core/config/google_oauth_config.dart';
 import 'package:memox/core/constants/app_constants.dart';
 import 'package:memox/data/settings/cloud_account_store.dart';
 import 'package:memox/domain/entities/cloud_account_link.dart';
+import 'package:memox/domain/entities/drive_sync_models.dart';
+import 'package:memox/domain/repositories/drive_sync_repository.dart';
 import 'package:memox/domain/services/google_account_auth_service.dart';
 import 'package:memox/presentation/features/settings/viewmodels/account_settings_viewmodel.dart';
+import 'package:memox/presentation/features/settings/viewmodels/drive_sync_settings_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../support/content_repository_harness.dart';
@@ -171,7 +175,39 @@ void main() {
   );
 
   test(
-    'DT5 onUpdate: access token request does not persist token material',
+    'DT5 onUpdate: reconnecting Drive refreshes Drive sync status',
+    () async {
+      final preferences = await SharedPreferences.getInstance();
+      await CloudAccountStore(preferences).save(_driveMissingLink);
+      final syncRepository = _FakeDriveSyncRepository();
+      final container = _createContainer(
+        auth: _FakeGoogleAccountAuthService(
+          authorizeResult: GoogleAccountAuthResult.success(
+            _session(
+              grantedScopes: const <String>{googleDriveAppDataScope},
+              driveAuthorizationState: DriveAuthorizationState.authorized,
+            ),
+          ),
+        ),
+        syncRepository: syncRepository,
+      );
+      addTearDown(container.dispose);
+
+      await container.read(accountSettingsControllerProvider.future);
+      await container.read(driveSyncSettingsControllerProvider.future);
+      expect(syncRepository.loadStatusCount, 1);
+
+      await container
+          .read(accountSettingsControllerProvider.notifier)
+          .reconnectDrive();
+      await container.read(driveSyncSettingsControllerProvider.future);
+
+      expect(syncRepository.loadStatusCount, 2);
+    },
+  );
+
+  test(
+    'DT6 onUpdate: access token request does not persist token material',
     () async {
       final preferences = await SharedPreferences.getInstance();
       await CloudAccountStore(preferences).save(_driveReadyLink);
@@ -202,6 +238,7 @@ void main() {
 ProviderContainer _createContainer({
   GoogleOAuthConfig? config,
   required _FakeGoogleAccountAuthService auth,
+  DriveSyncRepository? syncRepository,
 }) {
   final container = ProviderContainer(
     overrides: [
@@ -213,6 +250,8 @@ ProviderContainer _createContainer({
             ),
       ),
       googleAccountAuthServiceProvider.overrideWithValue(auth),
+      if (syncRepository != null)
+        driveSyncRepositoryProvider.overrideWith((ref) async => syncRepository),
       clockProvider.overrideWithValue(TestClock(DateTime.utc(2026, 5, 3, 9))),
     ],
   );
@@ -320,4 +359,31 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   @override
   Future<void> signOutLocal() async {}
+}
+
+final class _FakeDriveSyncRepository implements DriveSyncRepository {
+  int loadStatusCount = 0;
+
+  @override
+  Future<DriveSyncStatus> loadStatus() async {
+    loadStatusCount += 1;
+    return const DriveSyncStatus.needsDriveAuthorization();
+  }
+
+  @override
+  Future<DriveSyncRunResult> resolveConflict(
+    DriveSyncConflict conflict,
+    DriveSyncConflictChoice choice,
+  ) async {
+    return DriveSyncRunResult.canceled(
+      const DriveSyncStatus.needsDriveAuthorization(),
+    );
+  }
+
+  @override
+  Future<DriveSyncRunResult> syncNow() async {
+    return DriveSyncRunResult.noChanges(
+      const DriveSyncStatus.needsDriveAuthorization(),
+    );
+  }
 }

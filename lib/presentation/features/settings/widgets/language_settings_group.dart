@@ -22,6 +22,7 @@ class LanguageSettingsGroup extends ConsumerWidget {
       subtitle: l10n.settingsLocaleLabel,
       child: MxSegmentedControl<_LocaleChoice>(
         adaptive: true,
+        density: MxSegmentedControlDensity.compact,
         segments: [
           MxSegment(
             value: _LocaleChoice.system,

@@ -6,6 +6,7 @@ import '../../../../app/di/account_providers.dart';
 import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../../domain/services/google_account_auth_service.dart';
 import '../../../../domain/usecases/cloud_account_usecases.dart';
+import 'drive_sync_settings_viewmodel.dart';
 
 part 'account_settings_viewmodel.g.dart';
 
@@ -154,6 +155,7 @@ class AccountSettingsController extends _$AccountSettingsController {
         requiresPlatformSignInButton: current.requiresPlatformSignInButton,
       ),
     );
+    _refreshDriveSyncStatus();
   }
 
   Future<void> _handleAuthenticationEvent(
@@ -180,6 +182,7 @@ class AccountSettingsController extends _$AccountSettingsController {
         requiresPlatformSignInButton: requiresPlatformButton,
       ),
     );
+    _refreshDriveSyncStatus();
   }
 
   Future<void> _runAction(
@@ -201,6 +204,11 @@ class AccountSettingsController extends _$AccountSettingsController {
         requiresPlatformSignInButton: current.requiresPlatformSignInButton,
       ),
     );
+    _refreshDriveSyncStatus();
+  }
+
+  void _refreshDriveSyncStatus() {
+    ref.invalidate(driveSyncSettingsControllerProvider);
   }
 
   AccountSettingsState _stateFromActionResult(

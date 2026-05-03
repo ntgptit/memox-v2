@@ -9,13 +9,16 @@ import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_loading_state.dart';
-import '../../../shared/widgets/mx_avatar.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/account_settings_viewmodel.dart';
 import 'google_account_web_button.dart';
 import 'settings_group.dart';
+
+const double _accountAvatarRadius = 14;
+const double _accountStatusBadgeRadius = 12;
+const double _compactSignOutVerticalPadding = 6;
 
 class AccountSettingsGroup extends ConsumerWidget {
   const AccountSettingsGroup({super.key});
@@ -80,7 +83,7 @@ class _AccountSettingsContent extends ConsumerWidget {
             const MxGap(MxSpace.sm),
             MxText(message, role: MxTextRole.formHelper),
           ],
-          const MxGap(MxSpace.md),
+          const MxGap(MxSpace.sm),
           _AccountActions(
             state: state,
             onSignIn: () => unawaited(controller.signIn()),
@@ -92,9 +95,9 @@ class _AccountSettingsContent extends ConsumerWidget {
     );
   }
 
-  String _subtitle(AppLocalizations l10n) {
+  String? _subtitle(AppLocalizations l10n) {
     return switch (state.status) {
-      AccountLinkStatus.signedIn => l10n.settingsAccountSubtitleReady,
+      AccountLinkStatus.signedIn => null,
       AccountLinkStatus.needsDriveAuthorization =>
         l10n.settingsAccountSubtitleReconnect,
       AccountLinkStatus.unconfigured => l10n.settingsAccountSubtitleConfig,
@@ -138,24 +141,40 @@ class _LinkedAccountRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final displayName = link.displayName ?? link.email;
+    final scheme = Theme.of(context).colorScheme;
 
     return Row(
       children: [
-        MxAvatar(
-          imageUrl: link.photoUrl,
-          initials: _initials(displayName),
-          size: MxAvatarSize.lg,
+        CircleAvatar(
+          radius: _accountAvatarRadius,
+          backgroundColor: scheme.surfaceContainerHigh,
+          backgroundImage: link.photoUrl == null
+              ? null
+              : NetworkImage(link.photoUrl!),
+          child: link.photoUrl == null
+              ? MxText(_initials(displayName), role: MxTextRole.avatarInitials)
+              : null,
         ),
-        const MxGap(MxSpace.md),
+        const MxGap(MxSpace.sm),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              MxText(
-                displayName,
-                role: MxTextRole.listTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              Row(
+                children: [
+                  Expanded(
+                    child: MxText(
+                      displayName,
+                      role: MxTextRole.listTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (statusLabel.isNotEmpty) ...[
+                    const MxGap(MxSpace.xs),
+                    Flexible(child: _AccountStatusBadge(label: statusLabel)),
+                  ],
+                ],
               ),
               const MxGap(MxSpace.xxs),
               MxText(
@@ -164,8 +183,6 @@ class _LinkedAccountRow extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const MxGap(MxSpace.xs),
-              MxText(statusLabel, role: MxTextRole.formHelper),
             ],
           ),
         ),
@@ -174,10 +191,9 @@ class _LinkedAccountRow extends StatelessWidget {
   }
 
   String _initials(String value) {
-    final parts = StringUtils.normalizeSpaceToEmpty(value)
-        .split(' ')
-        .where((part) => part.isNotEmpty)
-        .toList(growable: false);
+    final parts = StringUtils.normalizeSpaceToEmpty(
+      value,
+    ).split(' ').where((part) => part.isNotEmpty).toList(growable: false);
     if (parts.isEmpty) {
       return '?';
     }
@@ -185,6 +201,39 @@ class _LinkedAccountRow extends StatelessWidget {
       return parts.first.substring(0, 1);
     }
     return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}';
+  }
+}
+
+class _AccountStatusBadge extends StatelessWidget {
+  const _AccountStatusBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: const BorderRadius.all(
+          Radius.circular(_accountStatusBadgeRadius),
+        ),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: MxSpace.xs,
+          vertical: MxSpace.xxs,
+        ),
+        child: MxText(
+          label,
+          role: MxTextRole.badge,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
   }
 }
 
@@ -217,11 +266,9 @@ class _AccountActions extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     if (state.status == AccountLinkStatus.signedIn) {
-      return MxSecondaryButton(
+      return _CompactSignOutButton(
         label: l10n.settingsAccountSignOut,
         onPressed: state.canSignOut ? onSignOut : null,
-        variant: MxSecondaryVariant.text,
-        tone: MxSecondaryButtonTone.danger,
         isLoading: state.isBusy,
       );
     }
@@ -230,19 +277,11 @@ class _AccountActions extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MxPrimaryButton(
-            label: l10n.settingsAccountReconnectDrive,
-            onPressed: state.canReconnectDrive ? onReconnect : null,
-            leadingIcon: Icons.cloud_sync_outlined,
-            isLoading: state.isBusy,
-            fullWidth: true,
-          ),
+          _reconnectAction(l10n),
           const MxGap(MxSpace.sm),
-          MxSecondaryButton(
+          _CompactSignOutButton(
             label: l10n.settingsAccountSignOut,
             onPressed: state.canSignOut ? onSignOut : null,
-            variant: MxSecondaryVariant.text,
-            tone: MxSecondaryButtonTone.danger,
             fullWidth: true,
           ),
         ],
@@ -269,6 +308,60 @@ class _AccountActions extends StatelessWidget {
       leadingIcon: Icons.account_circle_outlined,
       isLoading: state.isBusy,
       fullWidth: true,
+    );
+  }
+
+  Widget _reconnectAction(AppLocalizations l10n) {
+    if (state.requiresPlatformSignInButton) {
+      return buildGoogleAccountWebButton();
+    }
+    return MxPrimaryButton(
+      label: l10n.settingsAccountReconnectDrive,
+      onPressed: state.canReconnectDrive ? onReconnect : null,
+      leadingIcon: Icons.cloud_sync_outlined,
+      isLoading: state.isBusy,
+      fullWidth: true,
+    );
+  }
+}
+
+class _CompactSignOutButton extends StatelessWidget {
+  const _CompactSignOutButton({
+    required this.label,
+    required this.onPressed,
+    this.isLoading = false,
+    this.fullWidth = false,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final bool isLoading;
+  final bool fullWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final baseStyle = theme.textButtonTheme.style ?? const ButtonStyle();
+
+    return Theme(
+      data: theme.copyWith(
+        textButtonTheme: TextButtonThemeData(
+          style: baseStyle.copyWith(
+            padding: const WidgetStatePropertyAll(
+              EdgeInsets.symmetric(vertical: _compactSignOutVerticalPadding),
+            ),
+          ),
+        ),
+      ),
+      child: MxSecondaryButton(
+        label: label,
+        onPressed: onPressed,
+        size: MxButtonSize.small,
+        variant: MxSecondaryVariant.text,
+        tone: MxSecondaryButtonTone.danger,
+        isLoading: isLoading,
+        fullWidth: fullWidth,
+      ),
     );
   }
 }
