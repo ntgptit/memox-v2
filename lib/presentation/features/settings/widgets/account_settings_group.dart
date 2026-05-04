@@ -312,7 +312,7 @@ class _AccountActions extends StatelessWidget {
   }
 
   Widget _reconnectAction(AppLocalizations l10n) {
-    if (state.requiresPlatformSignInButton) {
+    if (state.requiresPlatformSignInButton && state.requiresRuntimeReconnect) {
       return buildGoogleAccountWebButton();
     }
     return MxPrimaryButton(

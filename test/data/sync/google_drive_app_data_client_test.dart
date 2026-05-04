@@ -114,18 +114,27 @@ void main() {
 
   test('DT4 request: Drive error response throws typed exception', () async {
     final httpClient = _FakeHttpClient(<_ResponseHandler>[
-      (_) => http.Response('unauthorized', 401),
+      (_) => http.Response(
+        jsonEncode(<String, Object?>{
+          'error': <String, Object?>{
+            'code': 403,
+            'message': 'Google Drive API has not been used in project.',
+            'errors': <Object?>[
+              <String, Object?>{'reason': 'accessNotConfigured'},
+            ],
+          },
+        }),
+        403,
+      ),
     ]);
     final client = GoogleDriveAppDataClient(httpClient);
 
     await expectLater(
       client.downloadFile(accessToken: 'bad-token', fileId: 'snapshot-file'),
       throwsA(
-        isA<GoogleDriveAppDataException>().having(
-          (error) => error.statusCode,
-          'statusCode',
-          401,
-        ),
+        isA<GoogleDriveAppDataException>()
+            .having((error) => error.statusCode, 'statusCode', 403)
+            .having((error) => error.reason, 'reason', 'accessNotConfigured'),
       ),
     );
   });

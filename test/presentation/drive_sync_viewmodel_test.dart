@@ -135,6 +135,70 @@ void main() {
 
     expect(repository.syncNowCount, 0);
   });
+
+  test('DT6 onRefreshRetry: refresh after reconnect enables sync', () async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResults: const <DriveSyncStatus>[
+        DriveSyncStatus.needsDriveAuthorization(),
+        DriveSyncStatus.noRemoteSnapshot(),
+      ],
+    );
+    final container = _container(repository: repository);
+    addTearDown(container.dispose);
+
+    final initialState = await container.read(
+      driveSyncSettingsControllerProvider.future,
+    );
+    await container
+        .read(driveSyncSettingsControllerProvider.notifier)
+        .refresh();
+    final state = container.read(driveSyncSettingsControllerProvider).value!;
+
+    expect(initialState.canSync, isFalse);
+    expect(state.kind, DriveSyncStatusKind.noRemoteSnapshot);
+    expect(state.canSync, isTrue);
+  });
+
+  test('DT7 loading: failure status keeps technical message', () async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: const DriveSyncStatus.failure(
+        'Google Drive API is disabled.',
+      ),
+    );
+    final container = _container(repository: repository);
+    addTearDown(container.dispose);
+
+    final state = await container.read(
+      driveSyncSettingsControllerProvider.future,
+    );
+
+    expect(state.kind, DriveSyncStatusKind.failure);
+    expect(state.canSync, isTrue);
+    expect(state.technicalMessage, 'Google Drive API is disabled.');
+  });
+
+  test('DT8 onSync: failure status can retry sync', () async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: const DriveSyncStatus.failure(
+        'Google Drive API is disabled.',
+      ),
+      syncResult: DriveSyncRunResult.uploadedLocal(
+        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      ),
+    );
+    final container = _container(repository: repository);
+    addTearDown(container.dispose);
+
+    await container.read(driveSyncSettingsControllerProvider.future);
+    await container
+        .read(driveSyncSettingsControllerProvider.notifier)
+        .syncNow();
+    final state = container.read(driveSyncSettingsControllerProvider).value!;
+
+    expect(repository.syncNowCount, 1);
+    expect(state.kind, DriveSyncStatusKind.synced);
+    expect(state.message, DriveSyncSettingsMessage.uploaded);
+  });
 }
 
 ProviderContainer _container({
@@ -154,9 +218,11 @@ ProviderContainer _container({
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   _FakeDriveSyncRepository({
     DriveSyncStatus? loadStatusResult,
+    List<DriveSyncStatus>? loadStatusResults,
     DriveSyncRunResult? syncResult,
     DriveSyncRunResult? resolveResult,
   }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
+       _loadStatusResults = loadStatusResults?.toList() ?? <DriveSyncStatus>[],
        syncResult =
            syncResult ??
            DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
@@ -165,6 +231,7 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
            DriveSyncRunResult.canceled(const DriveSyncStatus.ready());
 
   final DriveSyncStatus loadStatusResult;
+  final List<DriveSyncStatus> _loadStatusResults;
   final DriveSyncRunResult syncResult;
   final DriveSyncRunResult resolveResult;
   int syncNowCount = 0;
@@ -172,6 +239,9 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
 
   @override
   Future<DriveSyncStatus> loadStatus() async {
+    if (_loadStatusResults.isNotEmpty) {
+      return _loadStatusResults.removeAt(0);
+    }
     return loadStatusResult;
   }
 

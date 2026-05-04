@@ -25,13 +25,17 @@ class AccountSettingsState {
     this.link,
     this.message = AccountSettingsMessage.none,
     this.isBusy = false,
-  });
+    bool? requiresRuntimeReconnect,
+  }) : _requiresRuntimeReconnect = requiresRuntimeReconnect;
 
   final AccountLinkStatus status;
   final CloudAccountLink? link;
   final AccountSettingsMessage message;
   final bool isBusy;
   final bool requiresPlatformSignInButton;
+  final bool? _requiresRuntimeReconnect;
+
+  bool get requiresRuntimeReconnect => _requiresRuntimeReconnect ?? false;
 
   bool get canSignIn =>
       !isBusy &&
@@ -53,6 +57,7 @@ class AccountSettingsState {
     AccountSettingsMessage? message,
     bool? isBusy,
     bool? requiresPlatformSignInButton,
+    bool? requiresRuntimeReconnect,
   }) {
     return AccountSettingsState(
       status: status ?? this.status,
@@ -61,6 +66,8 @@ class AccountSettingsState {
       isBusy: isBusy ?? this.isBusy,
       requiresPlatformSignInButton:
           requiresPlatformSignInButton ?? this.requiresPlatformSignInButton,
+      requiresRuntimeReconnect:
+          requiresRuntimeReconnect ?? this.requiresRuntimeReconnect,
     );
   }
 }
@@ -179,14 +186,44 @@ class AccountSettingsController extends _$AccountSettingsController {
     final requiresPlatformButton =
         latest?.requiresPlatformSignInButton ??
         ref.read(googleAccountAuthServiceProvider).requiresPlatformSignInButton;
-    state = AsyncData(
-      _stateFromActionResult(
-        actionResult,
-        fallbackLink: latest?.link,
-        requiresPlatformSignInButton: requiresPlatformButton,
-      ),
+    final fallbackLink = actionResult.status == AccountLinkStatus.signedOut
+        ? null
+        : latest?.link;
+    final nextState = _stateFromActionResult(
+      actionResult,
+      fallbackLink: fallbackLink,
+      requiresPlatformSignInButton: requiresPlatformButton,
     );
-    _refreshDriveSyncStatus();
+    final shouldRefreshSync = _shouldRefreshDriveSyncStatus(current, nextState);
+    state = AsyncData(nextState);
+    if (shouldRefreshSync) {
+      _refreshDriveSyncStatus();
+    }
+  }
+
+  bool _shouldRefreshDriveSyncStatus(
+    AccountSettingsState? previous,
+    AccountSettingsState next,
+  ) {
+    if (previous == null) {
+      return true;
+    }
+    if (previous.status != next.status) {
+      return true;
+    }
+    return !_sameSyncAccount(previous.link, next.link);
+  }
+
+  bool _sameSyncAccount(CloudAccountLink? left, CloudAccountLink? right) {
+    if (left == null || right == null) {
+      return left == right;
+    }
+    return left.provider == right.provider &&
+        left.subjectId == right.subjectId &&
+        left.driveAuthorizationState == right.driveAuthorizationState &&
+        left.driveAppDataAuthorized == right.driveAppDataAuthorized &&
+        left.grantedScopes.contains(googleDriveAppDataScope) ==
+            right.grantedScopes.contains(googleDriveAppDataScope);
   }
 
   Future<void> _runAction(
@@ -239,6 +276,13 @@ class AccountSettingsController extends _$AccountSettingsController {
                 status: AccountLinkStatus.signedOut,
                 message: AccountSettingsMessage.signInCanceled,
                 requiresPlatformSignInButton: requiresPlatformSignInButton,
+              )
+            : requiresPlatformSignInButton
+            ? AccountSettingsState(
+                status: AccountLinkStatus.needsDriveAuthorization,
+                link: link,
+                requiresPlatformSignInButton: requiresPlatformSignInButton,
+                requiresRuntimeReconnect: true,
               )
             : AccountSettingsState(
                 status: link.driveAppDataAuthorized

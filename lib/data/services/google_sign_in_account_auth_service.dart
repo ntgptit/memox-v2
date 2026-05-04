@@ -20,6 +20,7 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
       StreamController<GoogleAccountAuthResult>.broadcast();
   Future<void>? _initializeFuture;
   StreamSubscription<GoogleSignInAuthenticationEvent>? _authSubscription;
+  GoogleSignInAccount? _currentAccount;
 
   @override
   Stream<GoogleAccountAuthResult> get authenticationEvents => _events.stream;
@@ -77,6 +78,7 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
       if (account == null) {
         return const GoogleAccountAuthResult.signedOut();
       }
+      _currentAccount = account;
       return _authorizeExistingScopes(account);
     } on GoogleSignInException catch (error) {
       return _mapGoogleException(error);
@@ -100,6 +102,7 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
       final account = await _signIn.authenticate(
         scopeHint: _driveAppDataScopes,
       );
+      _currentAccount = account;
       return _authorizeDriveAppData(account, promptIfNecessary: true);
     } on GoogleSignInException catch (error) {
       return _mapGoogleException(error);
@@ -163,6 +166,7 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
 
   @override
   Future<void> signOutLocal() {
+    _currentAccount = null;
     return _signIn.signOut();
   }
 
@@ -176,10 +180,12 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
   ) async {
     switch (event) {
       case GoogleSignInAuthenticationEventSignIn():
+        _currentAccount = event.user;
         _events.add(
           await _authorizeDriveAppData(event.user, promptIfNecessary: true),
         );
       case GoogleSignInAuthenticationEventSignOut():
+        _currentAccount = null;
         _events.add(const GoogleAccountAuthResult.signedOut());
     }
   }
@@ -257,6 +263,13 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
   Future<GoogleSignInAccount?> _currentAccountForLink(
     CloudAccountLink link,
   ) async {
+    final currentAccount = _currentAccount;
+    if (currentAccount != null && currentAccount.id == link.subjectId) {
+      return currentAccount;
+    }
+    if (kIsWeb) {
+      return null;
+    }
     final future = _signIn.attemptLightweightAuthentication();
     if (future == null) {
       return null;
@@ -265,6 +278,7 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
     if (account == null || account.id != link.subjectId) {
       return null;
     }
+    _currentAccount = account;
     return account;
   }
 

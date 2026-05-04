@@ -218,12 +218,27 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
   }
 
   DriveSyncStatus _mapDriveException(Object error) {
-    if (error is GoogleDriveAppDataException &&
-        (error.statusCode == 401 || error.statusCode == 403)) {
-      return const DriveSyncStatus.needsDriveAuthorization();
+    if (error is GoogleDriveAppDataException) {
+      if (_isAuthorizationFailure(error)) {
+        return const DriveSyncStatus.needsDriveAuthorization();
+      }
+      return DriveSyncStatus.failure(error.message);
     }
 
     return DriveSyncStatus.failure(error.toString());
+  }
+
+  bool _isAuthorizationFailure(GoogleDriveAppDataException error) {
+    if (error.statusCode == 401) {
+      return true;
+    }
+    if (error.statusCode != 403) {
+      return false;
+    }
+    return switch (error.reason) {
+      'authError' || 'insufficientPermissions' || 'invalidCredentials' => true,
+      _ => false,
+    };
   }
 
   Future<_DriveSyncContext> _loadReadyContext() async {

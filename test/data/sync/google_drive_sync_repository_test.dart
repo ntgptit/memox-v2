@@ -271,6 +271,7 @@ void main() {
         driveFailure: const GoogleDriveAppDataException(
           'insufficient authentication',
           statusCode: 403,
+          reason: 'insufficientPermissions',
         ),
       );
       final remote = _snapshotFor(
@@ -292,6 +293,24 @@ void main() {
       expect(result.kind, DriveSyncActionKind.failed);
       expect(result.status.kind, DriveSyncStatusKind.needsDriveAuthorization);
       expect(harness.database.restoredBytes, isNull);
+    },
+  );
+
+  test(
+    'DT14 loadStatus: Drive API disabled 403 surfaces configuration failure',
+    () async {
+      final harness = await _RepositoryHarness.create(
+        driveFailure: const GoogleDriveAppDataException(
+          'Google Drive API has not been used in project.',
+          statusCode: 403,
+          reason: 'accessNotConfigured',
+        ),
+      );
+
+      final status = await harness.repository.loadStatus();
+
+      expect(status.kind, DriveSyncStatusKind.failure);
+      expect(status.message, contains('Google Drive API'));
     },
   );
 }

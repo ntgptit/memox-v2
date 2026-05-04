@@ -22,17 +22,25 @@ final class DriveAppDataFile {
 }
 
 final class GoogleDriveAppDataException implements Exception {
-  const GoogleDriveAppDataException(this.message, {this.statusCode});
+  const GoogleDriveAppDataException(
+    this.message, {
+    this.statusCode,
+    this.reason,
+  });
 
   final String message;
   final int? statusCode;
+  final String? reason;
 
   @override
   String toString() {
     if (statusCode == null) {
       return 'GoogleDriveAppDataException: $message';
     }
-    return 'GoogleDriveAppDataException($statusCode): $message';
+    if (reason == null) {
+      return 'GoogleDriveAppDataException($statusCode): $message';
+    }
+    return 'GoogleDriveAppDataException($statusCode/$reason): $message';
   }
 }
 
@@ -181,7 +189,8 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
     required String mimeType,
     required Uint8List bytes,
   }) async {
-    final boundary = 'memox_drive_sync_${DateTime.now().microsecondsSinceEpoch}';
+    final boundary =
+        'memox_drive_sync_${DateTime.now().microsecondsSinceEpoch}';
     final metadataBytes = utf8.encode(jsonEncode(metadata));
     final body = BytesBuilder(copy: false)
       ..add(utf8.encode('--$boundary\r\n'))
@@ -218,17 +227,51 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return;
     }
+    final error = _decodeErrorResponse(response.body);
     throw GoogleDriveAppDataException(
-      response.body.isEmpty ? 'Google Drive request failed.' : response.body,
+      error.message,
       statusCode: response.statusCode,
+      reason: error.reason,
     );
+  }
+
+  ({String message, String? reason}) _decodeErrorResponse(String body) {
+    if (body.isEmpty) {
+      return (message: 'Google Drive request failed.', reason: null);
+    }
+
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is! Map<String, dynamic>) {
+        return (message: body, reason: null);
+      }
+      final error = decoded['error'];
+      if (error is! Map<String, dynamic>) {
+        return (message: body, reason: null);
+      }
+      final message = error['message'] is String
+          ? error['message'] as String
+          : body;
+      final errors = error['errors'];
+      if (errors is List && errors.isNotEmpty) {
+        final first = errors.first;
+        if (first is Map && first['reason'] is String) {
+          return (message: message, reason: first['reason'] as String);
+        }
+      }
+      return (message: message, reason: null);
+    } on FormatException {
+      return (message: body, reason: null);
+    }
   }
 
   DriveAppDataFile _decodeFile(Map<String, dynamic> data) {
     final id = data['id'];
     final name = data['name'];
     if (id is! String || id.isEmpty || name is! String || name.isEmpty) {
-      throw const GoogleDriveAppDataException('Drive file metadata is missing.');
+      throw const GoogleDriveAppDataException(
+        'Drive file metadata is missing.',
+      );
     }
 
     final appProperties = data['appProperties'] is Map

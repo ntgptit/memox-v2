@@ -14,6 +14,7 @@ import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
+import '../viewmodels/account_settings_viewmodel.dart';
 import '../viewmodels/drive_sync_settings_viewmodel.dart';
 import 'settings_group.dart';
 
@@ -80,17 +81,77 @@ class _DriveSyncContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final controller = ref.read(driveSyncSettingsControllerProvider.notifier);
+    final accountController = ref.read(
+      accountSettingsControllerProvider.notifier,
+    );
+    final statusText = _statusText(l10n);
+    final messageText = _messageText(l10n);
+    final needsReconnect =
+        state.kind == DriveSyncStatusKind.needsDriveAuthorization;
 
     return SettingsGroup(
       title: l10n.settingsDriveSyncTitle,
-      child: MxPrimaryButton(
-        label: l10n.settingsDriveSyncAction,
-        onPressed: state.canSync ? () => unawaited(controller.syncNow()) : null,
-        leadingIcon: Icons.cloud_sync_outlined,
-        isLoading: state.isBusy,
-        fullWidth: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MxText(statusText, role: MxTextRole.formHelper),
+          if (messageText != null) ...[
+            const MxGap(MxSpace.xs),
+            MxText(messageText, role: MxTextRole.formHelper),
+          ],
+          const MxGap(MxSpace.sm),
+          MxPrimaryButton(
+            label: needsReconnect
+                ? l10n.settingsAccountReconnectDrive
+                : l10n.settingsDriveSyncAction,
+            onPressed: needsReconnect
+                ? () => unawaited(accountController.reconnectDrive())
+                : state.canSync
+                ? () => unawaited(controller.syncNow())
+                : null,
+            leadingIcon: Icons.cloud_sync_outlined,
+            isLoading: state.isBusy,
+            fullWidth: true,
+          ),
+        ],
       ),
     );
+  }
+
+  String _statusText(AppLocalizations l10n) {
+    return switch (state.kind) {
+      DriveSyncStatusKind.signedOut => l10n.settingsDriveSyncSignedOut,
+      DriveSyncStatusKind.unconfigured => l10n.settingsDriveSyncUnconfigured,
+      DriveSyncStatusKind.needsDriveAuthorization =>
+        l10n.settingsDriveSyncReconnectRequired,
+      DriveSyncStatusKind.noRemoteSnapshot => l10n.settingsDriveSyncNoRemote,
+      DriveSyncStatusKind.synced => l10n.settingsDriveSyncSynced,
+      DriveSyncStatusKind.ready ||
+      DriveSyncStatusKind.localChanges ||
+      DriveSyncStatusKind.remoteChanges => l10n.settingsDriveSyncReady,
+      DriveSyncStatusKind.conflict => l10n.settingsDriveSyncConflictStatus,
+      DriveSyncStatusKind.unsupportedSchema =>
+        l10n.settingsDriveSyncUnsupportedSchema,
+      DriveSyncStatusKind.failure => l10n.settingsDriveSyncFailed,
+    };
+  }
+
+  String? _messageText(AppLocalizations l10n) {
+    final message = switch (state.message) {
+      DriveSyncSettingsMessage.none => null,
+      DriveSyncSettingsMessage.uploaded => l10n.settingsDriveSyncUploaded,
+      DriveSyncSettingsMessage.restored => l10n.settingsDriveSyncRestored,
+      DriveSyncSettingsMessage.noChanges => l10n.settingsDriveSyncNoChanges,
+      DriveSyncSettingsMessage.canceled => l10n.settingsDriveSyncCanceled,
+      DriveSyncSettingsMessage.failed => l10n.settingsDriveSyncFailed,
+    };
+    if (message != null) {
+      return message;
+    }
+    if (state.kind == DriveSyncStatusKind.failure) {
+      return state.technicalMessage;
+    }
+    return null;
   }
 }
 

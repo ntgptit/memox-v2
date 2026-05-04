@@ -65,6 +65,27 @@ void main() {
   );
 
   test(
+    'DT3 onOpen: web stored Drive-ready account requires reconnect when runtime session is missing',
+    () async {
+      final preferences = await SharedPreferences.getInstance();
+      await CloudAccountStore(preferences).save(_driveReadyLink);
+      final container = _createContainer(
+        auth: _FakeGoogleAccountAuthService(requiresPlatformSignInButton: true),
+      );
+      addTearDown(container.dispose);
+
+      final state = await container.read(
+        accountSettingsControllerProvider.future,
+      );
+
+      expect(state.status, AccountLinkStatus.needsDriveAuthorization);
+      expect(state.link?.email, 'user@example.com');
+      expect(state.requiresPlatformSignInButton, isTrue);
+      expect(state.requiresRuntimeReconnect, isTrue);
+    },
+  );
+
+  test(
     'DT1 onUpdate: sign-in success stores Drive-ready Google account',
     () async {
       final container = _createContainer(
@@ -289,6 +310,195 @@ void main() {
       expect(finalState.link?.driveAppDataAuthorized, isTrue);
     },
   );
+
+  test(
+    'DT8 onUpdate: duplicate auth event does not refresh Drive sync status',
+    () async {
+      final preferences = await SharedPreferences.getInstance();
+      await CloudAccountStore(preferences).save(_driveReadyLink);
+      final auth = _FakeGoogleAccountAuthService();
+      final syncRepository = _FakeDriveSyncRepository();
+      final container = _createContainer(
+        auth: auth,
+        syncRepository: syncRepository,
+      );
+      addTearDown(container.dispose);
+      final accountSubscription = container
+          .listen<AsyncValue<AccountSettingsState>>(
+            accountSettingsControllerProvider,
+            (_, _) {},
+            fireImmediately: true,
+          );
+      addTearDown(accountSubscription.close);
+      final syncSubscription = container
+          .listen<AsyncValue<DriveSyncSettingsState>>(
+            driveSyncSettingsControllerProvider,
+            (_, _) {},
+            fireImmediately: true,
+          );
+      addTearDown(syncSubscription.close);
+
+      await container.read(accountSettingsControllerProvider.future);
+      await container.read(driveSyncSettingsControllerProvider.future);
+      expect(syncRepository.loadStatusCount, 1);
+
+      auth.emit(
+        GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      );
+      await pumpEventQueue();
+
+      final state = container
+          .read(accountSettingsControllerProvider)
+          .requireValue;
+      expect(state.status, AccountLinkStatus.signedIn);
+      expect(syncRepository.loadStatusCount, 1);
+    },
+  );
+
+  test('DT9 onUpdate: platform sign-out event clears stored account', () async {
+    final preferences = await SharedPreferences.getInstance();
+    await CloudAccountStore(preferences).save(_driveReadyLink);
+    final auth = _FakeGoogleAccountAuthService();
+    final container = _createContainer(auth: auth);
+    addTearDown(container.dispose);
+    final accountSubscription = container
+        .listen<AsyncValue<AccountSettingsState>>(
+          accountSettingsControllerProvider,
+          (_, _) {},
+          fireImmediately: true,
+        );
+    addTearDown(accountSubscription.close);
+
+    await container.read(accountSettingsControllerProvider.future);
+    auth.emit(const GoogleAccountAuthResult.signedOut());
+    await pumpEventQueue();
+    final state = container
+        .read(accountSettingsControllerProvider)
+        .requireValue;
+    final repository = await container.read(
+      cloudAccountRepositoryProvider.future,
+    );
+
+    expect(state.status, AccountLinkStatus.signedOut);
+    expect(state.link, isNull);
+    expect(await repository.load(), isNull);
+  });
+
+  test(
+    'DT10 onUpdate: web reconnect event refreshes Drive sync status',
+    () async {
+      final preferences = await SharedPreferences.getInstance();
+      await CloudAccountStore(preferences).save(_driveReadyLink);
+      final auth = _FakeGoogleAccountAuthService(
+        requiresPlatformSignInButton: true,
+      );
+      final syncRepository = _FakeDriveSyncRepository();
+      final container = _createContainer(
+        auth: auth,
+        syncRepository: syncRepository,
+      );
+      addTearDown(container.dispose);
+      final accountSubscription = container
+          .listen<AsyncValue<AccountSettingsState>>(
+            accountSettingsControllerProvider,
+            (_, _) {},
+            fireImmediately: true,
+          );
+      addTearDown(accountSubscription.close);
+      final syncSubscription = container
+          .listen<AsyncValue<DriveSyncSettingsState>>(
+            driveSyncSettingsControllerProvider,
+            (_, _) {},
+            fireImmediately: true,
+          );
+      addTearDown(syncSubscription.close);
+
+      final initialAccount = await container.read(
+        accountSettingsControllerProvider.future,
+      );
+      await container.read(driveSyncSettingsControllerProvider.future);
+      expect(initialAccount.status, AccountLinkStatus.needsDriveAuthorization);
+      expect(syncRepository.loadStatusCount, 1);
+
+      auth.emit(
+        GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      );
+      await pumpEventQueue(times: 3);
+      await container.read(driveSyncSettingsControllerProvider.future);
+      final state = container
+          .read(accountSettingsControllerProvider)
+          .requireValue;
+
+      expect(state.status, AccountLinkStatus.signedIn);
+      expect(syncRepository.loadStatusCount, 2);
+    },
+  );
+
+  test(
+    'DT11 onUpdate: web auth event without Drive scope clears runtime reconnect flag',
+    () async {
+      final preferences = await SharedPreferences.getInstance();
+      await CloudAccountStore(preferences).save(_driveReadyLink);
+      final auth = _FakeGoogleAccountAuthService(
+        requiresPlatformSignInButton: true,
+      );
+      final container = _createContainer(auth: auth);
+      addTearDown(container.dispose);
+      final accountSubscription = container
+          .listen<AsyncValue<AccountSettingsState>>(
+            accountSettingsControllerProvider,
+            (_, _) {},
+            fireImmediately: true,
+          );
+      addTearDown(accountSubscription.close);
+
+      final initialState = await container.read(
+        accountSettingsControllerProvider.future,
+      );
+      auth.emit(
+        GoogleAccountAuthResult.driveAuthorizationRequired(
+          _session(
+            grantedScopes: const <String>{},
+            driveAuthorizationState:
+                DriveAuthorizationState.authorizationRequired,
+          ),
+        ),
+      );
+      await pumpEventQueue();
+      final state = container
+          .read(accountSettingsControllerProvider)
+          .requireValue;
+
+      expect(initialState.requiresRuntimeReconnect, isTrue);
+      expect(state.status, AccountLinkStatus.needsDriveAuthorization);
+      expect(state.requiresRuntimeReconnect, isFalse);
+      expect(state.link?.email, 'user@example.com');
+    },
+  );
+
+  test('DT12 onUpdate: legacy runtime reconnect null falls back safely', () {
+    const legacyState = AccountSettingsState(
+      status: AccountLinkStatus.needsDriveAuthorization,
+      requiresPlatformSignInButton: true,
+      requiresRuntimeReconnect: null,
+    );
+
+    final updatedState = legacyState.copyWith(isBusy: true);
+
+    expect(legacyState.requiresRuntimeReconnect, isFalse);
+    expect(updatedState.requiresRuntimeReconnect, isFalse);
+    expect(updatedState.isBusy, isTrue);
+  });
 }
 
 ProviderContainer _createContainer({
@@ -365,6 +575,7 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
     this.authorizeResult,
     this.accessTokenResult =
         const DriveAccessTokenResult.reauthorizationRequired(),
+    this.requiresPlatformSignInButton = false,
   });
 
   final StreamController<GoogleAccountAuthResult> _events =
@@ -375,15 +586,14 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   GoogleAccountAuthResult signInResult;
   GoogleAccountAuthResult? authorizeResult;
   DriveAccessTokenResult accessTokenResult;
+  @override
+  final bool requiresPlatformSignInButton;
 
   @override
   Stream<GoogleAccountAuthResult> get authenticationEvents => _events.stream;
 
   @override
   bool get supportsInteractiveSignIn => true;
-
-  @override
-  bool get requiresPlatformSignInButton => false;
 
   @override
   Future<void> initialize(GoogleOAuthConfig config) async {}

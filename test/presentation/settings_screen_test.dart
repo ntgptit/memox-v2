@@ -217,7 +217,7 @@ void main() {
   );
 
   testWidgets(
-    'DT8 onDisplay: renders platform Google button for web reconnect state',
+    'DT8 onDisplay: renders web Drive scope reconnect action for runtime account',
     (tester) async {
       final preferences = await SharedPreferences.getInstance();
       final store = CloudAccountStore(preferences);
@@ -239,7 +239,7 @@ void main() {
       );
 
       expect(find.text('Google Drive reconnect required'), findsOneWidget);
-      expect(find.text('Reconnect Google Drive'), findsNothing);
+      expect(find.text('Reconnect Google Drive'), findsOneWidget);
       expect(find.text('Sign out'), findsOneWidget);
     },
   );
@@ -252,7 +252,7 @@ void main() {
       expect(find.text('Drive sync'), findsOneWidget);
       expect(
         find.text('Sign in with Google to sync the local database with Drive.'),
-        findsNothing,
+        findsOneWidget,
       );
       final syncButton = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, 'Sync now'),
@@ -271,16 +271,69 @@ void main() {
       await _pumpSettings(tester, driveSyncRepository: repository);
 
       expect(find.text('Drive sync'), findsOneWidget);
-      expect(
-        find.text('Create the first Drive backup from this device.'),
-        findsNothing,
-      );
+      expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
       final syncButton = tester.widget<ElevatedButton>(
         find.widgetWithText(ElevatedButton, 'Sync now'),
       );
       expect(syncButton.onPressed, isNotNull);
     },
   );
+
+  testWidgets(
+    'DT12 onDisplay: web stored Drive-ready account without runtime auth requires reconnect',
+    (tester) async {
+      final preferences = await SharedPreferences.getInstance();
+      final store = CloudAccountStore(preferences);
+      await store.save(_driveReadyLink);
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.needsDriveAuthorization(),
+      );
+
+      await _pumpSettings(
+        tester,
+        googleConfig: _configuredGoogle,
+        googleAuth: _FakeGoogleAccountAuthService(
+          requiresPlatformSignInButton: true,
+        ),
+        driveSyncRepository: repository,
+      );
+
+      expect(find.text('MemoX User'), findsOneWidget);
+      expect(find.text('Google Drive reconnect required'), findsOneWidget);
+      expect(find.text('Google Drive ready'), findsNothing);
+      expect(find.text('Reconnect Google Drive'), findsOneWidget);
+      expect(
+        find.text('Reconnect Google Drive in Account first.'),
+        findsOneWidget,
+      );
+      final reconnectButton = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Reconnect Google Drive').last,
+      );
+      expect(reconnectButton.onPressed, isNotNull);
+    },
+  );
+
+  testWidgets('DT13 onDisplay: Drive sync failure keeps retry action enabled', (
+    tester,
+  ) async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: const DriveSyncStatus.failure(
+        'Google Drive API has not been used in project.',
+      ),
+    );
+
+    await _pumpSettings(tester, driveSyncRepository: repository);
+
+    expect(find.text('Drive sync failed. Try again.'), findsOneWidget);
+    expect(
+      find.text('Google Drive API has not been used in project.'),
+      findsOneWidget,
+    );
+    final syncButton = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Sync now'),
+    );
+    expect(syncButton.onPressed, isNotNull);
+  });
 
   testWidgets(
     'DT11 onDisplay: compact top settings groups fit first phone viewport',
@@ -736,6 +789,116 @@ void main() {
       );
     },
   );
+
+  testWidgets('DT10 onUpdate: web reconnect event enables Drive sync', (
+    tester,
+  ) async {
+    final preferences = await SharedPreferences.getInstance();
+    final store = CloudAccountStore(preferences);
+    await store.save(_driveReadyLink);
+    final googleAuth = _FakeGoogleAccountAuthService(
+      requiresPlatformSignInButton: true,
+    );
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResults: const <DriveSyncStatus>[
+        DriveSyncStatus.needsDriveAuthorization(),
+        DriveSyncStatus.noRemoteSnapshot(),
+      ],
+    );
+
+    await _pumpSettings(
+      tester,
+      googleConfig: _configuredGoogle,
+      googleAuth: googleAuth,
+      driveSyncRepository: repository,
+    );
+    expect(find.text('Google Drive reconnect required'), findsOneWidget);
+
+    googleAuth.emit(
+      GoogleAccountAuthResult.success(
+        _session(
+          grantedScopes: const <String>{googleDriveAppDataScope},
+          driveAuthorizationState: DriveAuthorizationState.authorized,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Google Drive ready'), findsOneWidget);
+    expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
+    final syncButton = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Sync now'),
+    );
+    expect(syncButton.onPressed, isNotNull);
+  });
+
+  testWidgets('DT11 onUpdate: Drive sync upload result is visible', (
+    tester,
+  ) async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+      syncResult: DriveSyncRunResult.uploadedLocal(
+        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      ),
+    );
+    await _pumpSettings(tester, driveSyncRepository: repository);
+
+    await tester.tap(find.text('Sync now'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Local data backed up to Google Drive.'), findsOneWidget);
+  });
+
+  testWidgets('DT12 onUpdate: web Drive scope reconnect enables Drive sync', (
+    tester,
+  ) async {
+    final preferences = await SharedPreferences.getInstance();
+    final store = CloudAccountStore(preferences);
+    await store.save(_driveReadyLink);
+    final googleAuth = _FakeGoogleAccountAuthService(
+      requiresPlatformSignInButton: true,
+      signInResult: GoogleAccountAuthResult.success(
+        _session(
+          grantedScopes: const <String>{googleDriveAppDataScope},
+          driveAuthorizationState: DriveAuthorizationState.authorized,
+        ),
+      ),
+    );
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResults: const <DriveSyncStatus>[
+        DriveSyncStatus.needsDriveAuthorization(),
+        DriveSyncStatus.needsDriveAuthorization(),
+        DriveSyncStatus.noRemoteSnapshot(),
+      ],
+    );
+
+    await _pumpSettings(
+      tester,
+      googleConfig: _configuredGoogle,
+      googleAuth: googleAuth,
+      driveSyncRepository: repository,
+    );
+    googleAuth.emit(
+      GoogleAccountAuthResult.driveAuthorizationRequired(
+        _session(
+          grantedScopes: const <String>{},
+          driveAuthorizationState:
+              DriveAuthorizationState.authorizationRequired,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Reconnect Google Drive').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Google Drive ready'), findsOneWidget);
+    expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
+    final syncButton = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Sync now'),
+    );
+    expect(syncButton.onPressed, isNotNull);
+  });
 }
 
 Future<_SettingsHarness> _pumpSettings(
@@ -810,9 +973,11 @@ final class _SettingsHarness {
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   _FakeDriveSyncRepository({
     DriveSyncStatus? loadStatusResult,
+    List<DriveSyncStatus>? loadStatusResults,
     DriveSyncRunResult? syncResult,
     DriveSyncRunResult? resolveResult,
   }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
+       _loadStatusResults = loadStatusResults?.toList() ?? <DriveSyncStatus>[],
        syncResult =
            syncResult ??
            DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
@@ -820,13 +985,17 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
            resolveResult ??
            DriveSyncRunResult.canceled(const DriveSyncStatus.ready());
 
-  final DriveSyncStatus loadStatusResult;
+  DriveSyncStatus loadStatusResult;
+  final List<DriveSyncStatus> _loadStatusResults;
   final DriveSyncRunResult syncResult;
   final DriveSyncRunResult resolveResult;
   int syncNowCount = 0;
 
   @override
   Future<DriveSyncStatus> loadStatus() async {
+    if (_loadStatusResults.isNotEmpty) {
+      return _loadStatusResults.removeAt(0);
+    }
     return loadStatusResult;
   }
 
@@ -953,6 +1122,10 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   Future<void> signOutLocal() async {
     signOutCount += 1;
+  }
+
+  void emit(GoogleAccountAuthResult result) {
+    _events.add(result);
   }
 
   Future<void> dispose() => _events.close();

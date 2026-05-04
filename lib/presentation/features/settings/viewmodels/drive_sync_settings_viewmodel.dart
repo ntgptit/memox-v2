@@ -41,7 +41,8 @@ final class DriveSyncSettingsState {
           kind == DriveSyncStatusKind.noRemoteSnapshot ||
           kind == DriveSyncStatusKind.synced ||
           kind == DriveSyncStatusKind.localChanges ||
-          kind == DriveSyncStatusKind.remoteChanges);
+          kind == DriveSyncStatusKind.remoteChanges ||
+          kind == DriveSyncStatusKind.failure);
 
   DriveSyncSettingsState copyWith({
     DriveSyncStatus? status,
@@ -72,7 +73,7 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
   Future<DriveSyncSettingsState> build() async {
     final useCase = await ref.watch(loadDriveSyncStatusUseCaseProvider.future);
     final status = await useCase.execute();
-    return DriveSyncSettingsState(status: status);
+    return _stateFromStatus(status);
   }
 
   Future<void> refresh() async {
@@ -82,7 +83,7 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
     if (!ref.mounted) {
       return;
     }
-    state = AsyncData(DriveSyncSettingsState(status: status));
+    state = AsyncData(_stateFromStatus(status));
   }
 
   Future<void> syncNow() async {
@@ -92,7 +93,9 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
       return;
     }
     state = AsyncData(current.copyWith(isBusy: true));
-    final useCase = await ref.read(syncGoogleDriveSnapshotUseCaseProvider.future);
+    final useCase = await ref.read(
+      syncGoogleDriveSnapshotUseCaseProvider.future,
+    );
     final result = await useCase.execute();
     await _applyResult(result);
   }
@@ -105,14 +108,18 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
       return;
     }
     state = AsyncData(current.copyWith(isBusy: true));
-    final useCase = await ref.read(resolveDriveSyncConflictUseCaseProvider.future);
+    final useCase = await ref.read(
+      resolveDriveSyncConflictUseCaseProvider.future,
+    );
     final result = await useCase.execute(conflict, choice);
     await _applyResult(result);
   }
 
   Future<void> _applyResult(DriveSyncRunResult result) async {
     if (result.restoreEffect != DriveSyncRestoreEffect.none) {
-      await ref.read(driveSyncRuntimeEffectsProvider).apply(result.restoreEffect);
+      await ref
+          .read(driveSyncRuntimeEffectsProvider)
+          .apply(result.restoreEffect);
     }
     if (!ref.mounted) {
       return;
@@ -135,6 +142,13 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
         DriveSyncActionKind.none => DriveSyncSettingsMessage.none,
       },
       technicalMessage: result.message ?? result.status.message,
+    );
+  }
+
+  DriveSyncSettingsState _stateFromStatus(DriveSyncStatus status) {
+    return DriveSyncSettingsState(
+      status: status,
+      technicalMessage: status.message,
     );
   }
 }
