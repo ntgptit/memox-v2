@@ -9,8 +9,8 @@ import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
-import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/account_settings_viewmodel.dart';
 import 'google_account_web_button.dart';
@@ -18,7 +18,6 @@ import 'settings_group.dart';
 
 const double _accountAvatarRadius = 14;
 const double _accountStatusBadgeRadius = 12;
-const double _compactSignOutVerticalPadding = 6;
 
 class AccountSettingsGroup extends ConsumerWidget {
   const AccountSettingsGroup({super.key});
@@ -57,6 +56,10 @@ class _AccountSettingsContent extends ConsumerWidget {
     return SettingsGroup(
       title: l10n.settingsAccountTitle,
       subtitle: _subtitle(l10n),
+      action: _headerAction(
+        l10n,
+        onSignOut: () => unawaited(controller.signOut()),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -83,13 +86,14 @@ class _AccountSettingsContent extends ConsumerWidget {
             const MxGap(MxSpace.sm),
             MxText(message, role: MxTextRole.formHelper),
           ],
-          const MxGap(MxSpace.sm),
-          _AccountActions(
-            state: state,
-            onSignIn: () => unawaited(controller.signIn()),
-            onReconnect: () => unawaited(controller.reconnectDrive()),
-            onSignOut: () => unawaited(controller.signOut()),
-          ),
+          if (state.status != AccountLinkStatus.signedIn) ...[
+            const MxGap(MxSpace.sm),
+            _AccountActions(
+              state: state,
+              onSignIn: () => unawaited(controller.signIn()),
+              onReconnect: () => unawaited(controller.reconnectDrive()),
+            ),
+          ],
         ],
       ),
     );
@@ -129,6 +133,24 @@ class _AccountSettingsContent extends ConsumerWidget {
         l10n.settingsAccountDriveAuthorizationRequired,
       AccountSettingsMessage.signedOut => l10n.settingsAccountSignedOutMessage,
     };
+  }
+
+  Widget? _headerAction(
+    AppLocalizations l10n, {
+    required VoidCallback onSignOut,
+  }) {
+    final canShowSignOut =
+        state.status == AccountLinkStatus.signedIn ||
+        (state.status == AccountLinkStatus.needsDriveAuthorization &&
+            !state.requiresRuntimeReconnect);
+    if (!canShowSignOut) {
+      return null;
+    }
+    return MxIconButton.compact(
+      icon: Icons.logout,
+      tooltip: l10n.settingsAccountSignOut,
+      onPressed: state.canSignOut ? onSignOut : null,
+    );
   }
 }
 
@@ -253,42 +275,22 @@ class _AccountActions extends StatelessWidget {
     required this.state,
     required this.onSignIn,
     required this.onReconnect,
-    required this.onSignOut,
   });
 
   final AccountSettingsState state;
   final VoidCallback onSignIn;
   final VoidCallback onReconnect;
-  final VoidCallback onSignOut;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
     if (state.status == AccountLinkStatus.signedIn) {
-      return _CompactSignOutButton(
-        label: l10n.settingsAccountSignOut,
-        onPressed: state.canSignOut ? onSignOut : null,
-        isLoading: state.isBusy,
-      );
+      return const SizedBox.shrink();
     }
 
     if (state.status == AccountLinkStatus.needsDriveAuthorization) {
-      final showSignOut = !state.requiresRuntimeReconnect;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _reconnectAction(l10n),
-          if (showSignOut) ...[
-            const MxGap(MxSpace.sm),
-            _CompactSignOutButton(
-              label: l10n.settingsAccountSignOut,
-              onPressed: state.canSignOut ? onSignOut : null,
-              fullWidth: true,
-            ),
-          ],
-        ],
-      );
+      return _reconnectAction(l10n);
     }
 
     if (state.status == AccountLinkStatus.unconfigured ||
@@ -324,47 +326,6 @@ class _AccountActions extends StatelessWidget {
       leadingIcon: Icons.cloud_sync_outlined,
       isLoading: state.isBusy,
       fullWidth: true,
-    );
-  }
-}
-
-class _CompactSignOutButton extends StatelessWidget {
-  const _CompactSignOutButton({
-    required this.label,
-    required this.onPressed,
-    this.isLoading = false,
-    this.fullWidth = false,
-  });
-
-  final String label;
-  final VoidCallback? onPressed;
-  final bool isLoading;
-  final bool fullWidth;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final baseStyle = theme.textButtonTheme.style ?? const ButtonStyle();
-
-    return Theme(
-      data: theme.copyWith(
-        textButtonTheme: TextButtonThemeData(
-          style: baseStyle.copyWith(
-            padding: const WidgetStatePropertyAll(
-              EdgeInsets.symmetric(vertical: _compactSignOutVerticalPadding),
-            ),
-          ),
-        ),
-      ),
-      child: MxSecondaryButton(
-        label: label,
-        onPressed: onPressed,
-        size: MxButtonSize.small,
-        variant: MxSecondaryVariant.text,
-        tone: MxSecondaryButtonTone.danger,
-        isLoading: isLoading,
-        fullWidth: fullWidth,
-      ),
     );
   }
 }

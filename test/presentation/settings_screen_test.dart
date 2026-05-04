@@ -186,7 +186,8 @@ void main() {
     expect(find.text('MemoX User'), findsOneWidget);
     expect(find.text('user@example.com'), findsOneWidget);
     expect(find.text('Google Drive ready'), findsOneWidget);
-    expect(find.text('Sign out'), findsOneWidget);
+    expect(find.text('Sign out'), findsNothing);
+    expect(find.byTooltip('Sign out'), findsOneWidget);
   });
 
   testWidgets(
@@ -213,6 +214,8 @@ void main() {
       expect(find.text('MemoX User'), findsOneWidget);
       expect(find.text('Google Drive reconnect required'), findsOneWidget);
       expect(find.text('Reconnect Google Drive'), findsOneWidget);
+      expect(find.text('Sign out'), findsNothing);
+      expect(find.byTooltip('Sign out'), findsOneWidget);
     },
   );
 
@@ -240,7 +243,8 @@ void main() {
 
       expect(find.text('Google Drive reconnect required'), findsOneWidget);
       expect(find.text('Reconnect Google Drive'), findsOneWidget);
-      expect(find.text('Sign out'), findsOneWidget);
+      expect(find.text('Sign out'), findsNothing);
+      expect(find.byTooltip('Sign out'), findsOneWidget);
     },
   );
 
@@ -254,10 +258,7 @@ void main() {
         find.text('Sign in with Google to sync the local database with Drive.'),
         findsOneWidget,
       );
-      final syncButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Sync now'),
-      );
-      expect(syncButton.onPressed, isNull);
+      expect(find.byTooltip('Sync now'), findsNothing);
     },
   );
 
@@ -272,10 +273,7 @@ void main() {
 
       expect(find.text('Drive sync'), findsOneWidget);
       expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
-      final syncButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Sync now'),
-      );
-      expect(syncButton.onPressed, isNotNull);
+      expect(find.byTooltip('Sync now'), findsOneWidget);
     },
   );
 
@@ -301,16 +299,13 @@ void main() {
       expect(find.text('MemoX User'), findsOneWidget);
       expect(find.text('Google Drive reconnect required'), findsOneWidget);
       expect(find.text('Google Drive ready'), findsNothing);
-      expect(find.text('Reconnect Google Drive'), findsOneWidget);
+      expect(find.text('Reconnect Google Drive'), findsNothing);
       expect(find.text('Sign out'), findsNothing);
       expect(
         find.text('Reconnect Google Drive in Account first.'),
         findsOneWidget,
       );
-      final reconnectButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Reconnect Google Drive').last,
-      );
-      expect(reconnectButton.onPressed, isNotNull);
+      expect(find.byTooltip('Sync now'), findsNothing);
     },
   );
 
@@ -330,10 +325,7 @@ void main() {
       find.text('Google Drive API has not been used in project.'),
       findsOneWidget,
     );
-    final syncButton = tester.widget<ElevatedButton>(
-      find.widgetWithText(ElevatedButton, 'Sync now'),
-    );
-    expect(syncButton.onPressed, isNotNull);
+    expect(find.byTooltip('Sync now'), findsOneWidget);
   });
 
   testWidgets(
@@ -349,10 +341,7 @@ void main() {
       expect(find.text('Bad state: sync provider unavailable'), findsOneWidget);
       expect(find.text('Something went wrong'), findsNothing);
       expect(find.text('Something went wrong.'), findsNothing);
-      final syncButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Sync now'),
-      );
-      expect(syncButton.onPressed, isNotNull);
+      expect(find.byTooltip('Sync now'), findsOneWidget);
     },
   );
 
@@ -791,7 +780,7 @@ void main() {
         googleAuth: googleAuth,
       );
 
-      await tester.tap(find.text('Sign out'));
+      await tester.tap(find.byTooltip('Sign out'));
       await tester.pumpAndSettle();
 
       final repository = await harness.container.read(
@@ -847,10 +836,7 @@ void main() {
 
     expect(find.text('Google Drive ready'), findsOneWidget);
     expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
-    final syncButton = tester.widget<ElevatedButton>(
-      find.widgetWithText(ElevatedButton, 'Sync now'),
-    );
-    expect(syncButton.onPressed, isNotNull);
+    expect(find.byTooltip('Sync now'), findsOneWidget);
   });
 
   testWidgets('DT11 onUpdate: Drive sync upload result is visible', (
@@ -864,7 +850,7 @@ void main() {
     );
     await _pumpSettings(tester, driveSyncRepository: repository);
 
-    await tester.tap(find.text('Sync now'));
+    await tester.tap(find.byTooltip('Sync now'));
     await tester.pumpAndSettle();
     expect(find.text('Choose sync direction'), findsOneWidget);
     await tester.tap(find.text('Upload local data to Drive'));
@@ -894,7 +880,7 @@ void main() {
     );
     await _pumpSettings(tester, driveSyncRepository: repository);
 
-    await tester.tap(find.text('Sync now'));
+    await tester.tap(find.byTooltip('Sync now'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Download Drive data to this device'));
     await tester.pumpAndSettle();
@@ -917,7 +903,7 @@ void main() {
     );
     await _pumpSettings(tester, driveSyncRepository: repository);
 
-    await tester.tap(find.text('Sync now'));
+    await tester.tap(find.byTooltip('Sync now'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Upload local data to Drive'));
     await tester.pumpAndSettle();
@@ -973,10 +959,7 @@ void main() {
 
     expect(find.text('Google Drive ready'), findsOneWidget);
     expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
-    final syncButton = tester.widget<ElevatedButton>(
-      find.widgetWithText(ElevatedButton, 'Sync now'),
-    );
-    expect(syncButton.onPressed, isNotNull);
+    expect(find.byTooltip('Sync now'), findsOneWidget);
   });
 
   testWidgets(
@@ -993,7 +976,7 @@ void main() {
 
       await _pumpSettings(tester, driveSyncRepository: repository);
 
-      await tester.tap(find.text('Sync now'));
+      await tester.tap(find.byTooltip('Sync now'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Upload local data to Drive'));
       await tester.pumpAndSettle();
@@ -1002,10 +985,7 @@ void main() {
 
       expect(find.text('Drive sync failed. Try again.'), findsOneWidget);
       expect(find.text(diagnostic), findsOneWidget);
-      final syncButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Sync now'),
-      );
-      expect(syncButton.onPressed, isNotNull);
+      expect(find.byTooltip('Sync now'), findsOneWidget);
     },
   );
 }

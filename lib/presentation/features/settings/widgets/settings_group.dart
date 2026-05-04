@@ -12,11 +12,13 @@ class SettingsGroup extends StatelessWidget {
     required this.title,
     required this.child,
     this.subtitle,
+    this.action,
     super.key,
   });
 
   final String title;
   final String? subtitle;
+  final Widget? action;
   final Widget child;
 
   @override
@@ -33,6 +35,7 @@ class SettingsGroup extends StatelessWidget {
       child: MxSection(
         title: title,
         subtitle: subtitle,
+        action: action,
         spacing: MxSpace.sm,
         child: child,
       ),
