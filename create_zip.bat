@@ -6,17 +6,9 @@ if /i not "%~1"=="__RUN__" (
     exit /b
 )
 
-set "ROOT_DIR=D:\workspace_STS_5\memox"
+for %%I in ("%~dp0.") do set "ROOT_DIR=%%~fI"
 set "OUTPUT_ZIP=%ROOT_DIR%\memox.zip"
-set "PS_SCRIPT=%TEMP%\create_zip_temp.ps1"
-
-set "ITEM1=%ROOT_DIR%\pubspec.yaml"
-set "ITEM2=%ROOT_DIR%\l10n.yaml"
-set "ITEM3=%ROOT_DIR%\devtools_options.yaml"
-set "ITEM4=%ROOT_DIR%\analysis_options.yaml"
-set "ITEM5=%ROOT_DIR%\lib"
-@REM set "ITEM6=%ROOT_DIR%\tools"
-@REM set "ITEM7=%ROOT_DIR%\.codex"
+set "PS_SCRIPT=%TEMP%\create_zip_temp_%RANDOM%_%RANDOM%.ps1"
 
 echo ==========================================
 echo Zip script started
@@ -41,17 +33,23 @@ if exist "%OUTPUT_ZIP%" (
 
 (
 echo $ErrorActionPreference = 'Stop'
-echo $paths = @(
-echo     "%ITEM1%"
-echo     "%ITEM2%"
-echo     "%ITEM3%"
-echo     "%ITEM4%"
-echo     "%ITEM5%"
-@REM echo     "%ITEM6%"
-@REM echo     "%ITEM7%"
-echo ^)
-echo $missingPaths = $paths ^| Where-Object { -not ^(Test-Path $_^) }
-echo $validPaths   = $paths ^| Where-Object { Test-Path $_ }
+echo $root = "%ROOT_DIR%"
+echo $scriptFile = "%~f0"
+echo $lines = Get-Content -LiteralPath $scriptFile
+echo $start = [Array]::IndexOf^($lines, '::ZIP_ITEMS_BEGIN'^)
+echo $end = [Array]::IndexOf^($lines, '::ZIP_ITEMS_END'^)
+echo if ^($start -lt 0 -or $end -le $start^) {
+echo     Write-Host "ERROR: ZIP item block was not found in create_zip.bat."
+echo     exit 1
+echo }
+echo $itemLines = $lines[^($start + 1^)..^($end - 1^)]
+echo $relativeItems = foreach ^($line in $itemLines^) {
+echo     $item = $line.Trim^(^)
+echo     if ^($item.Length -gt 0 -and -not $item.StartsWith^('#'^)^) { $item }
+echo }
+echo $paths = $relativeItems ^| Where-Object { $_.Trim^(^).Length -gt 0 } ^| ForEach-Object { Join-Path $root $_ }
+echo $missingPaths = $paths ^| Where-Object { -not ^(Test-Path -LiteralPath $_^) }
+echo $validPaths   = $paths ^| Where-Object { Test-Path -LiteralPath $_ }
 echo if ^($missingPaths.Count -gt 0^) {
 echo     Write-Host "Missing items:"
 echo     $missingPaths ^| ForEach-Object { Write-Host $_ }
@@ -60,7 +58,7 @@ echo if ^($validPaths.Count -eq 0^) {
 echo     Write-Host "ERROR: No valid files or folders were found to compress."
 echo     exit 1
 echo }
-echo Compress-Archive -Path $validPaths -DestinationPath "%OUTPUT_ZIP%" -Force
+echo Compress-Archive -LiteralPath $validPaths -DestinationPath "%OUTPUT_ZIP%" -Force
 echo Write-Host "Archive created successfully:"
 echo Write-Host "%OUTPUT_ZIP%"
 ) > "%PS_SCRIPT%"
@@ -82,3 +80,14 @@ echo SUCCESS: Archive created successfully.
 echo.
 echo Press any key to close this window...
 pause > nul
+exit /b
+
+::ZIP_ITEMS_BEGIN
+pubspec.yaml
+l10n.yaml
+analysis_options.yaml
+lib
+web/index.html
+android
+ios
+::ZIP_ITEMS_END
