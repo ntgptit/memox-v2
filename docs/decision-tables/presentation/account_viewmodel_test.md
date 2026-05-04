@@ -6,7 +6,7 @@ Test file: `test/presentation/account_viewmodel_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | OAuth config is missing | no linked account exists and Google client IDs are blank | account settings controller builds | state is `unconfigured` and sign-in is disabled | C0+C1 |
+| DT1 | OAuth config is missing on a non-Android platform | no linked account exists, Google client IDs are blank, and the platform is Windows | account settings controller builds | state is `unconfigured` and sign-in is disabled | C0+C1 |
 | DT2 | stored account is Drive-ready | account store contains Google account metadata with `drive.appdata` scope | account settings controller builds | state is `signedIn` with the stored email | C0+C1 |
 
 ## Decision table: onUpdate
@@ -19,3 +19,4 @@ Test file: `test/presentation/account_viewmodel_test.dart`
 | DT4 | reconnect succeeds after Drive scope was missing | store has account without Drive scope and fake auth returns authorized scope | `reconnectDrive` is requested | controller state becomes `signedIn` and store contains `drive.appdata` | C0+C1 |
 | DT5 | account reconnect must refresh Drive sync status | store has account without Drive scope, Drive Sync controller has already loaded stale reconnect-required status, and fake auth returns authorized scope | `reconnectDrive` is requested and Drive Sync state is read again | Drive Sync repository load count increases because account controller invalidates the sync status provider | C0+C1 |
 | DT6 | access token request has no cached token | store has linked account but fake auth returns reauthorization required | Drive access-token use case is requested | result is `reauthorizationRequired` and SharedPreferences does not contain token material | C0+C1 |
+| DT7 | Google-rendered web button emits authentication event | account controller is signed out and fake auth emits a Drive-ready event while account persistence is still pending | authentication event is received from `authenticationEvents` | controller enters `isBusy` before persistence completes, then becomes `signedIn` after persistence finishes | C0+C1 |

@@ -6,7 +6,14 @@ Test file: `test/app/config/app_config_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | Google client IDs are blank | config is built from blank values | platform capability is checked | web, Android, and iOS are not configured | C0+C1 |
-| DT2 | web client ID is present | config has `GOOGLE_WEB_CLIENT_ID` | web and Android capability are checked | web is configured and Android can use the web/server client ID fallback | C0+C1 |
-| DT3 | iOS client ID is present | config has `GOOGLE_IOS_CLIENT_ID` | iOS and desktop capability are checked | iOS is configured and Windows remains unsupported | C0+C1 |
+| DT1 | Google client IDs are blank | config is built from blank values | platform capability is checked | web and iOS are not configured, while Android remains delegated to native OAuth configuration | C0+C1 |
+| DT2 | web client ID is present | config has `GOOGLE_WEB_CLIENT_ID` | web, Android, iOS, and desktop capability are checked | web is configured, Android remains delegated to native OAuth configuration, and iOS/Windows are not configured by the web client | C0+C1 |
+| DT3 | iOS client ID is present | config has `GOOGLE_IOS_CLIENT_ID` | iOS, macOS, and desktop capability are checked | iOS and macOS are configured and Windows remains unsupported | C0+C1 |
 | DT4 | app config has no OAuth field value from a legacy or hot-reload instance | `AppConfig` is constructed through a path that omits `googleOAuthConfig` | account config is read | it returns empty Google OAuth config instead of throwing, so account linking is disabled safely | C0+C1 |
+| DT5 | server client ID is present without platform clients | config has only `GOOGLE_SERVER_CLIENT_ID` | web, Android, iOS, and desktop capability are checked | server client ID does not configure web or Apple clients, Android remains delegated to native OAuth configuration, and Windows remains unsupported | C0+C1 |
+
+## Decision table: webIndexOAuthMetadata
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | Google Sign-In web metadata is required by `google_sign_in_web` | `web/index.html` is served as the Flutter Web host page | the host page is inspected | a `google-signin-client_id` meta tag exists in `<head>` with the MemoX Web OAuth client ID | C0+C1 |

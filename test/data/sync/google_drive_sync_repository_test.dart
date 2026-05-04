@@ -229,6 +229,71 @@ void main() {
     expect(status.kind, DriveSyncStatusKind.failure);
     expect(status.message, 'token expired');
   });
+
+  test(
+    'DT11 loadStatus: Drive 401 maps to reconnect-required status',
+    () async {
+      final harness = await _RepositoryHarness.create(
+        driveFailure: const GoogleDriveAppDataException(
+          'access token expired',
+          statusCode: 401,
+        ),
+      );
+
+      final status = await harness.repository.loadStatus();
+
+      expect(status.kind, DriveSyncStatusKind.needsDriveAuthorization);
+      expect(status.message, isNull);
+    },
+  );
+
+  test(
+    'DT12 syncNow: Drive 401 maps failed result to reconnect-required status',
+    () async {
+      final harness = await _RepositoryHarness.create(
+        driveFailure: const GoogleDriveAppDataException(
+          'access token expired',
+          statusCode: 401,
+        ),
+      );
+
+      final result = await harness.repository.syncNow();
+
+      expect(result.kind, DriveSyncActionKind.failed);
+      expect(result.status.kind, DriveSyncStatusKind.needsDriveAuthorization);
+    },
+  );
+
+  test(
+    'DT13 resolveConflict: Drive 403 maps failed result to reconnect-required status',
+    () async {
+      final harness = await _RepositoryHarness.create(
+        driveFailure: const GoogleDriveAppDataException(
+          'insufficient authentication',
+          statusCode: 403,
+        ),
+      );
+      final remote = _snapshotFor(
+        databaseBytes: Uint8List.fromList(<int>[8, 8, 8]),
+        settings: const <String, Object?>{},
+      );
+      harness.drive.replaceRemoteSnapshot(remote);
+      final conflict = DriveSyncConflict(
+        localFingerprint: 'local',
+        remote: harness.drive.remote!,
+        reason: 'test',
+      );
+
+      final result = await harness.repository.resolveConflict(
+        conflict,
+        DriveSyncConflictChoice.useDriveCopy,
+      );
+
+      expect(result.kind, DriveSyncActionKind.failed);
+      expect(result.status.kind, DriveSyncStatusKind.needsDriveAuthorization);
+      expect(harness.database.restoredBytes, isNull);
+    },
+  );
 }
 
 final class _RepositoryHarness {
@@ -250,9 +315,10 @@ final class _RepositoryHarness {
     DriveAccessTokenResult tokenResult = const DriveAccessTokenResult.success(
       'access-token',
     ),
+    GoogleDriveAppDataException? driveFailure,
   }) async {
     final preferences = await SharedPreferences.getInstance();
-    final drive = _FakeDriveAppDataClient();
+    final drive = _FakeDriveAppDataClient(failure: driveFailure);
     final database = _FakeLocalDatabaseSnapshotGateway(
       databaseBytes: Uint8List.fromList(<int>[1, 2, 3]),
     );
@@ -310,6 +376,10 @@ DriveSyncSnapshot _snapshotFor({
 }
 
 final class _FakeDriveAppDataClient implements DriveAppDataClient {
+  _FakeDriveAppDataClient({this.failure});
+
+  final GoogleDriveAppDataException? failure;
+
   DriveAppDataFile? manifestFile;
   DriveAppDataFile? snapshotFile;
   Uint8List? manifestBytes;
@@ -375,6 +445,7 @@ final class _FakeDriveAppDataClient implements DriveAppDataClient {
     required String accessToken,
     required String name,
   }) async {
+    _throwIfFailure();
     return switch (name) {
       AppConstants.driveSyncManifestFileName => manifestFile,
       AppConstants.driveSyncSnapshotFileName => snapshotFile,
@@ -390,6 +461,7 @@ final class _FakeDriveAppDataClient implements DriveAppDataClient {
     required Uint8List bytes,
     Map<String, String> appProperties = const <String, String>{},
   }) async {
+    _throwIfFailure();
     createCount += 1;
     return _upsert(name: name, bytes: bytes);
   }
@@ -402,6 +474,7 @@ final class _FakeDriveAppDataClient implements DriveAppDataClient {
     required Uint8List bytes,
     Map<String, String> appProperties = const <String, String>{},
   }) async {
+    _throwIfFailure();
     updateCount += 1;
     final name = fileId == snapshotFile?.id
         ? AppConstants.driveSyncSnapshotFileName
@@ -414,6 +487,7 @@ final class _FakeDriveAppDataClient implements DriveAppDataClient {
     required String accessToken,
     required String fileId,
   }) async {
+    _throwIfFailure();
     if (fileId == manifestFile?.id && manifestBytes != null) {
       return manifestBytes!;
     }
@@ -445,6 +519,13 @@ final class _FakeDriveAppDataClient implements DriveAppDataClient {
       manifestBytes = bytes;
     }
     return file;
+  }
+
+  void _throwIfFailure() {
+    final error = failure;
+    if (error != null) {
+      throw error;
+    }
   }
 }
 

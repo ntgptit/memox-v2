@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../core/config/google_oauth_config.dart';
@@ -36,13 +37,27 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
 
   Future<void> _initialize(GoogleOAuthConfig config) async {
     await _signIn.initialize(
-      clientId: config.webClientId ?? config.iosClientId,
+      clientId: _resolveClientId(config),
       serverClientId: config.serverClientId,
     );
     _authSubscription = _signIn.authenticationEvents.listen(
       _handleAuthenticationEvent,
       onError: _handleAuthenticationError,
     );
+  }
+
+  String? _resolveClientId(GoogleOAuthConfig config) {
+    if (kIsWeb) {
+      return config.webClientId;
+    }
+
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.iOS || TargetPlatform.macOS => config.iosClientId,
+      TargetPlatform.android ||
+      TargetPlatform.fuchsia ||
+      TargetPlatform.linux ||
+      TargetPlatform.windows => null,
+    };
   }
 
   @override

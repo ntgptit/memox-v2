@@ -161,6 +161,10 @@ class AccountSettingsController extends _$AccountSettingsController {
   Future<void> _handleAuthenticationEvent(
     GoogleAccountAuthResult result,
   ) async {
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(current.copyWith(isBusy: true));
+    }
     final persistUseCase = await ref.read(
       persistGoogleAccountAuthResultUseCaseProvider.future,
     );
@@ -171,14 +175,14 @@ class AccountSettingsController extends _$AccountSettingsController {
     if (!ref.mounted) {
       return;
     }
-    final current = state.value;
+    final latest = state.value;
     final requiresPlatformButton =
-        current?.requiresPlatformSignInButton ??
+        latest?.requiresPlatformSignInButton ??
         ref.read(googleAccountAuthServiceProvider).requiresPlatformSignInButton;
     state = AsyncData(
       _stateFromActionResult(
         actionResult,
-        fallbackLink: current?.link,
+        fallbackLink: latest?.link,
         requiresPlatformSignInButton: requiresPlatformButton,
       ),
     );

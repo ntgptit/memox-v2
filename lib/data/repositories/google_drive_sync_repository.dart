@@ -79,7 +79,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
         remote: remote,
       );
     } on Object catch (error) {
-      return DriveSyncStatus.failure(error.toString());
+      return _mapDriveException(error);
     }
   }
 
@@ -169,7 +169,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
         conflict,
       );
     } on Object catch (error) {
-      final status = DriveSyncStatus.failure(error.toString());
+      final status = _mapDriveException(error);
       return DriveSyncRunResult.failed(status, error.toString());
     }
   }
@@ -212,9 +212,18 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
       );
       return restored;
     } on Object catch (error) {
-      final status = DriveSyncStatus.failure(error.toString());
+      final status = _mapDriveException(error);
       return DriveSyncRunResult.failed(status, error.toString());
     }
+  }
+
+  DriveSyncStatus _mapDriveException(Object error) {
+    if (error is GoogleDriveAppDataException &&
+        (error.statusCode == 401 || error.statusCode == 403)) {
+      return const DriveSyncStatus.needsDriveAuthorization();
+    }
+
+    return DriveSyncStatus.failure(error.toString());
   }
 
   Future<_DriveSyncContext> _loadReadyContext() async {
@@ -309,8 +318,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
     );
     final manifest = DriveSyncJson.decodeManifest(manifestJson);
     if (manifest == null ||
-        manifest.manifestVersion !=
-            DriveSyncManifest.currentManifestVersion ||
+        manifest.manifestVersion != DriveSyncManifest.currentManifestVersion ||
         manifest.snapshotFormatVersion !=
             DriveSyncManifest.currentSnapshotFormatVersion ||
         manifest.appId != DriveSyncManifest.currentAppId) {

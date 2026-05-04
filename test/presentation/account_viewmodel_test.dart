@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/account_providers.dart';
@@ -10,6 +11,7 @@ import 'package:memox/core/constants/app_constants.dart';
 import 'package:memox/data/settings/cloud_account_store.dart';
 import 'package:memox/domain/entities/cloud_account_link.dart';
 import 'package:memox/domain/entities/drive_sync_models.dart';
+import 'package:memox/domain/repositories/cloud_account_repository.dart';
 import 'package:memox/domain/repositories/drive_sync_repository.dart';
 import 'package:memox/domain/services/google_account_auth_service.dart';
 import 'package:memox/presentation/features/settings/viewmodels/account_settings_viewmodel.dart';
@@ -26,6 +28,10 @@ void main() {
   test(
     'DT1 onOpen: missing OAuth config produces unconfigured account state',
     () async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+      addTearDown(() {
+        debugDefaultTargetPlatformOverride = null;
+      });
       final container = _createContainer(
         config: GoogleOAuthConfig.fromValues(),
         auth: _FakeGoogleAccountAuthService(),
@@ -233,11 +239,62 @@ void main() {
       expect(rawAccount, isNot(contains('idToken')));
     },
   );
+
+  test(
+    'DT7 onUpdate: authentication event enters busy state before persistence completes',
+    () async {
+      final auth = _FakeGoogleAccountAuthService();
+      final repository = _PausingCloudAccountRepository();
+      final container = _createContainer(
+        auth: auth,
+        accountRepository: repository,
+      );
+      addTearDown(container.dispose);
+      final states = <AsyncValue<AccountSettingsState>>[];
+      final subscription = container.listen<AsyncValue<AccountSettingsState>>(
+        accountSettingsControllerProvider,
+        (_, next) => states.add(next),
+        fireImmediately: true,
+      );
+      addTearDown(subscription.close);
+
+      await container.read(accountSettingsControllerProvider.future);
+      states.clear();
+
+      auth.emit(
+        GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      );
+      await repository.saveStarted.future;
+
+      final busyState = states
+          .lastWhere((value) => value.hasValue && value.requireValue.isBusy)
+          .requireValue;
+      expect(busyState.isBusy, isTrue);
+      expect(busyState.status, AccountLinkStatus.signedOut);
+
+      repository.allowSave();
+      await repository.saveCompleted.future;
+      await Future<void>.delayed(Duration.zero);
+      final finalState = container
+          .read(accountSettingsControllerProvider)
+          .requireValue;
+
+      expect(finalState.isBusy, isFalse);
+      expect(finalState.status, AccountLinkStatus.signedIn);
+      expect(finalState.link?.driveAppDataAuthorized, isTrue);
+    },
+  );
 }
 
 ProviderContainer _createContainer({
   GoogleOAuthConfig? config,
   required _FakeGoogleAccountAuthService auth,
+  CloudAccountRepository? accountRepository,
   DriveSyncRepository? syncRepository,
 }) {
   final container = ProviderContainer(
@@ -250,6 +307,10 @@ ProviderContainer _createContainer({
             ),
       ),
       googleAccountAuthServiceProvider.overrideWithValue(auth),
+      if (accountRepository != null)
+        cloudAccountRepositoryProvider.overrideWith(
+          (ref) async => accountRepository,
+        ),
       if (syncRepository != null)
         driveSyncRepositoryProvider.overrideWith((ref) async => syncRepository),
       clockProvider.overrideWithValue(TestClock(DateTime.utc(2026, 5, 3, 9))),
@@ -359,6 +420,44 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   @override
   Future<void> signOutLocal() async {}
+
+  void emit(GoogleAccountAuthResult result) {
+    _events.add(result);
+  }
+}
+
+final class _PausingCloudAccountRepository implements CloudAccountRepository {
+  final Completer<void> saveStarted = Completer<void>();
+  final Completer<void> _allowSave = Completer<void>();
+  final Completer<void> saveCompleted = Completer<void>();
+
+  CloudAccountLink? _link;
+
+  @override
+  Future<CloudAccountLink?> load() async => _link;
+
+  @override
+  Future<void> save(CloudAccountLink link) async {
+    if (!saveStarted.isCompleted) {
+      saveStarted.complete();
+    }
+    await _allowSave.future;
+    _link = link;
+    if (!saveCompleted.isCompleted) {
+      saveCompleted.complete();
+    }
+  }
+
+  @override
+  Future<void> clear() async {
+    _link = null;
+  }
+
+  void allowSave() {
+    if (!_allowSave.isCompleted) {
+      _allowSave.complete();
+    }
+  }
 }
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {

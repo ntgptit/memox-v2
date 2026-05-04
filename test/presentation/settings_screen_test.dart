@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,10 +48,7 @@ void main() {
 
     expect(find.text('Settings'), findsWidgets);
     expect(find.text('Account'), findsOneWidget);
-    expect(
-      find.text('Google sign-in is not configured for this build.'),
-      findsOneWidget,
-    );
+    expect(find.text('No Google account is linked.'), findsOneWidget);
     expect(find.text('Light'), findsOneWidget);
     expect(find.text('System'), findsWidgets);
     await tester.scrollUntilVisible(
@@ -146,17 +144,22 @@ void main() {
   testWidgets(
     'DT5 onDisplay: disables Google sign-in when OAuth config is missing',
     (tester) async {
-      await _pumpSettings(tester);
+      debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+      try {
+        await _pumpSettings(tester);
 
-      final signInButton = tester.widget<ElevatedButton>(
-        find.widgetWithText(ElevatedButton, 'Sign in with Google'),
-      );
+        final signInButton = tester.widget<ElevatedButton>(
+          find.widgetWithText(ElevatedButton, 'Sign in with Google'),
+        );
 
-      expect(
-        find.text('Add Google OAuth client IDs to enable account linking.'),
-        findsOneWidget,
-      );
-      expect(signInButton.onPressed, isNull);
+        expect(
+          find.text('Add Google OAuth client IDs to enable account linking.'),
+          findsOneWidget,
+        );
+        expect(signInButton.onPressed, isNull);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
     },
   );
 

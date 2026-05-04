@@ -39,7 +39,7 @@ class GoogleOAuthConfig {
     }
 
     return switch (platform) {
-      TargetPlatform.android => serverClientId != null || webClientId != null,
+      TargetPlatform.android => true,
       TargetPlatform.iOS || TargetPlatform.macOS => iosClientId != null,
       TargetPlatform.fuchsia ||
       TargetPlatform.linux ||
