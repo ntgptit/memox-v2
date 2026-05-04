@@ -39,7 +39,7 @@ final class DriveSyncSettingsControllerProvider
 }
 
 String _$driveSyncSettingsControllerHash() =>
-    r'03322abfa5aa3458928feca5e303d75357aa6caf';
+    r'8f084b2174fb56adb6f4c087455353707b2b1b78';
 
 abstract class _$DriveSyncSettingsController
     extends $AsyncNotifier<DriveSyncSettingsState> {

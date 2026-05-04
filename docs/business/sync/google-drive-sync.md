@@ -1,7 +1,7 @@
 # Google Drive Sync
 
 ## Mục tiêu
-Google Drive Sync V1 cho phép user tự bấm `Sync now` trong Settings để sao lưu hoặc khôi phục snapshot DB local qua Google Drive `appDataFolder`.
+Google Drive Sync V1 cho phép user tự bấm `Sync now` trong Settings, chọn rõ hướng đồng bộ, rồi xác nhận trước khi sao lưu hoặc khôi phục snapshot DB local qua Google Drive `appDataFolder`.
 
 ## Phạm vi V1
 - Sync thủ công, không auto-sync nền.
@@ -33,10 +33,13 @@ Google Drive Sync V1 cho phép user tự bấm `Sync now` trong Settings để s
 ## Conflict policy
 | Tình huống | Hành vi |
 | --- | --- |
-| Chưa có remote snapshot | Upload local snapshot đầu tiên. |
+| User chọn local là mới nhất và xác nhận | Upload local snapshot, ghi đè hoặc tạo snapshot trên Drive. |
+| User chọn Drive là mới nhất và xác nhận | Validate manifest/hash/schema, restore settings, restore DB, rồi mở lại app state sạch. |
+| User hủy ở bước chọn hướng hoặc confirmation | Không mutate local hoặc Drive. |
+| Chưa có remote snapshot | Chỉ cho phép upload local; restore Drive bị vô hiệu hóa. |
 | Local giống remote | Cập nhật trạng thái, không upload/download DB. |
-| Local đổi, remote không đổi từ lần sync gần nhất | Upload local và ghi đè Drive snapshot. |
-| Remote đổi, local không đổi từ lần sync gần nhất | Hỏi user chọn bản local hay bản Drive. |
+| Local đổi, remote không đổi từ lần sync gần nhất | User vẫn phải chọn và xác nhận local là mới nhất trước khi upload. |
+| Remote đổi, local không đổi từ lần sync gần nhất | User vẫn phải chọn và xác nhận Drive là mới nhất trước khi restore. |
 | Local và remote cùng đổi hoặc không có baseline tin cậy | Hỏi user chọn bản local hay bản Drive. |
 | User chọn `Keep local` | Upload local và ghi đè Drive snapshot. |
 | User chọn `Use Drive copy` | Validate manifest/hash/schema, restore settings, restore DB, rồi mở lại app state sạch. |

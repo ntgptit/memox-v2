@@ -924,6 +924,84 @@ abstract class AppLocalizations {
   /// **'Sync now'**
   String get settingsDriveSyncAction;
 
+  /// No description provided for @settingsDriveSyncDirectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose sync direction'**
+  String get settingsDriveSyncDirectionTitle;
+
+  /// No description provided for @settingsDriveSyncDirectionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which copy is the source of truth for this sync.'**
+  String get settingsDriveSyncDirectionMessage;
+
+  /// No description provided for @settingsDriveSyncUploadLocalAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload local data to Drive'**
+  String get settingsDriveSyncUploadLocalAction;
+
+  /// No description provided for @settingsDriveSyncUploadLocalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this device as latest and replace the Drive snapshot.'**
+  String get settingsDriveSyncUploadLocalSubtitle;
+
+  /// No description provided for @settingsDriveSyncRestoreDriveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Drive data to this device'**
+  String get settingsDriveSyncRestoreDriveAction;
+
+  /// No description provided for @settingsDriveSyncRestoreDriveSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the Drive snapshot as latest and replace local data.'**
+  String get settingsDriveSyncRestoreDriveSubtitle;
+
+  /// No description provided for @settingsDriveSyncRestoreUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No Drive snapshot is available to download.'**
+  String get settingsDriveSyncRestoreUnavailable;
+
+  /// No description provided for @settingsDriveSyncUploadConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload local data?'**
+  String get settingsDriveSyncUploadConfirmTitle;
+
+  /// No description provided for @settingsDriveSyncUploadConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will replace the Google Drive snapshot with this device\'s current database and settings.'**
+  String get settingsDriveSyncUploadConfirmMessage;
+
+  /// No description provided for @settingsDriveSyncUploadConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload to Drive'**
+  String get settingsDriveSyncUploadConfirmAction;
+
+  /// No description provided for @settingsDriveSyncRestoreConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Drive copy?'**
+  String get settingsDriveSyncRestoreConfirmTitle;
+
+  /// No description provided for @settingsDriveSyncRestoreConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will replace this device\'s local database and settings with the Google Drive snapshot.'**
+  String get settingsDriveSyncRestoreConfirmMessage;
+
+  /// No description provided for @settingsDriveSyncRestoreConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from Drive'**
+  String get settingsDriveSyncRestoreConfirmAction;
+
   /// No description provided for @settingsDriveSyncUploaded.
   ///
   /// In en, this message translates to:

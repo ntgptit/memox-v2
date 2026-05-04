@@ -517,6 +517,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDriveSyncAction => 'Sync now';
 
   @override
+  String get settingsDriveSyncDirectionTitle => 'Choose sync direction';
+
+  @override
+  String get settingsDriveSyncDirectionMessage =>
+      'Choose which copy is the source of truth for this sync.';
+
+  @override
+  String get settingsDriveSyncUploadLocalAction => 'Upload local data to Drive';
+
+  @override
+  String get settingsDriveSyncUploadLocalSubtitle =>
+      'Use this device as latest and replace the Drive snapshot.';
+
+  @override
+  String get settingsDriveSyncRestoreDriveAction =>
+      'Download Drive data to this device';
+
+  @override
+  String get settingsDriveSyncRestoreDriveSubtitle =>
+      'Use the Drive snapshot as latest and replace local data.';
+
+  @override
+  String get settingsDriveSyncRestoreUnavailable =>
+      'No Drive snapshot is available to download.';
+
+  @override
+  String get settingsDriveSyncUploadConfirmTitle => 'Upload local data?';
+
+  @override
+  String get settingsDriveSyncUploadConfirmMessage =>
+      'This will replace the Google Drive snapshot with this device\'s current database and settings.';
+
+  @override
+  String get settingsDriveSyncUploadConfirmAction => 'Upload to Drive';
+
+  @override
+  String get settingsDriveSyncRestoreConfirmTitle => 'Restore Drive copy?';
+
+  @override
+  String get settingsDriveSyncRestoreConfirmMessage =>
+      'This will replace this device\'s local database and settings with the Google Drive snapshot.';
+
+  @override
+  String get settingsDriveSyncRestoreConfirmAction => 'Restore from Drive';
+
+  @override
   String get settingsDriveSyncUploaded =>
       'Local data backed up to Google Drive.';
 

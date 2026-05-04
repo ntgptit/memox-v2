@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/di/sync_providers.dart';
+import '../../../../core/errors/error_mapper.dart';
 import '../../../../domain/entities/drive_sync_models.dart';
 
 part 'drive_sync_settings_viewmodel.g.dart';
@@ -44,6 +45,10 @@ final class DriveSyncSettingsState {
           kind == DriveSyncStatusKind.remoteChanges ||
           kind == DriveSyncStatusKind.failure);
 
+  bool get canUploadLocal => canSync;
+
+  bool get canRestoreDrive => !isBusy && status.remote != null;
+
   DriveSyncSettingsState copyWith({
     DriveSyncStatus? status,
     DriveSyncConflict? pendingConflict,
@@ -71,19 +76,32 @@ final class DriveSyncSettingsState {
 class DriveSyncSettingsController extends _$DriveSyncSettingsController {
   @override
   Future<DriveSyncSettingsState> build() async {
-    final useCase = await ref.watch(loadDriveSyncStatusUseCaseProvider.future);
-    final status = await useCase.execute();
-    return _stateFromStatus(status);
+    try {
+      final useCase = await ref.watch(
+        loadDriveSyncStatusUseCaseProvider.future,
+      );
+      final status = await useCase.execute();
+      return _stateFromStatus(status);
+    } on Object catch (error) {
+      return _stateFromUnexpectedError(error);
+    }
   }
 
   Future<void> refresh() async {
     // guard:retry-reviewed
-    final useCase = await ref.read(loadDriveSyncStatusUseCaseProvider.future);
-    final status = await useCase.execute();
-    if (!ref.mounted) {
-      return;
+    try {
+      final useCase = await ref.read(loadDriveSyncStatusUseCaseProvider.future);
+      final status = await useCase.execute();
+      if (!ref.mounted) {
+        return;
+      }
+      state = AsyncData(_stateFromStatus(status));
+    } on Object catch (error) {
+      if (!ref.mounted) {
+        return;
+      }
+      state = AsyncData(_stateFromUnexpectedError(error));
     }
-    state = AsyncData(_stateFromStatus(status));
   }
 
   Future<void> syncNow() async {
@@ -93,11 +111,74 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
       return;
     }
     state = AsyncData(current.copyWith(isBusy: true));
-    final useCase = await ref.read(
-      syncGoogleDriveSnapshotUseCaseProvider.future,
+    try {
+      final useCase = await ref.read(
+        syncGoogleDriveSnapshotUseCaseProvider.future,
+      );
+      final result = await useCase.execute();
+      await _applyResult(result);
+    } on Object catch (error) {
+      if (!ref.mounted) {
+        return;
+      }
+      state = AsyncData(
+        _stateFromUnexpectedError(
+          error,
+          message: DriveSyncSettingsMessage.failed,
+        ),
+      );
+    }
+  }
+
+  Future<void> uploadLocalToDrive() async {
+    // guard:retry-reviewed
+    await _runDirectedSync(
+      canRun: (state) => state.canUploadLocal,
+      action: () async {
+        final useCase = await ref.read(
+          uploadLocalDriveSnapshotUseCaseProvider.future,
+        );
+        return useCase.execute();
+      },
     );
-    final result = await useCase.execute();
-    await _applyResult(result);
+  }
+
+  Future<void> restoreDriveToLocal() async {
+    // guard:retry-reviewed
+    await _runDirectedSync(
+      canRun: (state) => state.canRestoreDrive,
+      action: () async {
+        final useCase = await ref.read(
+          restoreDriveSnapshotUseCaseProvider.future,
+        );
+        return useCase.execute();
+      },
+    );
+  }
+
+  Future<void> _runDirectedSync({
+    required bool Function(DriveSyncSettingsState state) canRun,
+    required Future<DriveSyncRunResult> Function() action,
+  }) async {
+    final current = state.value;
+    if (current == null || !canRun(current)) {
+      return;
+    }
+    state = AsyncData(current.copyWith(isBusy: true));
+    try {
+      final result = await action();
+      await _applyResult(result);
+    } on Object catch (error) {
+      if (!ref.mounted) {
+        return;
+      }
+      state = AsyncData(
+        _stateFromUnexpectedError(
+          error,
+          message: DriveSyncSettingsMessage.failed,
+        ),
+      );
+    }
   }
 
   Future<void> resolveConflict(DriveSyncConflictChoice choice) async {
@@ -108,11 +189,23 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
       return;
     }
     state = AsyncData(current.copyWith(isBusy: true));
-    final useCase = await ref.read(
-      resolveDriveSyncConflictUseCaseProvider.future,
-    );
-    final result = await useCase.execute(conflict, choice);
-    await _applyResult(result);
+    try {
+      final useCase = await ref.read(
+        resolveDriveSyncConflictUseCaseProvider.future,
+      );
+      final result = await useCase.execute(conflict, choice);
+      await _applyResult(result);
+    } on Object catch (error) {
+      if (!ref.mounted) {
+        return;
+      }
+      state = AsyncData(
+        _stateFromUnexpectedError(
+          error,
+          message: DriveSyncSettingsMessage.failed,
+        ),
+      );
+    }
   }
 
   Future<void> _applyResult(DriveSyncRunResult result) async {
@@ -150,5 +243,22 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
       status: status,
       technicalMessage: status.message,
     );
+  }
+
+  DriveSyncSettingsState _stateFromUnexpectedError(
+    Object error, {
+    DriveSyncSettingsMessage message = DriveSyncSettingsMessage.none,
+  }) {
+    final diagnostic = _diagnosticFrom(error);
+    return DriveSyncSettingsState(
+      status: DriveSyncStatus.failure(diagnostic),
+      message: message,
+      technicalMessage: diagnostic,
+    );
+  }
+
+  String _diagnosticFrom(Object error) {
+    final failure = ErrorMapper.map(error);
+    return failure.technicalDetails ?? failure.message;
   }
 }

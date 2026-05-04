@@ -695,4 +695,18 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
       const DriveSyncStatus.needsDriveAuthorization(),
     );
   }
+
+  @override
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async {
+    return DriveSyncRunResult.noChanges(
+      const DriveSyncStatus.needsDriveAuthorization(),
+    );
+  }
+
+  @override
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async {
+    return DriveSyncRunResult.noChanges(
+      const DriveSyncStatus.needsDriveAuthorization(),
+    );
+  }
 }

@@ -489,6 +489,53 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsDriveSyncAction => 'Đồng bộ ngay';
 
   @override
+  String get settingsDriveSyncDirectionTitle => 'Chọn hướng đồng bộ';
+
+  @override
+  String get settingsDriveSyncDirectionMessage =>
+      'Chọn bản dữ liệu được xem là mới nhất cho lần đồng bộ này.';
+
+  @override
+  String get settingsDriveSyncUploadLocalAction =>
+      'Tải dữ liệu cục bộ lên Drive';
+
+  @override
+  String get settingsDriveSyncUploadLocalSubtitle =>
+      'Dùng thiết bị này làm bản mới nhất và thay snapshot trên Drive.';
+
+  @override
+  String get settingsDriveSyncRestoreDriveAction =>
+      'Tải dữ liệu Drive về thiết bị';
+
+  @override
+  String get settingsDriveSyncRestoreDriveSubtitle =>
+      'Dùng snapshot trên Drive làm bản mới nhất và thay dữ liệu cục bộ.';
+
+  @override
+  String get settingsDriveSyncRestoreUnavailable =>
+      'Chưa có snapshot Drive để tải về.';
+
+  @override
+  String get settingsDriveSyncUploadConfirmTitle => 'Tải dữ liệu cục bộ lên?';
+
+  @override
+  String get settingsDriveSyncUploadConfirmMessage =>
+      'Thao tác này sẽ thay snapshot Google Drive bằng DB và cài đặt hiện tại trên thiết bị này.';
+
+  @override
+  String get settingsDriveSyncUploadConfirmAction => 'Tải lên Drive';
+
+  @override
+  String get settingsDriveSyncRestoreConfirmTitle => 'Khôi phục bản Drive?';
+
+  @override
+  String get settingsDriveSyncRestoreConfirmMessage =>
+      'Thao tác này sẽ thay DB và cài đặt cục bộ trên thiết bị này bằng snapshot Google Drive.';
+
+  @override
+  String get settingsDriveSyncRestoreConfirmAction => 'Khôi phục từ Drive';
+
+  @override
   String get settingsDriveSyncUploaded =>
       'Đã sao lưu dữ liệu cục bộ lên Google Drive.';
 

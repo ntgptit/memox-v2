@@ -320,7 +320,7 @@ final class DriveSyncRepositoryProvider
 }
 
 String _$driveSyncRepositoryHash() =>
-    r'3b8c8a8122c92c38ccc29dd76253c2c75c4b33b7';
+    r'18f9d3fdba3fc0a1caacc923bf5055a7106d711e';
 
 @ProviderFor(loadDriveSyncStatusUseCase)
 final loadDriveSyncStatusUseCaseProvider =
@@ -407,6 +407,92 @@ final class SyncGoogleDriveSnapshotUseCaseProvider
 
 String _$syncGoogleDriveSnapshotUseCaseHash() =>
     r'15b1dcd535ab0c9f2c0cbd3032b7594548eecbf7';
+
+@ProviderFor(uploadLocalDriveSnapshotUseCase)
+final uploadLocalDriveSnapshotUseCaseProvider =
+    UploadLocalDriveSnapshotUseCaseProvider._();
+
+final class UploadLocalDriveSnapshotUseCaseProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<UploadLocalDriveSnapshotUseCase>,
+          UploadLocalDriveSnapshotUseCase,
+          FutureOr<UploadLocalDriveSnapshotUseCase>
+        >
+    with
+        $FutureModifier<UploadLocalDriveSnapshotUseCase>,
+        $FutureProvider<UploadLocalDriveSnapshotUseCase> {
+  UploadLocalDriveSnapshotUseCaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'uploadLocalDriveSnapshotUseCaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$uploadLocalDriveSnapshotUseCaseHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<UploadLocalDriveSnapshotUseCase> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<UploadLocalDriveSnapshotUseCase> create(Ref ref) {
+    return uploadLocalDriveSnapshotUseCase(ref);
+  }
+}
+
+String _$uploadLocalDriveSnapshotUseCaseHash() =>
+    r'0a64b2e962d545e5c4b449283d8dda659cdb4879';
+
+@ProviderFor(restoreDriveSnapshotUseCase)
+final restoreDriveSnapshotUseCaseProvider =
+    RestoreDriveSnapshotUseCaseProvider._();
+
+final class RestoreDriveSnapshotUseCaseProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<RestoreDriveSnapshotUseCase>,
+          RestoreDriveSnapshotUseCase,
+          FutureOr<RestoreDriveSnapshotUseCase>
+        >
+    with
+        $FutureModifier<RestoreDriveSnapshotUseCase>,
+        $FutureProvider<RestoreDriveSnapshotUseCase> {
+  RestoreDriveSnapshotUseCaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'restoreDriveSnapshotUseCaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$restoreDriveSnapshotUseCaseHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<RestoreDriveSnapshotUseCase> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<RestoreDriveSnapshotUseCase> create(Ref ref) {
+    return restoreDriveSnapshotUseCase(ref);
+  }
+}
+
+String _$restoreDriveSnapshotUseCaseHash() =>
+    r'db6a6e8002390e4b5c9638b56e05007208eb0d25';
 
 @ProviderFor(resolveDriveSyncConflictUseCase)
 final resolveDriveSyncConflictUseCaseProvider =

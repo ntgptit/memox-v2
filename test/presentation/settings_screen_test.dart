@@ -302,6 +302,7 @@ void main() {
       expect(find.text('Google Drive reconnect required'), findsOneWidget);
       expect(find.text('Google Drive ready'), findsNothing);
       expect(find.text('Reconnect Google Drive'), findsOneWidget);
+      expect(find.text('Sign out'), findsNothing);
       expect(
         find.text('Reconnect Google Drive in Account first.'),
         findsOneWidget,
@@ -334,6 +335,26 @@ void main() {
     );
     expect(syncButton.onPressed, isNotNull);
   });
+
+  testWidgets(
+    'DT14 onDisplay: unexpected Drive sync load error uses one failure surface',
+    (tester) async {
+      final repository = _FakeDriveSyncRepository(
+        loadStatusError: StateError('sync provider unavailable'),
+      );
+
+      await _pumpSettings(tester, driveSyncRepository: repository);
+
+      expect(find.text('Drive sync failed. Try again.'), findsOneWidget);
+      expect(find.text('Bad state: sync provider unavailable'), findsOneWidget);
+      expect(find.text('Something went wrong'), findsNothing);
+      expect(find.text('Something went wrong.'), findsNothing);
+      final syncButton = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Sync now'),
+      );
+      expect(syncButton.onPressed, isNotNull);
+    },
+  );
 
   testWidgets(
     'DT11 onDisplay: compact top settings groups fit first phone viewport',
@@ -837,7 +858,7 @@ void main() {
   ) async {
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
-      syncResult: DriveSyncRunResult.uploadedLocal(
+      uploadResult: DriveSyncRunResult.uploadedLocal(
         const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
       ),
     );
@@ -845,8 +866,66 @@ void main() {
 
     await tester.tap(find.text('Sync now'));
     await tester.pumpAndSettle();
+    expect(find.text('Choose sync direction'), findsOneWidget);
+    await tester.tap(find.text('Upload local data to Drive'));
+    await tester.pumpAndSettle();
+    expect(find.text('Upload local data?'), findsOneWidget);
+    await tester.tap(find.text('Upload to Drive'));
+    await tester.pumpAndSettle();
 
     expect(find.text('Local data backed up to Google Drive.'), findsOneWidget);
+    expect(repository.syncNowCount, 0);
+    expect(repository.uploadLocalCount, 1);
+  });
+
+  testWidgets('DT14 onUpdate: Drive sync restore requires confirmation', (
+    tester,
+  ) async {
+    final remote = _remoteSnapshot();
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: DriveSyncStatus(
+        kind: DriveSyncStatusKind.ready,
+        remote: remote,
+      ),
+      restoreResult: DriveSyncRunResult.restoredRemote(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced, remote: remote),
+        DriveSyncRestoreEffect.refreshDatabaseProvider,
+      ),
+    );
+    await _pumpSettings(tester, driveSyncRepository: repository);
+
+    await tester.tap(find.text('Sync now'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Download Drive data to this device'));
+    await tester.pumpAndSettle();
+    expect(find.text('Restore Drive copy?'), findsOneWidget);
+    await tester.tap(find.text('Restore from Drive'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Drive copy restored.'), findsOneWidget);
+    expect(repository.restoreDriveCount, 1);
+  });
+
+  testWidgets('DT15 onUpdate: canceling sync confirmation does not upload', (
+    tester,
+  ) async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+      uploadResult: DriveSyncRunResult.uploadedLocal(
+        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      ),
+    );
+    await _pumpSettings(tester, driveSyncRepository: repository);
+
+    await tester.tap(find.text('Sync now'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Upload local data to Drive'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(repository.uploadLocalCount, 0);
+    expect(find.text('Local data backed up to Google Drive.'), findsNothing);
   });
 
   testWidgets('DT12 onUpdate: web Drive scope reconnect enables Drive sync', (
@@ -899,6 +978,36 @@ void main() {
     );
     expect(syncButton.onPressed, isNotNull);
   });
+
+  testWidgets(
+    'DT13 onUpdate: Drive sync failure shows diagnostic without duplicate generic copy',
+    (tester) async {
+      const diagnostic = 'Google Drive API has not been used in project.';
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+        uploadResult: DriveSyncRunResult.failed(
+          const DriveSyncStatus.failure(diagnostic),
+          diagnostic,
+        ),
+      );
+
+      await _pumpSettings(tester, driveSyncRepository: repository);
+
+      await tester.tap(find.text('Sync now'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Upload local data to Drive'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Upload to Drive'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Drive sync failed. Try again.'), findsOneWidget);
+      expect(find.text(diagnostic), findsOneWidget);
+      final syncButton = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Sync now'),
+      );
+      expect(syncButton.onPressed, isNotNull);
+    },
+  );
 }
 
 Future<_SettingsHarness> _pumpSettings(
@@ -975,11 +1084,20 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
     DriveSyncStatus? loadStatusResult,
     List<DriveSyncStatus>? loadStatusResults,
     DriveSyncRunResult? syncResult,
+    DriveSyncRunResult? uploadResult,
+    DriveSyncRunResult? restoreResult,
     DriveSyncRunResult? resolveResult,
+    this.loadStatusError,
   }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
        _loadStatusResults = loadStatusResults?.toList() ?? <DriveSyncStatus>[],
        syncResult =
            syncResult ??
+           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+       uploadResult =
+           uploadResult ??
+           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+       restoreResult =
+           restoreResult ??
            DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
        resolveResult =
            resolveResult ??
@@ -988,11 +1106,20 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   DriveSyncStatus loadStatusResult;
   final List<DriveSyncStatus> _loadStatusResults;
   final DriveSyncRunResult syncResult;
+  final DriveSyncRunResult uploadResult;
+  final DriveSyncRunResult restoreResult;
   final DriveSyncRunResult resolveResult;
+  final Object? loadStatusError;
   int syncNowCount = 0;
+  int uploadLocalCount = 0;
+  int restoreDriveCount = 0;
 
   @override
   Future<DriveSyncStatus> loadStatus() async {
+    final error = loadStatusError;
+    if (error != null) {
+      throw error;
+    }
     if (_loadStatusResults.isNotEmpty) {
       return _loadStatusResults.removeAt(0);
     }
@@ -1003,6 +1130,18 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   Future<DriveSyncRunResult> syncNow() async {
     syncNowCount += 1;
     return syncResult;
+  }
+
+  @override
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async {
+    uploadLocalCount += 1;
+    return uploadResult;
+  }
+
+  @override
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async {
+    restoreDriveCount += 1;
+    return restoreResult;
   }
 
   @override
@@ -1035,6 +1174,28 @@ const _driveReadyLink = CloudAccountLink(
   linkedAt: 1,
   lastSignedInAt: 1,
 );
+
+DriveSyncRemoteSnapshot _remoteSnapshot() {
+  return DriveSyncRemoteSnapshot(
+    manifest: const DriveSyncManifest(
+      manifestVersion: DriveSyncManifest.currentManifestVersion,
+      snapshotFormatVersion: DriveSyncManifest.currentSnapshotFormatVersion,
+      appId: DriveSyncManifest.currentAppId,
+      appDatabaseSchemaVersion: 6,
+      createdAt: 1,
+      deviceId: 'remote-device',
+      deviceLabel: 'Remote device',
+      databaseSha256: 'db',
+      settingsSha256: 'settings',
+      snapshotSizeBytes: 2,
+    ),
+    manifestFileId: 'manifest-file',
+    manifestFileVersion: 'manifest-version',
+    snapshotFileId: 'snapshot-file',
+    snapshotFileVersion: 'snapshot-version',
+    modifiedAt: 1,
+  );
+}
 
 const _driveMissingLink = CloudAccountLink(
   provider: CloudProvider.google,

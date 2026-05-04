@@ -18,6 +18,8 @@ import '../viewmodels/account_settings_viewmodel.dart';
 import '../viewmodels/drive_sync_settings_viewmodel.dart';
 import 'settings_group.dart';
 
+enum _DriveSyncDirection { uploadLocal, restoreDrive }
+
 class DriveSyncSettingsGroup extends ConsumerWidget {
   const DriveSyncSettingsGroup({super.key});
 
@@ -45,7 +47,6 @@ class DriveSyncSettingsGroup extends ConsumerWidget {
       ),
       error: (_, _) => SettingsGroup(
         title: l10n.settingsDriveSyncTitle,
-        subtitle: l10n.sharedErrorTitle,
         child: MxText(l10n.errorUnexpected, role: MxTextRole.formHelper),
       ),
       data: (state) => _DriveSyncContent(state: state),
@@ -72,6 +73,44 @@ class DriveSyncSettingsGroup extends ConsumerWidget {
   }
 }
 
+Future<void> _showDirectionSheet(
+  BuildContext context,
+  WidgetRef ref,
+  DriveSyncSettingsState state,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final direction = await MxBottomSheet.show<_DriveSyncDirection>(
+    context: context,
+    title: l10n.settingsDriveSyncDirectionTitle,
+    child: _DriveSyncDirectionSheet(state: state),
+  );
+  if (!context.mounted || direction == null) {
+    return;
+  }
+
+  final confirmed = await MxBottomSheet.show<bool>(
+    context: context,
+    title: switch (direction) {
+      _DriveSyncDirection.uploadLocal =>
+        l10n.settingsDriveSyncUploadConfirmTitle,
+      _DriveSyncDirection.restoreDrive =>
+        l10n.settingsDriveSyncRestoreConfirmTitle,
+    },
+    child: _DriveSyncConfirmationSheet(direction: direction),
+  );
+  if (!context.mounted || confirmed != true) {
+    return;
+  }
+
+  final controller = ref.read(driveSyncSettingsControllerProvider.notifier);
+  switch (direction) {
+    case _DriveSyncDirection.uploadLocal:
+      await controller.uploadLocalToDrive();
+    case _DriveSyncDirection.restoreDrive:
+      await controller.restoreDriveToLocal();
+  }
+}
+
 class _DriveSyncContent extends ConsumerWidget {
   const _DriveSyncContent({required this.state});
 
@@ -80,7 +119,6 @@ class _DriveSyncContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final controller = ref.read(driveSyncSettingsControllerProvider.notifier);
     final accountController = ref.read(
       accountSettingsControllerProvider.notifier,
     );
@@ -107,7 +145,7 @@ class _DriveSyncContent extends ConsumerWidget {
             onPressed: needsReconnect
                 ? () => unawaited(accountController.reconnectDrive())
                 : state.canSync
-                ? () => unawaited(controller.syncNow())
+                ? () => unawaited(_showDirectionSheet(context, ref, state))
                 : null,
             leadingIcon: Icons.cloud_sync_outlined,
             isLoading: state.isBusy,
@@ -137,21 +175,125 @@ class _DriveSyncContent extends ConsumerWidget {
   }
 
   String? _messageText(AppLocalizations l10n) {
-    final message = switch (state.message) {
-      DriveSyncSettingsMessage.none => null,
+    return switch (state.message) {
+      DriveSyncSettingsMessage.none =>
+        state.kind == DriveSyncStatusKind.failure
+            ? _technicalMessage(l10n)
+            : null,
       DriveSyncSettingsMessage.uploaded => l10n.settingsDriveSyncUploaded,
       DriveSyncSettingsMessage.restored => l10n.settingsDriveSyncRestored,
       DriveSyncSettingsMessage.noChanges => l10n.settingsDriveSyncNoChanges,
       DriveSyncSettingsMessage.canceled => l10n.settingsDriveSyncCanceled,
-      DriveSyncSettingsMessage.failed => l10n.settingsDriveSyncFailed,
+      DriveSyncSettingsMessage.failed =>
+        state.kind == DriveSyncStatusKind.failure ||
+                state.kind == DriveSyncStatusKind.unsupportedSchema
+            ? _technicalMessage(l10n)
+            : null,
     };
-    if (message != null) {
-      return message;
+  }
+
+  String? _technicalMessage(AppLocalizations l10n) {
+    final message = state.technicalMessage;
+    if (message == null || message.isEmpty || message == _statusText(l10n)) {
+      return null;
     }
-    if (state.kind == DriveSyncStatusKind.failure) {
-      return state.technicalMessage;
-    }
-    return null;
+    return message;
+  }
+}
+
+class _DriveSyncDirectionSheet extends StatelessWidget {
+  const _DriveSyncDirectionSheet({required this.state});
+
+  final DriveSyncSettingsState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        MxText(
+          l10n.settingsDriveSyncDirectionMessage,
+          role: MxTextRole.formHelper,
+        ),
+        const MxGap(MxSpace.md),
+        MxListTile(
+          title: l10n.settingsDriveSyncUploadLocalAction,
+          subtitle: l10n.settingsDriveSyncUploadLocalSubtitle,
+          showChevron: true,
+          dense: true,
+          onTap: state.canUploadLocal
+              ? () => Navigator.of(context).pop(_DriveSyncDirection.uploadLocal)
+              : null,
+        ),
+        const MxDivider(),
+        MxListTile(
+          title: l10n.settingsDriveSyncRestoreDriveAction,
+          subtitle: state.canRestoreDrive
+              ? l10n.settingsDriveSyncRestoreDriveSubtitle
+              : l10n.settingsDriveSyncRestoreUnavailable,
+          showChevron: state.canRestoreDrive,
+          dense: true,
+          onTap: state.canRestoreDrive
+              ? () =>
+                    Navigator.of(context).pop(_DriveSyncDirection.restoreDrive)
+              : null,
+        ),
+        const MxGap(MxSpace.md),
+        MxSecondaryButton(
+          label: l10n.commonCancel,
+          onPressed: () => Navigator.of(context).pop(),
+          variant: MxSecondaryVariant.text,
+          fullWidth: true,
+        ),
+      ],
+    );
+  }
+}
+
+class _DriveSyncConfirmationSheet extends StatelessWidget {
+  const _DriveSyncConfirmationSheet({required this.direction});
+
+  final _DriveSyncDirection direction;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final isRestore = direction == _DriveSyncDirection.restoreDrive;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        MxText(
+          isRestore
+              ? l10n.settingsDriveSyncRestoreConfirmMessage
+              : l10n.settingsDriveSyncUploadConfirmMessage,
+          role: MxTextRole.formHelper,
+        ),
+        const MxGap(MxSpace.md),
+        MxPrimaryButton(
+          label: isRestore
+              ? l10n.settingsDriveSyncRestoreConfirmAction
+              : l10n.settingsDriveSyncUploadConfirmAction,
+          onPressed: () => Navigator.of(context).pop(true),
+          leadingIcon: isRestore
+              ? Icons.cloud_download_outlined
+              : Icons.cloud_upload_outlined,
+          tone: isRestore
+              ? MxPrimaryButtonTone.danger
+              : MxPrimaryButtonTone.primary,
+          fullWidth: true,
+        ),
+        const MxGap(MxSpace.sm),
+        MxSecondaryButton(
+          label: l10n.commonCancel,
+          onPressed: () => Navigator.of(context).pop(false),
+          variant: MxSecondaryVariant.text,
+          fullWidth: true,
+        ),
+      ],
+    );
   }
 }
 

@@ -5,6 +5,10 @@ abstract interface class DriveSyncRepository {
 
   Future<DriveSyncRunResult> syncNow();
 
+  Future<DriveSyncRunResult> uploadLocalSnapshot();
+
+  Future<DriveSyncRunResult> restoreDriveSnapshot();
+
   Future<DriveSyncRunResult> resolveConflict(
     DriveSyncConflict conflict,
     DriveSyncConflictChoice choice,

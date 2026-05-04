@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import '../../core/config/google_oauth_config.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/logging/app_logger.dart';
 import '../../core/services/clock.dart';
 import '../../core/services/id_generator.dart';
 import '../../domain/entities/cloud_account_link.dart';
@@ -29,6 +30,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
     required DriveSyncSnapshotCodec snapshotCodec,
     required Clock clock,
     required IdGenerator idGenerator,
+    AppLogger? logger,
   }) : _accountRepository = accountRepository,
        _authService = authService,
        _googleOAuthConfig = googleOAuthConfig,
@@ -38,7 +40,8 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
        _metadataStore = metadataStore,
        _snapshotCodec = snapshotCodec,
        _clock = clock,
-       _idGenerator = idGenerator;
+       _idGenerator = idGenerator,
+       _logger = logger ?? const NoopAppLogger();
 
   final CloudAccountRepository _accountRepository;
   final GoogleAccountAuthService _authService;
@@ -50,6 +53,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
   final DriveSyncSnapshotCodec _snapshotCodec;
   final Clock _clock;
   final IdGenerator _idGenerator;
+  final AppLogger _logger;
 
   @override
   Future<DriveSyncStatus> loadStatus() async {
@@ -78,7 +82,12 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
         lastSyncedAt: metadata?.lastSyncedAt,
         remote: remote,
       );
-    } on Object catch (error) {
+    } on Object catch (error, stackTrace) {
+      _logger.error(
+        'Failed to load Google Drive sync status.',
+        error,
+        stackTrace,
+      );
       return _mapDriveException(error);
     }
   }
@@ -168,7 +177,86 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
         ),
         conflict,
       );
-    } on Object catch (error) {
+    } on Object catch (error, stackTrace) {
+      _logger.error('Failed to sync Google Drive snapshot.', error, stackTrace);
+      final status = _mapDriveException(error);
+      return DriveSyncRunResult.failed(status, error.toString());
+    }
+  }
+
+  @override
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async {
+    final context = await _loadReadyContext();
+    if (!context.isReady) {
+      return DriveSyncRunResult.noChanges(context.status);
+    }
+
+    try {
+      final local = await _createLocalSnapshot();
+      final remote = await _loadRemoteSnapshot(context.accessToken);
+      if (remote != null && local.fingerprint == remote.fingerprint) {
+        await _saveMetadata(
+          accountSubjectId: context.link!.subjectId,
+          localFingerprint: local.fingerprint,
+          remote: remote,
+        );
+        return DriveSyncRunResult.noChanges(_syncedStatus(remote));
+      }
+
+      final uploaded = await _uploadLocalSnapshot(
+        accessToken: context.accessToken,
+        local: local,
+        remote: remote,
+        accountSubjectId: context.link!.subjectId,
+      );
+      return DriveSyncRunResult.uploadedLocal(uploaded);
+    } on Object catch (error, stackTrace) {
+      _logger.error(
+        'Failed to upload local snapshot to Google Drive.',
+        error,
+        stackTrace,
+      );
+      final status = _mapDriveException(error);
+      return DriveSyncRunResult.failed(status, error.toString());
+    }
+  }
+
+  @override
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async {
+    final context = await _loadReadyContext();
+    if (!context.isReady) {
+      return DriveSyncRunResult.noChanges(context.status);
+    }
+
+    try {
+      final remote = await _loadRemoteSnapshot(context.accessToken);
+      if (remote == null) {
+        return const DriveSyncRunResult.noChanges(
+          DriveSyncStatus.noRemoteSnapshot(),
+        );
+      }
+
+      final local = await _createLocalSnapshot();
+      if (local.fingerprint == remote.fingerprint) {
+        await _saveMetadata(
+          accountSubjectId: context.link!.subjectId,
+          localFingerprint: local.fingerprint,
+          remote: remote,
+        );
+        return DriveSyncRunResult.noChanges(_syncedStatus(remote));
+      }
+
+      return _restoreRemoteSnapshot(
+        accessToken: context.accessToken,
+        remote: remote,
+        accountSubjectId: context.link!.subjectId,
+      );
+    } on Object catch (error, stackTrace) {
+      _logger.error(
+        'Failed to restore Google Drive snapshot.',
+        error,
+        stackTrace,
+      );
       final status = _mapDriveException(error);
       return DriveSyncRunResult.failed(status, error.toString());
     }
@@ -211,7 +299,12 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
         accountSubjectId: context.link!.subjectId,
       );
       return restored;
-    } on Object catch (error) {
+    } on Object catch (error, stackTrace) {
+      _logger.error(
+        'Failed to resolve Google Drive sync conflict.',
+        error,
+        stackTrace,
+      );
       final status = _mapDriveException(error);
       return DriveSyncRunResult.failed(status, error.toString());
     }
@@ -500,6 +593,14 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
         remoteSnapshotVersion: remote.snapshotFileVersion,
         lastSyncedAt: _clock.nowEpochMillis(),
       ),
+    );
+  }
+
+  DriveSyncStatus _syncedStatus(DriveSyncRemoteSnapshot remote) {
+    return DriveSyncStatus(
+      kind: DriveSyncStatusKind.synced,
+      lastSyncedAt: _clock.nowEpochMillis(),
+      remote: remote,
     );
   }
 }

@@ -38,7 +38,7 @@ final class AccountSettingsControllerProvider
 }
 
 String _$accountSettingsControllerHash() =>
-    r'fc69787cef256fd5bbd5726c3daabbcc8095a3a1';
+    r'88c9270e55acaecc7462031f9a5c0fa9c7db9361';
 
 abstract class _$AccountSettingsController
     extends $AsyncNotifier<AccountSettingsState> {

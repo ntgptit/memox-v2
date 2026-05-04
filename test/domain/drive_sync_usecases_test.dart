@@ -55,16 +55,56 @@ void main() {
       expect(repository.lastChoice, DriveSyncConflictChoice.cancel);
     },
   );
+
+  test(
+    'DT4 if: UploadLocalDriveSnapshotUseCase delegates to repository',
+    () async {
+      final repository = _FakeDriveSyncRepository(
+        uploadResult: DriveSyncRunResult.uploadedLocal(
+          const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+        ),
+      );
+      final useCase = UploadLocalDriveSnapshotUseCase(repository);
+
+      final result = await useCase.execute();
+
+      expect(result.kind, DriveSyncActionKind.uploadedLocal);
+      expect(repository.uploadLocalCount, 1);
+    },
+  );
+
+  test('DT5 if: RestoreDriveSnapshotUseCase delegates to repository', () async {
+    final repository = _FakeDriveSyncRepository(
+      restoreResult: DriveSyncRunResult.restoredRemote(
+        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+        DriveSyncRestoreEffect.refreshDatabaseProvider,
+      ),
+    );
+    final useCase = RestoreDriveSnapshotUseCase(repository);
+
+    final result = await useCase.execute();
+
+    expect(result.kind, DriveSyncActionKind.restoredRemote);
+    expect(repository.restoreDriveCount, 1);
+  });
 }
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   _FakeDriveSyncRepository({
     DriveSyncStatus? loadStatusResult,
     DriveSyncRunResult? syncResult,
+    DriveSyncRunResult? uploadResult,
+    DriveSyncRunResult? restoreResult,
     DriveSyncRunResult? resolveResult,
   }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
        syncResult =
            syncResult ??
+           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+       uploadResult =
+           uploadResult ??
+           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+       restoreResult =
+           restoreResult ??
            DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
        resolveResult =
            resolveResult ??
@@ -72,9 +112,13 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
 
   final DriveSyncStatus loadStatusResult;
   final DriveSyncRunResult syncResult;
+  final DriveSyncRunResult uploadResult;
+  final DriveSyncRunResult restoreResult;
   final DriveSyncRunResult resolveResult;
   int loadStatusCount = 0;
   int syncNowCount = 0;
+  int uploadLocalCount = 0;
+  int restoreDriveCount = 0;
   int resolveConflictCount = 0;
   DriveSyncConflict? lastConflict;
   DriveSyncConflictChoice? lastChoice;
@@ -89,6 +133,18 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   Future<DriveSyncRunResult> syncNow() async {
     syncNowCount += 1;
     return syncResult;
+  }
+
+  @override
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async {
+    uploadLocalCount += 1;
+    return uploadResult;
+  }
+
+  @override
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async {
+    restoreDriveCount += 1;
+    return restoreResult;
   }
 
   @override

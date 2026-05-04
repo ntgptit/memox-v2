@@ -274,16 +274,19 @@ class _AccountActions extends StatelessWidget {
     }
 
     if (state.status == AccountLinkStatus.needsDriveAuthorization) {
+      final showSignOut = !state.requiresRuntimeReconnect;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _reconnectAction(l10n),
-          const MxGap(MxSpace.sm),
-          _CompactSignOutButton(
-            label: l10n.settingsAccountSignOut,
-            onPressed: state.canSignOut ? onSignOut : null,
-            fullWidth: true,
-          ),
+          if (showSignOut) ...[
+            const MxGap(MxSpace.sm),
+            _CompactSignOutButton(
+              label: l10n.settingsAccountSignOut,
+              onPressed: state.canSignOut ? onSignOut : null,
+              fullWidth: true,
+            ),
+          ],
         ],
       );
     }

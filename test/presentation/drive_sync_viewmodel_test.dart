@@ -43,6 +43,80 @@ void main() {
     expect(state.message, DriveSyncSettingsMessage.uploaded);
   });
 
+  test('DT13 onUploadLocal: upload command exposes uploaded message', () async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+      uploadResult: DriveSyncRunResult.uploadedLocal(
+        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      ),
+    );
+    final container = _container(repository: repository);
+    addTearDown(container.dispose);
+
+    await container.read(driveSyncSettingsControllerProvider.future);
+    await container
+        .read(driveSyncSettingsControllerProvider.notifier)
+        .uploadLocalToDrive();
+
+    final state = container.read(driveSyncSettingsControllerProvider).value!;
+    expect(repository.uploadLocalCount, 1);
+    expect(state.kind, DriveSyncStatusKind.synced);
+    expect(state.message, DriveSyncSettingsMessage.uploaded);
+  });
+
+  test('DT14 onRestoreDrive: restore command applies restore effect', () async {
+    final remote = _remoteSnapshot();
+    final effects = _FakeDriveSyncRuntimeEffects();
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: DriveSyncStatus(
+        kind: DriveSyncStatusKind.ready,
+        remote: remote,
+      ),
+      restoreResult: DriveSyncRunResult.restoredRemote(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced, remote: remote),
+        DriveSyncRestoreEffect.refreshDatabaseProvider,
+      ),
+    );
+    final container = _container(repository: repository, effects: effects);
+    addTearDown(container.dispose);
+
+    await container.read(driveSyncSettingsControllerProvider.future);
+    await container
+        .read(driveSyncSettingsControllerProvider.notifier)
+        .restoreDriveToLocal();
+
+    final state = container.read(driveSyncSettingsControllerProvider).value!;
+    expect(repository.restoreDriveCount, 1);
+    expect(effects.effects, <DriveSyncRestoreEffect>[
+      DriveSyncRestoreEffect.refreshDatabaseProvider,
+    ]);
+    expect(state.kind, DriveSyncStatusKind.synced);
+    expect(state.message, DriveSyncSettingsMessage.restored);
+  });
+
+  test(
+    'DT15 onRestoreDrive: restore command is disabled without remote snapshot',
+    () async {
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+      );
+      final container = _container(repository: repository);
+      addTearDown(container.dispose);
+
+      final initialState = await container.read(
+        driveSyncSettingsControllerProvider.future,
+      );
+      await container
+          .read(driveSyncSettingsControllerProvider.notifier)
+          .restoreDriveToLocal();
+
+      final state = container.read(driveSyncSettingsControllerProvider).value!;
+      expect(initialState.canRestoreDrive, isFalse);
+      expect(repository.restoreDriveCount, 0);
+      expect(state.kind, DriveSyncStatusKind.noRemoteSnapshot);
+    },
+  );
+
   test(
     'DT3 onSync: sync result stores pending conflict for UI sheet',
     () async {
@@ -159,6 +233,31 @@ void main() {
     expect(state.canSync, isTrue);
   });
 
+  test(
+    'DT11 onRefreshRetry: unexpected refresh error becomes failure state',
+    () async {
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+      );
+      final container = _container(repository: repository);
+      addTearDown(container.dispose);
+
+      await container.read(driveSyncSettingsControllerProvider.future);
+      repository.loadStatusError = StateError('refresh failed');
+      await container
+          .read(driveSyncSettingsControllerProvider.notifier)
+          .refresh();
+      final state = container.read(driveSyncSettingsControllerProvider).value!;
+
+      expect(state.kind, DriveSyncStatusKind.failure);
+      expect(state.technicalMessage, 'Bad state: refresh failed');
+      expect(
+        container.read(driveSyncSettingsControllerProvider).hasError,
+        isFalse,
+      );
+    },
+  );
+
   test('DT7 loading: failure status keeps technical message', () async {
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: const DriveSyncStatus.failure(
@@ -176,6 +275,29 @@ void main() {
     expect(state.canSync, isTrue);
     expect(state.technicalMessage, 'Google Drive API is disabled.');
   });
+
+  test(
+    'DT9 loading: unexpected load error becomes retryable failure state',
+    () async {
+      final repository = _FakeDriveSyncRepository(
+        loadStatusError: StateError('sync provider unavailable'),
+      );
+      final container = _container(repository: repository);
+      addTearDown(container.dispose);
+
+      final state = await container.read(
+        driveSyncSettingsControllerProvider.future,
+      );
+
+      expect(state.kind, DriveSyncStatusKind.failure);
+      expect(state.canSync, isTrue);
+      expect(state.technicalMessage, 'Bad state: sync provider unavailable');
+      expect(
+        container.read(driveSyncSettingsControllerProvider).hasError,
+        isFalse,
+      );
+    },
+  );
 
   test('DT8 onSync: failure status can retry sync', () async {
     final repository = _FakeDriveSyncRepository(
@@ -199,6 +321,70 @@ void main() {
     expect(state.kind, DriveSyncStatusKind.synced);
     expect(state.message, DriveSyncSettingsMessage.uploaded);
   });
+
+  test(
+    'DT10 onSync: unexpected sync error becomes visible failure state',
+    () async {
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+        syncError: StateError('Drive client failed before request'),
+      );
+      final container = _container(repository: repository);
+      addTearDown(container.dispose);
+
+      await container.read(driveSyncSettingsControllerProvider.future);
+      await container
+          .read(driveSyncSettingsControllerProvider.notifier)
+          .syncNow();
+      final state = container.read(driveSyncSettingsControllerProvider).value!;
+
+      expect(repository.syncNowCount, 1);
+      expect(state.kind, DriveSyncStatusKind.failure);
+      expect(state.message, DriveSyncSettingsMessage.failed);
+      expect(state.isBusy, isFalse);
+      expect(
+        state.technicalMessage,
+        'Bad state: Drive client failed before request',
+      );
+    },
+  );
+
+  test(
+    'DT12 onResolve: unexpected resolve error becomes visible failure state',
+    () async {
+      final conflict = _conflict();
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus(
+          kind: DriveSyncStatusKind.ready,
+        ),
+        syncResult: DriveSyncRunResult.conflict(
+          DriveSyncStatus(
+            kind: DriveSyncStatusKind.conflict,
+            conflict: conflict,
+            remote: conflict.remote,
+          ),
+          conflict,
+        ),
+        resolveError: StateError('restore effect failed'),
+      );
+      final container = _container(repository: repository);
+      addTearDown(container.dispose);
+
+      await container.read(driveSyncSettingsControllerProvider.future);
+      await container
+          .read(driveSyncSettingsControllerProvider.notifier)
+          .syncNow();
+      await container
+          .read(driveSyncSettingsControllerProvider.notifier)
+          .resolveConflict(DriveSyncConflictChoice.useDriveCopy);
+      final state = container.read(driveSyncSettingsControllerProvider).value!;
+
+      expect(repository.lastChoice, DriveSyncConflictChoice.useDriveCopy);
+      expect(state.kind, DriveSyncStatusKind.failure);
+      expect(state.message, DriveSyncSettingsMessage.failed);
+      expect(state.technicalMessage, 'Bad state: restore effect failed');
+    },
+  );
 }
 
 ProviderContainer _container({
@@ -220,11 +406,22 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
     DriveSyncStatus? loadStatusResult,
     List<DriveSyncStatus>? loadStatusResults,
     DriveSyncRunResult? syncResult,
+    DriveSyncRunResult? uploadResult,
+    DriveSyncRunResult? restoreResult,
     DriveSyncRunResult? resolveResult,
+    this.loadStatusError,
+    this.syncError,
+    this.resolveError,
   }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
        _loadStatusResults = loadStatusResults?.toList() ?? <DriveSyncStatus>[],
        syncResult =
            syncResult ??
+           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+       uploadResult =
+           uploadResult ??
+           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+       restoreResult =
+           restoreResult ??
            DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
        resolveResult =
            resolveResult ??
@@ -233,12 +430,23 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   final DriveSyncStatus loadStatusResult;
   final List<DriveSyncStatus> _loadStatusResults;
   final DriveSyncRunResult syncResult;
+  final DriveSyncRunResult uploadResult;
+  final DriveSyncRunResult restoreResult;
   final DriveSyncRunResult resolveResult;
+  Object? loadStatusError;
+  final Object? syncError;
+  final Object? resolveError;
   int syncNowCount = 0;
+  int uploadLocalCount = 0;
+  int restoreDriveCount = 0;
   DriveSyncConflictChoice? lastChoice;
 
   @override
   Future<DriveSyncStatus> loadStatus() async {
+    final error = loadStatusError;
+    if (error != null) {
+      throw error;
+    }
     if (_loadStatusResults.isNotEmpty) {
       return _loadStatusResults.removeAt(0);
     }
@@ -248,7 +456,23 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   @override
   Future<DriveSyncRunResult> syncNow() async {
     syncNowCount += 1;
+    final error = syncError;
+    if (error != null) {
+      throw error;
+    }
     return syncResult;
+  }
+
+  @override
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async {
+    uploadLocalCount += 1;
+    return uploadResult;
+  }
+
+  @override
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async {
+    restoreDriveCount += 1;
+    return restoreResult;
   }
 
   @override
@@ -257,6 +481,10 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
     DriveSyncConflictChoice choice,
   ) async {
     lastChoice = choice;
+    final error = resolveError;
+    if (error != null) {
+      throw error;
+    }
     return resolveResult;
   }
 }

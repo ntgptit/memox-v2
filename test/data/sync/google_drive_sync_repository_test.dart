@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/config/google_oauth_config.dart';
 import 'package:memox/core/constants/app_constants.dart';
+import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/core/services/clock.dart';
 import 'package:memox/core/services/id_generator.dart';
 import 'package:memox/data/repositories/google_drive_sync_repository.dart';
@@ -311,6 +312,130 @@ void main() {
 
       expect(status.kind, DriveSyncStatusKind.failure);
       expect(status.message, contains('Google Drive API'));
+      expect(harness.logger.errors, hasLength(1));
+      expect(
+        harness.logger.errors.single.message,
+        'Failed to load Google Drive sync status.',
+      );
+      expect(
+        harness.logger.errors.single.error,
+        isA<GoogleDriveAppDataException>(),
+      );
+    },
+  );
+
+  test(
+    'DT15 syncNow: Drive API disabled failure is logged and surfaced',
+    () async {
+      final harness = await _RepositoryHarness.create(
+        driveFailure: const GoogleDriveAppDataException(
+          'Google Drive API has not been used in project.',
+          statusCode: 403,
+          reason: 'accessNotConfigured',
+        ),
+      );
+
+      final result = await harness.repository.syncNow();
+
+      expect(result.kind, DriveSyncActionKind.failed);
+      expect(result.status.kind, DriveSyncStatusKind.failure);
+      expect(result.status.message, contains('Google Drive API'));
+      expect(harness.logger.errors, hasLength(1));
+      expect(
+        harness.logger.errors.single.message,
+        'Failed to sync Google Drive snapshot.',
+      );
+      expect(
+        harness.logger.errors.single.error,
+        isA<GoogleDriveAppDataException>(),
+      );
+    },
+  );
+
+  test(
+    'DT16 construct: missing logger falls back without breaking sync',
+    () async {
+      final harness = await _RepositoryHarness.create(
+        driveFailure: const GoogleDriveAppDataException(
+          'Google Drive API has not been used in project.',
+          statusCode: 403,
+          reason: 'accessNotConfigured',
+        ),
+        useNullLogger: true,
+      );
+
+      final status = await harness.repository.loadStatus();
+
+      expect(status.kind, DriveSyncStatusKind.failure);
+      expect(status.message, contains('Google Drive API'));
+      expect(harness.logger.errors, isEmpty);
+    },
+  );
+
+  test(
+    'DT17 uploadLocalSnapshot: user-selected local copy overwrites Drive',
+    () async {
+      final harness = await _RepositoryHarness.create();
+      await harness.repository.syncNow();
+      harness.database.databaseBytes = Uint8List.fromList(<int>[4, 5, 6]);
+      harness.drive.replaceRemoteSnapshot(
+        _snapshotFor(
+          databaseBytes: Uint8List.fromList(<int>[8, 8, 8]),
+          settings: const <String, Object?>{'settings.locale': 'vi'},
+        ),
+      );
+
+      final result = await harness.repository.uploadLocalSnapshot();
+
+      expect(result.kind, DriveSyncActionKind.uploadedLocal);
+      expect(result.status.kind, DriveSyncStatusKind.synced);
+      expect(harness.drive.updateCount, greaterThanOrEqualTo(2));
+      expect(harness.metadata.loadForAccount(_account.subjectId), isNotNull);
+    },
+  );
+
+  test(
+    'DT18 restoreDriveSnapshot: user-selected Drive copy restores local data',
+    () async {
+      final harness = await _RepositoryHarness.create();
+      await harness.repository.syncNow();
+      harness.database.databaseBytes = Uint8List.fromList(<int>[4, 5, 6]);
+      final remote = _snapshotFor(
+        databaseBytes: Uint8List.fromList(<int>[8, 8, 8]),
+        settings: const <String, Object?>{
+          AppConstants.sharedPrefsLocaleKey: 'vi',
+        },
+      );
+      harness.drive.replaceRemoteSnapshot(remote);
+
+      final result = await harness.repository.restoreDriveSnapshot();
+
+      expect(result.kind, DriveSyncActionKind.restoredRemote);
+      expect(
+        result.restoreEffect,
+        DriveSyncRestoreEffect.refreshDatabaseProvider,
+      );
+      expect(
+        harness.database.restoredBytes,
+        Uint8List.fromList(<int>[8, 8, 8]),
+      );
+      expect(
+        harness.preferences.getString(AppConstants.sharedPrefsLocaleKey),
+        'vi',
+      );
+    },
+  );
+
+  test(
+    'DT19 restoreDriveSnapshot: no remote snapshot leaves local data untouched',
+    () async {
+      final harness = await _RepositoryHarness.create();
+
+      final result = await harness.repository.restoreDriveSnapshot();
+
+      expect(result.kind, DriveSyncActionKind.noChanges);
+      expect(result.status.kind, DriveSyncStatusKind.noRemoteSnapshot);
+      expect(harness.database.restoredBytes, isNull);
     },
   );
 }
@@ -322,6 +447,7 @@ final class _RepositoryHarness {
     required this.database,
     required this.metadata,
     required this.preferences,
+    required this.logger,
   });
 
   final GoogleDriveSyncRepository repository;
@@ -329,12 +455,14 @@ final class _RepositoryHarness {
   final _FakeLocalDatabaseSnapshotGateway database;
   final DriveSyncMetadataStore metadata;
   final SharedPreferences preferences;
+  final _RecordingAppLogger logger;
 
   static Future<_RepositoryHarness> create({
     DriveAccessTokenResult tokenResult = const DriveAccessTokenResult.success(
       'access-token',
     ),
     GoogleDriveAppDataException? driveFailure,
+    bool useNullLogger = false,
   }) async {
     final preferences = await SharedPreferences.getInstance();
     final drive = _FakeDriveAppDataClient(failure: driveFailure);
@@ -342,6 +470,7 @@ final class _RepositoryHarness {
       databaseBytes: Uint8List.fromList(<int>[1, 2, 3]),
     );
     final metadata = DriveSyncMetadataStore(preferences);
+    final logger = _RecordingAppLogger();
     final repository = GoogleDriveSyncRepository(
       accountRepository: _FakeCloudAccountRepository(_account),
       authService: _FakeGoogleAccountAuthService(tokenResult),
@@ -355,6 +484,7 @@ final class _RepositoryHarness {
       snapshotCodec: const DriveSyncSnapshotCodec(),
       clock: const _FakeClock(100),
       idGenerator: const _FakeIdGenerator('device-id'),
+      logger: useNullLogger ? null : logger,
     );
 
     return _RepositoryHarness(
@@ -363,8 +493,32 @@ final class _RepositoryHarness {
       database: database,
       metadata: metadata,
       preferences: preferences,
+      logger: logger,
     );
   }
+}
+
+final class _RecordingAppLogger implements AppLogger {
+  final errors = <_RecordedLogError>[];
+
+  @override
+  void error(String message, Object error, StackTrace stackTrace) {
+    errors.add(
+      _RecordedLogError(message: message, error: error, stackTrace: stackTrace),
+    );
+  }
+}
+
+final class _RecordedLogError {
+  const _RecordedLogError({
+    required this.message,
+    required this.error,
+    required this.stackTrace,
+  });
+
+  final String message;
+  final Object error;
+  final StackTrace stackTrace;
 }
 
 const _account = CloudAccountLink(

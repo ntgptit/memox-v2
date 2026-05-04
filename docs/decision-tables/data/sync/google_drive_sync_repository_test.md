@@ -2,12 +2,18 @@
 
 Test file: `test/data/sync/google_drive_sync_repository_test.dart`
 
+## Decision table: construct
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT16 | logger dependency is absent during repository construction | repository is created with all sync dependencies but `logger` is null, and fake Drive throws a configuration failure while loading status | repository loads status | sync still returns `failure` with the Drive configuration message and no logging side effect is required | C0+C1 |
+
 ## Decision table: loadStatus
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT11 | Drive rejects the existing access token | account is Drive-authorized, auth service returns an access token, and fake Drive throws HTTP 401 while loading remote metadata | repository loads status | status becomes `needsDriveAuthorization` with no technical failure message | C0+C1 |
-| DT14 | Drive API is disabled or not configured for the project | account is Drive-authorized, auth service returns an access token, and fake Drive throws HTTP 403 with reason `accessNotConfigured` while loading remote metadata | repository loads status | status becomes `failure` with the Drive configuration message instead of a reconnect-required status | C0+C1 |
+| DT14 | Drive API is disabled or not configured for the project while loading status | account is Drive-authorized, auth service returns an access token, and fake Drive throws HTTP 403 with reason `accessNotConfigured` while loading remote metadata | repository loads status | status becomes `failure` with the Drive configuration message instead of a reconnect-required status, and the handled Drive error is logged for diagnostics | C0+C1 |
 
 ## Decision table: syncNow
 
@@ -20,6 +26,20 @@ Test file: `test/data/sync/google_drive_sync_repository_test.dart`
 | DT5 | both local and remote changed since baseline | first sync saved metadata, then local DB bytes and remote snapshot both change | repository runs `syncNow` | result requests conflict resolution with diverged reason | C0+C1 |
 | DT10 | access token provider fails | account is linked and Drive-authorized but auth service returns token failure | repository loads status | status is `failure` with the token error message | C0+C1 |
 | DT12 | Drive rejects token during sync request | account is Drive-authorized, auth service returns an access token, and fake Drive throws HTTP 401 while sync loads remote metadata | repository runs `syncNow` | result is `failed` with status `needsDriveAuthorization` instead of a technical `failure` status | C0+C1 |
+| DT15 | Drive API is disabled or not configured for the project during sync | account is Drive-authorized, auth service returns an access token, and fake Drive throws HTTP 403 with reason `accessNotConfigured` while sync loads remote metadata | repository runs `syncNow` | result is `failed` with status `failure`, the Drive configuration message is retained for UI display, and the handled Drive error is logged for diagnostics | C0+C1 |
+
+## Decision table: uploadLocalSnapshot
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT17 | user explicitly chooses local data as latest while local and Drive diverged | account is Drive-authorized, a baseline exists, local DB bytes changed, and Drive snapshot also changed | repository runs `uploadLocalSnapshot` | local snapshot overwrites Drive files, result is `uploadedLocal`, status becomes `synced`, and metadata is saved | C0+C1 |
+
+## Decision table: restoreDriveSnapshot
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT18 | user explicitly chooses Drive data as latest while local and Drive diverged | account is Drive-authorized, a baseline exists, local DB bytes changed, and Drive has a valid newer snapshot | repository runs `restoreDriveSnapshot` | settings and DB bytes are restored from Drive and the required runtime restore effect is returned | C0+C1 |
+| DT19 | user chooses Drive data but no remote snapshot exists | account is Drive-authorized and Drive has no manifest or snapshot file | repository runs `restoreDriveSnapshot` | result is `noChanges` with `noRemoteSnapshot` and local DB restore is not called | C0+C1 |
 
 ## Decision table: resolveConflict
 
