@@ -35,6 +35,7 @@ class PersonalizationSettingsGroup extends ConsumerWidget {
       title: l10n.settingsPersonalizationTitle,
       contentPadding: EdgeInsets.zero,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _PersonalizationRow(
             key: _themeRowKey,

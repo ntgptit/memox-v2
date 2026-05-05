@@ -213,6 +213,24 @@ void main() {
           .padding,
       EdgeInsets.zero,
     );
+    final personalizationCardFinder = find
+        .ancestor(
+          of: find.byKey(
+            const ValueKey<String>('settings-personalization-theme-row'),
+          ),
+          matching: find.byType(MxCard),
+        )
+        .first;
+    final personalizationRowTapFinder = find.descendant(
+      of: find.byKey(
+        const ValueKey<String>('settings-personalization-theme-row'),
+      ),
+      matching: find.byType(MxTappable),
+    );
+    expect(
+      tester.getSize(personalizationRowTapFinder).width,
+      tester.getSize(personalizationCardFinder).width,
+    );
     expect(find.byType(Divider), findsWidgets);
     await tester.scrollUntilVisible(
       find.text('Audio & Speech'),
