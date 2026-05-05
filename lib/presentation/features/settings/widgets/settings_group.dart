@@ -12,6 +12,7 @@ class SettingsGroup extends StatelessWidget {
     this.subtitle,
     this.action,
     this.onTap,
+    this.contentPadding = const EdgeInsets.all(MxSpace.lg),
     super.key,
   });
 
@@ -19,6 +20,7 @@ class SettingsGroup extends StatelessWidget {
   final String? subtitle;
   final Widget? action;
   final VoidCallback? onTap;
+  final EdgeInsetsGeometry contentPadding;
   final Widget child;
 
   @override
@@ -51,7 +53,12 @@ class SettingsGroup extends StatelessWidget {
           ],
         ),
         const MxGap(MxSpace.sm),
-        MxCard(variant: MxCardVariant.filled, onTap: onTap, child: child),
+        MxCard(
+          variant: MxCardVariant.filled,
+          padding: contentPadding,
+          onTap: onTap,
+          child: child,
+        ),
       ],
     );
   }

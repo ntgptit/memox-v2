@@ -33,6 +33,7 @@ class PersonalizationSettingsGroup extends ConsumerWidget {
 
     return SettingsGroup(
       title: l10n.settingsPersonalizationTitle,
+      contentPadding: EdgeInsets.zero,
       child: Column(
         children: [
           _PersonalizationRow(
@@ -42,7 +43,7 @@ class PersonalizationSettingsGroup extends ConsumerWidget {
             value: _themeLabel(l10n, themeMode),
             onTap: () => _showThemeSheet(context, ref, themeMode),
           ),
-          const MxDivider(),
+          const MxDivider(indent: MxSpace.xxl, endIndent: MxSpace.xxl),
           _PersonalizationRow(
             key: _languageRowKey,
             icon: Icons.translate_rounded,
@@ -123,39 +124,42 @@ class _PersonalizationRow extends StatelessWidget {
       semanticsLabel: title,
       onTap: onTap,
       showOverlay: false,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          minHeight: MxSpace.xxl + MxSpace.xxl + MxSpace.lg,
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
-            const MxGap(MxSpace.lg),
-            Expanded(
-              child: MxText(
-                title,
-                role: MxTextRole.listTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: MxSpace.xxl),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: MxSpace.xxl + MxSpace.xxl + MxSpace.lg,
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
+              const MxGap(MxSpace.lg),
+              Expanded(
+                child: MxText(
+                  title,
+                  role: MxTextRole.listTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            const MxGap(MxSpace.sm),
-            Flexible(
-              child: MxText(
-                value,
-                role: MxTextRole.tileMeta,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.end,
+              const MxGap(MxSpace.sm),
+              Flexible(
+                child: MxText(
+                  value,
+                  role: MxTextRole.tileMeta,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                ),
               ),
-            ),
-            const MxGap(MxSpace.sm),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: MxSpace.xxl,
-              color: scheme.onSurfaceVariant,
-            ),
-          ],
+              const MxGap(MxSpace.sm),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: MxSpace.xxl,
+                color: scheme.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     );

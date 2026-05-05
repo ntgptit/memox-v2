@@ -196,6 +196,23 @@ void main() {
       ),
       findsNothing,
     );
+    expect(
+      tester
+          .widget<MxCard>(
+            find
+                .ancestor(
+                  of: find.byKey(
+                    const ValueKey<String>(
+                      'settings-personalization-theme-row',
+                    ),
+                  ),
+                  matching: find.byType(MxCard),
+                )
+                .first,
+          )
+          .padding,
+      EdgeInsets.zero,
+    );
     expect(find.byType(Divider), findsWidgets);
     await tester.scrollUntilVisible(
       find.text('Audio & Speech'),
