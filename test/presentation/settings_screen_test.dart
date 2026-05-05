@@ -34,7 +34,9 @@ import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
+import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _speechPreviewButtonKey = ValueKey<String>(
@@ -152,9 +154,48 @@ void main() {
       _overviewCardForKey(tester, 'settings-overview-account-row').onTap,
       isNotNull,
     );
+    expect(
+      tester
+          .getSize(
+            find.byKey(const ValueKey<String>('settings-overview-account-row')),
+          )
+          .height,
+      greaterThanOrEqualTo(MxSpace.xxl + MxSpace.xxl + MxSpace.lg),
+    );
     expect(find.text('Personalization'), findsOneWidget);
     expect(find.text('Appearance'), findsOneWidget);
     expect(find.text('Language'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(
+          const ValueKey<String>('settings-personalization-theme-row'),
+        ),
+        matching: find.byType(MxTappable),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<MxTappable>(
+            find.descendant(
+              of: find.byKey(
+                const ValueKey<String>('settings-personalization-theme-row'),
+              ),
+              matching: find.byType(MxTappable),
+            ),
+          )
+          .showOverlay,
+      isFalse,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(
+          const ValueKey<String>('settings-personalization-theme-row'),
+        ),
+        matching: find.byType(MxListTile),
+      ),
+      findsNothing,
+    );
     expect(find.byType(Divider), findsWidgets);
     await tester.scrollUntilVisible(
       find.text('Audio & Speech'),
@@ -545,7 +586,7 @@ void main() {
     await _pumpSettingsRouter(tester);
 
     await tester.tap(
-      find.byKey(const ValueKey<String>('settings-overview-account-row')),
+      _overviewCardFinderForKey('settings-overview-account-row'),
     );
     await tester.pumpAndSettle();
 
@@ -561,7 +602,7 @@ void main() {
     await _pumpSettingsRouter(tester, driveSyncRepository: repository);
 
     await tester.tap(
-      find.byKey(const ValueKey<String>('settings-overview-account-row')),
+      _overviewCardFinderForKey('settings-overview-account-row'),
     );
     await tester.pumpAndSettle();
 
@@ -582,7 +623,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(const ValueKey<String>('settings-overview-learning-row')),
+      _overviewCardFinderForKey('settings-overview-learning-row'),
     );
     await tester.pumpAndSettle();
 
@@ -601,7 +642,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(const ValueKey<String>('settings-overview-audio-speech-row')),
+      _overviewCardFinderForKey('settings-overview-audio-speech-row'),
     );
     await tester.pumpAndSettle();
 
@@ -1339,11 +1380,14 @@ final class _SettingsHarness {
 }
 
 MxCard _overviewCardForKey(WidgetTester tester, String key) {
-  final cardFinder = find.ancestor(
+  return tester.widget<MxCard>(_overviewCardFinderForKey(key).first);
+}
+
+Finder _overviewCardFinderForKey(String key) {
+  return find.ancestor(
     of: find.byKey(ValueKey<String>(key)),
     matching: find.byType(MxCard),
   );
-  return tester.widget<MxCard>(cardFinder.first);
 }
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {

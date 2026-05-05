@@ -252,39 +252,45 @@ class _OverviewFocusContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return Row(
-      children: [
-        Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
-        const MxGap(MxSpace.lg),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              MxText(
-                title,
-                role: MxTextRole.listTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (subtitle != null) ...[
-                const MxGap(MxSpace.xxs),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: MxSpace.xxl + MxSpace.xxl + MxSpace.lg,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
+          const MxGap(MxSpace.lg),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 MxText(
-                  subtitle!,
-                  role: MxTextRole.listSubtitle,
-                  maxLines: 2,
+                  title,
+                  role: MxTextRole.listTitle,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (subtitle != null) ...[
+                  const MxGap(MxSpace.xxs),
+                  MxText(
+                    subtitle!,
+                    role: MxTextRole.listSubtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
-        const MxGap(MxSpace.sm),
-        Icon(
-          Icons.chevron_right_rounded,
-          size: MxSpace.xxl,
-          color: scheme.onSurfaceVariant,
-        ),
-      ],
+          const MxGap(MxSpace.sm),
+          Icon(
+            Icons.chevron_right_rounded,
+            size: MxSpace.xxl,
+            color: scheme.onSurfaceVariant,
+          ),
+        ],
+      ),
     );
   }
 }

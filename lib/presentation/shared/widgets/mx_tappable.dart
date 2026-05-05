@@ -16,6 +16,7 @@ class MxTappable extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.enabled = true,
+    this.showOverlay = true,
     this.semanticsLabel,
     this.backgroundColor,
     this.overlayBaseColor,
@@ -29,6 +30,7 @@ class MxTappable extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final bool enabled;
+  final bool showOverlay;
   final String? semanticsLabel;
   final Color? backgroundColor;
   final Color? overlayBaseColor;
@@ -54,9 +56,15 @@ class MxTappable extends StatelessWidget {
                 customBorder: shape,
                 focusNode: focusNode,
                 autofocus: autofocus,
-                overlayColor: AppFocus.overlayProperty(
-                  overlayBaseColor ?? scheme.onSurface,
-                ),
+                overlayColor: showOverlay
+                    ? AppFocus.overlayProperty(
+                        overlayBaseColor ?? scheme.onSurface,
+                      )
+                    : WidgetStateProperty.all(
+                        scheme.surface.withValues(
+                          alpha: AppOpacity.transparent,
+                        ),
+                      ),
                 onTap: onTap,
                 onLongPress: onLongPress,
                 child: child,

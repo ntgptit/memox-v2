@@ -8,6 +8,7 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_list_tile.dart';
+import '../../../shared/widgets/mx_tappable.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/locale_notifier.dart';
 import '../providers/theme_mode_notifier.dart';
@@ -117,27 +118,46 @@ class _PersonalizationRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return MxListTile(
-      leading: Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
-      title: title,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          MxText(
-            value,
-            role: MxTextRole.tileMeta,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const MxGap(MxSpace.sm),
-          Icon(
-            Icons.chevron_right_rounded,
-            size: MxSpace.xxl,
-            color: scheme.onSurfaceVariant,
-          ),
-        ],
-      ),
+    return MxTappable(
+      shape: const RoundedRectangleBorder(),
+      semanticsLabel: title,
       onTap: onTap,
+      showOverlay: false,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          minHeight: MxSpace.xxl + MxSpace.xxl + MxSpace.lg,
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
+            const MxGap(MxSpace.lg),
+            Expanded(
+              child: MxText(
+                title,
+                role: MxTextRole.listTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const MxGap(MxSpace.sm),
+            Flexible(
+              child: MxText(
+                value,
+                role: MxTextRole.tileMeta,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+              ),
+            ),
+            const MxGap(MxSpace.sm),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: MxSpace.xxl,
+              color: scheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
