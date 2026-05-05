@@ -6,6 +6,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/study_settings_policy.dart';
+import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
@@ -13,11 +14,14 @@ import '../../../shared/states/mx_loading_state.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
+import '../../../shared/widgets/mx_inline_toggle.dart';
+import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_text.dart';
-import '../../../shared/widgets/mx_toggle.dart';
 import '../../study/providers/study_settings_defaults_notifier.dart';
 import 'settings_group.dart';
 
+const _newStudyBatchRowKey = ValueKey<String>('settings-study-new-batch-row');
+const _reviewBatchRowKey = ValueKey<String>('settings-study-review-batch-row');
 const _newStudyBatchIncreaseKey = ValueKey<String>(
   'settings-study-new-batch-increase',
 );
@@ -46,12 +50,12 @@ class StudySettingsGroup extends ConsumerWidget {
       stackTrace: settings.hasError ? settings.stackTrace : null,
       onRetry: () => ref.invalidate(studyDefaultsSettingsProvider),
       skeletonBuilder: (_) => SettingsGroup(
-        title: l10n.settingsStudyDefaultsTitle,
+        title: l10n.settingsLearningExperienceTitle,
         subtitle: l10n.settingsStudyDefaultsLoading,
         child: const MxLoadingState(),
       ),
       errorBuilder: (_, _, _) => SettingsGroup(
-        title: l10n.settingsStudyDefaultsTitle,
+        title: l10n.settingsLearningExperienceTitle,
         subtitle: l10n.sharedErrorTitle,
         child: MxText(l10n.errorUnexpected, role: MxTextRole.formHelper),
       ),
@@ -71,51 +75,54 @@ class _StudySettingsContent extends ConsumerWidget {
     final notifier = ref.read(studyDefaultsSettingsProvider.notifier);
 
     return SettingsGroup(
-      title: l10n.settingsStudyDefaultsTitle,
-      subtitle: l10n.settingsStudyDefaultsSubtitle,
+      title: l10n.settingsLearningExperienceTitle,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _BatchSizeStepper(
-            label: l10n.settingsNewStudyBatchSizeLabel,
-            value: state.newStudyDefaults.batchSize,
-            studyType: StudyType.newStudy,
-            increaseKey: _newStudyBatchIncreaseKey,
-            decreaseKey: _newStudyBatchDecreaseKey,
-            onChanged: (value) =>
-                _persist(context, notifier.setNewStudyBatchSize(value), l10n),
+          _StudySettingRow(
+            key: _newStudyBatchRowKey,
+            icon: Icons.edit_calendar_outlined,
+            title: l10n.settingsNewStudyBatchSizeLabel,
+            value: l10n.settingsCardsCountValue(
+              state.newStudyDefaults.batchSize,
+            ),
+            onTap: () => _showBatchSizeSheet(context, StudyType.newStudy),
           ),
-          const MxGap(MxSpace.md),
           const MxDivider(),
-          const MxGap(MxSpace.md),
-          _BatchSizeStepper(
-            label: l10n.settingsReviewBatchSizeLabel,
-            value: state.reviewDefaults.batchSize,
-            studyType: StudyType.srsReview,
-            increaseKey: _reviewBatchIncreaseKey,
-            decreaseKey: _reviewBatchDecreaseKey,
-            onChanged: (value) =>
-                _persist(context, notifier.setReviewBatchSize(value), l10n),
+          _StudySettingRow(
+            key: _reviewBatchRowKey,
+            icon: Icons.history_rounded,
+            title: l10n.settingsReviewBatchSizeLabel,
+            value: l10n.settingsCardsCountValue(state.reviewDefaults.batchSize),
+            onTap: () => _showBatchSizeSheet(context, StudyType.srsReview),
           ),
-          const MxGap(MxSpace.md),
           const MxDivider(),
-          const MxGap(MxSpace.sm),
-          MxToggle(
+          MxInlineToggle(
             value: state.shuffleFlashcards,
-            onChanged: (value) =>
-                _persist(context, notifier.setShuffleFlashcards(value), l10n),
+            onChanged: (value) => _persistSetting(
+              context,
+              notifier.setShuffleFlashcards(value),
+              l10n,
+            ),
             label: l10n.studyShuffleCards,
           ),
-          MxToggle(
+          const MxGap(MxSpace.sm),
+          MxInlineToggle(
             value: state.shuffleAnswers,
-            onChanged: (value) =>
-                _persist(context, notifier.setShuffleAnswers(value), l10n),
+            onChanged: (value) => _persistSetting(
+              context,
+              notifier.setShuffleAnswers(value),
+              l10n,
+            ),
             label: l10n.studyShuffleAnswers,
           ),
-          MxToggle(
+          const MxGap(MxSpace.sm),
+          MxInlineToggle(
             value: state.prioritizeOverdue,
-            onChanged: (value) =>
-                _persist(context, notifier.setPrioritizeOverdue(value), l10n),
+            onChanged: (value) => _persistSetting(
+              context,
+              notifier.setPrioritizeOverdue(value),
+              l10n,
+            ),
             label: l10n.studyPrioritizeOverdue,
           ),
         ],
@@ -123,23 +130,114 @@ class _StudySettingsContent extends ConsumerWidget {
     );
   }
 
-  void _persist(
-    BuildContext context,
-    Future<void> action,
-    AppLocalizations l10n,
-  ) {
+  void _showBatchSizeSheet(BuildContext context, StudyType studyType) {
+    final l10n = AppLocalizations.of(context);
+    final title = switch (studyType) {
+      StudyType.newStudy => l10n.settingsNewStudyBatchSizeLabel,
+      StudyType.srsReview => l10n.settingsReviewBatchSizeLabel,
+    };
+
     unawaited(
-      action
-          .then((_) {
-            if (context.mounted) {
-              MxSnackbar.success(context, l10n.settingsUpdatedMessage);
-            }
-          })
-          .catchError((Object _) {
-            if (context.mounted) {
-              MxSnackbar.error(context, l10n.errorUnexpected);
-            }
-          }),
+      MxBottomSheet.show<void>(
+        context: context,
+        title: title,
+        child: _BatchSizeSheet(studyType: studyType),
+      ),
+    );
+  }
+}
+
+class _StudySettingRow extends StatelessWidget {
+  const _StudySettingRow({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onTap,
+    super.key,
+  });
+
+  final IconData icon;
+  final String title;
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return MxListTile(
+      leading: Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
+      title: title,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MxText(
+            value,
+            role: MxTextRole.tileMeta,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const MxGap(MxSpace.sm),
+          Icon(
+            Icons.chevron_right_rounded,
+            size: MxSpace.xxl,
+            color: scheme.onSurfaceVariant,
+          ),
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+class _BatchSizeSheet extends ConsumerWidget {
+  const _BatchSizeSheet({required this.studyType});
+
+  final StudyType studyType;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final settings = ref.watch(studyDefaultsSettingsProvider);
+    final state = settings.value;
+    if (settings.hasError) {
+      return MxText(l10n.errorUnexpected, role: MxTextRole.formHelper);
+    }
+    if (state == null) {
+      return const MxLoadingState();
+    }
+
+    final notifier = ref.read(studyDefaultsSettingsProvider.notifier);
+    final batch = switch (studyType) {
+      StudyType.newStudy => state.newStudyDefaults.batchSize,
+      StudyType.srsReview => state.reviewDefaults.batchSize,
+    };
+    final label = switch (studyType) {
+      StudyType.newStudy => l10n.settingsNewStudyBatchSizeLabel,
+      StudyType.srsReview => l10n.settingsReviewBatchSizeLabel,
+    };
+    final increaseKey = switch (studyType) {
+      StudyType.newStudy => _newStudyBatchIncreaseKey,
+      StudyType.srsReview => _reviewBatchIncreaseKey,
+    };
+    final decreaseKey = switch (studyType) {
+      StudyType.newStudy => _newStudyBatchDecreaseKey,
+      StudyType.srsReview => _reviewBatchDecreaseKey,
+    };
+
+    return _BatchSizeStepper(
+      label: label,
+      value: batch,
+      studyType: studyType,
+      increaseKey: increaseKey,
+      decreaseKey: decreaseKey,
+      onChanged: (value) {
+        final action = switch (studyType) {
+          StudyType.newStudy => notifier.setNewStudyBatchSize(value),
+          StudyType.srsReview => notifier.setReviewBatchSize(value),
+        };
+        _persistSetting(context, action, l10n);
+      },
     );
   }
 }
@@ -196,4 +294,24 @@ class _BatchSizeStepper extends StatelessWidget {
       ],
     );
   }
+}
+
+void _persistSetting(
+  BuildContext context,
+  Future<void> action,
+  AppLocalizations l10n,
+) {
+  unawaited(
+    action
+        .then((_) {
+          if (context.mounted) {
+            MxSnackbar.success(context, l10n.settingsUpdatedMessage);
+          }
+        })
+        .catchError((Object _) {
+          if (context.mounted) {
+            MxSnackbar.error(context, l10n.errorUnexpected);
+          }
+        }),
+  );
 }

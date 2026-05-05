@@ -197,6 +197,7 @@
   "progressSessionRetryFinalizeMessage": "Finalize retried.",
   "progressSessionActionFailed": "Session action failed.",
   "settingsAppearanceTitle": "Appearance",
+  "settingsPersonalizationTitle": "Personalization",
   "settingsAccountTitle": "Account",
   "settingsAccountLoading": "Loading account",
   "settingsAccountSubtitleSignedOut": "Link Google now so Drive sync can be enabled later.",
@@ -210,6 +211,13 @@
   "settingsAccountUnsupported": "Use Android, iOS, or web to link Google account.",
   "settingsAccountDriveReady": "Google Drive ready",
   "settingsAccountDriveReconnectRequired": "Google Drive reconnect required",
+  "settingsAccountOverviewSubtitle": "{status}\n{email}",
+  "@settingsAccountOverviewSubtitle": {
+    "placeholders": {
+      "status": {},
+      "email": {}
+    }
+  },
   "settingsAccountDriveAuthorizationRequired": "Grant Google Drive app data access to prepare sync.",
   "settingsAccountSignIn": "Sign in with Google",
   "settingsAccountReconnectDrive": "Reconnect Google Drive",
@@ -283,15 +291,47 @@
   "settingsLocaleEnglish": "English",
   "settingsLocaleVietnamese": "Vietnamese",
   "settingsStudyDefaultsTitle": "Study defaults",
+  "settingsLearningExperienceTitle": "Learning experience",
   "settingsStudyDefaultsSubtitle": "Defaults used when a new study session is created.",
   "settingsStudyDefaultsLoading": "Loading study defaults",
   "settingsNewStudyBatchSizeLabel": "New Study batch size",
   "settingsReviewBatchSizeLabel": "Review batch size",
+  "settingsLearningOverviewSummary": "New {newCount, plural, =1{1 card} other{{newCount} cards}} · Review {reviewCount, plural, =1{1 card} other{{reviewCount} cards}}",
+  "@settingsLearningOverviewSummary": {
+    "placeholders": {
+      "newCount": {
+        "type": "int"
+      },
+      "reviewCount": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsCardsCountValue": "{count, plural, =1{1 card} other{{count} cards}}",
+  "@settingsCardsCountValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSpeechTitle": "Speech",
+  "settingsAudioSpeechTitle": "Audio & Speech",
+  "settingsAudioSpeechEnabled": "On",
+  "settingsAudioSpeechDisabled": "Off",
+  "settingsAudioSpeechOverviewSummary": "{ttsState} · {voice}",
+  "@settingsAudioSpeechOverviewSummary": {
+    "placeholders": {
+      "ttsState": {},
+      "voice": {}
+    }
+  },
   "settingsSpeechLabel": "Korean and English pronunciation support",
   "settingsSpeechLoading": "Loading speech settings",
   "settingsSpeechAutoPlayLabel": "Auto-play in study",
+  "settingsSpeechTextToSpeechLabel": "Text-to-Speech",
   "settingsSpeechAutoPlaySubtitle": "Automatically pronounce cards after study transitions.",
+  "settingsSpeechVoiceSelectionLabel": "Voice selection",
   "settingsSpeechFrontLanguageLabel": "Front language",
   "settingsSpeechKorean": "Korean",
   "settingsSpeechEnglish": "English",

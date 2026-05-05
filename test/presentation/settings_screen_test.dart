@@ -4,10 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memox/app/di/account_providers.dart';
 import 'package:memox/app/di/sync_providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/app/di/study_providers.dart';
+import 'package:memox/app/router/route_names.dart';
 import 'package:memox/app/services/drive_sync_runtime_effects.dart';
 import 'package:memox/core/config/google_oauth_config.dart';
 import 'package:memox/core/constants/app_constants.dart';
@@ -22,10 +24,16 @@ import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/settings/providers/locale_notifier.dart';
 import 'package:memox/presentation/features/settings/providers/theme_mode_notifier.dart';
+import 'package:memox/presentation/features/settings/screens/account_settings_screen.dart';
+import 'package:memox/presentation/features/settings/screens/audio_speech_settings_screen.dart';
+import 'package:memox/presentation/features/settings/screens/learning_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/settings_screen.dart';
+import 'package:memox/presentation/features/settings/viewmodels/drive_sync_settings_viewmodel.dart';
 import 'package:memox/presentation/features/study/providers/study_settings_defaults_notifier.dart';
 import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,6 +42,12 @@ const _speechPreviewButtonKey = ValueKey<String>(
 );
 const _speechVoiceOptionsButtonKey = ValueKey<String>(
   'settings-speech-voice-options-button',
+);
+const _speechTextToSpeechToggleKey = ValueKey<String>(
+  'settings-speech-tts-toggle',
+);
+const _speechVoiceSelectionRowKey = ValueKey<String>(
+  'settings-speech-voice-selection-row',
 );
 
 void main() {
@@ -46,25 +60,21 @@ void main() {
   ) async {
     final harness = await _pumpSettings(tester);
 
-    expect(find.text('Settings'), findsWidgets);
+    expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Account'), findsOneWidget);
     expect(find.text('No Google account is linked.'), findsOneWidget);
-    expect(find.text('Light'), findsOneWidget);
+    expect(find.text('Personalization'), findsOneWidget);
+    expect(find.text('Appearance'), findsOneWidget);
+    expect(find.text('Language'), findsOneWidget);
+    expect(find.text('Light'), findsNothing);
     expect(find.text('System'), findsWidgets);
     await tester.scrollUntilVisible(
-      find.text('English'),
+      find.text('Learning experience'),
       300,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
-    expect(find.text('English'), findsWidgets);
-    await tester.scrollUntilVisible(
-      find.text('Study defaults'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
-    expect(find.text('Study defaults'), findsOneWidget);
+    expect(find.text('Learning experience'), findsOneWidget);
     expect(harness.tts.availableVoiceRequests, isEmpty);
   });
 
@@ -82,16 +92,13 @@ void main() {
 
       await _pumpSettings(
         tester,
+        child: const LearningSettingsScreen(),
         settle: false,
         studySettingsStoreFuture: completer.future,
       );
-      await tester.scrollUntilVisible(
-        find.text('Study defaults'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
+      await tester.pump();
 
-      expect(find.text('Study defaults'), findsOneWidget);
+      expect(find.text('Learning experience'), findsWidgets);
       expect(find.text('Loading study defaults'), findsOneWidget);
       expect(find.byType(MxLoadingState), findsOneWidget);
     },
@@ -111,52 +118,68 @@ void main() {
 
       await _pumpSettings(
         tester,
+        child: const AudioSpeechSettingsScreen(),
         settle: false,
         ttsSettingsStoreFuture: completer.future,
       );
-      await tester.scrollUntilVisible(
-        find.text('Loading speech settings'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
+      await tester.pump();
 
-      expect(find.text('Speech'), findsOneWidget);
+      expect(find.text('Audio & Speech'), findsWidgets);
       expect(find.text('Loading speech settings'), findsOneWidget);
       expect(find.byType(MxLoadingState), findsOneWidget);
     },
   );
 
-  testWidgets('DT1 onDisplay: shows theme and language sections', (
+  testWidgets('DT1 onDisplay: uses soft minimal tonal settings islands', (
     tester,
   ) async {
     await _pumpSettings(tester);
 
+    expect(
+      find.descendant(
+        of: find.byType(MxCard).first,
+        matching: find.text('Account'),
+      ),
+      findsNothing,
+    );
+    expect(
+      tester
+          .widgetList<MxCard>(find.byType(MxCard))
+          .map((card) => card.variant),
+      everyElement(MxCardVariant.filled),
+    );
+    expect(
+      _overviewCardForKey(tester, 'settings-overview-account-row').onTap,
+      isNotNull,
+    );
+    expect(find.text('Personalization'), findsOneWidget);
     expect(find.text('Appearance'), findsOneWidget);
+    expect(find.text('Language'), findsOneWidget);
+    expect(find.byType(Divider), findsWidgets);
     await tester.scrollUntilVisible(
-      find.text('Language'),
+      find.text('Audio & Speech'),
       300,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
-    expect(find.text('Language'), findsOneWidget);
+    expect(
+      _overviewCardForKey(tester, 'settings-overview-audio-speech-row').onTap,
+      isNotNull,
+    );
   });
 
   testWidgets(
-    'DT5 onDisplay: disables Google sign-in when OAuth config is missing',
+    'DT5 onDisplay: settings overview hides Google sign-in when OAuth config is missing',
     (tester) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.windows;
       try {
         await _pumpSettings(tester);
 
-        final signInButton = tester.widget<ElevatedButton>(
-          find.widgetWithText(ElevatedButton, 'Sign in with Google'),
-        );
-
         expect(
           find.text('Add Google OAuth client IDs to enable account linking.'),
           findsOneWidget,
         );
-        expect(signInButton.onPressed, isNull);
+        expect(find.text('Sign in with Google'), findsNothing);
       } finally {
         debugDefaultTargetPlatformOverride = null;
       }
@@ -184,10 +207,18 @@ void main() {
     );
 
     expect(find.text('MemoX User'), findsOneWidget);
-    expect(find.text('user@example.com'), findsOneWidget);
-    expect(find.text('Google Drive ready'), findsOneWidget);
+    expect(find.textContaining('user@example.com'), findsOneWidget);
+    expect(find.textContaining('Google Drive ready'), findsOneWidget);
+    expect(
+      tester.widget<CircleAvatar>(find.byType(CircleAvatar).first).radius,
+      MxSpace.xxl + MxSpace.md,
+    );
+    expect(
+      find.byKey(const ValueKey<String>('settings-overview-account-row')),
+      findsOneWidget,
+    );
     expect(find.text('Sign out'), findsNothing);
-    expect(find.byTooltip('Sign out'), findsOneWidget);
+    expect(find.byTooltip('Sign out'), findsNothing);
   });
 
   testWidgets(
@@ -212,10 +243,13 @@ void main() {
       );
 
       expect(find.text('MemoX User'), findsOneWidget);
-      expect(find.text('Google Drive reconnect required'), findsOneWidget);
-      expect(find.text('Reconnect Google Drive'), findsOneWidget);
+      expect(
+        find.textContaining('Google Drive reconnect required'),
+        findsOneWidget,
+      );
+      expect(find.text('Reconnect Google Drive'), findsNothing);
       expect(find.text('Sign out'), findsNothing);
-      expect(find.byTooltip('Sign out'), findsOneWidget);
+      expect(find.byTooltip('Sign out'), findsNothing);
     },
   );
 
@@ -241,39 +275,13 @@ void main() {
         ),
       );
 
-      expect(find.text('Google Drive reconnect required'), findsOneWidget);
-      expect(find.text('Reconnect Google Drive'), findsOneWidget);
-      expect(find.text('Sign out'), findsNothing);
-      expect(find.byTooltip('Sign out'), findsOneWidget);
-    },
-  );
-
-  testWidgets(
-    'DT9 onDisplay: shows Drive sync group disabled while signed out',
-    (tester) async {
-      await _pumpSettings(tester);
-
-      expect(find.text('Drive sync'), findsOneWidget);
       expect(
-        find.text('Sign in with Google to sync the local database with Drive.'),
+        find.textContaining('Google Drive reconnect required'),
         findsOneWidget,
       );
-      expect(find.byTooltip('Sync now'), findsNothing);
-    },
-  );
-
-  testWidgets(
-    'DT10 onDisplay: shows Drive sync action when Google Drive is ready',
-    (tester) async {
-      final repository = _FakeDriveSyncRepository(
-        loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
-      );
-
-      await _pumpSettings(tester, driveSyncRepository: repository);
-
-      expect(find.text('Drive sync'), findsOneWidget);
-      expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
-      expect(find.byTooltip('Sync now'), findsOneWidget);
+      expect(find.text('Reconnect Google Drive'), findsNothing);
+      expect(find.text('Sign out'), findsNothing);
+      expect(find.byTooltip('Sign out'), findsNothing);
     },
   );
 
@@ -297,19 +305,18 @@ void main() {
       );
 
       expect(find.text('MemoX User'), findsOneWidget);
-      expect(find.text('Google Drive reconnect required'), findsOneWidget);
+      expect(
+        find.textContaining('Google Drive reconnect required'),
+        findsOneWidget,
+      );
       expect(find.text('Google Drive ready'), findsNothing);
       expect(find.text('Reconnect Google Drive'), findsNothing);
       expect(find.text('Sign out'), findsNothing);
-      expect(
-        find.text('Reconnect Google Drive in Account first.'),
-        findsOneWidget,
-      );
       expect(find.byTooltip('Sync now'), findsNothing);
     },
   );
 
-  testWidgets('DT13 onDisplay: Drive sync failure keeps retry action enabled', (
+  testWidgets('DT13 onDisplay: Account detail shows Drive sync failure', (
     tester,
   ) async {
     final repository = _FakeDriveSyncRepository(
@@ -318,7 +325,11 @@ void main() {
       ),
     );
 
-    await _pumpSettings(tester, driveSyncRepository: repository);
+    await _pumpSettings(
+      tester,
+      child: const AccountSettingsScreen(),
+      driveSyncRepository: repository,
+    );
 
     expect(find.text('Drive sync failed. Try again.'), findsOneWidget);
     expect(
@@ -329,13 +340,17 @@ void main() {
   });
 
   testWidgets(
-    'DT14 onDisplay: unexpected Drive sync load error uses one failure surface',
+    'DT14 onDisplay: Account detail Drive sync load error uses one failure surface',
     (tester) async {
       final repository = _FakeDriveSyncRepository(
         loadStatusError: StateError('sync provider unavailable'),
       );
 
-      await _pumpSettings(tester, driveSyncRepository: repository);
+      await _pumpSettings(
+        tester,
+        child: const AccountSettingsScreen(),
+        driveSyncRepository: repository,
+      );
 
       expect(find.text('Drive sync failed. Try again.'), findsOneWidget);
       expect(find.text('Bad state: sync provider unavailable'), findsOneWidget);
@@ -344,6 +359,66 @@ void main() {
       expect(find.byTooltip('Sync now'), findsOneWidget);
     },
   );
+
+  testWidgets('DT15 onDisplay: shows last synced metadata when available', (
+    tester,
+  ) async {
+    final lastSyncedAt = DateTime(2026, 1, 2, 3, 4).millisecondsSinceEpoch;
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: DriveSyncStatus(
+        kind: DriveSyncStatusKind.synced,
+        lastSyncedAt: lastSyncedAt,
+      ),
+    );
+
+    await _pumpSettings(
+      tester,
+      child: const AccountSettingsScreen(),
+      driveSyncRepository: repository,
+    );
+
+    expect(find.text('Google Drive is up to date.'), findsOneWidget);
+    expect(find.textContaining('Last synced:'), findsOneWidget);
+  });
+
+  testWidgets('DT16 onDisplay: overview hides detail-only actions', (
+    tester,
+  ) async {
+    final preferences = await SharedPreferences.getInstance();
+    final store = CloudAccountStore(preferences);
+    await store.save(_driveReadyLink);
+
+    await _pumpSettings(
+      tester,
+      googleConfig: _configuredGoogle,
+      googleAuth: _FakeGoogleAccountAuthService(
+        restoreResult: GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Audio & Speech'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Sign out'), findsNothing);
+    expect(find.byTooltip('Sync now'), findsNothing);
+    expect(find.text('Drive sync'), findsNothing);
+    expect(
+      find.byKey(const ValueKey<String>('settings-study-new-batch-row')),
+      findsNothing,
+    );
+    expect(find.byKey(_speechTextToSpeechToggleKey), findsNothing);
+    expect(find.byKey(_speechPreviewButtonKey), findsNothing);
+    expect(find.byKey(_speechVoiceOptionsButtonKey), findsNothing);
+  });
 
   testWidgets(
     'DT11 onDisplay: compact top settings groups fit first phone viewport',
@@ -378,7 +453,7 @@ void main() {
           tester.view.physicalSize.height / tester.view.devicePixelRatio;
 
       expect(find.text('Account'), findsOneWidget);
-      expect(find.text('Drive sync'), findsOneWidget);
+      expect(find.text('Personalization'), findsOneWidget);
       expect(find.text('Appearance'), findsOneWidget);
       expect(find.text('Language'), findsOneWidget);
       expect(
@@ -388,61 +463,50 @@ void main() {
     },
   );
 
-  testWidgets(
-    'DT2 onDisplay: renders speech settings with Korean and English only',
-    (tester) async {
-      await _pumpSettings(tester);
-
-      await tester.scrollUntilVisible(
-        find.text('Speech'),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Speech'), findsOneWidget);
-      expect(find.text('Auto-play in study'), findsOneWidget);
-      expect(find.text('Front language'), findsOneWidget);
-      expect(find.text('Back language'), findsNothing);
-      expect(find.text('Voice options'), findsOneWidget);
-      expect(find.text('Front voice'), findsNothing);
-      expect(find.text('Back voice'), findsNothing);
-
-      final speechLanguageControls = tester
-          .widgetList<MxSegmentedControl<TtsLanguage>>(
-            find.byType(MxSegmentedControl<TtsLanguage>),
-          )
-          .toList();
-      expect(speechLanguageControls, hasLength(1));
-      for (final control in speechLanguageControls) {
-        expect(
-          control.segments.map((segment) => segment.value),
-          orderedEquals(TtsLanguage.values),
-        );
-      }
-    },
-  );
-
-  testWidgets('DT3 onDisplay: renders study defaults before speech settings', (
+  testWidgets('DT2 onDisplay: renders audio and speech overview row', (
     tester,
   ) async {
     await _pumpSettings(tester);
 
     await tester.scrollUntilVisible(
-      find.text('Study defaults'),
+      find.text('Audio & Speech'),
       300,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
+    expect(find.text('Audio & Speech'), findsOneWidget);
+    expect(find.text('Text-to-Speech'), findsOneWidget);
+    expect(find.text('Off · System voice'), findsOneWidget);
+    expect(find.text('Voice selection'), findsNothing);
+    expect(find.text('Front language'), findsNothing);
+    expect(find.text('Back language'), findsNothing);
+    expect(find.text('Voice options'), findsNothing);
+    expect(find.byTooltip('Voice options'), findsNothing);
+    expect(find.text('Front voice'), findsNothing);
+    expect(find.text('Back voice'), findsNothing);
+  });
+
+  testWidgets('DT3 onDisplay: renders study defaults overview summary', (
+    tester,
+  ) async {
+    await _pumpSettings(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('Learning experience'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Learning experience'), findsOneWidget);
     expect(find.text('Study defaults'), findsOneWidget);
-    expect(find.text('New Study batch size'), findsOneWidget);
-    expect(find.text('Review batch size'), findsOneWidget);
-    expect(find.text('5-20 cards'), findsOneWidget);
-    expect(find.text('5-50 cards'), findsOneWidget);
-    expect(find.text('Shuffle flashcards'), findsOneWidget);
-    expect(find.text('Shuffle answers'), findsOneWidget);
-    expect(find.text('Prioritize overdue cards'), findsOneWidget);
+    expect(find.text('New 10 cards · Review 20 cards'), findsOneWidget);
+    expect(find.text('New Study batch size'), findsNothing);
+    expect(find.text('Review batch size'), findsNothing);
+    expect(find.text('Shuffle flashcards'), findsNothing);
+    expect(find.text('Shuffle answers'), findsNothing);
+    expect(find.text('Prioritize overdue cards'), findsNothing);
   });
 
   testWidgets(
@@ -466,22 +530,100 @@ void main() {
       expect(store.loadNewStudyDefaults().batchSize, 20);
       expect(store.loadReviewDefaults().batchSize, 5);
       await tester.scrollUntilVisible(
-        find.text('Study defaults'),
+        find.text('Learning experience'),
         300,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
-      expect(find.text('20'), findsOneWidget);
-      expect(find.text('5'), findsOneWidget);
+      expect(find.text('New 20 cards · Review 5 cards'), findsOneWidget);
     },
   );
 
+  testWidgets('DT1 onNavigate: account overview opens account detail', (
+    tester,
+  ) async {
+    await _pumpSettingsRouter(tester);
+
+    await tester.tap(
+      find.byKey(const ValueKey<String>('settings-overview-account-row')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AccountSettingsScreen), findsOneWidget);
+  });
+
+  testWidgets('DT2 onNavigate: account detail contains Drive sync actions', (
+    tester,
+  ) async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
+    );
+    await _pumpSettingsRouter(tester, driveSyncRepository: repository);
+
+    await tester.tap(
+      find.byKey(const ValueKey<String>('settings-overview-account-row')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AccountSettingsScreen), findsOneWidget);
+    expect(find.text('Drive sync'), findsOneWidget);
+    expect(find.byTooltip('Sync now'), findsOneWidget);
+  });
+
+  testWidgets('DT3 onNavigate: learning overview opens learning detail', (
+    tester,
+  ) async {
+    await _pumpSettingsRouter(tester);
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey<String>('settings-overview-learning-row')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey<String>('settings-overview-learning-row')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LearningSettingsScreen), findsOneWidget);
+  });
+
+  testWidgets('DT4 onNavigate: audio overview opens audio detail', (
+    tester,
+  ) async {
+    await _pumpSettingsRouter(tester);
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey<String>('settings-overview-audio-speech-row')),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey<String>('settings-overview-audio-speech-row')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AudioSpeechSettingsScreen), findsOneWidget);
+  });
+
   testWidgets(
-    'DT1 onUpdate: updates theme and locale providers from segmented controls',
+    'DT1 onUpdate: personalization rows update theme and locale providers',
     (tester) async {
       final harness = await _pumpSettings(tester);
 
-      await tester.ensureVisible(find.text('Dark'));
+      await tester.ensureVisible(
+        find.byKey(
+          const ValueKey<String>('settings-personalization-theme-row'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const ValueKey<String>('settings-personalization-theme-row'),
+        ),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
@@ -489,7 +631,17 @@ void main() {
       expect(harness.container.read(themeModeProvider), ThemeMode.dark);
       expect(find.text('Settings updated.'), findsOneWidget);
 
-      await tester.ensureVisible(find.text('Vietnamese'));
+      await tester.ensureVisible(
+        find.byKey(
+          const ValueKey<String>('settings-personalization-language-row'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const ValueKey<String>('settings-personalization-language-row'),
+        ),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Vietnamese'));
       await tester.pumpAndSettle();
@@ -499,7 +651,7 @@ void main() {
   );
 
   testWidgets(
-    'DT2 onUpdate: compact text-scale fallback still updates providers',
+    'DT2 onUpdate: compact text-scale sheets still update providers',
     (tester) async {
       final harness = await _pumpSettings(
         tester,
@@ -509,22 +661,34 @@ void main() {
         ),
       );
 
-      await tester.scrollUntilVisible(
-        find.text('Appearance'),
-        300,
-        scrollable: find.byType(Scrollable).first,
+      await tester.ensureVisible(
+        find.byKey(
+          const ValueKey<String>('settings-personalization-theme-row'),
+        ),
       );
       await tester.pumpAndSettle();
-      expect(find.byType(RadioListTile<ThemeMode>), findsNWidgets(3));
-
-      await tester.ensureVisible(find.text('Dark'));
+      await tester.tap(
+        find.byKey(
+          const ValueKey<String>('settings-personalization-theme-row'),
+        ),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
 
       expect(harness.container.read(themeModeProvider), ThemeMode.dark);
 
-      await tester.ensureVisible(find.text('Vietnamese'));
+      await tester.ensureVisible(
+        find.byKey(
+          const ValueKey<String>('settings-personalization-language-row'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const ValueKey<String>('settings-personalization-language-row'),
+        ),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Vietnamese'));
       await tester.pumpAndSettle();
@@ -536,15 +700,25 @@ void main() {
   testWidgets(
     'DT3 onUpdate: speech controls persist settings and preview selected language',
     (tester) async {
-      final harness = await _pumpSettings(tester);
+      final harness = await _pumpSettings(
+        tester,
+        child: const AudioSpeechSettingsScreen(),
+      );
 
       await tester.scrollUntilVisible(
-        find.text('Auto-play in study'),
+        find.byKey(_speechTextToSpeechToggleKey),
         300,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(Switch).last);
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(_speechTextToSpeechToggleKey),
+          matching: find.byType(Switch),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(_speechVoiceSelectionRowKey));
       await tester.pumpAndSettle();
 
       final languageControls = tester
@@ -563,11 +737,7 @@ void main() {
       expect(settings.frontLanguage, TtsLanguage.english);
       expect(settings.rate, 0.7);
 
-      await tester.scrollUntilVisible(
-        find.byKey(_speechPreviewButtonKey),
-        300,
-        scrollable: find.byType(Scrollable).first,
-      );
+      await tester.ensureVisible(find.byKey(_speechPreviewButtonKey));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(_speechPreviewButtonKey));
       await tester.pumpAndSettle();
@@ -581,27 +751,29 @@ void main() {
   testWidgets(
     'DT4 onUpdate: speech voice options stay collapsed until requested',
     (tester) async {
-      final harness = await _pumpSettings(tester);
+      final harness = await _pumpSettings(
+        tester,
+        child: const AudioSpeechSettingsScreen(),
+      );
 
       expect(find.text('Front voice'), findsNothing);
       expect(find.text('Back voice'), findsNothing);
       expect(harness.tts.availableVoiceRequests, isEmpty);
+      expect(find.byKey(_speechVoiceOptionsButtonKey), findsNothing);
 
       await tester.scrollUntilVisible(
-        find.byKey(_speechVoiceOptionsButtonKey),
+        find.byKey(_speechVoiceSelectionRowKey),
         300,
-        scrollable: find
-            .descendant(
-              of: find.byKey(const ValueKey<String>('settings_content')),
-              matching: find.byType(Scrollable),
-            )
-            .first,
+        scrollable: find.byType(Scrollable).first,
       );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(_speechVoiceSelectionRowKey));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(_speechVoiceOptionsButtonKey));
       await tester.pumpAndSettle();
 
-      expect(find.text('Hide voice options'), findsOneWidget);
+      expect(find.text('Hide voice options'), findsNothing);
+      expect(find.byTooltip('Hide voice options'), findsOneWidget);
       expect(find.text('Front voice'), findsOneWidget);
       expect(find.text('Back voice'), findsNothing);
       expect(harness.tts.availableVoiceRequests, [TtsLanguage.korean]);
@@ -611,43 +783,52 @@ void main() {
   testWidgets(
     'DT5 onUpdate: study default controls persist batch sizes and shared toggles',
     (tester) async {
-      final harness = await _pumpSettings(tester);
+      final harness = await _pumpSettings(
+        tester,
+        child: const LearningSettingsScreen(),
+      );
 
       await tester.scrollUntilVisible(
-        find.byKey(const ValueKey<String>('settings-study-new-batch-increase')),
+        find.byKey(const ValueKey<String>('settings-study-new-batch-row')),
         300,
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
       await tester.tap(
+        find.byKey(const ValueKey<String>('settings-study-new-batch-row')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('5-20 cards'), findsOneWidget);
+      await tester.tap(
         find.byKey(const ValueKey<String>('settings-study-new-batch-increase')),
       );
       await tester.pumpAndSettle();
+      await tester.tap(find.byType(ModalBarrier).last);
+      await tester.pumpAndSettle();
       await tester.ensureVisible(
+        find.byKey(const ValueKey<String>('settings-study-review-batch-row')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const ValueKey<String>('settings-study-review-batch-row')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('5-50 cards'), findsOneWidget);
+      await tester.tap(
         find.byKey(
           const ValueKey<String>('settings-study-review-batch-decrease'),
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(
-          const ValueKey<String>('settings-study-review-batch-decrease'),
-        ),
-      );
+      await tester.tap(find.byType(ModalBarrier).last);
       await tester.pumpAndSettle();
-      await tester.ensureVisible(
-        find.widgetWithText(SwitchListTile, 'Shuffle flashcards'),
-      );
+      await tester.ensureVisible(find.text('Shuffle flashcards'));
       await tester.pumpAndSettle();
-      await tester.tap(
-        find.widgetWithText(SwitchListTile, 'Shuffle flashcards'),
-      );
+      await tester.tap(find.byType(Switch).at(0));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(SwitchListTile, 'Shuffle answers'));
+      await tester.tap(find.byType(Switch).at(1));
       await tester.pumpAndSettle();
-      await tester.tap(
-        find.widgetWithText(SwitchListTile, 'Prioritize overdue cards'),
-      );
+      await tester.tap(find.byType(Switch).at(2));
       await tester.pumpAndSettle();
 
       final settings = await harness.container.read(
@@ -681,6 +862,7 @@ void main() {
       );
       final harness = await _pumpSettings(
         tester,
+        child: const AccountSettingsScreen(),
         googleConfig: _configuredGoogle,
         googleAuth: googleAuth,
       );
@@ -704,6 +886,7 @@ void main() {
     (tester) async {
       final harness = await _pumpSettings(
         tester,
+        child: const AccountSettingsScreen(),
         googleConfig: _configuredGoogle,
         googleAuth: _FakeGoogleAccountAuthService(
           signInResult: const GoogleAccountAuthResult.canceled(),
@@ -727,6 +910,7 @@ void main() {
     (tester) async {
       final harness = await _pumpSettings(
         tester,
+        child: const AccountSettingsScreen(),
         googleConfig: _configuredGoogle,
         googleAuth: _FakeGoogleAccountAuthService(
           signInResult: GoogleAccountAuthResult.driveAuthorizationRequired(
@@ -776,6 +960,7 @@ void main() {
       );
       final harness = await _pumpSettings(
         tester,
+        child: const AccountSettingsScreen(),
         googleConfig: _configuredGoogle,
         googleAuth: googleAuth,
       );
@@ -818,11 +1003,15 @@ void main() {
 
     await _pumpSettings(
       tester,
+      child: const SettingsScreen(),
       googleConfig: _configuredGoogle,
       googleAuth: googleAuth,
       driveSyncRepository: repository,
     );
-    expect(find.text('Google Drive reconnect required'), findsOneWidget);
+    expect(
+      find.textContaining('Google Drive reconnect required'),
+      findsOneWidget,
+    );
 
     googleAuth.emit(
       GoogleAccountAuthResult.success(
@@ -834,9 +1023,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Google Drive ready'), findsOneWidget);
-    expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
-    expect(find.byTooltip('Sync now'), findsOneWidget);
+    expect(find.textContaining('Google Drive ready'), findsOneWidget);
+    expect(find.byTooltip('Sync now'), findsNothing);
   });
 
   testWidgets('DT11 onUpdate: Drive sync upload result is visible', (
@@ -848,7 +1036,11 @@ void main() {
         const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
       ),
     );
-    await _pumpSettings(tester, driveSyncRepository: repository);
+    await _pumpSettings(
+      tester,
+      child: const AccountSettingsScreen(),
+      driveSyncRepository: repository,
+    );
 
     await tester.tap(find.byTooltip('Sync now'));
     await tester.pumpAndSettle();
@@ -859,7 +1051,8 @@ void main() {
     await tester.tap(find.text('Upload to Drive'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Local data backed up to Google Drive.'), findsOneWidget);
+    expect(find.text('Google Drive is up to date.'), findsOneWidget);
+    expect(find.text('Local data backed up to Google Drive.'), findsNothing);
     expect(repository.syncNowCount, 0);
     expect(repository.uploadLocalCount, 1);
   });
@@ -878,7 +1071,11 @@ void main() {
         DriveSyncRestoreEffect.refreshDatabaseProvider,
       ),
     );
-    await _pumpSettings(tester, driveSyncRepository: repository);
+    await _pumpSettings(
+      tester,
+      child: const AccountSettingsScreen(),
+      driveSyncRepository: repository,
+    );
 
     await tester.tap(find.byTooltip('Sync now'));
     await tester.pumpAndSettle();
@@ -888,7 +1085,8 @@ void main() {
     await tester.tap(find.text('Restore from Drive'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Drive copy restored.'), findsOneWidget);
+    expect(find.text('Google Drive is up to date.'), findsOneWidget);
+    expect(find.text('Drive copy restored.'), findsNothing);
     expect(repository.restoreDriveCount, 1);
   });
 
@@ -901,7 +1099,11 @@ void main() {
         const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
       ),
     );
-    await _pumpSettings(tester, driveSyncRepository: repository);
+    await _pumpSettings(
+      tester,
+      child: const AccountSettingsScreen(),
+      driveSyncRepository: repository,
+    );
 
     await tester.tap(find.byTooltip('Sync now'));
     await tester.pumpAndSettle();
@@ -930,15 +1132,12 @@ void main() {
       ),
     );
     final repository = _FakeDriveSyncRepository(
-      loadStatusResults: const <DriveSyncStatus>[
-        DriveSyncStatus.needsDriveAuthorization(),
-        DriveSyncStatus.needsDriveAuthorization(),
-        DriveSyncStatus.noRemoteSnapshot(),
-      ],
+      loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
     );
 
-    await _pumpSettings(
+    final harness = await _pumpSettings(
       tester,
+      child: const AccountSettingsScreen(),
       googleConfig: _configuredGoogle,
       googleAuth: googleAuth,
       driveSyncRepository: repository,
@@ -958,8 +1157,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Google Drive ready'), findsOneWidget);
-    expect(find.text('No Drive snapshot exists yet.'), findsOneWidget);
-    expect(find.byTooltip('Sync now'), findsOneWidget);
+    final status = await harness.container.read(
+      driveSyncSettingsControllerProvider.future,
+    );
+    expect(status.kind, DriveSyncStatusKind.noRemoteSnapshot);
   });
 
   testWidgets(
@@ -974,7 +1175,11 @@ void main() {
         ),
       );
 
-      await _pumpSettings(tester, driveSyncRepository: repository);
+      await _pumpSettings(
+        tester,
+        child: const AccountSettingsScreen(),
+        driveSyncRepository: repository,
+      );
 
       await tester.tap(find.byTooltip('Sync now'));
       await tester.pumpAndSettle();
@@ -992,6 +1197,7 @@ void main() {
 
 Future<_SettingsHarness> _pumpSettings(
   WidgetTester tester, {
+  Widget child = const SettingsScreen(),
   MediaQueryData? mediaQueryData,
   Future<StudySettingsStore>? studySettingsStoreFuture,
   Future<TtsSettingsStore>? ttsSettingsStoreFuture,
@@ -1033,14 +1239,14 @@ Future<_SettingsHarness> _pumpSettings(
     addTearDown(effectiveGoogleAuth.dispose);
   }
 
-  final child = mediaQueryData == null
-      ? const SettingsScreen()
-      : MediaQuery(data: mediaQueryData, child: const SettingsScreen());
+  final effectiveChild = mediaQueryData == null
+      ? child
+      : MediaQuery(data: mediaQueryData, child: child);
 
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
-      child: _TestApp(child: child),
+      child: _TestApp(child: effectiveChild),
     ),
   );
   if (settle) {
@@ -1052,11 +1258,92 @@ Future<_SettingsHarness> _pumpSettings(
   return _SettingsHarness(container: container, tts: fakeTts);
 }
 
+Future<_SettingsHarness> _pumpSettingsRouter(
+  WidgetTester tester, {
+  GoogleOAuthConfig? googleConfig,
+  GoogleAccountAuthService? googleAuth,
+  DriveSyncRepository? driveSyncRepository,
+}) async {
+  final fakeTts = _FakeTtsService();
+  final effectiveGoogleAuth = googleAuth ?? _FakeGoogleAccountAuthService();
+  final effectiveDriveSyncRepository =
+      driveSyncRepository ??
+      _FakeDriveSyncRepository(
+        loadStatusResult: const DriveSyncStatus.signedOut(),
+      );
+  final container = ProviderContainer(
+    overrides: [
+      ttsServiceProvider.overrideWithValue(fakeTts),
+      driveSyncRepositoryProvider.overrideWith(
+        (ref) async => effectiveDriveSyncRepository,
+      ),
+      driveSyncRuntimeEffectsProvider.overrideWithValue(
+        _FakeDriveSyncRuntimeEffects(),
+      ),
+      if (googleConfig != null)
+        googleOAuthConfigProvider.overrideWithValue(googleConfig),
+      googleAccountAuthServiceProvider.overrideWithValue(effectiveGoogleAuth),
+    ],
+  );
+  final router = GoRouter(
+    initialLocation: RoutePaths.settings,
+    routes: [
+      GoRoute(
+        path: RoutePaths.settings,
+        name: RouteNames.settings,
+        builder: (context, state) => const SettingsScreen(),
+        routes: [
+          GoRoute(
+            path: RoutePaths.settingsAccountSegment,
+            name: RouteNames.settingsAccount,
+            builder: (context, state) => const AccountSettingsScreen(),
+          ),
+          GoRoute(
+            path: RoutePaths.settingsLearningSegment,
+            name: RouteNames.settingsLearning,
+            builder: (context, state) => const LearningSettingsScreen(),
+          ),
+          GoRoute(
+            path: RoutePaths.settingsAudioSpeechSegment,
+            name: RouteNames.settingsAudioSpeech,
+            builder: (context, state) => const AudioSpeechSettingsScreen(),
+          ),
+        ],
+      ),
+    ],
+  );
+
+  addTearDown(container.dispose);
+  addTearDown(router.dispose);
+  addTearDown(fakeTts.dispose);
+  if (effectiveGoogleAuth is _FakeGoogleAccountAuthService) {
+    addTearDown(effectiveGoogleAuth.dispose);
+  }
+
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: _RouterTestApp(router: router),
+    ),
+  );
+  await tester.pumpAndSettle();
+
+  return _SettingsHarness(container: container, tts: fakeTts);
+}
+
 final class _SettingsHarness {
   const _SettingsHarness({required this.container, required this.tts});
 
   final ProviderContainer container;
   final _FakeTtsService tts;
+}
+
+MxCard _overviewCardForKey(WidgetTester tester, String key) {
+  final cardFinder = find.ancestor(
+    of: find.byKey(ValueKey<String>(key)),
+    matching: find.byType(MxCard),
+  );
+  return tester.widget<MxCard>(cardFinder.first);
 }
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
@@ -1350,6 +1637,21 @@ class _TestApp extends StatelessWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: child,
+    );
+  }
+}
+
+class _RouterTestApp extends StatelessWidget {
+  const _RouterTestApp({required this.router});
+
+  final GoRouter router;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
     );
   }
 }

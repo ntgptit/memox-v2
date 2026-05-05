@@ -13,6 +13,9 @@ import '../../presentation/features/flashcards/screens/flashcard_list_screen.dar
 import '../../presentation/features/folders/screens/folder_detail_screen.dart';
 import '../../presentation/features/folders/screens/library_overview_screen.dart';
 import '../../presentation/features/progress/screens/progress_screen.dart';
+import '../../presentation/features/settings/screens/account_settings_screen.dart';
+import '../../presentation/features/settings/screens/audio_speech_settings_screen.dart';
+import '../../presentation/features/settings/screens/learning_settings_screen.dart';
 import '../../presentation/features/settings/screens/settings_screen.dart';
 import '../../presentation/features/study/screens/study_entry_screen.dart';
 import '../../presentation/features/study/screens/study_result_screen.dart';
@@ -185,6 +188,27 @@ GoRouter appRouter(Ref ref) {
                 name: RouteNames.settings,
                 pageBuilder: (context, state) =>
                     const NoTransitionPage(child: SettingsScreen()),
+                routes: [
+                  GoRoute(
+                    path: RoutePaths.settingsAccountSegment,
+                    name: RouteNames.settingsAccount,
+                    pageBuilder: (context, state) =>
+                        const NoTransitionPage(child: AccountSettingsScreen()),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.settingsLearningSegment,
+                    name: RouteNames.settingsLearning,
+                    pageBuilder: (context, state) =>
+                        const NoTransitionPage(child: LearningSettingsScreen()),
+                  ),
+                  GoRoute(
+                    path: RoutePaths.settingsAudioSpeechSegment,
+                    name: RouteNames.settingsAudioSpeech,
+                    pageBuilder: (context, state) => const NoTransitionPage(
+                      child: AudioSpeechSettingsScreen(),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -202,8 +226,14 @@ GoRouter appRouter(Ref ref) {
 }
 
 bool _shouldHideShellNavigation(GoRouterState state) {
-  return state.topRoute?.name == RouteNames.deckImport ||
-      state.name == RouteNames.deckImport;
+  const hiddenRoutes = {
+    RouteNames.deckImport,
+    RouteNames.settingsAccount,
+    RouteNames.settingsLearning,
+    RouteNames.settingsAudioSpeech,
+  };
+  return hiddenRoutes.contains(state.topRoute?.name) ||
+      hiddenRoutes.contains(state.name);
 }
 
 class _RouterErrorView extends StatelessWidget {

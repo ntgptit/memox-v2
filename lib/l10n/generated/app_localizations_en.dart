@@ -364,6 +364,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearanceTitle => 'Appearance';
 
   @override
+  String get settingsPersonalizationTitle => 'Personalization';
+
+  @override
   String get settingsAccountTitle => 'Account';
 
   @override
@@ -410,6 +413,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsAccountDriveReconnectRequired =>
       'Google Drive reconnect required';
+
+  @override
+  String settingsAccountOverviewSubtitle(Object status, Object email) {
+    return '$status\n$email';
+  }
 
   @override
   String get settingsAccountDriveAuthorizationRequired =>
@@ -630,6 +638,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsStudyDefaultsTitle => 'Study defaults';
 
   @override
+  String get settingsLearningExperienceTitle => 'Learning experience';
+
+  @override
   String get settingsStudyDefaultsSubtitle =>
       'Defaults used when a new study session is created.';
 
@@ -643,7 +654,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsReviewBatchSizeLabel => 'Review batch size';
 
   @override
+  String settingsLearningOverviewSummary(int newCount, int reviewCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      newCount,
+      locale: localeName,
+      other: '$newCount cards',
+      one: '1 card',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      reviewCount,
+      locale: localeName,
+      other: '$reviewCount cards',
+      one: '1 card',
+    );
+    return 'New $_temp0 · Review $_temp1';
+  }
+
+  @override
+  String settingsCardsCountValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsSpeechTitle => 'Speech';
+
+  @override
+  String get settingsAudioSpeechTitle => 'Audio & Speech';
+
+  @override
+  String get settingsAudioSpeechEnabled => 'On';
+
+  @override
+  String get settingsAudioSpeechDisabled => 'Off';
+
+  @override
+  String settingsAudioSpeechOverviewSummary(Object ttsState, Object voice) {
+    return '$ttsState · $voice';
+  }
 
   @override
   String get settingsSpeechLabel => 'Korean and English pronunciation support';
@@ -655,8 +708,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSpeechAutoPlayLabel => 'Auto-play in study';
 
   @override
+  String get settingsSpeechTextToSpeechLabel => 'Text-to-Speech';
+
+  @override
   String get settingsSpeechAutoPlaySubtitle =>
       'Automatically pronounce cards after study transitions.';
+
+  @override
+  String get settingsSpeechVoiceSelectionLabel => 'Voice selection';
 
   @override
   String get settingsSpeechFrontLanguageLabel => 'Front language';

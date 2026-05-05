@@ -6,31 +6,26 @@ import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../widgets/personalization_settings_group.dart';
-import '../widgets/settings_overview_groups.dart';
+import '../widgets/account_settings_group.dart';
+import '../widgets/drive_sync_settings_group.dart';
 
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+class AccountSettingsScreen extends StatelessWidget {
+  const AccountSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
     return MxScaffold(
-      title: l10n.settingsTitle,
+      title: l10n.settingsAccountTitle,
       body: MxContentShell(
         width: MxContentWidth.reading,
         applyVerticalPadding: true,
         child: ListView(
-          key: const ValueKey<String>('settings_content'),
-          children: [
-            const AccountSettingsOverviewGroup(),
-            const MxGap(MxSpace.xxl),
-            const PersonalizationSettingsGroup(),
-            const MxGap(MxSpace.xxl),
-            const LearningSettingsOverviewGroup(),
-            const MxGap(MxSpace.xxl),
-            const AudioSpeechSettingsOverviewGroup(),
+          children: const [
+            AccountSettingsGroup(),
+            MxGap(MxSpace.xxl),
+            DriveSyncSettingsGroup(),
           ],
         ),
       ),

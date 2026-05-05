@@ -12,6 +12,9 @@ abstract final class RouteNames {
   static const String library = 'library';
   static const String progress = 'progress';
   static const String settings = 'settings';
+  static const String settingsAccount = 'settings-account';
+  static const String settingsLearning = 'settings-learning';
+  static const String settingsAudioSpeech = 'settings-audio-speech';
 
   // --- Nested routes under /library ---
   static const String folderDetail = 'folder-detail';
@@ -34,6 +37,9 @@ abstract final class RoutePaths {
   static const String library = '/library';
   static const String progress = '/progress';
   static const String settings = '/settings';
+  static const String settingsAccountSegment = 'account';
+  static const String settingsLearningSegment = 'learning';
+  static const String settingsAudioSpeechSegment = 'audio-speech';
 
   /// Relative segment registered under `/library`. Keep the `:id` placeholder
   /// in sync with [folderIdParam].

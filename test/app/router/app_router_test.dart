@@ -1,18 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/app/di/account_providers.dart';
+import 'package:memox/app/di/sync_providers.dart';
 import 'package:memox/app/router/app_router.dart';
 import 'package:memox/app/router/route_guards.dart';
+import 'package:memox/core/config/google_oauth_config.dart';
+import 'package:memox/domain/entities/cloud_account_link.dart';
+import 'package:memox/domain/entities/drive_sync_models.dart';
 import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/repositories/drive_sync_repository.dart';
+import 'package:memox/domain/services/google_account_auth_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/deck_import_screen.dart';
+import 'package:memox/presentation/features/settings/screens/account_settings_screen.dart';
+import 'package:memox/presentation/features/settings/screens/audio_speech_settings_screen.dart';
+import 'package:memox/presentation/features/settings/screens/learning_settings_screen.dart';
+import 'package:memox/presentation/features/settings/screens/settings_screen.dart';
 import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_entry_screen.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('DT1 onNavigate: study session path resolves to session screen', (
     tester,
   ) async {
@@ -44,24 +60,78 @@ void main() {
   testWidgets('DT2 onNavigate: deck import path hides shell navigation', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          appRouteGuardsProvider.overrideWith(
-            (ref) => const AppRouteGuards(
-              initialLocation: '/library/deck/deck-001/import',
-            ),
-          ),
-        ],
-        child: const _RouterApp(),
-      ),
-    );
+    await _pumpRoute(tester, '/library/deck/deck-001/import');
     await tester.pumpAndSettle();
 
     expect(find.byType(DeckImportScreen), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
     expect(find.byType(NavigationRail), findsNothing);
   });
+
+  testWidgets('DT3 onNavigate: settings root keeps shell navigation', (
+    tester,
+  ) async {
+    await _pumpRoute(tester, '/settings');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SettingsScreen), findsOneWidget);
+    expect(find.byType(NavigationRail), findsOneWidget);
+  });
+
+  testWidgets('DT4 onNavigate: settings account route hides shell navigation', (
+    tester,
+  ) async {
+    await _pumpRoute(tester, '/settings/account');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AccountSettingsScreen), findsOneWidget);
+    expect(find.text('Drive sync'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byType(NavigationRail), findsNothing);
+  });
+
+  testWidgets(
+    'DT5 onNavigate: settings learning route hides shell navigation',
+    (tester) async {
+      await _pumpRoute(tester, '/settings/learning');
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LearningSettingsScreen), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(NavigationRail), findsNothing);
+    },
+  );
+
+  testWidgets('DT6 onNavigate: settings audio route hides shell navigation', (
+    tester,
+  ) async {
+    await _pumpRoute(tester, '/settings/audio-speech');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AudioSpeechSettingsScreen), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byType(NavigationRail), findsNothing);
+  });
+}
+
+Future<void> _pumpRoute(WidgetTester tester, String initialLocation) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        appRouteGuardsProvider.overrideWith(
+          (ref) => AppRouteGuards(initialLocation: initialLocation),
+        ),
+        googleOAuthConfigProvider.overrideWithValue(_configuredGoogle),
+        googleAccountAuthServiceProvider.overrideWithValue(
+          _FakeGoogleAccountAuthService(),
+        ),
+        driveSyncRepositoryProvider.overrideWith(
+          (ref) async => _FakeDriveSyncRepository(),
+        ),
+      ],
+      child: const _RouterApp(),
+    ),
+  );
 }
 
 class _RouterApp extends ConsumerWidget {
@@ -146,4 +216,87 @@ StudyFlashcardRef _card({
     back: back,
     sourcePool: SessionItemSourcePool.due,
   );
+}
+
+final _configuredGoogle = GoogleOAuthConfig.fromValues(
+  webClientId: 'web-client-id.apps.googleusercontent.com',
+  serverClientId: 'server-client-id.apps.googleusercontent.com',
+);
+
+final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
+  @override
+  Stream<GoogleAccountAuthResult> get authenticationEvents =>
+      const Stream<GoogleAccountAuthResult>.empty();
+
+  @override
+  bool get requiresPlatformSignInButton => false;
+
+  @override
+  bool get supportsInteractiveSignIn => true;
+
+  @override
+  Future<void> initialize(GoogleOAuthConfig config) async {}
+
+  @override
+  Future<GoogleAccountAuthResult> restoreLightweightSession(
+    GoogleOAuthConfig config,
+  ) async {
+    return const GoogleAccountAuthResult.signedOut();
+  }
+
+  @override
+  Future<GoogleAccountAuthResult> signInAndAuthorizeDriveAppData(
+    GoogleOAuthConfig config,
+  ) async {
+    return const GoogleAccountAuthResult.canceled();
+  }
+
+  @override
+  Future<GoogleAccountAuthResult> authorizeDriveAppData(
+    GoogleOAuthConfig config,
+    CloudAccountLink link,
+  ) async {
+    return const GoogleAccountAuthResult.canceled();
+  }
+
+  @override
+  Future<DriveAccessTokenResult> getDriveAppDataAccessToken(
+    GoogleOAuthConfig config,
+    CloudAccountLink link,
+  ) async {
+    return const DriveAccessTokenResult.reauthorizationRequired();
+  }
+
+  @override
+  Future<void> signOutLocal() async {}
+}
+
+final class _FakeDriveSyncRepository implements DriveSyncRepository {
+  @override
+  Future<DriveSyncStatus> loadStatus() async {
+    return const DriveSyncStatus.signedOut();
+  }
+
+  @override
+  Future<DriveSyncRunResult> syncNow() async {
+    return DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut());
+  }
+
+  @override
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async {
+    return DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut());
+  }
+
+  @override
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async {
+    return DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut());
+  }
+
+  @override
+  Future<DriveSyncRunResult> resolveConflict(
+    DriveSyncConflict conflict,
+    DriveSyncConflictChoice choice,
+  ) async {
+    return DriveSyncRunResult.canceled(const DriveSyncStatus.signedOut());
+  }
 }

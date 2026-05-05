@@ -20,6 +20,11 @@ extension AppNavigation on BuildContext {
   void goLibrary() => goNamed(RouteNames.library);
   void goProgress() => goNamed(RouteNames.progress);
   void goSettings() => goNamed(RouteNames.settings);
+
+  void pushSettingsAccount() => pushNamed(RouteNames.settingsAccount);
+  void pushSettingsLearning() => pushNamed(RouteNames.settingsLearning);
+  void pushSettingsAudioSpeech() => pushNamed(RouteNames.settingsAudioSpeech);
+
   void goFolderDetail(String folderId) {
     goNamed(
       RouteNames.folderDetail,

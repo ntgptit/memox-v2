@@ -16,8 +16,7 @@ import '../viewmodels/account_settings_viewmodel.dart';
 import 'google_account_web_button.dart';
 import 'settings_group.dart';
 
-const double _accountAvatarRadius = 14;
-const double _accountStatusBadgeRadius = 12;
+const double _accountAvatarRadius = MxSpace.xxl + MxSpace.md;
 
 class AccountSettingsGroup extends ConsumerWidget {
   const AccountSettingsGroup({super.key});
@@ -165,50 +164,59 @@ class _LinkedAccountRow extends StatelessWidget {
     final displayName = link.displayName ?? link.email;
     final scheme = Theme.of(context).colorScheme;
 
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: _accountAvatarRadius,
-          backgroundColor: scheme.surfaceContainerHigh,
-          backgroundImage: link.photoUrl == null
-              ? null
-              : NetworkImage(link.photoUrl!),
-          child: link.photoUrl == null
-              ? MxText(_initials(displayName), role: MxTextRole.avatarInitials)
-              : null,
-        ),
-        const MxGap(MxSpace.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: MxText(
-                      displayName,
-                      role: MxTextRole.listTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (statusLabel.isNotEmpty) ...[
-                    const MxGap(MxSpace.xs),
-                    Flexible(child: _AccountStatusBadge(label: statusLabel)),
-                  ],
-                ],
-              ),
-              const MxGap(MxSpace.xxs),
-              MxText(
-                link.email,
-                role: MxTextRole.listSubtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: MxSpace.lg),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: _accountAvatarRadius,
+            backgroundColor: scheme.surfaceContainerHigh,
+            backgroundImage: link.photoUrl == null
+                ? null
+                : NetworkImage(link.photoUrl!),
+            child: link.photoUrl == null
+                ? MxText(_initials(displayName), role: MxTextRole.stateTitle)
+                : null,
           ),
-        ),
-      ],
+          const MxGap(MxSpace.xxl),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MxText(
+                  displayName,
+                  role: MxTextRole.stateTitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (statusLabel.isNotEmpty) ...[
+                  const MxGap(MxSpace.xs),
+                  MxText(
+                    statusLabel,
+                    role: MxTextRole.listSubtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+                const MxGap(MxSpace.xs),
+                MxText(
+                  link.email,
+                  role: MxTextRole.listSubtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const MxGap(MxSpace.md),
+          Icon(
+            Icons.chevron_right_rounded,
+            key: const ValueKey<String>('settings-account-profile-chevron'),
+            size: MxSpace.xxl,
+            color: scheme.onSurfaceVariant,
+          ),
+        ],
+      ),
     );
   }
 
@@ -223,39 +231,6 @@ class _LinkedAccountRow extends StatelessWidget {
       return parts.first.substring(0, 1);
     }
     return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}';
-  }
-}
-
-class _AccountStatusBadge extends StatelessWidget {
-  const _AccountStatusBadge({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        borderRadius: const BorderRadius.all(
-          Radius.circular(_accountStatusBadgeRadius),
-        ),
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: MxSpace.xs,
-          vertical: MxSpace.xxs,
-        ),
-        child: MxText(
-          label,
-          role: MxTextRole.badge,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    );
   }
 }
 

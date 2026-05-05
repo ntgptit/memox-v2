@@ -672,6 +672,12 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get settingsAppearanceTitle;
 
+  /// No description provided for @settingsPersonalizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personalization'**
+  String get settingsPersonalizationTitle;
+
   /// No description provided for @settingsAccountTitle.
   ///
   /// In en, this message translates to:
@@ -749,6 +755,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Google Drive reconnect required'**
   String get settingsAccountDriveReconnectRequired;
+
+  /// No description provided for @settingsAccountOverviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{status}\n{email}'**
+  String settingsAccountOverviewSubtitle(Object status, Object email);
 
   /// No description provided for @settingsAccountDriveAuthorizationRequired.
   ///
@@ -1128,6 +1140,12 @@ abstract class AppLocalizations {
   /// **'Study defaults'**
   String get settingsStudyDefaultsTitle;
 
+  /// No description provided for @settingsLearningExperienceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning experience'**
+  String get settingsLearningExperienceTitle;
+
   /// No description provided for @settingsStudyDefaultsSubtitle.
   ///
   /// In en, this message translates to:
@@ -1152,11 +1170,47 @@ abstract class AppLocalizations {
   /// **'Review batch size'**
   String get settingsReviewBatchSizeLabel;
 
+  /// No description provided for @settingsLearningOverviewSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'New {newCount, plural, =1{1 card} other{{newCount} cards}} · Review {reviewCount, plural, =1{1 card} other{{reviewCount} cards}}'**
+  String settingsLearningOverviewSummary(int newCount, int reviewCount);
+
+  /// No description provided for @settingsCardsCountValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card} other{{count} cards}}'**
+  String settingsCardsCountValue(int count);
+
   /// No description provided for @settingsSpeechTitle.
   ///
   /// In en, this message translates to:
   /// **'Speech'**
   String get settingsSpeechTitle;
+
+  /// No description provided for @settingsAudioSpeechTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio & Speech'**
+  String get settingsAudioSpeechTitle;
+
+  /// No description provided for @settingsAudioSpeechEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get settingsAudioSpeechEnabled;
+
+  /// No description provided for @settingsAudioSpeechDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get settingsAudioSpeechDisabled;
+
+  /// No description provided for @settingsAudioSpeechOverviewSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{ttsState} · {voice}'**
+  String settingsAudioSpeechOverviewSummary(Object ttsState, Object voice);
 
   /// No description provided for @settingsSpeechLabel.
   ///
@@ -1176,11 +1230,23 @@ abstract class AppLocalizations {
   /// **'Auto-play in study'**
   String get settingsSpeechAutoPlayLabel;
 
+  /// No description provided for @settingsSpeechTextToSpeechLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Text-to-Speech'**
+  String get settingsSpeechTextToSpeechLabel;
+
   /// No description provided for @settingsSpeechAutoPlaySubtitle.
   ///
   /// In en, this message translates to:
   /// **'Automatically pronounce cards after study transitions.'**
   String get settingsSpeechAutoPlaySubtitle;
+
+  /// No description provided for @settingsSpeechVoiceSelectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice selection'**
+  String get settingsSpeechVoiceSelectionLabel;
 
   /// No description provided for @settingsSpeechFrontLanguageLabel.
   ///

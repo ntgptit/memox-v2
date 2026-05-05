@@ -334,6 +334,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsAppearanceTitle => 'Giao diện';
 
   @override
+  String get settingsPersonalizationTitle => 'Cá nhân hóa';
+
+  @override
   String get settingsAccountTitle => 'Tài khoản';
 
   @override
@@ -380,6 +383,11 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get settingsAccountDriveReconnectRequired =>
       'Cần kết nối lại Google Drive';
+
+  @override
+  String settingsAccountOverviewSubtitle(Object status, Object email) {
+    return '$status\n$email';
+  }
 
   @override
   String get settingsAccountDriveAuthorizationRequired =>
@@ -603,6 +611,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsStudyDefaultsTitle => 'Mặc định học';
 
   @override
+  String get settingsLearningExperienceTitle => 'Trải nghiệm học';
+
+  @override
   String get settingsStudyDefaultsSubtitle =>
       'Cài đặt mặc định dùng khi tạo phiên học mới.';
 
@@ -616,7 +627,49 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsReviewBatchSizeLabel => 'Số thẻ Review';
 
   @override
+  String settingsLearningOverviewSummary(int newCount, int reviewCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      newCount,
+      locale: localeName,
+      other: '$newCount thẻ',
+      one: '1 thẻ',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      reviewCount,
+      locale: localeName,
+      other: '$reviewCount thẻ',
+      one: '1 thẻ',
+    );
+    return 'Học mới $_temp0 · Ôn $_temp1';
+  }
+
+  @override
+  String settingsCardsCountValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ',
+      one: '1 thẻ',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsSpeechTitle => 'Giọng nói';
+
+  @override
+  String get settingsAudioSpeechTitle => 'Âm thanh & giọng nói';
+
+  @override
+  String get settingsAudioSpeechEnabled => 'Bật';
+
+  @override
+  String get settingsAudioSpeechDisabled => 'Tắt';
+
+  @override
+  String settingsAudioSpeechOverviewSummary(Object ttsState, Object voice) {
+    return '$ttsState · $voice';
+  }
 
   @override
   String get settingsSpeechLabel => 'Hỗ trợ phát âm tiếng Hàn và tiếng Anh';
@@ -628,8 +681,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsSpeechAutoPlayLabel => 'Tự phát trong khi học';
 
   @override
+  String get settingsSpeechTextToSpeechLabel => 'Text-to-Speech';
+
+  @override
   String get settingsSpeechAutoPlaySubtitle =>
       'Tự phát âm thẻ sau các chuyển trạng thái học.';
+
+  @override
+  String get settingsSpeechVoiceSelectionLabel => 'Chọn giọng';
 
   @override
   String get settingsSpeechFrontLanguageLabel => 'Ngôn ngữ mặt trước';

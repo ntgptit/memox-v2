@@ -197,6 +197,7 @@
   "progressSessionRetryFinalizeMessage": "Đã thử finalize lại.",
   "progressSessionActionFailed": "Thao tác với phiên học thất bại.",
   "settingsAppearanceTitle": "Giao diện",
+  "settingsPersonalizationTitle": "Cá nhân hóa",
   "settingsAccountTitle": "Tài khoản",
   "settingsAccountLoading": "Đang tải tài khoản",
   "settingsAccountSubtitleSignedOut": "Liên kết Google ngay để có thể bật đồng bộ Drive sau này.",
@@ -210,6 +211,13 @@
   "settingsAccountUnsupported": "Hãy dùng Android, iOS hoặc web để liên kết tài khoản Google.",
   "settingsAccountDriveReady": "Google Drive đã sẵn sàng",
   "settingsAccountDriveReconnectRequired": "Cần kết nối lại Google Drive",
+  "settingsAccountOverviewSubtitle": "{status}\n{email}",
+  "@settingsAccountOverviewSubtitle": {
+    "placeholders": {
+      "status": {},
+      "email": {}
+    }
+  },
   "settingsAccountDriveAuthorizationRequired": "Cấp quyền dữ liệu ứng dụng Google Drive để chuẩn bị đồng bộ.",
   "settingsAccountSignIn": "Đăng nhập bằng Google",
   "settingsAccountReconnectDrive": "Kết nối lại Google Drive",
@@ -283,15 +291,47 @@
   "settingsLocaleEnglish": "Tiếng Anh",
   "settingsLocaleVietnamese": "Tiếng Việt",
   "settingsStudyDefaultsTitle": "Mặc định học",
+  "settingsLearningExperienceTitle": "Trải nghiệm học",
   "settingsStudyDefaultsSubtitle": "Cài đặt mặc định dùng khi tạo phiên học mới.",
   "settingsStudyDefaultsLoading": "Đang tải mặc định học",
   "settingsNewStudyBatchSizeLabel": "Số thẻ New Study",
   "settingsReviewBatchSizeLabel": "Số thẻ Review",
+  "settingsLearningOverviewSummary": "Học mới {newCount, plural, =1{1 thẻ} other{{newCount} thẻ}} · Ôn {reviewCount, plural, =1{1 thẻ} other{{reviewCount} thẻ}}",
+  "@settingsLearningOverviewSummary": {
+    "placeholders": {
+      "newCount": {
+        "type": "int"
+      },
+      "reviewCount": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsCardsCountValue": "{count, plural, =1{1 thẻ} other{{count} thẻ}}",
+  "@settingsCardsCountValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSpeechTitle": "Giọng nói",
+  "settingsAudioSpeechTitle": "Âm thanh & giọng nói",
+  "settingsAudioSpeechEnabled": "Bật",
+  "settingsAudioSpeechDisabled": "Tắt",
+  "settingsAudioSpeechOverviewSummary": "{ttsState} · {voice}",
+  "@settingsAudioSpeechOverviewSummary": {
+    "placeholders": {
+      "ttsState": {},
+      "voice": {}
+    }
+  },
   "settingsSpeechLabel": "Hỗ trợ phát âm tiếng Hàn và tiếng Anh",
   "settingsSpeechLoading": "Đang tải cài đặt giọng nói",
   "settingsSpeechAutoPlayLabel": "Tự phát trong khi học",
+  "settingsSpeechTextToSpeechLabel": "Text-to-Speech",
   "settingsSpeechAutoPlaySubtitle": "Tự phát âm thẻ sau các chuyển trạng thái học.",
+  "settingsSpeechVoiceSelectionLabel": "Chọn giọng",
   "settingsSpeechFrontLanguageLabel": "Ngôn ngữ mặt trước",
   "settingsSpeechKorean": "Tiếng Hàn",
   "settingsSpeechEnglish": "Tiếng Anh",

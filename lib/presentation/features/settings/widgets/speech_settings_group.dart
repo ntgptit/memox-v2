@@ -6,6 +6,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/services/tts_service.dart';
+import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
@@ -13,8 +14,8 @@ import '../../../shared/states/mx_loading_state.dart';
 import '../../../shared/states/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_inline_toggle.dart';
-import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
+import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_select_field.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
 import '../../../shared/widgets/mx_slider.dart';
@@ -29,6 +30,12 @@ const _speechPreviewButtonKey = ValueKey<String>(
 );
 const _speechVoiceOptionsButtonKey = ValueKey<String>(
   'settings-speech-voice-options-button',
+);
+const _speechTextToSpeechToggleKey = ValueKey<String>(
+  'settings-speech-tts-toggle',
+);
+const _speechVoiceSelectionRowKey = ValueKey<String>(
+  'settings-speech-voice-selection-row',
 );
 
 class SpeechSettingsGroup extends ConsumerWidget {
@@ -46,12 +53,12 @@ class SpeechSettingsGroup extends ConsumerWidget {
       stackTrace: ttsSettings.hasError ? ttsSettings.stackTrace : null,
       onRetry: () => ref.invalidate(ttsSettingsProvider),
       skeletonBuilder: (_) => SettingsGroup(
-        title: l10n.settingsSpeechTitle,
+        title: l10n.settingsAudioSpeechTitle,
         subtitle: l10n.settingsSpeechLoading,
         child: const MxLoadingState(),
       ),
       errorBuilder: (_, _, _) => SettingsGroup(
-        title: l10n.settingsSpeechTitle,
+        title: l10n.settingsAudioSpeechTitle,
         subtitle: l10n.sharedErrorTitle,
         child: MxText(l10n.errorUnexpected, role: MxTextRole.formHelper),
       ),
@@ -74,7 +81,6 @@ class _SpeechSettingsContent extends ConsumerStatefulWidget {
 
 class _SpeechSettingsContentState
     extends ConsumerState<_SpeechSettingsContent> {
-  bool _showVoiceOptions = false;
   late final TextEditingController _previewTextController =
       TextEditingController();
 
@@ -89,70 +95,158 @@ class _SpeechSettingsContentState
     final l10n = AppLocalizations.of(context);
     final settings = widget.settings;
     ref.watch(ttsControllerProvider);
-    final voices = _showVoiceOptions
-        ? ref.watch(ttsVoicesProvider(settings.frontLanguage))
-        : const AsyncData<List<TtsVoice>>(<TtsVoice>[]);
     final notifier = ref.read(ttsSettingsProvider.notifier);
 
     return SettingsGroup(
-      title: l10n.settingsSpeechTitle,
-      subtitle: l10n.settingsSpeechLabel,
+      title: l10n.settingsAudioSpeechTitle,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _AutoPlayToggle(settings: settings, notifier: notifier),
-          const MxGap(MxSpace.md),
           const MxDivider(),
-          const MxGap(MxSpace.md),
-          _SpeechLanguageControl(
-            label: l10n.settingsSpeechFrontLanguageLabel,
-            selected: settings.frontLanguage,
-            onChanged: (language) {
-              unawaited(notifier.setFrontLanguage(language));
-              MxSnackbar.success(context, l10n.settingsUpdatedMessage);
-            },
-          ),
-          const MxGap(MxSpace.md),
-          const MxDivider(),
-          const MxGap(MxSpace.md),
-          _SpeechRateSlider(settings: settings, notifier: notifier),
-          const MxGap(MxSpace.lg),
-          const MxDivider(),
-          const MxGap(MxSpace.md),
-          _PreviewTextField(
-            controller: _previewTextController,
-            language: settings.frontLanguage,
-          ),
-          const MxGap(MxSpace.md),
-          _SpeechActionRow(
-            previewLabel: l10n.settingsSpeechPreviewSelected,
-            voiceOptionsLabel: _showVoiceOptions
-                ? l10n.settingsSpeechHideVoiceOptions
-                : l10n.settingsSpeechVoiceOptions,
-            onPreview: () => _previewSelected(settings, l10n),
-            onToggleVoiceOptions: _toggleVoiceOptions,
-          ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutCubic,
-            child: _showVoiceOptions
-                ? _VoiceOptions(
-                    key: const ValueKey<String>('speech-voice-options'),
-                    settings: settings,
-                    voices: voices,
-                    onChanged: (value) {
-                      unawaited(
-                        notifier.setFrontVoiceName(_voiceNameFromValue(value)),
-                      );
-                      MxSnackbar.success(context, l10n.settingsUpdatedMessage);
-                    },
-                  )
-                : const SizedBox.shrink(
-                    key: ValueKey<String>('speech-voice-options-hidden'),
-                  ),
+          _SpeechSettingRow(
+            key: _speechVoiceSelectionRowKey,
+            icon: Icons.mic_none_rounded,
+            title: l10n.settingsSpeechVoiceSelectionLabel,
+            value: _voiceSelectionValue(l10n, settings),
+            onTap: () => _showVoiceSettingsSheet(context),
           ),
         ],
       ),
+    );
+  }
+
+  void _showVoiceSettingsSheet(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    unawaited(
+      MxBottomSheet.show<void>(
+        context: context,
+        title: l10n.settingsSpeechVoiceSelectionLabel,
+        child: _SpeechDetailsSheet(controller: _previewTextController),
+      ),
+    );
+  }
+}
+
+class _SpeechSettingRow extends StatelessWidget {
+  const _SpeechSettingRow({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onTap,
+    super.key,
+  });
+
+  final IconData icon;
+  final String title;
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return MxListTile(
+      leading: Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
+      title: title,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MxText(
+            value,
+            role: MxTextRole.tileMeta,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const MxGap(MxSpace.sm),
+          Icon(
+            Icons.chevron_right_rounded,
+            size: MxSpace.xxl,
+            color: scheme.onSurfaceVariant,
+          ),
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+class _SpeechDetailsSheet extends ConsumerStatefulWidget {
+  const _SpeechDetailsSheet({required this.controller});
+
+  final TextEditingController controller;
+
+  @override
+  ConsumerState<_SpeechDetailsSheet> createState() =>
+      _SpeechDetailsSheetState();
+}
+
+class _SpeechDetailsSheetState extends ConsumerState<_SpeechDetailsSheet> {
+  bool _showVoiceOptions = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final settingsAsync = ref.watch(ttsSettingsProvider);
+    final settings = settingsAsync.value;
+    if (settingsAsync.hasError) {
+      return MxText(l10n.errorUnexpected, role: MxTextRole.formHelper);
+    }
+    if (settings == null) {
+      return const MxLoadingState();
+    }
+
+    final notifier = ref.read(ttsSettingsProvider.notifier);
+    final voices = _showVoiceOptions
+        ? ref.watch(ttsVoicesProvider(settings.frontLanguage))
+        : const AsyncData<List<TtsVoice>>(<TtsVoice>[]);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SpeechLanguageControl(
+          label: l10n.settingsSpeechFrontLanguageLabel,
+          selected: settings.frontLanguage,
+          onChanged: (language) {
+            unawaited(notifier.setFrontLanguage(language));
+            MxSnackbar.success(context, l10n.settingsUpdatedMessage);
+          },
+        ),
+        const MxGap(MxSpace.md),
+        _SpeechRateSlider(settings: settings, notifier: notifier),
+        const MxGap(MxSpace.lg),
+        _PreviewTextField(
+          controller: widget.controller,
+          language: settings.frontLanguage,
+        ),
+        const MxGap(MxSpace.md),
+        _SpeechActionRow(
+          previewLabel: l10n.settingsSpeechPreviewSelected,
+          voiceOptionsLabel: _showVoiceOptions
+              ? l10n.settingsSpeechHideVoiceOptions
+              : l10n.settingsSpeechVoiceOptions,
+          onPreview: () => _previewSelected(settings, l10n),
+          onToggleVoiceOptions: _toggleVoiceOptions,
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          child: _showVoiceOptions
+              ? _VoiceOptions(
+                  key: const ValueKey<String>('speech-voice-options'),
+                  settings: settings,
+                  voices: voices,
+                  onChanged: (value) {
+                    unawaited(
+                      notifier.setFrontVoiceName(_voiceNameFromValue(value)),
+                    );
+                    MxSnackbar.success(context, l10n.settingsUpdatedMessage);
+                  },
+                )
+              : const SizedBox.shrink(
+                  key: ValueKey<String>('speech-voice-options-hidden'),
+                ),
+        ),
+      ],
     );
   }
 
@@ -163,7 +257,7 @@ class _SpeechSettingsContentState
   }
 
   void _previewSelected(TtsSettings settings, AppLocalizations l10n) {
-    final custom = StringUtils.trimmed(_previewTextController.text);
+    final custom = StringUtils.trimmed(widget.controller.text);
     final text = StringUtils.isBlank(custom)
         ? _previewText(l10n, settings.frontLanguage)
         : custom;
@@ -196,9 +290,9 @@ class _AutoPlayToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return MxInlineToggle(
-      label: l10n.settingsSpeechAutoPlayLabel,
-      subtitle: l10n.settingsSpeechAutoPlaySubtitle,
-      leadingIcon: Icons.volume_up_rounded,
+      key: _speechTextToSpeechToggleKey,
+      label: l10n.settingsSpeechTextToSpeechLabel,
+      leadingIcon: Icons.record_voice_over_outlined,
       value: settings.autoPlay,
       onChanged: (value) {
         unawaited(notifier.setAutoPlay(value));
@@ -249,27 +343,20 @@ class _SpeechActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(
-          child: MxSecondaryButton(
-            key: _speechPreviewButtonKey,
-            label: previewLabel,
-            leadingIcon: Icons.volume_up_rounded,
-            variant: MxSecondaryVariant.tonal,
-            fullWidth: true,
-            onPressed: onPreview,
-          ),
+        MxIconButton.compact(
+          key: _speechPreviewButtonKey,
+          icon: Icons.volume_up_rounded,
+          tooltip: previewLabel,
+          onPressed: onPreview,
         ),
-        const MxGap(MxSpace.sm),
-        Expanded(
-          child: MxSecondaryButton(
-            key: _speechVoiceOptionsButtonKey,
-            label: voiceOptionsLabel,
-            leadingIcon: Icons.tune_rounded,
-            variant: MxSecondaryVariant.outlined,
-            fullWidth: true,
-            onPressed: onToggleVoiceOptions,
-          ),
+        const MxGap(MxSpace.xs),
+        MxIconButton.compact(
+          key: _speechVoiceOptionsButtonKey,
+          icon: Icons.tune_rounded,
+          tooltip: voiceOptionsLabel,
+          onPressed: onToggleVoiceOptions,
         ),
       ],
     );
@@ -470,6 +557,14 @@ String _languageLabel(AppLocalizations l10n, TtsLanguage language) {
     TtsLanguage.korean => l10n.settingsSpeechKorean,
     TtsLanguage.english => l10n.settingsSpeechEnglish,
   };
+}
+
+String _voiceSelectionValue(AppLocalizations l10n, TtsSettings settings) {
+  final voiceName = settings.frontVoiceName;
+  if (StringUtils.isNotBlank(voiceName)) {
+    return voiceName!;
+  }
+  return l10n.settingsSpeechSystemVoice;
 }
 
 String _previewText(AppLocalizations l10n, TtsLanguage language) {

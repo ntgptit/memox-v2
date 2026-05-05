@@ -132,6 +132,15 @@ class _DriveSyncContent extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           MxText(statusText, role: MxTextRole.formHelper),
+          if (state.lastSyncedAt case final lastSyncedAt?) ...[
+            const MxGap(MxSpace.xs),
+            MxText(
+              l10n.settingsDriveSyncLastSynced(
+                _formattedSyncTime(context, lastSyncedAt),
+              ),
+              role: MxTextRole.formHelper,
+            ),
+          ],
           if (messageText != null) ...[
             const MxGap(MxSpace.xs),
             MxText(messageText, role: MxTextRole.formHelper),
@@ -141,10 +150,7 @@ class _DriveSyncContent extends ConsumerWidget {
     );
   }
 
-  Widget? _syncAction(
-    AppLocalizations l10n, {
-    required VoidCallback onSync,
-  }) {
+  Widget? _syncAction(AppLocalizations l10n, {required VoidCallback onSync}) {
     if (!state.canSync) {
       return null;
     }
@@ -179,13 +185,10 @@ class _DriveSyncContent extends ConsumerWidget {
         state.kind == DriveSyncStatusKind.failure
             ? _technicalMessage(l10n)
             : null,
-      DriveSyncSettingsMessage.uploaded => l10n.settingsDriveSyncUploaded,
-      DriveSyncSettingsMessage.restored => l10n.settingsDriveSyncRestored,
-      DriveSyncSettingsMessage.noChanges =>
-        state.kind == DriveSyncStatusKind.synced
-            ? null
-            : l10n.settingsDriveSyncNoChanges,
-      DriveSyncSettingsMessage.canceled => l10n.settingsDriveSyncCanceled,
+      DriveSyncSettingsMessage.uploaded ||
+      DriveSyncSettingsMessage.restored ||
+      DriveSyncSettingsMessage.noChanges ||
+      DriveSyncSettingsMessage.canceled => null,
       DriveSyncSettingsMessage.failed =>
         state.kind == DriveSyncStatusKind.failure ||
                 state.kind == DriveSyncStatusKind.unsupportedSchema
@@ -200,6 +203,14 @@ class _DriveSyncContent extends ConsumerWidget {
       return null;
     }
     return message;
+  }
+
+  String _formattedSyncTime(BuildContext context, int epochMillis) {
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(epochMillis).toLocal();
+    final materialL10n = MaterialLocalizations.of(context);
+    final date = materialL10n.formatShortDate(dateTime);
+    final time = materialL10n.formatTimeOfDay(TimeOfDay.fromDateTime(dateTime));
+    return '$date $time';
   }
 }
 
