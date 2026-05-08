@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
-import '../../../shared/states/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
 import '../widgets/dashboard_content.dart';
 

@@ -8,12 +8,12 @@ import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../../domain/services/tts_service.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_loading_state.dart';
-import '../../../shared/states/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_text.dart';
-import '../../study/providers/study_settings_defaults_notifier.dart';
 import '../../tts/providers/tts_settings_notifier.dart';
 import '../viewmodels/account_settings_viewmodel.dart';
+import '../viewmodels/study_settings_defaults_viewmodel.dart';
 import 'settings_group.dart';
 
 const _accountOverviewRowKey = ValueKey<String>(

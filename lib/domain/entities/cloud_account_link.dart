@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 const String googleDriveAppDataScope =
     'https://www.googleapis.com/auth/drive.appdata';
 
@@ -21,7 +19,6 @@ enum AccountLinkStatus {
   error,
 }
 
-@immutable
 class CloudAccountLink {
   const CloudAccountLink({
     required this.provider,

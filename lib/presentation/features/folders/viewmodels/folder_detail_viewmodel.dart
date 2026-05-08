@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/content_providers.dart';
+import '../../../../app/di/content/content_revision_providers.dart';
+import '../../../../app/di/content/deck_providers.dart';
+import '../../../../app/di/content/folder_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/string_utils.dart';
@@ -12,6 +14,7 @@ import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
+import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'folder_detail_viewmodel.g.dart';
 
@@ -152,37 +155,20 @@ class FolderActionController extends _$FolderActionController {
 
   Future<bool> createSubfolder(String name) async {
     // guard:retry-reviewed
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(createFolderUseCaseProvider)
-        .createSubfolder(parentFolderId: folderId, name: name);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(createFolderUseCaseProvider)
+          .createSubfolder(parentFolderId: folderId, name: name),
+    );
   }
 
   Future<String?> createDeck(String name) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(createDeckUseCaseProvider)
-        .execute(folderId: folderId, name: name);
-    if (!ref.mounted) {
-      return null;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return null;
-    }
-    state = const AsyncData<void>(null);
-    return result.valueOrNull!.id;
+    final deck = await _actionRunner.runResultValue(
+      () => ref
+          .read(createDeckUseCaseProvider)
+          .execute(folderId: folderId, name: name),
+    );
+    return deck?.id;
   }
 
   Future<List<FolderDeckItem>> loadImportDeckTargets() async {
@@ -193,88 +179,51 @@ class FolderActionController extends _$FolderActionController {
   }
 
   Future<bool> updateFolder(String name) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(updateFolderUseCaseProvider)
-        .execute(folderId: folderId, name: name);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(updateFolderUseCaseProvider)
+          .execute(folderId: folderId, name: name),
+    );
   }
 
   Future<bool> deleteFolder() async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(deleteFolderUseCaseProvider)
-        .execute(folderId);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref.read(deleteFolderUseCaseProvider).execute(folderId),
+    );
   }
 
   Future<bool> moveFolder(String? targetParentId) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(moveFolderUseCaseProvider)
-        .execute(folderId: folderId, targetParentId: targetParentId);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(moveFolderUseCaseProvider)
+          .execute(folderId: folderId, targetParentId: targetParentId),
+    );
   }
 
   Future<bool> reorderSubfolders(List<String> orderedFolderIds) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(reorderFoldersUseCaseProvider)
-        .execute(parentFolderId: folderId, orderedFolderIds: orderedFolderIds);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(reorderFoldersUseCaseProvider)
+          .execute(
+            parentFolderId: folderId,
+            orderedFolderIds: orderedFolderIds,
+          ),
+    );
   }
 
   Future<bool> reorderDecks(List<String> orderedDeckIds) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(reorderDecksUseCaseProvider)
-        .execute(folderId: folderId, orderedDeckIds: orderedDeckIds);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(reorderDecksUseCaseProvider)
+          .execute(folderId: folderId, orderedDeckIds: orderedDeckIds),
+    );
+  }
+
+  MxAsyncActionRunner get _actionRunner {
+    return MxAsyncActionRunner(
+      isMounted: () => ref.mounted,
+      setState: (nextState) => state = nextState,
+    );
   }
 }
 

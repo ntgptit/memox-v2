@@ -34,124 +34,133 @@ void main() {
       );
     });
 
-    test('DT1 onNavigate: resets pre-release study tables during v2 migration', () async {
-      await database.close();
-      database = AppDatabase(
-        executor: NativeDatabase.memory(
-          setup: (sqlite) {
-            for (final statement in _legacyV1Statements) {
-              sqlite.execute(statement);
-            }
-          },
-        ),
-      );
+    test(
+      'DT1 onNavigate: resets pre-release study tables during v2 migration',
+      () async {
+        await database.close();
+        database = AppDatabase(
+          executor: NativeDatabase.memory(
+            setup: (sqlite) {
+              for (final statement in _legacyV1Statements) {
+                sqlite.execute(statement);
+              }
+            },
+          ),
+        );
 
-      final items = await database.select(database.studySessionItems).get();
-      final itemColumns = await database
-          .customSelect('PRAGMA table_info(study_session_items)')
-          .map((row) => row.read<String>('name'))
-          .get();
-      final attemptColumns = await database
-          .customSelect('PRAGMA table_info(study_attempts)')
-          .map((row) => row.read<String>('name'))
-          .get();
-      final progressColumns = await database
-          .customSelect('PRAGMA table_info(flashcard_progress)')
-          .map((row) => row.read<String>('name'))
-          .get();
-      final flashcardColumns = await database
-          .customSelect('PRAGMA table_info(flashcards)')
-          .map((row) => row.read<String>('name'))
-          .get();
-      final indexRows = await database
-          .customSelect(
-            "SELECT name FROM sqlite_master WHERE type = 'index' "
-            "AND name = 'idx_study_session_items_mode_round'",
-          )
-          .get();
+        final items = await database.select(database.studySessionItems).get();
+        final itemColumns = await database
+            .customSelect('PRAGMA table_info(study_session_items)')
+            .map((row) => row.read<String>('name'))
+            .get();
+        final attemptColumns = await database
+            .customSelect('PRAGMA table_info(study_attempts)')
+            .map((row) => row.read<String>('name'))
+            .get();
+        final progressColumns = await database
+            .customSelect('PRAGMA table_info(flashcard_progress)')
+            .map((row) => row.read<String>('name'))
+            .get();
+        final flashcardColumns = await database
+            .customSelect('PRAGMA table_info(flashcards)')
+            .map((row) => row.read<String>('name'))
+            .get();
+        final indexRows = await database
+            .customSelect(
+              "SELECT name FROM sqlite_master WHERE type = 'index' "
+              "AND name = 'idx_study_session_items_mode_round'",
+            )
+            .get();
 
-      expect(items, isEmpty);
-      expect(itemColumns, containsAll(<String>['study_mode', 'mode_order']));
-      expect(attemptColumns, contains('attempt_number'));
-      expect(
-        progressColumns,
-        containsAll(<String>['current_box', 'review_count', 'last_result']),
-      );
-      expect(flashcardColumns, containsAll(<String>['front', 'back', 'note']));
-      expect(flashcardColumns, isNot(contains('title')));
-      expect(indexRows, hasLength(1));
-    });
+        expect(items, isEmpty);
+        expect(itemColumns, containsAll(<String>['study_mode', 'mode_order']));
+        expect(attemptColumns, contains('attempt_number'));
+        expect(
+          progressColumns,
+          containsAll(<String>['current_box', 'review_count', 'last_result']),
+        );
+        expect(
+          flashcardColumns,
+          containsAll(<String>['front', 'back', 'note']),
+        );
+        expect(flashcardColumns, isNot(contains('title')));
+        expect(indexRows, hasLength(1));
+      },
+    );
 
-    test('DT1 onDelete: deleting a deck cascades to flashcards and progress', () async {
-      final now = DateTime.utc(2026, 4, 22).millisecondsSinceEpoch;
+    test(
+      'DT1 onDelete: deleting a deck cascades to flashcards and progress',
+      () async {
+        final now = DateTime.utc(2026, 4, 22).millisecondsSinceEpoch;
 
-      await database
-          .into(database.folders)
-          .insert(
-            FoldersCompanion.insert(
-              id: 'folder-1',
-              name: 'Languages',
-              contentMode: 'decks',
-              sortOrder: 0,
-              createdAt: now,
-              updatedAt: now,
-            ),
-          );
+        await database
+            .into(database.folders)
+            .insert(
+              FoldersCompanion.insert(
+                id: 'folder-1',
+                name: 'Languages',
+                contentMode: 'decks',
+                sortOrder: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
 
-      await database
-          .into(database.decks)
-          .insert(
-            DecksCompanion.insert(
-              id: 'deck-1',
-              folderId: 'folder-1',
-              name: 'Korean Basics',
-              sortOrder: 0,
-              createdAt: now,
-              updatedAt: now,
-            ),
-          );
+        await database
+            .into(database.decks)
+            .insert(
+              DecksCompanion.insert(
+                id: 'deck-1',
+                folderId: 'folder-1',
+                name: 'Korean Basics',
+                sortOrder: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
 
-      await database
-          .into(database.flashcards)
-          .insert(
-            FlashcardsCompanion.insert(
-              id: 'card-1',
-              deckId: 'deck-1',
-              front: 'annyeonghaseyo',
-              back: 'xin chao',
-              sortOrder: 0,
-              createdAt: now,
-              updatedAt: now,
-            ),
-          );
+        await database
+            .into(database.flashcards)
+            .insert(
+              FlashcardsCompanion.insert(
+                id: 'card-1',
+                deckId: 'deck-1',
+                front: 'annyeonghaseyo',
+                back: 'xin chao',
+                sortOrder: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
 
-      await database
-          .into(database.flashcardProgress)
-          .insert(
-            FlashcardProgressCompanion.insert(
-              flashcardId: 'card-1',
-              currentBox: 1,
-              reviewCount: 0,
-              lapseCount: 0,
-              createdAt: now,
-              updatedAt: now,
-            ),
-          );
+        await database
+            .into(database.flashcardProgress)
+            .insert(
+              FlashcardProgressCompanion.insert(
+                flashcardId: 'card-1',
+                currentBox: 1,
+                reviewCount: 0,
+                lapseCount: 0,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
 
-      await (database.delete(
-        database.decks,
-      )..where((table) => table.id.equals('deck-1'))).go();
+        await (database.delete(
+          database.decks,
+        )..where((table) => table.id.equals('deck-1'))).go();
 
-      final remainingFlashcards = await database
-          .select(database.flashcards)
-          .get();
-      final remainingProgress = await database
-          .select(database.flashcardProgress)
-          .get();
+        final remainingFlashcards = await database
+            .select(database.flashcards)
+            .get();
+        final remainingProgress = await database
+            .select(database.flashcardProgress)
+            .get();
 
-      expect(remainingFlashcards, isEmpty);
-      expect(remainingProgress, isEmpty);
-    });
+        expect(remainingFlashcards, isEmpty);
+        expect(remainingProgress, isEmpty);
+      },
+    );
   });
 }
 

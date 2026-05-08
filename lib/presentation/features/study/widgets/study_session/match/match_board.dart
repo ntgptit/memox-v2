@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../domain/study/entities/study_models.dart';
-import '../../../../../shared/layouts/mx_gap.dart';
-import '../../../../../shared/layouts/mx_space.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'match_batching.dart';
 import 'match_mode_tile.dart';
 import 'match_tile_models.dart';

@@ -10,7 +10,7 @@ rules:
     impact: style
     scope: all
     targets:
-      - "lib/app/di/*.dart"
+      - "lib/app/di/**/*.dart"
       - "lib/presentation/features/*/providers/*.dart"
       - "lib/presentation/features/*/viewmodels/*.dart"
     params:

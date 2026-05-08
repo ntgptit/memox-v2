@@ -6,9 +6,9 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import '../widgets/mx_secondary_button.dart';
 import '../layouts/mx_gap.dart';
-import '../widgets/mx_text.dart';
+import 'mx_secondary_button.dart';
+import 'mx_text.dart';
 
 /// Error state with optional "Retry" action and collapsible detail.
 class MxErrorState extends StatefulWidget {

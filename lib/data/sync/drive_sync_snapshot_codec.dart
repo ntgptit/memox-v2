@@ -53,7 +53,10 @@ final class DriveSyncSnapshotCodec {
         ),
       )
       ..addFile(
-        ArchiveFile.bytes(AppConstants.driveSyncSettingsEntryName, settingsBytes),
+        ArchiveFile.bytes(
+          AppConstants.driveSyncSettingsEntryName,
+          settingsBytes,
+        ),
       );
     final archiveBytes = ZipEncoder().encodeBytes(archive);
 
@@ -87,9 +90,7 @@ final class DriveSyncSnapshotCodec {
       archive,
       AppConstants.driveSyncSettingsEntryName,
     );
-    if (manifestText == null ||
-        databaseBytes == null ||
-        settingsText == null) {
+    if (manifestText == null || databaseBytes == null || settingsText == null) {
       return null;
     }
 

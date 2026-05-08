@@ -8,8 +8,8 @@ import 'package:memox/app/router/route_names.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/dashboard/screens/dashboard_screen.dart';
 import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
-import 'package:memox/presentation/shared/states/mx_error_state.dart';
-import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
 
 const _maximumCompactDashboardActionButtonWidth = 160.0;
@@ -151,6 +151,38 @@ void main() {
       expect(
         buttonWidths.first,
         lessThanOrEqualTo(_maximumCompactDashboardActionButtonWidth),
+      );
+    },
+  );
+
+  testWidgets(
+    'renders dashboard action buttons full-width in compact viewport',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(390, 844));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
+
+      const reviewKey = ValueKey('dashboard_review_now_action');
+      const startKey = ValueKey('dashboard_start_new_study_action');
+      const resumeKey = ValueKey('dashboard_continue_session_action');
+
+      await _pumpDashboard(tester, _newCardsOnlyDashboardState);
+
+      _expectDashboardActionLabel(reviewKey, 'Review');
+      _expectDashboardActionLabel(startKey, 'Start');
+      _expectDashboardActionLabel(resumeKey, 'Resume');
+
+      final buttonWidths = [
+        _dashboardActionButtonSize(tester, reviewKey).width,
+        _dashboardActionButtonSize(tester, startKey).width,
+        _dashboardActionButtonSize(tester, resumeKey).width,
+      ];
+
+      expect(buttonWidths.toSet(), hasLength(1));
+      expect(
+        buttonWidths.first,
+        greaterThan(_maximumCompactDashboardActionButtonWidth),
       );
     },
   );

@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/content_providers.dart';
+import '../../../../app/di/content/content_revision_providers.dart';
+import '../../../../app/di/content/deck_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
+import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'deck_action_viewmodel.g.dart';
 
@@ -58,84 +60,47 @@ class DeckActionController extends _$DeckActionController {
 
   Future<bool> updateDeck(String name) async {
     // guard:retry-reviewed
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(updateDeckUseCaseProvider)
-        .execute(deckId: deckId, name: name);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(updateDeckUseCaseProvider)
+          .execute(deckId: deckId, name: name),
+    );
   }
 
   Future<bool> deleteDeck() async {
-    state = const AsyncLoading<void>();
-    final result = await ref.read(deleteDeckUseCaseProvider).execute(deckId);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref.read(deleteDeckUseCaseProvider).execute(deckId),
+    );
   }
 
   Future<bool> moveDeck(String targetFolderId) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(moveDeckUseCaseProvider)
-        .execute(deckId: deckId, targetFolderId: targetFolderId);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(moveDeckUseCaseProvider)
+          .execute(deckId: deckId, targetFolderId: targetFolderId),
+    );
   }
 
   Future<String?> duplicateDeck(String targetFolderId) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(duplicateDeckUseCaseProvider)
-        .execute(deckId: deckId, targetFolderId: targetFolderId);
-    if (!ref.mounted) {
-      return null;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return null;
-    }
-    state = const AsyncData<void>(null);
-    return result.valueOrNull?.id;
+    final deck = await _actionRunner.runResultValue(
+      () => ref
+          .read(duplicateDeckUseCaseProvider)
+          .execute(deckId: deckId, targetFolderId: targetFolderId),
+    );
+    return deck?.id;
   }
 
   Future<ExportData?> exportDeck() async {
-    state = const AsyncLoading<void>();
-    final result = await ref.read(exportDeckUseCaseProvider).execute(deckId);
-    if (!ref.mounted) {
-      return null;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return null;
-    }
-    state = const AsyncData<void>(null);
-    return result.valueOrNull;
+    return _actionRunner.runResultValue(
+      () => ref.read(exportDeckUseCaseProvider).execute(deckId),
+    );
+  }
+
+  MxAsyncActionRunner get _actionRunner {
+    return MxAsyncActionRunner(
+      isMounted: () => ref.mounted,
+      setState: (nextState) => state = nextState,
+    );
   }
 }
 

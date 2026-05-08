@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/content_providers.dart';
-import '../../../../app/di/study_providers.dart';
+import '../../../../app/di/content/content_revision_providers.dart';
+import '../../../../app/di/content/folder_providers.dart';
+import '../../../../app/di/study/study_usecase_providers.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
 import '../../../../domain/value_objects/content_queries.dart';
-import '../../study/providers/study_session_notifier.dart';
+import '../../../shared/providers/study_revision_providers.dart';
+import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'progress_session_notifier.g.dart';
 
@@ -61,24 +63,13 @@ Future<ProgressOverviewState> progressOverview(Ref ref) async {
   final sessions = await ref
       .watch(resumeStudySessionUseCaseProvider)
       .listActiveSessions();
-  final cardCount = library.folders.fold<int>(
-    0,
-    (sum, folder) => sum + folder.itemCount,
-  );
-  final weightedMasteryTotal = library.folders.fold<int>(
-    0,
-    (sum, folder) => sum + folder.itemCount * folder.masteryPercent,
-  );
-
   return ProgressOverviewState(
     sessions: sessions,
     overdueCount: library.overdueCount,
     dueTodayCount: library.dueTodayCount,
     newCardCount: library.newCardCount,
-    cardCount: cardCount,
-    masteryPercent: cardCount == 0
-        ? 0
-        : (weightedMasteryTotal / cardCount).round(),
+    cardCount: library.cardCount,
+    masteryPercent: library.masteryPercent,
   );
 }
 
@@ -95,70 +86,42 @@ class ProgressSessionActionController
   FutureOr<void> build() {}
 
   Future<bool> cancel(String sessionId) async {
-    state = const AsyncLoading<void>();
-    try {
-      await ref.read(cancelStudySessionUseCaseProvider).execute(sessionId);
-      if (!ref.mounted) {
-        return false;
-      }
-      _refresh();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
+    return _executeMutation(
+      () => ref.read(cancelStudySessionUseCaseProvider).execute(sessionId),
+    );
   }
 
   Future<bool> finalize(StudySessionSnapshot snapshot) async {
-    state = const AsyncLoading<void>();
-    try {
-      await ref
+    return _executeMutation(
+      () => ref
           .read(finalizeStudySessionUseCaseProvider)
           .execute(
             sessionId: snapshot.session.id,
             studyType: snapshot.session.studyType,
-          );
-      if (!ref.mounted) {
-        return false;
-      }
-      _refresh();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
+          ),
+    );
   }
 
   Future<bool> retryFinalize(StudySessionSnapshot snapshot) async {
-    state = const AsyncLoading<void>();
-    try {
-      await ref
+    return _executeMutation(
+      () => ref
           .read(retryFinalizeUseCaseProvider)
           .execute(
             sessionId: snapshot.session.id,
             studyType: snapshot.session.studyType,
-          );
-      if (!ref.mounted) {
-        return false;
-      }
-      _refresh();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
+          ),
+    );
+  }
+
+  Future<bool> _executeMutation(Future<void> Function() action) async {
+    return _actionRunner.run(action, onSuccess: _refresh);
+  }
+
+  MxAsyncActionRunner get _actionRunner {
+    return MxAsyncActionRunner(
+      isMounted: () => ref.mounted,
+      setState: (nextState) => state = nextState,
+    );
   }
 
   void _refresh() {

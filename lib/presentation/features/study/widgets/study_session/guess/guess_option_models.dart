@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../core/theme/extensions/theme_extensions.dart';
+import 'package:memox/core/theme/extensions/theme_extensions.dart';
 
 enum GuessOptionState { idle, error, success }
 

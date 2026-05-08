@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memox/app/di/content_providers.dart';
-import 'package:memox/app/di/study_providers.dart';
+import 'package:memox/app/di/content/content_revision_providers.dart';
+import 'package:memox/app/di/content/folder_providers.dart';
+import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/core/errors/result.dart';
 import 'package:memox/domain/entities/folder_entity.dart';
 import 'package:memox/domain/enums/study_enums.dart';

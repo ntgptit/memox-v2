@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/account_providers.dart';
-import 'package:memox/app/di/content_providers.dart';
+import 'package:memox/app/di/content/content_core_providers.dart';
 import 'package:memox/app/di/sync_providers.dart';
 import 'package:memox/core/config/google_oauth_config.dart';
 import 'package:memox/core/constants/app_constants.dart';
@@ -499,6 +499,79 @@ void main() {
     expect(updatedState.requiresRuntimeReconnect, isFalse);
     expect(updatedState.isBusy, isTrue);
   });
+
+  test(
+    'DT13 onUpdate: auth service rebuild cancels stale event subscription',
+    () async {
+      final firstAuth = _FakeGoogleAccountAuthService();
+      final secondAuth = _FakeGoogleAccountAuthService();
+      final authSwitcher =
+          NotifierProvider<_AuthServiceSwitcher, _FakeGoogleAccountAuthService>(
+            () => _AuthServiceSwitcher(firstAuth),
+          );
+      final container = ProviderContainer(
+        overrides: [
+          googleOAuthConfigProvider.overrideWithValue(
+            GoogleOAuthConfig.fromValues(
+              webClientId: 'web-client-id.apps.googleusercontent.com',
+              serverClientId: 'server-client-id.apps.googleusercontent.com',
+            ),
+          ),
+          googleAccountAuthServiceProvider.overrideWith(
+            (ref) => ref.watch(authSwitcher),
+          ),
+          clockProvider.overrideWithValue(
+            TestClock(DateTime.utc(2026, 5, 3, 9)),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final accountSubscription = container
+          .listen<AsyncValue<AccountSettingsState>>(
+            accountSettingsControllerProvider,
+            (_, _) {},
+            fireImmediately: true,
+          );
+      addTearDown(accountSubscription.close);
+
+      await container.read(accountSettingsControllerProvider.future);
+      expect(firstAuth.listenCount, 1);
+
+      container.read(authSwitcher.notifier).replace(secondAuth);
+      await container.read(accountSettingsControllerProvider.future);
+
+      expect(firstAuth.cancelCount, 1);
+      expect(secondAuth.listenCount, 1);
+      firstAuth.emit(
+        GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      );
+      await pumpEventQueue();
+      expect(
+        container.read(accountSettingsControllerProvider).requireValue.status,
+        AccountLinkStatus.signedOut,
+      );
+
+      secondAuth.emit(
+        GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      );
+      await pumpEventQueue();
+
+      expect(
+        container.read(accountSettingsControllerProvider).requireValue.status,
+        AccountLinkStatus.signedIn,
+      );
+    },
+  );
 }
 
 ProviderContainer _createContainer({
@@ -576,16 +649,26 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
     this.accessTokenResult =
         const DriveAccessTokenResult.reauthorizationRequired(),
     this.requiresPlatformSignInButton = false,
-  });
+  }) {
+    _events = StreamController<GoogleAccountAuthResult>.broadcast(
+      onListen: () {
+        listenCount += 1;
+      },
+      onCancel: () {
+        cancelCount += 1;
+      },
+    );
+  }
 
-  final StreamController<GoogleAccountAuthResult> _events =
-      StreamController<GoogleAccountAuthResult>.broadcast();
+  late final StreamController<GoogleAccountAuthResult> _events;
 
   GoogleAccountAuthResult restoreResult =
       const GoogleAccountAuthResult.signedOut();
   GoogleAccountAuthResult signInResult;
   GoogleAccountAuthResult? authorizeResult;
   DriveAccessTokenResult accessTokenResult;
+  int listenCount = 0;
+  int cancelCount = 0;
   @override
   final bool requiresPlatformSignInButton;
 
@@ -633,6 +716,22 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   void emit(GoogleAccountAuthResult result) {
     _events.add(result);
+  }
+}
+
+final class _AuthServiceSwitcher
+    extends Notifier<_FakeGoogleAccountAuthService> {
+  _AuthServiceSwitcher(this._initial);
+
+  final _FakeGoogleAccountAuthService _initial;
+
+  @override
+  _FakeGoogleAccountAuthService build() {
+    return _initial;
+  }
+
+  void replace(_FakeGoogleAccountAuthService next) {
+    state = next;
   }
 }
 

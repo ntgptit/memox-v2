@@ -1,11 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/study_providers.dart';
+import '../../../../app/di/study/study_settings_providers.dart';
+import '../../../../app/di/study/study_usecase_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
-import 'study_settings_defaults_notifier.dart';
-import 'study_session_notifier.dart';
+import '../../../shared/providers/study_revision_providers.dart';
 
 part 'study_entry_notifier.g.dart';
 

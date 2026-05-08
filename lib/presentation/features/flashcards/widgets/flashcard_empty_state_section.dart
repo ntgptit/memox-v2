@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../shared/states/mx_empty_state.dart';
+import '../../../shared/widgets/mx_empty_state.dart';
 
 class FlashcardEmptyStateSection extends StatelessWidget {
   const FlashcardEmptyStateSection({required this.deckId, super.key});

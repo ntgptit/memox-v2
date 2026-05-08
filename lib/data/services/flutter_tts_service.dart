@@ -77,14 +77,8 @@ final class FlutterTtsService implements TtsService {
       () => _flutterTts.setSpeechRate(TtsSettings.normalizeRate(rate)),
       label: 'setSpeechRate',
     );
-    await _runOnEngine(
-      () => _flutterTts.setVolume(1.0),
-      label: 'setVolume',
-    );
-    await _runOnEngine(
-      () => _flutterTts.setPitch(1.0),
-      label: 'setPitch',
-    );
+    await _runOnEngine(() => _flutterTts.setVolume(1.0), label: 'setVolume');
+    await _runOnEngine(() => _flutterTts.setPitch(1.0), label: 'setPitch');
     if (StringUtils.isNotBlank(voiceName)) {
       await _runOnEngine(
         () => _flutterTts.setVoice(<String, String>{

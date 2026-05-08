@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
-import 'package:memox/presentation/features/study/widgets/study_session/study_mode_local_round.dart';
+import 'package:memox/domain/study/study_session_round.dart';
 
 void main() {
   test('DT1 onInsert: pendingModeRoundItems falls back to current item', () {
@@ -74,17 +74,42 @@ void main() {
         ),
       );
 
-      final progress = overallStudyProgress(
+      final progress = studyModeProgressFromGrades(
         snapshot: snapshot,
-        localCorrectCount: localCorrectGradeCount(const <String, AttemptGrade>{
+        localGrades: const <String, AttemptGrade>{
           'item-1': AttemptGrade.correct,
           'item-2': AttemptGrade.incorrect,
-        }),
+        },
       );
 
-      expect(progress, 0.3);
+      expect(progress.value, 0.3);
+      expect(progress.percent, 30);
     },
   );
+
+  test('DT3 onUpdate: display progress clamps over-complete values', () {
+    final snapshot = _snapshot(
+      currentItem: _item(id: 'item-1', queuePosition: 1),
+      summary: const StudySummary(
+        totalCards: 1,
+        totalModeCount: 1,
+        completedAttempts: 1,
+        correctAttempts: 1,
+        incorrectAttempts: 0,
+        increasedBoxCount: 0,
+        decreasedBoxCount: 0,
+        remainingCount: 0,
+      ),
+    );
+
+    final progress = studyModeProgress(
+      snapshot: snapshot,
+      localCorrectCount: 1,
+    );
+
+    expect(progress.value, 1);
+    expect(progress.percent, 100);
+  });
 }
 
 StudySessionSnapshot _snapshot({

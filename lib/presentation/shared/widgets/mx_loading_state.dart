@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import '../widgets/mx_progress_indicator.dart';
 import '../layouts/mx_gap.dart';
-import '../widgets/mx_text.dart';
+import 'mx_progress_indicator.dart';
+import 'mx_text.dart';
 
 /// Full-area loading placeholder with optional label.
 class MxLoadingState extends StatelessWidget {

@@ -1,4 +1,4 @@
-import '../../../../../domain/enums/study_enums.dart';
+import 'package:memox/domain/enums/study_enums.dart';
 
 class StudyAnswerSubmission {
   const StudyAnswerSubmission({

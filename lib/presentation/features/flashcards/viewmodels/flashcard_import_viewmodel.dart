@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/content_providers.dart';
+import '../../../../app/di/content/flashcard_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../domain/value_objects/content_actions.dart';
+import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'flashcard_import_viewmodel.g.dart';
 
@@ -175,32 +176,24 @@ class FlashcardImportController extends _$FlashcardImportController {
   Future<FlashcardImportPreparation?> preparePreview() async {
     // guard:retry-reviewed
     final draft = ref.read(flashcardImportDraftProvider(deckId));
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(prepareFlashcardImportUseCaseProvider)
-        .execute(
-          deckId: deckId,
-          format: draft.format,
-          rawContent: draft.rawContent,
-          sourceBytes: draft.sourceBytes,
-          excelHasHeader: draft.excelHasHeader,
-          duplicatePolicy: draft.duplicatePolicy,
-          structuredTextSeparator: draft.structuredTextSeparator,
-        );
-    if (!ref.mounted) {
-      return null;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return null;
-    }
-    final preparation = result.valueOrNull!;
-    ref
-        .read(flashcardImportDraftProvider(deckId).notifier)
-        .setPreparation(preparation);
-    state = const AsyncData<void>(null);
-    return preparation;
+    return _actionRunner.runResultValue(
+      () => ref
+          .read(prepareFlashcardImportUseCaseProvider)
+          .execute(
+            deckId: deckId,
+            format: draft.format,
+            rawContent: draft.rawContent,
+            sourceBytes: draft.sourceBytes,
+            excelHasHeader: draft.excelHasHeader,
+            duplicatePolicy: draft.duplicatePolicy,
+            structuredTextSeparator: draft.structuredTextSeparator,
+          ),
+      onSuccess: (preparation) {
+        ref
+            .read(flashcardImportDraftProvider(deckId).notifier)
+            .setPreparation(preparation);
+      },
+    );
   }
 
   Future<int?> commitImport() async {
@@ -210,25 +203,25 @@ class FlashcardImportController extends _$FlashcardImportController {
       return null;
     }
 
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(commitFlashcardImportUseCaseProvider)
-        .execute(deckId: deckId, preparation: preparation);
-    if (!ref.mounted) {
-      return null;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return null;
-    }
-    ref.read(flashcardImportDraftProvider(deckId).notifier).reset();
-    state = const AsyncData<void>(null);
-    return result.valueOrNull;
+    return _actionRunner.runResultValue(
+      () => ref
+          .read(commitFlashcardImportUseCaseProvider)
+          .execute(deckId: deckId, preparation: preparation),
+      onSuccess: (_) {
+        ref.read(flashcardImportDraftProvider(deckId).notifier).reset();
+      },
+    );
   }
 
   void cancelImport() {
     ref.read(flashcardImportDraftProvider(deckId).notifier).reset();
+  }
+
+  MxAsyncActionRunner get _actionRunner {
+    return MxAsyncActionRunner(
+      isMounted: () => ref.mounted,
+      setState: (nextState) => state = nextState,
+    );
   }
 }
 

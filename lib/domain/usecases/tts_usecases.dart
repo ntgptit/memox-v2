@@ -1,11 +1,16 @@
 import '../../core/utils/string_utils.dart';
+import '../services/tts_playback_policy.dart';
 import '../services/tts_service.dart';
 import '../study/entities/study_models.dart';
 
 final class SpeakFlashcardUseCase {
-  const SpeakFlashcardUseCase(this._ttsService);
+  const SpeakFlashcardUseCase(
+    this._ttsService, {
+    TtsPlaybackPolicy playbackPolicy = const TtsPlaybackPolicy(),
+  }) : _playbackPolicy = playbackPolicy;
 
   final TtsService _ttsService;
+  final TtsPlaybackPolicy _playbackPolicy;
 
   Future<void> speakText({
     required String text,
@@ -29,7 +34,7 @@ final class SpeakFlashcardUseCase {
     required TtsTextSide side,
     required TtsSettings settings,
   }) {
-    if (side != TtsTextSide.front) {
+    if (!_playbackPolicy.canSpeakFlashcardSide(side)) {
       return Future<void>.value();
     }
     return speakText(

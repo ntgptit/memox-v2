@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/app.dart';
 import 'package:memox/app/config/app_config.dart';
 import 'package:memox/app/config/env.dart';
-import 'package:memox/app/di/content_providers.dart';
+import 'package:memox/app/di/content/content_core_providers.dart';
 import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/app/logging/app_talker.dart';

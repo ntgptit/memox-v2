@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../../../core/utils/string_utils.dart';
-import '../../../../../../domain/enums/study_enums.dart';
-import '../../../../../../domain/study/entities/study_models.dart';
-import '../../../../../shared/layouts/mx_gap.dart';
-import '../../../../../shared/layouts/mx_space.dart';
-import '../study_mode_local_round.dart';
+import 'package:memox/core/utils/string_utils.dart';
+import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/domain/study/study_session_round.dart';
 import '../study_mode_progress_row.dart';
 import '../study_mode_session_scaffold.dart';
 import 'fill_actions.dart';
@@ -81,11 +81,10 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final item = _currentItem;
-    final progress = overallStudyProgress(
+    final progress = studyModeProgressFromGrades(
       snapshot: widget.snapshot,
-      localCorrectCount: localCorrectGradeCount(_stagedGrades),
-    ).clamp(0, 1).toDouble();
-    final percent = (progress * 100).round();
+      localGrades: _stagedGrades,
+    );
 
     return StudyModeSessionScaffold(
       title: l10n.studyModeFill,
@@ -100,8 +99,8 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 StudyModeProgressRow(
-                  value: progress,
-                  label: l10n.commonPercentValue(percent),
+                  value: progress.value,
+                  label: l10n.commonPercentValue(progress.percent),
                 ),
                 const MxGap(MxSpace.md),
                 Expanded(

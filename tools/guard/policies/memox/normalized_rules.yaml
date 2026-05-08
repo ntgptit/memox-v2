@@ -1066,11 +1066,14 @@ rules:
   - id: route_definition_outside_router
     type: forbidden_pattern
     name: "Route Definition Outside Router"
-    description: "GoRouter route definitions must stay in `lib/app/router/app_router.dart`."
+    description: "GoRouter route definitions must stay in `lib/app/router/app_router.dart` or feature-local route registries."
     message_code: route_definition_outside_router
     severity: error
     impact: architecture
     scope: non_router_source
+    exclude:
+      - "presentation/features/*/routes/*_routes.dart"
+      - "**/presentation/features/*/routes/*_routes.dart"
     fix_hint_code: keep_route_definitions_in_router
     params:
       patterns:

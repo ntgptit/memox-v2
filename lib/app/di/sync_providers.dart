@@ -14,9 +14,8 @@ import '../../domain/usecases/drive_sync_usecases.dart';
 import '../services/drive_sync_runtime_effects.dart';
 import '../logging/app_talker.dart';
 import 'account_providers.dart';
-import 'content_providers.dart';
+import 'content/content_core_providers.dart';
 import 'providers.dart';
-import 'study_providers.dart';
 
 part 'sync_providers.g.dart';
 
@@ -27,36 +26,36 @@ http.Client driveSyncHttpClient(Ref ref) {
   return client;
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 DriveAppDataClient googleDriveAppDataClient(Ref ref) {
   return GoogleDriveAppDataClient(ref.watch(driveSyncHttpClientProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 DriveSyncSnapshotCodec driveSyncSnapshotCodec(Ref ref) {
   return const DriveSyncSnapshotCodec();
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 LocalDatabaseSnapshotGateway localDatabaseSnapshotGateway(Ref ref) {
   return createLocalDatabaseSnapshotGateway(ref.watch(appDatabaseProvider));
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Future<AppSettingsSnapshotStore> appSettingsSnapshotStore(Ref ref) async {
   return AppSettingsSnapshotStore(
     await ref.watch(sharedPreferencesProvider.future),
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Future<DriveSyncMetadataStore> driveSyncMetadataStore(Ref ref) async {
   return DriveSyncMetadataStore(
     await ref.watch(sharedPreferencesProvider.future),
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Future<DriveSyncRepository> driveSyncRepository(Ref ref) async {
   return GoogleDriveSyncRepository(
     accountRepository: await ref.watch(cloudAccountRepositoryProvider.future),
@@ -75,14 +74,14 @@ Future<DriveSyncRepository> driveSyncRepository(Ref ref) async {
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Future<LoadDriveSyncStatusUseCase> loadDriveSyncStatusUseCase(Ref ref) async {
   return LoadDriveSyncStatusUseCase(
     await ref.watch(driveSyncRepositoryProvider.future),
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Future<SyncGoogleDriveSnapshotUseCase> syncGoogleDriveSnapshotUseCase(
   Ref ref,
 ) async {
@@ -91,7 +90,7 @@ Future<SyncGoogleDriveSnapshotUseCase> syncGoogleDriveSnapshotUseCase(
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Future<UploadLocalDriveSnapshotUseCase> uploadLocalDriveSnapshotUseCase(
   Ref ref,
 ) async {
@@ -100,14 +99,14 @@ Future<UploadLocalDriveSnapshotUseCase> uploadLocalDriveSnapshotUseCase(
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Future<RestoreDriveSnapshotUseCase> restoreDriveSnapshotUseCase(Ref ref) async {
   return RestoreDriveSnapshotUseCase(
     await ref.watch(driveSyncRepositoryProvider.future),
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 Future<ResolveDriveSyncConflictUseCase> resolveDriveSyncConflictUseCase(
   Ref ref,
 ) async {
@@ -116,12 +115,12 @@ Future<ResolveDriveSyncConflictUseCase> resolveDriveSyncConflictUseCase(
   );
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 AppReloadService appReloadService(Ref ref) {
   return createAppReloadService();
 }
 
-@Riverpod(keepAlive: true)
+@riverpod
 DriveSyncRuntimeEffects driveSyncRuntimeEffects(Ref ref) {
   return RiverpodDriveSyncRuntimeEffects(
     ref: ref,

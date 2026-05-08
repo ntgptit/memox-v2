@@ -25,11 +25,11 @@ import 'package:memox/presentation/shared/layouts/mx_content_shell.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_scaffold.dart';
 import 'package:memox/presentation/shared/layouts/mx_section.dart';
-import 'package:memox/presentation/shared/states/mx_empty_state.dart';
-import 'package:memox/presentation/shared/states/mx_error_state.dart';
-import 'package:memox/presentation/shared/states/mx_loading_state.dart';
-import 'package:memox/presentation/shared/states/mx_offline_state.dart';
-import 'package:memox/presentation/shared/states/mx_retained_async_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_empty_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_offline_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_retained_async_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_animated_switcher.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
@@ -5881,9 +5881,9 @@ List<File> _sharedWidgetSourceFiles() {
 
 List<File> _sharedStateSourceFiles() {
   final files = <File>[
-    File('lib/presentation/shared/states/mx_empty_state.dart'),
-    File('lib/presentation/shared/states/mx_error_state.dart'),
-    File('lib/presentation/shared/states/mx_loading_state.dart'),
+    File('lib/presentation/shared/widgets/mx_empty_state.dart'),
+    File('lib/presentation/shared/widgets/mx_error_state.dart'),
+    File('lib/presentation/shared/widgets/mx_loading_state.dart'),
   ];
 
   for (final file in files) {

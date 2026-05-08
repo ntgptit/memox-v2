@@ -19,7 +19,7 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../decks/actions/deck_quick_actions.dart';
 import '../../decks/viewmodels/deck_action_viewmodel.dart';

@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memox/app/di/study_providers.dart';
+import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/services/tts_service.dart';
@@ -17,7 +17,7 @@ import 'package:memox/presentation/features/study/widgets/study_session/guess/gu
 import 'package:memox/presentation/features/study/widgets/study_session/fill/fill_motion.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/recall/recall_motion.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/study_speak_button.dart';
-import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/presentation/shared/widgets/mx_text_field.dart';

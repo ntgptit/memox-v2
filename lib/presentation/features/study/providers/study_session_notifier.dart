@@ -2,26 +2,18 @@ import 'dart:math';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/study_providers.dart';
+import '../../../../app/di/study/study_usecase_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
+import '../../../shared/providers/study_revision_providers.dart';
+import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'study_session_notifier.g.dart';
 
 const _defaultAnswerDistractorLimit = 3;
 const _guessAnswerDistractorLimit = 4;
-
-@Riverpod(keepAlive: true)
-class StudySessionDataRevision extends _$StudySessionDataRevision {
-  @override
-  int build() => 0;
-
-  void bump() {
-    state += 1;
-  }
-}
 
 @Riverpod(keepAlive: true)
 Future<StudySessionSnapshot> studySessionState(Ref ref, String sessionId) {
@@ -34,68 +26,61 @@ class StudySessionActionController extends _$StudySessionActionController {
   FutureOr<void> build(String sessionId) {}
 
   Future<bool> answer(AttemptGrade grade) async {
-    state = const AsyncLoading<void>();
-    final snapshot = await ref.read(
-      studySessionStateProvider(sessionId).future,
-    );
-    if (!ref.mounted) {
-      return false;
-    }
-    try {
-      await ref
+    return _executeWithCurrentSession(
+      (snapshot) => ref
           .read(answerFlashcardUseCaseProvider)
           .execute(
             sessionId: sessionId,
             studyType: snapshot.session.studyType,
             grade: grade,
-          );
-      if (!ref.mounted) {
-        return false;
-      }
-      _refreshStudySessionReadModels();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
+          ),
+    );
   }
 
   Future<bool> answerCurrentReviewModeAsCorrect() async {
-    state = const AsyncLoading<void>();
-    final snapshot = await ref.read(
-      studySessionStateProvider(sessionId).future,
-    );
-    if (!ref.mounted) {
-      return false;
-    }
-    try {
-      await ref
+    return _executeWithCurrentSession(
+      (snapshot) => ref
           .read(answerCurrentModeBatchUseCaseProvider)
-          .execute(
-            sessionId: sessionId,
-            studyType: snapshot.session.studyType,
-          );
-      if (!ref.mounted) {
-        return false;
-      }
-      _refreshStudySessionReadModels();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
+          .execute(sessionId: sessionId, studyType: snapshot.session.studyType),
+    );
   }
 
   Future<bool> answerCurrentModeItemGradesBatch(
     Map<String, AttemptGrade> itemGrades,
+  ) async {
+    return _executeWithCurrentSession(
+      (snapshot) => ref
+          .read(answerCurrentModeItemGradesBatchUseCaseProvider)
+          .execute(
+            sessionId: sessionId,
+            studyType: snapshot.session.studyType,
+            itemGrades: itemGrades,
+          ),
+    );
+  }
+
+  Future<bool> skip() async {
+    return _executeWithCurrentSession(
+      (_) => ref.read(skipFlashcardUseCaseProvider).execute(sessionId),
+    );
+  }
+
+  Future<bool> cancel() async {
+    return _executeWithCurrentSession(
+      (_) => ref.read(cancelStudySessionUseCaseProvider).execute(sessionId),
+    );
+  }
+
+  Future<bool> finalizeSession() async {
+    return _executeWithCurrentSession(
+      (snapshot) => ref
+          .read(finalizeStudySessionUseCaseProvider)
+          .execute(sessionId: sessionId, studyType: snapshot.session.studyType),
+    );
+  }
+
+  Future<bool> _executeWithCurrentSession(
+    Future<void> Function(StudySessionSnapshot snapshot) action,
   ) async {
     state = const AsyncLoading<void>();
     final snapshot = await ref.read(
@@ -104,100 +89,18 @@ class StudySessionActionController extends _$StudySessionActionController {
     if (!ref.mounted) {
       return false;
     }
-    try {
-      await ref
-          .read(answerCurrentModeItemGradesBatchUseCaseProvider)
-          .execute(
-            sessionId: sessionId,
-            studyType: snapshot.session.studyType,
-            itemGrades: itemGrades,
-          );
-      if (!ref.mounted) {
-        return false;
-      }
-      _refreshStudySessionReadModels();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
+    return _executeMutation(() => action(snapshot));
   }
 
-  Future<bool> skip() async {
-    state = const AsyncLoading<void>();
-    await ref.read(studySessionStateProvider(sessionId).future);
-    if (!ref.mounted) {
-      return false;
-    }
-    try {
-      await ref.read(skipFlashcardUseCaseProvider).execute(sessionId);
-      if (!ref.mounted) {
-        return false;
-      }
-      _refreshStudySessionReadModels();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
+  Future<bool> _executeMutation(Future<void> Function() action) async {
+    return _actionRunner.run(action, onSuccess: _refreshStudySessionReadModels);
   }
 
-  Future<bool> cancel() async {
-    state = const AsyncLoading<void>();
-    await ref.read(studySessionStateProvider(sessionId).future);
-    if (!ref.mounted) {
-      return false;
-    }
-    try {
-      await ref.read(cancelStudySessionUseCaseProvider).execute(sessionId);
-      if (!ref.mounted) {
-        return false;
-      }
-      _refreshStudySessionReadModels();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
-  }
-
-  Future<bool> finalizeSession() async {
-    state = const AsyncLoading<void>();
-    final snapshot = await ref.read(
-      studySessionStateProvider(sessionId).future,
+  MxAsyncActionRunner get _actionRunner {
+    return MxAsyncActionRunner(
+      isMounted: () => ref.mounted,
+      setState: (nextState) => state = nextState,
     );
-    if (!ref.mounted) {
-      return false;
-    }
-    try {
-      await ref
-          .read(finalizeStudySessionUseCaseProvider)
-          .execute(sessionId: sessionId, studyType: snapshot.session.studyType);
-      if (!ref.mounted) {
-        return false;
-      }
-      _refreshStudySessionReadModels();
-      state = const AsyncData<void>(null);
-      return true;
-    } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return false;
-      }
-      state = AsyncError<void>(error, stackTrace);
-      return false;
-    }
   }
 
   void _refreshStudySessionReadModels() {

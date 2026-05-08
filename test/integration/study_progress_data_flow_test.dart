@@ -8,7 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/config/app_config.dart';
 import 'package:memox/app/config/env.dart';
-import 'package:memox/app/di/content_providers.dart';
+import 'package:memox/app/di/content/content_core_providers.dart';
+import 'package:memox/app/di/content/content_revision_providers.dart';
 import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/router/app_router.dart';
 import 'package:memox/app/router/route_names.dart';
@@ -92,11 +93,13 @@ void main() {
       await harness.seedDeck();
       await harness.pumpApp(tester, _flashcardListLocation(_deckId));
       await _pumpUntilFound(tester, find.text(_alphaFront));
+      await _scrollUntilAnyFound(tester, find.text(_alphaBack));
 
-      expect(find.text(_alphaFront), findsOneWidget);
+      expect(find.text(_alphaFront), findsWidgets);
       expect(find.text(_alphaBack), findsOneWidget);
 
-      await _tapText(tester, 'Study');
+      await _scrollUntilAnyFound(tester, find.text('Study this deck'));
+      await _tapText(tester, 'Study this deck');
       await _pumpUntilFound(tester, find.text('Start a study session'));
 
       await _tapText(tester, 'Study');

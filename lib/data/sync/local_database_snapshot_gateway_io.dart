@@ -50,7 +50,9 @@ final class _IoLocalDatabaseSnapshotGateway
   }
 
   @override
-  Future<DriveSyncRestoreEffect> restoreDatabase(Uint8List databaseBytes) async {
+  Future<DriveSyncRestoreEffect> restoreDatabase(
+    Uint8List databaseBytes,
+  ) async {
     final databaseFile = await _databaseFile();
     await _database.close();
     await _backupIfExists(databaseFile);

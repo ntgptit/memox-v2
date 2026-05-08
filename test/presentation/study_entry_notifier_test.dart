@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memox/app/di/study_providers.dart';
+import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/core/errors/app_exception.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
@@ -127,7 +127,8 @@ final class _SuccessfulStudyRepo implements StudyRepo {
   }) {
     throw UnimplementedError();
   }
-@override
+
+  @override
   Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
     required String sessionId,
     required Map<String, AttemptGrade> itemGrades,
@@ -211,7 +212,8 @@ final class _EmptyStudyRepo implements StudyRepo {
   }) {
     throw UnimplementedError();
   }
-@override
+
+  @override
   Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
     required String sessionId,
     required Map<String, AttemptGrade> itemGrades,

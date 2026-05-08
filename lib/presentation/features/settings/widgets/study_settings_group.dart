@@ -10,14 +10,14 @@ import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_loading_state.dart';
-import '../../../shared/states/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_inline_toggle.dart';
 import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_text.dart';
-import '../../study/providers/study_settings_defaults_notifier.dart';
+import '../viewmodels/study_settings_defaults_viewmodel.dart';
 import 'settings_group.dart';
 
 const _newStudyBatchRowKey = ValueKey<String>('settings-study-new-batch-row');

@@ -1,4 +1,4 @@
-import '../../../../../../domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
 
 const matchVisiblePairLimit = 5;
 

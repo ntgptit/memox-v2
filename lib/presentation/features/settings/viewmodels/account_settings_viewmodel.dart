@@ -75,17 +75,21 @@ class AccountSettingsState {
 @riverpod
 class AccountSettingsController extends _$AccountSettingsController {
   StreamSubscription<GoogleAccountAuthResult>? _authSubscription;
+  GoogleAccountAuthService? _subscribedAuthService;
+  bool _registeredDispose = false;
 
   @override
   Future<AccountSettingsState> build() async {
     final service = ref.watch(googleAccountAuthServiceProvider);
-    _authSubscription ??= service.authenticationEvents.listen((result) {
-      unawaited(_handleAuthenticationEvent(result));
-    });
-    ref.onDispose(() {
-      unawaited(_authSubscription?.cancel());
-      _authSubscription = null;
-    });
+    if (!_registeredDispose) {
+      ref.onDispose(() {
+        unawaited(_authSubscription?.cancel());
+        _authSubscription = null;
+        _subscribedAuthService = null;
+      });
+      _registeredDispose = true;
+    }
+    await _watchAuthenticationEvents(service);
 
     final config = ref.watch(googleOAuthConfigProvider);
     final requiresPlatformButton = service.requiresPlatformSignInButton;
@@ -199,6 +203,27 @@ class AccountSettingsController extends _$AccountSettingsController {
     if (shouldRefreshSync) {
       _refreshDriveSyncStatus();
     }
+  }
+
+  Future<void> _watchAuthenticationEvents(
+    GoogleAccountAuthService service,
+  ) async {
+    if (identical(_subscribedAuthService, service) &&
+        _authSubscription != null) {
+      return;
+    }
+    await _cancelAuthenticationSubscription();
+    _subscribedAuthService = service;
+    _authSubscription = service.authenticationEvents.listen((result) {
+      unawaited(_handleAuthenticationEvent(result));
+    });
+  }
+
+  Future<void> _cancelAuthenticationSubscription() async {
+    final subscription = _authSubscription;
+    _authSubscription = null;
+    _subscribedAuthService = null;
+    await subscription?.cancel();
   }
 
   bool _shouldRefreshDriveSyncStatus(

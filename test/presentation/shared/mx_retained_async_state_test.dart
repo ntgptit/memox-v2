@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
-import 'package:memox/presentation/shared/states/mx_error_state.dart';
-import 'package:memox/presentation/shared/states/mx_loading_state.dart';
-import 'package:memox/presentation/shared/states/mx_retained_async_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_retained_async_state.dart';
 
 void main() {
   testWidgets('DT1 onOpen: shows full loading state on first load', (

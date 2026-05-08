@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../domain/study/entities/study_models.dart';
-import '../../../../../shared/layouts/mx_space.dart';
-import '../../../../../shared/widgets/mx_card.dart';
-import '../../../../../shared/widgets/mx_shake_transition.dart';
-import '../../../../../shared/widgets/mx_text.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_shake_transition.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'guess_motion.dart';
 import 'guess_option_models.dart';
 

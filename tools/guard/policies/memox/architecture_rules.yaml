@@ -17,6 +17,130 @@ rules:
         domain: ["app", "data", "presentation"]
         data: ["app", "presentation"]
 
+  - id: domain_no_flutter_foundation_import
+    type: forbidden_pattern
+    name: "Domain No Flutter Foundation Import"
+    description: "Domain entities and services must stay pure Dart and must not import Flutter framework annotations."
+    message_code: domain_flutter_foundation_import
+    severity: error
+    impact: architecture
+    scope: domain_files
+    fix_hint_code: keep_domain_pure_dart
+    params:
+      patterns:
+        - "import\\s+'package:flutter/foundation\\.dart'"
+
+  - id: presentation_no_dart_io_imports
+    type: forbidden_pattern
+    name: "Presentation No dart:io Imports"
+    description: "Feature screens and widgets must not read files or platform IO directly; route platform access through core/data helpers."
+    message_code: presentation_dart_io_import
+    severity: error
+    impact: architecture
+    scope: feature_ui
+    fix_hint_code: move_platform_io_to_core_or_data
+    params:
+      patterns:
+        - "import\\s+'dart:io"
+
+  - id: presentation_no_broad_dart_ui_imports
+    type: forbidden_pattern
+    name: "Presentation No Broad dart:ui Imports"
+    description: "Presentation code that needs low-level engine APIs must import only the explicit symbols it uses."
+    message_code: presentation_broad_dart_ui_import
+    severity: error
+    impact: architecture
+    scope: ui
+    fix_hint_code: narrow_dart_ui_imports
+    params:
+      patterns:
+        - "import\\s+'dart:ui';"
+
+  - id: study_session_no_deep_relative_imports
+    type: forbidden_pattern
+    name: "Study Session No Deep Relative Imports"
+    description: "Study session widgets may use relative imports only inside the local widget subtree; cross-layer and cross-feature imports must use `package:memox/...`."
+    message_code: study_session_deep_relative_import
+    severity: error
+    impact: architecture
+    scope: study_session_widget_files
+    fix_hint_code: use_package_import_for_study_session_boundary
+    params:
+      patterns:
+        - "^import\\s+'(?:\\.\\./){3,}[^']+';"
+
+  - id: study_session_widgets_no_progress_formula
+    type: forbidden_pattern
+    name: "Study Session Widgets No Progress Formula"
+    description: "Study session widgets should bind display-ready progress values from domain helpers instead of recalculating progress and percent in build methods."
+    message_code: study_session_widget_progress_formula
+    severity: error
+    impact: architecture
+    scope: study_session_widget_files
+    fix_hint_code: use_domain_study_progress_value
+    params:
+      patterns:
+        - "\\boverallStudyProgress\\s*\\("
+        - "\\blocalCorrectGradeCount\\s*\\("
+
+  - id: presentation_async_action_controllers_use_runner
+    type: forbidden_pattern
+    name: "Presentation Async Action Controllers Use Runner"
+    description: "Presentation action controllers should route action failure state through the shared async action runner instead of hand-writing AsyncError boilerplate."
+    message_code: presentation_async_action_controller_boilerplate
+    severity: error
+    impact: architecture
+    scope: presentation_async_action_controller_files
+    fix_hint_code: use_mx_async_action_runner
+    params:
+      patterns:
+        - "state\\s*=\\s*AsyncError<void>\\s*\\("
+
+  - id: cross_feature_study_provider_imports
+    type: forbidden_pattern
+    name: "Cross-feature Study Provider Imports"
+    description: "Non-study presentation features must not import Study feature providers directly; expose shared revision or settings boundaries outside the feature."
+    message_code: cross_feature_study_provider_import
+    severity: error
+    impact: architecture
+    scope: features
+    fix_hint_code: move_shared_provider_boundary
+    params:
+      patterns:
+        - "import\\s+'(?:\\.\\./)+study/providers/"
+        - "import\\s+'(?:\\.\\./)+app/di/study/study_revision_providers\\.dart'"
+        - "import\\s+'package:memox/presentation/features/study/providers/"
+        - "import\\s+'package:memox/app/di/study/study_revision_providers\\.dart'"
+
+  - id: centralized_shared_preferences_provider
+    type: forbidden_pattern
+    name: "Centralized SharedPreferences Provider"
+    description: "Only the app-level DI provider may call `SharedPreferences.getInstance()`; feature DI must reuse `sharedPreferencesProvider`."
+    message_code: duplicate_shared_preferences_provider
+    severity: error
+    impact: architecture
+    scope: core_di
+    exclude:
+      - "lib/app/di/providers.dart"
+      - "providers.dart"
+    fix_hint_code: use_central_shared_preferences_provider
+    params:
+      patterns:
+        - "SharedPreferences\\.getInstance\\s*\\("
+
+  - id: stateless_di_providers_auto_dispose
+    type: forbidden_pattern
+    name: "Stateless DI Providers Auto Dispose"
+    description: "Stateless DAO, repository, use-case, strategy, and store DI providers should use auto-dispose `@riverpod`; reserve keepAlive for services with resource lifecycle or explicit app-wide state."
+    message_code: stateless_di_provider_keep_alive
+    severity: error
+    impact: architecture
+    scope: stateless_di_provider_files
+    fix_hint_code: use_auto_dispose_for_stateless_di
+    params:
+      patterns:
+        - "@Riverpod\\(keepAlive:\\s*true\\)"
+
   - id: core_di_no_ui_imports
     type: forbidden_pattern
     name: "Core DI No UI Imports"
@@ -42,6 +166,22 @@ rules:
     params:
       patterns:
         - "class\\s+\\w+\\s+extends\\s+_\\$\\w+"
+
+  - id: app_router_no_feature_screen_imports
+    type: forbidden_pattern
+    name: "App Router No Feature Screen Imports"
+    description: "`app_router.dart` must compose feature route registries instead of importing feature screens or widgets directly."
+    message_code: app_router_feature_screen_import
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/app/router/app_router.dart"
+    fix_hint_code: use_feature_route_registry
+    params:
+      patterns:
+        - "import\\s+'(?:\\.\\./)+presentation/features/[^']+/(?:screens|widgets)/"
+        - "import\\s+'package:memox/presentation/features/[^/]+/(?:screens|widgets)/"
 
   - id: core_di_barrel_exports
     type: required_pattern
@@ -121,6 +261,23 @@ rules:
       patterns:
         - "ref\\.(?:read|watch)\\s*\\(\\s*\\w+RepositoryProvider\\b"
         - "ref\\.(?:read|watch)\\s*\\(\\s*(?:storageServiceProvider|reminderServiceProvider|deviceSettingsServiceProvider|dailyTaskCheckerProvider|eventBusProvider)\\b"
+
+  - id: tts_controller_uses_playback_policy
+    type: forbidden_pattern
+    name: "TTS Controller Uses Playback Policy"
+    description: "TTS presentation controllers must not hardcode which flashcard side can be spoken; route that business rule through `TtsPlaybackPolicy`."
+    message_code: tts_controller_hardcoded_playback_side
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/presentation/features/tts/providers/tts_controller_notifier.dart"
+    fix_hint_code: use_tts_playback_policy
+    params:
+      patterns:
+        - "if\\s*\\([^\\)]*TtsTextSide\\.front"
+        - "side\\s*!=\\s*TtsTextSide\\.front"
+      skip_comments: true
 
   - id: use_case_direct_dependency_creation
     type: forbidden_pattern
@@ -281,7 +438,7 @@ rules:
   - id: provider_like_file_location
     type: naming_convention
     name: "Provider-like File Location"
-    description: "Files with provider-style suffixes must live in `app/di` or feature `providers/` or `viewmodels/` folders."
+    description: "Files with provider-style suffixes must live in `app/di`, `presentation/shared/providers`, or feature `providers` or `viewmodels` folders."
     message_code: provider_like_file_location
     severity: error
     impact: architecture
@@ -289,7 +446,23 @@ rules:
     fix_hint_code: move_provider_like_file_to_provider_bucket
     params:
       level: path
-      pattern: "^lib/(?:(?:app/di)|(?:presentation/features/[^/]+/(?:providers|viewmodels)))/[a-z0-9_]+_(?:provider|providers|notifier|notifiers|viewmodel)\\.dart$"
+      pattern: "^lib/(?:(?:app/di(?:/[^/]+)*)|(?:presentation/shared/providers)|(?:presentation/features/[^/]+/(?:providers|viewmodels)))/[a-z0-9_]+_(?:provider|providers|notifier|notifiers|viewmodel)\\.dart$"
+
+  - id: di_provider_export_wrappers
+    type: forbidden_pattern
+    name: "DI Provider Export Wrappers"
+    description: "Provider-owned files under `lib/app/di/**` must contain concrete provider wiring, not export-wrapper shortcuts."
+    message_code: di_provider_export_wrapper
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/app/di/**/*_providers.dart"
+    fix_hint_code: import_concrete_di_provider_file
+    params:
+      patterns:
+        - "^export\\s+"
+      skip_comments: true
 
   - id: rogue_top_level_shared_utils_files
     type: naming_convention
@@ -343,6 +516,22 @@ rules:
     params:
       level: file
       pattern: "^mx_[a-z0-9_]+\\.dart$"
+
+  - id: shared_states_folder_forbidden
+    type: naming_convention
+    name: "Shared States Folder Forbidden"
+    description: "`lib/presentation/shared/states/**` is reserved for data state objects and must not contain widget surfaces."
+    message_code: shared_states_folder_forbidden
+    severity: error
+    impact: architecture
+    scope: all
+    targets:
+      - "lib/presentation/shared/states/*.dart"
+      - "lib/presentation/shared/states/**/*.dart"
+    fix_hint_code: move_shared_state_widget_to_widgets
+    params:
+      level: path
+      pattern: "^$"
 
   - id: shared_widget_public_type_prefix
     type: forbidden_pattern

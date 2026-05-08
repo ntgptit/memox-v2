@@ -11,6 +11,24 @@ messages:
     en: "Widget build method exceeds {max_lines} lines."
   layer_import_violation:
     en: "Layer '{current_layer}' must not import '{imported_layer}'."
+  domain_flutter_foundation_import:
+    en: "Domain files must not import `package:flutter/foundation.dart`; keep entities and domain services pure Dart."
+  presentation_dart_io_import:
+    en: "Presentation screens/widgets must not import `dart:io`; move file and platform IO behind a core/data boundary."
+  presentation_broad_dart_ui_import:
+    en: "Presentation files must not import all of `dart:ui`; use a narrow import such as `show ImageFilter` or move the low-level API behind a helper."
+  study_session_deep_relative_import:
+    en: "Study session widgets must not use deep relative imports. Use `package:memox/...` for cross-layer or cross-feature dependencies, and keep relative imports inside the local widget subtree."
+  study_session_widget_progress_formula:
+    en: "Study session widgets must not recalculate study progress or staged correct counts directly. Use the domain `studyModeProgress` / `studyModeProgressFromGrades` helpers and bind their display-ready value."
+  presentation_async_action_controller_boilerplate:
+    en: "Presentation action controllers must not hand-write `AsyncError<void>` mutation boilerplate. Route action execution through `MxAsyncActionRunner` so loading, mounted checks, failure mapping, and success state stay centralized."
+  cross_feature_study_provider_import:
+    en: "Non-study presentation features must not import Study feature providers directly; move shared revision/settings state to an app or owning-feature boundary."
+  duplicate_shared_preferences_provider:
+    en: "Do not call `SharedPreferences.getInstance()` from feature DI; reuse the centralized `sharedPreferencesProvider`."
+  stateless_di_provider_keep_alive:
+    en: "Stateless DI providers for DAOs, repositories, use cases, strategies, and stores should use auto-dispose `@riverpod`; keepAlive is reserved for resource-owning services or explicit app-wide state."
   async_builder:
     en: "Avoid raw `.when(...)` on AsyncValue in feature UI."
   no_hardcoded_color:
@@ -73,6 +91,8 @@ messages:
     en: "`lib/app/di/*` may not import presentation modules."
   core_di_state_leak:
     en: "`lib/app/di/*` should not define stateful Riverpod notifier classes."
+  app_router_feature_screen_import:
+    en: "`app_router.dart` must not import feature screens or widgets directly; import feature-local route registries instead."
   missing_core_di_export:
     en: "`lib/app/di/providers.dart` is missing required exports: {missing_patterns}."
   app_provider_ui_import:
@@ -83,6 +103,8 @@ messages:
     en: "Notifier and viewmodel files must not instantiate infrastructure dependencies directly; read injected dependencies from provider wiring instead."
   feature_provider_direct_infrastructure_access:
     en: "Feature provider/viewmodel files must not read raw repository or infrastructure providers directly. Route repository, storage, reminder, device-settings, daily-task-checker, and event-bus access through a use case or facade boundary."
+  tts_controller_hardcoded_playback_side:
+    en: "TTS presentation controllers must not hardcode `TtsTextSide.front` playback policy. Use `TtsPlaybackPolicy` from domain wiring instead."
   use_case_direct_dependency_creation:
     en: "Domain use cases must not instantiate infrastructure dependencies directly; receive contracts through constructor or provider injection instead."
   missing_app_provider_export:
@@ -108,7 +130,9 @@ messages:
   route_like_file_location:
     en: "Files named `*_route.dart`, `*_routes.dart`, or `*_router.dart` must live in `lib/app/router/` or a feature-local `routes/` folder."
   provider_like_file_location:
-    en: "Files with provider-style suffixes must live in `lib/app/di/` or feature `providers/` or `viewmodels/` folders."
+    en: "Files with provider-style suffixes must live in `lib/app/di/**`, `lib/presentation/shared/providers/**`, or feature `providers/` or `viewmodels/` folders."
+  di_provider_export_wrapper:
+    en: "`lib/app/di/**/*_providers.dart` must not be an export wrapper; import the concrete DI provider file directly."
   rogue_top_level_shared_utils_files:
     en: "Do not add new source under `lib/shared/` or `lib/utils/`; move it into an owned layer such as `core`, `presentation/shared`, or a feature folder."
   cross_feature_presentation_imports:
@@ -137,6 +161,8 @@ messages:
     en: "`lib/core/theme/**` must not use export-wrapper files; import the concrete source file directly."
   shared_widget_file_naming:
     en: "Widget-bearing shared file '{file_name}' must follow the `mx_*.dart` naming contract."
+  shared_states_folder_forbidden:
+    en: "`lib/presentation/shared/states/**` must not contain widget surfaces; move shared state UI to `lib/presentation/shared/widgets/**`."
   feature_widget_folder_contract:
     en: "Feature widget file '{path}' must live under `widgets/<screen_slug>/...` or `widgets/common/...`."
   shared_widget_public_type_prefix:
@@ -284,7 +310,7 @@ messages:
   raw_navigator_push_usage:
     en: "UI code should not use raw `Navigator` push APIs; route through `GoRouter` or a shared navigation helper with `RouteConstants`."
   route_definition_outside_router:
-    en: "Declare `GoRoute(...)` entries only inside `lib/app/router/app_router.dart`."
+    en: "Declare `GoRoute(...)` entries only inside `lib/app/router/app_router.dart` or feature-local `routes/*_routes.dart` registries."
   widget_repository_provider_access:
     en: "Widget files must not read or watch repository providers directly; route business logic through notifier, state, or use-case providers."
   widget_callback_ref_watch_usage:
@@ -372,9 +398,39 @@ fix_hints:
   move_to_feature_or_app_provider:
     text:
       en: "Move stateful notifier logic into `presentation/features/<feature>/providers`, `presentation/features/<feature>/viewmodels`, or another app-owned state module instead of `app/di`."
+  use_feature_route_registry:
+    text:
+      en: "Move the screen-specific `GoRoute(...)` entry into `lib/presentation/features/<feature>/routes/<feature>_routes.dart`, then have `app_router.dart` compose that registry instead of importing the screen."
   keep_app_providers_app_level:
     text:
       en: "App-level providers may depend on core and domain, but should not import feature presentation code directly."
+  keep_domain_pure_dart:
+    text:
+      en: "Remove Flutter annotations/imports from domain code. If the class is immutable by construction, keep `final` fields and const constructors without framework annotations."
+  move_platform_io_to_core_or_data:
+    text:
+      en: "Move file reads, filesystem access, and other `dart:io` work into `lib/core/**` or `lib/data/**`, then have presentation call that boundary."
+  narrow_dart_ui_imports:
+    text:
+      en: "Replace `import 'dart:ui';` with an explicit symbol import such as `import 'dart:ui' show ImageFilter;`."
+  use_package_import_for_study_session_boundary:
+    text:
+      en: "Replace deep `../../../...` imports in study-session widgets with `package:memox/...` when the dependency crosses feature, layer, or shared boundaries."
+  use_domain_study_progress_value:
+    text:
+      en: "Move study-progress ratio, staged-correct counting, and percent rounding into `lib/domain/study/study_session_round.dart`, then have widgets bind the returned value object."
+  use_mx_async_action_runner:
+    text:
+      en: "Replace repeated loading/result/failure branches with `MxAsyncActionRunner.run`, `runResult`, or `runResultValue` from `lib/presentation/shared/viewmodels/mx_async_action_runner.dart`."
+  move_shared_provider_boundary:
+    text:
+      en: "Expose cross-feature invalidation or settings state through app DI, domain use cases, or the owning feature instead of importing another feature's provider file."
+  use_central_shared_preferences_provider:
+    text:
+      en: "Import `lib/app/di/providers.dart` and watch `sharedPreferencesProvider.future` instead of creating another SharedPreferences provider."
+  use_auto_dispose_for_stateless_di:
+    text:
+      en: "Change stateless DI wiring to `@riverpod`; keep `@Riverpod(keepAlive: true)` only for providers that own a disposable service, explicit app-wide state, or screen query cache policy."
   rename_screen_file_to_screen_or_page:
     text:
       en: "If the file represents a screen/page, rename it to `*_screen.dart` or `*_page.dart`. If it is only a widget, move it out of `screens/` or rename it to a non-screen suffix such as `_view.dart`."
@@ -386,19 +442,28 @@ fix_hints:
       en: "Move route-like files into `lib/app/router/` or `lib/presentation/features/<feature>/routes/` so navigation contracts stay discoverable and consistent."
   move_provider_like_file_to_provider_bucket:
     text:
-      en: "Move provider-like files into `lib/app/di/` or the owning feature's `providers/` or `viewmodels/` folder."
+      en: "Move provider-like files into `lib/app/di/**`, `lib/presentation/shared/providers/**`, or the owning feature's `providers/` or `viewmodels/` folder."
+  import_concrete_di_provider_file:
+    text:
+      en: "Remove the provider export wrapper and update callers to import the concrete provider file under its DI package folder."
   move_code_out_of_top_level_shared_utils:
     text:
       en: "Do not create top-level `lib/shared/` or `lib/utils/` buckets. Place the code in `lib/core/**`, `lib/presentation/shared/**`, or an owning feature directory instead."
   move_shared_code_or_raise_boundary:
     text:
       en: "Do not couple feature screens/widgets directly. Move reusable UI into `presentation/shared`, share state through app/domain boundaries, or duplicate the small UI locally when reuse is not real."
+  move_shared_state_widget_to_widgets:
+    text:
+      en: "Place shared loading, empty, error, offline, and retained-async UI surfaces under `lib/presentation/shared/widgets/`. Keep `states/` for data state objects only."
   inject_dependency_via_provider:
     text:
       en: "Move the concrete dependency construction into `app/di` or another app-owned dependency wiring module, expose it through provider wiring, and inject or read the dependency instead of constructing it inline."
   use_usecase_or_facade_boundary:
     text:
       en: "Introduce or reuse a use-case/facade provider so the feature provider depends on a stable application/domain boundary instead of raw repository or infrastructure providers."
+  use_tts_playback_policy:
+    text:
+      en: "Move the side eligibility rule into `lib/domain/services/tts_playback_policy.dart`, inject it through app DI, and call the policy from presentation instead of comparing against `TtsTextSide.front`."
   keep_ui_imports_out_of_domain:
     text:
       en: "Keep Flutter UI imports, `BuildContext`, navigation, and material widgets out of `lib/domain/**`; use pure Dart/domain contracts only."
@@ -536,7 +601,7 @@ fix_hints:
       en: "Route logs and monitoring through a centralized app logging utility instead of raw print/debug or direct Sentry calls."
   keep_route_definitions_in_router:
     text:
-      en: "Declare concrete `GoRoute(...)` entries only in `lib/app/router/app_router.dart`; keep other files limited to route names, helpers, and navigation calls."
+      en: "Keep concrete `GoRoute(...)` entries in `lib/app/router/app_router.dart` or feature-local `routes/*_routes.dart` files. Other files should stay limited to route names, helpers, and navigation calls."
   use_read_inside_callback:
     text:
       en: "Inside button/tap/retry callbacks, use `ref.read(...)` for one-shot work. Reserve `ref.watch(...)` for render paths that should rebuild."

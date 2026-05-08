@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../shared/layouts/mx_gap.dart';
-import '../../../../shared/layouts/mx_space.dart';
-import '../../../../shared/widgets/mx_card.dart';
-import '../../../../shared/widgets/mx_text.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 
 class ReadyToFinalizePanel extends StatelessWidget {
   const ReadyToFinalizePanel({super.key});

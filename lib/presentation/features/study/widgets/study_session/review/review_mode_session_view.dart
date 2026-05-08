@@ -4,12 +4,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../../../domain/services/tts_service.dart';
-import '../../../../../../domain/study/entities/study_models.dart';
-import '../../../../../shared/layouts/mx_gap.dart';
-import '../../../../../shared/layouts/mx_space.dart';
-import '../../../../../shared/widgets/mx_text.dart';
-import '../study_mode_local_round.dart';
+import 'package:memox/domain/services/tts_service.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
+import 'package:memox/domain/study/study_session_round.dart';
 import '../study_mode_progress_row.dart';
 import '../study_mode_session_scaffold.dart';
 import '../study_speak_button.dart';
@@ -80,11 +80,10 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cards = _reviewCards;
-    final progress = overallStudyProgress(
+    final progress = studyModeProgress(
       snapshot: widget.snapshot,
       localCorrectCount: _reviewLocalCorrectCount(cards.length),
     );
-    final percent = (progress * 100).round();
 
     return StudyModeSessionScaffold(
       title: l10n.studyModeReview,
@@ -96,8 +95,8 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           StudyModeProgressRow(
-            value: progress,
-            label: l10n.studyReviewProgressPercent(percent),
+            value: progress.value,
+            label: l10n.studyReviewProgressPercent(progress.percent),
           ),
           const MxGap(MxSpace.md),
           Expanded(

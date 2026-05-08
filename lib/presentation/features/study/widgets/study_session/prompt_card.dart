@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../shared/layouts/mx_gap.dart';
-import '../../../../shared/layouts/mx_space.dart';
-import '../../../../shared/widgets/mx_card.dart';
-import '../../../../shared/widgets/mx_primary_button.dart';
-import '../../../../shared/widgets/mx_text.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'answer_feedback_panel.dart';
 import 'study_answer_models.dart';
 

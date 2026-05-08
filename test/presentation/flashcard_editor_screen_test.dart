@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:memox/app/di/content_providers.dart';
+import 'package:memox/app/di/content/flashcard_providers.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/core/errors/result.dart';
 import 'package:memox/domain/entities/flashcard_entity.dart';

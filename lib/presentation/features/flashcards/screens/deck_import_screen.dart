@@ -1,15 +1,12 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/utils/string_utils.dart';
+import '../../../../core/files/deck_import_file_reader.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
@@ -825,34 +822,4 @@ String _contentHint(AppLocalizations l10n, ImportSourceFormat format) {
     ImportSourceFormat.excel => l10n.importExcelRulesText,
     ImportSourceFormat.structuredText => l10n.importTextHint,
   };
-}
-
-@visibleForTesting
-Future<String?> readDeckImportFileContent(PlatformFile file) async {
-  final bytes = file.bytes;
-  if (bytes != null) {
-    return utf8.decode(bytes);
-  }
-
-  final path = file.path;
-  if (path == null) {
-    return null;
-  }
-
-  return File(path).readAsString(encoding: utf8);
-}
-
-@visibleForTesting
-Future<Uint8List?> readDeckImportFileBytes(PlatformFile file) async {
-  final bytes = file.bytes;
-  if (bytes != null) {
-    return Uint8List.fromList(bytes);
-  }
-
-  final path = file.path;
-  if (path == null) {
-    return null;
-  }
-
-  return File(path).readAsBytes();
 }

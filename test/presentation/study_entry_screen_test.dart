@@ -8,7 +8,7 @@ import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_entry_screen.dart';
-import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 
 void main() {
   testWidgets('DT1 onOpen: shows loading state while study entry loads', (

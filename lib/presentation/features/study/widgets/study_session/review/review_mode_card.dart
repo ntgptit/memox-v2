@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../shared/layouts/mx_space.dart';
-import '../../../../../shared/widgets/mx_card.dart';
-import '../../../../../shared/widgets/mx_icon_button.dart';
-import '../../../../../shared/widgets/mx_text.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 
 class ReviewModeCard extends StatelessWidget {
   const ReviewModeCard({

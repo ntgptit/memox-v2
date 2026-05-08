@@ -160,10 +160,9 @@ class _DashboardActionRow extends StatelessWidget {
     final iconColor = action.isPrimary && action.onAction != null
         ? scheme.primary
         : scheme.onSurfaceVariant;
-    final button = SizedBox(
-      key: action.actionKey,
-      width: _dashboardActionButtonWidth,
-      child: action.isPrimary
+
+    Widget buildButton() {
+      return action.isPrimary
           ? MxPrimaryButton(
               label: action.actionLabel,
               leadingIcon: action.actionIcon,
@@ -178,8 +177,24 @@ class _DashboardActionRow extends StatelessWidget {
               variant: MxSecondaryVariant.outlined,
               fullWidth: true,
               onPressed: action.onAction,
-            ),
-    );
+            );
+    }
+
+    Widget buildFixedButton() {
+      return SizedBox(
+        key: action.actionKey,
+        width: _dashboardActionButtonWidth,
+        child: buildButton(),
+      );
+    }
+
+    Widget buildFullWidthButton() {
+      return SizedBox(
+        key: action.actionKey,
+        width: double.infinity,
+        child: buildButton(),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: MxSpace.sm),
@@ -189,7 +204,7 @@ class _DashboardActionRow extends StatelessWidget {
 
           if (constraints.maxWidth < _dashboardActionInlineMinWidth) {
             return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,10 +215,7 @@ class _DashboardActionRow extends StatelessWidget {
                   ],
                 ),
                 const MxGap(MxSpace.sm),
-                Padding(
-                  padding: const EdgeInsets.only(left: MxSpace.xxl),
-                  child: button,
-                ),
+                buildFullWidthButton(),
               ],
             );
           }
@@ -215,7 +227,7 @@ class _DashboardActionRow extends StatelessWidget {
               const MxGap(MxSpace.md),
               Expanded(child: details),
               const MxGap(MxSpace.md),
-              button,
+              buildFixedButton(),
             ],
           );
         },

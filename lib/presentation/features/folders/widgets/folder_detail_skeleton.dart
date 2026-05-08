@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_feature_layout.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 
 const double _folderHeaderActionSize = 40;

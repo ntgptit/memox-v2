@@ -1,5 +1,12 @@
-import '../../../../../domain/enums/study_enums.dart';
-import '../../../../../domain/study/entities/study_models.dart';
+import '../enums/study_enums.dart';
+import 'entities/study_models.dart';
+
+final class StudyProgressValue {
+  const StudyProgressValue({required this.value, required this.percent});
+
+  final double value;
+  final int percent;
+}
 
 List<StudySessionItem> pendingModeRoundItems(StudySessionSnapshot snapshot) {
   final items = snapshot.currentRoundItems
@@ -53,6 +60,27 @@ double overallStudyProgress({
   }
   final correct = snapshot.summary.correctAttempts + localCorrectCount;
   return (correct / total).clamp(0, 1).toDouble();
+}
+
+StudyProgressValue studyModeProgress({
+  required StudySessionSnapshot snapshot,
+  double localCorrectCount = 0,
+}) {
+  final value = overallStudyProgress(
+    snapshot: snapshot,
+    localCorrectCount: localCorrectCount,
+  );
+  return StudyProgressValue(value: value, percent: (value * 100).round());
+}
+
+StudyProgressValue studyModeProgressFromGrades({
+  required StudySessionSnapshot snapshot,
+  required Map<String, AttemptGrade> localGrades,
+}) {
+  return studyModeProgress(
+    snapshot: snapshot,
+    localCorrectCount: localCorrectGradeCount(localGrades),
+  );
 }
 
 double localCorrectGradeCount(Map<String, AttemptGrade> grades) {

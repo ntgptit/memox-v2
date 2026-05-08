@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:memox/app/di/content_providers.dart';
+import 'package:memox/app/di/content/flashcard_providers.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/core/theme/tokens/app_icon_sizes.dart';
 import 'package:memox/core/errors/result.dart';
@@ -21,7 +21,7 @@ import 'package:memox/presentation/features/flashcards/screens/flashcard_list_sc
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_detail_card_row.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
-import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 

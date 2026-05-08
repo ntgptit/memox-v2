@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/layouts/mx_gap.dart';
-import '../../../../shared/layouts/mx_space.dart';
-import '../../../../shared/widgets/mx_progress_indicator.dart';
-import '../../../../shared/widgets/mx_text.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_progress_indicator.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 
 class StudyModeProgressRow extends StatelessWidget {
   const StudyModeProgressRow({

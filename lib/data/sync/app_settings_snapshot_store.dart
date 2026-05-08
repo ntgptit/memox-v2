@@ -7,32 +7,28 @@ enum _SnapshotSettingType { string, int, double, bool }
 final class AppSettingsSnapshotStore {
   const AppSettingsSnapshotStore(this._preferences);
 
-  static const Map<String, _SnapshotSettingType> _includedKeys =
-      <String, _SnapshotSettingType>{
-        AppConstants.sharedPrefsThemeModeKey: _SnapshotSettingType.string,
-        AppConstants.sharedPrefsLocaleKey: _SnapshotSettingType.string,
-        AppConstants.sharedPrefsDefaultNewBatchSizeKey:
-            _SnapshotSettingType.int,
-        AppConstants.sharedPrefsDefaultReviewBatchSizeKey:
-            _SnapshotSettingType.int,
-        AppConstants.sharedPrefsShuffleFlashcardsKey:
-            _SnapshotSettingType.bool,
-        AppConstants.sharedPrefsShuffleAnswersKey: _SnapshotSettingType.bool,
-        AppConstants.sharedPrefsPrioritizeOverdueKey: _SnapshotSettingType.bool,
-        AppConstants.sharedPrefsTtsAutoPlayKey: _SnapshotSettingType.bool,
-        AppConstants.sharedPrefsTtsFrontLanguageKey:
-            _SnapshotSettingType.string,
-        AppConstants.sharedPrefsTtsRateKey: _SnapshotSettingType.double,
-        AppConstants.sharedPrefsTtsFrontVoiceNameKey:
-            _SnapshotSettingType.string,
-      };
+  static const Map<String, _SnapshotSettingType>
+  _includedKeys = <String, _SnapshotSettingType>{
+    AppConstants.sharedPrefsThemeModeKey: _SnapshotSettingType.string,
+    AppConstants.sharedPrefsLocaleKey: _SnapshotSettingType.string,
+    AppConstants.sharedPrefsDefaultNewBatchSizeKey: _SnapshotSettingType.int,
+    AppConstants.sharedPrefsDefaultReviewBatchSizeKey: _SnapshotSettingType.int,
+    AppConstants.sharedPrefsShuffleFlashcardsKey: _SnapshotSettingType.bool,
+    AppConstants.sharedPrefsShuffleAnswersKey: _SnapshotSettingType.bool,
+    AppConstants.sharedPrefsPrioritizeOverdueKey: _SnapshotSettingType.bool,
+    AppConstants.sharedPrefsTtsAutoPlayKey: _SnapshotSettingType.bool,
+    AppConstants.sharedPrefsTtsFrontLanguageKey: _SnapshotSettingType.string,
+    AppConstants.sharedPrefsTtsRateKey: _SnapshotSettingType.double,
+    AppConstants.sharedPrefsTtsFrontVoiceNameKey: _SnapshotSettingType.string,
+  };
 
   final SharedPreferences _preferences;
 
   Map<String, Object?> load() {
     return <String, Object?>{
       for (final entry in _includedKeys.entries)
-        if (_preferences.containsKey(entry.key)) entry.key: _preferences.get(entry.key),
+        if (_preferences.containsKey(entry.key))
+          entry.key: _preferences.get(entry.key),
     };
   }
 

@@ -4,15 +4,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../../../domain/services/tts_service.dart';
-import '../../../../../../domain/enums/study_enums.dart';
-import '../../../../../../domain/study/entities/study_models.dart';
-import '../../../../../shared/layouts/mx_gap.dart';
-import '../../../../../shared/layouts/mx_space.dart';
-import '../../../../../shared/widgets/mx_card.dart';
-import '../../../../../shared/widgets/mx_icon_button.dart';
-import '../../../../../shared/widgets/mx_text.dart';
-import '../study_mode_local_round.dart';
+import 'package:memox/domain/services/tts_service.dart';
+import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
+import 'package:memox/domain/study/study_session_round.dart';
 import '../study_mode_progress_row.dart';
 import '../study_mode_session_scaffold.dart';
 import '../study_speak_button.dart';
@@ -74,11 +74,10 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final item = _currentItem;
-    final progress = overallStudyProgress(
+    final progress = studyModeProgressFromGrades(
       snapshot: widget.snapshot,
-      localCorrectCount: localCorrectGradeCount(_stagedGrades),
-    ).clamp(0, 1).toDouble();
-    final percent = (progress * 100).round();
+      localGrades: _stagedGrades,
+    );
     if (item == null) {
       return StudyModeSessionScaffold(
         title: l10n.studyModeGuess,
@@ -105,8 +104,8 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
             side: TtsTextSide.front,
           ),
           StudyModeProgressRow(
-            value: progress,
-            label: l10n.commonPercentValue(percent),
+            value: progress.value,
+            label: l10n.commonPercentValue(progress.percent),
           ),
           const MxGap(MxSpace.md),
           Expanded(

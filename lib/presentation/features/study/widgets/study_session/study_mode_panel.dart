@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../domain/enums/study_enums.dart';
-import '../../../../../domain/study/entities/study_models.dart';
+import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
 import 'fill/fill_mode_panel.dart';
 import 'guess/guess_mode_panel.dart';
 import 'match/match_mode_panel.dart';

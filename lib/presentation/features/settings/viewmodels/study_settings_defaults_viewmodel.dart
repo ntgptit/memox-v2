@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/study_providers.dart';
+import '../../../../app/di/study/study_settings_providers.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
 import '../../../../domain/study/study_settings_policy.dart';
+import '../../../shared/providers/study_revision_providers.dart';
 
-part 'study_settings_defaults_notifier.g.dart';
+part 'study_settings_defaults_viewmodel.g.dart';
 
 @immutable
 final class StudyDefaultsSettingsState {
@@ -21,16 +22,6 @@ final class StudyDefaultsSettingsState {
   bool get shuffleFlashcards => newStudyDefaults.shuffleFlashcards;
   bool get shuffleAnswers => newStudyDefaults.shuffleAnswers;
   bool get prioritizeOverdue => newStudyDefaults.prioritizeOverdue;
-}
-
-@Riverpod(keepAlive: true)
-class StudySettingsDataRevision extends _$StudySettingsDataRevision {
-  @override
-  int build() => 0;
-
-  void bump() {
-    state += 1;
-  }
 }
 
 @Riverpod(keepAlive: true)

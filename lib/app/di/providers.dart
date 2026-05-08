@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../core/constants/app_constants.dart';
@@ -12,6 +13,11 @@ import '../config/env.dart';
 import '../logging/app_talker.dart';
 
 part 'providers.g.dart';
+
+@Riverpod(keepAlive: true)
+Future<SharedPreferences> sharedPreferences(Ref ref) {
+  return SharedPreferences.getInstance();
+}
 
 @Riverpod(keepAlive: true)
 AppEnv appEnv(Ref ref) {

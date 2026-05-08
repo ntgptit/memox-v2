@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:memox/app/di/content_providers.dart';
+import 'package:memox/app/di/content/content_core_providers.dart';
+import 'package:memox/app/di/content/content_revision_providers.dart';
 import 'package:memox/app/di/providers.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
 import 'package:memox/domain/value_objects/content_queries.dart';

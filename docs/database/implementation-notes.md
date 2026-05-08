@@ -3,6 +3,7 @@
 ## Suggested File Placement
 Theo cấu trúc repo hiện tại, local DB nên đi vào:
 - `lib/data/datasources/local/app_database.dart`
+- `lib/data/datasources/local/migrations/app_database_migrations.dart`
 - `lib/data/datasources/local/tables/folders_table.dart`
 - `lib/data/datasources/local/tables/decks_table.dart`
 - `lib/data/datasources/local/tables/flashcards_table.dart`
@@ -41,6 +42,8 @@ Trình tự:
 - Mọi timestamp lưu UTC epoch milliseconds
 
 ## Drift Migration Notes
+- `app_database.dart` chỉ giữ schema/version/open hooks; migration orchestration, schema helpers, index definitions, and legacy data backfill nằm trong `lib/data/datasources/local/migrations/`.
+- Ưu tiên Drift `Migrator` API cho thao tác schema như create/drop/alter table và create/drop index; chỉ giữ SQL trực tiếp cho data backfill hoặc schema introspection mà Drift chưa có API typed tương đương.
 - App `schemaVersion=2` là migration tương thích cho local DB đã được tạo khi `study_session_items.study_mode` chưa tồn tại.
 - Migration thêm `study_mode`, map `srs_review` về `fill`, map New Study `mode_order` 1..5 lần lượt về `review`, `match`, `guess`, `recall`, `fill`, rồi tạo lại index idempotent.
 - App `schemaVersion=5` cho phép `flashcard_progress.last_result=initial_passed` để tách nghĩa New Study completion khỏi SRS Review `perfect`, đồng thời convert các row legacy `perfect` có thể đối chiếu an toàn với completed New Study attempt.

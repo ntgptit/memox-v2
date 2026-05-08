@@ -4,7 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_empty_state.dart';
+import '../../../shared/widgets/mx_empty_state.dart';
 import '../../../shared/widgets/mx_text.dart';
 
 class ActiveSessionsHeader extends StatelessWidget {

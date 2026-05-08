@@ -1,0 +1,485 @@
+// ignore_for_file: experimental_member_use
+
+part of '../app_database.dart';
+
+Future<void> _runSchemaMigrations(
+  AppDatabase database,
+  Migrator migrator,
+  int from,
+) async {
+  final runner = _AppDatabaseMigrationRunner(database, migrator);
+  await runner.run(from);
+}
+
+Future<void> _createSchemaIndexes(Migrator migrator) async {
+  for (final index in _schemaIndexes) {
+    await migrator.createIndex(index);
+  }
+}
+
+Future<void> _enableForeignKeys(AppDatabase database) async {
+  await database.customStatement(_Pragma.foreignKeysOn);
+}
+
+final class _AppDatabaseMigrationRunner {
+  const _AppDatabaseMigrationRunner(this.database, this.migrator);
+
+  final AppDatabase database;
+  final Migrator migrator;
+
+  Future<void> run(int from) async {
+    if (from < 2) {
+      await _rebuildLegacyFlashcardProgressIfNeeded();
+      await _resetLegacyStudyTablesIfNeeded();
+    }
+    if (from < 3) {
+      await _migrateFlashcardsForSchemaV3();
+    }
+    if (from < 4) {
+      await _normalizeStudyAttemptResultsForSchemaV4();
+    }
+    if (from < 5) {
+      await _allowInitialPassedReviewResultForSchemaV5();
+    }
+    if (from < 6) {
+      await _repairMissingFlashcardProgressForSchemaV6();
+    }
+  }
+
+  Future<void> _rebuildLegacyFlashcardProgressIfNeeded() async {
+    if (!await _hasTable(_TableName.flashcardProgress)) {
+      await migrator.createTable(database.flashcardProgress);
+      return;
+    }
+
+    if (!await _hasRequiredFlashcardProgressColumns()) {
+      await _dropFlashcardProgressIndexes();
+      await migrator.deleteTable(_TableName.flashcardProgress);
+      await migrator.createTable(database.flashcardProgress);
+      return;
+    }
+
+    final tableSql = await _tableSql(_TableName.flashcardProgress) ?? '';
+    if (!tableSql.contains("'correct'") && !tableSql.contains("'remembered'")) {
+      return;
+    }
+
+    await _dropFlashcardProgressIndexes();
+    await _alterTable(
+      TableMigration(
+        database.flashcardProgress,
+        columnTransformer: <GeneratedColumn, Expression>{
+          database.flashcardProgress.lastResult: const CustomExpression<String>(
+            _legacyFlashcardProgressResultExpression,
+          ),
+        },
+      ),
+    );
+  }
+
+  Future<bool> _hasRequiredFlashcardProgressColumns() async {
+    return await _hasColumn(_TableName.flashcardProgress, 'current_box') &&
+        await _hasColumn(_TableName.flashcardProgress, 'review_count') &&
+        await _hasColumn(_TableName.flashcardProgress, 'lapse_count') &&
+        await _hasColumn(_TableName.flashcardProgress, 'last_result') &&
+        await _hasColumn(_TableName.flashcardProgress, 'created_at') &&
+        await _hasColumn(_TableName.flashcardProgress, 'updated_at');
+  }
+
+  Future<void> _resetLegacyStudyTablesIfNeeded() async {
+    if (!await _needsStudyTableReset()) {
+      return;
+    }
+
+    await _dropStudyTables();
+    await migrator.createTable(database.studySessions);
+    await migrator.createTable(database.studySessionItems);
+    await migrator.createTable(database.studyAttempts);
+  }
+
+  Future<void> _normalizeStudyAttemptResultsForSchemaV4() async {
+    if (!await _hasTable(_TableName.studyAttempts)) {
+      await migrator.createTable(database.studyAttempts);
+      return;
+    }
+
+    final tableSql = await _tableSql(_TableName.studyAttempts) ?? '';
+    if (!tableSql.contains("'remembered'") && !tableSql.contains("'forgot'")) {
+      await _normalizeLegacyStudyAttemptRows();
+      return;
+    }
+
+    await _alterTable(
+      TableMigration(
+        database.studyAttempts,
+        columnTransformer: <GeneratedColumn, Expression>{
+          database.studyAttempts.result: const CustomExpression<String>(
+            _legacyStudyAttemptResultExpression,
+          ),
+        },
+      ),
+    );
+  }
+
+  Future<void> _normalizeLegacyStudyAttemptRows() async {
+    await (database.update(
+          database.studyAttempts,
+        )..where((table) => table.result.equals(_LegacyStudyResult.remembered)))
+        .write(
+          const StudyAttemptsCompanion(
+            result: Value(_StudyAttemptResult.correct),
+          ),
+        );
+    await (database.update(
+      database.studyAttempts,
+    )..where((table) => table.result.equals(_LegacyStudyResult.forgot))).write(
+      const StudyAttemptsCompanion(
+        result: Value(_StudyAttemptResult.incorrect),
+      ),
+    );
+  }
+
+  Future<void> _allowInitialPassedReviewResultForSchemaV5() async {
+    if (!await _hasTable(_TableName.flashcardProgress)) {
+      await migrator.createTable(database.flashcardProgress);
+      return;
+    }
+
+    final tableSql = await _tableSql(_TableName.flashcardProgress) ?? '';
+    if (!tableSql.contains("'initial_passed'")) {
+      await _dropFlashcardProgressIndexes();
+      await _alterTable(TableMigration(database.flashcardProgress));
+    }
+    await _migrateLegacyNewStudyPerfectResultsForSchemaV5();
+  }
+
+  Future<void> _migrateLegacyNewStudyPerfectResultsForSchemaV5() async {
+    if (!await _hasTable(_TableName.studySessions) ||
+        !await _hasTable(_TableName.studyAttempts) ||
+        !await _hasColumn(_TableName.studySessions, 'study_type') ||
+        !await _hasColumn(_TableName.studySessions, 'status') ||
+        !await _hasColumn(_TableName.studyAttempts, 'flashcard_id') ||
+        !await _hasColumn(_TableName.studyAttempts, 'new_box') ||
+        !await _hasColumn(_TableName.studyAttempts, 'next_due_at')) {
+      return;
+    }
+
+    await database.customStatement(_migrateLegacyNewStudyPerfectResultsSql);
+  }
+
+  Future<void> _repairMissingFlashcardProgressForSchemaV6() async {
+    if (!await _hasTable(_TableName.flashcards)) {
+      return;
+    }
+    if (!await _hasTable(_TableName.flashcardProgress)) {
+      await migrator.createTable(database.flashcardProgress);
+    }
+    if (!await _hasColumn(_TableName.flashcards, 'created_at') ||
+        !await _hasColumn(_TableName.flashcards, 'updated_at')) {
+      return;
+    }
+
+    await database.customStatement(_repairMissingFlashcardProgressSql);
+  }
+
+  Future<bool> _needsStudyTableReset() async {
+    if (!await _hasTable(_TableName.studySessions) ||
+        !await _hasTable(_TableName.studySessionItems) ||
+        !await _hasTable(_TableName.studyAttempts)) {
+      return true;
+    }
+    if (await _hasColumn(_TableName.studySessions, 'study_mode')) {
+      return true;
+    }
+    if (!await _hasColumn(_TableName.studySessions, 'study_flow')) {
+      return true;
+    }
+    if (!await _hasColumn(_TableName.studySessionItems, 'study_mode')) {
+      return true;
+    }
+    if (!await _hasColumn(_TableName.studySessionItems, 'mode_order')) {
+      return true;
+    }
+    return !await _hasColumn(_TableName.studyAttempts, 'attempt_number');
+  }
+
+  Future<void> _migrateFlashcardsForSchemaV3() async {
+    if (!await _hasTable(_TableName.flashcards)) {
+      await migrator.createTable(database.flashcards);
+      return;
+    }
+
+    if (!await _hasRequiredFlashcardColumns()) {
+      await _dropAndCreateFlashcardContentTables();
+      return;
+    }
+
+    if (!await _hasColumn(_TableName.flashcards, 'title')) {
+      return;
+    }
+
+    await _alterTable(TableMigration(database.flashcards));
+  }
+
+  Future<bool> _hasRequiredFlashcardColumns() async {
+    return await _hasColumn(_TableName.flashcards, 'id') &&
+        await _hasColumn(_TableName.flashcards, 'deck_id') &&
+        await _hasColumn(_TableName.flashcards, 'front') &&
+        await _hasColumn(_TableName.flashcards, 'back') &&
+        await _hasColumn(_TableName.flashcards, 'note') &&
+        await _hasColumn(_TableName.flashcards, 'sort_order') &&
+        await _hasColumn(_TableName.flashcards, 'created_at') &&
+        await _hasColumn(_TableName.flashcards, 'updated_at');
+  }
+
+  Future<void> _dropAndCreateFlashcardContentTables() async {
+    await _runWithoutForeignKeys(() async {
+      await _dropStudyTables();
+      await migrator.deleteTable(_TableName.flashcardProgress);
+      await migrator.drop(_SchemaIndex.flashcardsDeckSortOrder);
+      await migrator.deleteTable(_TableName.flashcards);
+      await migrator.createTable(database.flashcards);
+      await migrator.createTable(database.flashcardProgress);
+      await migrator.createTable(database.studySessions);
+      await migrator.createTable(database.studySessionItems);
+      await migrator.createTable(database.studyAttempts);
+    });
+  }
+
+  Future<void> _dropStudyTables() async {
+    await migrator.deleteTable(_TableName.studyAttempts);
+    await migrator.deleteTable(_TableName.studySessionItems);
+    await migrator.deleteTable(_TableName.studySessions);
+  }
+
+  Future<void> _dropFlashcardProgressIndexes() async {
+    await migrator.drop(_SchemaIndex.flashcardProgressDueAt);
+    await migrator.drop(_SchemaIndex.flashcardProgressLastStudiedAt);
+  }
+
+  Future<void> _alterTable(TableMigration migration) async {
+    await _runWithoutForeignKeys(() async {
+      await migrator.alterTable(migration);
+    });
+  }
+
+  Future<void> _runWithoutForeignKeys(Future<void> Function() action) async {
+    await database.customStatement(_Pragma.foreignKeysOff);
+    try {
+      await action();
+    } finally {
+      await database.customStatement(_Pragma.foreignKeysOn);
+    }
+  }
+
+  Future<bool> _hasTable(String tableName) async {
+    final row = await database
+        .customSelect(
+          _SchemaIntrospection.tableExistsSql,
+          variables: <Variable<String>>[Variable<String>(tableName)],
+        )
+        .getSingleOrNull();
+    return row != null;
+  }
+
+  Future<bool> _hasColumn(String tableName, String columnName) async {
+    final rows = await database
+        .customSelect('PRAGMA table_info($tableName)')
+        .get();
+    return rows.any((row) => row.read<String>('name') == columnName);
+  }
+
+  Future<String?> _tableSql(String tableName) async {
+    final row = await database
+        .customSelect(
+          _SchemaIntrospection.tableSqlSql,
+          variables: <Variable<String>>[Variable<String>(tableName)],
+        )
+        .getSingleOrNull();
+    return row?.read<String>('sql');
+  }
+}
+
+abstract final class _TableName {
+  const _TableName._();
+
+  static const String flashcards = 'flashcards';
+  static const String flashcardProgress = 'flashcard_progress';
+  static const String studyAttempts = 'study_attempts';
+  static const String studySessionItems = 'study_session_items';
+  static const String studySessions = 'study_sessions';
+}
+
+abstract final class _Pragma {
+  const _Pragma._();
+
+  static const String foreignKeysOn = 'PRAGMA foreign_keys = ON';
+  static const String foreignKeysOff = 'PRAGMA foreign_keys = OFF';
+}
+
+abstract final class _SchemaIntrospection {
+  const _SchemaIntrospection._();
+
+  static const String tableExistsSql =
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?";
+  static const String tableSqlSql =
+      "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?";
+}
+
+abstract final class _LegacyStudyResult {
+  const _LegacyStudyResult._();
+
+  static const String remembered = 'remembered';
+  static const String forgot = 'forgot';
+}
+
+abstract final class _StudyAttemptResult {
+  const _StudyAttemptResult._();
+
+  static const String correct = 'correct';
+  static const String incorrect = 'incorrect';
+}
+
+abstract final class _SchemaIndex {
+  const _SchemaIndex._();
+
+  static final Index foldersParentId = Index(
+    'idx_folders_parent_id',
+    'CREATE INDEX IF NOT EXISTS idx_folders_parent_id ON folders (parent_id)',
+  );
+  static final Index foldersParentSortOrder = Index(
+    'idx_folders_parent_sort_order',
+    'CREATE INDEX IF NOT EXISTS idx_folders_parent_sort_order ON folders (parent_id, sort_order)',
+  );
+  static final Index decksFolderSortOrder = Index(
+    'idx_decks_folder_sort_order',
+    'CREATE INDEX IF NOT EXISTS idx_decks_folder_sort_order ON decks (folder_id, sort_order)',
+  );
+  static final Index flashcardsDeckSortOrder = Index(
+    'idx_flashcards_deck_sort_order',
+    'CREATE INDEX IF NOT EXISTS idx_flashcards_deck_sort_order ON flashcards (deck_id, sort_order)',
+  );
+  static final Index flashcardProgressDueAt = Index(
+    'idx_flashcard_progress_due_at',
+    'CREATE INDEX IF NOT EXISTS idx_flashcard_progress_due_at ON flashcard_progress (due_at)',
+  );
+  static final Index flashcardProgressLastStudiedAt = Index(
+    'idx_flashcard_progress_last_studied_at',
+    'CREATE INDEX IF NOT EXISTS idx_flashcard_progress_last_studied_at ON flashcard_progress (last_studied_at)',
+  );
+  static final Index studySessionsStatusStartedAt = Index(
+    'idx_study_sessions_status_started_at',
+    'CREATE INDEX IF NOT EXISTS idx_study_sessions_status_started_at ON study_sessions (status, started_at DESC)',
+  );
+  static final Index studySessionsEntryResume = Index(
+    'idx_study_sessions_entry_resume',
+    'CREATE INDEX IF NOT EXISTS idx_study_sessions_entry_resume ON study_sessions (entry_type, entry_ref_id, status, started_at DESC)',
+  );
+  static final Index studySessionItemsQueue = Index(
+    'idx_study_session_items_queue',
+    'CREATE INDEX IF NOT EXISTS idx_study_session_items_queue ON study_session_items (session_id, status, mode_order, round_index, queue_position)',
+  );
+  static final Index studySessionItemsModeRound = Index(
+    'idx_study_session_items_mode_round',
+    'CREATE INDEX IF NOT EXISTS idx_study_session_items_mode_round ON study_session_items (session_id, study_mode, mode_order, round_index)',
+  );
+  static final Index studyAttemptsSessionAnsweredAt = Index(
+    'idx_study_attempts_session_answered_at',
+    'CREATE INDEX IF NOT EXISTS idx_study_attempts_session_answered_at ON study_attempts (session_id, answered_at DESC)',
+  );
+  static final Index studyAttemptsItem = Index(
+    'idx_study_attempts_item',
+    'CREATE INDEX IF NOT EXISTS idx_study_attempts_item ON study_attempts (session_item_id)',
+  );
+}
+
+final List<Index> _schemaIndexes = <Index>[
+  _SchemaIndex.foldersParentId,
+  _SchemaIndex.foldersParentSortOrder,
+  _SchemaIndex.decksFolderSortOrder,
+  _SchemaIndex.flashcardsDeckSortOrder,
+  _SchemaIndex.flashcardProgressDueAt,
+  _SchemaIndex.flashcardProgressLastStudiedAt,
+  _SchemaIndex.studySessionsStatusStartedAt,
+  _SchemaIndex.studySessionsEntryResume,
+  _SchemaIndex.studySessionItemsQueue,
+  _SchemaIndex.studySessionItemsModeRound,
+  _SchemaIndex.studyAttemptsSessionAnsweredAt,
+  _SchemaIndex.studyAttemptsItem,
+];
+
+const String _legacyFlashcardProgressResultExpression = '''
+CASE last_result
+  WHEN 'correct' THEN 'perfect'
+  WHEN 'remembered' THEN 'perfect'
+  WHEN 'incorrect' THEN 'recovered'
+  WHEN 'forgot' THEN 'forgot'
+  ELSE last_result
+END
+''';
+
+const String _legacyStudyAttemptResultExpression = '''
+CASE result
+  WHEN 'remembered' THEN 'correct'
+  WHEN 'forgot' THEN 'incorrect'
+  ELSE result
+END
+''';
+
+const String _migrateLegacyNewStudyPerfectResultsSql = '''
+UPDATE flashcard_progress
+SET last_result = 'initial_passed'
+WHERE last_result = 'perfect'
+  AND current_box = 2
+  AND due_at IS NOT NULL
+  AND EXISTS (
+    SELECT 1
+    FROM study_attempts AS attempts
+    INNER JOIN study_sessions AS sessions
+      ON sessions.id = attempts.session_id
+    WHERE attempts.flashcard_id = flashcard_progress.flashcard_id
+      AND sessions.study_type = 'new'
+      AND sessions.status = 'completed'
+      AND attempts.new_box = flashcard_progress.current_box
+      AND attempts.next_due_at = flashcard_progress.due_at
+  )
+  AND NOT EXISTS (
+    SELECT 1
+    FROM study_attempts AS attempts
+    INNER JOIN study_sessions AS sessions
+      ON sessions.id = attempts.session_id
+    WHERE attempts.flashcard_id = flashcard_progress.flashcard_id
+      AND sessions.study_type = 'srs_review'
+      AND sessions.status = 'completed'
+      AND attempts.new_box = flashcard_progress.current_box
+      AND attempts.next_due_at = flashcard_progress.due_at
+  )
+''';
+
+const String _repairMissingFlashcardProgressSql = '''
+INSERT INTO flashcard_progress (
+  flashcard_id,
+  current_box,
+  review_count,
+  lapse_count,
+  last_result,
+  last_studied_at,
+  due_at,
+  created_at,
+  updated_at
+)
+SELECT
+  flashcards.id,
+  1,
+  0,
+  0,
+  NULL,
+  NULL,
+  NULL,
+  flashcards.created_at,
+  flashcards.updated_at
+FROM flashcards
+LEFT JOIN flashcard_progress
+  ON flashcard_progress.flashcard_id = flashcards.id
+WHERE flashcard_progress.flashcard_id IS NULL
+''';

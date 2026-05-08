@@ -3,13 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/content_providers.dart';
+import '../../../../app/di/content/content_core_providers.dart';
+import '../../../../app/di/content/content_revision_providers.dart';
+import '../../../../app/di/content/folder_providers.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/services/clock.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_queries.dart';
+import '../../../shared/viewmodels/mx_async_action_runner.dart';
 import '../models/library_folder.dart';
 
 part 'library_overview_viewmodel.g.dart';
@@ -100,18 +103,16 @@ class LibraryOverviewActionController
 
   Future<bool> createFolder(String name) async {
     // guard:retry-reviewed
-    state = const AsyncLoading<void>();
-    final result = await ref.read(createFolderUseCaseProvider).createRoot(name);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref.read(createFolderUseCaseProvider).createRoot(name),
+    );
+  }
+
+  MxAsyncActionRunner get _actionRunner {
+    return MxAsyncActionRunner(
+      isMounted: () => ref.mounted,
+      setState: (nextState) => state = nextState,
+    );
   }
 }
 

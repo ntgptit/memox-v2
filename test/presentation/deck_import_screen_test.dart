@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memox/app/di/content_providers.dart';
+import 'package:memox/app/di/content/flashcard_providers.dart';
 import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/core/errors/result.dart';
 import 'package:memox/domain/repositories/flashcard_repository.dart';
@@ -304,41 +302,6 @@ void main() {
 
     expect(find.text('1 row detected'), findsOneWidget);
     expect(find.text('Import 1 card'), findsOneWidget);
-  });
-
-  test('DT1 onInsert: readDeckImportFileContent decodes UTF-8 bytes', () async {
-    const content = 'front,back\nXin chào,Tiếng Việt có dấu: ă ê ô ư';
-    final file = PlatformFile(
-      name: 'cards.csv',
-      size: utf8.encode(content).length,
-      bytes: Uint8List.fromList(utf8.encode(content)),
-    );
-
-    final decoded = await readDeckImportFileContent(file);
-
-    expect(decoded, content);
-  });
-
-  test(
-    'DT2 onInsert: readDeckImportFileContent returns null when file has no source',
-    () {
-      final file = PlatformFile(name: 'missing.csv', size: 0);
-
-      expect(readDeckImportFileContent(file), completion(isNull));
-    },
-  );
-
-  test('DT6 onInsert: readDeckImportFileBytes returns binary bytes', () async {
-    final sourceBytes = Uint8List.fromList(<int>[80, 75, 3, 4, 0, 1]);
-    final file = PlatformFile(
-      name: 'cards.xlsx',
-      size: sourceBytes.length,
-      bytes: sourceBytes,
-    );
-
-    final decoded = await readDeckImportFileBytes(file);
-
-    expect(decoded, sourceBytes);
   });
 
   testWidgets(

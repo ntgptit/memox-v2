@@ -7,13 +7,16 @@ import 'package:memox/core/errors/failures.dart';
 
 void main() {
   group('ErrorMapper.map', () {
-    test('DT1 onRefreshRetry: maps timeout exceptions to retryable network failures', () {
-      final failure = ErrorMapper.map(TimeoutException('request timed out'));
+    test(
+      'DT1 onRefreshRetry: maps timeout exceptions to retryable network failures',
+      () {
+        final failure = ErrorMapper.map(TimeoutException('request timed out'));
 
-      expect(failure.type, FailureType.network);
-      expect(failure.code, FailureCodes.requestTimedOut);
-      expect(failure.isRetryable, isTrue);
-    });
+        expect(failure.type, FailureType.network);
+        expect(failure.code, FailureCodes.requestTimedOut);
+        expect(failure.isRetryable, isTrue);
+      },
+    );
 
     test('DT1 mapError: preserves configuration exception metadata', () {
       final failure = ErrorMapper.map(

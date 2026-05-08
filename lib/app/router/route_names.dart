@@ -1,9 +1,9 @@
 /// Canonical list of GoRouter route names + paths for the MemoX app.
 ///
 /// All navigation call sites must reference these symbols instead of
-/// hardcoding path literals. The router tree in [app_router.dart] consumes
-/// the same constants, so a single rename updates both the tree and every
-/// call site.
+/// hardcoding path literals. The app router and feature route registries
+/// consume the same constants, so a single rename updates both the tree and
+/// every call site.
 abstract final class RouteNames {
   const RouteNames._();
 

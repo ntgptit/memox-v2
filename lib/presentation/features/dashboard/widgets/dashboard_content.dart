@@ -22,9 +22,9 @@ class DashboardContent extends StatelessWidget {
         const MxGap(MxSpace.lg),
         const DashboardFocusHeader(),
         const MxGap(MxSpace.lg),
-        DashboardLibraryProgressCard(state: state),
-        const MxGap(MxSpace.lg),
         DashboardActionList(state: state),
+        const MxGap(MxSpace.lg),
+        DashboardLibraryProgressCard(state: state),
         if (state.deckHighlights.isNotEmpty) ...[
           const MxGap(MxSpace.lg),
           DashboardDeckHighlightsSection(items: state.deckHighlights),

@@ -8,7 +8,7 @@ import '../../../../domain/entities/drive_sync_models.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_list_tile.dart';

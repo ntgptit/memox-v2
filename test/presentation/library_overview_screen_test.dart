@@ -10,7 +10,7 @@ import 'package:memox/presentation/features/folders/models/library_folder.dart';
 import 'package:memox/presentation/features/folders/screens/library_overview_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/library_overview_viewmodel.dart';
 import 'package:memox/presentation/features/folders/widgets/library_folder_list.dart';
-import 'package:memox/presentation/shared/states/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
 
 import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';

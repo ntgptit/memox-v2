@@ -49,7 +49,9 @@ void main() {
     expect(result, isNull);
   });
 
-  testWidgets('DT2 onBehavior: confirm returns trimmed value', (WidgetTester tester) async {
+  testWidgets('DT2 onBehavior: confirm returns trimmed value', (
+    WidgetTester tester,
+  ) async {
     String? result;
 
     await tester.pumpWidget(
@@ -86,79 +88,81 @@ void main() {
     expect(find.byType(Dialog), findsNothing);
   });
 
-  testWidgets('DT3 onBehavior: done action submits using the same logic as confirm', (
-    WidgetTester tester,
-  ) async {
-    String? result;
+  testWidgets(
+    'DT3 onBehavior: done action submits using the same logic as confirm',
+    (WidgetTester tester) async {
+      String? result;
 
-    await tester.pumpWidget(
-      _TestApp(
-        child: Builder(
-          builder: (context) {
-            return TextButton(
-              onPressed: () async {
-                result = await MxNameDialog.show(
-                  context: context,
-                  title: 'Rename deck',
-                  label: 'Deck name',
-                  hintText: 'e.g. Core vocabulary',
-                  confirmLabel: 'Save',
-                );
-              },
-              child: const Text('Open dialog'),
-            );
-          },
+      await tester.pumpWidget(
+        _TestApp(
+          child: Builder(
+            builder: (context) {
+              return TextButton(
+                onPressed: () async {
+                  result = await MxNameDialog.show(
+                    context: context,
+                    title: 'Rename deck',
+                    label: 'Deck name',
+                    hintText: 'e.g. Core vocabulary',
+                    confirmLabel: 'Save',
+                  );
+                },
+                child: const Text('Open dialog'),
+              );
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    await tester.tap(find.text('Open dialog'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Open dialog'));
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField), '  Biology  ');
-    await tester.pump();
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), '  Biology  ');
+      await tester.pump();
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
 
-    expect(result, 'Biology');
-    expect(find.byType(Dialog), findsNothing);
-  });
+      expect(result, 'Biology');
+      expect(find.byType(Dialog), findsNothing);
+    },
+  );
 
-  testWidgets('DT1 onUpdate: rename dialog places the cursor at the end of initial value', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(
-      _TestApp(
-        child: Builder(
-          builder: (context) {
-            return TextButton(
-              onPressed: () {
-                MxNameDialog.show(
-                  context: context,
-                  title: 'Rename folder',
-                  label: 'Folder name',
-                  hintText: 'e.g. Listening practice',
-                  confirmLabel: 'Save',
-                  initialValue: 'Existing folder',
-                );
-              },
-              child: const Text('Open dialog'),
-            );
-          },
+  testWidgets(
+    'DT1 onUpdate: rename dialog places the cursor at the end of initial value',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _TestApp(
+          child: Builder(
+            builder: (context) {
+              return TextButton(
+                onPressed: () {
+                  MxNameDialog.show(
+                    context: context,
+                    title: 'Rename folder',
+                    label: 'Folder name',
+                    hintText: 'e.g. Listening practice',
+                    confirmLabel: 'Save',
+                    initialValue: 'Existing folder',
+                  );
+                },
+                child: const Text('Open dialog'),
+              );
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    await tester.tap(find.text('Open dialog'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Open dialog'));
+      await tester.pumpAndSettle();
 
-    final field = tester.widget<TextFormField>(find.byType(TextFormField));
-    final controller = field.controller!;
+      final field = tester.widget<TextFormField>(find.byType(TextFormField));
+      final controller = field.controller!;
 
-    expect(controller.text, 'Existing folder');
-    expect(controller.selection.baseOffset, 'Existing folder'.length);
-    expect(controller.selection.extentOffset, 'Existing folder'.length);
-  });
+      expect(controller.text, 'Existing folder');
+      expect(controller.selection.baseOffset, 'Existing folder'.length);
+      expect(controller.selection.extentOffset, 'Existing folder'.length);
+    },
+  );
 
   testWidgets('DT1 onNavigate: dialog does not dismiss when tapping outside', (
     WidgetTester tester,

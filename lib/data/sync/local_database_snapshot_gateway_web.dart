@@ -41,7 +41,9 @@ final class _WebLocalDatabaseSnapshotGateway
   }
 
   @override
-  Future<DriveSyncRestoreEffect> restoreDatabase(Uint8List databaseBytes) async {
+  Future<DriveSyncRestoreEffect> restoreDatabase(
+    Uint8List databaseBytes,
+  ) async {
     await _database.close();
     final probe = await WasmDatabase.probe(
       databaseName: AppConstants.localDatabaseName,

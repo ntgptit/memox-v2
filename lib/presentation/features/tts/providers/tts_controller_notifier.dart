@@ -30,7 +30,7 @@ class TtsController extends _$TtsController {
     required TtsLanguage language,
     TtsTextSide? side,
   }) async {
-    if (side != null && side != TtsTextSide.front) {
+    if (!ref.read(ttsPlaybackPolicyProvider).canSpeakTextSide(side)) {
       return false;
     }
     if (StringUtils.isBlank(text)) {
@@ -61,7 +61,7 @@ class TtsController extends _$TtsController {
     required String text,
     required TtsTextSide side,
   }) async {
-    if (side != TtsTextSide.front) {
+    if (!ref.read(ttsPlaybackPolicyProvider).canSpeakFlashcardSide(side)) {
       return false;
     }
     final settings = await ref.read(ttsSettingsProvider.future);
@@ -79,7 +79,7 @@ class TtsController extends _$TtsController {
     required StudyFlashcardRef flashcard,
     required TtsTextSide side,
   }) async {
-    if (side != TtsTextSide.front) {
+    if (!ref.read(ttsPlaybackPolicyProvider).canSpeakFlashcardSide(side)) {
       return false;
     }
     try {
@@ -106,7 +106,7 @@ class TtsController extends _$TtsController {
     required String text,
     required TtsTextSide side,
   }) async {
-    if (side != TtsTextSide.front) {
+    if (!ref.read(ttsPlaybackPolicyProvider).canSpeakFlashcardSide(side)) {
       return false;
     }
     final settings = await ref.read(ttsSettingsProvider.future);

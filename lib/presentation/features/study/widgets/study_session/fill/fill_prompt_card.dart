@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../../../domain/study/entities/study_models.dart';
-import '../../../../../shared/layouts/mx_space.dart';
-import '../../../../../shared/widgets/mx_card.dart';
-import '../../../../../shared/widgets/mx_icon_button.dart';
-import '../../../../../shared/widgets/mx_text.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 
 class FillPromptCard extends StatelessWidget {
   const FillPromptCard({required this.item, super.key});

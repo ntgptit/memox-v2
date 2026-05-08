@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 
 void main() {
-  testWidgets('DT1 onInsert: MxGap adds horizontal spacing inside Row', (tester) async {
+  testWidgets('DT1 onInsert: MxGap adds horizontal spacing inside Row', (
+    tester,
+  ) async {
     const firstKey = ValueKey('first');
     const secondKey = ValueKey('second');
 
@@ -26,7 +28,9 @@ void main() {
     expect(secondLeft - firstRight, 20);
   });
 
-  testWidgets('DT2 onInsert: MxGap adds vertical spacing inside Column', (tester) async {
+  testWidgets('DT2 onInsert: MxGap adds vertical spacing inside Column', (
+    tester,
+  ) async {
     const firstKey = ValueKey('first');
     const secondKey = ValueKey('second');
 
@@ -49,7 +53,9 @@ void main() {
     expect(secondTop - firstBottom, 20);
   });
 
-  testWidgets('DT1 onDisplay: MxGap follows ListView scroll direction', (tester) async {
+  testWidgets('DT1 onDisplay: MxGap follows ListView scroll direction', (
+    tester,
+  ) async {
     const firstKey = ValueKey('first');
     const secondKey = ValueKey('second');
 
@@ -76,36 +82,37 @@ void main() {
     expect(secondLeft - firstRight, 20);
   });
 
-  testWidgets('DT2 onDisplay: MxSliverGap renders spacing inside CustomScrollView', (
-    tester,
-  ) async {
-    const firstKey = ValueKey('first');
-    const secondKey = ValueKey('second');
+  testWidgets(
+    'DT2 onDisplay: MxSliverGap renders spacing inside CustomScrollView',
+    (tester) async {
+      const firstKey = ValueKey('first');
+      const secondKey = ValueKey('second');
 
-    await tester.pumpWidget(
-      const _Host(
-        child: SizedBox(
-          height: 120,
-          child: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: SizedBox(key: firstKey, width: 10, height: 10),
-              ),
-              MxSliverGap(20),
-              SliverToBoxAdapter(
-                child: SizedBox(key: secondKey, width: 10, height: 10),
-              ),
-            ],
+      await tester.pumpWidget(
+        const _Host(
+          child: SizedBox(
+            height: 120,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: SizedBox(key: firstKey, width: 10, height: 10),
+                ),
+                MxSliverGap(20),
+                SliverToBoxAdapter(
+                  child: SizedBox(key: secondKey, width: 10, height: 10),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    final firstBottom = tester.getBottomLeft(find.byKey(firstKey)).dy;
-    final secondTop = tester.getTopLeft(find.byKey(secondKey)).dy;
+      final firstBottom = tester.getBottomLeft(find.byKey(firstKey)).dy;
+      final secondTop = tester.getTopLeft(find.byKey(secondKey)).dy;
 
-    expect(secondTop - firstBottom, 20);
-  });
+      expect(secondTop - firstBottom, 20);
+    },
+  );
 }
 
 class _Host extends StatelessWidget {

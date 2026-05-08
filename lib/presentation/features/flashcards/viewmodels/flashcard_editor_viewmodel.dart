@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/content_providers.dart';
+import '../../../../app/di/content/flashcard_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/value_objects/content_actions.dart';
+import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'flashcard_editor_viewmodel.g.dart';
 
@@ -180,43 +181,35 @@ class FlashcardEditorController extends _$FlashcardEditorController {
       return false;
     }
 
-    state = const AsyncLoading<void>();
     if (args.isEditing) {
-      final result = await ref
-          .read(updateFlashcardUseCaseProvider)
-          .execute(
-            flashcardId: args.flashcardId!,
-            draft: draftState.toDraft(),
-            progressPolicy: progressPolicy,
-          );
-      if (!ref.mounted) {
-        return false;
-      }
-      final failure = result.failureOrNull;
-      if (failure != null) {
-        state = AsyncError<void>(failure, StackTrace.current);
-        return false;
-      }
-      state = const AsyncData<void>(null);
-      return true;
+      return _actionRunner.runResult(
+        () => ref
+            .read(updateFlashcardUseCaseProvider)
+            .execute(
+              flashcardId: args.flashcardId!,
+              draft: draftState.toDraft(),
+              progressPolicy: progressPolicy,
+            ),
+      );
     }
 
-    final result = await ref
-        .read(createFlashcardUseCaseProvider)
-        .execute(deckId: args.deckId, draft: draftState.toDraft());
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    if (keepCreating) {
-      ref.read(flashcardEditorDraftProvider(args).notifier).clearForNext();
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(createFlashcardUseCaseProvider)
+          .execute(deckId: args.deckId, draft: draftState.toDraft()),
+      onSuccess: (_) {
+        if (keepCreating) {
+          ref.read(flashcardEditorDraftProvider(args).notifier).clearForNext();
+        }
+      },
+    );
+  }
+
+  MxAsyncActionRunner get _actionRunner {
+    return MxAsyncActionRunner(
+      isMounted: () => ref.mounted,
+      setState: (nextState) => state = nextState,
+    );
   }
 }
 

@@ -8,7 +8,7 @@ import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_loading_state.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_text.dart';

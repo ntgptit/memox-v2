@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../app/di/content_providers.dart';
+import '../../../../app/di/content/content_revision_providers.dart';
+import '../../../../app/di/content/flashcard_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/string_utils.dart';
@@ -11,6 +12,7 @@ import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
+import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'flashcard_list_viewmodel.g.dart';
 
@@ -183,76 +185,47 @@ class FlashcardActionController extends _$FlashcardActionController {
 
   Future<bool> deleteFlashcards(List<String> flashcardIds) async {
     // guard:retry-reviewed
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(deleteFlashcardsUseCaseProvider)
-        .execute(flashcardIds);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    ref.read(flashcardSelectionProvider(deckId).notifier).clear();
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref.read(deleteFlashcardsUseCaseProvider).execute(flashcardIds),
+      onSuccess: (_) {
+        ref.read(flashcardSelectionProvider(deckId).notifier).clear();
+      },
+    );
   }
 
   Future<bool> moveFlashcards({
     required List<String> flashcardIds,
     required String targetDeckId,
   }) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(moveFlashcardsUseCaseProvider)
-        .execute(flashcardIds: flashcardIds, targetDeckId: targetDeckId);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    ref.read(flashcardSelectionProvider(deckId).notifier).clear();
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(moveFlashcardsUseCaseProvider)
+          .execute(flashcardIds: flashcardIds, targetDeckId: targetDeckId),
+      onSuccess: (_) {
+        ref.read(flashcardSelectionProvider(deckId).notifier).clear();
+      },
+    );
   }
 
   Future<bool> reorderFlashcards(List<String> orderedFlashcardIds) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(reorderFlashcardsUseCaseProvider)
-        .execute(deckId: deckId, orderedFlashcardIds: orderedFlashcardIds);
-    if (!ref.mounted) {
-      return false;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return false;
-    }
-    state = const AsyncData<void>(null);
-    return true;
+    return _actionRunner.runResult(
+      () => ref
+          .read(reorderFlashcardsUseCaseProvider)
+          .execute(deckId: deckId, orderedFlashcardIds: orderedFlashcardIds),
+    );
   }
 
   Future<ExportData?> exportFlashcards(List<String> flashcardIds) async {
-    state = const AsyncLoading<void>();
-    final result = await ref
-        .read(exportFlashcardsUseCaseProvider)
-        .execute(flashcardIds);
-    if (!ref.mounted) {
-      return null;
-    }
-    final failure = result.failureOrNull;
-    if (failure != null) {
-      state = AsyncError<void>(failure, StackTrace.current);
-      return null;
-    }
-    state = const AsyncData<void>(null);
-    return result.valueOrNull;
+    return _actionRunner.runResultValue(
+      () => ref.read(exportFlashcardsUseCaseProvider).execute(flashcardIds),
+    );
+  }
+
+  MxAsyncActionRunner get _actionRunner {
+    return MxAsyncActionRunner(
+      isMounted: () => ref.mounted,
+      setState: (nextState) => state = nextState,
+    );
   }
 }
 

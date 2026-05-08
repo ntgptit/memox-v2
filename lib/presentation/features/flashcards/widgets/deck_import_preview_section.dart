@@ -4,7 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_error_state.dart';
+import '../../../shared/widgets/mx_error_state.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../../../shared/widgets/mx_term_row.dart';
 

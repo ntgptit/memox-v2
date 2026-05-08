@@ -8,12 +8,15 @@ void main() {
       initialLocation: RouteDefaults.initialLocation,
     );
 
-    test('DT1 onOpen: redirects the root path to the configured initial location', () {
-      expect(
-        guards.redirectLocationFor(Uri.parse('/')),
-        RouteDefaults.initialLocation,
-      );
-    });
+    test(
+      'DT1 onOpen: redirects the root path to the configured initial location',
+      () {
+        expect(
+          guards.redirectLocationFor(Uri.parse('/')),
+          RouteDefaults.initialLocation,
+        );
+      },
+    );
 
     test('DT1 onNavigate: does not redirect non-root paths', () {
       expect(guards.redirectLocationFor(Uri.parse(RoutePaths.library)), isNull);

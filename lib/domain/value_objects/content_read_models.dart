@@ -48,6 +48,26 @@ final class LibraryOverviewReadModel {
   final int newCardCount;
   final int totalFolderCount;
   final List<LibraryFolderReadModel> folders;
+
+  int get deckCount {
+    return folders.fold<int>(0, (sum, folder) => sum + folder.deckCount);
+  }
+
+  int get cardCount {
+    return folders.fold<int>(0, (sum, folder) => sum + folder.itemCount);
+  }
+
+  int get masteryPercent {
+    final totalCardCount = cardCount;
+    if (totalCardCount == 0) {
+      return 0;
+    }
+    final weightedMasteryTotal = folders.fold<int>(
+      0,
+      (sum, folder) => sum + folder.itemCount * folder.masteryPercent,
+    );
+    return (weightedMasteryTotal / totalCardCount).round();
+  }
 }
 
 final class FolderDeckReadModel {

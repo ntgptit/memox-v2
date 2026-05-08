@@ -11,7 +11,7 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/states/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../widgets/flashcard_editor_form.dart';

@@ -23,9 +23,6 @@ Test file: `test/presentation/deck_import_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | `readDeckImportFileContent` receives in-memory UTF-8 bytes | `PlatformFile.bytes` contains Vietnamese CSV text with diacritics | helper reads the file content | decoded string equals the original UTF-8 CSV content | C0+C1 |
-| DT2 | `readDeckImportFileContent` has neither bytes nor path source | `PlatformFile` is created with only name and size | helper reads the file content | result completes with `null` and no fallback content is fabricated | C0+C1 |
-| DT6 | `readDeckImportFileBytes` receives in-memory `.xlsx` bytes | `PlatformFile.bytes` contains binary workbook data | helper reads the file bytes | returned bytes equal the original workbook bytes and are not decoded as text | C0+C1 |
 | DT3 | preview preparation is in flight, so the focused import action is locked | raw CSV text is entered and repository `prepareHandler` returns a pending future | user taps `Preview import` and then taps another source segment | progress indicator appears, the primary action is disabled, `Clear` remains absent, and source format cannot switch while preview is running | C0+C1 |
 | DT4 | commit import is in flight after a valid preview | preview succeeds and repository `commitHandler` returns a pending future | user taps `Import 1 card` | progress indicator appears and the visible Import action is disabled while commit is running | C0+C1 |
 | DT5 | preview result contains one valid item and one issue | raw CSV contains one complete row and one row with missing back text | user taps `Preview import` and scrolls to preview summary | `1 valid · 1 issues`, `Line 3`, and `Back is required.` are visible | C0+C1 |
