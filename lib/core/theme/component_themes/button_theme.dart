@@ -56,7 +56,7 @@ abstract final class ButtonThemeBuilder {
         padding: _padding,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
         textStyle: AppTypography.labelLarge,
-        side: BorderSide(color: scheme.outlineVariant),
+        side: BorderSide(color: scheme.outline),
       ),
     );
   }
@@ -64,14 +64,13 @@ abstract final class ButtonThemeBuilder {
   static OutlinedButtonThemeData outlined(ColorScheme scheme) {
     return OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        backgroundColor: scheme.surfaceContainerLow,
         foregroundColor: scheme.primary,
         disabledForegroundColor: scheme.onSurface.withValues(
           alpha: AppOpacity.disabled,
         ),
         minimumSize: const Size(0, _minHeight),
         padding: _padding,
-        side: BorderSide(color: scheme.outlineVariant),
+        side: BorderSide(color: scheme.outline),
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
         textStyle: AppTypography.labelLarge,
       ),

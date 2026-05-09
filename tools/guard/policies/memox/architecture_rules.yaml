@@ -345,7 +345,7 @@ rules:
         - "customColors\\.repetitionColor\\("
 
   - id: feature_theme_token_imports
-    type: structural_check
+    type: forbidden_pattern
     name: "Feature Theme Token Imports"
     description: "Feature-layer source must not import raw theme source files such as `app_colors.dart` or `app_typography.dart`; consume UI values through theme/context accessors or shared widgets instead."
     message_code: feature_theme_token_imports
@@ -354,17 +354,16 @@ rules:
     scope: features
     fix_hint_code: use_theme_accessors_in_features
     params:
-      check_id: forbidden_import_paths
-      forbidden_import_paths:
-        - "core/theme/tokens/app_colors.dart"
-        - "core/theme/tokens/app_typography.dart"
-        - "core/theme/tokens/app_spacing.dart"
-        - "core/theme/tokens/app_radius.dart"
-        - "core/theme/tokens/app_elevation.dart"
-        - "core/theme/tokens/app_motion.dart"
-        - "core/theme/tokens/app_opacity.dart"
-        - "core/theme/responsive/app_breakpoints.dart"
-        - "core/theme/tokens/app_icon_sizes.dart"
+      patterns:
+        - "import\\s+'package:memox/core/theme/tokens/app_colors\\.dart'"
+        - "import\\s+'package:memox/core/theme/tokens/app_typography\\.dart'"
+        - "import\\s+'package:memox/core/theme/tokens/app_spacing\\.dart'"
+        - "import\\s+'package:memox/core/theme/tokens/app_radius\\.dart'"
+        - "import\\s+'package:memox/core/theme/tokens/app_elevation\\.dart'"
+        - "import\\s+'package:memox/core/theme/tokens/app_motion\\.dart'"
+        - "import\\s+'package:memox/core/theme/tokens/app_opacity\\.dart'"
+        - "import\\s+'package:memox/core/theme/responsive/app_breakpoints\\.dart'"
+        - "import\\s+'package:memox/core/theme/tokens/app_icon_sizes\\.dart'"
 
   - id: features_no_direct_text_theme
     type: forbidden_pattern

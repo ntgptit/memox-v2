@@ -55,7 +55,7 @@
       }
     }
   },
-  "dashboardReviewEmptyMessage": "No review cards are due right now.",
+  "dashboardReviewEmptyMessage": "No review cards are due. Open your library to add cards.",
   "dashboardReviewNowAction": "Review",
   "dashboardNewStudyTitle": "New Study",
   "dashboardNewCardsLabel": "New cards available",
@@ -79,7 +79,7 @@
       }
     }
   },
-  "dashboardResumeEmptyMessage": "No active study session right now.",
+  "dashboardResumeEmptyMessage": "No active session. Start studying to resume later.",
   "dashboardContinueSessionAction": "Resume",
   "dashboardLibraryHealthTitle": "Library health",
   "dashboardLibraryHealthSummary": "{folderCount, plural, =0{0 folders} =1{1 folder} other{{folderCount} folders}} · {deckCount, plural, =0{0 decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}",

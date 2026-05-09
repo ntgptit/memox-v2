@@ -6,7 +6,7 @@ Test file: `test/presentation/dashboard_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | `dashboardOverviewProvider` is unresolved and DashboardScreen enters the loading branch | dashboard route is opened with a pending `Completer<DashboardOverviewState>` | the first frame is pumped before the future completes | `MxLoadingState` is rendered exactly once | C0+C1 |
+| DT1 | `dashboardOverviewProvider` is unresolved and DashboardScreen enters the loading branch | dashboard route is opened with a pending `Completer<DashboardOverviewState>` | the first frame is pumped before the future completes | `DashboardSkeleton` is rendered exactly once | C0+C1 |
 
 ## Decision table: onSearchFilterSort
 
@@ -24,7 +24,9 @@ Test file: `test/presentation/dashboard_screen_test.dart`
 | DT4 | library progress uses separate mastery and structural metadata with singular plurals | `DashboardOverviewState` has one folder, one deck, one card, and one percent mastery | dashboard renders the loaded data branch | `1% mastery` and `1 folder · 1 deck · 1 card` are visible while duplicated old metadata and `1 folders` are absent | C0+C1 |
 | DT5 | recent deck highlights have more than three items and include due counts | dashboard state contains four deck highlights with at least one `lastStudiedAt` and the first deck has due cards | dashboard renders deck highlight section | `Recent decks` appears, only the first three deck rows render, metadata shows card count only, and the first deck study action badge shows due count | C0+C1 |
 | DT6 | deck highlights are all fallback decks with no `lastStudiedAt` | dashboard state contains suggested decks but none has been studied | dashboard renders deck highlight section | `Start a deck` appears instead of `Recent decks`, with deck metadata shown as card count only | C0+C1 |
-| DT7 | no deck has cards to suggest | dashboard state has an empty `deckHighlights` list | dashboard renders loaded data branch | both `Recent decks` and `Start a deck` sections are absent | C0+C1 |
+| DT7 | no deck has cards to suggest | dashboard state has an empty `deckHighlights` list | dashboard renders loaded data branch | `Recent decks` is absent; empty-deck card shows `Start a deck` and the new-study empty body string (also shown on the New Study row, so two matching text nodes) | C0+C1 |
+
+_Disabled action visuals are driven by `ThemeData` / `ButtonTheme` tokens only — feature code must not wrap dashboard action buttons in `Opacity`._
 
 ## Decision table: onNavigate
 

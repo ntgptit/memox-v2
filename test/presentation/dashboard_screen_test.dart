@@ -8,15 +8,16 @@ import 'package:memox/app/router/route_names.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/dashboard/screens/dashboard_screen.dart';
 import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
+import 'package:memox/presentation/features/dashboard/widgets/dashboard_skeleton.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
-import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
 
 const _maximumCompactDashboardActionButtonWidth = 160.0;
 
 void main() {
   testWidgets(
-    'DT1 onOpen: shows loading state while dashboard overview loads',
+    'DT1 onOpen: shows skeleton while dashboard overview loads',
     (tester) async {
       final completer = Completer<DashboardOverviewState>();
       addTearDown(() {
@@ -35,7 +36,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byType(MxLoadingState), findsOneWidget);
+      expect(find.byType(DashboardSkeleton), findsOneWidget);
     },
   );
 
@@ -70,10 +71,6 @@ void main() {
     expect(find.text('Ready to study today?'), findsOneWidget);
     expect(find.text('Home'), findsNothing);
     expect(find.text('Today\'s study focus'), findsOneWidget);
-    expect(
-      find.text('Review, study new cards, or continue a session.'),
-      findsOneWidget,
-    );
     expect(find.byType(MxProgressRing), findsOneWidget);
     expect(find.text('Library progress'), findsOneWidget);
     expect(find.text('30% mastery'), findsOneWidget);
@@ -118,7 +115,21 @@ void main() {
       );
       expect(find.byType(MxProgressRing), findsOneWidget);
       expect(find.text('Library progress'), findsOneWidget);
-      expect(find.text('No active study session right now.'), findsOneWidget);
+      expect(
+        find.text('No active session. Start studying to resume later.'),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('dashboard_action_list_card')),
+          matching: find.byType(Opacity),
+        ),
+        findsNothing,
+      );
+      final actionListCard = tester.widget<MxCard>(
+        find.byKey(const ValueKey('dashboard_action_list_card')),
+      );
+      expect(actionListCard.variant, MxCardVariant.outlined);
     },
   );
 
@@ -237,14 +248,88 @@ void main() {
   );
 
   testWidgets(
-    'DT7 onDisplay: hides deck highlight section without suggested decks',
+    'DT7 onDisplay: shows deck empty state CTA when no suggested decks exist',
     (tester) async {
       await _pumpDashboard(tester, _idleDashboardState);
+      await _scrollDashboardToDeckHighlights(tester);
 
       expect(find.text('Recent decks'), findsNothing);
-      expect(find.text('Start a deck'), findsNothing);
+      expect(find.text('Start a deck'), findsOneWidget);
+      expect(
+        find.text('Add or import cards before starting a new study session.'),
+        findsNWidgets(2),
+      );
     },
   );
+
+  testWidgets('shows skeleton layout while dashboard data is loading', (
+    tester,
+  ) async {
+    final completer = Completer<DashboardOverviewState>();
+    addTearDown(() {
+      if (!completer.isCompleted) {
+        completer.complete(_studyReadyDashboardState);
+      }
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          dashboardOverviewProvider.overrideWith((ref) => completer.future),
+        ],
+        child: const _TestApp(child: DashboardScreen()),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(DashboardSkeleton), findsOneWidget);
+    expect(find.byKey(const ValueKey('dashboard_skeleton')), findsOneWidget);
+  });
+
+  testWidgets(
+    'renders dashboard without overflow on Samsung 412x915 viewport',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(412, 915));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
+
+      await _pumpDashboard(tester, _studyReadyDashboardState);
+
+      expect(find.text('Today Review'), findsOneWidget);
+      expect(find.text('New Study'), findsOneWidget);
+      expect(find.text('Resume'), findsWidgets);
+      expect(find.byType(MxProgressRing), findsOneWidget);
+
+      final actionListCard = find.byKey(
+        const ValueKey('dashboard_action_list_card'),
+      );
+      expect(actionListCard, findsOneWidget);
+      final cardSize = tester.getSize(actionListCard);
+      expect(cardSize.width, lessThanOrEqualTo(412));
+    },
+  );
+
+  testWidgets('renders dashboard without overflow at text scale 1.5', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+    addTearDown(() {
+      tester.platformDispatcher.textScaleFactorTestValue = 1.0;
+    });
+
+    await _pumpDashboard(tester, _studyReadyDashboardState);
+
+    expect(find.text('Today Review'), findsOneWidget);
+    expect(find.text('New Study'), findsOneWidget);
+    await tester.drag(
+      find.byKey(const ValueKey('dashboard_content')),
+      const Offset(0, -320),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Library progress'), findsOneWidget);
+  });
 
   testWidgets(
     'DT1 onNavigate: Review opens Today study entry when review cards exist',
@@ -398,6 +483,7 @@ Future<void> _pumpDashboardRouter(
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         routerConfig: router,
       ),
     ),
@@ -536,6 +622,7 @@ class _TestApp extends StatelessWidget {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
       home: child,
     );
   }

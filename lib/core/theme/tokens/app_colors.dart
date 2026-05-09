@@ -109,8 +109,8 @@ abstract final class AppColors {
   static const Color darkNavy25 = Color(0xFF1D2344);
   static const Color darkNavy30 = Color(0xFF272C48);
   static const Color darkNavy40 = Color(0xFF353B61);
-  static const Color darkNavyOutline = Color(0xFF3B4168);
-  static const Color darkNavyOutlineVariant = Color(0xFF272C48);
+  static const Color darkNavyOutline = Color(0xFF4A5180);
+  static const Color darkNavyOutlineVariant = Color(0xFF2F3658);
 
   // Semantic dark tokens.
   static const Color success30 = Color(0xFF174A05);

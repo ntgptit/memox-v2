@@ -22,21 +22,3 @@ class DashboardGreetingHeader extends StatelessWidget {
     );
   }
 }
-
-class DashboardFocusHeader extends StatelessWidget {
-  const DashboardFocusHeader({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxText(l10n.dashboardHeading, role: MxTextRole.sectionTitle),
-        const MxGap(MxSpace.xs),
-        MxText(l10n.dashboardSubtitle, role: MxTextRole.sectionSubtitle),
-      ],
-    );
-  }
-}

@@ -347,7 +347,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardReviewEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'No review cards are due right now.'**
+  /// **'No review cards are due. Open your library to add cards.'**
   String get dashboardReviewEmptyMessage;
 
   /// No description provided for @dashboardReviewNowAction.
@@ -407,7 +407,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardResumeEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'No active study session right now.'**
+  /// **'No active session. Start studying to resume later.'**
   String get dashboardResumeEmptyMessage;
 
   /// No description provided for @dashboardContinueSessionAction.

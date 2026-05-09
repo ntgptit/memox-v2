@@ -30,6 +30,7 @@ class DashboardLibraryProgressCard extends StatelessWidget {
 
     return MxCard(
       key: const ValueKey('dashboard_library_progress_card'),
+      variant: MxCardVariant.outlined,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

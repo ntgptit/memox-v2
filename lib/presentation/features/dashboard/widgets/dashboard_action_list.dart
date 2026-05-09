@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../core/theme/extensions/theme_extensions.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -27,6 +28,7 @@ class DashboardActionList extends StatelessWidget {
 
     return MxCard(
       key: const ValueKey('dashboard_action_list_card'),
+      variant: MxCardVariant.outlined,
       padding: const EdgeInsets.symmetric(
         horizontal: MxSpace.lg,
         vertical: MxSpace.sm,
@@ -157,9 +159,9 @@ class _DashboardActionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final iconColor = action.isPrimary && action.onAction != null
-        ? scheme.primary
-        : scheme.onSurfaceVariant;
+    final iconColor = action.onAction == null
+        ? context.mxOnSurfaceDisabled
+        : (action.isPrimary ? scheme.primary : scheme.onSurfaceVariant);
 
     Widget buildButton() {
       return action.isPrimary

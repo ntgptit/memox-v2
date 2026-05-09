@@ -2,7 +2,7 @@ family: global
 
 rules:
   - id: no_else
-    type: ast_check
+    type: forbidden_pattern
     name: "No Else"
     description: "Prefer early return, guard clauses, or switch expressions over `else`."
     message_code: no_else
@@ -12,8 +12,9 @@ rules:
     fix_hint_code: remove_else_with_guard_clause
     suggestion: "Refactor control flow to return early and flatten nesting."
     params:
-      check_id: no_else_control_flow
-      else_pattern: "(?m)(?:^|[}\\s])else(?:\\s+if\\b|\\s*\\{|\\s*$)"
+      patterns:
+        - "(?m)(?:^|[}\\s])else(?:\\s+if\\b|\\s*\\{|\\s*$)"
+      skip_comments: true
 
   - id: naming_convention
     type: naming_convention
@@ -119,7 +120,7 @@ rules:
         - "\\b(?:vi|en)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
 
   - id: no_inline_locale_pair_strings
-    type: ast_check
+    type: forbidden_pattern
     name: "No Inline Locale Pair Strings"
     description: "Avoid inline `vi:` / `en:` locale pair strings in UI code; move user-facing copy into generated l10n resources."
     message_code: no_hardcoded_string
@@ -127,10 +128,10 @@ rules:
     impact: i18n
     scope: ui_surfaces
     params:
-      check_id: ui_inline_locale_pair_strings
-      locale_patterns:
+      patterns:
         - "\\b(?:vi|en)\\s*:\\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'"
         - "\\b(?:vi|en)\\s*:\\s*\"(?:[^\"]*[A-Za-zÀ-ỹ][^\"]*)\""
+      skip_comments: true
 
   - id: no_hardcoded_notification_text
     type: forbidden_pattern

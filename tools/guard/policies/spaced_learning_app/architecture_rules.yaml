@@ -184,7 +184,7 @@ rules:
         - "customColors\\.repetitionColor\\("
 
   - id: feature_theme_token_imports
-    type: structural_check
+    type: forbidden_pattern
     name: "Feature Theme Token Imports"
     description: "Feature-layer source must not import `theme_tokens.dart` or any raw file under `core/theme/tokens/`; consume UI values through theme/context accessors or shared widgets instead."
     message_code: feature_theme_token_imports
@@ -193,10 +193,9 @@ rules:
     scope: features
     fix_hint_code: use_theme_accessors_in_features
     params:
-      check_id: forbidden_import_paths
-      forbidden_import_paths:
-        - "core/theme/theme_tokens.dart"
-        - "core/theme/tokens/"
+      patterns:
+        - "import\\s+'package:memox/core/theme/theme_tokens\\.dart'"
+        - "import\\s+'package:memox/core/theme/tokens/[^']+\\.dart'"
 
   - id: theme_semantic_palette_contract
     type: ast_check

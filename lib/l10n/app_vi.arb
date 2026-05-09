@@ -55,7 +55,7 @@
       }
     }
   },
-  "dashboardReviewEmptyMessage": "Hiện không có thẻ cần ôn.",
+  "dashboardReviewEmptyMessage": "Hiện không có thẻ cần ôn. Mở Thư viện để thêm thẻ.",
   "dashboardReviewNowAction": "Ôn",
   "dashboardNewStudyTitle": "Học mới",
   "dashboardNewCardsLabel": "Thẻ mới có thể học",
@@ -79,7 +79,7 @@
       }
     }
   },
-  "dashboardResumeEmptyMessage": "Hiện không có phiên học nào đang mở.",
+  "dashboardResumeEmptyMessage": "Hiện không có phiên học đang mở. Bắt đầu học để tiếp tục sau.",
   "dashboardContinueSessionAction": "Tiếp tục",
   "dashboardLibraryHealthTitle": "Sức khỏe thư viện",
   "dashboardLibraryHealthSummary": "{folderCount} thư mục · {deckCount} bộ thẻ · {cardCount} thẻ",

@@ -115,6 +115,8 @@ Tokens live in `lib/core/theme/` as **separate files**, not a single barrel:
 - No raw size literals in regular feature widgets. One-off layout dimensions in **shared** widgets need `// guard:raw-size-reviewed`.
 - No `MediaQuery`-based font scaling in feature/widget code. Tier-aware typography is applied ONCE in `MemoxApp.builder` via `AppTypography.scaledTextTheme(...)`; shared widgets and features read `Theme.of(context).textTheme.*` and inherit the scaled values automatically. Screen-percentage layouts only inside dialog/sheet/overlay/fullscreen-modal widgets.
 - Repetition colors: always via `customColors.repetitionColor(repetitionOrder.repetitionColorRole)`. Never rotate a raw palette list.
+- Do not wrap interactive widgets in `Opacity` to simulate disabled state. Use `onPressed: null` (or equivalent) and rely on `disabledForegroundColor` / `disabledBackgroundColor` from component themes.
+- On dark theme, prefer `MxCardVariant.outlined` for busy stacked screens (Dashboard, Library listings, filter panels). Reserve `MxCardVariant.filled` for ambient single surfaces (dialogs, sheets, hero blocks).
 
 ---
 

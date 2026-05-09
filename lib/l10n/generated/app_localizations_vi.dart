@@ -139,7 +139,8 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get dashboardReviewEmptyMessage => 'Hiện không có thẻ cần ôn.';
+  String get dashboardReviewEmptyMessage =>
+      'Hiện không có thẻ cần ôn. Mở Thư viện để thêm thẻ.';
 
   @override
   String get dashboardReviewNowAction => 'Ôn';
@@ -175,7 +176,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dashboardResumeEmptyMessage =>
-      'Hiện không có phiên học nào đang mở.';
+      'Hiện không có phiên học đang mở. Bắt đầu học để tiếp tục sau.';
 
   @override
   String get dashboardContinueSessionAction => 'Tiếp tục';

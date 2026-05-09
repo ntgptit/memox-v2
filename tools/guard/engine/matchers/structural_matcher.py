@@ -3,9 +3,7 @@ from __future__ import annotations
 import re
 
 from ..constants import KEY_CLASS_PATTERN
-from ..constants import KEY_FORBIDDEN_IMPORT_PATHS
 from ..constants import KEY_FORBIDDEN_IMPORTS
-from ..constants import KEY_IMPORT_PATTERN
 from ..constants import KEY_LAYER_DETECTION_PATTERN
 from ..constants import KEY_METHOD_PATTERN
 from ..constants import KEY_REQUIRED_MEMBERS
@@ -13,7 +11,6 @@ from ..models import Rule
 from ..models import Violation
 
 DEFAULT_IMPORT_PATTERN = r"import\s+'[^']*/(app|core|data|domain|presentation)/"
-DIRECT_IMPORT_PATTERN = r"^\s*import\s+'(?P<import_path>[^']+)';"
 CONTENT_SEPARATOR = "\n"
 OPENING_BRACE = "{"
 CLOSING_BRACE = "}"
@@ -25,8 +22,6 @@ class StructuralMatcher:
         check_id = rule.params.get("check_id", "")
         if check_id == "cross_feature_presentation_imports":
             return _check_cross_feature_presentation_imports(rule, rel_path, lines)
-        if check_id == "forbidden_import_paths":
-            return _check_forbidden_import_paths(rule, rel_path, lines)
         return []
 
     @staticmethod
@@ -204,71 +199,6 @@ def _check_cross_feature_presentation_imports(
         )
 
     return violations
-
-
-def _check_forbidden_import_paths(
-    rule: Rule,
-    rel_path: str,
-    lines: list[str],
-) -> list[Violation]:
-    import_pattern = re.compile(
-        rule.params.get(
-            KEY_IMPORT_PATTERN,
-            DIRECT_IMPORT_PATTERN,
-        )
-    )
-    forbidden_import_paths = rule.params.get(KEY_FORBIDDEN_IMPORT_PATHS, [])
-    if not forbidden_import_paths:
-        return []
-
-    violations: list[Violation] = []
-
-    for index, line in enumerate(lines):
-        import_match = import_pattern.search(line)
-        if import_match is None:
-            continue
-
-        import_path = import_match.groupdict().get("import_path", "")
-        if not import_path:
-            continue
-
-        forbidden_import = next(
-            (
-                forbidden_path
-                for forbidden_path in forbidden_import_paths
-                if _matches_forbidden_import_path(import_path, forbidden_path)
-            ),
-            None,
-        )
-        if forbidden_import is None:
-            continue
-
-        violations.append(
-            Violation(
-                rule_id=rule.id,
-                code=rule.message_code or rule.id,
-                family=rule.family,
-                severity=rule.severity,
-                confidence=rule.confidence,
-                impact=rule.impact,
-                file_path=rel_path,
-                line_number=index + 1,
-                symbol=import_path,
-                message=rule.description,
-                message_params={
-                    "forbidden_import": forbidden_import,
-                    "import_path": import_path,
-                },
-            )
-        )
-
-    return violations
-
-
-def _matches_forbidden_import_path(import_path: str, forbidden_path: str) -> bool:
-    if forbidden_path.endswith("/"):
-        return forbidden_path in import_path
-    return import_path.endswith(forbidden_path)
 
 
 def _extract_block(lines: list[str], start: int) -> list[str]:

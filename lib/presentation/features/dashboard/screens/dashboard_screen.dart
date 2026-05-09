@@ -7,6 +7,7 @@ import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
 import '../widgets/dashboard_content.dart';
+import '../widgets/dashboard_skeleton.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -25,6 +26,7 @@ class DashboardScreen extends ConsumerWidget {
           error: queryState.hasError ? queryState.error : null,
           stackTrace: queryState.hasError ? queryState.stackTrace : null,
           onRetry: () => ref.invalidate(dashboardOverviewProvider),
+          skeletonBuilder: (_) => const DashboardSkeleton(),
           dataBuilder: (context, state) => DashboardContent(state: state),
         ),
       ),

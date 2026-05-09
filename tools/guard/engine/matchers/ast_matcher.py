@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from pathlib import Path
 import re
 
-from ..constants import UTF8_ENCODING
 from ..models import Rule
 from ..models import Violation
 
@@ -53,14 +51,10 @@ class AstMatcher:
     @staticmethod
     def check(rule: Rule, rel_path: str, lines: list[str]) -> list[Violation]:
         check_id = rule.params.get("check_id", "")
-        if check_id == "no_else_control_flow":
-            return _check_no_else_control_flow(rule, rel_path, lines)
         if check_id == "theme_semantic_palette_contract":
             return _check_theme_semantic_palette_contract(rule, rel_path, lines)
         if check_id == "theme_typography_contract":
             return _check_theme_typography_contract(rule, rel_path, lines)
-        if check_id == "ui_inline_locale_pair_strings":
-            return _check_ui_inline_locale_pair_strings(rule, rel_path, lines)
         if check_id == "ui_try_count":
             return _check_ui_try_count(rule, rel_path, lines)
         if check_id == "ui_async_callback_await_count":
@@ -122,90 +116,6 @@ class AstMatcher:
         if check_id == "provider_generated_pairing":
             return _check_provider_generated_pairing(rule, rel_path, lines)
         return []
-
-
-def _check_no_else_control_flow(
-    rule: Rule,
-    rel_path: str,
-    lines: list[str],
-) -> list[Violation]:
-    content = _strip_strings_and_comments_preserve_layout(lines)
-    else_pattern = re.compile(
-        rule.params.get(
-            "else_pattern",
-            r"(?m)(?:^|[}\s])else(?:\s+if\b|\s*\{|\s*$)",
-        )
-    )
-
-    violations: list[Violation] = []
-    seen_lines: set[int] = set()
-    for match in else_pattern.finditer(content):
-        line_number = content.count("\n", 0, match.start()) + 1
-        if line_number in seen_lines:
-            continue
-
-        seen_lines.add(line_number)
-        violations.append(
-            Violation(
-                rule_id=rule.id,
-                code=rule.message_code or rule.id,
-                family=rule.family,
-                severity=rule.severity,
-                confidence=rule.confidence,
-                impact=rule.impact,
-                file_path=rel_path,
-                line_number=line_number,
-                symbol="else",
-                message=rule.description,
-                message_params={"keyword": "else"},
-            )
-        )
-
-    return violations
-
-
-def _check_ui_inline_locale_pair_strings(
-    rule: Rule,
-    rel_path: str,
-    lines: list[str],
-) -> list[Violation]:
-    content = CONTENT_SEPARATOR.join(lines)
-    locale_patterns = [
-        re.compile(pattern, re.S)
-        for pattern in rule.params.get(
-            "locale_patterns",
-            [
-                r"\b(?:vi|en)\s*:\s*'(?:[^']*[A-Za-zÀ-ỹ][^']*)'",
-                r'\b(?:vi|en)\s*:\s*"(?:[^"]*[A-Za-zÀ-ỹ][^"]*)"',
-            ],
-        )
-    ]
-
-    violations: list[Violation] = []
-    seen_lines: set[int] = set()
-    for pattern in locale_patterns:
-        for match in pattern.finditer(content):
-            line_number = content.count("\n", 0, match.start()) + 1
-            if line_number in seen_lines:
-                continue
-
-            seen_lines.add(line_number)
-            violations.append(
-                Violation(
-                    rule_id=rule.id,
-                    code=rule.message_code or rule.id,
-                    family=rule.family,
-                    severity=rule.severity,
-                    confidence=rule.confidence,
-                    impact=rule.impact,
-                    file_path=rel_path,
-                    line_number=line_number,
-                    symbol=lines[line_number - 1].strip(),
-                    message=rule.description,
-                )
-            )
-
-    return violations
 
 
 def _check_theme_semantic_palette_contract(

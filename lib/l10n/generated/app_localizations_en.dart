@@ -141,7 +141,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardReviewEmptyMessage =>
-      'No review cards are due right now.';
+      'No review cards are due. Open your library to add cards.';
 
   @override
   String get dashboardReviewNowAction => 'Review';
@@ -177,7 +177,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardResumeEmptyMessage =>
-      'No active study session right now.';
+      'No active session. Start studying to resume later.';
 
   @override
   String get dashboardContinueSessionAction => 'Resume';

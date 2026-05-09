@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../tokens/app_colors.dart';
+import '../tokens/app_opacity.dart';
 
 /// Theme extension exposing MemoX semantic colors that are not part of
 /// the standard [ColorScheme] (success / warning / info / rating / mastery /
@@ -204,6 +205,12 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
 extension MxColorsContext on BuildContext {
   MxColorsExtension get mxColors =>
       Theme.of(this).extension<MxColorsExtension>() ?? MxColorsExtension.light;
+}
+
+/// Semantic disabled foreground on [ColorScheme.onSurface] (token-backed).
+extension MxColorSchemeSemantics on BuildContext {
+  Color get mxOnSurfaceDisabled =>
+      Theme.of(this).colorScheme.onSurface.withValues(alpha: AppOpacity.disabled);
 }
 
 // ---------------------------------------------------------------------------
