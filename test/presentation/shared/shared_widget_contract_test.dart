@@ -46,6 +46,7 @@ import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_inline_toggle.dart';
 import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_page_dots.dart';
+import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_indicator.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
@@ -2244,10 +2245,14 @@ void main() {
 
     await _pumpLayoutWidget(
       tester,
-      const Column(
+      Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          MxDialog(key: dialogKey, title: 'Geometry', child: Text('Dialog')),
+          MxDialog(
+            key: dialogKey,
+            title: 'Geometry',
+            child: const Text('Dialog'),
+          ),
           MxGap(AppSpacing.lg),
           SizedBox(
             height: 220, // guard:raw-size-reviewed bounded sheet fixture

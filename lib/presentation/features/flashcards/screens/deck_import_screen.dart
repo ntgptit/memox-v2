@@ -21,6 +21,7 @@ import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_inline_toggle.dart';
 import '../../../shared/widgets/mx_list_tile.dart';
+import '../../../shared/widgets/mx_button_size.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';

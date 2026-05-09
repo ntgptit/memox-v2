@@ -32,7 +32,6 @@ class MxSelectField<T> extends StatelessWidget {
     final effectiveValue = _effectiveValue;
 
     return DropdownButtonFormField<T>(
-      key: ValueKey<int>(_fieldStateHash(effectiveValue)),
       initialValue: effectiveValue,
       items: options
           .map(
@@ -57,13 +56,6 @@ class MxSelectField<T> extends StatelessWidget {
     }
     final matches = options.where((option) => option.value == value);
     return matches.length == 1 ? value : null;
-  }
-
-  int _fieldStateHash(T? effectiveValue) {
-    return Object.hash(
-      effectiveValue,
-      Object.hashAll(options.map((option) => option.value)),
-    );
   }
 
   void _handleChanged(T? value) {

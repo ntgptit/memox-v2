@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
-import 'mx_primary_button.dart';
+import 'mx_button_size.dart';
 import 'mx_search_field.dart';
 import 'mx_secondary_button.dart';
 
@@ -114,10 +114,12 @@ class MxSearchSortToolbar<T> extends StatelessWidget {
 
     final selectedOption = _selectedOption;
     if (sortOptions.isNotEmpty) {
+      final triggerLabel =
+          selectedOption?.label ?? sortLabel ?? sortOptions.first.label;
       widgets.add(
         MenuAnchor(
           builder: (context, controller, _) => MxSecondaryButton(
-            label: selectedOption?.label ?? sortLabel!,
+            label: triggerLabel,
             leadingIcon: selectedOption?.icon ?? Icons.swap_vert_rounded,
             size: MxButtonSize.small,
             variant: selectedOption != null

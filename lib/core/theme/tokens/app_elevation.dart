@@ -21,7 +21,9 @@ abstract final class AppElevation {
   static const double button = level0;
   static const double buttonPressed = level1;
   static const double fab = level3;
-  static const double fabHovered = level4;
+  static const double fabFocus = level4;
+  static const double fabHover = level4;
+  static const double fabPressed = level3;
   static const double dialog = level3;
   static const double bottomSheet = level3;
   static const double menu = level2;

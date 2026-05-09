@@ -5,7 +5,7 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
-import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_button_size.dart';
 import '../../../shared/widgets/mx_progress_ring.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';

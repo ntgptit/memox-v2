@@ -10,7 +10,7 @@ enum MxTextFieldVariant { outlined, borderless }
 /// leading/trailing icons.
 class MxTextField extends StatelessWidget {
   const MxTextField({
-    required this.label,
+    this.label,
     this.controller,
     this.hintText,
     this.helperText,
@@ -40,7 +40,7 @@ class MxTextField extends StatelessWidget {
     super.key,
   });
 
-  final String label;
+  final String? label;
   final TextEditingController? controller;
   final String? hintText;
   final String? helperText;
@@ -103,6 +103,7 @@ class MxTextField extends StatelessWidget {
   InputDecoration _decoration() {
     if (variant == MxTextFieldVariant.borderless) {
       return InputDecoration(
+        labelText: label,
         hintText: hintText,
         helperText: helperText,
         errorText: errorText,

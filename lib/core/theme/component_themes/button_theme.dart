@@ -31,7 +31,7 @@ abstract final class ButtonThemeBuilder {
           alpha: AppOpacity.disabled,
         ),
         elevation: AppElevation.button,
-        shadowColor: scheme.primary,
+        shadowColor: scheme.shadow,
         minimumSize: const Size(0, _minHeight),
         padding: _padding,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
@@ -112,10 +112,10 @@ abstract final class ButtonThemeBuilder {
     return FloatingActionButtonThemeData(
       backgroundColor: scheme.primaryContainer,
       foregroundColor: scheme.onPrimaryContainer,
-      elevation: 4,
-      focusElevation: 6,
-      hoverElevation: 6,
-      highlightElevation: 8,
+      elevation: AppElevation.fab,
+      focusElevation: AppElevation.fabFocus,
+      hoverElevation: AppElevation.fabHover,
+      highlightElevation: AppElevation.fabPressed,
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.cardLarge),
     );
   }

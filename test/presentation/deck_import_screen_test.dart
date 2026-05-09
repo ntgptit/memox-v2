@@ -13,6 +13,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/deck_import_screen.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_import_viewmodel.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_term_row.dart';
 

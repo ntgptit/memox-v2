@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
@@ -7,12 +8,12 @@ import '../layouts/mx_gap.dart';
 /// Base MemoX dialog — consistent padding, title + optional icon, scrollable
 /// content area, and a row of action buttons at the bottom.
 class MxDialog extends StatelessWidget {
-  const MxDialog({
+  MxDialog({
     required this.title,
     required this.child,
     this.icon,
     this.actions = const [],
-    this.maxWidth = 480,
+    this.maxWidth,
     super.key,
   });
 
@@ -20,7 +21,7 @@ class MxDialog extends StatelessWidget {
   final IconData? icon;
   final Widget child;
   final List<Widget> actions;
-  final double maxWidth;
+  final double? maxWidth;
 
   static Future<T?> show<T>({
     required BuildContext context,
@@ -64,10 +65,12 @@ class MxDialog extends StatelessWidget {
           )
         : Text(title, style: titleStyle);
 
+    final resolvedMaxWidth = maxWidth ?? context.dialogMaxWidth;
+
     return Dialog(
       clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth),
+        constraints: BoxConstraints(maxWidth: resolvedMaxWidth),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xxl),
           child: Column(

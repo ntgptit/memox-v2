@@ -6,6 +6,7 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/options/content_sort_options.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
+import '../../../shared/widgets/mx_button_size.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_search_field.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';

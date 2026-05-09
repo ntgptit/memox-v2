@@ -4,7 +4,7 @@ import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import 'mx_primary_button.dart';
+import 'mx_button_size.dart';
 import '../layouts/mx_gap.dart';
 
 enum MxSecondaryVariant { tonal, outlined, text }

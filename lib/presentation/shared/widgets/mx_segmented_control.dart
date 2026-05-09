@@ -214,7 +214,6 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
         final next = Set<T>.of(selected);
         if (checked ?? false) {
           next.add(segment.value);
-          if (next.isEmpty && !emptySelectionAllowed) return;
           onChanged(next);
           return;
         }

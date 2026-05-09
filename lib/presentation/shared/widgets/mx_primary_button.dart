@@ -5,8 +5,7 @@ import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
 import '../layouts/mx_gap.dart';
-
-enum MxButtonSize { small, medium, large }
+import 'mx_button_size.dart';
 
 enum MxPrimaryButtonTone { primary, success, danger }
 

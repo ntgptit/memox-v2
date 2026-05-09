@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
-import 'mx_primary_button.dart';
+import 'mx_button_size.dart';
 import 'mx_secondary_button.dart';
 import 'mx_search_sort_toolbar.dart' show MxSortOption;
 
