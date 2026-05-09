@@ -38,7 +38,14 @@ class MxSectionHeader extends StatelessWidget {
           ),
         ),
         if (actionLabel != null && onAction != null)
-          TextButton(onPressed: onAction, child: Text(actionLabel!)),
+          TextButton(
+            onPressed: onAction,
+            child: MxText(
+              actionLabel!,
+              role: MxTextRole.tileTrailing,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
       ],
     );
   }

@@ -4,6 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_section_header.dart';
 import '../../../shared/widgets/mx_text.dart';
 
@@ -37,9 +38,11 @@ class FlashcardStudyModesSection extends StatelessWidget {
           subtitle: l10n.flashcardsStudyModesTitle,
         ),
         const MxGap(MxSpace.md),
-        enabled
-            ? _StudyModeFlowCard(modes: modes)
-            : _StudyUnavailableCard(message: l10n.decksStudyUnavailableNoCards),
+        _StudyModeListCard(modes: modes, enabled: enabled),
+        if (!enabled) ...[
+          const MxGap(MxSpace.sm),
+          _StudyUnavailableCard(message: l10n.decksStudyUnavailableNoCards),
+        ],
       ],
     );
   }
@@ -52,60 +55,26 @@ class _ModeTileData {
   final IconData icon;
 }
 
-class _StudyModeFlowCard extends StatelessWidget {
-  const _StudyModeFlowCard({required this.modes});
+class _StudyModeListCard extends StatelessWidget {
+  const _StudyModeListCard({required this.modes, required this.enabled});
 
   final List<_ModeTileData> modes;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     return MxCard(
-      child: Wrap(
-        spacing: MxSpace.sm,
-        runSpacing: MxSpace.sm,
+      padding: const EdgeInsets.symmetric(vertical: MxSpace.xs),
+      child: Column(
         children: [
           for (var index = 0; index < modes.length; index++)
-            _StudyModeChip(order: index + 1, data: modes[index]),
-        ],
-      ),
-    );
-  }
-}
-
-class _StudyModeChip extends StatelessWidget {
-  const _StudyModeChip({required this.order, required this.data});
-
-  final int order;
-  final _ModeTileData data;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        border: Border.all(color: scheme.outlineVariant),
-        borderRadius: BorderRadius.circular(MxSpace.xl),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: MxSpace.md,
-          vertical: MxSpace.sm,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(data.icon, color: scheme.primary),
-            const MxGap(MxSpace.xs),
-            MxText(
-              '$order. ${data.label}',
-              role: MxTextRole.tileMeta,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            MxListTile(
+              title: modes[index].label,
+              leadingIcon: modes[index].icon,
+              showChevron: enabled,
+              enabled: enabled,
             ),
-          ],
-        ),
+        ],
       ),
     );
   }

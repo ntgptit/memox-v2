@@ -140,7 +140,7 @@ class MxSecondaryButton extends StatelessWidget {
   ButtonStyle? _mergeButtonStyles(ButtonStyle? base, ButtonStyle? overrides) {
     if (base == null) return overrides;
     if (overrides == null) return base;
-    return overrides.merge(base);
+    return base.merge(overrides);
   }
 
   ButtonStyle? _toneStyle(ThemeData theme, MxColorsExtension mxColors) {

@@ -15,6 +15,7 @@ Test file: `test/presentation/shared/shared_widget_contract_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | shared widget rebuild receives equivalent inputs | each cataloged widget uses the same full-data builder, key, theme, and surface size for two consecutive pumps | the widget is pumped, measured, pumped again, and measured again | the keyed subject remains present and its rendered size is unchanged between rebuilds | C0+C1 |
+| DT2 | select field receives a null or stale controlled value after parent options change | `MxSelectField` renders with selected value `due`, then parent rebuilds with value `missing` not present in options, then with `value=null` | the same keyed select field is pumped for each parent state | `Due` is shown first, stale value does not throw and falls back to `Choose mode`, and null value also shows `Choose mode` | C0+C1 |
 
 ## Decision table: onLayout
 
@@ -34,6 +35,7 @@ Test file: `test/presentation/shared/shared_widget_contract_test.dart`
 | DT2 | representative surfaces, text, icons, dividers, tiles, options, and skeletons resolve from MemoX theme or tokens | `MxCard`, `MxText`, `MxIconButton`, `MxDivider`, `MxAnswerOptionCard`, `MxStudySetTile`, and `MxSkeleton` render inside the MemoX `MaterialApp` wrapper | descendant Material, decoration, and text widgets are inspected after layout | background, border color, soft radius, elevation, typography, icon size, divider style, tile icon radius, and skeleton radius match the active theme or token contract | C0+C1 |
 | DT3 | disabled and error visual states use themed state colors | disabled destructive `MxPrimaryButton` and error-role `MxText` render inside the MemoX theme wrapper | button state properties and rendered text style are resolved | disabled foreground/background use `ColorScheme.onSurface` with `AppOpacity` tokens and error text uses `ColorScheme.error` | C0+C1 |
 | DT4 | focus, pressed, and hover overlays use shared focus theme | interactive `MxTappable` renders with the default overlay base color | the descendant `InkWell` overlay is resolved for hovered, focused, and pressed widget states | every state layer matches `AppFocus.overlay` against the active `ColorScheme.onSurface` | C0+C1 |
+| DT5 | shared row/header copy should use semantic text roles | `MxToggle` renders title/subtitle and `MxSectionHeader` renders an action label | widgets render inside the MemoX theme wrapper | toggle title/subtitle are `MxTextRole.listTitle`/`listSubtitle`, and section action uses `MxTextRole.tileTrailing` | C0+C1 |
 
 ## Decision table: onInteraction
 
@@ -61,6 +63,7 @@ Test file: `test/presentation/shared/shared_widget_contract_test.dart`
 | DT7 | icon-only shared buttons rely on tooltip semantics | `MxIconButton` renders with an icon, tooltip label, and callback | semantics are enabled and the widget renders inside the MemoX theme wrapper | the icon is visible, the hit area is Material-sized, and screen-reader semantics expose the tooltip label | C0+C1 |
 | DT8 | normal shared button composition has a visual baseline | deterministic normal samples build enabled primary, secondary, text, tonal, and icon-only buttons | the widget is pumped in the golden harness and compared to `goldens/shared_button_normal.png` | the rendered pixels match the committed normal button golden | C0+C1 |
 | DT9 | disabled and loading shared button composition has a visual baseline | deterministic state samples build disabled primary, secondary, icon-only buttons and loading primary and secondary buttons | the widget is pumped in the golden harness and compared to `goldens/shared_button_states.png` | the rendered pixels match the committed loading/disabled button golden | C0+C1 |
+| DT10 | component-level size and tone styles must override hostile themed button defaults | app theme sets primary, tonal, outlined, and text button base styles with conflicting minimum size, foreground, background, and side colors | large success `MxPrimaryButton` and large danger `MxSecondaryButton` variants render | resolved styles keep component large height and semantic success/danger colors instead of the hostile base theme values | C0+C1 |
 
 ## Decision table: onCard
 

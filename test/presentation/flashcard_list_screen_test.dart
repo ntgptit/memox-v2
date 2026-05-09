@@ -20,9 +20,14 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/flashcard_list_screen.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_detail_card_row.dart';
+import 'package:memox/presentation/features/flashcards/widgets/flashcard_deck_summary_section.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_preview_section.dart';
+import 'package:memox/presentation/features/flashcards/widgets/flashcard_study_modes_section.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_toolbar_section.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
+import 'package:memox/presentation/shared/widgets/mx_badge.dart';
+import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_search_field.dart';
@@ -189,6 +194,20 @@ void main() {
       await _scrollToText(tester, 'No flashcards yet');
       expect(find.text('No flashcards yet'), findsOneWidget);
       expect(find.text('Add'), findsOneWidget);
+
+      await _scrollToText(tester, 'Study modes');
+      final disabledTiles = tester
+          .widgetList<MxListTile>(_studyModeTiles())
+          .toList();
+      expect(disabledTiles, hasLength(5));
+      expect(disabledTiles.every((tile) => !tile.enabled), isTrue);
+      expect(
+        find.descendant(
+          of: _studyModeSection(),
+          matching: find.byIcon(Icons.chevron_right),
+        ),
+        findsNothing,
+      );
     },
   );
 
@@ -272,6 +291,121 @@ void main() {
         lessThan(tester.getTopLeft(preview).dy),
       );
       expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'DT7 onDisplay: renders deck metadata row and visual progress bar',
+    (WidgetTester tester) async {
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final summary = find.byType(FlashcardDeckSummarySection);
+      final summaryBadge = find.descendant(
+        of: summary,
+        matching: find.byType(MxBadge),
+      );
+
+      expect(
+        find.descendant(of: summary, matching: find.byType(MxAvatar)),
+        findsOneWidget,
+      );
+      expect(summaryBadge, findsOneWidget);
+      expect(
+        find.descendant(
+          of: summaryBadge,
+          matching: find.text('2 cards · 7% mastery'),
+        ),
+        findsOneWidget,
+      );
+
+      await _scrollToText(tester, 'Your progress');
+      final progressBars = tester
+          .widgetList<LinearProgressIndicator>(
+            find.byType(LinearProgressIndicator),
+          )
+          .toList();
+
+      expect(progressBars.any((bar) => bar.value == 0.07), isTrue);
+    },
+  );
+
+  testWidgets(
+    'DT8 onDisplay: renders enabled study mode tiles in mockup order',
+    (WidgetTester tester) async {
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _scrollToText(tester, 'Study modes');
+
+      final tiles = tester.widgetList<MxListTile>(_studyModeTiles()).toList();
+      final section = _studyModeSection();
+
+      expect(tiles, hasLength(5));
+      expect(tiles.every((tile) => tile.enabled), isTrue);
+      expect(
+        find.descendant(
+          of: section,
+          matching: find.byIcon(Icons.chevron_right),
+        ),
+        findsNWidgets(5),
+      );
+      expect(
+        tester
+            .getTopLeft(
+              find.descendant(of: section, matching: find.text('Review')),
+            )
+            .dy,
+        lessThan(
+          tester
+              .getTopLeft(
+                find.descendant(of: section, matching: find.text('Match')),
+              )
+              .dy,
+        ),
+      );
+      expect(
+        find.descendant(of: section, matching: find.text('Guess')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: section, matching: find.text('Recall')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: section, matching: find.text('Fill')),
+        findsOneWidget,
+      );
     },
   );
 
@@ -632,7 +766,9 @@ void main() {
     expect(backInPreview, findsOneWidget);
 
     await tester.tap(
-      find.descendant(of: preview, matching: find.byTooltip('Fullscreen')),
+      find
+          .descendant(of: preview, matching: find.byTooltip('Fullscreen'))
+          .first,
     );
     await tester.pumpAndSettle();
 
@@ -866,6 +1002,17 @@ Finder _rowForText(String text) {
 
 Finder _rowIcon(String rowText, IconData icon) {
   return find.descendant(of: _rowForText(rowText), matching: find.byIcon(icon));
+}
+
+Finder _studyModeSection() {
+  return find.byType(FlashcardStudyModesSection);
+}
+
+Finder _studyModeTiles() {
+  return find.descendant(
+    of: _studyModeSection(),
+    matching: find.byType(MxListTile),
+  );
 }
 
 Finder _verticalScrollable() {

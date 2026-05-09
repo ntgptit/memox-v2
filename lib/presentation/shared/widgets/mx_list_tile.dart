@@ -20,6 +20,7 @@ class MxListTile extends StatelessWidget {
     this.dense = false,
     this.selected = false,
     this.showChevron = false,
+    this.enabled = true,
     super.key,
   });
 
@@ -33,6 +34,7 @@ class MxListTile extends StatelessWidget {
   final bool dense;
   final bool selected;
   final bool showChevron;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +49,20 @@ class MxListTile extends StatelessWidget {
                 width: AppSpacing.xxxxl, // 40
                 height: AppSpacing.xxxxl, // 40
                 decoration: BoxDecoration(
-                  color: scheme.primaryContainer,
+                  color: enabled
+                      ? scheme.primaryContainer
+                      : scheme.onSurface.withValues(
+                          alpha: AppOpacity.disabledSurface,
+                        ),
                   borderRadius: AppRadius.borderLg,
                 ),
                 alignment: Alignment.center,
                 child: Icon(
                   leadingIcon,
                   size: AppIconSizes.md,
-                  color: scheme.onPrimaryContainer,
+                  color: enabled
+                      ? scheme.onPrimaryContainer
+                      : scheme.onSurface.withValues(alpha: AppOpacity.disabled),
                 ),
               )
             : null);
@@ -65,7 +73,9 @@ class MxListTile extends StatelessWidget {
             ? Icon(
                 Icons.chevron_right,
                 size: AppIconSizes.lg,
-                color: scheme.onSurfaceVariant,
+                color: enabled
+                    ? scheme.onSurfaceVariant
+                    : scheme.onSurface.withValues(alpha: AppOpacity.disabled),
               )
             : null);
 
@@ -74,6 +84,9 @@ class MxListTile extends StatelessWidget {
       title: MxText(
         title,
         role: dense ? MxTextRole.tileTitle : MxTextRole.listTitle,
+        color: enabled
+            ? null
+            : scheme.onSurface.withValues(alpha: AppOpacity.disabled),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
@@ -83,14 +96,18 @@ class MxListTile extends StatelessWidget {
               child: MxText(
                 subtitle!,
                 role: MxTextRole.listSubtitle,
+                color: enabled
+                    ? null
+                    : scheme.onSurface.withValues(alpha: AppOpacity.disabled),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             )
           : null,
       trailing: effectiveTrailing,
-      onTap: onTap,
-      onLongPress: onLongPress,
+      enabled: enabled,
+      onTap: enabled ? onTap : null,
+      onLongPress: enabled ? onLongPress : null,
       selected: selected,
       selectedTileColor:
           listTileTheme.selectedTileColor ??

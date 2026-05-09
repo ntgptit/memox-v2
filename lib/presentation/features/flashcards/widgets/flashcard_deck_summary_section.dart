@@ -3,6 +3,8 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_avatar.dart';
+import '../../../shared/widgets/mx_badge.dart';
 import '../../../shared/widgets/mx_breadcrumb_bar.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
@@ -25,6 +27,11 @@ class FlashcardDeckSummarySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final ownerLabel = _deckContextLabel(l10n, state);
+    final deckSummary = l10n.flashcardsDeckSummary(
+      state.totalCount,
+      state.progress.masteryPercent,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,6 +41,23 @@ class FlashcardDeckSummarySection extends StatelessWidget {
           role: MxTextRole.pageTitle,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
+        ),
+        const MxGap(MxSpace.sm),
+        Row(
+          children: [
+            MxAvatar(initials: state.deckName, size: MxAvatarSize.sm),
+            const MxGap(MxSpace.sm),
+            Expanded(
+              child: MxText(
+                ownerLabel,
+                role: MxTextRole.tileMeta,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const MxGap(MxSpace.sm),
+            MxBadge(label: deckSummary, tone: MxBadgeTone.neutral),
+          ],
         ),
         const MxGap(MxSpace.sm),
         MxBreadcrumbBar(
@@ -48,14 +72,6 @@ class FlashcardDeckSummarySection extends StatelessWidget {
                     : () => onOpenBreadcrumb(state.breadcrumb[index].folderId!),
               ),
           ],
-        ),
-        const MxGap(MxSpace.sm),
-        MxText(
-          l10n.flashcardsDeckSummary(
-            state.totalCount,
-            state.progress.masteryPercent,
-          ),
-          role: MxTextRole.contentBody,
         ),
         const MxGap(MxSpace.md),
         MxPrimaryButton(
@@ -73,5 +89,15 @@ class FlashcardDeckSummarySection extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  String _deckContextLabel(AppLocalizations l10n, FlashcardListState state) {
+    if (state.breadcrumb.isEmpty) {
+      return l10n.appName;
+    }
+    final parentIndex = state.breadcrumb.length > 1
+        ? state.breadcrumb.length - 2
+        : 0;
+    return state.breadcrumb[parentIndex].label;
   }
 }

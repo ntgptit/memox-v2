@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'mx_text.dart';
+
 /// Shared binary setting row backed by Material switch styling.
 class MxToggle extends StatelessWidget {
   const MxToggle({
@@ -20,8 +22,10 @@ class MxToggle extends StatelessWidget {
     return SwitchListTile(
       value: value,
       onChanged: onChanged,
-      title: Text(label),
-      subtitle: subtitle == null ? null : Text(subtitle!),
+      title: MxText(label, role: MxTextRole.listTitle),
+      subtitle: subtitle == null
+          ? null
+          : MxText(subtitle!, role: MxTextRole.listSubtitle),
     );
   }
 }

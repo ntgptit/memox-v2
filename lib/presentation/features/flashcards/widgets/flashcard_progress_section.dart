@@ -4,6 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_progress_indicator.dart';
 import '../../../shared/widgets/mx_section_header.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
@@ -40,12 +41,24 @@ class FlashcardProgressSection extends StatelessWidget {
         ),
         const MxGap(MxSpace.md),
         MxCard(
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              for (var index = 0; index < items.length; index++) ...[
-                Expanded(child: _ProgressStat(item: items[index])),
-                if (index != items.length - 1) const MxGap(MxSpace.sm),
-              ],
+              MxLinearProgress(
+                value: progress.masteryPercent / 100,
+                label: l10n.flashcardsProgressMastered,
+                showPercentage: true,
+                size: MxProgressSize.large,
+              ),
+              const MxGap(MxSpace.lg),
+              Row(
+                children: [
+                  for (var index = 0; index < items.length; index++) ...[
+                    Expanded(child: _ProgressStat(item: items[index])),
+                    if (index != items.length - 1) const MxGap(MxSpace.sm),
+                  ],
+                ],
+              ),
             ],
           ),
         ),

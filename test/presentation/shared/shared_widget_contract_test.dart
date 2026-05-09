@@ -136,6 +136,72 @@ void main() {
     }
   });
 
+  testWidgets(
+    'DT2 onUpdate: MxSelectField tolerates null and stale selected values',
+    (tester) async {
+      const selectKey = ValueKey('select-controlled-state');
+      const allOption = MxSelectOption(value: 'all', label: 'All');
+      const dueOption = MxSelectOption(value: 'due', label: 'Due');
+
+      await _pumpLayoutWidget(
+        tester,
+        const MxSelectField<String>(
+          key: selectKey,
+          label: 'Mode',
+          value: 'due',
+          placeholder: 'Choose mode',
+          options: [allOption, dueOption],
+          onChanged: _noopString,
+        ),
+      );
+
+      expect(
+        find.descendant(of: find.byKey(selectKey), matching: find.text('Due')),
+        findsOneWidget,
+      );
+
+      await _pumpLayoutWidget(
+        tester,
+        const MxSelectField<String>(
+          key: selectKey,
+          label: 'Mode',
+          value: 'missing',
+          placeholder: 'Choose mode',
+          options: [allOption],
+          onChanged: _noopString,
+        ),
+      );
+
+      expect(
+        find.descendant(
+          of: find.byKey(selectKey),
+          matching: find.text('Choose mode'),
+        ),
+        findsOneWidget,
+      );
+
+      await _pumpLayoutWidget(
+        tester,
+        const MxSelectField<String>(
+          key: selectKey,
+          label: 'Mode',
+          value: null,
+          placeholder: 'Choose mode',
+          options: [allOption],
+          onChanged: _noopString,
+        ),
+      );
+
+      expect(
+        find.descendant(
+          of: find.byKey(selectKey),
+          matching: find.text('Choose mode'),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+
   test(
     'DT1 onLayout: keeps padding margin and gap declarations token based',
     () {
@@ -627,6 +693,51 @@ void main() {
       expect(
         inkWell.overlayColor?.resolve({WidgetState.pressed}),
         AppFocus.overlay(scheme.onSurface, {WidgetState.pressed}),
+      );
+    },
+  );
+
+  testWidgets(
+    'DT5 onVisualStyle: renders shared row copy through MxText roles',
+    (tester) async {
+      const toggleKey = ValueKey('visual-toggle-typography');
+      const headerKey = ValueKey('visual-section-header-typography');
+
+      await _pumpLayoutWidget(
+        tester,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MxToggle(
+              key: toggleKey,
+              label: 'Daily reminder',
+              subtitle: 'Send a reminder each day.',
+              value: true,
+              onChanged: (_) {},
+            ),
+            const MxGap(AppSpacing.md),
+            MxSectionHeader(
+              key: headerKey,
+              title: 'Recent',
+              subtitle: 'Updated today',
+              actionLabel: 'View all',
+              onAction: _noop,
+            ),
+          ],
+        ),
+      );
+
+      expect(
+        _mxTextInside(tester, toggleKey, 'Daily reminder').role,
+        MxTextRole.listTitle,
+      );
+      expect(
+        _mxTextInside(tester, toggleKey, 'Send a reminder each day.').role,
+        MxTextRole.listSubtitle,
+      );
+      expect(
+        _mxTextInside(tester, headerKey, 'View all').role,
+        MxTextRole.tileTrailing,
       );
     },
   );
@@ -1265,6 +1376,96 @@ void main() {
       semantics.dispose();
     }
   });
+
+  testWidgets(
+    'DT10 onButton: component size and tone override themed button bases',
+    (tester) async {
+      const primaryKey = ValueKey('button-override-primary');
+      const outlinedKey = ValueKey('button-override-outlined');
+      const tonalKey = ValueKey('button-override-tonal');
+      const textKey = ValueKey('button-override-text');
+      final baseTheme = AppTheme.light();
+      final customTheme = baseTheme.copyWith(
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: _hostileButtonBaseStyle(baseTheme.colorScheme.tertiary),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: _hostileButtonBaseStyle(baseTheme.colorScheme.tertiary),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: _hostileButtonBaseStyle(baseTheme.colorScheme.tertiary),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: _hostileButtonBaseStyle(baseTheme.colorScheme.tertiary),
+        ),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: customTheme,
+          home: const Scaffold(
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MxPrimaryButton(
+                  key: primaryKey,
+                  label: 'Save',
+                  size: MxButtonSize.large,
+                  tone: MxPrimaryButtonTone.success,
+                  onPressed: _noop,
+                ),
+                MxSecondaryButton(
+                  key: outlinedKey,
+                  label: 'Delete',
+                  size: MxButtonSize.large,
+                  tone: MxSecondaryButtonTone.danger,
+                  onPressed: _noop,
+                ),
+                MxSecondaryButton(
+                  key: tonalKey,
+                  label: 'Delete',
+                  size: MxButtonSize.large,
+                  variant: MxSecondaryVariant.tonal,
+                  tone: MxSecondaryButtonTone.danger,
+                  onPressed: _noop,
+                ),
+                MxSecondaryButton(
+                  key: textKey,
+                  label: 'Delete',
+                  size: MxButtonSize.large,
+                  variant: MxSecondaryVariant.text,
+                  tone: MxSecondaryButtonTone.danger,
+                  onPressed: _noop,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final mxColors = customTheme.extension<MxColorsExtension>()!;
+      final primaryStyle = _elevatedButton(tester, primaryKey).style!;
+      final outlinedStyle = _outlinedButton(tester, outlinedKey).style!;
+      final tonalStyle = tester
+          .widget<FilledButton>(_filledButtonFinder(tonalKey))
+          .style!;
+      final textStyle = tester
+          .widget<TextButton>(_textButtonFinder(textKey))
+          .style!;
+      final states = <WidgetState>{};
+
+      expect(primaryStyle.minimumSize?.resolve(states), const Size(0, 52));
+      expect(primaryStyle.backgroundColor?.resolve(states), mxColors.success);
+      expect(primaryStyle.foregroundColor?.resolve(states), mxColors.onSuccess);
+
+      for (final style in [outlinedStyle, tonalStyle, textStyle]) {
+        expect(style.minimumSize?.resolve(states), const Size(0, 52));
+        expect(style.foregroundColor?.resolve(states), mxColors.ratingAgain);
+        expect(style.side?.resolve(states)?.color, mxColors.ratingAgain);
+      }
+    },
+  );
 
   testWidgets('DT8 onButton: matches normal button golden', (tester) async {
     await _expectGoldenMatches(
@@ -3607,6 +3808,18 @@ void _expectSharedButtonStyle(
     resolvedStyle.textStyle?.resolve(states),
     AppTypography.labelLarge,
     reason: reason,
+  );
+}
+
+ButtonStyle _hostileButtonBaseStyle(Color color) {
+  return ButtonStyle(
+    minimumSize: const WidgetStatePropertyAll(Size(0, 72)),
+    padding: const WidgetStatePropertyAll(
+      EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+    ),
+    backgroundColor: WidgetStatePropertyAll(color),
+    foregroundColor: WidgetStatePropertyAll(color),
+    side: WidgetStatePropertyAll(BorderSide(color: color)),
   );
 }
 
@@ -6202,3 +6415,5 @@ class _SourceRule {
 }
 
 void _noop() {}
+
+void _noopString(String value) {}

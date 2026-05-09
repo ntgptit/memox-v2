@@ -22,8 +22,11 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
   // guard:raw-size-reviewed wide card ratio follows the deck-detail preview.
   static const double _previewAspectRatio = 2.08;
   static const double _fullscreenAspectRatio = 0.75;
+  static const double _previewViewportFraction = 0.94;
 
-  late final PageController _controller = PageController();
+  late final PageController _controller = PageController(
+    viewportFraction: _previewViewportFraction,
+  );
   var _activeIndex = 0;
   var _showBack = false;
 
@@ -73,7 +76,7 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
             );
           },
         ),
-        const MxGap(MxSpace.md),
+        const MxGap(MxSpace.sm),
         MxPageDots(
           count: widget.items.length,
           activeIndex: _activeIndex,
