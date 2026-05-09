@@ -55,16 +55,26 @@ class MxPageDots extends StatelessWidget {
                             duration: const Duration(milliseconds: 180),
                             width: isActive
                                 ? AppSpacing
-                                      .sm // guard:raw-size-reviewed active dot uses sm token
+                                      .lg // guard:raw-size-reviewed active dot uses lg token
                                 : AppSpacing
                                       .xs, // guard:raw-size-reviewed inactive dot uses xs token
-                            height: AppSpacing
-                                .xs, // guard:raw-size-reviewed dot height uses xs token
+                            height: isActive
+                                ? AppSpacing
+                                      .sm // guard:raw-size-reviewed active dot height uses sm token
+                                : AppSpacing
+                                      .xs, // guard:raw-size-reviewed inactive dot height uses xs token
                             decoration: BoxDecoration(
                               color: isActive
                                   ? scheme.primary
-                                  : scheme.onSurfaceVariant,
-                              shape: BoxShape.circle,
+                                  : scheme.outlineVariant,
+                              shape: isActive
+                                  ? BoxShape.rectangle
+                                  : BoxShape.circle,
+                              borderRadius: isActive
+                                  ? const BorderRadius.all(
+                                      Radius.circular(AppSpacing.xs),
+                                    )
+                                  : null,
                             ),
                           ),
                         ),

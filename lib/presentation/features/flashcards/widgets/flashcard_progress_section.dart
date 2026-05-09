@@ -4,20 +4,14 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
-import '../../../shared/widgets/mx_progress_ring.dart';
 import '../../../shared/widgets/mx_section_header.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
 
 class FlashcardProgressSection extends StatelessWidget {
-  const FlashcardProgressSection({
-    required this.progress,
-    required this.totalCount,
-    super.key,
-  });
+  const FlashcardProgressSection({required this.progress, super.key});
 
   final FlashcardDeckProgressState progress;
-  final int totalCount;
 
   @override
   Widget build(BuildContext context) {
@@ -45,22 +39,18 @@ class FlashcardProgressSection extends StatelessWidget {
           subtitle: l10n.flashcardsProgressSubtitle,
         ),
         const MxGap(MxSpace.md),
-        for (var index = 0; index < items.length; index++) ...[
-          _ProgressTile(
-            item: items[index],
-            ratio: _ratioFor(items[index].count),
+        MxCard(
+          child: Row(
+            children: [
+              for (var index = 0; index < items.length; index++) ...[
+                Expanded(child: _ProgressStat(item: items[index])),
+                if (index != items.length - 1) const MxGap(MxSpace.sm),
+              ],
+            ],
           ),
-          if (index != items.length - 1) const MxGap(MxSpace.sm),
-        ],
+        ),
       ],
     );
-  }
-
-  double _ratioFor(int count) {
-    if (totalCount == 0) {
-      return 0;
-    }
-    return count / totalCount;
   }
 }
 
@@ -71,40 +61,29 @@ class _ProgressItem {
   final int count;
 }
 
-class _ProgressTile extends StatelessWidget {
-  const _ProgressTile({required this.item, required this.ratio});
+class _ProgressStat extends StatelessWidget {
+  const _ProgressStat({required this.item});
 
   final _ProgressItem item;
-  final double ratio;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final countLabel = l10n.flashcardsProgressCountValue(item.count);
 
-    return MxCard(
-      child: Row(
-        children: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              MxProgressRing(value: ratio, showLabel: false),
-              MxText(countLabel, role: MxTextRole.studyProgress),
-            ],
-          ),
-          const MxGap(MxSpace.lg),
-          Expanded(
-            child: MxText(
-              item.label,
-              role: MxTextRole.tileTitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const MxGap(MxSpace.md),
-          MxText(countLabel, role: MxTextRole.tileTrailing),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        MxText(countLabel, role: MxTextRole.studyProgress),
+        const MxGap(MxSpace.xs),
+        MxText(
+          item.label,
+          role: MxTextRole.tileMeta,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 }

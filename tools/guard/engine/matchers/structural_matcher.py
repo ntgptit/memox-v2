@@ -4,6 +4,7 @@ import re
 
 from ..constants import KEY_CLASS_PATTERN
 from ..constants import KEY_FORBIDDEN_IMPORTS
+from ..constants import KEY_IMPORT_PATTERN
 from ..constants import KEY_LAYER_DETECTION_PATTERN
 from ..constants import KEY_METHOD_PATTERN
 from ..constants import KEY_REQUIRED_MEMBERS

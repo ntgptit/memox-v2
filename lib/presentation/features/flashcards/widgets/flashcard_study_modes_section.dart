@@ -8,14 +8,9 @@ import '../../../shared/widgets/mx_section_header.dart';
 import '../../../shared/widgets/mx_text.dart';
 
 class FlashcardStudyModesSection extends StatelessWidget {
-  const FlashcardStudyModesSection({
-    required this.enabled,
-    required this.onStartStudy,
-    super.key,
-  });
+  const FlashcardStudyModesSection({required this.enabled, super.key});
 
   final bool enabled;
-  final VoidCallback onStartStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -37,16 +32,14 @@ class FlashcardStudyModesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        MxSectionHeader(title: l10n.flashcardsStudyModesTitle),
+        MxSectionHeader(
+          title: l10n.studyFlowTitle,
+          subtitle: l10n.flashcardsStudyModesTitle,
+        ),
         const MxGap(MxSpace.md),
-        for (var index = 0; index < modes.length; index++) ...[
-          _StudyModeTile(
-            data: modes[index],
-            enabled: enabled,
-            onTap: onStartStudy,
-          ),
-          if (index != modes.length - 1) const MxGap(MxSpace.sm),
-        ],
+        enabled
+            ? _StudyModeFlowCard(modes: modes)
+            : _StudyUnavailableCard(message: l10n.decksStudyUnavailableNoCards),
       ],
     );
   }
@@ -59,41 +52,88 @@ class _ModeTileData {
   final IconData icon;
 }
 
-class _StudyModeTile extends StatelessWidget {
-  const _StudyModeTile({
-    required this.data,
-    required this.enabled,
-    required this.onTap,
-  });
+class _StudyModeFlowCard extends StatelessWidget {
+  const _StudyModeFlowCard({required this.modes});
 
+  final List<_ModeTileData> modes;
+
+  @override
+  Widget build(BuildContext context) {
+    return MxCard(
+      child: Wrap(
+        spacing: MxSpace.sm,
+        runSpacing: MxSpace.sm,
+        children: [
+          for (var index = 0; index < modes.length; index++)
+            _StudyModeChip(order: index + 1, data: modes[index]),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudyModeChip extends StatelessWidget {
+  const _StudyModeChip({required this.order, required this.data});
+
+  final int order;
   final _ModeTileData data;
-  final bool enabled;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final foreground = enabled ? scheme.onSurface : scheme.onSurfaceVariant;
 
-    return MxCard(
-      onTap: enabled ? onTap : null,
-      child: Row(
-        children: [
-          Icon(
-            data.icon,
-            color: enabled ? scheme.primary : scheme.onSurfaceVariant,
-          ),
-          const MxGap(MxSpace.md),
-          Expanded(
-            child: MxText(
-              data.label,
-              role: MxTextRole.tileTitle,
-              color: foreground,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        border: Border.all(color: scheme.outlineVariant),
+        borderRadius: BorderRadius.circular(MxSpace.xl),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: MxSpace.md,
+          vertical: MxSpace.sm,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(data.icon, color: scheme.primary),
+            const MxGap(MxSpace.xs),
+            MxText(
+              '$order. ${data.label}',
+              role: MxTextRole.tileMeta,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StudyUnavailableCard extends StatelessWidget {
+  const _StudyUnavailableCard({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return MxCard(
+      backgroundColor: scheme.surfaceContainerHighest,
+      child: Row(
+        children: [
+          Icon(Icons.lock_outline_rounded, color: scheme.onSurfaceVariant),
+          const MxGap(MxSpace.md),
+          Expanded(
+            child: MxText(
+              message,
+              role: MxTextRole.contentBody,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          Icon(Icons.arrow_forward_rounded, color: foreground),
         ],
       ),
     );

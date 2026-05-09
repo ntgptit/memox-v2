@@ -20,11 +20,12 @@ class FlashcardPreviewSection extends StatefulWidget {
 
 class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
   // guard:raw-size-reviewed wide card ratio follows the deck-detail preview.
-  static const double _previewAspectRatio = 1.48;
+  static const double _previewAspectRatio = 2.08;
   static const double _fullscreenAspectRatio = 0.75;
 
   late final PageController _controller = PageController();
   var _activeIndex = 0;
+  var _showBack = false;
 
   @override
   void dispose() {
@@ -50,14 +51,22 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
                 onPageChanged: (index) {
                   setState(() {
                     _activeIndex = index;
+                    _showBack = false;
                   });
                 },
                 itemBuilder: (context, index) {
                   final item = widget.items[index];
-                  return MxFlashcard(
-                    content: item.front,
-                    aspectRatio: _previewAspectRatio,
-                    onFullscreen: () => _showFullscreen(context, item),
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    child: _PreviewFlashcard(
+                      key: ValueKey('${item.id}:$_showBack'),
+                      item: item,
+                      showBack: _showBack,
+                      aspectRatio: _previewAspectRatio,
+                      onTap: _toggleFace,
+                      onFullscreen: () =>
+                          _showFullscreen(context, item, _showBack),
+                    ),
                   );
                 },
               ),
@@ -80,18 +89,70 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
     );
   }
 
+  void _toggleFace() {
+    setState(() {
+      _showBack = !_showBack;
+    });
+  }
+
   Future<void> _showFullscreen(
     BuildContext context,
     FlashcardListItemState item,
+    bool initialShowBack,
   ) {
     final l10n = AppLocalizations.of(context);
+    var showBack = initialShowBack;
     return MxDialog.show<void>(
       context: context,
       title: l10n.flashcardsPreviewDialogTitle,
-      child: MxFlashcard(
-        content: item.front,
-        aspectRatio: _fullscreenAspectRatio,
+      child: StatefulBuilder(
+        builder: (context, setDialogState) {
+          return _PreviewFlashcard(
+            item: item,
+            showBack: showBack,
+            aspectRatio: _fullscreenAspectRatio,
+            onTap: () {
+              setDialogState(() {
+                showBack = !showBack;
+              });
+            },
+          );
+        },
       ),
+    );
+  }
+}
+
+class _PreviewFlashcard extends StatelessWidget {
+  const _PreviewFlashcard({
+    required this.item,
+    required this.showBack,
+    required this.aspectRatio,
+    this.onTap,
+    this.onFullscreen,
+    super.key,
+  });
+
+  final FlashcardListItemState item;
+  final bool showBack;
+  final double aspectRatio;
+  final VoidCallback? onTap;
+  final VoidCallback? onFullscreen;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final face = showBack ? MxFlashcardFace.back : MxFlashcardFace.front;
+
+    return MxFlashcard(
+      content: showBack ? item.back : item.front,
+      face: face,
+      language: showBack
+          ? l10n.flashcardsFieldBackLabel
+          : l10n.flashcardsFieldFrontLabel,
+      aspectRatio: aspectRatio,
+      onTap: onTap,
+      onFullscreen: onFullscreen,
     );
   }
 }

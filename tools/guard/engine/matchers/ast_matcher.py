@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 import re
 
+from ..constants import UTF8_ENCODING
 from ..models import Rule
 from ..models import Violation
 

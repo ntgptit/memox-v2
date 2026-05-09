@@ -20,9 +20,12 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/flashcard_list_screen.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_detail_card_row.dart';
+import 'package:memox/presentation/features/flashcards/widgets/flashcard_preview_section.dart';
+import 'package:memox/presentation/features/flashcards/widgets/flashcard_toolbar_section.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_search_field.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
 void main() {
@@ -78,16 +81,16 @@ void main() {
 
     await _scrollToText(tester, 'Korean deck');
     expect(find.text('Korean deck'), findsWidgets);
-    await _scrollToText(tester, 'Study modes');
-    expect(find.text('Study modes'), findsOneWidget);
-    await _scrollToText(tester, 'Your progress');
-    expect(find.text('Your progress'), findsOneWidget);
     await _scrollToText(tester, 'Cards');
     expect(find.text('Cards'), findsOneWidget);
     await _scrollToRowText(tester, 'Front 1');
     expect(find.text('Front 1'), findsWidgets);
     expect(find.text('Back 1'), findsOneWidget);
     expect(find.text('Front 2'), findsWidgets);
+    await _scrollToText(tester, 'Your progress');
+    expect(find.text('Your progress'), findsOneWidget);
+    await _scrollToText(tester, 'Study modes');
+    expect(find.text('Study modes'), findsOneWidget);
   });
 
   testWidgets(
@@ -172,25 +175,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await _scrollToText(tester, 'No flashcards yet');
-      expect(find.text('No flashcards yet'), findsOneWidget);
-      expect(find.text('Add'), findsOneWidget);
       expect(find.text('Import'), findsOneWidget);
-
       final studyButtonFinder = find.widgetWithText(
         MxPrimaryButton,
         'Study this deck',
-      );
-      await tester.scrollUntilVisible(
-        studyButtonFinder,
-        300,
-        scrollable: _verticalScrollable(),
       );
       expect(studyButtonFinder, findsOneWidget);
       expect(
         tester.widget<MxPrimaryButton>(studyButtonFinder).onPressed,
         isNull,
       );
+
+      await _scrollToText(tester, 'No flashcards yet');
+      expect(find.text('No flashcards yet'), findsOneWidget);
+      expect(find.text('Add'), findsOneWidget);
     },
   );
 
@@ -220,19 +218,59 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await _scrollToText(tester, 'Study modes');
-      expect(find.text('Study modes'), findsOneWidget);
-      await _scrollToText(tester, 'Your progress');
-      expect(find.text('Your progress'), findsOneWidget);
-      await _scrollToText(tester, 'Cards');
-      expect(find.text('Cards'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.byIcon(Icons.file_upload_outlined),
-        300,
-        scrollable: _verticalScrollable(),
-      );
       expect(find.byIcon(Icons.file_upload_outlined), findsOneWidget);
       expect(find.byTooltip('Reorder'), findsOneWidget);
+      await _scrollToText(tester, 'Cards');
+      expect(find.text('Cards'), findsOneWidget);
+      await _scrollToText(tester, 'Your progress');
+      expect(find.text('Your progress'), findsOneWidget);
+      await _scrollToText(tester, 'Study modes');
+      expect(find.text('Study modes'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'DT6 onDisplay: keeps quick study action and toolbar above preview on compact layout',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(390, 844));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
+
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final studyButton = find.widgetWithText(
+        MxPrimaryButton,
+        'Study this deck',
+      );
+      final toolbar = find.byType(FlashcardToolbarSection);
+      final preview = find.byType(FlashcardPreviewSection);
+
+      expect(studyButton, findsOneWidget);
+      expect(toolbar, findsOneWidget);
+      expect(preview, findsOneWidget);
+      expect(find.byType(MxSearchField), findsOneWidget);
+      expect(
+        tester.getTopLeft(toolbar).dy,
+        lessThan(tester.getTopLeft(preview).dy),
+      );
       expect(tester.takeException(), isNull);
     },
   );
@@ -549,6 +587,73 @@ void main() {
     expect(_rowIcon('Front 1', Icons.star_rounded), findsOneWidget);
   });
 
+  testWidgets('DT3 onSelect: preview card flips inline and in fullscreen', (
+    WidgetTester tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() async {
+      await tester.binding.setSurfaceSize(null);
+    });
+
+    const deckId = 'deck-001';
+    final container = ProviderContainer(
+      overrides: [
+        flashcardListQueryProvider(deckId).overrideWith(
+          (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final preview = find.byType(FlashcardPreviewSection);
+    final frontInPreview = find.descendant(
+      of: preview,
+      matching: find.text('Front 1'),
+    );
+    final backInPreview = find.descendant(
+      of: preview,
+      matching: find.text('Back 1'),
+    );
+
+    expect(frontInPreview, findsOneWidget);
+    expect(backInPreview, findsNothing);
+
+    await tester.tap(frontInPreview);
+    await tester.pumpAndSettle();
+
+    expect(backInPreview, findsOneWidget);
+
+    await tester.tap(
+      find.descendant(of: preview, matching: find.byTooltip('Fullscreen')),
+    );
+    await tester.pumpAndSettle();
+
+    final dialog = find.byType(Dialog);
+    expect(find.text('Preview card'), findsOneWidget);
+    expect(
+      find.descendant(of: dialog, matching: find.text('Back 1')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.descendant(of: dialog, matching: find.text('Back 1')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(of: dialog, matching: find.text('Front 1')),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('DT1 onMove: move destination picker states progress is kept', (
     WidgetTester tester,
   ) async {
@@ -586,7 +691,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Select'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(MxSecondaryButton, 'Move'));
+
+    final moveButton = find.widgetWithText(MxSecondaryButton, 'Move');
+    await tester.ensureVisible(moveButton);
+    await tester.pumpAndSettle();
+    await tester.tap(moveButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Move flashcards'), findsOneWidget);

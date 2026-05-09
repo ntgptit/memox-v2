@@ -34,7 +34,6 @@ import '../widgets/flashcard_list_skeleton.dart';
 import '../widgets/flashcard_preview_section.dart';
 import '../widgets/flashcard_progress_section.dart';
 import '../widgets/flashcard_reorder_list.dart';
-import '../widgets/flashcard_study_action_section.dart';
 import '../widgets/flashcard_study_modes_section.dart';
 import '../widgets/flashcard_toolbar_section.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
@@ -138,31 +137,13 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                   ),
                 ),
                 const MxSliverGap(MxSpace.xl),
-                if (state.previewItems.isNotEmpty) ...[
-                  SliverToBoxAdapter(
-                    child: FlashcardPreviewSection(items: state.previewItems),
-                  ),
-                  const MxSliverGap(MxSpace.xl),
-                ],
                 SliverToBoxAdapter(
                   child: FlashcardDeckSummarySection(
                     state: state,
+                    studyEnabled: state.items.isNotEmpty,
+                    onStartStudy: () => _goStudyEntry(state),
                     onOpenBreadcrumb: (folderId) =>
                         context.goFolderDetail(folderId),
-                  ),
-                ),
-                const MxSliverGap(MxSpace.xl),
-                SliverToBoxAdapter(
-                  child: FlashcardStudyModesSection(
-                    enabled: state.items.isNotEmpty,
-                    onStartStudy: () => _goStudyEntry(state),
-                  ),
-                ),
-                const MxSliverGap(MxSpace.xl),
-                SliverToBoxAdapter(
-                  child: FlashcardProgressSection(
-                    progress: state.progress,
-                    totalCount: state.totalCount,
                   ),
                 ),
                 const MxSliverGap(MxSpace.xl),
@@ -180,6 +161,12 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                     onStartReorder: () => _enterReorderMode(state),
                   ),
                 ),
+                if (state.previewItems.isNotEmpty) ...[
+                  const MxSliverGap(MxSpace.xl),
+                  SliverToBoxAdapter(
+                    child: FlashcardPreviewSection(items: state.previewItems),
+                  ),
+                ],
                 if (selection.isNotEmpty) ...[
                   const MxSliverGap(MxSpace.lg),
                   SliverToBoxAdapter(
@@ -207,6 +194,18 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                   selection: selection,
                   onToggleSelection: selectionNotifier.toggle,
                 ),
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: FlashcardProgressSection(progress: state.progress),
+                ),
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: FlashcardStudyModesSection(
+                    enabled: state.items.isNotEmpty,
+                  ),
+                ),
+                if (!_isReorderMode)
+                  const MxSliverGap(kMinInteractiveDimension + MxSpace.xxl),
               ],
             );
           },
@@ -431,22 +430,12 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
       ),
       const MxSliverGap(MxSpace.md),
     ];
-    final cta = <Widget>[
-      const MxSliverGap(MxSpace.xl),
-      SliverToBoxAdapter(
-        child: FlashcardStudyActionSection(
-          enabled: state.items.isNotEmpty,
-          onStartStudy: () => _goStudyEntry(state),
-        ),
-      ),
-    ];
     if (state.items.isEmpty) {
       return [
         ...header,
         SliverToBoxAdapter(
           child: FlashcardEmptyStateSection(deckId: widget.deckId),
         ),
-        ...cta,
       ];
     }
     return [
@@ -459,7 +448,6 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
         onOpenActions: _openFlashcardActions,
         onSpeak: _speakFront,
       ),
-      ...cta,
     ];
   }
 
