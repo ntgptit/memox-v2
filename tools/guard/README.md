@@ -16,7 +16,7 @@ guard/
 ## Cách chạy
 
 ```bash
-python guard/run.py --policy <ten_policy> [tuy_chon]
+python tools/guard/run.py --policy <ten_policy> [tuy_chon]
 ```
 
 Xem thêm tài liệu tổng thể ở `README.md` ở thư mục gốc của dự án.

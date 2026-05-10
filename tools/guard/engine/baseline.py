@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from json import JSONDecodeError
 from datetime import datetime
 from pathlib import Path
 
@@ -28,7 +29,10 @@ class BaselineManager:
         self.baseline: set[str] = set()
 
         if baseline_path.exists():
-            data = json.loads(baseline_path.read_text(encoding=UTF8_ENCODING))
+            try:
+                data = json.loads(baseline_path.read_text(encoding=UTF8_ENCODING))
+            except (JSONDecodeError, OSError):
+                data = {}
             self.baseline = {
                 self._key(item) for item in data.get(KEY_VIOLATIONS, [])
             }

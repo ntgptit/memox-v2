@@ -5,7 +5,7 @@ Các bài kiểm thử đơn vị cho Guard Engine.
 ## Cách chạy
 
 ```bash
-python -m pytest guard/tests/
+python -m pytest tools/guard/tests/
 ```
 
 ## Các file kiểm thử
@@ -29,4 +29,4 @@ python -m pytest guard/tests/
        # Assert
        assert len(violations) == 1
    ```
-3. Chạy `pytest guard/tests/test_<ten>.py -v` để kiểm tra.
+3. Chạy `pytest tools/guard/tests/test_<ten>.py -v` để kiểm tra.
