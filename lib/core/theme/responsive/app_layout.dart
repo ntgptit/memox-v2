@@ -33,6 +33,23 @@ enum MxContentWidth {
 /// 3. Only `core/theme/` + `presentation/shared/layouts/` should hold raw
 ///    pixel numbers. Features describe layout through roles and tokens.
 abstract final class AppLayout {
+  /// guard:raw-size-reviewed compact button content threshold keeps icon-label
+  /// rows from overflowing when a parent surface becomes narrower than a
+  /// comfortable mobile button.
+  static const double _buttonIconWidthFloor = 72;
+
+  /// guard:raw-size-reviewed very narrow host width where empty state content
+  /// must spend less horizontal space on padding so the action remains tappable.
+  static const double _emptyStateDensePaddingWidth = 160;
+
+  /// guard:raw-size-reviewed row width where the decorative folder tile
+  /// leading tile can fit without starving the text column on compact surfaces.
+  static const double _folderTileLeadingWidthFloor = 180;
+
+  /// guard:raw-size-reviewed row width where trailing progress/action metadata
+  /// can fit beside folder title and captions without making the row untappable.
+  static const double _folderTileTrailingWidthFloor = 280;
+
   // --- Rail / navigation ----------------------------------------------------
 
   /// Width of the extended navigation rail (drawer-style) on large screens.
@@ -122,6 +139,30 @@ abstract final class AppLayout {
   /// full-width on compact.
   static double dialogMaxWidth(WindowSize size) =>
       size == WindowSize.compact ? double.infinity : 560;
+
+  // --- Shared component density --------------------------------------------
+
+  /// Whether an action button has enough local width to show decorative icons.
+  static bool showsButtonIcons({
+    required bool hasBoundedWidth,
+    required double maxWidth,
+  }) => !hasBoundedWidth || maxWidth >= _buttonIconWidthFloor;
+
+  /// Whether empty-state padding should collapse on a very narrow host.
+  static bool usesDenseEmptyStatePadding(double width) =>
+      width <= _emptyStateDensePaddingWidth;
+
+  /// Whether a folder tile has enough local width to show its leading icon tile.
+  static bool showsFolderTileLeading({
+    required bool hasBoundedWidth,
+    required double maxWidth,
+  }) => !hasBoundedWidth || maxWidth >= _folderTileLeadingWidthFloor;
+
+  /// Whether a folder tile has enough local width to show trailing metadata.
+  static bool showsFolderTileTrailing({
+    required bool hasBoundedWidth,
+    required double maxWidth,
+  }) => !hasBoundedWidth || maxWidth >= _folderTileTrailingWidthFloor;
 }
 
 /// Ergonomics: read layout specs straight off [BuildContext] so feature code

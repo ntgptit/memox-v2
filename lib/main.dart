@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/bootstrap/app_bootstrap.dart';
+import 'app/bootstrap/desktop_window_config.dart';
 import 'app/config/app_config.dart';
 import 'app/config/env.dart';
 import 'app/di/providers.dart';
@@ -23,6 +24,8 @@ Future<void> main() async {
       reportAppErrorToTalker(talker, error, stackTrace);
     },
     beforeRun: () async {
+      await configureDesktopWindowForTest();
+
       final env = AppEnv.fromEnvironment();
       final config = AppConfig.fromEnv(env);
       configureAppTalker(talker, config);

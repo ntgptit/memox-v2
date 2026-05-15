@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
@@ -65,25 +66,37 @@ class MxPrimaryButton extends StatelessWidget {
     if (fullWidth) {
       return SizedBox(width: double.infinity, child: button);
     }
-    return IntrinsicWidth(child: button);
+    return button;
   }
 
   Widget _buildLabel() {
-    final labelText = Text(label, overflow: TextOverflow.ellipsis, maxLines: 1);
-    return Row(
-      mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (leadingIcon != null) ...[
-          Icon(leadingIcon, size: AppIconSizes.md),
-          const MxGap(AppSpacing.sm),
-        ],
-        Flexible(child: labelText),
-        if (trailingIcon != null) ...[
-          const MxGap(AppSpacing.sm),
-          Icon(trailingIcon, size: AppIconSizes.md),
-        ],
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final canShowIcons = AppLayout.showsButtonIcons(
+          hasBoundedWidth: constraints.hasBoundedWidth,
+          maxWidth: constraints.maxWidth,
+        );
+        final labelText = Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        );
+        return Row(
+          mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (leadingIcon != null && canShowIcons) ...[
+              Icon(leadingIcon, size: AppIconSizes.md),
+              const MxGap(AppSpacing.sm),
+            ],
+            Flexible(child: labelText),
+            if (trailingIcon != null && canShowIcons) ...[
+              const MxGap(AppSpacing.sm),
+              Icon(trailingIcon, size: AppIconSizes.md),
+            ],
+          ],
+        );
+      },
     );
   }
 

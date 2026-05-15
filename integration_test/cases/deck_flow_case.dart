@@ -30,7 +30,7 @@ void deckFlowTests() {
     testWidgets('DT4 onInsert: creates a deck inside an unlocked folder flow', (
       tester,
     ) async {
-      await pumpTestApp(tester);
+      final app = await pumpTestApp(tester);
 
       final folder = FolderRobot(tester);
       await folder.createRootFolder('E2E Deck Folder');
@@ -39,7 +39,11 @@ void deckFlowTests() {
       final deck = DeckRobot(tester);
       await deck.createDeck('E2E Deck');
 
+      final storedFolder = await app.findFolderByName('E2E Deck Folder');
       expect(find.text('E2E Deck'), findsOneWidget);
+      expect(storedFolder.parentId, isNull);
+      expect(storedFolder.contentMode, 'decks');
+      expect(storedFolder.sortOrder, greaterThanOrEqualTo(0));
       expect(tester.takeException(), isNull);
     });
 

@@ -7,7 +7,7 @@ Test file: `integration_test/app_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | integration binding boots the real `MemoxApp` with test config, in-memory Drift database, deterministic ids, and no-op TTS | `pumpTestApp` creates the app wrapper for the default library route | the integration test pumps the app and waits for the shell | one `MaterialApp`, one router, and no widget exception are present | C0+C1 |
-| DT2 | compact surface sizing boots the same app shell without switching to a different entrypoint | `pumpTestApp` receives `integrationTestCompactSurfaceSize` before rendering the default library route | the integration test pumps the app and waits for the shell | one `MaterialApp`, one router, and no widget exception are present on the compact viewport | C0+C1 |
+| DT2 | compact sizing boots the same app shell through the native desktop window instead of fake-shrinking only the Flutter surface | Windows integration test is launched with `--dart-define=ROBOT_TEST=true`, and desktop bootstrap configures `window_manager` before rendering the default library route | the integration test pumps the app and waits for the shell | one `MaterialApp`, one router, and no widget exception are present on the compact native window | C0+C1 |
 | DT8 | unknown initial route is routed through the app-level router error surface | `pumpTestApp` starts with `/unknown-route` and exposes internal route details in test config | the router resolves the initial location | `Navigation error` and `Something went wrong.` are rendered without an uncaught widget exception | C0+C1 |
 
 ## Decision table: onNavigate

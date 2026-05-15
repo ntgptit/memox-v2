@@ -27,13 +27,17 @@ void folderFlowTests() {
     testWidgets(
       'DT1 onInsert: creates a root folder through the library flow',
       (tester) async {
-        await pumpTestApp(tester);
+        final app = await pumpTestApp(tester);
 
         final folder = FolderRobot(tester);
         await folder.expectEmptyLibrary();
         await folder.createRootFolder('E2E Folder');
 
+        final storedFolder = await app.findFolderByName('E2E Folder');
         expect(find.text('E2E Folder'), findsOneWidget);
+        expect(storedFolder.parentId, isNull);
+        expect(storedFolder.contentMode, 'unlocked');
+        expect(storedFolder.sortOrder, greaterThanOrEqualTo(0));
         expect(tester.takeException(), isNull);
       },
     );
@@ -55,14 +59,21 @@ void folderFlowTests() {
     testWidgets(
       'DT3 onInsert: creates a subfolder and locks parent to subfolder mode',
       (tester) async {
-        await pumpTestApp(tester);
+        final app = await pumpTestApp(tester);
 
         final folder = FolderRobot(tester);
         await folder.createRootFolder('E2E Parent Folder');
         await folder.openFolder('E2E Parent Folder');
         await folder.createSubfolder('E2E Child Folder');
 
+        final storedParent = await app.findFolderByName('E2E Parent Folder');
+        final storedChild = await app.findFolderByName('E2E Child Folder');
         expect(find.text('E2E Child Folder'), findsOneWidget);
+        expect(storedParent.parentId, isNull);
+        expect(storedParent.contentMode, 'subfolders');
+        expect(storedChild.parentId, storedParent.id);
+        expect(storedChild.contentMode, 'unlocked');
+        expect(storedChild.sortOrder, greaterThanOrEqualTo(0));
         expect(find.text('New deck'), findsNothing);
         expect(tester.takeException(), isNull);
       },

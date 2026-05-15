@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../core/theme/responsive/app_breakpoints.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_breadcrumb_bar.dart';
@@ -30,23 +31,11 @@ class FolderHeaderSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            MxIconButton.toolbar(
-              icon: Icons.arrow_back,
-              tooltip: l10n.commonBack,
-              onPressed: onBack,
-            ),
-            const MxGap(MxSpace.sm),
-            Expanded(
-              child: MxText(state.header.name, role: MxTextRole.pageTitle),
-            ),
-            MxIconButton.toolbar(
-              icon: Icons.more_horiz_rounded,
-              tooltip: l10n.foldersMoreActionsTooltip,
-              onPressed: onOpenActions,
-            ),
-          ],
+        _FolderHeaderTitleRow(
+          title: state.header.name,
+          isCompact: context.isCompact,
+          onBack: onBack,
+          onOpenActions: onOpenActions,
         ),
         const MxGap(MxSpace.sm),
         MxBreadcrumbBar(
@@ -86,5 +75,58 @@ class FolderHeaderSection extends StatelessWidget {
         state.decks.fold<int>(0, (sum, item) => sum + item.cardCount),
       ),
     };
+  }
+}
+
+class _FolderHeaderTitleRow extends StatelessWidget {
+  const _FolderHeaderTitleRow({
+    required this.title,
+    required this.isCompact,
+    required this.onBack,
+    required this.onOpenActions,
+  });
+
+  final String title;
+  final bool isCompact;
+  final VoidCallback onBack;
+  final VoidCallback onOpenActions;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final back = MxIconButton.toolbar(
+      icon: Icons.arrow_back,
+      tooltip: l10n.commonBack,
+      onPressed: onBack,
+    );
+    final more = MxIconButton.toolbar(
+      icon: Icons.more_horiz_rounded,
+      tooltip: l10n.foldersMoreActionsTooltip,
+      onPressed: onOpenActions,
+    );
+
+    if (isCompact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: MxSpace.sm,
+            runSpacing: MxSpace.xs,
+            children: [back, more],
+          ),
+          const MxGap(MxSpace.xs),
+          MxText(title, role: MxTextRole.pageTitle),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        back,
+        const MxGap(MxSpace.sm),
+        Expanded(child: MxText(title, role: MxTextRole.pageTitle)),
+        more,
+      ],
+    );
   }
 }

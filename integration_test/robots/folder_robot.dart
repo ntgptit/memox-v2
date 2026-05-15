@@ -34,7 +34,7 @@ final class FolderRobot extends MemoxRobot {
   }
 
   Future<void> createSubfolder(String name) async {
-    await tapVisible(find.text('New subfolder'));
+    await _openCreateSubfolder();
     await waitUntilVisible(find.text('Folder name'));
     await enterText(find.byType(TextField).last, name);
     await tapVisible(find.text('Create').last);
@@ -99,5 +99,31 @@ final class FolderRobot extends MemoxRobot {
       return;
     }
     await tapVisible(find.byTooltip('Create folder'));
+  }
+
+  Future<void> _openCreateSubfolder() async {
+    final textButton = find.text('New subfolder');
+    if (textButton.evaluate().isNotEmpty) {
+      await tapVisible(textButton.last);
+      return;
+    }
+
+    await _tapFab();
+    for (var attempt = 0; attempt < 20; attempt++) {
+      await tester.pump(const Duration(milliseconds: 100));
+      if (find.text('Folder name').evaluate().isNotEmpty) {
+        return;
+      }
+      final createChoice = find.text('New subfolder');
+      if (createChoice.evaluate().isNotEmpty) {
+        await tapVisible(createChoice.last);
+        return;
+      }
+    }
+    fail('Timed out opening subfolder creation');
+  }
+
+  Future<void> _tapFab() async {
+    await tapFloatingActionButton();
   }
 }

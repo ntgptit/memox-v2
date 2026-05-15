@@ -63,6 +63,8 @@ dependencies:
   fl_chart: ^1.2.0
   archive: ^4.0.9
   xml: ^6.6.1
+  window_manager: ^0.4.3
+  screen_retriever: ^0.2.0
 
 dev_dependencies:
   flutter_test:

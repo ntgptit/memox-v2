@@ -12,7 +12,7 @@ Test file: `integration_test/app_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT4 | unlocked root folder accepts the deck branch when the user chooses `New deck` | `E2E Deck Folder` is open and shows the unlocked empty-folder state | the user taps `New deck`, enters `E2E Deck`, and confirms | `E2E Deck` is visible in the folder detail list and no widget exception is recorded | C0+C1 |
+| DT4 | unlocked root folder accepts the deck branch when the user chooses `New deck` | `E2E Deck Folder` is open and shows the unlocked empty-folder state | the user taps `New deck`, enters `E2E Deck`, and confirms | `E2E Deck` is visible and the parent folder row is persisted with `content_mode=decks` without widget exceptions | C0+C1 |
 | DT5 | deck-mode folder accepts another sibling deck and blocks subfolder creation UI | `E2E Multi Deck Folder` already contains `E2E First Deck` | the user creates `E2E Second Deck` in the same folder | both deck rows are visible and `New subfolder` is absent from the folder actions | C0+C1 |
 | DT6 | create-deck dialog cancellation must not mutate the folder | `E2E Deck Cancel Folder` is open in the unlocked empty-folder state | the user opens `Create deck`, enters `E2E Cancelled Deck`, and presses `Cancel` | the folder remains empty and `E2E Cancelled Deck` is absent | C0+C1 |
 

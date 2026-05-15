@@ -3334,6 +3334,59 @@ void main() {
     },
   );
 
+  testWidgets('DT6 onResponsive: keeps constrained action surfaces tappable', (
+    tester,
+  ) async {
+    const emptyKey = ValueKey('responsive-constrained-empty');
+    const folderKey = ValueKey('responsive-constrained-folder');
+    const buttonKey = ValueKey('responsive-constrained-button');
+
+    await _pumpLayoutWidget(
+      tester,
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MxEmptyState(
+            key: emptyKey,
+            title: 'Empty',
+            message: 'Create content to continue',
+            actionLabel: 'Create folder',
+            actionLeadingIcon: Icons.add,
+            onAction: _noop,
+          ),
+          const MxGap(AppSpacing.md),
+          MxFolderTile(
+            key: folderKey,
+            name: 'Very long constrained folder title',
+            icon: Icons.folder_outlined,
+            caption: '999 subfolders · 999 decks · 999 cards',
+            supportingCaption: 'Mastery 100%',
+            masteryPercent: 100,
+            onTap: _noop,
+            trailing: const Icon(Icons.more_horiz),
+          ),
+          const MxGap(AppSpacing.md),
+          MxPrimaryButton(
+            key: buttonKey,
+            label: 'Create folder',
+            leadingIcon: Icons.add,
+            onPressed: _noop,
+          ),
+        ],
+      ),
+      scenario: const _RenderScenario(
+        label: 'responsive-constrained-actions',
+        surfaceSize: Size(160, 700),
+      ),
+      maxWidth: 128,
+    );
+
+    expect(find.byKey(emptyKey), findsOneWidget);
+    expect(find.byKey(folderKey), findsOneWidget);
+    expect(find.byKey(buttonKey), findsOneWidget);
+    expect(find.text('Create folder'), findsWidgets);
+  });
+
   testWidgets(
     'DT1 onGolden: matches normal shared widget golden in light theme',
     (tester) async {

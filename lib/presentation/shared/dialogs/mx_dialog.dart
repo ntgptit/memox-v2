@@ -8,7 +8,7 @@ import '../layouts/mx_gap.dart';
 /// Base MemoX dialog — consistent padding, title + optional icon, scrollable
 /// content area, and a row of action buttons at the bottom.
 class MxDialog extends StatelessWidget {
-  MxDialog({
+  const MxDialog({
     required this.title,
     required this.child,
     this.icon,

@@ -96,11 +96,22 @@ final class DeckRobot extends MemoxRobot {
   Future<void> _openCreateDeck() async {
     final textButton = find.text('New deck');
     if (textButton.evaluate().isNotEmpty) {
-      await tapVisible(textButton);
+      await tapVisible(textButton.last);
       return;
     }
-    final size = tester.view.physicalSize / tester.view.devicePixelRatio;
-    await tester.tapAt(Offset(size.width - 56, size.height - 56));
-    await tester.pump(const Duration(milliseconds: 100));
+
+    await tapFloatingActionButton();
+    for (var attempt = 0; attempt < 20; attempt++) {
+      await tester.pump(const Duration(milliseconds: 100));
+      if (find.text('Create deck').evaluate().isNotEmpty) {
+        return;
+      }
+      final createChoice = find.text('New deck');
+      if (createChoice.evaluate().isNotEmpty) {
+        await tapVisible(createChoice.last);
+        return;
+      }
+    }
+    fail('Timed out opening deck creation');
   }
 }

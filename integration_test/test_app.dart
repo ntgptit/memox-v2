@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/app.dart';
+import 'package:memox/app/bootstrap/desktop_window_config.dart';
 import 'package:memox/app/config/app_config.dart';
 import 'package:memox/app/config/env.dart';
 import 'package:memox/app/di/content/content_core_providers.dart';
@@ -23,7 +25,7 @@ import 'package:memox/presentation/features/settings/providers/locale_notifier.d
 import 'package:memox/presentation/features/settings/providers/theme_mode_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const Size integrationTestCompactSurfaceSize = Size(390, 844);
+const Size integrationTestCompactSurfaceSize = Size(393, 852);
 
 Future<IntegrationTestAppHandle> pumpTestApp(
   WidgetTester tester, {
@@ -33,9 +35,14 @@ Future<IntegrationTestAppHandle> pumpTestApp(
   Future<void> Function(IntegrationTestAppHandle app)? seedData,
 }) async {
   if (surfaceSize != null) {
-    await tester.binding.setSurfaceSize(surfaceSize);
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    if (Platform.isWindows) {
+      _expectWindowsRobotTestMode();
+    } else {
+      await tester.binding.setSurfaceSize(surfaceSize);
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+    }
   }
+  await configureDesktopWindowForTest();
 
   SharedPreferences.setMockInitialValues(<String, Object>{
     AppConstants.sharedPrefsShuffleFlashcardsKey: false,
@@ -83,6 +90,17 @@ Future<IntegrationTestAppHandle> pumpTestApp(
   await tester.pump();
 
   return handle;
+}
+
+void _expectWindowsRobotTestMode() {
+  const isRobotTest = bool.fromEnvironment('ROBOT_TEST');
+  if (isRobotTest) {
+    return;
+  }
+  fail(
+    'Windows E2E compact tests must resize the native app window, not only '
+    'the Flutter test surface. Run with --dart-define=ROBOT_TEST=true.',
+  );
 }
 
 AppConfig integrationTestConfig({required String initialLocation}) {
@@ -194,6 +212,12 @@ final class IntegrationTestAppHandle {
             updatedAt: now,
           ),
         );
+  }
+
+  Future<Folder> findFolderByName(String name) {
+    return (database.select(
+      database.folders,
+    )..where((table) => table.name.equals(name))).getSingle();
   }
 
   Future<void> dispose() async {

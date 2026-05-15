@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
@@ -45,7 +46,9 @@ class MxEmptyState extends StatelessWidget {
           return SizedBox(
             width: width,
             child: Padding(
-              padding: AppSpacing.screen,
+              padding: AppLayout.usesDenseEmptyStatePadding(width)
+                  ? AppSpacing.screenVertical
+                  : AppSpacing.screen,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

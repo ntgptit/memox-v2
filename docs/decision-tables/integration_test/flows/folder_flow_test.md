@@ -12,9 +12,9 @@ Test file: `integration_test/app_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | empty library accepts a non-blank root folder name through the visible create-folder UI | the library route renders `No folders yet` with an empty in-memory database | the user opens `Create folder`, enters `E2E Folder`, and confirms | `E2E Folder` is visible in the library list and no widget exception is recorded | C0+C1 |
+| DT1 | empty library accepts a non-blank root folder name through the visible create-folder UI | the library route renders `No folders yet` with an empty in-memory database | the user opens `Create folder`, enters `E2E Folder`, and confirms | `E2E Folder` is visible and the folder row is persisted with `parent_id=null`, `content_mode=unlocked`, and non-negative `sort_order` | C0+C1 |
 | DT2 | create-root dialog cancellation must not mutate the library | the library route renders `No folders yet` and the create-folder dialog is opened | the user enters `E2E Cancelled Folder` and presses `Cancel` | the dialog closes, the empty-library state remains visible, and `E2E Cancelled Folder` is absent | C0+C1 |
-| DT3 | unlocked folder accepts a first subfolder and locks the parent into subfolder mode | `E2E Parent Folder` is open with the unlocked empty-folder actions | the user creates `E2E Child Folder` through `New subfolder` | `E2E Child Folder` is visible and the deck creation action is no longer rendered in that folder | C0+C1 |
+| DT3 | unlocked folder accepts a first subfolder and locks the parent into subfolder mode | `E2E Parent Folder` is open with the unlocked empty-folder actions | the user creates `E2E Child Folder` through `New subfolder` | `E2E Child Folder` is visible, the child row stores the parent id with `content_mode=unlocked`, and the parent row stores `content_mode=subfolders` | C0+C1 |
 
 ## Decision table: onDisplay
 

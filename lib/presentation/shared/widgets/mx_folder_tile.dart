@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
@@ -36,6 +37,7 @@ class MxFolderTile extends StatelessWidget {
   /// guard:raw-size-reviewed minimum row height keeps tap target ≥ 48 dp even
   /// when caption is absent; not a theme token because it is row-geometry.
   static const double _minRowHeight = 64;
+
   final String name;
   final IconData icon;
 
@@ -63,75 +65,90 @@ class MxFolderTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    final row = ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: _minRowHeight),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: AppIconSizes.xxxl,
-              height: AppIconSizes.xxxl,
-              decoration: BoxDecoration(
-                color: tileColor ?? scheme.primaryContainer,
-                borderRadius: AppRadius.borderLg,
-              ),
-              alignment: Alignment.center,
-              child: Icon(
-                icon,
-                size: AppIconSizes.lg,
-                color: iconColor ?? scheme.onPrimaryContainer,
-              ),
+    final row = LayoutBuilder(
+      builder: (context, constraints) {
+        final showLeading = AppLayout.showsFolderTileLeading(
+          hasBoundedWidth: constraints.hasBoundedWidth,
+          maxWidth: constraints.maxWidth,
+        );
+        final showTrailing = AppLayout.showsFolderTileTrailing(
+          hasBoundedWidth: constraints.hasBoundedWidth,
+          maxWidth: constraints.maxWidth,
+        );
+
+        return ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: _minRowHeight),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  MxText(
-                    name,
-                    role: MxTextRole.tileTitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (showLeading) ...[
+                  Container(
+                    width: AppIconSizes.xxxl,
+                    height: AppIconSizes.xxxl,
+                    decoration: BoxDecoration(
+                      color: tileColor ?? scheme.primaryContainer,
+                      borderRadius: AppRadius.borderLg,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      icon,
+                      size: AppIconSizes.lg,
+                      color: iconColor ?? scheme.onPrimaryContainer,
+                    ),
                   ),
-                  if (caption != null) ...[
-                    const MxGap(AppSpacing.xxs),
-                    MxText(
-                      caption!,
-                      role: MxTextRole.tileMeta,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                  if (supportingCaption != null) ...[
-                    const MxGap(AppSpacing.xxs),
-                    MxText(
-                      supportingCaption!,
-                      role: MxTextRole.tileMeta,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                  const SizedBox(width: AppSpacing.md),
                 ],
-              ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      MxText(
+                        name,
+                        role: MxTextRole.tileTitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: true,
+                      ),
+                      if (caption != null) ...[
+                        const MxGap(AppSpacing.xxs),
+                        MxText(
+                          caption!,
+                          role: MxTextRole.tileMeta,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                      if (supportingCaption != null) ...[
+                        const MxGap(AppSpacing.xxs),
+                        MxText(
+                          supportingCaption!,
+                          role: MxTextRole.tileMeta,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (masteryPercent != null && showTrailing) ...[
+                  const SizedBox(width: AppSpacing.md),
+                  MxProgressRing(value: masteryPercent! / 100),
+                ],
+                if (trailing != null && showTrailing) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  trailing!,
+                ],
+              ],
             ),
-            if (masteryPercent != null) ...[
-              const SizedBox(width: AppSpacing.md),
-              MxProgressRing(value: masteryPercent! / 100),
-            ],
-            if (trailing != null) ...[
-              const SizedBox(width: AppSpacing.sm),
-              trailing!,
-            ],
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
 
     return MxTappable(

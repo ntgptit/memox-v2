@@ -45,7 +45,8 @@ class MemoxRobot {
     await waitUntilVisible(finder);
     await tester.ensureVisible(finder);
     await tester.pump(const Duration(milliseconds: 100));
-    await tester.tap(finder);
+    final target = await _waitUntilTappable(finder);
+    await tester.tap(target);
     await tester.pump(const Duration(milliseconds: 100));
   }
 
@@ -53,8 +54,19 @@ class MemoxRobot {
     await waitUntilVisible(finder);
     await tester.ensureVisible(finder);
     await tester.pump(const Duration(milliseconds: 100));
-    await tester.longPress(finder);
+    final target = await _waitUntilTappable(finder);
+    await tester.longPress(target);
     await tester.pump(const Duration(milliseconds: 100));
+  }
+
+  Future<void> tapFloatingActionButton() async {
+    final fab = find.byType(FloatingActionButton);
+    await waitUntilVisible(fab);
+    final button = find.descendant(
+      of: fab.last,
+      matching: find.byType(RawMaterialButton),
+    );
+    await tapVisible(button.last);
   }
 
   Future<void> enterText(Finder finder, String text) async {
@@ -69,5 +81,16 @@ class MemoxRobot {
 
   Future<void> clearSearch() async {
     await enterText(find.byType(TextField).first, '');
+  }
+
+  Future<Finder> _waitUntilTappable(Finder finder, {int maxPumps = 60}) async {
+    for (var attempt = 0; attempt < maxPumps; attempt++) {
+      final target = finder.hitTestable();
+      if (target.evaluate().isNotEmpty) {
+        return target;
+      }
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    fail('Timed out waiting for tappable $finder');
   }
 }
