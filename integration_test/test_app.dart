@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/app.dart';
-import 'package:memox/app/bootstrap/desktop_window_config.dart';
 import 'package:memox/app/config/app_config.dart';
 import 'package:memox/app/config/env.dart';
 import 'package:memox/app/di/content/content_core_providers.dart';
@@ -25,7 +24,8 @@ import 'package:memox/presentation/features/settings/providers/locale_notifier.d
 import 'package:memox/presentation/features/settings/providers/theme_mode_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const Size integrationTestCompactSurfaceSize = Size(393, 852);
+const Size integrationTestCompactSurfaceSize = Size(412, 915);
+const String _windowsE2EWindowSizeEnv = 'MEMOX_E2E_WINDOW_SIZE';
 
 Future<IntegrationTestAppHandle> pumpTestApp(
   WidgetTester tester, {
@@ -36,13 +36,12 @@ Future<IntegrationTestAppHandle> pumpTestApp(
 }) async {
   if (surfaceSize != null) {
     if (Platform.isWindows) {
-      _expectWindowsRobotTestMode();
+      _expectWindowsNativeWindowSizeEnv(surfaceSize);
     } else {
       await tester.binding.setSurfaceSize(surfaceSize);
       addTearDown(() => tester.binding.setSurfaceSize(null));
     }
   }
-  await configureDesktopWindowForTest();
 
   SharedPreferences.setMockInitialValues(<String, Object>{
     AppConstants.sharedPrefsShuffleFlashcardsKey: false,
@@ -92,15 +91,44 @@ Future<IntegrationTestAppHandle> pumpTestApp(
   return handle;
 }
 
-void _expectWindowsRobotTestMode() {
-  const isRobotTest = bool.fromEnvironment('ROBOT_TEST');
-  if (isRobotTest) {
+void _expectWindowsNativeWindowSizeEnv(Size expectedSize) {
+  final expectedValue = _formatWindowSize(expectedSize);
+  final rawValue = Platform.environment[_windowsE2EWindowSizeEnv]?.trim();
+  if (rawValue == null || rawValue.isEmpty) {
+    fail(
+      'Windows E2E compact tests must resize the native app window before '
+      'Flutter renders. Set $_windowsE2EWindowSizeEnv=$expectedValue.',
+    );
+  }
+
+  final actualSize = _parseWindowSize(rawValue);
+  if (actualSize == expectedSize) {
     return;
   }
+
   fail(
-    'Windows E2E compact tests must resize the native app window, not only '
-    'the Flutter test surface. Run with --dart-define=ROBOT_TEST=true.',
+    'Windows E2E compact tests expected $_windowsE2EWindowSizeEnv='
+    '$expectedValue, but got "$rawValue".',
   );
+}
+
+Size? _parseWindowSize(String value) {
+  final parts = value.toLowerCase().split('x');
+  if (parts.length != 2) {
+    return null;
+  }
+
+  final width = int.tryParse(parts[0]);
+  final height = int.tryParse(parts[1]);
+  if (width == null || height == null || width <= 0 || height <= 0) {
+    return null;
+  }
+
+  return Size(width.toDouble(), height.toDouble());
+}
+
+String _formatWindowSize(Size size) {
+  return '${size.width.toInt()}x${size.height.toInt()}';
 }
 
 AppConfig integrationTestConfig({required String initialLocation}) {

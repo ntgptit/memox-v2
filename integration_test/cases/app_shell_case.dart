@@ -14,7 +14,7 @@ void appShellTests() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('DT2 onOpen: boots MemoX app shell on compact surface size', (
+  testWidgets('DT2 onOpen: boots MemoX app shell on compact native window', (
     tester,
   ) async {
     await pumpTestApp(tester, surfaceSize: integrationTestCompactSurfaceSize);
@@ -47,7 +47,7 @@ void appShellTests() {
     await robot.tapVisible(find.text('Home'));
     await robot.waitUntilVisible(find.text("Today's study focus"));
     await robot.tapVisible(find.text('Progress'));
-    await robot.waitUntilVisible(find.text('No active study sessions'));
+    await robot.waitUntilVisible(find.text('Learning overview'));
     await robot.tapVisible(find.text('Settings'));
     await robot.waitUntilVisible(find.text('Appearance'));
     await robot.tapVisible(find.text('Library'));
