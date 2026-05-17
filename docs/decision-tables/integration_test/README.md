@@ -1,24 +1,32 @@
 # Integration Test Robot Harness
 
-The executable E2E test cases for `integration_test/app_test.dart` are
-currently cleared. Keep this area as the robot-test harness only until new E2E
-coverage is added intentionally.
-
 MemoX keeps one Flutter integration entrypoint:
 
 ```txt
 integration_test/app_test.dart
 ```
 
-That entrypoint only validates `IntegrationTestWidgetsFlutterBinding` for the
-robot harness. No app flow or feature journey is registered. Robot helpers and
-app-pump configuration remain in:
+That entrypoint validates `IntegrationTestWidgetsFlutterBinding` and registers
+intentional feature flow modules from:
+
+```txt
+integration_test/cases/**
+```
+
+Robot helpers and app-pump configuration remain in:
 
 ```txt
 integration_test/test_app.dart
 integration_test/robots/**
 ```
 
-When executable E2E cases are restored, add module files under
+Folder flow coverage is restored in:
+
+```txt
+integration_test/cases/folder_flow_test.dart
+docs/decision-tables/integration_test/cases/folder_flow_test.md
+```
+
+When adding more E2E coverage, keep new modules under
 `integration_test/cases/**`, import them from `integration_test/app_test.dart`,
 and add matching Decision Table rows under this directory in the same change.

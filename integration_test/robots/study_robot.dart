@@ -63,6 +63,12 @@ final class StudyRobot extends MemoxRobot {
     await tapVisible(find.text('Study now').last);
   }
 
+  Future<void> startDefaultStudyFromEntry() async {
+    await waitUntilVisible(find.text('Start a study session'));
+    await waitUntilVisible(find.text('Study flow'));
+    await tapVisible(find.widgetWithText(ElevatedButton, 'Study').last);
+  }
+
   Future<void> expectStudySessionVisible({
     required String front,
     required String back,
@@ -70,5 +76,11 @@ final class StudyRobot extends MemoxRobot {
     await waitUntilVisible(find.text('Review'));
     await waitUntilVisible(find.text(front));
     await waitUntilVisible(find.text(back));
+  }
+
+  Future<void> expectNoEligibleFlashcardsMessage() async {
+    await waitUntilVisible(
+      find.text('No eligible flashcards are available for this study session.'),
+    );
   }
 }

@@ -6,4 +6,4 @@ Test file: `integration_test/app_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | integration entrypoint initializes robot harness only | app test starts without imported flow case modules | integration binding initializes before robot flows are registered | integration binding exists and no feature journey is executed | C0+C1 |
+| DT1 | integration entrypoint initializes the robot harness before registering imported flow cases | app test imports the folder flow case module | integration binding initializes before robot flows execute | integration binding exists so the folder robot cases can pump the app through the shared harness | C0+C1 |

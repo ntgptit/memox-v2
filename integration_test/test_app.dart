@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,6 +33,9 @@ Future<IntegrationTestAppHandle> pumpTestApp(
   String initialLocation = RoutePaths.library,
   Size? surfaceSize,
   Map<String, Object> sharedPreferencesOverrides = const <String, Object>{},
+  File? databaseFile,
+  FixedTestClock? clock,
+  SequenceTestIdGenerator? idGenerator,
   Future<void> Function(IntegrationTestAppHandle app)? seedData,
 }) async {
   if (surfaceSize != null) {
@@ -50,16 +54,20 @@ Future<IntegrationTestAppHandle> pumpTestApp(
     AppConstants.sharedPrefsTtsAutoPlayKey: false,
     ...sharedPreferencesOverrides,
   });
+  final sharedPreferences = await SharedPreferences.getInstance();
 
-  final database = AppDatabase(executor: NativeDatabase.memory());
+  final database = AppDatabase(
+    executor: _openIntegrationDatabase(databaseFile),
+  );
   await database.ensureOpen();
 
   final config = integrationTestConfig(initialLocation: initialLocation);
   final fakeTts = NoopTtsService();
   final handle = IntegrationTestAppHandle._(
     database: database,
-    clock: FixedTestClock(DateTime.utc(2026, 4, 28, 9)),
-    idGenerator: SequenceTestIdGenerator(),
+    databaseFile: databaseFile,
+    clock: clock ?? FixedTestClock(DateTime.utc(2026, 4, 28, 9)),
+    idGenerator: idGenerator ?? SequenceTestIdGenerator(),
     ttsService: fakeTts,
   );
   addTearDown(handle.dispose);
@@ -76,6 +84,7 @@ Future<IntegrationTestAppHandle> pumpTestApp(
         appEnvProvider.overrideWithValue(AppEnv.local),
         appConfigProvider.overrideWithValue(config),
         talkerProvider.overrideWithValue(createAppTalker(config)),
+        sharedPreferencesProvider.overrideWith((_) async => sharedPreferences),
         appDatabaseProvider.overrideWithValue(database),
         clockProvider.overrideWithValue(handle.clock),
         idGeneratorProvider.overrideWithValue(handle.idGenerator),
@@ -89,6 +98,54 @@ Future<IntegrationTestAppHandle> pumpTestApp(
   await tester.pump();
 
   return handle;
+}
+
+Future<File> createIntegrationTestDatabaseFile() async {
+  final directory = await Directory.systemTemp.createTemp('memox_e2e_db_');
+  addTearDown(() async {
+    if (await directory.exists()) {
+      await directory.delete(recursive: true);
+    }
+  });
+  return File(
+    '${directory.path}${Platform.pathSeparator}memox-integration.sqlite',
+  );
+}
+
+Future<IntegrationTestAppHandle> restartTestApp(
+  WidgetTester tester,
+  IntegrationTestAppHandle app, {
+  String initialLocation = RoutePaths.library,
+  Size? surfaceSize,
+  Map<String, Object> sharedPreferencesOverrides = const <String, Object>{},
+}) async {
+  final databaseFile = app.databaseFile;
+  if (databaseFile == null) {
+    fail('restartTestApp requires pumpTestApp(databaseFile: ...).');
+  }
+
+  final clock = app.clock;
+  final idGenerator = app.idGenerator;
+  await tester.pumpWidget(const SizedBox.shrink());
+  await tester.pumpAndSettle();
+  await app.dispose();
+
+  return pumpTestApp(
+    tester,
+    initialLocation: initialLocation,
+    surfaceSize: surfaceSize,
+    sharedPreferencesOverrides: sharedPreferencesOverrides,
+    databaseFile: databaseFile,
+    clock: clock,
+    idGenerator: idGenerator,
+  );
+}
+
+QueryExecutor _openIntegrationDatabase(File? databaseFile) {
+  if (databaseFile == null) {
+    return NativeDatabase.memory();
+  }
+  return NativeDatabase(databaseFile);
 }
 
 void _expectWindowsNativeWindowSizeEnv(Size expectedSize) {
@@ -148,17 +205,113 @@ AppConfig integrationTestConfig({required String initialLocation}) {
 final class IntegrationTestAppHandle {
   IntegrationTestAppHandle._({
     required this.database,
+    required this.databaseFile,
     required this.clock,
     required this.idGenerator,
     required this.ttsService,
   });
 
   final AppDatabase database;
+  final File? databaseFile;
   final FixedTestClock clock;
   final SequenceTestIdGenerator idGenerator;
   final NoopTtsService ttsService;
 
   var _disposed = false;
+
+  Future<Folder> seedRootFolder({
+    required String folderId,
+    required String folderName,
+    FolderContentMode contentMode = FolderContentMode.unlocked,
+    int sortOrder = 0,
+  }) async {
+    final now = clock.nowEpochMillis() + sortOrder;
+    await database
+        .into(database.folders)
+        .insert(
+          FoldersCompanion.insert(
+            id: folderId,
+            name: folderName,
+            contentMode: contentMode.storageValue,
+            sortOrder: sortOrder,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+    return findFolderByName(folderName);
+  }
+
+  Future<Folder> seedSubfolder({
+    required String parentFolderId,
+    required String folderId,
+    required String folderName,
+    FolderContentMode contentMode = FolderContentMode.unlocked,
+    int sortOrder = 0,
+    bool lockParentToSubfolders = true,
+  }) async {
+    final now = clock.nowEpochMillis() + sortOrder;
+    await database.transaction(() async {
+      if (lockParentToSubfolders) {
+        await (database.update(
+          database.folders,
+        )..where((table) => table.id.equals(parentFolderId))).write(
+          FoldersCompanion(
+            contentMode: Value(FolderContentMode.subfolders.storageValue),
+            updatedAt: Value(now),
+          ),
+        );
+      }
+      await database
+          .into(database.folders)
+          .insert(
+            FoldersCompanion.insert(
+              id: folderId,
+              parentId: Value(parentFolderId),
+              name: folderName,
+              contentMode: contentMode.storageValue,
+              sortOrder: sortOrder,
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+    });
+    return findFolderByName(folderName);
+  }
+
+  Future<Deck> seedDeckInFolder({
+    required String folderId,
+    required String deckId,
+    required String deckName,
+    int sortOrder = 0,
+    bool lockFolderToDecks = true,
+  }) async {
+    final now = clock.nowEpochMillis() + sortOrder;
+    await database.transaction(() async {
+      if (lockFolderToDecks) {
+        await (database.update(
+          database.folders,
+        )..where((table) => table.id.equals(folderId))).write(
+          FoldersCompanion(
+            contentMode: Value(FolderContentMode.decks.storageValue),
+            updatedAt: Value(now),
+          ),
+        );
+      }
+      await database
+          .into(database.decks)
+          .insert(
+            DecksCompanion.insert(
+              id: deckId,
+              folderId: folderId,
+              name: deckName,
+              sortOrder: sortOrder,
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+    });
+    return findDeckByName(deckName);
+  }
 
   Future<void> seedDeckWithFlashcard({
     required String folderId,
@@ -207,6 +360,60 @@ final class IntegrationTestAppHandle {
             updatedAt: now,
           ),
         );
+    await _seedFlashcardProgress(flashcardId: flashcardId, now: now);
+  }
+
+  Future<void> seedDeckWithFlashcardInFolder({
+    required String folderId,
+    required String deckId,
+    required String deckName,
+    required String flashcardId,
+    required String front,
+    required String back,
+    int deckSortOrder = 0,
+    int flashcardSortOrder = 0,
+    bool lockFolderToDecks = true,
+  }) async {
+    await seedDeckInFolder(
+      folderId: folderId,
+      deckId: deckId,
+      deckName: deckName,
+      sortOrder: deckSortOrder,
+      lockFolderToDecks: lockFolderToDecks,
+    );
+    await seedFlashcardInDeck(
+      deckId: deckId,
+      flashcardId: flashcardId,
+      front: front,
+      back: back,
+      sortOrder: flashcardSortOrder,
+    );
+  }
+
+  Future<void> seedFlashcardInDeck({
+    required String deckId,
+    required String flashcardId,
+    required String front,
+    required String back,
+    int sortOrder = 0,
+  }) async {
+    final now = clock.nowEpochMillis() + sortOrder;
+    await database.transaction(() async {
+      await database
+          .into(database.flashcards)
+          .insert(
+            FlashcardsCompanion.insert(
+              id: flashcardId,
+              deckId: deckId,
+              front: front,
+              back: back,
+              sortOrder: sortOrder,
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      await _seedFlashcardProgress(flashcardId: flashcardId, now: now);
+    });
   }
 
   Future<void> seedDeckWithoutFlashcards({
@@ -246,6 +453,55 @@ final class IntegrationTestAppHandle {
     return (database.select(
       database.folders,
     )..where((table) => table.name.equals(name))).getSingle();
+  }
+
+  Future<Folder?> findFolderByNameOrNull(String name) {
+    return (database.select(
+      database.folders,
+    )..where((table) => table.name.equals(name))).getSingleOrNull();
+  }
+
+  Future<Deck> findDeckByName(String name) {
+    return (database.select(
+      database.decks,
+    )..where((table) => table.name.equals(name))).getSingle();
+  }
+
+  Future<List<String>> latestOriginalStudySessionFlashcardIds() async {
+    final session =
+        await (database.select(database.studySessions)
+              ..orderBy([(table) => OrderingTerm.desc(table.startedAt)])
+              ..limit(1))
+            .getSingle();
+    final items =
+        await (database.select(database.studySessionItems)
+              ..where(
+                (table) =>
+                    table.sessionId.equals(session.id) &
+                    table.modeOrder.equals(1) &
+                    table.roundIndex.equals(1),
+              )
+              ..orderBy([(table) => OrderingTerm.asc(table.queuePosition)]))
+            .get();
+    return items.map((item) => item.flashcardId).toList(growable: false);
+  }
+
+  Future<void> _seedFlashcardProgress({
+    required String flashcardId,
+    required int now,
+  }) {
+    return database
+        .into(database.flashcardProgress)
+        .insert(
+          FlashcardProgressCompanion.insert(
+            flashcardId: flashcardId,
+            currentBox: 1,
+            reviewCount: 0,
+            lapseCount: 0,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
   }
 
   Future<void> dispose() async {
