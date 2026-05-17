@@ -119,8 +119,9 @@ Keep production UI unchanged until the target is executable. In the next pass:
 
 1. Add Decision Table rows for Samsung tall-narrow coverage:
    - Shared `onResponsive`: include `412 x 915` explicitly.
-   - Integration flow coverage: add a compact Samsung target row under
-     `docs/decision-tables/integration_test/flows/coverage_expansion_test.md`.
+   - Integration flow coverage: restore an executable integration case module
+     and add its matching Decision Table row under
+     `docs/decision-tables/integration_test/**`.
    - High-value presentation screens: dashboard, library, flashcard list,
      deck import, study entry, study session, progress, and settings.
 2. Add a test helper/constant for `const Size(412, 915)` and reuse it instead
@@ -132,4 +133,3 @@ Keep production UI unchanged until the target is executable. In the next pass:
 4. Only fix production layout if one of the new `412 x 915` tests exposes a
    concrete overflow, clipped action, hidden input, broken first viewport, or
    bad text-scale fallback.
-
