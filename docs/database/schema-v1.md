@@ -1,6 +1,7 @@
 # Schema V1
 
 ## Design Rules
+
 - Dùng `TEXT` id cho entity id
 - Dùng `INTEGER` UTC epoch milliseconds cho mọi timestamp
 - Dùng `TEXT` cho enum để migration đọc dễ hơn
@@ -8,6 +9,7 @@
 - Các write nghiệp vụ quan trọng chạy trong transaction
 
 ## ERD
+
 ```mermaid
 erDiagram
     FOLDERS ||--o{ FOLDERS : parent_of
@@ -22,6 +24,7 @@ erDiagram
 ```
 
 ## 1. `folders`
+
 | Column | Type | Null | Notes |
 | --- | --- | --- | --- |
 | `id` | TEXT | no | PK |
@@ -33,12 +36,14 @@ erDiagram
 | `updated_at` | INTEGER | no | UTC epoch ms |
 
 ### Constraint
+
 - `parent_id` phải khác `id`
 - Không cho tạo cycle ở tầng ứng dụng trước khi update `parent_id`
 - `content_mode=subfolders` thì chỉ được chứa folder con
 - `content_mode=decks` thì chỉ được chứa deck
 
 ## 2. `decks`
+
 | Column | Type | Null | Notes |
 | --- | --- | --- | --- |
 | `id` | TEXT | no | PK |
@@ -49,12 +54,14 @@ erDiagram
 | `updated_at` | INTEGER | no | UTC epoch ms |
 
 ### Derived, không lưu source of truth
+
 - `card_count`
 - `due_today_count`
 - `last_studied_at`
 - `mastery_percent`
 
 ## 3. `flashcards`
+
 | Column | Type | Null | Notes |
 | --- | --- | --- | --- |
 | `id` | TEXT | no | PK |
@@ -67,11 +74,13 @@ erDiagram
 | `updated_at` | INTEGER | no | UTC epoch ms |
 
 ### Rule
+
 - Mỗi flashcard luôn thuộc đúng 1 deck
 - Sort theo tên dùng `front`
 - Search ít nhất trên `front`, `back`
 
 ## 4. `flashcard_progress`
+
 | Column | Type | Null | Notes |
 | --- | --- | --- | --- |
 | `flashcard_id` | TEXT | no | PK, FK -> `flashcards.id` |
@@ -85,6 +94,7 @@ erDiagram
 | `updated_at` | INTEGER | no | UTC epoch ms |
 
 ### Rule
+
 - Mỗi flashcard có đúng 1 hàng progress
 - Nếu dữ liệu cũ thiếu progress row, migration phải tạo lại progress mặc định thay vì để query học suy luận từ `flashcards` trần
 - `move flashcard` không đổi progress row
@@ -105,6 +115,7 @@ erDiagram
   - `incorrect` -> nhánh chưa tốt / recovered
 
 ## 5. `study_sessions`
+
 | Column | Type | Null | Notes |
 | --- | --- | --- | --- |
 | `id` | TEXT | no | PK |
@@ -122,6 +133,7 @@ erDiagram
 | `restarted_from_session_id` | TEXT | yes | FK tự tham chiếu nếu session là kết quả restart |
 
 ### Rule
+
 - Session status phải đi theo chuỗi hợp lệ:
   - `draft` → `in_progress` (khi user bắt đầu học)
   - `in_progress` → `ready_to_finalize` (khi pass đủ điều kiện học, retry batch rỗng ở mode cuối)
@@ -138,6 +150,7 @@ erDiagram
 - Mode hiện tại được xác định từ `study_session_items.mode_order`, `study_session_items.study_mode` và các item còn `pending`
 
 ## 6. `study_session_items`
+
 | Column | Type | Null | Notes |
 | --- | --- | --- | --- |
 | `id` | TEXT | no | PK |
@@ -152,6 +165,7 @@ erDiagram
 | `completed_at` | INTEGER | yes | UTC epoch ms |
 
 ### Rule
+
 - `skip` không tạo item mới, chỉ đổi `queue_position`
 - New Study `retry incorrect` tạo thêm item mới với cùng `study_mode`, cùng `mode_order` và `round_index` lớn hơn
 - SRS Review `retry incorrect` tạo thêm item mới với `study_mode=fill`, `mode_order=1` và `round_index` lớn hơn
@@ -165,6 +179,7 @@ erDiagram
 - SRS Review chuyển session sang `ready_to_finalize` khi toàn bộ flashcard trong batch pass Fill và retry batch rỗng
 
 ## 7. `study_attempts`
+
 | Column | Type | Null | Notes |
 | --- | --- | --- | --- |
 | `id` | TEXT | no | PK |
@@ -179,6 +194,7 @@ erDiagram
 | `answered_at` | INTEGER | no | UTC epoch ms |
 
 ### Rule
+
 - Chỉ ghi `study_attempts` cho lượt chấm thật
 - Mỗi lần user trả lời phải ghi `attempt_number`
 - `attempt_number` dùng để thống kê, xác định flashcard có từng sai trong session không, và tính kết quả SRS cuối session
@@ -199,6 +215,7 @@ erDiagram
 - Session summary có thể derive từ bảng này hoặc snapshot ngược vào `study_sessions` khi kết thúc
 
 ## Derived Query, không tạo thêm source of truth
+
 - Breadcrumb folder: recursive query từ `folders.parent_id`
 - `library.deckCount`: tổng deck trong subtree của folder
 - `library.itemCount`: tổng flashcard trong subtree của folder
@@ -208,6 +225,7 @@ erDiagram
 - `masteryPercent`: tính từ progress, không lưu cố định
 
 ## Chưa đưa vào core schema v1
+
 - tag table cho deck hoặc flashcard
 - FTS virtual table
 - cloze payload nâng cao cho Fill mode
