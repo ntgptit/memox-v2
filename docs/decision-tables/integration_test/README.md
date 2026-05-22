@@ -20,11 +20,15 @@ integration_test/test_app.dart
 integration_test/robots/**
 ```
 
-Folder flow coverage is restored in:
+Folder and deck flow coverage is restored in:
 
 ```txt
 integration_test/cases/folder_flow_test.dart
 docs/decision-tables/integration_test/cases/folder_flow_test.md
+integration_test/cases/deck_flow_test.dart
+docs/decision-tables/integration_test/cases/deck_flow_test.md
+integration_test/cases/flashcard_flow_test.dart
+docs/decision-tables/integration_test/cases/flashcard_flow_test.md
 ```
 
 When adding more E2E coverage, keep new modules under

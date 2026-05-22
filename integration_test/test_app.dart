@@ -321,6 +321,12 @@ final class IntegrationTestAppHandle {
     required String deckName,
     required String front,
     required String back,
+    String? note,
+    int currentBox = 1,
+    int reviewCount = 0,
+    int lapseCount = 0,
+    int? lastStudiedAt,
+    int? dueAt,
   }) async {
     final now = clock.nowEpochMillis();
     await database
@@ -355,12 +361,21 @@ final class IntegrationTestAppHandle {
             deckId: deckId,
             front: front,
             back: back,
+            note: note == null ? const Value.absent() : Value(note),
             sortOrder: 0,
             createdAt: now,
             updatedAt: now,
           ),
         );
-    await _seedFlashcardProgress(flashcardId: flashcardId, now: now);
+    await _seedFlashcardProgress(
+      flashcardId: flashcardId,
+      now: now,
+      currentBox: currentBox,
+      reviewCount: reviewCount,
+      lapseCount: lapseCount,
+      lastStudiedAt: lastStudiedAt,
+      dueAt: dueAt,
+    );
   }
 
   Future<void> seedDeckWithFlashcardInFolder({
@@ -370,9 +385,15 @@ final class IntegrationTestAppHandle {
     required String flashcardId,
     required String front,
     required String back,
+    String? note,
     int deckSortOrder = 0,
     int flashcardSortOrder = 0,
     bool lockFolderToDecks = true,
+    int currentBox = 1,
+    int reviewCount = 0,
+    int lapseCount = 0,
+    int? lastStudiedAt,
+    int? dueAt,
   }) async {
     await seedDeckInFolder(
       folderId: folderId,
@@ -386,7 +407,13 @@ final class IntegrationTestAppHandle {
       flashcardId: flashcardId,
       front: front,
       back: back,
+      note: note,
       sortOrder: flashcardSortOrder,
+      currentBox: currentBox,
+      reviewCount: reviewCount,
+      lapseCount: lapseCount,
+      lastStudiedAt: lastStudiedAt,
+      dueAt: dueAt,
     );
   }
 
@@ -395,7 +422,13 @@ final class IntegrationTestAppHandle {
     required String flashcardId,
     required String front,
     required String back,
+    String? note,
     int sortOrder = 0,
+    int currentBox = 1,
+    int reviewCount = 0,
+    int lapseCount = 0,
+    int? lastStudiedAt,
+    int? dueAt,
   }) async {
     final now = clock.nowEpochMillis() + sortOrder;
     await database.transaction(() async {
@@ -407,12 +440,21 @@ final class IntegrationTestAppHandle {
               deckId: deckId,
               front: front,
               back: back,
+              note: note == null ? const Value.absent() : Value(note),
               sortOrder: sortOrder,
               createdAt: now,
               updatedAt: now,
             ),
           );
-      await _seedFlashcardProgress(flashcardId: flashcardId, now: now);
+      await _seedFlashcardProgress(
+        flashcardId: flashcardId,
+        now: now,
+        currentBox: currentBox,
+        reviewCount: reviewCount,
+        lapseCount: lapseCount,
+        lastStudiedAt: lastStudiedAt,
+        dueAt: dueAt,
+      );
     });
   }
 
@@ -467,6 +509,40 @@ final class IntegrationTestAppHandle {
     )..where((table) => table.name.equals(name))).getSingle();
   }
 
+  Future<Deck?> findDeckByNameOrNull(String name) {
+    return (database.select(
+      database.decks,
+    )..where((table) => table.name.equals(name))).getSingleOrNull();
+  }
+
+  Future<List<Deck>> listDecksInFolder(String folderId) {
+    return (database.select(database.decks)
+          ..where((table) => table.folderId.equals(folderId))
+          ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+        .get();
+  }
+
+  Future<List<Flashcard>> listFlashcardsInDeck(String deckId) {
+    return (database.select(database.flashcards)
+          ..where((table) => table.deckId.equals(deckId))
+          ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+        .get();
+  }
+
+  Future<FlashcardProgressData> findProgressByFlashcardId(String flashcardId) {
+    return (database.select(
+      database.flashcardProgress,
+    )..where((table) => table.flashcardId.equals(flashcardId))).getSingle();
+  }
+
+  Future<FlashcardProgressData?> findProgressByFlashcardIdOrNull(
+    String flashcardId,
+  ) {
+    return (database.select(database.flashcardProgress)
+          ..where((table) => table.flashcardId.equals(flashcardId)))
+        .getSingleOrNull();
+  }
+
   Future<List<String>> latestOriginalStudySessionFlashcardIds() async {
     final session =
         await (database.select(database.studySessions)
@@ -489,17 +565,24 @@ final class IntegrationTestAppHandle {
   Future<void> _seedFlashcardProgress({
     required String flashcardId,
     required int now,
+    int currentBox = 1,
+    int reviewCount = 0,
+    int lapseCount = 0,
+    int? lastStudiedAt,
+    int? dueAt,
   }) {
     return database
         .into(database.flashcardProgress)
         .insert(
           FlashcardProgressCompanion.insert(
             flashcardId: flashcardId,
-            currentBox: 1,
-            reviewCount: 0,
-            lapseCount: 0,
+            currentBox: currentBox,
+            reviewCount: reviewCount,
+            lapseCount: lapseCount,
             createdAt: now,
             updatedAt: now,
+            lastStudiedAt: Value(lastStudiedAt),
+            dueAt: Value(dueAt),
           ),
         );
   }

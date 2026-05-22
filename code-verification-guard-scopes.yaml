@@ -1,0 +1,108 @@
+version: 1
+
+metadata:
+  id: memox-project-scope-overrides
+  name: MemoX Project Scope Overrides
+  description: Project-local scan boundaries for running code-verification-guard against MemoX.
+
+scopes:
+  project_files:
+    include:
+      - code-verification-guard.yaml
+      - pubspec.yaml
+      - analysis_options.yaml
+      - lib/**/*.dart
+      - test/**/*.dart
+      - integration_test/**/*.dart
+    exclude:
+      - '**/*.g.dart'
+      - '**/*.freezed.dart'
+      - lib/l10n/generated/**
+      - web/**
+      - tools/**
+      - code-verification-guard/**
+
+  all_text_files:
+    include:
+      - code-verification-guard.yaml
+      - pubspec.yaml
+      - analysis_options.yaml
+      - lib/**/*.dart
+      - test/**/*.dart
+      - integration_test/**/*.dart
+    exclude:
+      - '**/*.g.dart'
+      - '**/*.freezed.dart'
+      - lib/l10n/generated/**
+      - web/**
+      - tools/**
+      - code-verification-guard/**
+
+  text_source_files:
+    include:
+      - code-verification-guard.yaml
+      - pubspec.yaml
+      - analysis_options.yaml
+      - lib/**/*.dart
+      - test/**/*.dart
+      - integration_test/**/*.dart
+    exclude:
+      - '**/*.g.dart'
+      - '**/*.freezed.dart'
+      - lib/l10n/generated/**
+      - web/**
+      - tools/**
+      - code-verification-guard/**
+
+  source_files:
+    include:
+      - lib/**/*.dart
+      - test/**/*.dart
+      - integration_test/**/*.dart
+    exclude:
+      - '**/*.g.dart'
+      - '**/*.freezed.dart'
+      - lib/l10n/generated/**
+      - web/**
+      - tools/**
+      - code-verification-guard/**
+
+  source_and_config_files:
+    include:
+      - code-verification-guard.yaml
+      - pubspec.yaml
+      - analysis_options.yaml
+      - lib/**/*.dart
+      - test/**/*.dart
+      - integration_test/**/*.dart
+    exclude:
+      - '**/*.g.dart'
+      - '**/*.freezed.dart'
+      - lib/l10n/generated/**
+      - web/**
+      - tools/**
+      - code-verification-guard/**
+
+  dart_source:
+    include:
+      - lib/**/*.dart
+      - test/**/*.dart
+      - integration_test/**/*.dart
+    exclude:
+      - '**/*.g.dart'
+      - '**/*.freezed.dart'
+      - lib/l10n/generated/**
+
+  flutter_source:
+    include:
+      - lib/**/*.dart
+      - test/**/*.dart
+      - integration_test/**/*.dart
+    exclude:
+      - '**/*.g.dart'
+      - '**/*.freezed.dart'
+      - lib/l10n/generated/**
+
+  guard_python_non_constants:
+    include: []
+    exclude: []

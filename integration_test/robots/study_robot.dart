@@ -8,11 +8,11 @@ final class StudyRobot extends MemoxRobot {
 
   Future<void> expectFlashcardListVisible(String front) async {
     await waitUntilVisible(find.text(front));
-    await waitUntilVisible(find.text('Study now'));
+    await waitUntilVisible(find.text('Study this deck'));
   }
 
   Future<void> openStudyEntryFromFlashcardList() async {
-    await tapVisible(find.text('Study now'));
+    await tapVisible(find.text('Study this deck'));
     await waitUntilVisible(find.text('Start a study session'));
     await waitUntilVisible(find.text('Study flow'));
     await waitUntilVisible(find.text('Session settings'));
@@ -54,7 +54,7 @@ final class StudyRobot extends MemoxRobot {
     await waitUntilVisible(find.text('New flashcard'));
     await enterText(find.byType(TextField).at(0), front);
     await enterText(find.byType(TextField).at(1), back);
-    await tapVisible(find.text('Save flashcard'));
+    await tapVisible(find.widgetWithText(ElevatedButton, 'Save').last);
     await waitUntilVisible(find.text(front));
   }
 
@@ -76,6 +76,16 @@ final class StudyRobot extends MemoxRobot {
     await waitUntilVisible(find.text('Review'));
     await waitUntilVisible(find.text(front));
     await waitUntilVisible(find.text(back));
+  }
+
+  Future<void> expectStudySessionAbsent(String text) async {
+    expect(find.text(text), findsNothing);
+  }
+
+  Future<void> expectFillStudySessionVisible({required String prompt}) async {
+    await waitUntilVisible(find.text('Fill'));
+    await waitUntilVisible(find.text(prompt));
+    await waitUntilVisible(find.text('Answer'));
   }
 
   Future<void> expectNoEligibleFlashcardsMessage() async {

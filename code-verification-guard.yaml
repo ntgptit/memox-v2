@@ -1,0 +1,73 @@
+version: 1
+
+project:
+  name: memox
+  root: .
+  source_roots:
+    - lib
+    - test
+    - integration_test
+    - docs
+
+profile: local
+
+rule_sets:
+  common: true
+  languages:
+    - dart
+    - flutter
+  projects:
+    - memox
+
+scopes:
+  - code-verification-guard-scopes.yaml
+registries: []
+
+overrides:
+  disabled_rules: []
+  severity: {}
+  rule_options:
+    memox.provider_file_naming:
+      exclude:
+        - '**/*.g.dart'
+        - '**/*.freezed.dart'
+    memox.app_string_normalization_uses_string_utils:
+      exclude:
+        - '**/*.g.dart'
+        - '**/*.freezed.dart'
+        - lib/core/utils/string_utils.dart
+        - lib/data/datasources/local/tables/*.dart
+    common.max_file_lines:
+      include:
+        - lib/**/*.dart
+      exclude:
+        - '**/*.g.dart'
+        - '**/*.freezed.dart'
+        - lib/l10n/generated/**
+        - test/**
+        - integration_test/**
+      count_mode: logical
+    common.no_large_source_file:
+      include:
+        - lib/**/*.dart
+      exclude:
+        - '**/*.g.dart'
+        - '**/*.freezed.dart'
+        - lib/l10n/generated/**
+        - test/**
+        - integration_test/**
+      count_mode: logical
+    flutter.max_build_lines:
+      count_mode: logical
+      exclude:
+        - lib/presentation/shared/**
+
+failure:
+  fail_on:
+    - error
+  warning_as_error: false
+
+report:
+  format: console
+  show_code_line: true
+  show_fix_hint: true

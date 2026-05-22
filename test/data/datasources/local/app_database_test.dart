@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/data/datasources/local/app_database.dart';
@@ -31,6 +32,114 @@ void main() {
           'study_session_items',
           'study_attempts',
         ]),
+      );
+    });
+
+    test('DT2 onInsert: rejects a deck with a missing parent folder', () async {
+      await expectLater(
+        database.customInsert(
+          '''
+            INSERT INTO decks
+              (id, folder_id, name, sort_order, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ''',
+          variables: <Variable>[
+            const Variable<String>('deck-invalid-folder'),
+            const Variable<String>('folder-missing'),
+            const Variable<String>('Daily Words'),
+            const Variable<int>(0),
+            const Variable<int>(1),
+            const Variable<int>(1),
+          ],
+        ),
+        throwsA(anything),
+      );
+    });
+
+    test('DT3 onInsert: rejects a deck without an id', () async {
+      await _insertValidFolder(database, id: 'folder-1');
+
+      await expectLater(
+        database.customInsert(
+          '''
+          INSERT INTO decks
+            (folder_id, name, sort_order, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?)
+          ''',
+          variables: <Variable>[
+            const Variable<String>('folder-1'),
+            const Variable<String>('Daily Words'),
+            const Variable<int>(0),
+            const Variable<int>(1),
+            const Variable<int>(1),
+          ],
+        ),
+        throwsA(anything),
+      );
+    });
+
+    test('DT4 onInsert: rejects a deck without a name', () async {
+      await _insertValidFolder(database, id: 'folder-1');
+
+      await expectLater(
+        database.customInsert(
+          '''
+          INSERT INTO decks
+            (id, folder_id, sort_order, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?)
+          ''',
+          variables: <Variable>[
+            const Variable<String>('deck-missing-name'),
+            const Variable<String>('folder-1'),
+            const Variable<int>(0),
+            const Variable<int>(1),
+            const Variable<int>(1),
+          ],
+        ),
+        throwsA(anything),
+      );
+    });
+
+    test('DT5 onInsert: rejects a deck without sort_order', () async {
+      await _insertValidFolder(database, id: 'folder-1');
+
+      await expectLater(
+        database.customInsert(
+          '''
+          INSERT INTO decks
+            (id, folder_id, name, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?)
+          ''',
+          variables: <Variable>[
+            const Variable<String>('deck-missing-sort'),
+            const Variable<String>('folder-1'),
+            const Variable<String>('Daily Words'),
+            const Variable<int>(1),
+            const Variable<int>(1),
+          ],
+        ),
+        throwsA(anything),
+      );
+    });
+
+    test('DT6 onInsert: rejects a deck without timestamps', () async {
+      await _insertValidFolder(database, id: 'folder-1');
+
+      await expectLater(
+        database.customInsert(
+          '''
+          INSERT INTO decks
+            (id, folder_id, name, sort_order)
+          VALUES (?, ?, ?, ?)
+          ''',
+          variables: <Variable>[
+            const Variable<String>('deck-missing-timestamps'),
+            const Variable<String>('folder-1'),
+            const Variable<String>('Daily Words'),
+            const Variable<int>(0),
+          ],
+        ),
+        throwsA(anything),
       );
     });
 
@@ -162,6 +271,24 @@ void main() {
       },
     );
   });
+}
+
+Future<void> _insertValidFolder(AppDatabase database, {required String id}) {
+  return database.customInsert(
+    '''
+    INSERT INTO folders
+      (id, name, content_mode, sort_order, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+    ''',
+    variables: <Variable>[
+      Variable<String>(id),
+      const Variable<String>('Languages'),
+      const Variable<String>('unlocked'),
+      const Variable<int>(0),
+      const Variable<int>(1),
+      const Variable<int>(1),
+    ],
+  );
 }
 
 const List<String> _legacyV1Statements = <String>[

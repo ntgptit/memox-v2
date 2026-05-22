@@ -32,6 +32,22 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
   - `lib/l10n/generated/**`
   - platform-generated Flutter files unless the task explicitly requires it
 
+## Nested Guard Repository Contract
+
+- `code-verification-guard/` is a separate nested Git repository, even though it is vendored inside this workspace.
+- Do not commit changes under `code-verification-guard/**` in the MemoX repository.
+- Changes inside `code-verification-guard/**` must be committed and pushed from:
+  - `D:\workspace_STS_5\memox\code-verification-guard`
+  - remote: `https://github.com/ntgptit/code-verification-guard-v2.git`
+- MemoX repository changes must be committed and pushed from:
+  - `D:\workspace_STS_5\memox`
+  - remote: `https://github.com/ntgptit/memox-v2.git`
+- MemoX may track project-level guard config files such as:
+  - `code-verification-guard.yaml`
+  - `code-verification-guard-scopes.yaml`
+- When staging MemoX changes, never use `git add .` if `code-verification-guard/` is unignored or visible as untracked content. Stage explicit paths only.
+- If `code-verification-guard/` appears as untracked content in MemoX, do not add it unless the user explicitly asks to convert it to a submodule.
+
 ## MemoX Planning Contract
 
 - Any non-trivial MemoX plan must start with a `5Why` analysis before implementation details.
@@ -92,8 +108,16 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 
 ### `tools/guard/**`
 
-- Repo-local architectural guardrail.
-- Treat `tools/guard/policies/memox/**` as enforceable repo contract, not optional guidance.
+- Legacy repo-local architectural guardrail.
+- Do not extend this guard for new MemoX rules unless the user explicitly asks to maintain the legacy guard.
+- Prefer `code-verification-guard/` plus root `code-verification-guard.yaml` for new guard work.
+
+### `code-verification-guard/**`
+
+- Separate nested Git repository for the new YAML-first guard engine and reusable rule registries.
+- Treat changes here as `code-verification-guard-v2` work, not MemoX app work.
+- Keep generic engine behavior project-agnostic; MemoX-specific rules belong under `registries/projects/memox/**`, scopes under `scopes/**`, or root MemoX config when the setting is project-local.
+- Commit and push this repository separately from MemoX.
 
 ## Architecture Contract
 
@@ -154,7 +178,7 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 For Dart or Flutter code changes, run the strongest relevant checks in this order:
 
 1. `dart run build_runner build --delete-conflicting-outputs` when touching Drift tables, Riverpod annotations, Freezed, or JSON-serializable models
-2. `python tools/guard/run.py --policy memox`
+2. `python code-verification-guard\guard\run.py check --project .`
 3. `flutter analyze`
 4. Targeted `flutter test` commands for the affected area
 

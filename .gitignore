@@ -12,6 +12,9 @@
 .swiftpm/
 migrate_working_dir/
 
+# Vendored nested repository; commit and push from code-verification-guard/ itself.
+/code-verification-guard/
+
 # IntelliJ related
 *.iml
 *.ipr
