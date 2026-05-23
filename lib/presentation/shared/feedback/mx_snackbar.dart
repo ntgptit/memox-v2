@@ -4,6 +4,7 @@ import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
 import '../layouts/mx_gap.dart';
+import '../motion/mx_motion.dart';
 
 enum MxSnackbarTone { neutral, success, warning, error }
 
@@ -15,7 +16,7 @@ abstract final class MxSnackbar {
     MxSnackbarTone tone = MxSnackbarTone.neutral,
     String? actionLabel,
     VoidCallback? onAction,
-    Duration duration = const Duration(seconds: 4),
+    Duration duration = MxDurations.snackbar,
     IconData? icon,
   }) {
     final scheme = Theme.of(context).colorScheme;

@@ -9,14 +9,24 @@ abstract final class AppDurations {
   static const Duration lg = Duration(milliseconds: 300);
   static const Duration xl = Duration(milliseconds: 450);
   static const Duration xxl = Duration(milliseconds: 600);
+  static const Duration xxxl = Duration(milliseconds: 1200);
 
   // --- Semantic durations ---
   static const Duration press = xs;
   static const Duration stateChange = sm;
+  static const Duration quickTransition = Duration(milliseconds: 180);
   static const Duration fade = md;
+  static const Duration pageTurn = Duration(milliseconds: 250);
   static const Duration slide = lg;
   static const Duration page = lg;
+  static const Duration successHold = Duration(milliseconds: 350);
+  static const Duration feedbackHold = xl;
+  static const Duration feedbackPause = Duration(milliseconds: 650);
   static const Duration cardFlip = xl;
+  static const Duration skeletonPulse = xxxl;
+  static const Duration snackbar = Duration(seconds: 4);
+  static const Duration reviewAutoSubmit = Duration(seconds: 2);
+  static const Duration recallAnswerTimeout = Duration(seconds: 20);
 }
 
 /// Easing curves aligned with Material 3 motion.

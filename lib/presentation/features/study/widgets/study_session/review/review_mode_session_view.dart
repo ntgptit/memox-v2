@@ -8,6 +8,7 @@ import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/motion/mx_motion.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/domain/study/study_session_round.dart';
 import '../study_mode_progress_row.dart';
@@ -17,7 +18,7 @@ import 'review_mode_card.dart';
 import 'review_page_scroll_behavior.dart';
 
 const _reviewPointerScrollThreshold = 20.0;
-const _reviewPageTurnDuration = Duration(milliseconds: 250);
+const _reviewPageTurnDuration = MxDurations.pageTurn;
 
 class ReviewModeSessionView extends StatefulWidget {
   const ReviewModeSessionView({
@@ -264,7 +265,7 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
     if (_autoSubmitTimer != null) {
       return;
     }
-    _autoSubmitTimer = Timer(const Duration(seconds: 2), _submitBatch);
+    _autoSubmitTimer = Timer(MxDurations.reviewAutoSubmit, _submitBatch);
   }
 
   Future<void> _submitBatch() async {

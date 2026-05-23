@@ -10,6 +10,7 @@ import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/motion/mx_motion.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
@@ -228,7 +229,7 @@ class _SpeechDetailsSheetState extends ConsumerState<_SpeechDetailsSheet> {
           onToggleVoiceOptions: _toggleVoiceOptions,
         ),
         AnimatedSize(
-          duration: const Duration(milliseconds: 200),
+          duration: MxDurations.fade,
           curve: Curves.easeOutCubic,
           child: _showVoiceOptions
               ? _VoiceOptions(

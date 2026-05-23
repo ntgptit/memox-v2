@@ -4,6 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../shared/dialogs/mx_dialog.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/motion/mx_motion.dart';
 import '../../../shared/widgets/mx_flashcard.dart';
 import '../../../shared/widgets/mx_page_dots.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
@@ -60,7 +61,7 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
                 itemBuilder: (context, index) {
                   final item = widget.items[index];
                   return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 180),
+                    duration: MxDurations.quickTransition,
                     child: _PreviewFlashcard(
                       key: ValueKey('${item.id}:$_showBack'),
                       item: item,
@@ -83,7 +84,7 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
           onDotTap: (index) {
             _controller.animateToPage(
               index,
-              duration: const Duration(milliseconds: 180),
+              duration: MxDurations.quickTransition,
               curve: Curves.easeOut,
             );
           },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
+import '../motion/mx_motion.dart';
 import '../widgets/mx_text.dart';
 
 /// Themed modal bottom sheet with a centered drag handle, a title row, and
@@ -47,7 +48,7 @@ class MxBottomSheet extends StatelessWidget {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return AnimatedPadding(
-      duration: const Duration(milliseconds: 180),
+      duration: MxDurations.quickTransition,
       curve: Curves.easeOutCubic,
       padding: EdgeInsets.only(bottom: bottomInset),
       child: SafeArea(

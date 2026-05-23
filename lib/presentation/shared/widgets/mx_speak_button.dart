@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../motion/mx_motion.dart';
 import 'mx_icon_button.dart';
 
 class MxSpeakButton extends StatefulWidget {
@@ -22,7 +23,7 @@ class _MxSpeakButtonState extends State<MxSpeakButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 650),
+    duration: MxDurations.feedbackPause,
   );
   late final Animation<double> _scale = Tween<double>(
     begin: 0.95,

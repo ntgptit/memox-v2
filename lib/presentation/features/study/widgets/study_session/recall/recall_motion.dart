@@ -1,7 +1,4 @@
-const recallAnswerTimeoutDuration = Duration(
-  seconds: 20,
-); // guard:raw-size-reviewed recall answer timeout
+import 'package:memox/presentation/shared/motion/mx_motion.dart';
 
-const recallRevealTransitionDuration = Duration(
-  milliseconds: 300,
-); // guard:raw-size-reviewed recall reveal transition
+const recallAnswerTimeoutDuration = MxDurations.recallAnswerTimeout;
+const recallRevealTransitionDuration = MxDurations.slide;

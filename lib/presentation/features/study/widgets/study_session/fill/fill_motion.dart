@@ -1,8 +1,7 @@
 import 'package:flutter/animation.dart';
+import 'package:memox/presentation/shared/motion/mx_motion.dart';
 
-const fillStateTransitionDuration = Duration(
-  milliseconds: 200,
-); // guard:raw-duration-reviewed local Fill state transition timing.
+const fillStateTransitionDuration = MxDurations.fade;
 
 const fillStateTransitionCurve = Curves.easeOutCubic;
 const fillStateExitCurve = Curves.easeInCubic;

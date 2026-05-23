@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_spacing.dart';
+import '../motion/mx_motion.dart';
 import 'mx_tappable.dart';
 
 /// Compact page indicator dots used under the flashcard carousel and other
@@ -52,7 +53,7 @@ class MxPageDots extends StatelessWidget {
                         dimension: kMinInteractiveDimension,
                         child: Center(
                           child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
+                            duration: MxDurations.stateChange,
                             width: isActive
                                 ? AppSpacing
                                       .lg // guard:raw-size-reviewed active dot uses lg token

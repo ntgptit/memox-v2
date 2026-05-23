@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
+import '../motion/mx_motion.dart';
 import 'mx_progress_indicator.dart';
 import 'mx_text.dart';
 
@@ -55,7 +56,7 @@ class _MxSkeletonState extends State<MxSkeleton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1200),
+    duration: MxDurations.skeletonPulse,
   )..repeat(reverse: true);
 
   @override
