@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/extensions/theme_extensions.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_card.dart';
-import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_button_size.dart';
+import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_icon_tile.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
@@ -28,21 +27,15 @@ class DashboardActionList extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = _actions(context);
 
-    return MxCard(
-      key: const ValueKey('dashboard_action_list_card'),
-      variant: MxCardVariant.outlined,
-      padding: const EdgeInsets.symmetric(
-        horizontal: MxSpace.lg,
-        vertical: MxSpace.sm,
-      ),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: actions.length,
-        itemBuilder: (context, index) =>
-            _DashboardActionRow(action: actions[index]),
-        separatorBuilder: (context, index) => const MxDivider(),
-      ),
+    return Column(
+      key: const ValueKey('dashboard_action_list'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < actions.length; i++) ...[
+          if (i > 0) const MxGap(MxSpace.md),
+          _DashboardActionCard(action: actions[i]),
+        ],
+      ],
     );
   }
 
@@ -160,25 +153,110 @@ class _DashboardMetric {
   final String value;
 }
 
-class _DashboardActionRow extends StatelessWidget {
-  const _DashboardActionRow({required this.action});
+class _DashboardActionCard extends StatelessWidget {
+  const _DashboardActionCard({required this.action});
 
   final _DashboardActionSpec action;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final iconColor = action.onAction == null
-        ? context.mxOnSurfaceDisabled
-        : (action.isPrimary ? scheme.primary : scheme.onSurfaceVariant);
+    final isEnabled = action.onAction != null;
+    final showAccent = action.isPrimary && isEnabled;
 
-    Widget buildButton() {
+    return MxCard(
+      key: ValueKey('dashboard_action_card_${action.actionKey}'),
+      variant: MxCardVariant.outlined,
+      accent: showAccent,
+      child: _DashboardActionBody(action: action, isEnabled: isEnabled),
+    );
+  }
+}
+
+class _DashboardActionBody extends StatelessWidget {
+  const _DashboardActionBody({required this.action, required this.isEnabled});
+
+  final _DashboardActionSpec action;
+  final bool isEnabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final details = _DashboardActionDetails(action: action);
+        final iconTile = _DashboardActionIcon(
+          action: action,
+          isEnabled: isEnabled,
+        );
+
+        if (constraints.maxWidth < _dashboardActionInlineMinWidth) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  iconTile,
+                  const MxGap(MxSpace.md),
+                  Expanded(child: details),
+                ],
+              ),
+              const MxGap(MxSpace.md),
+              _DashboardActionButton(action: action, fullWidth: true),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            iconTile,
+            const MxGap(MxSpace.md),
+            Expanded(child: details),
+            const MxGap(MxSpace.md),
+            _DashboardActionButton(action: action, fullWidth: false),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DashboardActionIcon extends StatelessWidget {
+  const _DashboardActionIcon({required this.action, required this.isEnabled});
+
+  final _DashboardActionSpec action;
+  final bool isEnabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return MxIconTile(icon: action.icon, tone: _tone());
+  }
+
+  MxIconTileTone _tone() {
+    if (!isEnabled) return MxIconTileTone.disabled;
+    if (action.isPrimary) return MxIconTileTone.primary;
+    return MxIconTileTone.neutral;
+  }
+}
+
+class _DashboardActionButton extends StatelessWidget {
+  const _DashboardActionButton({
+    required this.action,
+    required this.fullWidth,
+  });
+
+  final _DashboardActionSpec action;
+  final bool fullWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget button() {
       return action.isPrimary
           ? MxPrimaryButton(
               label: action.actionLabel,
               leadingIcon: action.actionIcon,
               size: MxButtonSize.small,
-              fullWidth: true,
+              fullWidth: fullWidth,
               onPressed: action.onAction,
             )
           : MxSecondaryButton(
@@ -186,63 +264,15 @@ class _DashboardActionRow extends StatelessWidget {
               leadingIcon: action.actionIcon,
               size: MxButtonSize.small,
               variant: MxSecondaryVariant.outlined,
-              fullWidth: true,
+              fullWidth: fullWidth,
               onPressed: action.onAction,
             );
     }
 
-    Widget buildFixedButton() {
-      return SizedBox(
-        key: action.actionKey,
-        width: _dashboardActionButtonWidth,
-        child: buildButton(),
-      );
-    }
-
-    Widget buildFullWidthButton() {
-      return SizedBox(
-        key: action.actionKey,
-        width: double.infinity,
-        child: buildButton(),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: MxSpace.sm),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final details = _DashboardActionDetails(action: action);
-
-          if (constraints.maxWidth < _dashboardActionInlineMinWidth) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(action.icon, color: iconColor),
-                    const MxGap(MxSpace.md),
-                    Expanded(child: details),
-                  ],
-                ),
-                const MxGap(MxSpace.sm),
-                buildFullWidthButton(),
-              ],
-            );
-          }
-
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(action.icon, color: iconColor),
-              const MxGap(MxSpace.md),
-              Expanded(child: details),
-              const MxGap(MxSpace.md),
-              buildFixedButton(),
-            ],
-          );
-        },
-      ),
+    return SizedBox(
+      key: action.actionKey,
+      width: fullWidth ? double.infinity : _dashboardActionButtonWidth,
+      child: button(),
     );
   }
 }

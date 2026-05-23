@@ -8,11 +8,17 @@ import 'app/di/providers.dart';
 import 'app/logging/app_talker.dart';
 import 'app/router/app_router.dart';
 import 'core/theme/responsive/app_breakpoints.dart';
+import 'core/theme/responsive/app_layout.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/tokens/app_spacing.dart';
 import 'core/theme/tokens/app_typography.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'presentation/features/settings/providers/locale_notifier.dart';
 import 'presentation/features/settings/providers/theme_mode_notifier.dart';
+
+/// Upper bound for OS-level text scaling applied to MemoX. Above ~1.2 the bold
+/// display/headline roles start blowing past line constraints on 412 dp phones.
+const double _kMaxTextScaleFactor = 1.2;
 
 Future<void> main() async {
   final talker = createAppTalker();
@@ -86,12 +92,37 @@ class MemoxApp extends ConsumerWidget {
           theme.primaryTextTheme,
           size,
         );
-        return Theme(
-          data: theme.copyWith(
-            textTheme: scaledTextTheme,
-            primaryTextTheme: scaledPrimaryTextTheme,
+        // Clamp system text scaling so OEM accessibility defaults (e.g. Samsung
+        // One UI ships a 1.0–1.3 ramp) don't compound with bold display roles
+        // and make chrome feel oversized on phones.
+        final mediaQuery = MediaQuery.of(context);
+        final clampedTextScaler = mediaQuery.textScaler.clamp(
+          maxScaleFactor: _kMaxTextScaleFactor,
+        );
+        // Density override: tighten ListTile vertical rhythm on phone-class
+        // viewports where the M3 standard density wastes ~4–8 dp per row.
+        final isCompactMobile = AppLayout.isCompactMobileWidth(
+          mediaQuery.size.width,
+        );
+        final listTileTheme = isCompactMobile
+            ? theme.listTileTheme.copyWith(
+                visualDensity: const VisualDensity(
+                  horizontal: 0,
+                  vertical: -1,
+                ),
+                minVerticalPadding: AppSpacing.xs,
+              )
+            : theme.listTileTheme;
+        return MediaQuery(
+          data: mediaQuery.copyWith(textScaler: clampedTextScaler),
+          child: Theme(
+            data: theme.copyWith(
+              textTheme: scaledTextTheme,
+              primaryTextTheme: scaledPrimaryTextTheme,
+              listTileTheme: listTileTheme,
+            ),
+            child: child ?? const SizedBox.shrink(),
           ),
-          child: child ?? const SizedBox.shrink(),
         );
       },
     );

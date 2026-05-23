@@ -67,7 +67,7 @@ abstract final class AppTypography {
   static const TextStyle titleLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 20,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     height: 28 / 20,
     letterSpacing: 0,
   );
@@ -75,7 +75,7 @@ abstract final class AppTypography {
   static const TextStyle titleMedium = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     height: 24 / 16,
     letterSpacing: 0,
   );
@@ -83,7 +83,7 @@ abstract final class AppTypography {
   static const TextStyle titleSmall = TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.w600,
     height: 20 / 14,
     letterSpacing: 0,
   );

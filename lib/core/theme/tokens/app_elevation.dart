@@ -59,4 +59,20 @@ abstract final class AppShadows {
     BoxShadow(color: Color(0x339FA2BF), blurRadius: 32, offset: Offset(0, 16)),
     BoxShadow(color: Color(0x529FA2BF), blurRadius: 8, offset: Offset(0, 4)),
   ];
+
+  /// Indigo-tinted halo for hero / primary action surfaces. Pass the seed
+  /// color (typically `ColorScheme.primary`) — the helper layers two soft
+  /// shadows so the card "lifts" without competing with the bordered outline.
+  static List<BoxShadow> primaryGlow(Color seed) => [
+    BoxShadow(
+      color: seed.withValues(alpha: 0.28),
+      blurRadius: 24,
+      offset: const Offset(0, 12),
+    ),
+    BoxShadow(
+      color: seed.withValues(alpha: 0.14),
+      blurRadius: 6,
+      offset: const Offset(0, 2),
+    ),
+  ];
 }

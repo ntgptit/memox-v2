@@ -22,7 +22,6 @@ abstract final class AppBarThemeBuilder {
       actionsIconTheme: IconThemeData(color: scheme.onSurfaceVariant, size: 24),
       titleTextStyle: AppTypography.titleLarge.copyWith(
         color: scheme.onSurface,
-        fontWeight: FontWeight.w700,
       ),
       toolbarTextStyle: AppTypography.bodyMedium.copyWith(
         color: scheme.onSurface,

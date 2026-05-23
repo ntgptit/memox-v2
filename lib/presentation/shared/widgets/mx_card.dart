@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_elevation.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import 'mx_tappable.dart';
 
@@ -20,6 +21,7 @@ class MxCard extends StatelessWidget {
     this.borderRadius,
     this.backgroundColor,
     this.borderColor,
+    this.accent = false,
     super.key,
   });
 
@@ -33,6 +35,12 @@ class MxCard extends StatelessWidget {
   final Color? backgroundColor;
   final Color? borderColor;
 
+  /// When true the card paints a tonal primary-tinted background, an indigo
+  /// border, and lifts off the surface with [AppShadows.primaryGlow]. Use for
+  /// the single highlighted call-to-action on a screen — not as a generic
+  /// emphasis on multiple surfaces.
+  final bool accent;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -42,11 +50,19 @@ class MxCard extends StatelessWidget {
     final resolvedPadding = padding ?? AppLayout.cardPadding(context);
     final resolvedClipBehavior =
         clipBehavior ?? cardTheme.clipBehavior ?? Clip.antiAlias;
-    final cardColor = backgroundColor ?? _backgroundColor(cardTheme, scheme);
+    final accentBackground = accent
+        ? scheme.primaryContainer.withValues(alpha: AppOpacity.disabledSurface)
+        : null;
+    final accentBorder = accent
+        ? scheme.primary.withValues(alpha: AppOpacity.half)
+        : null;
+    final cardColor =
+        backgroundColor ?? accentBackground ?? _backgroundColor(cardTheme, scheme);
+    final resolvedBorderColor = borderColor ?? accentBorder;
     final cardShape = RoundedRectangleBorder(
       borderRadius: resolvedBorderRadius,
-      side: variant == MxCardVariant.outlined || borderColor != null
-          ? BorderSide(color: borderColor ?? scheme.outlineVariant)
+      side: variant == MxCardVariant.outlined || resolvedBorderColor != null
+          ? BorderSide(color: resolvedBorderColor ?? scheme.outlineVariant)
           : BorderSide.none,
     );
 
@@ -61,22 +77,32 @@ class MxCard extends StatelessWidget {
       child: Padding(padding: resolvedPadding, child: child),
     );
 
-    if (onTap == null && onLongPress == null) return content;
+    final tappable = onTap == null && onLongPress == null
+        ? content
+        : Card(
+            color: cardColor,
+            elevation: _elevation(cardTheme),
+            shadowColor: cardTheme.shadowColor,
+            surfaceTintColor: cardTheme.surfaceTintColor,
+            margin: cardTheme.margin ?? EdgeInsets.zero,
+            clipBehavior: resolvedClipBehavior,
+            shape: cardShape,
+            child: MxTappable(
+              shape: cardShape,
+              onTap: onTap,
+              onLongPress: onLongPress,
+              child: Padding(padding: resolvedPadding, child: child),
+            ),
+          );
 
-    return Card(
-      color: cardColor,
-      elevation: _elevation(cardTheme),
-      shadowColor: cardTheme.shadowColor,
-      surfaceTintColor: cardTheme.surfaceTintColor,
-      margin: cardTheme.margin ?? EdgeInsets.zero,
-      clipBehavior: resolvedClipBehavior,
-      shape: cardShape,
-      child: MxTappable(
-        shape: cardShape,
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: Padding(padding: resolvedPadding, child: child),
+    if (!accent) return tappable;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: resolvedBorderRadius,
+        boxShadow: AppShadows.primaryGlow(scheme.primary),
       ),
+      child: tappable,
     );
   }
 

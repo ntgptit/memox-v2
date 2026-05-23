@@ -79,8 +79,10 @@ abstract final class AppLayout {
   static const double _folderTileTrailingWidthFloor = 280;
 
   /// guard:raw-size-reviewed row width where a study-set trailing action can
-  /// sit beside title/meta content without starving the text column.
-  static const double _studySetTileInlineTrailingWidthFloor = 400;
+  /// sit beside title/meta content without starving the text column. Sized so
+  /// the 98 px progress pill plus a 40 px leading icon and ~180 px title column
+  /// stay inline on standard phone widths (360–430).
+  static const double _studySetTileInlineTrailingWidthFloor = 320;
 
   /// guard:raw-size-reviewed local width where section actions should move
   /// under the heading so compact/mobile copy keeps a readable line length.

@@ -13,12 +13,12 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 Before claiming any code change is done, run:
 
 ```bash
-python tools/guard/run.py --policy memox
+python code-verification-guard\guard\run.py check --project .
 ```
 
 Must report **0 errors** and **0 criticals**. Warnings are acceptable only when the rule explicitly allows them.
 
-- Policy lives in `tools/guard/policies/memox/` (`*.yaml`). Read the relevant rule before arguing with it.
+- Policy lives in `code-verification-guard/registries/projects/memox/` (`*.yaml`). Read the relevant rule before arguing with it.
 - Rule scopes: `ui` (features + shared), `features` (features only), `shared_widget_dirs`, `widget_ui_files`, `app_bootstrap`, `theme_sources`, `theme_extensions`.
 - Escape hatch for one-off layout sizes: append `// guard:raw-size-reviewed <reason>` on the literal's line. Use sparingly — prefer tokens.
 - When a rule fires, read the rule definition in the YAML before patching. Do not silence rules.
@@ -297,7 +297,7 @@ If you find yourself writing the same `context.responsive(...)` call on three sc
 - [ ] Tier-sensitive numbers (columns, paddings, column widths) routed through `AppLayout` / `LayoutContext` — fall back to `context.responsive` only for one-offs.
 - [ ] No `MediaQuery` size math for fonts; no `Orientation` branching for desktop.
 - [ ] Tap targets ≥ 48 dp; focus + hover states present on expanded+.
-- [ ] `flutter analyze` clean; `python tools/guard/run.py --policy memox` clean.
+- [ ] `flutter analyze` clean; `python code-verification-guard\guard\run.py check --project .` clean.
 
 ---
 
@@ -333,7 +333,7 @@ If you find yourself writing the same `context.responsive(...)` call on three sc
 
 ## Verification workflow (run in this order)
 
-1. `python tools/guard/run.py --policy memox` — must be clean (0 FAIL).
+1. `python code-verification-guard\guard\run.py check --project .` — must be clean (0 errors, 0 criticals).
 2. `flutter analyze` — must report **No issues found**.
 3. Targeted widget/unit tests for the area touched (when they exist).
 
