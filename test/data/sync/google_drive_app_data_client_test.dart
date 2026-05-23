@@ -7,6 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:memox/data/sync/google_drive_app_data_client.dart';
 
+const String _driveCredential = 'access-token';
+const String _missingFileCredential = 'token';
+const String _invalidDriveCredential = 'bad-token';
+
 void main() {
   test(
     'DT1 request: list searches appDataFolder and decodes first file',
@@ -39,7 +43,7 @@ void main() {
       final client = GoogleDriveAppDataClient(httpClient);
 
       final file = await client.findFileByName(
-        accessToken: 'access-token',
+        accessToken: _driveCredential,
         name: 'memox.sync.manifest.json',
       );
 
@@ -62,7 +66,10 @@ void main() {
       final client = GoogleDriveAppDataClient(httpClient);
 
       expect(
-        await client.findFileByName(accessToken: 'token', name: 'missing'),
+        await client.findFileByName(
+          accessToken: _missingFileCredential,
+          name: 'missing',
+        ),
         isNull,
       );
     },
@@ -100,7 +107,7 @@ void main() {
       final client = GoogleDriveAppDataClient(httpClient);
 
       final file = await client.createFile(
-        accessToken: 'access-token',
+        accessToken: _driveCredential,
         name: 'memox.sync.snapshot.zip',
         mimeType: 'application/octet-stream',
         bytes: Uint8List.fromList(<int>[1, 2, 3]),
@@ -130,7 +137,10 @@ void main() {
     final client = GoogleDriveAppDataClient(httpClient);
 
     await expectLater(
-      client.downloadFile(accessToken: 'bad-token', fileId: 'snapshot-file'),
+      client.downloadFile(
+        accessToken: _invalidDriveCredential,
+        fileId: 'snapshot-file',
+      ),
       throwsA(
         isA<GoogleDriveAppDataException>()
             .having((error) => error.statusCode, 'statusCode', 403)

@@ -1,5 +1,9 @@
 # 🎯 Bộ Prompt UI cho Flutter — App "Spaced Learning" (Phiên bản tối ưu)
 
+> Legacy reference only.
+> Nguồn design đáng tin cậy hiện tại là `docs/system-design/MemoX Design System/`.
+> File prompt này chỉ giữ lại để tham khảo ý tưởng màn hình lịch sử. Khi có mâu thuẫn, ưu tiên `docs/system-design/MemoX Design System/`, root `AGENTS.md`, `CLAUDE.md`, repository guard, và Flutter implementation contract hiện tại.
+
 > **Triết lý thiết kế**: Đẹp trong sự tiết chế. Mỗi element đều có lý do tồn tại.
 > Lấy cảm hứng từ Apple Notes, Google Keep, Duolingo — đơn giản nhưng tinh tế.
 
@@ -28,11 +32,17 @@ SPACING & BREATHING ROOM:
 - Touch targets: minimum 48dp height (M3 standard)
 
 THEME SOURCE OF TRUTH:
-- Do NOT invent a standalone color palette for these prompts
-- Use the app theme as the only color source:
-  + `lib/core/theme/tokens/color_tokens.dart`
-  + `lib/core/theme/color_schemes/app_color_scheme.dart`
-  + `lib/core/theme/color_schemes/custom_colors.dart`
+- Do NOT invent a standalone color palette for these prompts.
+- Design intent, brand voice, token meaning, and UI kit references come from `docs/system-design/MemoX Design System/`.
+- Flutter output must implement that intent through the current app theme:
+  + `lib/core/theme/tokens/app_colors.dart`
+  + `lib/core/theme/tokens/app_typography.dart`
+  + `lib/core/theme/tokens/app_spacing.dart`
+  + `lib/core/theme/tokens/app_radius.dart`
+  + `lib/core/theme/tokens/app_motion.dart`
+  + `lib/core/theme/extensions/theme_extensions.dart`
+  + `lib/core/theme/schemes/light_theme.dart`
+  + `lib/core/theme/schemes/dark_theme.dart`
   + `lib/core/theme/app_theme.dart`
 - For Flutter output, consume the app theme through `Theme.of(context).colorScheme` and theme extensions, not one-off hex colors
 - Use semantic roles everywhere: `primary`, `surface`, `surfaceContainer*`, `onSurface`, `onSurfaceVariant`, `success`, `warning`, `error`, `masteryLow`, `masteryMid`, `masteryHigh`
@@ -48,9 +58,8 @@ FLUTTER IMPLEMENTATION TARGET:
 - Keep the result mobile-first and tuned for a phone viewport around 390x844 logical pixels
 
 AGENTIC EXECUTION MODE:
-- You are explicitly allowed to use subagents / parallel workers for non-trivial tasks when the model or toolchain supports it
-- Delegate only bounded, concrete subtasks with clear ownership, then integrate the results back into one coherent Flutter implementation
-- Use subagents when they materially help with multi-screen work, theme alignment, widget extraction, verification, or test authoring
+- Follow root `AGENTS.md` for delegation. Do not use subagents unless the user explicitly asks for delegation or parallel agent work.
+- If delegation is explicitly allowed, delegate only bounded, concrete subtasks with clear ownership, then integrate the results back into one coherent Flutter implementation.
 - Perform recursive review before finalizing:
   + first-pass implementation
   + self-review for theme, layout, state, navigation, and repository alignment

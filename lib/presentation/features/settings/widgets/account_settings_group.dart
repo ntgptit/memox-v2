@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../core/utils/string_utils.dart';
+import '../../../../core/widgets/app_async_builder.dart';
 import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
@@ -26,18 +27,19 @@ class AccountSettingsGroup extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final account = ref.watch(accountSettingsControllerProvider);
 
-    return account.when(
-      loading: () => SettingsGroup(
+    return AppAsyncBuilder<AccountSettingsState>(
+      value: account,
+      loading: (context) => SettingsGroup(
         title: l10n.settingsAccountTitle,
         subtitle: l10n.settingsAccountLoading,
         child: const MxLoadingState(),
       ),
-      error: (_, _) => SettingsGroup(
+      error: (context, error, stackTrace) => SettingsGroup(
         title: l10n.settingsAccountTitle,
         subtitle: l10n.sharedErrorTitle,
         child: MxText(l10n.errorUnexpected, role: MxTextRole.formHelper),
       ),
-      data: (state) => _AccountSettingsContent(state: state),
+      data: (context, state) => _AccountSettingsContent(state: state),
     );
   }
 }

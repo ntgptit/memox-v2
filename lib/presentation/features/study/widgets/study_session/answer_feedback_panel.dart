@@ -23,11 +23,9 @@ class AnswerFeedbackPanel extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final cardShape = theme.cardTheme.shape;
-    final borderRadius =
-        cardShape is RoundedRectangleBorder &&
-            cardShape.borderRadius is BorderRadius
-        ? cardShape.borderRadius as BorderRadius
-        : BorderRadius.zero;
+    final borderRadius = cardShape is RoundedRectangleBorder
+        ? cardShape.borderRadius
+        : null;
     final background = feedback.isCorrect
         ? scheme.primaryContainer
         : scheme.errorContainer;

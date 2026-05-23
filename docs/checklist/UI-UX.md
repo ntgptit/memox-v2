@@ -1,5 +1,8 @@
 # Checklist kiểm tra UI/UX cho app mobile
 
+> Nguồn design đáng tin cậy của MemoX là `docs/system-design/MemoX Design System/`.
+> Checklist này chỉ dùng để review chất lượng UI/UX chung. Nếu checklist này mâu thuẫn với Design System, root `AGENTS.md`, guard, hoặc Flutter theme/shared-widget contract hiện tại, hãy ưu tiên Design System và cập nhật checklist thay vì áp rule cũ.
+
 ## 1. Bố cục tổng thể
 
 * Màn hình có mục tiêu rõ ràng, người dùng nhìn vào biết ngay đang làm gì.
@@ -250,6 +253,7 @@ Kiểm tra thêm:
 
 ## 19. Tính nhất quán thiết kế
 
+* Mọi quyết định visual phải bám `docs/system-design/MemoX Design System/` trước, rồi mới kiểm tra implementation qua theme token và shared widget.
 * Cùng một loại button có cùng style trong toàn app.
 * Cùng một loại card có cùng radius, padding, elevation.
 * Cùng một loại input có cùng style.

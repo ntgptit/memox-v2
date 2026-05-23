@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/tokens/app_radius.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
@@ -129,9 +130,7 @@ class _ProgressSkeleton extends StatelessWidget {
         MxSkeleton(
           height: _dashboardProgressChartSize,
           width: _dashboardProgressChartSize,
-          borderRadius: BorderRadius.all(
-            Radius.circular(_dashboardProgressChartSize / 2),
-          ),
+          borderRadius: AppRadius.borderFull,
         ),
         MxGap(MxSpace.xl),
         Expanded(

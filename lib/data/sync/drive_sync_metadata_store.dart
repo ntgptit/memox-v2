@@ -21,7 +21,7 @@ final class DriveSyncMetadataStore {
 
     try {
       final decoded = jsonDecode(raw);
-      if (decoded is! Map<String, dynamic>) {
+      if (decoded is! Map<String, Object?>) {
         return null;
       }
       final metadata = _decode(decoded);
@@ -62,7 +62,7 @@ final class DriveSyncMetadataStore {
     return next;
   }
 
-  DriveSyncMetadata? _decode(Map<String, dynamic> data) {
+  DriveSyncMetadata? _decode(Map<String, Object?> data) {
     final accountSubjectId = data['accountSubjectId'];
     final manifestFileId = data['manifestFileId'];
     final snapshotFileId = data['snapshotFileId'];

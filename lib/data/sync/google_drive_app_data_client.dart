@@ -98,7 +98,7 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
     _throwIfUnsuccessful(response);
 
     final decoded = jsonDecode(response.body);
-    if (decoded is! Map<String, dynamic>) {
+    if (decoded is! Map<String, Object?>) {
       throw const GoogleDriveAppDataException('Invalid Drive list response.');
     }
     final files = decoded['files'];
@@ -106,7 +106,7 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
       return null;
     }
     final first = files.first;
-    if (first is! Map<String, dynamic>) {
+    if (first is! Map<String, Object?>) {
       throw const GoogleDriveAppDataException('Invalid Drive file metadata.');
     }
     return _decodeFile(first);
@@ -213,7 +213,7 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
     _throwIfUnsuccessful(response);
 
     final decoded = jsonDecode(response.body);
-    if (decoded is! Map<String, dynamic>) {
+    if (decoded is! Map<String, Object?>) {
       throw const GoogleDriveAppDataException('Invalid Drive upload response.');
     }
     return _decodeFile(decoded);
@@ -242,11 +242,11 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
 
     try {
       final decoded = jsonDecode(body);
-      if (decoded is! Map<String, dynamic>) {
+      if (decoded is! Map<String, Object?>) {
         return (message: body, reason: null);
       }
       final error = decoded['error'];
-      if (error is! Map<String, dynamic>) {
+      if (error is! Map<String, Object?>) {
         return (message: body, reason: null);
       }
       final message = error['message'] is String
@@ -265,7 +265,7 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
     }
   }
 
-  DriveAppDataFile _decodeFile(Map<String, dynamic> data) {
+  DriveAppDataFile _decodeFile(Map<String, Object?> data) {
     final id = data['id'];
     final name = data['name'];
     if (id is! String || id.isEmpty || name is! String || name.isEmpty) {

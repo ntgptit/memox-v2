@@ -12,6 +12,7 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 
 - Use `flutter-full-app` for Flutter feature, architecture, local-state, and local-data work.
 - Use `markdown-spec-to-code` when implementing from `docs/business/**` or `docs/database/**`.
+- Use `docs/system-design/MemoX Design System/SKILL.md` as the MemoX design skill for Flutter UI, visual design, brand, component composition, marketing surfaces, decks, mocks, and prototypes.
 - Use `flutter-app-development` as supporting context when a task spans app shell, routing, theme, and feature structure.
 - Only use sub-agents if the user explicitly asks for delegation or parallel agent work.
 
@@ -72,6 +73,14 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
   - `docs/database/implementation-notes.md`
   - `docs/database/storage-boundaries.md`
 
+### `docs/system-design/**`
+
+- `docs/system-design/MemoX Design System/` is the trusted design source for MemoX brand, visual language, design tokens, UI kit references, content voice, and component intent.
+- Treat `docs/system-design/MemoX Design System/README.md` as the first document to read before changing Flutter UI, shared widgets, theme tokens, visual review checklists, presentation decks, marketing surfaces, mocks, or prototypes.
+- `docs/system-design/MemoX Design System/SKILL.md` is the portable agent skill for applying the design system.
+- `docs/system-design/v0-memox-prompts-v2.md` is legacy prompt reference only. It may inspire screen intent, but it must not override the trusted Design System, this `AGENTS.md`, repository guards, or current Flutter implementation contracts.
+- If any design doc, checklist, prompt, or agent instruction conflicts with the trusted Design System, update that document or explicitly call out the drift before implementing UI.
+
 ### `lib/app/**`
 
 - App bootstrap, DI, router, global config only.
@@ -81,7 +90,7 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 ### `lib/core/**`
 
 - Shared non-feature building blocks only.
-- `lib/core/theme/**` is the design-system source of truth.
+- `lib/core/theme/**` is the Flutter implementation of the trusted Design System. Token, theme, or component-theme changes must stay aligned with `docs/system-design/MemoX Design System/README.md`.
 - Do not add ad hoc feature helpers here unless they are genuinely cross-feature.
 
 ### `lib/data/**`
@@ -144,6 +153,8 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 
 ## UI And Theme Contract
 
+- Design intent, brand rules, copy voice, token meaning, and UI kit references come from `docs/system-design/MemoX Design System/`.
+- Flutter code implements that design through `lib/core/theme/**` tokens/theme extensions/component themes and `lib/presentation/shared/**` widgets. Do not bypass these layers to match a mock quickly.
 - UI code should consume colors from `Theme.of(context).colorScheme` or theme extensions, not raw palette files.
 - UI code should consume typography from `Theme.of(context).textTheme`, not custom inline `TextStyle(...)` unless there is a strong repo-local reason.
 - Shared widgets should own semantic typography through internal `MxText`/`MxTextRole` usage. Only typography primitives such as `MxText` and `MxTextField` may expose `MxTextRole` as public API; other shared widgets should expose semantic variants or component-specific props instead.

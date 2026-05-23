@@ -8,7 +8,7 @@ Read the `README.md` file within this skill, and explore the other available fil
 
 Key MemoX rules to carry forward:
 - One font family: **Plus Jakarta Sans**. Collapsed type scale: 48 / 32 / 24 / 20 / 16 / 14 / 12. Nothing in between.
-- Seeded primary: deep indigo `#24389C`. Mastery/success uses green `#004E1A`. Streak uses orange `#F97316`. No emoji, ever.
+- Current light primary: indigo `#5265F5`. Mastery/success uses green `#57CA22`. Streak/warning uses amber `#FFA319`. No emoji, ever.
 - Cards are white (`surface-container-lowest`) with a **ghost border** (1px at 15% of outline-variant) and 16px radius. Shadows cap at 6% opacity — prefer surface-container tiers over shadows.
 - Copy is calm, sentence-case, second-person, and always offers the next action.
 - M3 tonal surfaces, no bluish-purple gradients, no bouncy/elastic easing, no raw Material defaults in feature UI.

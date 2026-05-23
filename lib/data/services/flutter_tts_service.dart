@@ -133,7 +133,7 @@ final class FlutterTtsService implements TtsService {
   }
 
   Future<void> _runOnEngine(
-    Future<dynamic> Function() action, {
+    Future<Object?> Function() action, {
     required String label,
   }) async {
     try {

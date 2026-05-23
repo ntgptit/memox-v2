@@ -22,7 +22,7 @@ final class CloudAccountStore implements CloudAccountRepository {
 
     try {
       final decoded = jsonDecode(rawValue);
-      if (decoded is! Map<String, dynamic>) {
+      if (decoded is! Map<String, Object?>) {
         return null;
       }
       return _decodeLink(decoded);
@@ -48,7 +48,7 @@ final class CloudAccountStore implements CloudAccountRepository {
     return _preferences.remove(AppConstants.sharedPrefsCloudAccountLinkKey);
   }
 
-  CloudAccountLink? _decodeLink(Map<String, dynamic> data) {
+  CloudAccountLink? _decodeLink(Map<String, Object?> data) {
     final schemaVersion = data['schemaVersion'];
     final provider = data['provider'];
     final subjectId = data['subjectId'];
@@ -58,7 +58,8 @@ final class CloudAccountStore implements CloudAccountRepository {
     final driveAuthorizationState = data['driveAuthorizationState'];
     final scopes = data['grantedScopes'];
 
-    if (schemaVersion != CloudAccountLink.currentSchemaVersion ||
+    if (schemaVersion is! int ||
+        schemaVersion != CloudAccountLink.currentSchemaVersion ||
         provider != CloudProvider.google.name ||
         subjectId is! String ||
         subjectId.isEmpty ||

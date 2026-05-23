@@ -29,7 +29,7 @@ abstract final class DriveSyncJson {
   }
 
   static DriveSyncManifest? decodeManifest(Object? value) {
-    if (value is! Map<String, dynamic>) {
+    if (value is! Map<String, Object?>) {
       return null;
     }
 
@@ -77,7 +77,7 @@ abstract final class DriveSyncJson {
   static Map<String, Object?>? decodeJsonObject(String value) {
     try {
       final decoded = jsonDecode(value);
-      if (decoded is Map<String, dynamic>) {
+      if (decoded is Map<String, Object?>) {
         return Map<String, Object?>.from(decoded);
       }
       return null;

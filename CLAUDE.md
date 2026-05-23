@@ -59,7 +59,9 @@ lib/
 
 ## Theme layer (design system)
 
-Tokens live in `lib/core/theme/` as **separate files**, not a single barrel:
+Canonical design intent lives in `docs/system-design/MemoX Design System/`. Read its `README.md` before changing Flutter UI, shared widgets, theme tokens, visual QA rules, decks, mocks, marketing surfaces, or prototypes. Older prompt files and generic UI checklists are reference material only when they agree with the trusted Design System and the repo guard.
+
+Tokens live in `lib/core/theme/` as the Flutter implementation of that Design System. They remain **separate files**, not a single barrel:
 
 | File | Purpose |
 | --- | --- |
@@ -101,6 +103,7 @@ Tokens live in `lib/core/theme/` as **separate files**, not a single barrel:
 
 **Rules**:
 
+- Design intent, brand voice, visual language, token meaning, and UI kit references come from `docs/system-design/MemoX Design System/`; Flutter implementation must route through `lib/core/theme/**`, `lib/presentation/shared/**`, and `lib/l10n/*.arb`.
 - New Material component surfaces MUST be configured here before being used in a feature. Do not thread `color:` / `padding:` per call site — add it to the component theme.
 - Focus / hover / pressed visuals MUST flow through `AppFocus.overlay(...)` or `AppFocus.overlayProperty(...)`. Do not hand-roll focus rings with `Container + Border` or hardcode alpha values.
 - Shared `Mx*` widgets compose on top of these themes; they do not re-declare the same colors or paddings.
