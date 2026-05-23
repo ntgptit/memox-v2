@@ -103,7 +103,7 @@ class MxTextField extends StatelessWidget {
   InputDecoration _decoration() {
     if (variant == MxTextFieldVariant.borderless) {
       return InputDecoration(
-        labelText: label,
+        labelText: null,
         hintText: hintText,
         helperText: helperText,
         errorText: errorText,

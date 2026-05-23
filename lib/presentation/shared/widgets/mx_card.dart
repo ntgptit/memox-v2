@@ -56,7 +56,9 @@ class MxCard extends StatelessWidget {
         ? scheme.primary.withValues(alpha: AppOpacity.half)
         : null;
     final cardColor =
-        backgroundColor ?? accentBackground ?? _backgroundColor(cardTheme, scheme);
+        backgroundColor ??
+        accentBackground ??
+        _backgroundColor(cardTheme, scheme);
     final resolvedBorderColor = borderColor ?? accentBorder;
     final cardShape = RoundedRectangleBorder(
       borderRadius: resolvedBorderRadius,
@@ -107,9 +109,9 @@ class MxCard extends StatelessWidget {
 
   Color _backgroundColor(CardThemeData cardTheme, ColorScheme scheme) {
     return switch (variant) {
-      MxCardVariant.filled => cardTheme.color ?? scheme.surfaceContainerLow,
+      MxCardVariant.filled => cardTheme.color ?? scheme.surfaceContainerLowest,
       MxCardVariant.elevated => scheme.surfaceContainerLow,
-      MxCardVariant.outlined => scheme.surfaceContainerLow,
+      MxCardVariant.outlined => scheme.surfaceContainerLowest,
     };
   }
 

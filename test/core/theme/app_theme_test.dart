@@ -18,12 +18,31 @@ void main() {
         final scheme = theme.colorScheme;
 
         expect(scheme.surface, AppColors.lightSurface);
+        expect(scheme.surfaceDim, AppColors.lightSurfaceDim);
+        expect(
+          scheme.surfaceContainerLowest,
+          AppColors.lightSurfaceContainerLowest,
+        );
         expect(scheme.surfaceContainerLow, AppColors.lightSurfaceContainerLow);
+        expect(scheme.surfaceContainer, AppColors.lightSurfaceContainer);
+        expect(
+          scheme.surfaceContainerHigh,
+          AppColors.lightSurfaceContainerHigh,
+        );
+        expect(
+          scheme.surfaceContainerHighest,
+          AppColors.lightSurfaceContainerHighest,
+        );
         expect(scheme.primary, AppColors.lightPrimary40);
+        expect(scheme.onPrimary, AppColors.lightOnPrimary);
+        expect(scheme.primaryContainer, AppColors.lightPrimary90);
+        expect(scheme.onPrimaryContainer, AppColors.lightOnPrimaryContainer);
         expect(scheme.onSurface, AppColors.lightNeutral10);
         expect(scheme.onSurfaceVariant, AppColors.lightNeutral20);
+        expect(scheme.outline, AppColors.lightNeutralVariant60);
         expect(scheme.outlineVariant, AppColors.lightNeutralVariant90);
-        expect(theme.cardTheme.color, scheme.surfaceContainerLow);
+        expect(theme.cardTheme.color, scheme.surfaceContainerLowest);
+        expect(theme.cardTheme.color, AppColors.lightSurfaceContainerLowest);
         expect(
           theme.inputDecorationTheme.fillColor,
           scheme.surfaceContainerLow,
@@ -33,6 +52,30 @@ void main() {
           scheme.surfaceContainerLow,
         );
         expect(theme.navigationBarTheme.indicatorColor, scheme.primary);
+        expect(
+          theme.extension<MxColorsExtension>()!.success,
+          AppColors.lightSuccess40,
+        );
+        expect(
+          theme.extension<MxColorsExtension>()!.mastery,
+          AppColors.lightMastery,
+        );
+        expect(
+          theme.extension<MxColorsExtension>()!.streak,
+          AppColors.lightStreak,
+        );
+        expect(
+          theme.extension<MxColorsExtension>()!.ratingAgain,
+          AppColors.lightRatingAgain,
+        );
+        expect(
+          theme.extension<MxColorsExtension>()!.ratingGood,
+          AppColors.lightRatingGood,
+        );
+        expect(
+          theme.extension<MxColorsExtension>()!.ratingEasy,
+          AppColors.lightRatingEasy,
+        );
       },
     );
 
@@ -43,11 +86,17 @@ void main() {
         final scheme = theme.colorScheme;
 
         expect(scheme.surface, AppColors.darkNavy5);
+        expect(scheme.surfaceDim, AppColors.darkNavyDim);
+        expect(scheme.surfaceContainerLowest, AppColors.darkNavy10);
         expect(scheme.surfaceContainerLow, AppColors.darkNavy15);
         expect(scheme.primary, AppColors.darkPrimary80);
+        expect(scheme.onPrimary, AppColors.darkOnPrimary);
+        expect(scheme.onSurface, AppColors.darkNeutral95);
         expect(scheme.onSurfaceVariant, AppColors.darkNeutral70);
+        expect(scheme.outline, AppColors.darkNavyOutline);
         expect(scheme.outlineVariant, AppColors.darkNavyOutlineVariant);
-        expect(theme.cardTheme.color, scheme.surfaceContainerLow);
+        expect(theme.cardTheme.color, scheme.surfaceContainerLowest);
+        expect(theme.cardTheme.color, AppColors.darkNavy10);
         expect(
           theme.inputDecorationTheme.fillColor,
           scheme.surfaceContainerLow,
@@ -57,6 +106,14 @@ void main() {
           scheme.surfaceContainerLow,
         );
         expect(theme.navigationBarTheme.indicatorColor, scheme.primary);
+        expect(
+          theme.extension<MxColorsExtension>()!.mastery,
+          AppColors.darkSuccess80,
+        );
+        expect(
+          theme.extension<MxColorsExtension>()!.streak,
+          AppColors.darkStreak,
+        );
       },
     );
 

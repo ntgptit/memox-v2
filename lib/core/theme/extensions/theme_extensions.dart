@@ -122,7 +122,7 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
     ratingGood: AppColors.darkRatingGood,
     ratingEasy: AppColors.darkRatingEasy,
     mastery: AppColors.darkSuccess80,
-    streak: AppColors.darkWarning80,
+    streak: AppColors.darkStreak,
   );
 
   @override

@@ -5,16 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/router/route_names.dart';
-import 'package:memox/core/theme/responsive/app_layout.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/dashboard/screens/dashboard_screen.dart';
 import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
 import 'package:memox/presentation/features/dashboard/widgets/dashboard_skeleton.dart';
-import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
-import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
-
-const _maximumCompactDashboardActionButtonWidth = 160.0;
 
 void main() {
   testWidgets('DT1 onOpen: shows skeleton while dashboard overview loads', (
@@ -62,109 +57,58 @@ void main() {
     },
   );
 
-  testWidgets('DT1 onDisplay: renders compact dashboard with progress chart', (
+  testWidgets('DT1 onDisplay: renders Home kit dashboard hero and stats', (
     tester,
   ) async {
     await _pumpDashboard(tester, _studyReadyDashboardState);
 
-    expect(find.text('Hello 👋'), findsOneWidget);
-    expect(find.text('Ready to study today?'), findsOneWidget);
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('Good evening, learner'), findsOneWidget);
     expect(find.text('Home'), findsNothing);
-    expect(find.text('Today\'s study focus'), findsOneWidget);
-    expect(find.byType(MxProgressRing), findsOneWidget);
-    expect(find.text('Library progress'), findsOneWidget);
-    expect(find.text('30% mastery'), findsOneWidget);
-    expect(find.text('30% mastery · 2 folders · 20 cards'), findsNothing);
-    expect(find.text('2 folders · 3 decks · 20 cards'), findsOneWidget);
-    expect(find.text('View library'), findsOneWidget);
+    expect(find.text('Due now'), findsOneWidget);
+    expect(find.text('5 cards across 3 decks'), findsOneWidget);
+    expect(find.text('About 2 minutes'), findsOneWidget);
+    expect(find.text('Start review'), findsOneWidget);
+    expect(find.text('Streak'), findsOneWidget);
+    expect(find.text('0 days'), findsOneWidget);
     expect(find.text('Mastery'), findsOneWidget);
-    expect(find.text('30%'), findsOneWidget);
-    expect(find.text('Today Review'), findsOneWidget);
-    expect(find.text('Overdue: 3'), findsOneWidget);
-    expect(find.text('Due today: 2'), findsOneWidget);
-    expect(find.text('New Study'), findsOneWidget);
-    expect(find.text('7 new cards are ready.'), findsOneWidget);
-    expect(
-      find.text('7 new cards are ready for a deck or folder session.'),
-      findsNothing,
-    );
-    expect(find.text('New cards available: 7'), findsOneWidget);
-    expect(find.text('Resume'), findsWidgets);
-    expect(find.text('Active sessions: 1'), findsOneWidget);
+    expect(find.text('6 cards'), findsOneWidget);
+    expect(find.text('Pick up where you left off'), findsOneWidget);
+    expect(find.text('Start a deck'), findsOneWidget);
   });
 
   testWidgets(
-    'DT2 onDisplay: disables study actions when no dashboard work exists',
+    'DT2 onDisplay: renders caught-up Home state when no review cards exist',
     (tester) async {
       await _pumpDashboard(tester, _idleDashboardState);
 
-      _expectSecondaryButtonEnabled(
-        tester,
-        key: const ValueKey('dashboard_review_now_action'),
-        isEnabled: false,
-      );
-      _expectPrimaryButtonEnabled(
-        tester,
-        key: const ValueKey('dashboard_start_new_study_action'),
-        isEnabled: false,
-      );
-      _expectSecondaryButtonEnabled(
-        tester,
-        key: const ValueKey('dashboard_continue_session_action'),
-        isEnabled: false,
-      );
-      expect(find.byType(MxProgressRing), findsOneWidget);
-      expect(find.text('Library progress'), findsOneWidget);
+      expect(find.text('All caught up'), findsOneWidget);
+      expect(find.text('No cards due now'), findsOneWidget);
+      expect(find.text('View library'), findsWidgets);
       expect(
-        find.text('No active session. Start studying to resume later.'),
-        findsOneWidget,
-      );
-      expect(
-        find.descendant(
-          of: find.byKey(const ValueKey('dashboard_action_list_card')),
-          matching: find.byType(Opacity),
-        ),
+        find.byKey(const ValueKey('dashboard_review_now_action')),
         findsNothing,
       );
-      final actionListCard = tester.widget<MxCard>(
-        find.byKey(const ValueKey('dashboard_action_list_card')),
-      );
-      expect(actionListCard.variant, MxCardVariant.outlined);
-    },
-  );
-
-  testWidgets(
-    'DT3 onDisplay: keeps dashboard action buttons concise and equal width',
-    (tester) async {
-      const reviewKey = ValueKey('dashboard_review_now_action');
-      const startKey = ValueKey('dashboard_start_new_study_action');
-      const resumeKey = ValueKey('dashboard_continue_session_action');
-
-      await _pumpDashboard(tester, _newCardsOnlyDashboardState);
-
-      _expectDashboardActionLabel(reviewKey, 'Review');
-      _expectDashboardActionLabel(startKey, 'Start');
-      _expectDashboardActionLabel(resumeKey, 'Resume');
-      expect(find.text('Review now'), findsNothing);
-      expect(find.text('Start new study'), findsNothing);
-      expect(find.text('Continue session'), findsNothing);
-      _expectSecondaryButtonSurface(reviewKey);
-      _expectPrimaryButtonSurface(startKey);
-      _expectSecondaryButtonSurface(resumeKey);
-
-      final buttonWidths = [
-        _dashboardActionButtonSize(tester, reviewKey).width,
-        _dashboardActionButtonSize(tester, startKey).width,
-        _dashboardActionButtonSize(tester, resumeKey).width,
-      ];
-
-      expect(buttonWidths.toSet(), hasLength(1));
       expect(
-        buttonWidths.first,
-        lessThanOrEqualTo(_maximumCompactDashboardActionButtonWidth),
+        find.byKey(const ValueKey('dashboard_start_new_study_action')),
+        findsWidgets,
       );
     },
   );
+
+  testWidgets('DT3 onDisplay: keeps the due CTA primary and full-width', (
+    tester,
+  ) async {
+    await _pumpDashboard(tester, _studyReadyDashboardState);
+
+    const reviewKey = ValueKey('dashboard_review_now_action');
+    _expectDashboardActionLabel(reviewKey, 'Start review');
+    _expectPrimaryButtonSurface(reviewKey);
+    expect(
+      _dashboardActionButtonSize(tester, reviewKey).width,
+      greaterThan(300),
+    );
+  });
 
   testWidgets(
     'renders dashboard action buttons full-width in compact viewport',
@@ -174,26 +118,13 @@ void main() {
         await tester.binding.setSurfaceSize(null);
       });
 
+      await _pumpDashboard(tester, _studyReadyDashboardState);
+
       const reviewKey = ValueKey('dashboard_review_now_action');
-      const startKey = ValueKey('dashboard_start_new_study_action');
-      const resumeKey = ValueKey('dashboard_continue_session_action');
-
-      await _pumpDashboard(tester, _newCardsOnlyDashboardState);
-
-      _expectDashboardActionLabel(reviewKey, 'Review');
-      _expectDashboardActionLabel(startKey, 'Start');
-      _expectDashboardActionLabel(resumeKey, 'Resume');
-
-      final buttonWidths = [
-        _dashboardActionButtonSize(tester, reviewKey).width,
-        _dashboardActionButtonSize(tester, startKey).width,
-        _dashboardActionButtonSize(tester, resumeKey).width,
-      ];
-
-      expect(buttonWidths.toSet(), hasLength(1));
+      _expectDashboardActionLabel(reviewKey, 'Start review');
       expect(
-        buttonWidths.first,
-        greaterThan(_maximumCompactDashboardActionButtonWidth),
+        _dashboardActionButtonSize(tester, reviewKey).width,
+        greaterThan(300),
       );
     },
   );
@@ -203,8 +134,8 @@ void main() {
     (tester) async {
       await _pumpDashboard(tester, _singleItemDashboardState);
 
-      expect(find.text('1% mastery'), findsOneWidget);
-      expect(find.text('1 folder · 1 deck · 1 card'), findsOneWidget);
+      expect(find.text('Mastery'), findsOneWidget);
+      expect(find.text('0 cards'), findsOneWidget);
       expect(find.text('1% mastery · 1 folders · 1 cards'), findsNothing);
       expect(find.textContaining('1 folders'), findsNothing);
     },
@@ -216,13 +147,13 @@ void main() {
       await _pumpDashboard(tester, _recentDecksDashboardState);
       await _scrollDashboardToDeckHighlights(tester);
 
-      expect(find.text('Recent decks'), findsOneWidget);
+      expect(find.text('Pick up where you left off'), findsOneWidget);
       expect(find.text('Start a deck'), findsNothing);
       expect(find.text('Grammar'), findsOneWidget);
       expect(find.text('Vocabulary'), findsOneWidget);
       expect(find.text('Reading'), findsOneWidget);
       expect(find.text('Writing'), findsNothing);
-      expect(find.text('12 cards'), findsOneWidget);
+      expect(find.text('4 due · 12 cards'), findsOneWidget);
       expect(find.text('12 cards · 4 due today'), findsNothing);
       expect(
         find.descendant(
@@ -243,7 +174,7 @@ void main() {
       expect(find.text('Start a deck'), findsOneWidget);
       expect(find.text('Recent decks'), findsNothing);
       expect(find.text('Starter'), findsOneWidget);
-      expect(find.text('1 card'), findsOneWidget);
+      expect(find.text('All caught up · 1 card'), findsOneWidget);
     },
   );
 
@@ -257,7 +188,7 @@ void main() {
       expect(find.text('Start a deck'), findsOneWidget);
       expect(
         find.text('Add or import cards before starting a new study session.'),
-        findsNWidgets(2),
+        findsOneWidget,
       );
     },
   );
@@ -296,29 +227,15 @@ void main() {
 
       await _pumpDashboard(tester, _studyReadyDashboardState);
 
-      expect(find.text('Hello 👋'), findsNothing);
-      expect(find.text('Ready to study today?'), findsNothing);
-      expect(find.text('Today Review'), findsOneWidget);
-      expect(find.text('New Study'), findsOneWidget);
-      expect(find.text('Resume'), findsWidgets);
-      expect(find.text('5 due'), findsOneWidget);
-      expect(find.text('7 new'), findsOneWidget);
-      expect(find.text('1 active'), findsOneWidget);
-      expect(find.text('7 new cards are ready.'), findsNothing);
-      expect(find.text('New cards available: 7'), findsNothing);
-      expect(find.text('30% mastery'), findsNothing);
-      expect(find.text('2 folders · 3 decks · 20 cards'), findsOneWidget);
-
-      final progressRing = find.byType(MxProgressRing);
-      expect(progressRing, findsOneWidget);
-      final progressContext = tester.element(progressRing);
-      expect(
-        tester.getSize(progressRing),
-        Size.square(AppLayout.dashboardChartSize(progressContext)),
-      );
+      expect(find.text('Today'), findsOneWidget);
+      expect(find.text('Good evening, learner'), findsOneWidget);
+      expect(find.text('Due now'), findsOneWidget);
+      expect(find.text('5 cards across 3 decks'), findsOneWidget);
+      expect(find.text('Start review'), findsOneWidget);
+      expect(find.text('Pick up where you left off'), findsOneWidget);
 
       final actionListCard = find.byKey(
-        const ValueKey('dashboard_action_list_card'),
+        const ValueKey('dashboard_due_now_card'),
       );
       expect(actionListCard, findsOneWidget);
       final cardSize = tester.getSize(actionListCard);
@@ -337,14 +254,14 @@ void main() {
 
     await _pumpDashboard(tester, _studyReadyDashboardState);
 
-    expect(find.text('Today Review'), findsOneWidget);
-    expect(find.text('New Study'), findsOneWidget);
+    expect(find.text('Due now'), findsOneWidget);
+    expect(find.text('Start review'), findsOneWidget);
     await tester.drag(
       find.byKey(const ValueKey('dashboard_content')),
       const Offset(0, -320),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Library progress'), findsOneWidget);
+    expect(find.text('Pick up where you left off'), findsOneWidget);
   });
 
   testWidgets(
@@ -379,44 +296,6 @@ void main() {
     expect(router.routeInformationProvider.value.uri.path, '/library');
   });
 
-  testWidgets('DT3 onNavigate: Resume opens single resumable session', (
-    tester,
-  ) async {
-    final router = _dashboardRouter();
-    addTearDown(router.dispose);
-    await _pumpDashboardRouter(tester, router, _studyReadyDashboardState);
-
-    await _tapDashboardButton(
-      tester,
-      const ValueKey('dashboard_continue_session_action'),
-    );
-
-    expect(
-      router.routeInformationProvider.value.uri.path,
-      '/library/study/session/session-001',
-    );
-  });
-
-  testWidgets(
-    'DT4 onNavigate: Resume opens Progress when multiple sessions exist',
-    (tester) async {
-      final router = _dashboardRouter();
-      addTearDown(router.dispose);
-      await _pumpDashboardRouter(
-        tester,
-        router,
-        _multipleSessionsDashboardState,
-      );
-
-      await _tapDashboardButton(
-        tester,
-        const ValueKey('dashboard_continue_session_action'),
-      );
-
-      expect(router.routeInformationProvider.value.uri.path, '/progress');
-    },
-  );
-
   testWidgets(
     'DT5 onNavigate: tapping a recent deck row opens flashcards and preserves back stack',
     (tester) async {
@@ -441,7 +320,7 @@ void main() {
       router.pop();
       await tester.pumpAndSettle();
 
-      expect(find.text('Recent decks'), findsOneWidget);
+      expect(find.text('Pick up where you left off'), findsOneWidget);
       expect(find.text('Grammar'), findsOneWidget);
     },
   );
@@ -522,32 +401,6 @@ Future<void> _scrollDashboardToDeckHighlights(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-void _expectPrimaryButtonEnabled(
-  WidgetTester tester, {
-  required Key key,
-  required bool isEnabled,
-}) {
-  final finder = find.descendant(
-    of: find.byKey(key),
-    matching: find.byType(ElevatedButton),
-  );
-  final button = tester.widget<ElevatedButton>(finder);
-  expect(button.onPressed, isEnabled ? isNotNull : isNull);
-}
-
-void _expectSecondaryButtonEnabled(
-  WidgetTester tester, {
-  required Key key,
-  required bool isEnabled,
-}) {
-  final finder = find.descendant(
-    of: find.byKey(key),
-    matching: find.byType(OutlinedButton),
-  );
-  final button = tester.widget<OutlinedButton>(finder);
-  expect(button.onPressed, isEnabled ? isNotNull : isNull);
-}
-
 void _expectPrimaryButtonSurface(Key key) {
   expect(
     find.descendant(of: find.byKey(key), matching: find.byType(ElevatedButton)),
@@ -555,17 +408,6 @@ void _expectPrimaryButtonSurface(Key key) {
   );
   expect(
     find.descendant(of: find.byKey(key), matching: find.byType(OutlinedButton)),
-    findsNothing,
-  );
-}
-
-void _expectSecondaryButtonSurface(Key key) {
-  expect(
-    find.descendant(of: find.byKey(key), matching: find.byType(OutlinedButton)),
-    findsOneWidget,
-  );
-  expect(
-    find.descendant(of: find.byKey(key), matching: find.byType(ElevatedButton)),
     findsNothing,
   );
 }
@@ -654,32 +496,6 @@ const _studyReadyDashboardState = DashboardOverviewState(
   cardCount: 20,
   masteryPercent: 30,
   resumeSessionId: 'session-001',
-  deckHighlights: <DashboardDeckHighlightItem>[],
-);
-
-const _multipleSessionsDashboardState = DashboardOverviewState(
-  overdueCount: 3,
-  dueTodayCount: 2,
-  newCardCount: 7,
-  activeSessionCount: 2,
-  folderCount: 2,
-  deckCount: 3,
-  cardCount: 20,
-  masteryPercent: 30,
-  resumeSessionId: null,
-  deckHighlights: <DashboardDeckHighlightItem>[],
-);
-
-const _newCardsOnlyDashboardState = DashboardOverviewState(
-  overdueCount: 0,
-  dueTodayCount: 0,
-  newCardCount: 7,
-  activeSessionCount: 0,
-  folderCount: 2,
-  deckCount: 3,
-  cardCount: 20,
-  masteryPercent: 30,
-  resumeSessionId: null,
   deckHighlights: <DashboardDeckHighlightItem>[],
 );
 

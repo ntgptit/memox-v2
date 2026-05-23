@@ -116,7 +116,10 @@ class AppLocalizationsVi extends AppLocalizations {
       'Phần nền cho Cài đặt chưa được nối xong.';
 
   @override
-  String get dashboardGreetingTitle => 'Xin chào 👋';
+  String get dashboardTodayLabel => 'Hôm nay';
+
+  @override
+  String get dashboardGreetingTitle => 'Chào buổi tối, learner';
 
   @override
   String get dashboardGreetingSubtitle => 'Sẵn sàng học hôm nay chưa?';
@@ -156,6 +159,25 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get dashboardReviewNowAction => 'Ôn';
+
+  @override
+  String get dashboardDueNowLabel => 'Đến hạn';
+
+  @override
+  String dashboardDueNowSummary(int cardCount, int deckCount) {
+    return '$cardCount thẻ trong $deckCount bộ thẻ';
+  }
+
+  @override
+  String dashboardReviewTimeEstimate(int minutes) {
+    return 'Khoảng $minutes phút';
+  }
+
+  @override
+  String get dashboardStartReviewAction => 'Bắt đầu ôn';
+
+  @override
+  String get dashboardAllCaughtUpTitle => 'Đã xong hôm nay';
 
   @override
   String get dashboardNewStudyTitle => 'Học mới';
@@ -233,6 +255,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dashboardMasteryLabel => 'Thành thạo';
 
   @override
+  String dashboardStreakDays(int count) {
+    return '$count ngày';
+  }
+
+  @override
+  String dashboardMasteredCards(int count) {
+    return '$count thẻ';
+  }
+
+  @override
   String get dashboardDueTodayTitle => 'Đến hạn hôm nay';
 
   @override
@@ -270,11 +302,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dashboardRecentDecksTitle => 'Deck gần đây';
 
   @override
+  String get dashboardPickUpTitle => 'Tiếp tục từ nơi bạn dừng lại';
+
+  @override
   String get dashboardStartDeckTitle => 'Bắt đầu với deck';
 
   @override
   String dashboardDeckStats(int cardCount) {
     return '$cardCount thẻ';
+  }
+
+  @override
+  String dashboardDeckDueSummary(int dueCount, int cardCount) {
+    return '$dueCount đến hạn · $cardCount thẻ';
+  }
+
+  @override
+  String dashboardDeckCaughtUpSummary(int cardCount) {
+    return 'Đã xong hôm nay · $cardCount thẻ';
   }
 
   @override

@@ -8,6 +8,7 @@ Test file: `test/presentation/shared/shared_primitives_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT1 | action sheet item has label and subtitle text | `MxActionSheetList` contains one item with label `New deck` and subtitle `Create cards in this folder` | action sheet list renders | label uses `MxTextRole.actionSheetItem` and subtitle uses `MxTextRole.actionSheetSubtitle` | C0+C1 |
 | DT2 | toolbar icon button is used for app bar actions | `MxIconButton.toolbar` is built with tooltip `Back` and a non-null callback | toolbar icon button renders | background resolves fully transparent, border side is none, fixed size is the Material minimum touch target, and tooltip semantics remain visible | C0+C1 |
+| DT3 | Home shared card composition is requested | `MxDueSummaryCard` renders a queue summary with a primary action and `MxStatCard` renders a streak metric | widgets render under `AppTheme.light()` | due summary card, soft icon tile, action label, stat card, and metric value are visible | C0+C1 |
 
 ## Decision table: onSelect
 
@@ -19,6 +20,7 @@ Test file: `test/presentation/shared/shared_primitives_test.dart`
 | DT4 | bulk action bar has label, subtitle, secondary action, and primary action | action bar label is `3 selected` and actions mutate `moveTapped` and `archiveTapped` | user taps `Move` and `Archive` | label and subtitle are visible, and both callbacks are called | C0+C1 |
 | DT5 | term row is selected and has a tap callback | row has term `Hello`, definition `Xin chao`, caption `2 examples`, and selected state true | user taps the term text | row text and selected icon are visible, and tap callback is called | C0+C1 |
 | DT6 | compact segmented control should keep three short options inline while inheriting theme colors | `MxSegmentedControl` has `density: compact`, three short options, width `320`, and selected value `{1}` | user taps `Text` | `SegmentedButton<int>` is used instead of radio fallback, control height stays in the compact theme range, selected value becomes `{3}`, and selected background resolves from the common segmented theme | C0+C1 |
+| DT7 | pickup row has deck title, due summary, and tap callback | `MxPickupTile` renders `Biology essentials`, due summary text, soft primary icon tone, and a non-null `onTap` | user taps the deck title | both text lines are visible and the callback is called once | C0+C1 |
 
 ## Decision table: onSearchFilterSort
 

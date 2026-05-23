@@ -21,9 +21,9 @@ class MxStudyProgressAction extends StatelessWidget {
   // guard:raw-size-reviewed compact trailing action — smaller pill so deck
   // rows stay balanced on phone widths; still leaves room for `100%` + badge.
   static const double _pillWidth = 72;
-  static const double _pillHeight = 36;
+  static const double _pillHeight = kMinInteractiveDimension;
   static const double _stackWidth = 80;
-  static const double _stackHeight = 44;
+  static const double _stackHeight = 56;
   static const double _strokeWidth = 2.5;
   static const double _badgeWidthFloor = 20;
   static const double _badgeHeight = 16;

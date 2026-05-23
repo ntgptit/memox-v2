@@ -29,7 +29,7 @@ import '../component_themes/tooltip_theme.dart';
 const ColorScheme _darkScheme = ColorScheme(
   brightness: Brightness.dark,
   primary: AppColors.darkPrimary80,
-  onPrimary: AppColors.darkPrimary20,
+  onPrimary: AppColors.darkOnPrimary,
   primaryContainer: AppColors.darkPrimary30,
   onPrimaryContainer: AppColors.darkPrimary90,
   secondary: AppColors.darkSecondary80,
@@ -52,7 +52,7 @@ const ColorScheme _darkScheme = ColorScheme(
   surfaceContainer: AppColors.darkNavy20,
   surfaceContainerHigh: AppColors.darkNavy25,
   surfaceContainerHighest: AppColors.darkNavy30,
-  surfaceDim: AppColors.darkNavy5,
+  surfaceDim: AppColors.darkNavyDim,
   surfaceBright: AppColors.darkNavy40,
   inverseSurface: AppColors.darkNeutral90,
   onInverseSurface: AppColors.darkNavy20,

@@ -38,14 +38,18 @@ import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_chip.dart';
+import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_divider.dart';
+import 'package:memox/presentation/shared/widgets/mx_due_summary_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_fab.dart';
 import 'package:memox/presentation/shared/widgets/mx_flashcard.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_inline_toggle.dart';
 import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_page_dots.dart';
+import 'package:memox/presentation/shared/widgets/mx_pickup_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_indicator.dart';
@@ -61,6 +65,7 @@ import 'package:memox/presentation/shared/widgets/mx_shake_transition.dart';
 import 'package:memox/presentation/shared/widgets/mx_slider.dart';
 import 'package:memox/presentation/shared/widgets/mx_sort_menu_chip.dart';
 import 'package:memox/presentation/shared/widgets/mx_speak_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_stat_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_streak_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_progress_action.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
@@ -594,7 +599,7 @@ void main() {
       );
       final skeletonDecoration = skeleton.decoration! as BoxDecoration;
 
-      expect(card.color, scheme.surfaceContainerLow);
+      expect(card.color, scheme.surfaceContainerLowest);
       expect(card.elevation, AppElevation.card);
       expect(shape.borderRadius, AppRadius.card);
       expect(shape.side.color, scheme.outlineVariant);
@@ -1530,7 +1535,12 @@ void main() {
       final card = _materialCard(tester, key);
       final shape = _cardShape(card);
 
-      expect(card.color, scheme.surfaceContainerLow, reason: entry.name);
+      final expectedColor = switch (entry.variant) {
+        MxCardVariant.elevated => scheme.surfaceContainerLow,
+        MxCardVariant.filled ||
+        MxCardVariant.outlined => scheme.surfaceContainerLowest,
+      };
+      expect(card.color, expectedColor, reason: entry.name);
       expect(card.elevation, entry.elevation, reason: entry.name);
       expect(shape.borderRadius, AppRadius.card, reason: entry.name);
       if (entry.variant == MxCardVariant.outlined) {
@@ -4277,6 +4287,7 @@ const Set<String> _widgetsRequiringInteractionCoverage = {
   'MxNameDialog',
   'MxOfflineState',
   'MxPageDots',
+  'MxPickupTile',
   'MxPrimaryButton',
   'MxReorderableList',
   'MxSearchField',
@@ -5215,6 +5226,37 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
     ),
   ),
   _SharedWidgetCase(
+    name: 'MxDeckCard',
+    minimal: (key) =>
+        MxDeckCard(key: key, title: 'Vocabulary', icon: Icons.style_outlined),
+    full: (key) => MxDeckCard(
+      key: key,
+      title: 'Biology essentials',
+      icon: Icons.science_outlined,
+      metaLine: '48 cards',
+      masteryPercent: 72,
+      onTap: () {},
+      onLongPress: () {},
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxDueSummaryCard',
+    minimal: (key) => MxDueSummaryCard(
+      key: key,
+      label: 'Due now',
+      title: '12 cards',
+      message: 'About 4 minutes',
+      action: const SizedBox.shrink(),
+    ),
+    full: (key) => MxDueSummaryCard(
+      key: key,
+      label: 'Review queue',
+      title: '12 cards across 3 decks',
+      message: 'Start with what is most likely to fade.',
+      action: MxPrimaryButton(label: 'Start review', onPressed: () {}),
+    ),
+  ),
+  _SharedWidgetCase(
     name: 'MxChip',
     minimal: (key) => MxChip(key: key, label: 'Chip'),
     full: (key) => MxChip(
@@ -5286,6 +5328,15 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
     ),
   ),
   _SharedWidgetCase(
+    name: 'MxIconTile',
+    minimal: (key) => MxIconTile(key: key, icon: Icons.school_outlined),
+    full: (key) => MxIconTile(
+      key: key,
+      icon: Icons.school_outlined,
+      tone: MxIconTileTone.primarySoft,
+    ),
+  ),
+  _SharedWidgetCase(
     name: 'MxInlineToggle',
     minimal: (key) => MxInlineToggle(
       key: key,
@@ -5322,6 +5373,24 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
     minimal: (key) => MxPageDots(key: key, count: 0, activeIndex: 0),
     full: (key) =>
         MxPageDots(key: key, count: 3, activeIndex: 1, onDotTap: (_) {}),
+  ),
+  _SharedWidgetCase(
+    name: 'MxPickupTile',
+    minimal: (key) =>
+        MxPickupTile(key: key, title: 'Biology', subtitle: '12 due today'),
+    full: (key) => MxPickupTile(
+      key: key,
+      title: 'Biology essentials',
+      subtitle: '12 due today out of 48 cards',
+      leadingTone: MxIconTileTone.primarySoft,
+      trailing: MxStudyProgressAction(
+        masteryPercent: 72,
+        badgeCount: 12,
+        tooltip: 'Study',
+        onPressed: () {},
+      ),
+      onTap: () {},
+    ),
   ),
   _SharedWidgetCase(
     name: 'MxPrimaryButton',
@@ -5561,6 +5630,17 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       tooltip: 'Stop',
       isSpeaking: true,
       onPressed: () {},
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxStatCard',
+    minimal: (key) => MxStatCard(key: key, label: 'Mastered', value: '12'),
+    full: (key) => MxStatCard(
+      key: key,
+      label: 'Streak',
+      value: '3 days',
+      icon: Icons.local_fire_department_outlined,
+      tone: MxStatTone.streak,
     ),
   ),
   _SharedWidgetCase(
@@ -5862,6 +5942,15 @@ final List<_InteractionCase> _tapCallbackCases = [
       count: 3,
       activeIndex: 0,
       onDotTap: (_) => onAction(),
+    ),
+  ),
+  _InteractionCase(
+    'MxPickupTile',
+    (key, onAction) => MxPickupTile(
+      key: key,
+      title: 'Deck',
+      subtitle: '12 due today',
+      onTap: onAction,
     ),
   ),
   _InteractionCase(

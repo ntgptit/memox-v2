@@ -83,7 +83,7 @@ abstract final class AppLayout {
   /// sit beside title/meta content without starving the text column. Sized so
   /// the 98 px progress pill plus a 40 px leading icon and ~180 px title column
   /// stay inline on standard phone widths (360–430).
-  static const double _studySetTileInlineTrailingWidthFloor = 320;
+  static const double _studySetTileInlineTrailingWidthFloor = 400;
 
   /// guard:raw-size-reviewed local width where section actions should move
   /// under the heading so compact/mobile copy keeps a readable line length.

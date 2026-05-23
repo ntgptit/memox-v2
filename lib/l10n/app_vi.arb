@@ -41,7 +41,8 @@
   "appShellHomePlaceholderDescription": "Phần nền cho Trang chủ chưa được nối xong.",
   "appShellProgressPlaceholderDescription": "Phần nền cho Tiến độ chưa được nối xong.",
   "appShellSettingsPlaceholderDescription": "Phần nền cho Cài đặt chưa được nối xong.",
-  "dashboardGreetingTitle": "Xin chào 👋",
+  "dashboardTodayLabel": "Hôm nay",
+  "dashboardGreetingTitle": "Chào buổi tối, learner",
   "dashboardGreetingSubtitle": "Sẵn sàng học hôm nay chưa?",
   "dashboardHeading": "Trọng tâm học hôm nay",
   "dashboardSubtitle": "Ôn bài, học thẻ mới hoặc tiếp tục phiên.",
@@ -65,6 +66,28 @@
     }
   },
   "dashboardReviewNowAction": "Ôn",
+  "dashboardDueNowLabel": "Đến hạn",
+  "dashboardDueNowSummary": "{cardCount} thẻ trong {deckCount} bộ thẻ",
+  "@dashboardDueNowSummary": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "deckCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardReviewTimeEstimate": "Khoảng {minutes} phút",
+  "@dashboardReviewTimeEstimate": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardStartReviewAction": "Bắt đầu ôn",
+  "dashboardAllCaughtUpTitle": "Đã xong hôm nay",
   "dashboardNewStudyTitle": "Học mới",
   "dashboardNewCardsLabel": "Thẻ mới có thể học",
   "dashboardNewStudyMessage": "{count} thẻ mới đã sẵn sàng.",
@@ -121,6 +144,22 @@
     }
   },
   "dashboardMasteryLabel": "Thành thạo",
+  "dashboardStreakDays": "{count} ngày",
+  "@dashboardStreakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardMasteredCards": "{count} thẻ",
+  "@dashboardMasteredCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboardDueTodayTitle": "Đến hạn hôm nay",
   "dashboardDueTodayMessage": "{count} thẻ sẵn sàng để ôn",
   "@dashboardDueTodayMessage": {
@@ -155,9 +194,29 @@
     }
   },
   "dashboardRecentDecksTitle": "Deck gần đây",
+  "dashboardPickUpTitle": "Tiếp tục từ nơi bạn dừng lại",
   "dashboardStartDeckTitle": "Bắt đầu với deck",
   "dashboardDeckStats": "{cardCount} thẻ",
   "@dashboardDeckStats": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDeckDueSummary": "{dueCount} đến hạn · {cardCount} thẻ",
+  "@dashboardDeckDueSummary": {
+    "placeholders": {
+      "dueCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDeckCaughtUpSummary": "Đã xong hôm nay · {cardCount} thẻ",
+  "@dashboardDeckCaughtUpSummary": {
     "placeholders": {
       "cardCount": {
         "type": "int"

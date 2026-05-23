@@ -9,6 +9,9 @@ import 'package:memox/presentation/shared/dialogs/mx_destination_picker_sheet.da
 import 'package:memox/presentation/shared/dialogs/mx_bottom_sheet.dart';
 import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_due_summary_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_tile.dart';
+import 'package:memox/presentation/shared/widgets/mx_pickup_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_reorderable_list.dart';
 import 'package:memox/presentation/shared/widgets/mx_search_sort_toolbar.dart';
@@ -18,6 +21,7 @@ import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_inline_toggle.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:memox/presentation/shared/widgets/mx_speak_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_stat_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_term_row.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/presentation/shared/widgets/mx_text_field.dart';
@@ -89,6 +93,46 @@ void main() {
       expect(fixedSize, const Size.square(kMinInteractiveDimension));
       expect(targetSize.width, greaterThanOrEqualTo(kMinInteractiveDimension));
       expect(targetSize.height, greaterThanOrEqualTo(kMinInteractiveDimension));
+    },
+  );
+
+  testWidgets(
+    'DT3 onDisplay: Home shared cards render design-system composition',
+    (tester) async {
+      await tester.pumpWidget(
+        _TestApp(
+          child: Theme(
+            data: AppTheme.light(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MxDueSummaryCard(
+                  label: 'Due now',
+                  title: '12 cards across 3 decks',
+                  message: 'About 4 minutes',
+                  action: MxPrimaryButton(
+                    label: 'Start review',
+                    onPressed: () {},
+                  ),
+                ),
+                const MxStatCard(
+                  label: 'Streak',
+                  value: '3 days',
+                  icon: Icons.local_fire_department_outlined,
+                  tone: MxStatTone.streak,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(MxDueSummaryCard), findsOneWidget);
+      expect(find.byType(MxIconTile), findsOneWidget);
+      expect(find.text('12 cards across 3 decks'), findsOneWidget);
+      expect(find.text('Start review'), findsOneWidget);
+      expect(find.byType(MxStatCard), findsOneWidget);
+      expect(find.text('3 days'), findsOneWidget);
     },
   );
 
@@ -566,6 +610,34 @@ void main() {
       );
     },
   );
+
+  testWidgets('DT7 onSelect: MxPickupTile opens its target row', (
+    tester,
+  ) async {
+    var tapped = false;
+
+    await tester.pumpWidget(
+      _TestApp(
+        child: Theme(
+          data: AppTheme.light(),
+          child: MxPickupTile(
+            title: 'Biology essentials',
+            subtitle: '12 due today out of 48 cards',
+            leadingTone: MxIconTileTone.primarySoft,
+            onTap: () => tapped = true,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Biology essentials'), findsOneWidget);
+    expect(find.text('12 due today out of 48 cards'), findsOneWidget);
+
+    await tester.tap(find.text('Biology essentials'));
+    await tester.pump();
+
+    expect(tapped, isTrue);
+  });
 
   testWidgets(
     'DT3 onSelect: MxSearchSortToolbar renders selected sort button with icon',

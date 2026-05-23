@@ -41,7 +41,8 @@
   "appShellHomePlaceholderDescription": "Home dashboard foundation is not wired yet.",
   "appShellProgressPlaceholderDescription": "Progress foundation is not wired yet.",
   "appShellSettingsPlaceholderDescription": "Settings foundation is not wired yet.",
-  "dashboardGreetingTitle": "Hello 👋",
+  "dashboardTodayLabel": "Today",
+  "dashboardGreetingTitle": "Good evening, learner",
   "dashboardGreetingSubtitle": "Ready to study today?",
   "dashboardHeading": "Today's study focus",
   "dashboardSubtitle": "Review, study new cards, or continue a session.",
@@ -65,6 +66,28 @@
     }
   },
   "dashboardReviewNowAction": "Review",
+  "dashboardDueNowLabel": "Due now",
+  "dashboardDueNowSummary": "{cardCount, plural, =1{1 card} other{{cardCount} cards}} across {deckCount, plural, =1{1 deck} other{{deckCount} decks}}",
+  "@dashboardDueNowSummary": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "deckCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardReviewTimeEstimate": "About {minutes, plural, =1{1 minute} other{{minutes} minutes}}",
+  "@dashboardReviewTimeEstimate": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardStartReviewAction": "Start review",
+  "dashboardAllCaughtUpTitle": "All caught up",
   "dashboardNewStudyTitle": "New Study",
   "dashboardNewCardsLabel": "New cards available",
   "dashboardNewStudyMessage": "{count} new cards are ready.",
@@ -121,6 +144,22 @@
     }
   },
   "dashboardMasteryLabel": "Mastery",
+  "dashboardStreakDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@dashboardStreakDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardMasteredCards": "{count, plural, =1{1 card} other{{count} cards}}",
+  "@dashboardMasteredCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboardDueTodayTitle": "Due today",
   "dashboardDueTodayMessage": "{count} cards ready to review",
   "@dashboardDueTodayMessage": {
@@ -155,9 +194,29 @@
     }
   },
   "dashboardRecentDecksTitle": "Recent decks",
+  "dashboardPickUpTitle": "Pick up where you left off",
   "dashboardStartDeckTitle": "Start a deck",
   "dashboardDeckStats": "{cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}",
   "@dashboardDeckStats": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDeckDueSummary": "{dueCount, plural, =1{1 due} other{{dueCount} due}} · {cardCount, plural, =1{1 card} other{{cardCount} cards}}",
+  "@dashboardDeckDueSummary": {
+    "placeholders": {
+      "dueCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDeckCaughtUpSummary": "All caught up · {cardCount, plural, =1{1 card} other{{cardCount} cards}}",
+  "@dashboardDeckCaughtUpSummary": {
     "placeholders": {
       "cardCount": {
         "type": "int"

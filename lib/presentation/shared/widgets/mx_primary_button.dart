@@ -167,7 +167,7 @@ class MxPrimaryButton extends StatelessWidget {
                 minimumSize: WidgetStatePropertyAll(Size(0, 48)),
                 padding: WidgetStatePropertyAll(
                   EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
+                    horizontal: AppSpacing.md,
                     vertical: AppSpacing.md,
                   ),
                 ),

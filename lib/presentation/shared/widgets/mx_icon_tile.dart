@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 
 /// Tonal accent tier for an [MxIconTile].
 ///
 /// Maps to a `(background, foreground)` pair from the active [ColorScheme]
 /// so feature widgets choose a *role*, not a raw color.
-enum MxIconTileTone { neutral, primary, disabled }
+enum MxIconTileTone { neutral, primary, primarySoft, disabled }
 
 /// Rounded-square icon container used as the leading affordance on
 /// dashboard action cards, list rows, and quick-link tiles.
@@ -60,6 +61,10 @@ class MxIconTile extends StatelessWidget {
         scheme.onSurfaceVariant,
       ),
       MxIconTileTone.primary => (scheme.primary, scheme.onPrimary),
+      MxIconTileTone.primarySoft => (
+        scheme.primary.withValues(alpha: AppOpacity.disabledSurface),
+        scheme.primary,
+      ),
       MxIconTileTone.disabled => (
         scheme.surfaceContainerHighest,
         context.mxOnSurfaceDisabled,

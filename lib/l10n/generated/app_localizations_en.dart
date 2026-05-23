@@ -116,7 +116,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Settings foundation is not wired yet.';
 
   @override
-  String get dashboardGreetingTitle => 'Hello 👋';
+  String get dashboardTodayLabel => 'Today';
+
+  @override
+  String get dashboardGreetingTitle => 'Good evening, learner';
 
   @override
   String get dashboardGreetingSubtitle => 'Ready to study today?';
@@ -157,6 +160,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardReviewNowAction => 'Review';
+
+  @override
+  String get dashboardDueNowLabel => 'Due now';
+
+  @override
+  String dashboardDueNowSummary(int cardCount, int deckCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      deckCount,
+      locale: localeName,
+      other: '$deckCount decks',
+      one: '1 deck',
+    );
+    return '$_temp0 across $_temp1';
+  }
+
+  @override
+  String dashboardReviewTimeEstimate(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes',
+      one: '1 minute',
+    );
+    return 'About $_temp0';
+  }
+
+  @override
+  String get dashboardStartReviewAction => 'Start review';
+
+  @override
+  String get dashboardAllCaughtUpTitle => 'All caught up';
 
   @override
   String get dashboardNewStudyTitle => 'New Study';
@@ -255,6 +295,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardMasteryLabel => 'Mastery';
 
   @override
+  String dashboardStreakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dashboardMasteredCards(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get dashboardDueTodayTitle => 'Due today';
 
   @override
@@ -292,6 +354,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardRecentDecksTitle => 'Recent decks';
 
   @override
+  String get dashboardPickUpTitle => 'Pick up where you left off';
+
+  @override
   String get dashboardStartDeckTitle => 'Start a deck';
 
   @override
@@ -304,6 +369,34 @@ class AppLocalizationsEn extends AppLocalizations {
       zero: '0 cards',
     );
     return '$_temp0';
+  }
+
+  @override
+  String dashboardDeckDueSummary(int dueCount, int cardCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dueCount,
+      locale: localeName,
+      other: '$dueCount due',
+      one: '1 due',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String dashboardDeckCaughtUpSummary(int cardCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+    );
+    return 'All caught up · $_temp0';
   }
 
   @override

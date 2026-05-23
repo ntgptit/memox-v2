@@ -2,162 +2,82 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
-import '../../../shared/widgets/mx_button_size.dart';
-import '../../../shared/widgets/mx_progress_ring.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
+import '../../../shared/widgets/mx_stat_card.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
 
 const _dashboardPercentMax = 100;
+const _dashboardPlaceholderStreakDays = 0;
 
-class DashboardLibraryProgressCard extends StatelessWidget {
-  const DashboardLibraryProgressCard({required this.state, super.key});
-
-  final DashboardOverviewState state;
-
-  @override
-  Widget build(BuildContext context) {
-    final masteryPercent = state.masteryPercent
-        .clamp(0, _dashboardPercentMax)
-        .toInt();
-    final chartGap = context.isCompactMobile ? MxSpace.lg : MxSpace.xl;
-
-    return MxCard(
-      key: const ValueKey('dashboard_library_progress_card'),
-      variant: MxCardVariant.outlined,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _DashboardMasteryChart(percent: masteryPercent),
-          MxGap(chartGap),
-          Expanded(
-            child: _DashboardLibraryProgressDetails(
-              state: state,
-              percent: masteryPercent,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DashboardMasteryChart extends StatelessWidget {
-  const _DashboardMasteryChart({required this.percent});
-
-  final int percent;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    final progress = percent / _dashboardPercentMax;
-
-    return Semantics(
-      container: true,
-      label: l10n.dashboardLibraryProgressMessage(percent),
-      child: ExcludeSemantics(
-        child: SizedBox.square(
-          dimension: AppLayout.dashboardChartSize(context),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              MxProgressRing(
-                value: progress,
-                size: AppLayout.dashboardChartSize(context),
-                strokeWidth: AppLayout.dashboardChartStrokeWidth(context),
-                showLabel: false,
-                trackColor: scheme.surfaceContainerHighest,
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  MxText(
-                    l10n.commonPercentValue(percent),
-                    role: MxTextRole.sectionTitle,
-                    textAlign: TextAlign.center,
-                  ),
-                  MxText(
-                    l10n.dashboardMasteryLabel,
-                    role: MxTextRole.tileMeta,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DashboardLibraryProgressDetails extends StatelessWidget {
-  const _DashboardLibraryProgressDetails({
-    required this.state,
-    required this.percent,
-  });
+class DashboardHomeStatsSection extends StatelessWidget {
+  const DashboardHomeStatsSection({required this.state, super.key});
 
   final DashboardOverviewState state;
-  final int percent;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
+    final masteredCount =
+        (state.cardCount * state.masteryPercent / _dashboardPercentMax).round();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.query_stats_outlined, color: scheme.primary),
-            const MxGap(MxSpace.md),
-            Expanded(
-              child: MxText(
-                l10n.dashboardLibraryProgressTitle,
-                role: MxTextRole.sectionTitle,
-              ),
-            ),
-          ],
-        ),
-        const MxGap(MxSpace.xs),
-        if (context.showsSupportingCopy) ...[
-          MxText(
-            l10n.dashboardLibraryProgressMessage(percent),
-            role: MxTextRole.contentBody,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+        Expanded(
+          child: MxStatCard(
+            icon: Icons.local_fire_department_outlined,
+            label: AppLocalizations.of(context).sharedStreakLabel,
+            value: AppLocalizations.of(
+              context,
+            ).dashboardStreakDays(_dashboardPlaceholderStreakDays),
+            tone: MxStatTone.streak,
           ),
-          const MxGap(MxSpace.xs),
-        ],
-        MxText(
-          l10n.dashboardLibraryHealthSummary(
-            state.folderCount,
-            state.deckCount,
-            state.cardCount,
-          ),
-          role: MxTextRole.tileMeta,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
         const MxGap(MxSpace.md),
-        MxSecondaryButton(
-          key: const ValueKey('dashboard_open_library_action'),
-          label: l10n.dashboardOpenLibraryAction,
-          leadingIcon: Icons.folder_open_outlined,
-          size: MxButtonSize.small,
-          variant: MxSecondaryVariant.text,
-          onPressed: () => context.goLibrary(),
+        Expanded(
+          child: MxStatCard(
+            label: AppLocalizations.of(context).dashboardMasteryLabel,
+            value: AppLocalizations.of(
+              context,
+            ).dashboardMasteredCards(masteredCount),
+            tone: MxStatTone.mastery,
+          ),
         ),
       ],
+    );
+  }
+}
+
+class DashboardEmptyDeckCard extends StatelessWidget {
+  const DashboardEmptyDeckCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return MxCard(
+      variant: MxCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MxText(l10n.dashboardStartDeckTitle, role: MxTextRole.sectionTitle),
+          const MxGap(MxSpace.sm),
+          MxText(
+            l10n.dashboardNewStudyEmptyMessage,
+            role: MxTextRole.contentBody,
+          ),
+          const MxGap(MxSpace.md),
+          MxSecondaryButton(
+            key: const ValueKey('dashboard_start_new_study_action'),
+            label: l10n.dashboardOpenLibraryAction,
+            leadingIcon: Icons.folder_open_outlined,
+            variant: MxSecondaryVariant.text,
+            onPressed: () => context.goLibrary(),
+          ),
+        ],
+      ),
     );
   }
 }

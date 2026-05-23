@@ -302,10 +302,16 @@ abstract class AppLocalizations {
   /// **'Settings foundation is not wired yet.'**
   String get appShellSettingsPlaceholderDescription;
 
+  /// No description provided for @dashboardTodayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get dashboardTodayLabel;
+
   /// No description provided for @dashboardGreetingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Hello 👋'**
+  /// **'Good evening, learner'**
   String get dashboardGreetingTitle;
 
   /// No description provided for @dashboardGreetingSubtitle.
@@ -361,6 +367,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Review'**
   String get dashboardReviewNowAction;
+
+  /// No description provided for @dashboardDueNowLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Due now'**
+  String get dashboardDueNowLabel;
+
+  /// No description provided for @dashboardDueNowSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{cardCount, plural, =1{1 card} other{{cardCount} cards}} across {deckCount, plural, =1{1 deck} other{{deckCount} decks}}'**
+  String dashboardDueNowSummary(int cardCount, int deckCount);
+
+  /// No description provided for @dashboardReviewTimeEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'About {minutes, plural, =1{1 minute} other{{minutes} minutes}}'**
+  String dashboardReviewTimeEstimate(int minutes);
+
+  /// No description provided for @dashboardStartReviewAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start review'**
+  String get dashboardStartReviewAction;
+
+  /// No description provided for @dashboardAllCaughtUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up'**
+  String get dashboardAllCaughtUpTitle;
 
   /// No description provided for @dashboardNewStudyTitle.
   ///
@@ -456,6 +492,18 @@ abstract class AppLocalizations {
   /// **'Mastery'**
   String get dashboardMasteryLabel;
 
+  /// No description provided for @dashboardStreakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String dashboardStreakDays(int count);
+
+  /// No description provided for @dashboardMasteredCards.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card} other{{count} cards}}'**
+  String dashboardMasteredCards(int count);
+
   /// No description provided for @dashboardDueTodayTitle.
   ///
   /// In en, this message translates to:
@@ -516,6 +564,12 @@ abstract class AppLocalizations {
   /// **'Recent decks'**
   String get dashboardRecentDecksTitle;
 
+  /// No description provided for @dashboardPickUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick up where you left off'**
+  String get dashboardPickUpTitle;
+
   /// No description provided for @dashboardStartDeckTitle.
   ///
   /// In en, this message translates to:
@@ -527,6 +581,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}'**
   String dashboardDeckStats(int cardCount);
+
+  /// No description provided for @dashboardDeckDueSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{dueCount, plural, =1{1 due} other{{dueCount} due}} · {cardCount, plural, =1{1 card} other{{cardCount} cards}}'**
+  String dashboardDeckDueSummary(int dueCount, int cardCount);
+
+  /// No description provided for @dashboardDeckCaughtUpSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up · {cardCount, plural, =1{1 card} other{{cardCount} cards}}'**
+  String dashboardDeckCaughtUpSummary(int cardCount);
 
   /// No description provided for @progressOverviewHeading.
   ///

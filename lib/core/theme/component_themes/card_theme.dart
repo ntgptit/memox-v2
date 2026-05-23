@@ -6,7 +6,7 @@ import '../tokens/app_radius.dart';
 abstract final class CardThemeBuilder {
   static CardThemeData build(ColorScheme scheme) {
     return CardThemeData(
-      color: scheme.surfaceContainerLow,
+      color: scheme.surfaceContainerLowest,
       shadowColor: scheme.shadow.withValues(
         alpha: scheme.brightness == Brightness.light ? 0.32 : 0.60,
       ),
