@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
@@ -83,25 +84,37 @@ class MxSecondaryButton extends StatelessWidget {
     if (fullWidth) {
       return SizedBox(width: double.infinity, child: button);
     }
-    return IntrinsicWidth(child: button);
+    return button;
   }
 
   Widget _buildLabel() {
-    final labelText = Text(label, overflow: TextOverflow.ellipsis, maxLines: 1);
-    return Row(
-      mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (leadingIcon != null) ...[
-          Icon(leadingIcon, size: AppIconSizes.md),
-          const MxGap(AppSpacing.sm),
-        ],
-        Flexible(child: labelText),
-        if (trailingIcon != null) ...[
-          const MxGap(AppSpacing.sm),
-          Icon(trailingIcon, size: AppIconSizes.md),
-        ],
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final canShowIcons = AppLayout.showsButtonIcons(
+          hasBoundedWidth: constraints.hasBoundedWidth,
+          maxWidth: constraints.maxWidth,
+        );
+        final labelText = Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        );
+        return Row(
+          mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (leadingIcon != null && canShowIcons) ...[
+              Icon(leadingIcon, size: AppIconSizes.md),
+              const MxGap(AppSpacing.sm),
+            ],
+            Flexible(child: labelText),
+            if (trailingIcon != null && canShowIcons) ...[
+              const MxGap(AppSpacing.sm),
+              Icon(trailingIcon, size: AppIconSizes.md),
+            ],
+          ],
+        );
+      },
     );
   }
 
@@ -140,7 +153,7 @@ class MxSecondaryButton extends StatelessWidget {
   ButtonStyle? _mergeButtonStyles(ButtonStyle? base, ButtonStyle? overrides) {
     if (base == null) return overrides;
     if (overrides == null) return base;
-    return base.merge(overrides);
+    return overrides.merge(base);
   }
 
   ButtonStyle? _toneStyle(ThemeData theme, MxColorsExtension mxColors) {

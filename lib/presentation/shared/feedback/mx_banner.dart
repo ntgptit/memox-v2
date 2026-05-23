@@ -114,8 +114,8 @@ class MxBanner extends StatelessWidget {
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(
-                minWidth: AppSpacing.xxxl, // 32
-                minHeight: AppSpacing.xxxl, // 32
+                minWidth: kMinInteractiveDimension,
+                minHeight: kMinInteractiveDimension,
               ),
             ),
         ],

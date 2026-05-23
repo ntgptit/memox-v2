@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
@@ -50,77 +51,49 @@ class MxStudySetTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    final tile = Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: AppIconSizes.xxl, // guard:raw-size-reviewed icon tile token
-            height: AppIconSizes.xxl, // guard:raw-size-reviewed icon tile token
-            decoration: BoxDecoration(
-              color: iconBackground ?? scheme.primaryContainer,
-              borderRadius: AppRadius.borderLg,
-            ),
-            alignment: Alignment.center,
-            child: Icon(
-              icon,
-              size: AppIconSizes.md,
-              color: iconColor ?? scheme.onPrimaryContainer,
-            ),
+    final tile = LayoutBuilder(
+      builder: (context, constraints) {
+        final stackTrailing =
+            trailing != null &&
+            AppLayout.stacksStudySetTileTrailing(
+              hasBoundedWidth: constraints.hasBoundedWidth,
+              maxWidth: constraints.maxWidth,
+            );
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
           ),
-          const MxGap(_contentGap),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MxText(
-                  title,
-                  role: MxTextRole.tileTitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width:
+                    AppIconSizes.xxl, // guard:raw-size-reviewed icon tile token
+                height:
+                    AppIconSizes.xxl, // guard:raw-size-reviewed icon tile token
+                decoration: BoxDecoration(
+                  color: iconBackground ?? scheme.primaryContainer,
+                  borderRadius: AppRadius.borderLg,
                 ),
-                if (metaLine != null) ...[
-                  const MxGap(AppSpacing.xxs),
-                  MxText(
-                    metaLine!,
-                    role: MxTextRole.tileMeta,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-                if (ownerLabel != null) ...[
-                  const MxGap(AppSpacing.sm),
-                  Row(
-                    children: [
-                      MxAvatar(
-                        initials: ownerInitials,
-                        size: MxAvatarSize.sm,
-                        badgeLabel: ownerBadge,
-                      ),
-                      if (ownerBadge == null) ...[
-                        const MxGap(AppSpacing.sm),
-                        Expanded(
-                          child: MxText(
-                            ownerLabel!,
-                            role: MxTextRole.tileMeta,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
+                alignment: Alignment.center,
+                child: Icon(
+                  icon,
+                  size: AppIconSizes.md,
+                  color: iconColor ?? scheme.onPrimaryContainer,
+                ),
+              ),
+              const MxGap(_contentGap),
+              Expanded(child: _buildTextColumn(stackTrailing: stackTrailing)),
+              if (trailing != null && !stackTrailing) ...[
+                const MxGap(AppSpacing.sm),
+                trailing!,
               ],
-            ),
+            ],
           ),
-          if (trailing != null) ...[const MxGap(AppSpacing.sm), trailing!],
-        ],
-      ),
+        );
+      },
     );
 
     return MxTappable(
@@ -130,6 +103,56 @@ class MxStudySetTile extends StatelessWidget {
       backgroundColor: scheme.surfaceContainerLow,
       overlayBaseColor: scheme.primary,
       child: tile,
+    );
+  }
+
+  Widget _buildTextColumn({required bool stackTrailing}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxText(
+          title,
+          role: MxTextRole.tileTitle,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (metaLine != null) ...[
+          const MxGap(AppSpacing.xxs),
+          MxText(
+            metaLine!,
+            role: MxTextRole.tileMeta,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+        if (ownerLabel != null) ...[
+          const MxGap(AppSpacing.sm),
+          Row(
+            children: [
+              MxAvatar(
+                initials: ownerInitials,
+                size: MxAvatarSize.sm,
+                badgeLabel: ownerBadge,
+              ),
+              if (ownerBadge == null) ...[
+                const MxGap(AppSpacing.sm),
+                Expanded(
+                  child: MxText(
+                    ownerLabel!,
+                    role: MxTextRole.tileMeta,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+        if (trailing != null && stackTrailing) ...[
+          const MxGap(AppSpacing.sm),
+          Align(alignment: Alignment.centerRight, child: trailing!),
+        ],
+      ],
     );
   }
 }

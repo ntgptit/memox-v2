@@ -74,6 +74,7 @@ class MxDialog extends StatelessWidget {
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: resolvedMaxWidth),
             child: Dialog(
+              insetPadding: EdgeInsets.zero,
               clipBehavior: Clip.antiAlias,
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.xxl),

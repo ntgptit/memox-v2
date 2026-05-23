@@ -50,6 +50,18 @@ abstract final class AppLayout {
   /// can fit beside folder title and captions without making the row untappable.
   static const double _folderTileTrailingWidthFloor = 280;
 
+  /// guard:raw-size-reviewed row width where a study-set trailing action can
+  /// sit beside title/meta content without starving the text column.
+  static const double _studySetTileInlineTrailingWidthFloor = 400;
+
+  /// guard:raw-size-reviewed local width where section actions should move
+  /// under the heading so compact/mobile copy keeps a readable line length.
+  static const double _sectionActionInlineWidthFloor = 400;
+
+  /// guard:raw-size-reviewed text scale where section actions stack even on a
+  /// wider host because the title needs more vertical room.
+  static const double _sectionActionLargeTextScale = 1.3;
+
   // --- Rail / navigation ----------------------------------------------------
 
   /// Width of the extended navigation rail (drawer-style) on large screens.
@@ -163,6 +175,21 @@ abstract final class AppLayout {
     required bool hasBoundedWidth,
     required double maxWidth,
   }) => !hasBoundedWidth || maxWidth >= _folderTileTrailingWidthFloor;
+
+  /// Whether a study-set trailing action should sit under the text column.
+  static bool stacksStudySetTileTrailing({
+    required bool hasBoundedWidth,
+    required double maxWidth,
+  }) => hasBoundedWidth && maxWidth < _studySetTileInlineTrailingWidthFloor;
+
+  /// Whether a section action should move below its heading on compact hosts.
+  static bool stacksSectionAction({
+    required bool hasBoundedWidth,
+    required double maxWidth,
+    required double textScale,
+  }) =>
+      textScale >= _sectionActionLargeTextScale ||
+      (hasBoundedWidth && maxWidth < _sectionActionInlineWidthFloor);
 }
 
 /// Ergonomics: read layout specs straight off [BuildContext] so feature code

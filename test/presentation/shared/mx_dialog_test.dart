@@ -9,15 +9,25 @@ void main() {
   testWidgets('DT1 onDisplay: compact dialog stays inside viewport', (
     tester,
   ) async {
-    _setSurfaceSize(tester, const Size(360, 640));
+    _setSurfaceSize(tester, const Size(412, 915));
 
+    late double expectedMaxWidth;
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light(),
-        home: const Scaffold(
-          body: MxDialog(
-            title: 'Compact',
-            child: SizedBox(width: 1000, child: Text('Dialog body')),
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              final inset =
+                  Theme.of(context).dialogTheme.insetPadding ?? EdgeInsets.zero;
+              expectedMaxWidth =
+                  MediaQuery.sizeOf(context).width - inset.horizontal;
+
+              return const MxDialog(
+                title: 'Compact',
+                child: SizedBox(width: 1000, child: Text('Dialog body')),
+              );
+            },
           ),
         ),
       ),
@@ -25,7 +35,8 @@ void main() {
 
     final dialogSize = tester.getSize(find.byType(Dialog));
 
-    expect(dialogSize.width, lessThanOrEqualTo(360));
+    expect(dialogSize.width, lessThanOrEqualTo(expectedMaxWidth));
+    expect(dialogSize.width, greaterThanOrEqualTo(expectedMaxWidth - 1));
   });
 
   testWidgets('DT2 onDisplay: wide dialog caps to AppLayout max width', (

@@ -1906,7 +1906,7 @@ void main() {
       inputTheme.contentPadding,
       const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
+        vertical: AppSpacing.lg,
       ),
     );
   });
@@ -2637,7 +2637,7 @@ void main() {
     );
 
     expect(widths, hasLength(3));
-    expect(widths.where((width) => width == AppSpacing.sm), hasLength(1));
+    expect(widths.where((width) => width == AppSpacing.lg), hasLength(1));
     expect(widths.where((width) => width == AppSpacing.xs), hasLength(2));
   });
 
@@ -3079,7 +3079,7 @@ void main() {
       (index) => tester.getSize(dotFinder.at(index)).width,
     );
 
-    expect(widths.where((width) => width == AppSpacing.sm), hasLength(1));
+    expect(widths.where((width) => width == AppSpacing.lg), hasLength(1));
     expect(widths.where((width) => width == AppSpacing.xs), hasLength(2));
   });
 
@@ -3210,6 +3210,31 @@ void main() {
       }
     },
   );
+
+  testWidgets('DT11 onAccessibility: banner dismiss target is tappable', (
+    tester,
+  ) async {
+    const bannerKey = ValueKey('accessibility-banner-target');
+
+    await _pumpLayoutWidget(
+      tester,
+      MxBanner(
+        key: bannerKey,
+        title: 'Offline',
+        message: 'Changes will sync when the connection returns.',
+        onDismiss: _noop,
+      ),
+    );
+
+    final closeButton = find.descendant(
+      of: find.byKey(bannerKey),
+      matching: find.byType(IconButton),
+    );
+    final closeSize = tester.getSize(closeButton);
+
+    expect(closeSize.width, greaterThanOrEqualTo(kMinInteractiveDimension));
+    expect(closeSize.height, greaterThanOrEqualTo(kMinInteractiveDimension));
+  });
 
   testWidgets('DT1 onResponsive: renders important widgets at compact widths', (
     tester,
@@ -3386,6 +3411,196 @@ void main() {
     expect(find.byKey(buttonKey), findsOneWidget);
     expect(find.text('Create folder'), findsWidgets);
   });
+
+  testWidgets(
+    'DT7 onResponsive: 412x915 adaptive shell keeps body above bottom nav',
+    (tester) async {
+      const bodyKey = ValueKey('responsive-412-shell-body');
+
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(412, 915);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        _AppHarness(
+          host: _WidgetHost.home,
+          scrollableHost: false,
+          themeMode: ThemeMode.light,
+          textScaleFactor: 1,
+          surfaceSize: const Size(412, 915),
+          child: MxAdaptiveScaffold(
+            title: 'Home',
+            constrainBody: false,
+            selectedIndex: 0,
+            onDestinationSelected: (_) {},
+            floatingActionButton: const MxFab(
+              icon: Icons.add,
+              tooltip: 'Create',
+              onPressed: _noop,
+            ),
+            destinations: const [
+              MxAdaptiveDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              MxAdaptiveDestination(
+                icon: Icon(Icons.folder_outlined),
+                selectedIcon: Icon(Icons.folder),
+                label: 'Library',
+              ),
+              MxAdaptiveDestination(
+                icon: Icon(Icons.show_chart_outlined),
+                selectedIcon: Icon(Icons.show_chart),
+                label: 'Progress',
+              ),
+              MxAdaptiveDestination(
+                icon: Icon(Icons.settings_outlined),
+                selectedIcon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            ],
+            body: const SizedBox.expand(
+              key: bodyKey,
+              child: ColoredBox(color: Colors.transparent),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(NavigationBar), findsOneWidget);
+
+      final bodyBottom = tester.getBottomLeft(find.byKey(bodyKey)).dy;
+      final navTop = tester.getTopLeft(find.byType(NavigationBar)).dy;
+
+      expect(bodyBottom, lessThanOrEqualTo(navTop));
+    },
+  );
+
+  testWidgets(
+    'DT8 onResponsive: stacks study set trailing action on compact width',
+    (tester) async {
+      const tileKey = ValueKey('responsive-study-set-stacked');
+      const trailingKey = ValueKey('responsive-study-set-trailing');
+      const title = 'Long deck title that needs priority space';
+      const metaLine = '120 cards due today';
+
+      await _pumpLayoutWidget(
+        tester,
+        const MxStudySetTile(
+          key: tileKey,
+          title: title,
+          icon: Icons.style_outlined,
+          metaLine: metaLine,
+          trailing: MxStudyProgressAction(
+            key: trailingKey,
+            masteryPercent: 88,
+            badgeCount: 12,
+            tooltip: 'Study',
+            onPressed: _noop,
+          ),
+        ),
+        scenario: const _RenderScenario(
+          label: 'responsive-study-set-stacked',
+          surfaceSize: Size(412, 915),
+        ),
+        maxWidth: 380,
+      );
+
+      final metaBottom = tester.getBottomLeft(find.text(metaLine)).dy;
+      final trailingTop = tester.getTopLeft(find.byKey(trailingKey)).dy;
+
+      expect(find.byKey(tileKey), findsOneWidget);
+      expect(find.byKey(trailingKey), findsOneWidget);
+      expect(trailingTop, greaterThan(metaBottom));
+    },
+  );
+
+  testWidgets(
+    'DT9 onResponsive: secondary button hides icons when constrained',
+    (tester) async {
+      const buttonKey = ValueKey('responsive-secondary-constrained');
+
+      await _pumpLayoutWidget(
+        tester,
+        MxSecondaryButton(
+          key: buttonKey,
+          label: 'Create',
+          leadingIcon: Icons.add,
+          onPressed: _noop,
+        ),
+        scenario: const _RenderScenario(
+          label: 'responsive-secondary-constrained',
+          surfaceSize: Size(412, 915),
+        ),
+        maxWidth: 64, // guard:raw-size-reviewed compact button fixture width
+      );
+
+      expect(find.byKey(buttonKey), findsOneWidget);
+      expect(find.text('Create'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(buttonKey),
+          matching: find.byIcon(Icons.add),
+        ),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
+    'DT10 onResponsive: section actions stack under compact headings',
+    (tester) async {
+      const headerTitle = 'Decks that need attention';
+      const headerAction = 'View all decks';
+      const sectionTitle = 'Recent activity';
+      const sectionActionKey = ValueKey('responsive-section-action');
+
+      await _pumpLayoutWidget(
+        tester,
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MxSectionHeader(
+              title: headerTitle,
+              actionLabel: headerAction,
+              onAction: _noop,
+            ),
+            const MxGap(AppSpacing.lg),
+            MxSection(
+              title: sectionTitle,
+              action: TextButton(
+                key: sectionActionKey,
+                onPressed: _noop,
+                child: const Text('Open activity'),
+              ),
+              child: const Text('Section body'),
+            ),
+          ],
+        ),
+        scenario: const _RenderScenario(
+          label: 'responsive-section-actions',
+          surfaceSize: Size(412, 915),
+        ),
+        maxWidth: 380,
+      );
+
+      final headerTitleBottom = tester.getBottomLeft(find.text(headerTitle)).dy;
+      final headerActionTop = tester.getTopLeft(find.text(headerAction)).dy;
+      final sectionTitleBottom = tester
+          .getBottomLeft(find.text(sectionTitle))
+          .dy;
+      final sectionActionTop = tester
+          .getTopLeft(find.byKey(sectionActionKey))
+          .dy;
+
+      expect(headerActionTop, greaterThan(headerTitleBottom));
+      expect(sectionActionTop, greaterThan(sectionTitleBottom));
+    },
+  );
 
   testWidgets(
     'DT1 onGolden: matches normal shared widget golden in light theme',

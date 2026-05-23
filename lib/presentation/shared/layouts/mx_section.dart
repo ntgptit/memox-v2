@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import 'mx_gap.dart';
 import '../widgets/mx_text.dart';
@@ -31,28 +32,62 @@ class MxSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final heading = _SectionHeading(title: title, subtitle: subtitle);
+              if (action == null) return heading;
+
+              final stackAction = AppLayout.stacksSectionAction(
+                hasBoundedWidth: constraints.hasBoundedWidth,
+                maxWidth: constraints.maxWidth,
+                textScale: MediaQuery.textScalerOf(context).scale(1),
+              );
+
+              if (stackAction) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    MxText(title, role: MxTextRole.sectionTitle),
-                    if (subtitle != null) ...[
-                      const MxGap(AppSpacing.xxs),
-                      MxText(subtitle!, role: MxTextRole.sectionSubtitle),
-                    ],
+                    heading,
+                    const MxGap(AppSpacing.xs),
+                    Align(alignment: Alignment.centerLeft, child: action),
                   ],
-                ),
-              ),
-              ?action,
-            ],
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(child: heading),
+                  action!,
+                ],
+              );
+            },
           ),
           MxGap(spacing),
           child,
         ],
       ),
+    );
+  }
+}
+
+class _SectionHeading extends StatelessWidget {
+  const _SectionHeading({required this.title, this.subtitle});
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxText(title, role: MxTextRole.sectionTitle),
+        if (subtitle != null) ...[
+          const MxGap(AppSpacing.xxs),
+          MxText(subtitle!, role: MxTextRole.sectionSubtitle),
+        ],
+      ],
     );
   }
 }

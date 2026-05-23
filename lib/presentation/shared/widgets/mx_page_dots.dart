@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../motion/mx_motion.dart';
 import 'mx_tappable.dart';
@@ -72,9 +73,7 @@ class MxPageDots extends StatelessWidget {
                                   ? BoxShape.rectangle
                                   : BoxShape.circle,
                               borderRadius: isActive
-                                  ? const BorderRadius.all(
-                                      Radius.circular(AppSpacing.xs),
-                                    )
+                                  ? AppRadius.borderXs
                                   : null,
                             ),
                           ),
