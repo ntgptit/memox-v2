@@ -45,8 +45,8 @@ class FlashcardDetailCardRow extends StatelessWidget {
               Expanded(
                 child: MxText(
                   item.front,
-                  role: MxTextRole.listTitle,
-                  maxLines: 3,
+                  role: MxTextRole.tileTitle,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -59,7 +59,7 @@ class FlashcardDetailCardRow extends StatelessWidget {
                     tooltip: l10n.studyCardAudioTooltip,
                     onPressed: onSpeak,
                   ),
-                  const MxGap(MxSpace.md),
+                  const MxGap(MxSpace.xs),
                   MxIconButton.compact(
                     icon: selected
                         ? Icons.star_rounded
@@ -73,11 +73,11 @@ class FlashcardDetailCardRow extends StatelessWidget {
               ),
             ],
           ),
-          const MxGap(MxSpace.md),
+          const MxGap(MxSpace.xs),
           MxText(
             item.back,
-            role: MxTextRole.listSubtitle,
-            maxLines: 5,
+            role: MxTextRole.tileMeta,
+            maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
           if (item.note != null) ...[

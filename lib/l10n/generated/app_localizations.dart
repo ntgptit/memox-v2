@@ -2694,6 +2694,120 @@ abstract class AppLocalizations {
   /// **'Fill'**
   String get studyModeFill;
 
+  /// No description provided for @studyModeReviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Flip cards on SRS schedule'**
+  String get studyModeReviewSubtitle;
+
+  /// No description provided for @studyModeMatchSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair fronts & backs'**
+  String get studyModeMatchSubtitle;
+
+  /// No description provided for @studyModeGuessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Multiple choice A / B / C / D'**
+  String get studyModeGuessSubtitle;
+
+  /// No description provided for @studyModeRecallSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write from memory'**
+  String get studyModeRecallSubtitle;
+
+  /// No description provided for @studyModeFillSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the blank'**
+  String get studyModeFillSubtitle;
+
+  /// No description provided for @studyModeMixTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mix'**
+  String get studyModeMixTitle;
+
+  /// No description provided for @studyModeMixSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All 5 modes, one session'**
+  String get studyModeMixSubtitle;
+
+  /// No description provided for @studyModeMixBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Adaptive'**
+  String get studyModeMixBadge;
+
+  /// No description provided for @studyModeMixSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Review · Match · Guess · Recall · Fill'**
+  String get studyModeMixSummary;
+
+  /// No description provided for @deckBreakdownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Card breakdown'**
+  String get deckBreakdownTitle;
+
+  /// No description provided for @deckBreakdownNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get deckBreakdownNew;
+
+  /// No description provided for @deckBreakdownLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning'**
+  String get deckBreakdownLearning;
+
+  /// No description provided for @deckBreakdownReviewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewing'**
+  String get deckBreakdownReviewing;
+
+  /// No description provided for @deckBreakdownMastered.
+  ///
+  /// In en, this message translates to:
+  /// **'Mastered'**
+  String get deckBreakdownMastered;
+
+  /// No description provided for @libraryDeckDueSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'· {dueCount} due'**
+  String libraryDeckDueSuffix(int dueCount);
+
+  /// No description provided for @libraryDeckAllCaughtUp.
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up'**
+  String get libraryDeckAllCaughtUp;
+
+  /// No description provided for @libraryFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get libraryFilterAll;
+
+  /// No description provided for @deckMasteryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mastery'**
+  String get deckMasteryLabel;
+
+  /// No description provided for @deckMasteryProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{mastered} of {total} cards mastered'**
+  String deckMasteryProgress(int mastered, int total);
+
   /// No description provided for @studyReadyToFinalizeTitle.
   ///
   /// In en, this message translates to:

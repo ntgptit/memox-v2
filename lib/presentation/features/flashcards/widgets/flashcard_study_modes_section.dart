@@ -6,6 +6,7 @@ import '../../../../core/theme/extensions/theme_extensions.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_mode_mix_card.dart';
 import '../../../shared/widgets/mx_section_header.dart';
 import '../../../shared/widgets/mx_text.dart';
 
@@ -20,31 +21,31 @@ class FlashcardStudyModesSection extends StatelessWidget {
     final modes = <_ModeTileData>[
       _ModeTileData(
         label: l10n.studyModeReview,
-        subtitle: l10n.studyStartAction,
+        subtitle: l10n.studyModeReviewSubtitle,
         icon: Icons.style_outlined,
         masteryTone: false,
       ),
       _ModeTileData(
         label: l10n.studyModeMatch,
-        subtitle: l10n.studyModeMatch,
+        subtitle: l10n.studyModeMatchSubtitle,
         icon: Icons.compare_arrows_rounded,
         masteryTone: false,
       ),
       _ModeTileData(
         label: l10n.studyModeGuess,
-        subtitle: l10n.studyModeGuess,
+        subtitle: l10n.studyModeGuessSubtitle,
         icon: Icons.quiz_outlined,
         masteryTone: false,
       ),
       _ModeTileData(
         label: l10n.studyModeRecall,
-        subtitle: l10n.studyModeRecall,
+        subtitle: l10n.studyModeRecallSubtitle,
         icon: Icons.psychology_alt_outlined,
         masteryTone: true,
       ),
       _ModeTileData(
         label: l10n.studyModeFill,
-        subtitle: l10n.studyModeFill,
+        subtitle: l10n.studyModeFillSubtitle,
         icon: Icons.edit_note_rounded,
         masteryTone: true,
       ),
@@ -55,11 +56,25 @@ class FlashcardStudyModesSection extends StatelessWidget {
       children: [
         MxSectionHeader(
           title: l10n.studyFlowTitle,
-          subtitle: context.showsSupportingCopy
-              ? l10n.flashcardsStudyModesTitle
-              : null,
+          style: MxSectionHeaderStyle.overline,
         ),
         const MxGap(MxSpace.md),
+        if (enabled) ...[
+          MxModeMixCard(
+            title: l10n.studyModeMixTitle,
+            subtitle: l10n.studyModeMixSubtitle,
+            badgeLabel: l10n.studyModeMixBadge,
+            modeIcons: const [
+              Icons.style_outlined,
+              Icons.compare_arrows_rounded,
+              Icons.quiz_outlined,
+              Icons.psychology_alt_outlined,
+              Icons.edit_note_rounded,
+            ],
+            modesSummary: l10n.studyModeMixSummary,
+          ),
+          const MxGap(MxSpace.sm),
+        ],
         _StudyModeListCard(modes: modes, enabled: enabled),
         if (!enabled) ...[
           const MxGap(MxSpace.sm),

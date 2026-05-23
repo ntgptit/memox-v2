@@ -799,6 +799,38 @@
   "studyModeGuess": "Guess",
   "studyModeRecall": "Recall",
   "studyModeFill": "Fill",
+  "studyModeReviewSubtitle": "Flip cards on SRS schedule",
+  "studyModeMatchSubtitle": "Pair fronts & backs",
+  "studyModeGuessSubtitle": "Multiple choice A / B / C / D",
+  "studyModeRecallSubtitle": "Write from memory",
+  "studyModeFillSubtitle": "Complete the blank",
+  "studyModeMixTitle": "Mix",
+  "studyModeMixSubtitle": "All 5 modes, one session",
+  "studyModeMixBadge": "Adaptive",
+  "studyModeMixSummary": "Review · Match · Guess · Recall · Fill",
+  "deckBreakdownTitle": "Card breakdown",
+  "deckBreakdownNew": "New",
+  "deckBreakdownLearning": "Learning",
+  "deckBreakdownReviewing": "Reviewing",
+  "deckBreakdownMastered": "Mastered",
+  "libraryDeckDueSuffix": "· {dueCount} due",
+  "@libraryDeckDueSuffix": {
+    "placeholders": {
+      "dueCount": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryDeckAllCaughtUp": "All caught up",
+  "libraryFilterAll": "All",
+  "deckMasteryLabel": "Mastery",
+  "deckMasteryProgress": "{mastered} of {total} cards mastered",
+  "@deckMasteryProgress": {
+    "placeholders": {
+      "mastered": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
   "studyReadyToFinalizeTitle": "Ready to finalize",
   "studyReadyToFinalizeMessage": "All required items are passed. Finalize to commit SRS progress.",
   "studyChooseMatchingAnswer": "Choose the matching answer.",

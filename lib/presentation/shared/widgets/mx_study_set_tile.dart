@@ -129,20 +129,22 @@ class MxStudySetTile extends StatelessWidget {
     ColorScheme scheme,
   ) {
     final mx = context.mxColors;
-    // Tonal palette derived from theme tokens — gives each study set a stable
-    // identity color without ever touching raw RGB. Index picked from the
-    // tile title hash so the same deck always reads with the same tone.
-    final palettes = <_IconTilePalette>[
-      _IconTilePalette(scheme.primaryContainer, scheme.onPrimaryContainer),
-      _IconTilePalette(scheme.secondaryContainer, scheme.onSecondaryContainer),
-      _IconTilePalette(scheme.tertiaryContainer, scheme.onTertiaryContainer),
-      _IconTilePalette(mx.successContainer, mx.onSuccessContainer),
-      _IconTilePalette(mx.warningContainer, mx.onWarningContainer),
-      _IconTilePalette(mx.infoContainer, mx.onInfoContainer),
+    // Brand-color tint pattern shared with [MxDeckCard] / [MxFolderTile] so
+    // every Library row feels like one family of cards.
+    final brandColors = <Color>[
+      scheme.primary,
+      scheme.secondary,
+      scheme.tertiary,
+      mx.success,
+      mx.warning,
+      mx.info,
     ];
     final seed = title.isEmpty ? 0 : title.hashCode;
-    final index = seed.abs() % palettes.length;
-    return palettes[index];
+    final brand = brandColors[seed.abs() % brandColors.length];
+    return _IconTilePalette(
+      brand.withValues(alpha: AppOpacity.disabledSurface),
+      brand,
+    );
   }
 
   Widget _buildTextColumn({required bool stackTrailing}) {

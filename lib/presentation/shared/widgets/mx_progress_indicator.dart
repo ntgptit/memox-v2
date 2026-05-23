@@ -81,6 +81,10 @@ class MxLinearProgress extends StatelessWidget {
           MxProgressSize.large => AppSpacing.sm,
         };
     final progressColor = color ?? context.mxColors.masteryProgress(value);
+    // Design System: linear progress tracks sit on `surfaceContainer`, not
+    // the default mid-tone Material chooses. Keeps the bar legible on both
+    // light surfaces and dark navy cards.
+    final trackColor = scheme.surfaceContainer;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -116,6 +120,7 @@ class MxLinearProgress extends StatelessWidget {
           child: LinearProgressIndicator(
             value: value.clamp(0.0, 1.0),
             color: progressColor,
+            backgroundColor: trackColor,
             minHeight: trackHeight,
           ),
         ),

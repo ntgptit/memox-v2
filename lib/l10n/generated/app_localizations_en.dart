@@ -1633,6 +1633,67 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyModeFill => 'Fill';
 
   @override
+  String get studyModeReviewSubtitle => 'Flip cards on SRS schedule';
+
+  @override
+  String get studyModeMatchSubtitle => 'Pair fronts & backs';
+
+  @override
+  String get studyModeGuessSubtitle => 'Multiple choice A / B / C / D';
+
+  @override
+  String get studyModeRecallSubtitle => 'Write from memory';
+
+  @override
+  String get studyModeFillSubtitle => 'Complete the blank';
+
+  @override
+  String get studyModeMixTitle => 'Mix';
+
+  @override
+  String get studyModeMixSubtitle => 'All 5 modes, one session';
+
+  @override
+  String get studyModeMixBadge => 'Adaptive';
+
+  @override
+  String get studyModeMixSummary => 'Review · Match · Guess · Recall · Fill';
+
+  @override
+  String get deckBreakdownTitle => 'Card breakdown';
+
+  @override
+  String get deckBreakdownNew => 'New';
+
+  @override
+  String get deckBreakdownLearning => 'Learning';
+
+  @override
+  String get deckBreakdownReviewing => 'Reviewing';
+
+  @override
+  String get deckBreakdownMastered => 'Mastered';
+
+  @override
+  String libraryDeckDueSuffix(int dueCount) {
+    return '· $dueCount due';
+  }
+
+  @override
+  String get libraryDeckAllCaughtUp => 'All caught up';
+
+  @override
+  String get libraryFilterAll => 'All';
+
+  @override
+  String get deckMasteryLabel => 'Mastery';
+
+  @override
+  String deckMasteryProgress(int mastered, int total) {
+    return '$mastered of $total cards mastered';
+  }
+
+  @override
   String get studyReadyToFinalizeTitle => 'Ready to finalize';
 
   @override

@@ -98,7 +98,6 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
           ? MxFab(
               icon: Icons.add,
               tooltip: _resolveFabTooltip(l10n, queryData),
-              extendedLabel: _resolveFabTooltip(l10n, queryData),
               onPressed: _isReorderMode
                   ? null
                   : () {

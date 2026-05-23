@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
 import 'mx_card.dart';
 import 'mx_progress_indicator.dart';
 import 'mx_text.dart';
+
+/// How [MxDeckCard] renders its trailing slot.
+///
+/// `chevron` matches the Design System Library row default; `percent` shows
+/// the mastery `%` text for surfaces where a numeric readout is preferred.
+enum MxDeckCardTrailing { chevron, percent, none }
 
 /// Card-form study set surface used inside deck grids and library lists.
 ///
@@ -23,6 +30,7 @@ class MxDeckCard extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.trailing,
+    this.trailingMode = MxDeckCardTrailing.chevron,
     super.key,
   });
 
@@ -41,23 +49,27 @@ class MxDeckCard extends StatelessWidget {
 
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+
+  /// Custom trailing widget. When provided, overrides [trailingMode].
   final Widget? trailing;
+
+  /// Built-in trailing variant used when [trailing] is null. Defaults to
+  /// [MxDeckCardTrailing.chevron] to match the Design System Library row.
+  final MxDeckCardTrailing trailingMode;
 
   @override
   Widget build(BuildContext context) {
-    final palette = _resolveIconPalette(context, Theme.of(context).colorScheme);
+    final scheme = Theme.of(context).colorScheme;
+    final palette = _resolveIconPalette(context, scheme);
     final hasMastery = masteryPercent != null;
     final mastery = (masteryPercent ?? 0).clamp(0, 100);
     final progressValue = mastery / 100;
-    final trailingContent =
-        trailing ??
-        (hasMastery
-            ? MxText(
-                '$mastery%',
-                role: MxTextRole.tileTrailing,
-                color: context.mxColors.masteryProgress(progressValue),
-              )
-            : null);
+    final trailingContent = trailing ?? _buildDefaultTrailing(
+      context,
+      hasMastery: hasMastery,
+      mastery: mastery,
+      progressValue: progressValue,
+    );
 
     return MxCard(
       variant: MxCardVariant.filled,
@@ -125,24 +137,55 @@ class MxDeckCard extends StatelessWidget {
     );
   }
 
+  Widget? _buildDefaultTrailing(
+    BuildContext context, {
+    required bool hasMastery,
+    required int mastery,
+    required double progressValue,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    switch (trailingMode) {
+      case MxDeckCardTrailing.none:
+        return null;
+      case MxDeckCardTrailing.percent:
+        if (!hasMastery) return null;
+        return MxText(
+          '$mastery%',
+          role: MxTextRole.tileTrailing,
+          color: context.mxColors.masteryProgress(progressValue),
+        );
+      case MxDeckCardTrailing.chevron:
+        return Icon(
+          Icons.chevron_right_rounded,
+          size: AppIconSizes.md,
+          color: scheme.onSurfaceVariant,
+        );
+    }
+  }
+
   _DeckCardPalette _resolveIconPalette(
     BuildContext context,
     ColorScheme scheme,
   ) {
     final mx = context.mxColors;
-    // Shared with [MxStudySetTile] / [MxFolderTile] so a single deck reads
-    // with the same identity color across list rows and grid cards.
-    final palettes = <_DeckCardPalette>[
-      _DeckCardPalette(scheme.primaryContainer, scheme.onPrimaryContainer),
-      _DeckCardPalette(scheme.secondaryContainer, scheme.onSecondaryContainer),
-      _DeckCardPalette(scheme.tertiaryContainer, scheme.onTertiaryContainer),
-      _DeckCardPalette(mx.successContainer, mx.onSuccessContainer),
-      _DeckCardPalette(mx.warningContainer, mx.onWarningContainer),
-      _DeckCardPalette(mx.infoContainer, mx.onInfoContainer),
+    // Brand-color tint pattern from Design System "02 · Library" — see
+    // [MxFolderTile._resolveIconPalette] for the rationale. Keeping the same
+    // brand-color list here ensures a deck reads with the same identity tone
+    // whether rendered as a folder row or a deck card.
+    final brandColors = <Color>[
+      scheme.primary,
+      scheme.secondary,
+      scheme.tertiary,
+      mx.success,
+      mx.warning,
+      mx.info,
     ];
     final seed = title.isEmpty ? 0 : title.hashCode;
-    final index = seed.abs() % palettes.length;
-    return palettes[index];
+    final brand = brandColors[seed.abs() % brandColors.length];
+    return _DeckCardPalette(
+      brand.withValues(alpha: AppOpacity.disabledSurface),
+      brand,
+    );
   }
 }
 

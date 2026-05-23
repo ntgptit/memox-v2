@@ -6,7 +6,6 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_deck_card.dart';
 import '../../../shared/widgets/mx_folder_tile.dart';
-import '../../../shared/widgets/mx_study_progress_action.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 
 /// Sliver-based renderer for a folder's children (subfolders or decks).
@@ -67,24 +66,21 @@ class _SubfolderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final stats = l10n.libraryFolderStats(
+      item.subfolderCount,
+      item.deckCount,
+      item.itemCount,
+    );
+    final dueSuffix = item.dueCardCount > 0
+        ? ' ${l10n.libraryDeckDueSuffix(item.dueCardCount)}'
+        : '';
     return MxFolderTile(
       name: item.name,
       icon: item.icon,
-      caption: l10n.libraryFolderStats(
-        item.subfolderCount,
-        item.deckCount,
-        item.itemCount,
-      ),
+      caption: '$stats$dueSuffix',
+      masteryPercent: item.masteryPercent,
       onTap: () => onOpenSubfolder(item.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
-      trailing: MxStudyProgressAction(
-        key: ValueKey('folder_recursive_study_${item.id}'),
-        masteryPercent: item.masteryPercent,
-        badgeCount: item.dueCardCount,
-        tooltip: l10n.studyStartAction,
-        onPressed: () =>
-            context.goStudyEntry(entryType: 'folder', entryRefId: item.id),
-      ),
     );
   }
 }
@@ -98,21 +94,17 @@ class _DeckCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final cards = l10n.foldersDeckStats(item.cardCount);
+    final due = item.dueToday > 0
+        ? ' ${l10n.libraryDeckDueSuffix(item.dueToday)}'
+        : ' · ${l10n.libraryDeckAllCaughtUp}';
     return MxDeckCard(
       title: item.name,
       icon: Icons.style_outlined,
-      metaLine: l10n.foldersDeckStats(item.cardCount),
+      metaLine: '$cards$due',
       masteryPercent: item.masteryPercent,
       onTap: () => context.pushFlashcardList(item.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
-      trailing: MxStudyProgressAction(
-        key: ValueKey('deck_study_${item.id}'),
-        masteryPercent: item.masteryPercent,
-        badgeCount: item.dueToday,
-        tooltip: l10n.studyStartAction,
-        onPressed: () =>
-            context.goStudyEntry(entryType: 'deck', entryRefId: item.id),
-      ),
     );
   }
 }

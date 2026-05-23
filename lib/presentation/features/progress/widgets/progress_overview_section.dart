@@ -35,7 +35,8 @@ class LearningOverview extends StatelessWidget {
     final masteryMetric = _MetricCard(
       key: const ValueKey('progress_metric_mastery'),
       label: l10n.dashboardMasteryLabel,
-      value: '${state.masteryPercent}%',
+      value: '${state.masteryPercent}',
+      unit: '%',
       icon: Icons.trending_up_rounded,
       tone: MxStatTone.mastery,
     );
@@ -189,6 +190,7 @@ class _MetricCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.tone,
+    this.unit,
     super.key,
   });
 
@@ -196,10 +198,17 @@ class _MetricCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final MxStatTone tone;
+  final String? unit;
 
   @override
   Widget build(BuildContext context) {
-    return MxStatCard(label: label, value: value, icon: icon, tone: tone);
+    return MxStatCard(
+      label: label,
+      value: value,
+      unit: unit,
+      icon: icon,
+      tone: tone,
+    );
   }
 }
 

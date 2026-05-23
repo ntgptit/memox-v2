@@ -17,6 +17,7 @@ class MxStatCard extends StatelessWidget {
     this.tone = MxStatTone.neutral,
     this.icon,
     this.supportingText,
+    this.unit,
     super.key,
   });
 
@@ -25,6 +26,11 @@ class MxStatCard extends StatelessWidget {
   final MxStatTone tone;
   final IconData? icon;
   final String? supportingText;
+
+  /// Optional short unit suffix rendered next to [value] in a smaller, muted
+  /// style. Matches the Design System Home/Stats cards (`7 days`, `512 cards`,
+  /// `88%`).
+  final String? unit;
 
   @override
   Widget build(BuildContext context) {
@@ -54,12 +60,29 @@ class MxStatCard extends StatelessWidget {
             ],
           ),
           const MxGap(AppSpacing.xs),
-          MxText(
-            value,
-            role: MxTextRole.pageTitle,
-            color: scheme.onSurface,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Flexible(
+                child: MxText(
+                  value,
+                  role: MxTextRole.pageTitle,
+                  color: scheme.onSurface,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (unit != null) ...[
+                const MxGap(AppSpacing.xs),
+                MxText(
+                  unit!,
+                  role: MxTextRole.tileMeta,
+                  color: scheme.onSurfaceVariant,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
           ),
           if (supportingText != null) ...[
             const MxGap(AppSpacing.xxs),

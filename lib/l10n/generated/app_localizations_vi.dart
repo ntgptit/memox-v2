@@ -1524,6 +1524,67 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyModeFill => 'Điền';
 
   @override
+  String get studyModeReviewSubtitle => 'Lật thẻ theo lịch SRS';
+
+  @override
+  String get studyModeMatchSubtitle => 'Ghép mặt trước với mặt sau';
+
+  @override
+  String get studyModeGuessSubtitle => 'Trắc nghiệm A / B / C / D';
+
+  @override
+  String get studyModeRecallSubtitle => 'Viết lại từ trí nhớ';
+
+  @override
+  String get studyModeFillSubtitle => 'Điền vào chỗ trống';
+
+  @override
+  String get studyModeMixTitle => 'Mix';
+
+  @override
+  String get studyModeMixSubtitle => 'Cả 5 chế độ, một phiên';
+
+  @override
+  String get studyModeMixBadge => 'Thích ứng';
+
+  @override
+  String get studyModeMixSummary => 'Xem lại · Ghép · Đoán · Nhớ · Điền';
+
+  @override
+  String get deckBreakdownTitle => 'Phân loại thẻ';
+
+  @override
+  String get deckBreakdownNew => 'Mới';
+
+  @override
+  String get deckBreakdownLearning => 'Đang học';
+
+  @override
+  String get deckBreakdownReviewing => 'Đang ôn';
+
+  @override
+  String get deckBreakdownMastered => 'Thuộc';
+
+  @override
+  String libraryDeckDueSuffix(int dueCount) {
+    return '· $dueCount đến hạn';
+  }
+
+  @override
+  String get libraryDeckAllCaughtUp => 'Đã ôn hết';
+
+  @override
+  String get libraryFilterAll => 'Tất cả';
+
+  @override
+  String get deckMasteryLabel => 'Mastery';
+
+  @override
+  String deckMasteryProgress(int mastered, int total) {
+    return '$mastered trên $total thẻ đã thuộc';
+  }
+
+  @override
   String get studyReadyToFinalizeTitle => 'Sẵn sàng finalize';
 
   @override

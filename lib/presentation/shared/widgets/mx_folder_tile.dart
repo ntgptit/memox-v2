@@ -7,16 +7,18 @@ import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
-import 'mx_progress_ring.dart';
+import 'mx_progress_indicator.dart';
 import 'mx_text.dart';
 import 'mx_tappable.dart';
 
-/// Calm, low-chrome folder row for library listings.
+/// How [MxFolderTile] renders its trailing slot.
+enum MxFolderTileTrailing { chevron, none }
+
+/// Library list row used by **both** folder and deck listings.
 ///
-/// Mirrors [MxStudySetTile] geometry so folder rows and deck rows feel like
-/// the same family: identical leading tile size, padding, identity palette,
-/// and trailing slot. Layout: tonal icon tile (color picked from the folder
-/// name hash) + title + optional single caption + optional trailing widget.
+/// Mirrors the Design System "02 · Library" pattern: a single shape that the
+/// whole library reads as one family of cards. Layout: tonal icon tile +
+/// title + single meta line + inline 6px mastery bar (when known) + chevron.
 class MxFolderTile extends StatelessWidget {
   const MxFolderTile({
     required this.name,
@@ -28,8 +30,12 @@ class MxFolderTile extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.trailing,
+    this.trailingMode = MxFolderTileTrailing.chevron,
     super.key,
   });
+
+  /// guard:raw-size-reviewed Inline progress bar height per Design System.
+  static const double _progressBarHeight = 6;
 
   final String name;
   final IconData icon;
@@ -37,7 +43,7 @@ class MxFolderTile extends StatelessWidget {
   /// Single-line secondary line, e.g. `5 decks · 128 items`.
   final String? caption;
 
-  /// Mastery in `[0, 100]`. `null` hides the trailing ring.
+  /// Mastery in `[0, 100]`. `null` hides the inline progress bar.
   final int? masteryPercent;
 
   /// Tonal container color. Defaults to a hash-derived identity color.
@@ -49,12 +55,20 @@ class MxFolderTile extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
+  /// Custom trailing override. When provided, [trailingMode] is ignored.
   final Widget? trailing;
+
+  /// Built-in trailing variant when [trailing] is null. Defaults to chevron
+  /// to match the Design System Library row.
+  final MxFolderTileTrailing trailingMode;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final palette = _resolveIconPalette(context, scheme);
+    final hasMastery = masteryPercent != null;
+    final mastery = (masteryPercent ?? 0).clamp(0, 100);
+    final progressValue = mastery / 100;
 
     final row = LayoutBuilder(
       builder: (context, constraints) {
@@ -70,6 +84,7 @@ class MxFolderTile extends StatelessWidget {
         final contentGap = context.isCompactMobile
             ? AppSpacing.md
             : AppSpacing.lg;
+        final trailingWidget = trailing ?? _buildDefaultTrailing(context);
 
         return ConstrainedBox(
           constraints: const BoxConstraints(
@@ -118,16 +133,21 @@ class MxFolderTile extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
+                      if (hasMastery) ...[
+                        const MxGap(AppSpacing.sm),
+                        MxLinearProgress(
+                          value: progressValue,
+                          size: MxProgressSize.small,
+                          color: context.mxColors.masteryProgress(progressValue),
+                          minHeight: _progressBarHeight,
+                        ),
+                      ],
                     ],
                   ),
                 ),
-                if (masteryPercent != null && showTrailing) ...[
-                  const SizedBox(width: AppSpacing.md),
-                  MxProgressRing(value: masteryPercent! / 100),
-                ],
-                if (trailing != null && showTrailing) ...[
+                if (trailingWidget != null && showTrailing) ...[
                   const SizedBox(width: AppSpacing.sm),
-                  trailing!,
+                  trailingWidget,
                 ],
               ],
             ),
@@ -157,25 +177,43 @@ class MxFolderTile extends StatelessWidget {
     );
   }
 
+  Widget? _buildDefaultTrailing(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    switch (trailingMode) {
+      case MxFolderTileTrailing.none:
+        return null;
+      case MxFolderTileTrailing.chevron:
+        return Icon(
+          Icons.chevron_right_rounded,
+          size: AppIconSizes.md,
+          color: scheme.onSurfaceVariant,
+        );
+    }
+  }
+
   _IconTilePalette _resolveIconPalette(
     BuildContext context,
     ColorScheme scheme,
   ) {
     final mx = context.mxColors;
-    // Same identity ramp as [MxStudySetTile] — folder + deck rows that
-    // belong together pick from one shared palette so the Library reads as
-    // a single family of cards.
-    final palettes = <_IconTilePalette>[
-      _IconTilePalette(scheme.primaryContainer, scheme.onPrimaryContainer),
-      _IconTilePalette(scheme.secondaryContainer, scheme.onSecondaryContainer),
-      _IconTilePalette(scheme.tertiaryContainer, scheme.onTertiaryContainer),
-      _IconTilePalette(mx.successContainer, mx.onSuccessContainer),
-      _IconTilePalette(mx.warningContainer, mx.onWarningContainer),
-      _IconTilePalette(mx.infoContainer, mx.onInfoContainer),
+    // Brand-color tint pattern from Design System "02 · Library": each tile
+    // shows a 12% alpha wash of the brand color with the full color as the
+    // icon fill. This reads as a vibrant identity chip even on dark navy
+    // backgrounds, where the M3 *Container tokens collapse to muted tones.
+    final brandColors = <Color>[
+      scheme.primary,
+      scheme.secondary,
+      scheme.tertiary,
+      mx.success,
+      mx.warning,
+      mx.info,
     ];
     final seed = name.isEmpty ? 0 : name.hashCode;
-    final index = seed.abs() % palettes.length;
-    return palettes[index];
+    final brand = brandColors[seed.abs() % brandColors.length];
+    return _IconTilePalette(
+      brand.withValues(alpha: AppOpacity.disabledSurface),
+      brand,
+    );
   }
 }
 

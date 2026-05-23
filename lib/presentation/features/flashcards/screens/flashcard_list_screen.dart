@@ -24,14 +24,13 @@ import '../../../shared/widgets/mx_fab.dart';
 import '../../decks/actions/deck_quick_actions.dart';
 import '../../decks/viewmodels/deck_action_viewmodel.dart';
 import '../../tts/providers/tts_controller_notifier.dart';
-import '../widgets/flashcard_card_list_header.dart';
+import '../widgets/flashcard_breadcrumb_section.dart';
 import '../widgets/flashcard_bulk_action_section.dart';
 import '../widgets/flashcard_deck_summary_section.dart';
 import '../widgets/flashcard_empty_state_section.dart';
 import '../widgets/flashcard_header_section.dart';
 import '../widgets/flashcard_items_section.dart';
 import '../widgets/flashcard_list_skeleton.dart';
-import '../widgets/flashcard_preview_section.dart';
 import '../widgets/flashcard_progress_section.dart';
 import '../widgets/flashcard_reorder_list.dart';
 import '../widgets/flashcard_study_modes_section.dart';
@@ -113,6 +112,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: FlashcardHeaderSection(
+                    title: state.deckName,
                     onBack: () => context.popRoute(
                       fallback: () => _goToDeckParent(context, state),
                     ),
@@ -136,15 +136,34 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                     ),
                   ),
                 ),
-                const MxSliverGap(MxSpace.xl),
+                const MxSliverGap(MxSpace.sm),
+                // DS Deck Detail order: appbar → breadcrumb → hero summary →
+                // study modes (primary CTA) → card breakdown → preview → items.
+                SliverToBoxAdapter(
+                  child: FlashcardBreadcrumbSection(
+                    breadcrumb: state.breadcrumb,
+                    onOpenBreadcrumb: (folderId) =>
+                        context.goFolderDetail(folderId),
+                    onOpenLibrary: context.goLibrary,
+                  ),
+                ),
+                const MxSliverGap(MxSpace.md),
                 SliverToBoxAdapter(
                   child: FlashcardDeckSummarySection(
                     state: state,
                     studyEnabled: state.items.isNotEmpty,
                     onStartStudy: () => _goStudyEntry(state),
-                    onOpenBreadcrumb: (folderId) =>
-                        context.goFolderDetail(folderId),
                   ),
+                ),
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: FlashcardStudyModesSection(
+                    enabled: state.items.isNotEmpty,
+                  ),
+                ),
+                const MxSliverGap(MxSpace.xl),
+                SliverToBoxAdapter(
+                  child: FlashcardProgressSection(progress: state.progress),
                 ),
                 const MxSliverGap(MxSpace.xl),
                 SliverToBoxAdapter(
@@ -152,6 +171,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                     selectedSort: toolbarState.sortMode,
                     isReorderMode: _isReorderMode,
                     canManualReorder: state.canManualReorder,
+                    searchTerm: toolbarState.searchTerm,
                     onSearchChanged: toolbarNotifier.setSearchTerm,
                     onSearchClear: () => toolbarNotifier.setSearchTerm(''),
                     onSortSelected: toolbarNotifier.setSortMode,
@@ -161,12 +181,6 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                     onStartReorder: () => _enterReorderMode(state),
                   ),
                 ),
-                if (state.previewItems.isNotEmpty) ...[
-                  const MxSliverGap(MxSpace.xl),
-                  SliverToBoxAdapter(
-                    child: FlashcardPreviewSection(items: state.previewItems),
-                  ),
-                ],
                 if (selection.isNotEmpty) ...[
                   const MxSliverGap(MxSpace.lg),
                   SliverToBoxAdapter(
@@ -188,21 +202,11 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                     ),
                   ),
                 ],
-                const MxSliverGap(MxSpace.xl),
+                const MxSliverGap(MxSpace.lg),
                 ..._buildBodySlivers(
                   state: state,
                   selection: selection,
                   onToggleSelection: selectionNotifier.toggle,
-                ),
-                const MxSliverGap(MxSpace.xl),
-                SliverToBoxAdapter(
-                  child: FlashcardProgressSection(progress: state.progress),
-                ),
-                const MxSliverGap(MxSpace.xl),
-                SliverToBoxAdapter(
-                  child: FlashcardStudyModesSection(
-                    enabled: state.items.isNotEmpty,
-                  ),
                 ),
                 if (!_isReorderMode)
                   const MxSliverGap(kMinInteractiveDimension + MxSpace.xxl),
@@ -424,22 +428,14 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
         ),
       ];
     }
-    final header = <Widget>[
-      SliverToBoxAdapter(
-        child: FlashcardCardListHeader(sortMode: state.sortMode),
-      ),
-      const MxSliverGap(MxSpace.md),
-    ];
     if (state.items.isEmpty) {
       return [
-        ...header,
         SliverToBoxAdapter(
           child: FlashcardEmptyStateSection(deckId: widget.deckId),
         ),
       ];
     }
     return [
-      ...header,
       FlashcardItemsSection(
         state: state,
         deckId: widget.deckId,

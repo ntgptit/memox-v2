@@ -15,6 +15,7 @@ class MxChip extends StatelessWidget {
     this.selected = false,
     this.showCheckmark = false,
     this.tone = MxChipTone.neutral,
+    this.count,
     super.key,
   });
 
@@ -25,6 +26,10 @@ class MxChip extends StatelessWidget {
   final bool selected;
   final bool showCheckmark;
   final MxChipTone tone;
+
+  /// Optional trailing count rendered inline (e.g. `All 142`). Mirrors the
+  /// Design System filter chips on the Cards-management screen.
+  final int? count;
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +54,26 @@ class MxChip extends StatelessWidget {
 
     final labelStyle = textTheme.labelLarge?.copyWith(color: fg);
 
+    final Widget labelWidget = count == null
+        ? Text(label)
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label),
+              const SizedBox(width: 6),
+              Text(
+                '$count',
+                style: textTheme.labelMedium?.copyWith(
+                  color: fg.withValues(alpha: selected ? 0.7 : 0.55),
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          );
+
     if (onDeleted != null) {
       return InputChip(
-        label: Text(label),
+        label: labelWidget,
         avatar: icon != null ? Icon(icon, size: AppIconSizes.sm) : null,
         selected: selected,
         onPressed: onTap,
@@ -66,7 +88,7 @@ class MxChip extends StatelessWidget {
 
     if (onTap != null) {
       return FilterChip(
-        label: Text(label),
+        label: labelWidget,
         avatar: icon != null
             ? Icon(icon, size: AppIconSizes.sm, color: fg)
             : null,
@@ -82,7 +104,7 @@ class MxChip extends StatelessWidget {
     }
 
     return Chip(
-      label: Text(label),
+      label: labelWidget,
       avatar: icon != null
           ? Icon(icon, size: AppIconSizes.sm, color: fg)
           : null,

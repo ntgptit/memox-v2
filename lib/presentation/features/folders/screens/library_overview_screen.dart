@@ -6,44 +6,49 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../shared/layouts/mx_gap.dart';
-import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/options/content_sort_options.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_animated_switcher.dart';
 import '../../../shared/widgets/mx_fab.dart';
-import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../actions/folder_quick_actions.dart';
 import '../models/library_folder.dart';
+import '../widgets/library_app_bar.dart';
 import '../widgets/library_empty_state_section.dart';
 import '../widgets/library_folder_list.dart';
-import '../widgets/library_hero_section.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 import '../viewmodels/library_overview_viewmodel.dart';
 
 Widget buildLibraryOverviewFab(BuildContext context, WidgetRef ref) {
   final l10n = AppLocalizations.of(context);
 
+  // DS Library: compact icon-only FAB sitting above the bottom nav. The wide
+  // "Create folder" pill belonged to the previous dashboard pattern.
   return MxFab(
     icon: Icons.add,
     tooltip: l10n.libraryCreateFolderTooltip,
-    extendedLabel: l10n.libraryCreateFolderTooltip,
     onPressed: () => _handleCreateFolder(context, ref),
   );
 }
 
-class LibraryOverviewView extends ConsumerWidget {
+class LibraryOverviewView extends ConsumerStatefulWidget {
   const LibraryOverviewView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LibraryOverviewView> createState() =>
+      _LibraryOverviewViewState();
+}
+
+class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
+  bool _searchOpen = false;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final sortOptions = buildContentSortOptions(l10n);
     ref.listen<AsyncValue<void>>(libraryOverviewActionControllerProvider, (
       _,
       next,
@@ -68,6 +73,8 @@ class LibraryOverviewView extends ConsumerWidget {
     }
     final toolbarState = ref.watch(libraryToolbarStateProvider);
     final toolbarNotifier = ref.read(libraryToolbarStateProvider.notifier);
+    final isSearchVisible =
+        _searchOpen || StringUtils.isNotBlank(toolbarState.searchTerm);
 
     return MxScaffold(
       floatingActionButton: buildLibraryOverviewFab(context, ref),
@@ -83,31 +90,34 @@ class LibraryOverviewView extends ConsumerWidget {
           dataBuilder: (context, state) {
             return CustomScrollView(
               slivers: [
-                SliverToBoxAdapter(child: LibraryHeroSection(state: state)),
-                const MxSliverGap(MxSpace.xl),
                 SliverToBoxAdapter(
-                  child: MxSearchSortToolbar<ContentSortMode>(
-                    searchHintText: l10n.commonSearch,
+                  child: LibraryAppBar(
+                    title: l10n.libraryTitle,
+                    isSearchOpen: isSearchVisible,
+                    onToggleSearch: () =>
+                        setState(() => _searchOpen = !_searchOpen),
+                    searchTerm: toolbarState.searchTerm,
                     onSearchChanged: toolbarNotifier.setSearchTerm,
                     onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                    sortOptions: sortOptions,
-                    selectedSort: toolbarState.sortMode,
-                    sortLabel: l10n.commonSort,
-                    onSortSelected: toolbarNotifier.setSortMode,
+                    chips: [
+                      LibraryFilterChip(
+                        label: l10n.libraryFilterAll,
+                        selected: true,
+                        onTap: () {},
+                      ),
+                    ],
                   ),
                 ),
-                const MxSliverGap(MxSpace.xl),
-                SliverToBoxAdapter(
-                  child: _LibrarySectionHeader(
-                    title: l10n.libraryFoldersSectionTitle,
-                    subtitle: StringUtils.isBlank(toolbarState.searchTerm)
-                        ? l10n.libraryManageFoldersSubtitle
-                        : l10n.librarySearchResultsSubtitle,
-                    showSubtitle:
-                        context.showsSupportingCopy ||
-                        StringUtils.isNotBlank(toolbarState.searchTerm),
+                if (StringUtils.isNotBlank(toolbarState.searchTerm)) ...[
+                  const MxSliverGap(MxSpace.md),
+                  SliverToBoxAdapter(
+                    child: _LibrarySectionHeader(
+                      title: l10n.libraryFoldersSectionTitle,
+                      subtitle: l10n.librarySearchResultsSubtitle,
+                      showSubtitle: true,
+                    ),
                   ),
-                ),
+                ],
                 const MxSliverGap(MxSpace.md),
                 ..._buildFolderListSlivers(context, ref, state),
               ],
@@ -150,8 +160,6 @@ List<Widget> _buildFolderListSlivers(
         allowRootDestination: false,
         canImportFlashcards: folder.canImportFlashcards,
       ),
-      onStartStudy: (folderId) =>
-          context.goStudyEntry(entryType: 'folder', entryRefId: folderId),
     ),
   ];
 }

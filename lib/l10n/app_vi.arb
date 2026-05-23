@@ -799,6 +799,38 @@
   "studyModeGuess": "Đoán",
   "studyModeRecall": "Nhớ lại",
   "studyModeFill": "Điền",
+  "studyModeReviewSubtitle": "Lật thẻ theo lịch SRS",
+  "studyModeMatchSubtitle": "Ghép mặt trước với mặt sau",
+  "studyModeGuessSubtitle": "Trắc nghiệm A / B / C / D",
+  "studyModeRecallSubtitle": "Viết lại từ trí nhớ",
+  "studyModeFillSubtitle": "Điền vào chỗ trống",
+  "studyModeMixTitle": "Mix",
+  "studyModeMixSubtitle": "Cả 5 chế độ, một phiên",
+  "studyModeMixBadge": "Thích ứng",
+  "studyModeMixSummary": "Xem lại · Ghép · Đoán · Nhớ · Điền",
+  "deckBreakdownTitle": "Phân loại thẻ",
+  "deckBreakdownNew": "Mới",
+  "deckBreakdownLearning": "Đang học",
+  "deckBreakdownReviewing": "Đang ôn",
+  "deckBreakdownMastered": "Thuộc",
+  "libraryDeckDueSuffix": "· {dueCount} đến hạn",
+  "@libraryDeckDueSuffix": {
+    "placeholders": {
+      "dueCount": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryDeckAllCaughtUp": "Đã ôn hết",
+  "libraryFilterAll": "Tất cả",
+  "deckMasteryLabel": "Mastery",
+  "deckMasteryProgress": "{mastered} trên {total} thẻ đã thuộc",
+  "@deckMasteryProgress": {
+    "placeholders": {
+      "mastered": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
   "studyReadyToFinalizeTitle": "Sẵn sàng finalize",
   "studyReadyToFinalizeMessage": "Toàn bộ thẻ bắt buộc đã pass. Finalize để commit tiến độ SRS.",
   "studyChooseMatchingAnswer": "Chọn đáp án khớp.",

@@ -37,6 +37,10 @@ enum MxTextRole {
   reviewFront,
   reviewBack,
   avatarInitials,
+
+  /// Uppercase, tracked label per Design System overline style (`MASTERY`,
+  /// `STUDY MODES`, `CARD BREAKDOWN`). 11/700 with 1.2 letter-spacing.
+  overline,
 }
 
 abstract final class MxTextStyles {
@@ -157,6 +161,11 @@ abstract final class MxTextStyles {
       ),
       MxTextRole.avatarInitials => textTheme.labelMedium!.copyWith(
         color: scheme.onSurfaceVariant,
+      ),
+      MxTextRole.overline => textTheme.labelMedium!.copyWith(
+        color: scheme.onSurfaceVariant,
+        letterSpacing: 1.2,
+        fontWeight: FontWeight.w700,
       ),
     };
   }

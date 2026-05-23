@@ -278,7 +278,6 @@ void main() {
                 LibraryFolderSliver(
                   folders: _sampleLibraryState.folders,
                   onOpenFolder: (folderId) => openedFolderId = folderId,
-                  onStartStudy: (_) {},
                 ),
               ],
             ),
