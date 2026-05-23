@@ -32,6 +32,9 @@ class DashboardHomeStatsSection extends StatelessWidget {
             value: AppLocalizations.of(
               context,
             ).dashboardStreakDays(_dashboardPlaceholderStreakDays),
+            supportingText: AppLocalizations.of(
+              context,
+            ).dashboardReviewCompactStatus(state.reviewCount),
             tone: MxStatTone.streak,
           ),
         ),
@@ -42,6 +45,9 @@ class DashboardHomeStatsSection extends StatelessWidget {
             value: AppLocalizations.of(
               context,
             ).dashboardMasteredCards(masteredCount),
+            supportingText: AppLocalizations.of(
+              context,
+            ).dashboardLibraryProgressMessage(state.masteryPercent),
             tone: MxStatTone.mastery,
           ),
         ),

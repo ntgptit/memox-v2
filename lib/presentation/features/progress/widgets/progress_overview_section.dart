@@ -5,6 +5,8 @@ import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_progress_indicator.dart';
+import '../../../shared/widgets/mx_stat_card.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/progress_session_notifier.dart';
 
@@ -21,31 +23,42 @@ class LearningOverview extends StatelessWidget {
       label: l10n.progressReviewDueCount,
       value: '${state.reviewCount}',
       icon: Icons.event_available_outlined,
+      tone: state.reviewCount > 0 ? MxStatTone.streak : MxStatTone.neutral,
     );
     final newMetric = _MetricCard(
       key: const ValueKey('progress_metric_new_cards'),
       label: l10n.dashboardNewCardsLabel,
       value: '${state.newCardCount}',
       icon: Icons.add_card_outlined,
+      tone: MxStatTone.primary,
     );
     final masteryMetric = _MetricCard(
       key: const ValueKey('progress_metric_mastery'),
       label: l10n.dashboardMasteryLabel,
       value: '${state.masteryPercent}%',
       icon: Icons.trending_up_rounded,
+      tone: MxStatTone.mastery,
     );
     final activeMetric = _MetricCard(
       key: const ValueKey('progress_metric_active'),
       label: l10n.progressActiveSessionsCount,
       value: '${state.activeSessionCount}',
       icon: Icons.play_circle_outline,
+      tone: MxStatTone.success,
     );
 
-    return _MetricCardGroup(
-      first: reviewMetric,
-      second: newMetric,
-      third: masteryMetric,
-      fourth: activeMetric,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _MetricCardGroup(
+          first: reviewMetric,
+          second: newMetric,
+          third: masteryMetric,
+          fourth: activeMetric,
+        ),
+        _LearningSummaryCard(state: state),
+        const MxGap(MxSpace.lg),
+      ],
     );
   }
 }
@@ -63,18 +76,23 @@ class SessionRecoveryOverview extends StatelessWidget {
       label: l10n.progressActiveSessionsCount,
       value: '${state.activeSessionCount}',
       icon: Icons.play_circle_outline,
+      tone: MxStatTone.primary,
     );
     final readyMetric = _MetricCard(
       key: const ValueKey('progress_metric_ready'),
       label: l10n.progressReadySessionsCount,
       value: '${state.readySessionCount}',
       icon: Icons.flag_outlined,
+      tone: MxStatTone.success,
     );
     final failedMetric = _MetricCard(
       key: const ValueKey('progress_metric_failed'),
       label: l10n.progressFailedSessionsCount,
       value: '${state.failedSessionCount}',
       icon: Icons.error_outline,
+      tone: state.failedSessionCount > 0
+          ? MxStatTone.streak
+          : MxStatTone.neutral,
     );
 
     return _MetricCardGroup(
@@ -118,7 +136,6 @@ class _MetricCardGroup extends StatelessWidget {
               ],
             ],
           ),
-          const MxGap(MxSpace.lg),
         ],
       );
     }
@@ -149,7 +166,6 @@ class _MetricCardGroup extends StatelessWidget {
               ],
             ),
           ),
-          const MxGap(MxSpace.lg),
         ],
       );
     }
@@ -162,7 +178,6 @@ class _MetricCardGroup extends StatelessWidget {
         second,
         const MxGap(MxSpace.md),
         third,
-        const MxGap(MxSpace.lg),
       ],
     );
   }
@@ -173,25 +188,63 @@ class _MetricCard extends StatelessWidget {
     required this.label,
     required this.value,
     required this.icon,
+    required this.tone,
     super.key,
   });
 
   final String label;
   final String value;
   final IconData icon;
+  final MxStatTone tone;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    return MxStatCard(label: label, value: value, icon: icon, tone: tone);
+  }
+}
+
+class _LearningSummaryCard extends StatelessWidget {
+  const _LearningSummaryCard({required this.state});
+
+  final ProgressOverviewState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final reviewTotal = state.reviewCount + state.newCardCount;
+
     return MxCard(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(icon, color: scheme.primary),
-          const MxGap(MxSpace.sm),
-          MxText(value, role: MxTextRole.pageTitle),
-          const MxGap(MxSpace.xs),
-          MxText(label, role: MxTextRole.tileMeta),
+          MxText(
+            l10n.dashboardLibraryProgressTitle,
+            role: MxTextRole.formLabel,
+          ),
+          const MxGap(MxSpace.md),
+          MxLinearProgress(
+            value: state.masteryPercent / 100,
+            showPercentage: true,
+            size: MxProgressSize.large,
+          ),
+          const MxGap(MxSpace.md),
+          Row(
+            children: [
+              Expanded(
+                child: MxText(
+                  l10n.dashboardReviewCompactStatus(reviewTotal),
+                  role: MxTextRole.tileMeta,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const MxGap(MxSpace.sm),
+              MxText(
+                '${state.activeSessionCount}',
+                role: MxTextRole.tileTrailing,
+              ),
+            ],
+          ),
         ],
       ),
     );

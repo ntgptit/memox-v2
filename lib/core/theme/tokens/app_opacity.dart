@@ -17,6 +17,9 @@ abstract final class AppOpacity {
   /// Subtle hover / pressed state.
   static const double hover = 0.08;
 
+  /// MemoX ghost border opacity for quiet card outlines.
+  static const double ghostBorder = 0.15;
+
   /// Drag handle / scrim.
   static const double handle = 0.4;
 

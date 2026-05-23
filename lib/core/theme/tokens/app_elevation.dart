@@ -15,7 +15,7 @@ abstract final class AppElevation {
   // --- Semantic elevations ---
   static const double appBar = level1;
   static const double appBarScrolled = level2;
-  static const double card = level1;
+  static const double card = level0;
   static const double cardRaised = level2;
   static const double cardHovered = level3;
   static const double button = level0;

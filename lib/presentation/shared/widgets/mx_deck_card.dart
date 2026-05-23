@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
 import 'mx_card.dart';
 import 'mx_progress_indicator.dart';
 import 'mx_text.dart';
 
-/// Card-form study set surface used inside 2-col deck grids.
+/// Card-form study set surface used inside deck grids and library lists.
 ///
-/// Layout: tall color block top (palette derived from [title] hash) over a
-/// title + meta + progress strip. Designed to read as a "Quizlet-mobile"
-/// deck cover — much more visually rich than the row variant
-/// ([MxStudySetTile]) and used when a grid layout is more appropriate than
-/// a vertical list.
+/// Layout follows the MemoX mobile kit: identity icon tile, title/meta,
+/// mastery strip, and a compact trailing percent. The surface stays low
+/// chrome so the deck content, not the container, carries the hierarchy.
 class MxDeckCard extends StatelessWidget {
   const MxDeckCard({
     required this.title,
@@ -23,17 +22,13 @@ class MxDeckCard extends StatelessWidget {
     this.masteryPercent,
     this.onTap,
     this.onLongPress,
+    this.trailing,
     super.key,
   });
 
-  /// guard:raw-size-reviewed cover aspect ratio (16:9) keeps the colored
-  /// block readable across compact phone widths (~165-200 dp) without
-  /// dwarfing the title row beneath it.
-  static const double _coverAspectRatio = 16 / 9;
-
   /// guard:raw-size-reviewed progress bar height — slim enough to feel like
   /// a hint, not a primary surface element.
-  static const double _progressBarHeight = 4;
+  static const double _progressBarHeight = 6;
 
   final String title;
   final IconData icon;
@@ -46,44 +41,63 @@ class MxDeckCard extends StatelessWidget {
 
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     final palette = _resolveIconPalette(context, Theme.of(context).colorScheme);
+    final hasMastery = masteryPercent != null;
     final mastery = (masteryPercent ?? 0).clamp(0, 100);
     final progressValue = mastery / 100;
+    final trailingContent =
+        trailing ??
+        (hasMastery
+            ? MxText(
+                '$mastery%',
+                role: MxTextRole.tileTrailing,
+                color: context.mxColors.masteryProgress(progressValue),
+              )
+            : null);
 
     return MxCard(
       variant: MxCardVariant.filled,
-      padding: EdgeInsets.zero,
       onTap: onTap,
       onLongPress: onLongPress,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          AspectRatio(
-            aspectRatio: _coverAspectRatio,
-            child: Container(
+          Container(
+            width: AppIconSizes.xxxl,
+            height: AppIconSizes.xxxl,
+            decoration: BoxDecoration(
               color: palette.background,
-              alignment: Alignment.center,
-              child: Icon(
-                icon,
-                size: AppIconSizes.xl,
-                color: palette.foreground,
-              ),
+              borderRadius: AppRadius.borderLg,
             ),
+            alignment: Alignment.center,
+            child: Icon(icon, size: AppIconSizes.md, color: palette.foreground),
           ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
+          const MxGap(AppSpacing.md),
+          Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
-                MxText(
-                  title,
-                  role: MxTextRole.tileTitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: MxText(
+                        title,
+                        role: MxTextRole.tileTitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (trailingContent != null) ...[
+                      const MxGap(AppSpacing.sm),
+                      trailingContent,
+                    ],
+                  ],
                 ),
                 if (metaLine != null) ...[
                   const MxGap(AppSpacing.xxs),
@@ -94,14 +108,13 @@ class MxDeckCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-                if (masteryPercent != null) ...[
+                if (hasMastery) ...[
                   const MxGap(AppSpacing.sm),
-                  SizedBox(
-                    height: _progressBarHeight,
-                    child: MxLinearProgress(
-                      value: progressValue,
-                      size: MxProgressSize.small,
-                    ),
+                  MxLinearProgress(
+                    value: progressValue,
+                    size: MxProgressSize.small,
+                    color: context.mxColors.masteryProgress(progressValue),
+                    minHeight: _progressBarHeight,
                   ),
                 ],
               ],

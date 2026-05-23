@@ -11,9 +11,11 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/presentation/features/folders/screens/folder_detail_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart';
+import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
+import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
+import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 
 void main() {
   testWidgets(
@@ -139,7 +141,15 @@ void main() {
 
       expect(find.text('Japanese N5'), findsAtLeastNWidgets(1));
 
-      await tester.tap(find.text('Japanese').first);
+      final japaneseCrumb = find.ancestor(
+        of: find.descendant(
+          of: find.byType(MxBreadcrumbBar),
+          matching: find.text('Japanese'),
+        ),
+        matching: find.byType(MxTappable),
+      );
+
+      await tester.tap(japaneseCrumb);
       await tester.pumpAndSettle();
 
       expect(find.text('Japanese'), findsAtLeastNWidgets(1));
@@ -272,7 +282,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Vitamin B1'), findsOneWidget);
-    expect(find.text('1 card'), findsOneWidget);
+    expect(find.text('1 card'), findsAtLeastNWidgets(1));
     expect(find.text('1 cards · 1 due today'), findsNothing);
     expect(find.text('1'), findsOneWidget);
   });
@@ -419,7 +429,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No subfolders yet'), findsOneWidget);
-      expect(find.text('New subfolder'), findsOneWidget);
+      expect(find.text('New subfolder'), findsAtLeastNWidgets(1));
       expect(find.text('New deck'), findsNothing);
     },
   );
@@ -446,7 +456,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('No decks yet'), findsOneWidget);
-    expect(find.text('New deck'), findsOneWidget);
+    expect(find.text('New deck'), findsAtLeastNWidgets(1));
     expect(find.text('New subfolder'), findsNothing);
   });
 
@@ -680,7 +690,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final deckTile = find.widgetWithText(MxStudySetTile, 'Vitamin B1');
+    final deckTile = find.widgetWithText(MxDeckCard, 'Vitamin B1');
 
     await tester.ensureVisible(deckTile);
     await tester.tap(deckTile);

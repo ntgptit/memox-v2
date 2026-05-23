@@ -4,7 +4,6 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/library_overview_viewmodel.dart';
 
@@ -21,9 +20,10 @@ class LibraryHeroSection extends StatelessWidget {
       return MxText(l10n.libraryTitle, role: MxTextRole.pageTitle);
     }
 
-    return MxCard(
-      variant: MxCardVariant.elevated,
-      padding: AppLayout.heroPadding(context),
+    return Padding(
+      padding: AppLayout.heroPadding(
+        context,
+      ).resolve(Directionality.of(context)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -33,7 +33,7 @@ class LibraryHeroSection extends StatelessWidget {
           ),
           const MxGap(MxSpace.xs),
           MxText(l10n.libraryTitle, role: MxTextRole.pageTitle),
-          const MxGap(MxSpace.md),
+          const MxGap(MxSpace.sm),
           MxText(
             l10n.libraryHeroDueToday(state.dueToday),
             role: MxTextRole.heroAccent,

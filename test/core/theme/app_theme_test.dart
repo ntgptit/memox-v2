@@ -223,7 +223,7 @@ void main() {
 
       expect(AppRadius.button, AppRadius.borderLg);
       expect(AppRadius.buttonSmall, AppRadius.borderLg);
-      expect(AppRadius.card, AppRadius.borderXl);
+      expect(AppRadius.card, AppRadius.borderLg);
       expect(AppRadius.cardLarge, AppRadius.borderXxl);
       expect(AppRadius.dialog, AppRadius.borderXxl);
       expect(

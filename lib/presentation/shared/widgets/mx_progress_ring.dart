@@ -60,7 +60,7 @@ class MxProgressRing extends StatelessWidget {
         children: [
           ring,
           Text(
-            '${(clamped * 100).round()}',
+            '${(clamped * 100).round()}%',
             style: textTheme.labelSmall?.copyWith(color: scheme.onSurface),
           ),
         ],

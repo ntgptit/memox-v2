@@ -40,7 +40,7 @@ abstract final class AppRadius {
   static const BorderRadius buttonSmall = borderLg;
   static const BorderRadius buttonPill = borderFull;
   static const BorderRadius chip = borderFull;
-  static const BorderRadius card = borderXl;
+  static const BorderRadius card = borderLg;
   static const BorderRadius cardLarge = borderXxl;
   static const BorderRadius dialog = borderXxl;
   static const BorderRadius bottomSheet = BorderRadius.vertical(top: radiusXxl);

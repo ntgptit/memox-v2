@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
+import '../../../core/theme/extensions/theme_extensions.dart';
 import '../layouts/mx_gap.dart';
 
 enum MxProgressSize { small, medium, large }
@@ -54,6 +55,7 @@ class MxLinearProgress extends StatelessWidget {
     this.showPercentage = false,
     this.size = MxProgressSize.medium,
     this.color,
+    this.minHeight,
     super.key,
   });
 
@@ -62,6 +64,7 @@ class MxLinearProgress extends StatelessWidget {
   final bool showPercentage;
   final MxProgressSize size;
   final Color? color;
+  final double? minHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +72,15 @@ class MxLinearProgress extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final progressTheme = Theme.of(context).progressIndicatorTheme;
     final pct = (value.clamp(0.0, 1.0) * 100).round();
-    final trackHeight = switch (size) {
-      MxProgressSize.small => AppSpacing.xs,
-      MxProgressSize.medium =>
-        progressTheme.linearMinHeight ?? _defaultLinearProgressTrackHeight,
-      MxProgressSize.large => AppSpacing.sm,
-    };
+    final trackHeight =
+        minHeight ??
+        switch (size) {
+          MxProgressSize.small => AppSpacing.xs,
+          MxProgressSize.medium =>
+            progressTheme.linearMinHeight ?? _defaultLinearProgressTrackHeight,
+          MxProgressSize.large => AppSpacing.sm,
+        };
+    final progressColor = color ?? context.mxColors.masteryProgress(value);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -109,7 +115,7 @@ class MxLinearProgress extends StatelessWidget {
           borderRadius: AppRadius.borderFull,
           child: LinearProgressIndicator(
             value: value.clamp(0.0, 1.0),
-            color: color,
+            color: progressColor,
             minHeight: trackHeight,
           ),
         ),

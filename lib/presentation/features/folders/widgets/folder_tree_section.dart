@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../../core/theme/responsive/app_layout.dart';
-import '../../../../core/theme/tokens/app_spacing.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_deck_card.dart';
@@ -46,19 +44,11 @@ class FolderTreeSliver extends StatelessWidget {
     }
 
     final decks = state.decks;
-    final columns = context.gridColumns(base: 2);
-    return SliverGrid(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: columns,
-        crossAxisSpacing: AppSpacing.md,
-        mainAxisSpacing: AppSpacing.md,
-        childAspectRatio: 0.88,
-      ),
-      delegate: SliverChildBuilderDelegate(
-        (context, index) =>
-            _DeckCard(item: decks[index], onOpenActions: onOpenDeckActions),
-        childCount: decks.length,
-      ),
+    return SliverList.separated(
+      itemCount: decks.length,
+      itemBuilder: (context, index) =>
+          _DeckCard(item: decks[index], onOpenActions: onOpenDeckActions),
+      separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
     );
   }
 }
@@ -115,6 +105,14 @@ class _DeckCard extends StatelessWidget {
       masteryPercent: item.masteryPercent,
       onTap: () => context.pushFlashcardList(item.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
+      trailing: MxStudyProgressAction(
+        key: ValueKey('deck_study_${item.id}'),
+        masteryPercent: item.masteryPercent,
+        badgeCount: item.dueToday,
+        tooltip: l10n.studyStartAction,
+        onPressed: () =>
+            context.goStudyEntry(entryType: 'deck', entryRefId: item.id),
+      ),
     );
   }
 }

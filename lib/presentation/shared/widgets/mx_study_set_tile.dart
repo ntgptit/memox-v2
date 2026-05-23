@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import 'mx_avatar.dart';
@@ -102,13 +103,24 @@ class MxStudySetTile extends StatelessWidget {
       },
     );
 
-    return MxTappable(
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
-      onTap: onTap,
-      onLongPress: onLongPress,
-      backgroundColor: scheme.surfaceContainerLow,
-      overlayBaseColor: scheme.primary,
-      child: tile,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLowest,
+        borderRadius: AppRadius.card,
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(
+            alpha: AppOpacity.ghostBorder,
+          ),
+        ),
+      ),
+      child: MxTappable(
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
+        onTap: onTap,
+        onLongPress: onLongPress,
+        backgroundColor: scheme.surfaceContainerLowest,
+        overlayBaseColor: scheme.primary,
+        child: tile,
+      ),
     );
   }
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../core/theme/extensions/theme_extensions.dart';
+import '../../../../core/theme/tokens/app_radius.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -22,14 +24,17 @@ class FlashcardProgressSection extends StatelessWidget {
       _ProgressItem(
         label: l10n.flashcardsProgressNew,
         count: progress.newCount,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       _ProgressItem(
         label: l10n.flashcardsProgressLearning,
         count: progress.learningCount,
+        color: context.mxColors.warning,
       ),
       _ProgressItem(
         label: l10n.flashcardsProgressMastered,
         count: progress.masteredCount,
+        color: context.mxColors.mastery,
       ),
     ];
 
@@ -54,14 +59,10 @@ class FlashcardProgressSection extends StatelessWidget {
                 size: MxProgressSize.large,
               ),
               const MxGap(MxSpace.lg),
-              Row(
-                children: [
-                  for (var index = 0; index < items.length; index++) ...[
-                    Expanded(child: _ProgressStat(item: items[index])),
-                    if (index != items.length - 1) const MxGap(MxSpace.sm),
-                  ],
-                ],
-              ),
+              for (var index = 0; index < items.length; index++) ...[
+                _ProgressStat(item: items[index]),
+                if (index != items.length - 1) const MxGap(MxSpace.sm),
+              ],
             ],
           ),
         ),
@@ -71,10 +72,15 @@ class FlashcardProgressSection extends StatelessWidget {
 }
 
 class _ProgressItem {
-  const _ProgressItem({required this.label, required this.count});
+  const _ProgressItem({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
 
   final String label;
   final int count;
+  final Color color;
 }
 
 class _ProgressStat extends StatelessWidget {
@@ -87,18 +93,26 @@ class _ProgressStat extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final countLabel = l10n.flashcardsProgressCountValue(item.count);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Row(
       children: [
-        MxText(countLabel, role: MxTextRole.studyProgress),
-        const MxGap(MxSpace.xs),
-        MxText(
-          item.label,
-          role: MxTextRole.tileMeta,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: item.color,
+            borderRadius: AppRadius.borderFull,
+          ),
+          child: const SizedBox.square(dimension: MxSpace.sm),
         ),
+        const MxGap(MxSpace.sm),
+        Expanded(
+          child: MxText(
+            item.label,
+            role: MxTextRole.tileMeta,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        const MxGap(MxSpace.sm),
+        MxText(countLabel, role: MxTextRole.tileTrailing),
       ],
     );
   }

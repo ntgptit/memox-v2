@@ -27,7 +27,7 @@ import 'package:memox/presentation/features/flashcards/widgets/flashcard_toolbar
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
 import 'package:memox/presentation/shared/widgets/mx_badge.dart';
-import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_search_field.dart';
@@ -197,10 +197,9 @@ void main() {
 
       await _scrollToText(tester, 'Study modes');
       final disabledTiles = tester
-          .widgetList<MxListTile>(_studyModeTiles())
+          .widgetList<MxCard>(_studyModeTiles())
           .toList();
       expect(disabledTiles, hasLength(5));
-      expect(disabledTiles.every((tile) => !tile.enabled), isTrue);
       expect(
         find.descendant(
           of: _studyModeSection(),
@@ -373,17 +372,16 @@ void main() {
 
       await _scrollToText(tester, 'Study modes');
 
-      final tiles = tester.widgetList<MxListTile>(_studyModeTiles()).toList();
+      final tiles = tester.widgetList<MxCard>(_studyModeTiles()).toList();
       final section = _studyModeSection();
 
       expect(tiles, hasLength(5));
-      expect(tiles.every((tile) => tile.enabled), isTrue);
       expect(
         find.descendant(
           of: section,
           matching: find.byIcon(Icons.chevron_right),
         ),
-        findsNWidgets(5),
+        findsNothing,
       );
       expect(
         tester
@@ -394,7 +392,7 @@ void main() {
         lessThan(
           tester
               .getTopLeft(
-                find.descendant(of: section, matching: find.text('Match')),
+                find.descendant(of: section, matching: find.text('Guess')),
               )
               .dy,
         ),
@@ -1016,7 +1014,12 @@ Finder _studyModeSection() {
 Finder _studyModeTiles() {
   return find.descendant(
     of: _studyModeSection(),
-    matching: find.byType(MxListTile),
+    matching: find.byWidgetPredicate(
+      (widget) =>
+          widget is MxCard &&
+          widget.key is ValueKey<String> &&
+          (widget.key! as ValueKey<String>).value.startsWith('study_mode_'),
+    ),
   );
 }
 

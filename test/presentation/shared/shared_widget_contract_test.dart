@@ -602,7 +602,10 @@ void main() {
       expect(card.color, scheme.surfaceContainerLowest);
       expect(card.elevation, AppElevation.card);
       expect(shape.borderRadius, AppRadius.card);
-      expect(shape.side.color, scheme.outlineVariant);
+      expect(
+        shape.side.color,
+        scheme.outlineVariant.withValues(alpha: AppOpacity.ghostBorder),
+      );
       expect(text.style?.fontSize, theme.textTheme.titleMedium?.fontSize);
       expect(text.style?.color, scheme.onSurface);
       expect(icon.size, AppIconSizes.md);
@@ -1543,12 +1546,12 @@ void main() {
       expect(card.color, expectedColor, reason: entry.name);
       expect(card.elevation, entry.elevation, reason: entry.name);
       expect(shape.borderRadius, AppRadius.card, reason: entry.name);
-      if (entry.variant == MxCardVariant.outlined) {
-        expect(shape.side.color, scheme.outlineVariant, reason: entry.name);
-        expect(shape.side.width, 1);
-      } else {
-        expect(shape.side, BorderSide.none, reason: entry.name);
-      }
+      expect(
+        shape.side.color,
+        scheme.outlineVariant.withValues(alpha: AppOpacity.ghostBorder),
+        reason: entry.name,
+      );
+      expect(shape.side.width, 1, reason: entry.name);
     }
   });
 

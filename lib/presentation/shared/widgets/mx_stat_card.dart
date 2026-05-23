@@ -16,6 +16,7 @@ class MxStatCard extends StatelessWidget {
     required this.value,
     this.tone = MxStatTone.neutral,
     this.icon,
+    this.supportingText,
     super.key,
   });
 
@@ -23,6 +24,7 @@ class MxStatCard extends StatelessWidget {
   final String value;
   final MxStatTone tone;
   final IconData? icon;
+  final String? supportingText;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +53,7 @@ class MxStatCard extends StatelessWidget {
               ),
             ],
           ),
-          const MxGap(AppSpacing.sm),
+          const MxGap(AppSpacing.xs),
           MxText(
             value,
             role: MxTextRole.pageTitle,
@@ -59,6 +61,16 @@ class MxStatCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+          if (supportingText != null) ...[
+            const MxGap(AppSpacing.xxs),
+            MxText(
+              supportingText!,
+              role: MxTextRole.formHelper,
+              color: accent,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ],
       ),
     );

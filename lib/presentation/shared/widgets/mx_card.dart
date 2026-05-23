@@ -59,12 +59,13 @@ class MxCard extends StatelessWidget {
         backgroundColor ??
         accentBackground ??
         _backgroundColor(cardTheme, scheme);
-    final resolvedBorderColor = borderColor ?? accentBorder;
+    final resolvedBorderColor =
+        borderColor ??
+        accentBorder ??
+        scheme.outlineVariant.withValues(alpha: AppOpacity.ghostBorder);
     final cardShape = RoundedRectangleBorder(
       borderRadius: resolvedBorderRadius,
-      side: variant == MxCardVariant.outlined || resolvedBorderColor != null
-          ? BorderSide(color: resolvedBorderColor ?? scheme.outlineVariant)
-          : BorderSide.none,
+      side: BorderSide(color: resolvedBorderColor),
     );
 
     final content = Card(

@@ -30,14 +30,7 @@ class FolderHeaderSection extends StatelessWidget {
     final showSummary =
         context.showsSupportingCopy || state.mode != FolderDetailMode.unlocked;
 
-    // The current folder is already shown by the page title above, so drop the
-    // trailing breadcrumb crumb when it just repeats the title.
-    final crumbs = state.header.breadcrumb;
-    final lastCrumbIsTitle =
-        crumbs.isNotEmpty && crumbs.last.label == state.header.name;
-    final visibleCrumbs = lastCrumbIsTitle
-        ? crumbs.sublist(0, crumbs.length - 1)
-        : crumbs;
+    final visibleCrumbs = state.header.breadcrumb;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,9 +60,7 @@ class FolderHeaderSection extends StatelessWidget {
                       index == visibleCrumbs.length - 1 ||
                           visibleCrumbs[index].folderId == null
                       ? null
-                      : () => onOpenBreadcrumb(
-                          visibleCrumbs[index].folderId!,
-                        ),
+                      : () => onOpenBreadcrumb(visibleCrumbs[index].folderId!),
                 ),
             ],
           ),
