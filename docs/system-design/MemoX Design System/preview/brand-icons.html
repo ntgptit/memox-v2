@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Iconography</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .grid { display:grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
+  .cell { aspect-ratio: 1; border: var(--memox-border-ghost); border-radius: 12px; display:flex; align-items:center; justify-content:center; color: var(--memox-on-surface); }
+  .cell svg { width: 24px; height: 24px; stroke-width: 2; }
+  .row-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); margin-bottom: 8px; }
+  .note { font-size: 11px; color: var(--memox-on-surface-variant); margin-top: 10px; }
+</style>
+</head>
+<body>
+  <div class="row-lbl">Lucide · 24px · 2px stroke · substitute for Material Symbols</div>
+  <div class="grid">
+    <div class="cell"><i data-lucide="book-open"></i></div>
+    <div class="cell"><i data-lucide="layers"></i></div>
+    <div class="cell"><i data-lucide="folder"></i></div>
+    <div class="cell"><i data-lucide="graduation-cap"></i></div>
+    <div class="cell"><i data-lucide="bar-chart-3"></i></div>
+    <div class="cell"><i data-lucide="settings"></i></div>
+    <div class="cell"><i data-lucide="search"></i></div>
+    <div class="cell"><i data-lucide="plus"></i></div>
+    <div class="cell" style="color:var(--memox-streak)"><i data-lucide="flame"></i></div>
+    <div class="cell"><i data-lucide="brain-circuit"></i></div>
+    <div class="cell"><i data-lucide="arrow-right"></i></div>
+    <div class="cell" style="color:var(--memox-mastery)"><i data-lucide="check"></i></div>
+    <div class="cell" style="color:var(--memox-error)"><i data-lucide="x"></i></div>
+    <div class="cell"><i data-lucide="flag"></i></div>
+    <div class="cell"><i data-lucide="more-horizontal"></i></div>
+    <div class="cell"><i data-lucide="chevron-right"></i></div>
+  </div>
+  <div class="note">No emoji. No unicode glyphs. Material Symbols in Flutter; Lucide in web surfaces.</div>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

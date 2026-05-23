@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Type in Use</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: var(--memox-surface-container-low); font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .card { background: #fff; border-radius: var(--memox-radius-card); border: var(--memox-border-ghost); padding: 18px 20px; }
+  .ov { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); }
+  .h { font-size: 24px; font-weight: 600; letter-spacing: -0.64px; margin-top: 6px; }
+  .sub { font-size: 14px; color: var(--memox-on-surface-variant); margin-top: 6px; }
+  .stats { display:flex; gap: 28px; margin-top: 14px; }
+  .stat { display:flex; flex-direction: column; }
+  .stat .n { font-size: 32px; font-weight: 700; letter-spacing:-0.64px; font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); }
+  .green { color: var(--memox-mastery); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="ov">Today · 10 Apr</div>
+    <div class="h">Good evening, Alex</div>
+    <div class="sub">You have 23 cards due. Reviewing takes about 8 minutes.</div>
+    <div class="stats">
+      <div class="stat"><div class="n green">7</div><div class="l">day streak</div></div>
+      <div class="stat"><div class="n">23</div><div class="l">due</div></div>
+      <div class="stat"><div class="n">512</div><div class="l">mastered</div></div>
+    </div>
+  </div>
+</body>
+</html>

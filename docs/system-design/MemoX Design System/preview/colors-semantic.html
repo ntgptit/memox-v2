@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Semantic Colors</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--memox-surface-container-low); }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .cell { border-radius: var(--memox-radius-md); padding: 14px; height: 110px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; border: var(--memox-border-ghost); }
+  .nm { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: var(--memox-ls-section); }
+  .sub { font-size: 10px; opacity: .85; text-transform: uppercase; letter-spacing: var(--memox-ls-section); font-weight: 700; }
+  .hx { font-size: 10px; font-variant-numeric: tabular-nums; opacity: .9; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="cell" style="background:#2BA88B"><div><div class="sub">Semantic</div><div class="nm">Success</div></div><div class="hx">#2BA88B</div></div>
+    <div class="cell" style="background:#F59E0B; color:#0F1638"><div><div class="sub">Semantic</div><div class="nm">Warning</div></div><div class="hx">#F59E0B</div></div>
+    <div class="cell" style="background:#DC2D4E"><div><div class="sub">Semantic</div><div class="nm">Error</div></div><div class="hx">#DC2D4E</div></div>
+    <div class="cell" style="background:#1F8A5B"><div><div class="sub">Custom</div><div class="nm">Mastery</div></div><div class="hx">#1F8A5B</div></div>
+    <div class="cell" style="background:#F97316"><div><div class="sub">Custom</div><div class="nm">Streak</div></div><div class="hx">#F97316</div></div>
+  </div>
+</body>
+</html>

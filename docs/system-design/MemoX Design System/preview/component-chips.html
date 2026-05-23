@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Chips</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .row { display:flex; gap: 6px; align-items:center; flex-wrap:wrap; margin-bottom: 12px; }
+  .lbl { font-size: 10px; font-weight:700; letter-spacing:1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); min-width:62px; }
+  .chip { height: 30px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 600; display:inline-flex; align-items:center; gap: 6px; border: var(--memox-border-ghost); background: #fff; }
+  .chip.selected { background: var(--memox-primary); color:#fff; border: none; }
+  .chip.status-new { background:#F1F3F8; color:#6E7591; }
+  .chip.status-learn { background: rgba(245,158,11,0.16); color:#A56300; }
+  .chip.status-review { background: rgba(82,101,245,0.12); color: var(--memox-primary); }
+  .chip.status-mastered { background: rgba(31,138,91,0.12); color: var(--memox-mastery); }
+  .dot { width: 6px; height: 6px; border-radius: 999px; }
+  .count { font-size: 10px; font-weight: 700; opacity: 0.6; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="row"><span class="lbl">Filter</span>
+    <span class="chip selected">All <span class="count" style="opacity:0.85">142</span></span>
+    <span class="chip">Korean <span class="count">98</span></span>
+    <span class="chip">Japanese <span class="count">44</span></span>
+    <span class="chip">Archived</span>
+  </div>
+  <div class="row"><span class="lbl">Status</span>
+    <span class="chip status-new"><span class="dot" style="background:var(--memox-status-new)"></span>New <span class="count">4</span></span>
+    <span class="chip status-learn"><span class="dot" style="background:var(--memox-status-learning)"></span>Learning <span class="count">8</span></span>
+    <span class="chip status-review"><span class="dot" style="background:var(--memox-status-reviewing)"></span>Reviewing <span class="count">24</span></span>
+    <span class="chip status-mastered"><span class="dot" style="background:var(--memox-status-mastered)"></span>Mastered <span class="count">106</span></span>
+  </div>
+</body>
+</html>

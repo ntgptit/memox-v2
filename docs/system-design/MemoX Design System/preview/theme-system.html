@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1280" />
+<title>MemoX — Theme System (all tokens)</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  body { margin: 0; padding: 0; font-family: var(--memox-font-sans); background: var(--memox-surface); color: var(--memox-on-surface); transition: background 200ms; }
+  body.dark { background: #0A0E27; color: #E4E8FA; }
+  body.dark { --memox-surface: #0A0E27; --memox-surface-container-lowest: #131A3A; --memox-surface-container-low: #1B2249; --memox-surface-container: #232B5A; --memox-surface-container-high: #2C356E; --memox-on-surface: #E4E8FA; --memox-on-surface-variant: #A4ACD0; --memox-outline-variant: #2A3267; --memox-primary: #5265F5; --memox-on-primary: #fff; --memox-mastery: #6FE0BD; --memox-error: #FF8FA3; --memox-warning: #FFC658; --memox-streak: #FFAE6E; --memox-status-mastered: #6FE0BD; --memox-status-reviewing: #5265F5; --memox-status-learning: #F59E0B; --memox-status-new: #6B75A3; --memox-rating-good: #5265F5; --memox-rating-easy: #6FE0BD; --memox-rating-again: #FF8FA3; --memox-rating-hard: #FFC658; --memox-border-ghost: 1px solid rgba(139,154,255,0.16); --memox-accent: #B5A0FF; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 32px 32px 80px; }
+  .hero { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom: 40px; padding-bottom: 24px; border-bottom: var(--memox-border-ghost); }
+  .hero-title { font-size: 36px; font-weight: 800; letter-spacing: -0.8px; margin: 0 0 6px; }
+  .hero-sub { font-size: 14px; color: var(--memox-on-surface-variant); max-width: 560px; line-height: 1.5; }
+  .toggle { display:inline-flex; gap:4px; padding:4px; border-radius:999px; background:var(--memox-surface-container-low); border: var(--memox-border-ghost); }
+  .toggle button { border:none; background:transparent; border-radius:999px; height:32px; padding:0 14px; font-size:12px; font-weight:600; color:var(--memox-on-surface-variant); display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-family:inherit; }
+  .toggle button.active { background:var(--memox-surface-container-lowest); color:var(--memox-on-surface); box-shadow:0 1px 2px rgba(0,0,0,0.1); }
+  .toggle svg { width:14px; height:14px; }
+
+  section { margin-bottom: 56px; }
+  .sec-head { display:flex; align-items:baseline; gap:14px; margin-bottom: 18px; }
+  .sec-num { font-size: 11px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--memox-primary); font-variant-numeric: tabular-nums; }
+  .sec-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin: 0; }
+  .sec-desc { font-size: 13px; color: var(--memox-on-surface-variant); margin-left: auto; max-width: 420px; line-height: 1.4; }
+
+  .grid-6 { display:grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .grid-5 { display:grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .grid-4 { display:grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .grid-3 { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-2 { display:grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+  .sw { border-radius: 12px; padding: 12px; height: 90px; display:flex; flex-direction: column; justify-content: space-between; border: var(--memox-border-ghost); }
+  .sw .nm { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+  .sw .hx { font-size: 10px; font-variant-numeric: tabular-nums; opacity: .9; }
+
+  .type-row { display:grid; grid-template-columns: 90px 1fr 140px; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: var(--memox-border-ghost); }
+  .type-row:last-child { border-bottom: none; }
+  .type-tag { font-size: 11px; font-weight: 700; color: var(--memox-on-surface-variant); letter-spacing: 1px; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+  .type-role { font-size: 11px; color: var(--memox-on-surface-variant); text-align: right; }
+
+  .space-row { display:grid; grid-template-columns: 90px 1fr 110px; align-items:center; gap: 14px; padding: 4px 0; }
+  .space-lbl { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); font-variant-numeric: tabular-nums; }
+  .space-bar { height: 10px; background: var(--memox-primary); border-radius: 4px; }
+  .space-meta { font-size: 11px; color: var(--memox-on-surface-variant); text-align:right; }
+
+  .radius-tile { aspect-ratio: 1; border: var(--memox-border-ghost); background: var(--memox-surface-container-low); display:flex; align-items:flex-end; padding:8px; font-size: 10px; font-weight: 700; color: var(--memox-on-surface-variant); letter-spacing: 0.8px; text-transform: uppercase; }
+
+  .elev-tile { height: 80px; border-radius: 12px; background: var(--memox-surface-container-lowest); border: var(--memox-border-ghost); padding: 12px; display:flex; flex-direction: column; justify-content: space-between; }
+
+  .comp-card { background: var(--memox-surface-container-lowest); border: var(--memox-border-ghost); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .comp-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); }
+  .btn { font-family: inherit; border: none; cursor: pointer; height: 42px; padding: 0 18px; border-radius: 10px; font-size: 13px; font-weight: 600; display:inline-flex; align-items:center; gap: 6px; }
+  .btn-primary { background: var(--memox-primary); color: var(--memox-on-primary); }
+  .btn-secondary { background: var(--memox-surface-container); color: var(--memox-on-surface); }
+  .btn-outline { background: transparent; color: var(--memox-primary); border: 1px solid var(--memox-primary); }
+  .btn-text { background: transparent; color: var(--memox-primary); }
+  .chip { height: 32px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; display:inline-flex; align-items:center; gap: 6px; background:var(--memox-surface-container-lowest); border: var(--memox-border-ghost); }
+  .chip.active { background: var(--memox-primary); color: var(--memox-on-primary); border: none; }
+  .input { height: 44px; padding: 0 14px; background: var(--memox-surface-container-low); border-radius: 10px; display:flex; align-items:center; font-size: 14px; color: var(--memox-on-surface-variant); }
+  .input.focus { border: 1px solid var(--memox-primary); background: var(--memox-surface-container-lowest); color: var(--memox-on-surface); }
+  .status-pill { padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #fff; }
+  .ring-row { display:flex; gap: 12px; align-items: center; }
+  .ring { width: 40px; height: 40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div>
+      <div style="font-size:11px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:var(--memox-primary); margin-bottom:8px">MemoX Design System</div>
+      <h1 class="hero-title">Tokyo Pure Light <span style="color:var(--memox-on-surface-variant)">·</span> Tokyo Nebula</h1>
+      <p class="hero-sub">Calm, mobile-first flashcard app. Plus Jakarta Sans, vibrant indigo primary, deep navy night sky, indigo-tinted outlines. Material 3 tonal surfaces. No emoji, no hype, no gradient chrome.</p>
+    </div>
+    <div class="toggle">
+      <button class="active" data-theme="light" id="lightBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        Light
+      </button>
+      <button data-theme="dark" id="darkBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        Dark
+      </button>
+    </div>
+  </div>
+
+  <!-- 1. Brand colors -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01 · Color</span><h2 class="sec-title">Brand & seeds</h2><span class="sec-desc">Primary indigo carries every action. Violet is the Nebula signature accent. 5 alternate seeds available in Settings.</span></div>
+    <div class="grid-6">
+      <div class="sw" style="background:var(--memox-primary); color:var(--memox-on-primary); grid-column: span 2; height: 110px;"><div><div class="nm" style="opacity:.85">Primary · Brand</div><div style="font-size:22px; font-weight:800; letter-spacing:-0.5px; margin-top:6px">Indigo</div></div><div class="hx">#5265F5</div></div>
+      <div class="sw" style="background:#8B6FF5; color:#fff; height:110px;"><div class="nm">Violet</div><div class="hx">#8B6FF5</div></div>
+      <div class="sw" style="background:#2BA88B; color:#fff; height:110px;"><div class="nm">Teal</div><div class="hx">#2BA88B</div></div>
+      <div class="sw" style="background:#E57373; color:#fff; height:110px;"><div class="nm">Rose</div><div class="hx">#E57373</div></div>
+      <div class="sw" style="background:#F59E0B; color:#fff; height:110px;"><div class="nm">Amber</div><div class="hx">#F59E0B</div></div>
+    </div>
+  </section>
+
+  <!-- 2. Surface ladder -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02 · Color</span><h2 class="sec-title">Surface ladder</h2><span class="sec-desc">6-step cool-blue stack (Light) or deep navy → paper indigo (Nebula). Cards float on page.</span></div>
+    <div class="grid-6">
+      <div class="sw" style="background:var(--memox-surface-container-lowest)"><div class="nm">Lowest</div><div class="hx">paper</div></div>
+      <div class="sw" style="background:var(--memox-surface)"><div class="nm">Page</div><div class="hx">surface</div></div>
+      <div class="sw" style="background:var(--memox-surface-container-low)"><div class="nm">Low</div><div class="hx">section</div></div>
+      <div class="sw" style="background:var(--memox-surface-container)"><div class="nm">Container</div><div class="hx">default</div></div>
+      <div class="sw" style="background:var(--memox-surface-container-high)"><div class="nm">High</div><div class="hx">tonal lift</div></div>
+      <div class="sw" style="background:#DAE0EF; border: var(--memox-border-ghost)"><div class="nm">Highest</div><div class="hx">strong</div></div>
+    </div>
+  </section>
+
+  <!-- 3. Semantic colors -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03 · Color</span><h2 class="sec-title">Semantic & study</h2><span class="sec-desc">Status, ratings, mastery, streak. Green = mastery (the warm feeling of fluency).</span></div>
+    <div class="grid-5">
+      <div class="sw" style="background:var(--memox-mastery); color:#fff"><div class="nm">Mastery</div><div class="hx">#1F8A5B</div></div>
+      <div class="sw" style="background:var(--memox-warning); color:#191C1E"><div class="nm">Warning</div><div class="hx">#F59E0B</div></div>
+      <div class="sw" style="background:var(--memox-error); color:#fff"><div class="nm">Error</div><div class="hx">#DC2D4E</div></div>
+      <div class="sw" style="background:var(--memox-streak); color:#fff"><div class="nm">Streak</div><div class="hx">#F97316</div></div>
+      <div class="sw" style="background:var(--memox-rating-easy); color:#fff"><div class="nm">Easy/Success</div><div class="hx">#2BA88B</div></div>
+    </div>
+    <div style="margin-top: 14px; display:flex; gap: 8px; flex-wrap:wrap">
+      <span class="status-pill" style="background:var(--memox-status-new)">New</span>
+      <span class="status-pill" style="background:var(--memox-status-learning); color:#191C1E">Learning</span>
+      <span class="status-pill" style="background:var(--memox-status-reviewing)">Reviewing</span>
+      <span class="status-pill" style="background:var(--memox-status-mastered)">Mastered</span>
+      <span style="margin-left:24px"></span>
+      <span class="status-pill" style="background:var(--memox-rating-again)">Again</span>
+      <span class="status-pill" style="background:var(--memox-rating-hard); color:#191C1E">Hard</span>
+      <span class="status-pill" style="background:var(--memox-rating-good)">Good</span>
+      <span class="status-pill" style="background:var(--memox-rating-easy)">Easy</span>
+    </div>
+  </section>
+
+  <!-- 4. Typography -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04 · Type</span><h2 class="sec-title">Type scale</h2><span class="sec-desc">Plus Jakarta Sans · constrained scale 48 / 32 / 24 / 20 / 16 / 14 / 12. Nothing in between.</span></div>
+    <div class="comp-card">
+      <div class="type-row"><div class="type-tag">48 / 600</div><div style="font-size:48px; font-weight:600; letter-spacing:-0.64px; line-height:1.05">127</div><div class="type-role">Stat display</div></div>
+      <div class="type-row"><div class="type-tag">32 / 700</div><div style="font-size:32px; font-weight:700; letter-spacing:-0.5px; line-height:1.15">Good evening, Alex</div><div class="type-role">Display large · hero</div></div>
+      <div class="type-row"><div class="type-tag">24 / 600</div><div style="font-size:24px; font-weight:600; letter-spacing:-0.4px">Korean vocabulary</div><div class="type-role">Headline · screen titles</div></div>
+      <div class="type-row"><div class="type-tag">20 / 600</div><div style="font-size:20px; font-weight:600">Due today</div><div class="type-role">Title large · bridge</div></div>
+      <div class="type-row"><div class="type-tag">16 / 500</div><div style="font-size:16px; font-weight:500; line-height:1.5">Review 23 cards to keep your streak alive.</div><div class="type-role">Body · base reading</div></div>
+      <div class="type-row"><div class="type-tag">14 / 500</div><div style="font-size:14px; font-weight:500; color:var(--memox-on-surface-variant)">Last studied 2 hours ago</div><div class="type-role">Body small · meta</div></div>
+      <div class="type-row"><div class="type-tag">12 / 700</div><div style="font-size:12px; font-weight:700; letter-spacing:1.2px; color:var(--memox-on-surface-variant); text-transform:uppercase">Section overline</div><div class="type-role">Caption · overline</div></div>
+    </div>
+  </section>
+
+  <!-- 5. Spacing & 6. Radii -->
+  <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap: 32px;">
+    <section style="margin-bottom: 0">
+      <div class="sec-head"><span class="sec-num">05 · Space</span><h2 class="sec-title">Spacing (4dp grid)</h2></div>
+      <div class="comp-card">
+        <div class="space-row"><div class="space-lbl">xs · 4</div><div class="space-bar" style="width:4px"></div><div class="space-meta">hairline</div></div>
+        <div class="space-row"><div class="space-lbl">sm · 8</div><div class="space-bar" style="width:8px"></div><div class="space-meta">list gap</div></div>
+        <div class="space-row"><div class="space-lbl">md · 12</div><div class="space-bar" style="width:12px"></div><div class="space-meta">inline</div></div>
+        <div class="space-row"><div class="space-lbl">lg · 16</div><div class="space-bar" style="width:16px"></div><div class="space-meta">card pad</div></div>
+        <div class="space-row"><div class="space-lbl">xl · 24</div><div class="space-bar" style="width:24px"></div><div class="space-meta">screen pad</div></div>
+        <div class="space-row"><div class="space-lbl">xxl · 32</div><div class="space-bar" style="width:32px"></div><div class="space-meta">section gap</div></div>
+        <div class="space-row"><div class="space-lbl">xxxl · 48</div><div class="space-bar" style="width:48px"></div><div class="space-meta">hero gap</div></div>
+      </div>
+    </section>
+
+    <section style="margin-bottom: 0">
+      <div class="sec-head"><span class="sec-num">06 · Shape</span><h2 class="sec-title">Radii</h2></div>
+      <div class="grid-4">
+        <div class="radius-tile" style="border-radius:4px">xs 4</div>
+        <div class="radius-tile" style="border-radius:8px">sm 8</div>
+        <div class="radius-tile" style="border-radius:12px">md 12</div>
+        <div class="radius-tile" style="border-radius:16px">lg 16</div>
+        <div class="radius-tile" style="border-radius:24px">xl 24</div>
+        <div class="radius-tile" style="border-radius:28px">xxl 28</div>
+        <div class="radius-tile" style="border-radius:999px">full</div>
+        <div class="radius-tile" style="border-radius:14px; background:var(--memox-primary); color:#fff">card 12</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 7. Components -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07 · Components</span><h2 class="sec-title">Primitives</h2><span class="sec-desc">Buttons, chips, inputs, status pills, cards. Every primary action lives in indigo; mode badges adopt their mode's accent.</span></div>
+    <div class="grid-3">
+      <!-- Buttons -->
+      <div class="comp-card">
+        <span class="comp-label">Buttons</span>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn btn-primary">Start review</button>
+          <button class="btn btn-secondary">Skip</button>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn btn-outline">Hint</button>
+          <button class="btn btn-text">Undo</button>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn btn-primary" style="border-radius:999px">Show answer</button>
+          <button class="btn btn-outline" style="border-radius:999px">Mark correct</button>
+        </div>
+      </div>
+
+      <!-- Chips -->
+      <div class="comp-card">
+        <span class="comp-label">Chips & filters</span>
+        <div style="display:flex; gap:6px; flex-wrap:wrap">
+          <span class="chip active">All decks</span>
+          <span class="chip">Korean</span>
+          <span class="chip">Japanese</span>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap">
+          <span class="chip" style="background:rgba(31,138,91,0.12); color:var(--memox-mastery); border:1px solid rgba(31,138,91,0.30)"><span style="width:6px; height:6px; border-radius:999px; background:var(--memox-mastery)"></span>Mastered 106</span>
+          <span class="chip" style="background:rgba(82,101,245,0.10); color:var(--memox-primary); border:1px solid rgba(82,101,245,0.30)">Reviewing 24</span>
+        </div>
+      </div>
+
+      <!-- Inputs -->
+      <div class="comp-card">
+        <span class="comp-label">Inputs</span>
+        <div class="input focus">Korean TOPIK II — Vocab</div>
+        <div class="input">Search your decks…</div>
+      </div>
+
+      <!-- Mastery rings -->
+      <div class="comp-card">
+        <span class="comp-label">Mastery progress (single-color thresholds)</span>
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <div style="display:grid; grid-template-columns: 100px 1fr 40px; align-items:center; gap:10px"><span style="font-size:12px">HSK 1</span><div style="height:6px; background:var(--memox-surface-container); border-radius:999px; overflow:hidden"><div style="height:100%; width:18%; background:var(--memox-status-learning)"></div></div><span style="font-size:11px; font-variant-numeric:tabular-nums; text-align:right">18%</span></div>
+          <div style="display:grid; grid-template-columns: 100px 1fr 40px; align-items:center; gap:10px"><span style="font-size:12px">Genki 1–5</span><div style="height:6px; background:var(--memox-surface-container); border-radius:999px; overflow:hidden"><div style="height:100%; width:52%; background:var(--memox-status-reviewing)"></div></div><span style="font-size:11px; font-variant-numeric:tabular-nums; text-align:right">52%</span></div>
+          <div style="display:grid; grid-template-columns: 100px 1fr 40px; align-items:center; gap:10px"><span style="font-size:12px">TOPIK II</span><div style="height:6px; background:var(--memox-surface-container); border-radius:999px; overflow:hidden"><div style="height:100%; width:86%; background:var(--memox-status-mastered)"></div></div><span style="font-size:11px; font-variant-numeric:tabular-nums; text-align:right">86%</span></div>
+        </div>
+      </div>
+
+      <!-- Card sample -->
+      <div class="comp-card">
+        <span class="comp-label">Deck card</span>
+        <div style="background:var(--memox-surface-container-lowest); border:var(--memox-border-ghost); border-radius:12px; padding:12px; display:flex; gap:12px; align-items:center">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(82,101,245,0.10); color:var(--memox-primary); display:flex; align-items:center; justify-content:center"><i data-lucide="layers"></i></div>
+          <div style="flex:1">
+            <div style="font-size:14px; font-weight:600">TOPIK II — Vocab</div>
+            <div style="font-size:11px; color:var(--memox-on-surface-variant)">142 cards · 23 due</div>
+          </div>
+          <i data-lucide="chevron-right" style="color:var(--memox-on-surface-variant)"></i>
+        </div>
+      </div>
+
+      <!-- Bottom nav sample -->
+      <div class="comp-card">
+        <span class="comp-label">Bottom nav (glass)</span>
+        <div style="height:64px; background:var(--memox-chrome-glass); backdrop-filter:blur(18px); border:var(--memox-border-ghost); border-radius:18px; display:grid; grid-template-columns:repeat(4,1fr); align-items:center; padding:0 8px">
+          <div style="text-align:center; color:var(--memox-primary); font-size:10px; font-weight:600"><div style="background:rgba(82,101,245,0.12); display:inline-flex; padding:4px 12px; border-radius:999px"><i data-lucide="home"></i></div><div>Home</div></div>
+          <div style="text-align:center; color:var(--memox-on-surface-variant); font-size:10px; font-weight:600"><i data-lucide="layers"></i><div>Library</div></div>
+          <div style="text-align:center; color:var(--memox-on-surface-variant); font-size:10px; font-weight:600"><i data-lucide="bar-chart-3"></i><div>Stats</div></div>
+          <div style="text-align:center; color:var(--memox-on-surface-variant); font-size:10px; font-weight:600"><i data-lucide="settings"></i><div>Settings</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Motion & opacity -->
+  <section>
+    <div class="sec-head"><span class="sec-num">08 · Motion</span><h2 class="sec-title">Motion & opacity</h2><span class="sec-desc">M3 standard easing for most UI, emphasized for hero transitions. No bounce, no elastic.</span></div>
+    <div class="grid-2">
+      <div class="comp-card">
+        <span class="comp-label">Durations</span>
+        <div class="space-row"><div class="space-lbl">fast · 100ms</div><div class="space-bar" style="width:10%; background:var(--memox-primary)"></div><div class="space-meta">state change</div></div>
+        <div class="space-row"><div class="space-lbl">normal · 200ms</div><div class="space-bar" style="width:20%; background:var(--memox-primary)"></div><div class="space-meta">content switch</div></div>
+        <div class="space-row"><div class="space-lbl">slow · 300ms</div><div class="space-bar" style="width:30%; background:var(--memox-primary)"></div><div class="space-meta">page transition</div></div>
+        <div class="space-row"><div class="space-lbl">flip · 350ms</div><div class="space-bar" style="width:35%; background:var(--memox-primary)"></div><div class="space-meta">card flip</div></div>
+      </div>
+      <div class="comp-card">
+        <span class="comp-label">Opacity layers</span>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px">
+          <div style="height:60px; border-radius:10px; position:relative; overflow:hidden; border:var(--memox-border-ghost); background:var(--memox-surface-container-lowest)"><div style="position:absolute; inset:0; background:var(--memox-primary); opacity:0.08"></div><div style="position:relative; padding:8px; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase">Hover · 0.08</div></div>
+          <div style="height:60px; border-radius:10px; position:relative; overflow:hidden; border:var(--memox-border-ghost); background:var(--memox-surface-container-lowest)"><div style="position:absolute; inset:0; background:var(--memox-primary); opacity:0.12"></div><div style="position:relative; padding:8px; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase">Focus · 0.12</div></div>
+          <div style="height:60px; border-radius:10px; position:relative; overflow:hidden; border:var(--memox-border-ghost); background:var(--memox-surface-container-lowest)"><div style="position:absolute; inset:0; background:var(--memox-primary); opacity:0.18"></div><div style="position:relative; padding:8px; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase">Selected · 0.18</div></div>
+        </div>
+        <div style="font-size:11px; color:var(--memox-on-surface-variant); line-height:1.5">Disabled <b>0.38</b> · Hint <b>0.50</b> · Glass <b>0.84</b> · Scrim <b>0.32</b> · Fade-out (wrong) <b>0.40</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Voice -->
+  <section>
+    <div class="sec-head"><span class="sec-num">09 · Voice</span><h2 class="sec-title">Tone</h2><span class="sec-desc">Calm, sentence-case, second-person. No emoji. Always offer the next action.</span></div>
+    <div class="grid-2">
+      <div class="comp-card" style="border-left: 4px solid var(--memox-mastery)">
+        <span class="comp-label" style="color:var(--memox-mastery)">Do</span>
+        <div style="font-size:14px; line-height:1.5">"All caught up."</div>
+        <div style="font-size:14px; line-height:1.5">"You have 23 cards due today. About 8 minutes."</div>
+        <div style="font-size:14px; line-height:1.5">"You're offline. Changes will sync later."</div>
+        <div style="font-size:14px; line-height:1.5">"Good selected. Undo?"</div>
+      </div>
+      <div class="comp-card" style="border-left: 4px solid var(--memox-error)">
+        <span class="comp-label" style="color:var(--memox-error)">Don't</span>
+        <div style="font-size:14px; line-height:1.5; color:var(--memox-on-surface-variant)">"Awesome job! 🎉🔥"</div>
+        <div style="font-size:14px; line-height:1.5; color:var(--memox-on-surface-variant)">"⚠️ Connection lost!!!"</div>
+        <div style="font-size:14px; line-height:1.5; color:var(--memox-on-surface-variant)">"Keep smashing it!!"</div>
+        <div style="font-size:14px; line-height:1.5; color:var(--memox-on-surface-variant)">"Oops, something went wrong"</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  lucide.createIcons();
+  const lightBtn = document.getElementById('lightBtn');
+  const darkBtn = document.getElementById('darkBtn');
+  const applyTheme = (t) => {
+    document.body.classList.toggle('dark', t === 'dark');
+    lightBtn.classList.toggle('active', t === 'light');
+    darkBtn.classList.toggle('active', t === 'dark');
+    try { localStorage.setItem('memox-theme-all', t); } catch {}
+    setTimeout(() => lucide.createIcons(), 50);
+  };
+  lightBtn.addEventListener('click', () => applyTheme('light'));
+  darkBtn.addEventListener('click', () => applyTheme('dark'));
+  try { applyTheme(localStorage.getItem('memox-theme-all') || 'light'); } catch {}
+</script>
+</body>
+</html>

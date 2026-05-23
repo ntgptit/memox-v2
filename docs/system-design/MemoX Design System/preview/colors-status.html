@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Card Status Palette</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--memox-surface-container-low); font-family: var(--memox-font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .chip { border-radius: var(--memox-radius-md); background:#fff; border: var(--memox-border-ghost); padding: 14px; display: flex; flex-direction: column; gap: 10px; height: 110px; justify-content: space-between; }
+  .top { display:flex; align-items:center; gap:10px; }
+  .dot { width: 10px; height: 10px; border-radius: 999px; }
+  .nm { font-size: 14px; font-weight: 700; }
+  .hx { font-size: 10px; color: var(--memox-on-surface-variant); font-variant-numeric: tabular-nums; text-transform: uppercase; letter-spacing: var(--memox-ls-section); font-weight:700; }
+  .pill { align-self:flex-start; padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: var(--memox-ls-section); color: #fff; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="chip"><div class="top"><span class="dot" style="background:#8C95B8"></span><span class="nm">New</span></div><span class="pill" style="background:#8C95B8">New</span><div class="hx">#8C95B8</div></div>
+    <div class="chip"><div class="top"><span class="dot" style="background:#F59E0B"></span><span class="nm">Learning</span></div><span class="pill" style="background:#F59E0B; color:#0F1638">Learning</span><div class="hx">#F59E0B</div></div>
+    <div class="chip"><div class="top"><span class="dot" style="background:#5265F5"></span><span class="nm">Reviewing</span></div><span class="pill" style="background:#5265F5">Reviewing</span><div class="hx">#5265F5</div></div>
+    <div class="chip"><div class="top"><span class="dot" style="background:#1F8A5B"></span><span class="nm">Mastered</span></div><span class="pill" style="background:#1F8A5B">Mastered</span><div class="hx">#1F8A5B</div></div>
+  </div>
+</body>
+</html>

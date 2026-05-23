@@ -1,0 +1,1260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=390, initial-scale=1" />
+<title>MemoX — Mobile UI Kit</title>
+<link rel="stylesheet" href="../../colors_and_type.css" />
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  body { margin: 0; background: #E6E8EA; font-family: var(--memox-font-sans); transition: background 200ms cubic-bezier(0.2,0,0,1); }
+  body.stage-dark { background: #0D0D0F; }
+  .stage {
+    padding: 28px;
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-x: auto;
+    min-height: 100vh;
+  }
+  .phone {
+    width: 390px;
+    height: 780px;
+    background: var(--memox-surface);
+    border-radius: 44px;
+    border: 8px solid #1a1a1a;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 24px 60px rgba(25,28,30,0.12);
+  }
+  .memox-dark .phone {
+    border-color: #2A2A2C;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+  }
+  .phone-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--memox-on-surface-variant);
+    margin-top: 10px;
+  }
+  .phone-col { display: flex; flex-direction: column; align-items: center; }
+  /* shared app layout inside phone */
+  .app { height: 100%; width: 100%; display: flex; flex-direction: column; background: var(--memox-surface); color: var(--memox-on-surface); position: relative; overflow: hidden; }
+  .statusbar { height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; font-size: 14px; font-weight: 600; }
+  .appbar { height: 48px; display: flex; align-items: center; padding: 0 8px; gap: 4px; }
+  .appbar .title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; flex: 1; }
+  .appbar-lg { height: 56px; padding: 0 14px; }
+  .scroll { flex: 1; overflow-y: auto; padding: 0 14px 14px; scrollbar-width: none; -ms-overflow-style: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+  .ov { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); }
+  .h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.64px; line-height: 1.15; margin: 4px 0 8px; }
+  .h2 { font-size: 20px; font-weight: 600; margin: 0; }
+  .card { background: var(--memox-surface-container-lowest); border: var(--memox-border-ghost); border-radius: 12px; padding: 12px; }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 999px; display:inline-flex; align-items:center; justify-content:center; background: transparent; border: none; padding: 0; color: var(--memox-on-surface); cursor: pointer; }
+  .icon-btn:hover { background: rgba(82,101,245,0.08); }
+  .memox-dark .icon-btn:hover { background: rgba(108,124,255,0.14); }
+  .icon-btn svg { width: 20px; height: 20px; }
+  /* Scroll row — hide scrollbar but keep scrolling */
+  .scroll-x { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+  .scroll-x::-webkit-scrollbar { display: none; }
+  .bottom-nav-wrap { padding: 4px 10px 12px; }
+  .bottom-nav {
+    height: 64px;
+    background: var(--memox-chrome-glass);
+    backdrop-filter: var(--memox-chrome-blur);
+    -webkit-backdrop-filter: var(--memox-chrome-blur);
+    border: var(--memox-border-ghost);
+    border-radius: 18px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: center;
+  }
+  .bn-item { display:flex; flex-direction:column; align-items:center; gap: 3px; color: var(--memox-on-surface-variant); font-size: 10px; font-weight: 600; cursor: pointer; }
+  .bn-item svg { width: 20px; height: 20px; }
+  .bn-item.active { color: var(--memox-primary); }
+  .bn-item.active .bn-pill { background: rgba(82, 101, 245, 0.14); padding: 4px 14px; border-radius: 999px; }
+  .memox-dark .bn-item.active .bn-pill { background: rgba(139, 154, 255, 0.20); }
+  button { font-family: inherit; cursor: pointer; }
+  .pill-btn {
+    height: 42px; padding: 0 18px; border-radius: 10px; border: none;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.1px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .pill-btn.primary { background: var(--memox-primary); color: #fff; }
+  .pill-btn.secondary { background: var(--memox-surface-container); color: var(--memox-on-surface); }
+  .pill-btn.outline { background: transparent; color: var(--memox-primary); border: 1px solid var(--memox-outline-variant); }
+  .status-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+  .icon-tile {
+    background: rgba(82, 101, 245, 0.10);
+    color: var(--memox-primary);
+  }
+  .memox-dark .icon-tile {
+    background: rgba(139, 154, 255, 0.16);
+    color: var(--memox-primary);
+  }
+  .toast-dark {
+    background: #0F1638; color: #E4E8FA;
+  }
+  .memox-dark .toast-dark {
+    background: #232B5A; color: #E4E8FA;
+  }
+
+  /* ── Dark mode (scoped, not via media query so users can toggle per preview) ── */
+  /* Tokyo Nebula — deep navy night, paper indigo cards, violet accent */
+  .memox-dark {
+    --memox-surface:                    #0A0E27;
+    --memox-surface-bright:             #232B5A;
+    --memox-surface-dim:                #060925;
+    --memox-surface-container-lowest:   #131A3A;
+    --memox-surface-container-low:      #1B2249;
+    --memox-surface-container:          #232B5A;
+    --memox-surface-container-high:     #2C356E;
+    --memox-surface-container-highest:  #353D7E;
+    --memox-on-surface:          #E4E8FA;
+    --memox-on-surface-variant:  #A4ACD0;
+    --memox-outline:             #5A6BAE;
+    --memox-outline-variant:     #2A3267;
+    --memox-success: #6FE0BD;
+    --memox-mastery: #6FE0BD;
+    --memox-error:   #FF8FA3;
+    --memox-streak:  #FFAE6E;
+    --memox-accent:  #B5A0FF;
+    --memox-chrome-glass: rgba(10, 14, 39, 0.84);
+    --memox-border-ghost: 1px solid rgba(139, 154, 255, 0.16);
+    --memox-primary:    #5265F5;
+    --memox-on-primary: #FFFFFF;
+    --memox-mastery-low:  #8B4F66;
+    --memox-mastery-mid:  #8B7338;
+    --memox-mastery-high: #3F8070;
+  }
+  .memox-dark .phone-body-bg { background: #060925; }
+  .mode-toggle {
+    position: sticky; top: 16px; z-index: 5;
+    display: inline-flex; gap: 4px;
+    padding: 4px; border-radius: 999px;
+    background: rgba(0,0,0,0.06); backdrop-filter: blur(8px);
+    border: 1px solid rgba(0,0,0,0.06);
+    margin: 0 0 20px;
+    font-family: var(--memox-font-sans);
+  }
+  body.stage-dark .mode-toggle { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); }
+  .mode-toggle button {
+    border: none; background: transparent; border-radius: 999px;
+    height: 32px; padding: 0 14px; font-size: 12px; font-weight: 600;
+    color: #454652; display: inline-flex; align-items: center; gap: 6px;
+  }
+  body.stage-dark .mode-toggle button { color: #C2C2C8; }
+  .mode-toggle button.active { background: #fff; color: #191C1E; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+  body.stage-dark .mode-toggle button.active { background: #35353A; color: #E5E5E7; }
+  .mode-toggle svg { width: 14px; height: 14px; }
+  .stage-header { padding: 0 28px; position: sticky; top: 0; z-index: 6; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+function StatusBar(){
+  return (
+    <div className="statusbar">
+      <span>9:41</span>
+      <span style={{display:'flex',gap:4,alignItems:'center'}}>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M1 11h2V7H1v4zm4 0h2V4H5v7zm4 0h2V1H9v10zm4 0h2V8h-2v3z"/></svg>
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor"><path d="M7 10.3a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm0-3a3 3 0 0 1 2.12.88l1.06-1.06a4.5 4.5 0 0 0-6.36 0l1.06 1.06A3 3 0 0 1 7 7.3zm0-3a6 6 0 0 1 4.24 1.76l1.07-1.07a7.5 7.5 0 0 0-10.62 0l1.07 1.07A6 6 0 0 1 7 4.3z"/></svg>
+        <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><rect x="1" y="1" width="18" height="10" rx="2" stroke="currentColor" strokeOpacity=".4"/><rect x="2.5" y="2.5" width="13" height="7" rx="1" fill="currentColor"/><rect x="20" y="4" width="1.5" height="4" rx=".5" fill="currentColor"/></svg>
+      </span>
+    </div>
+  );
+}
+
+// Single-color mastery fill — replaces tri-stop gradient.
+// Returns the appropriate status color token based on percentage thresholds.
+function masteryColor(pct){
+  if (pct < 0.34) return 'var(--memox-status-learning)';   // amber — early
+  if (pct < 0.67) return 'var(--memox-status-reviewing)';  // primary — mid
+  return 'var(--memox-status-mastered)';                    // green — high
+}
+
+function Ic({name, size=22, color}){
+  const ref = React.useRef();
+  React.useEffect(() => {
+    if (ref.current && window.lucide) {
+      ref.current.innerHTML = '';
+      const i = document.createElement('i');
+      i.setAttribute('data-lucide', name);
+      ref.current.appendChild(i);
+      window.lucide.createIcons({ icons: window.lucide.icons });
+      const svg = ref.current.querySelector('svg');
+      if (svg) {
+        svg.setAttribute('width', size);
+        svg.setAttribute('height', size);
+        if (color) svg.style.stroke = color;
+      }
+    }
+  }, [name, size, color]);
+  return <span ref={ref} style={{display:'inline-flex', lineHeight:0}} />;
+}
+
+/* Breadcrumb — folder/deck/card hierarchy path. Last segment is the current location. */
+function Breadcrumb({segments}){
+  return (
+    <div className="scroll-x" style={{
+      display:'flex', alignItems:'center', gap:4,
+      padding:'2px 14px 8px',
+      fontSize:11,
+    }}>
+      {segments.map((s, i) => {
+        const last = i === segments.length - 1;
+        return (
+          <React.Fragment key={i}>
+            <span style={{
+              color: last ? 'var(--memox-on-surface)' : 'var(--memox-on-surface-variant)',
+              fontWeight: last ? 700 : 500,
+              whiteSpace:'nowrap',
+              cursor: last ? 'default' : 'pointer',
+              letterSpacing: 0.1,
+            }}>{s.label}</span>
+            {!last && <Ic name="chevron-right" size={12} color="var(--memox-outline)"/>}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+}
+
+function BottomNav({active, onChange}){
+  const items = [
+    {id:'home', icon:'home', label:'Home'},
+    {id:'library', icon:'layers', label:'Library'},
+    {id:'stats', icon:'bar-chart-3', label:'Stats'},
+    {id:'settings', icon:'settings', label:'Settings'},
+  ];
+  return (
+    <div className="bottom-nav-wrap">
+      <div className="bottom-nav">
+        {items.map(it => (
+          <div key={it.id} className={"bn-item " + (active===it.id?'active':'')} onClick={() => onChange(it.id)}>
+            <span className="bn-pill"><Ic name={it.icon} size={22} /></span>
+            <span>{it.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─────── Screen: Home ─────── */
+function HomeScreen({go}){
+  return (
+    <div className="app">
+      <StatusBar/>
+      <div className="appbar appbar-lg" style={{justifyContent:'space-between'}}>
+        <div>
+          <div className="ov">Thursday · 10 Apr</div>
+          <div className="h2" style={{marginTop:2, fontSize:18}}>Good evening, Alex</div>
+        </div>
+        <div style={{width:36, height:36, borderRadius:999, background:'linear-gradient(135deg,#F59E0B,#E57373)', color:'#fff', display:'flex',alignItems:'center',justifyContent:'center', fontSize:13, fontWeight:700}}>A</div>
+      </div>
+
+      <div className="scroll">
+        {/* Due CTA */}
+        <div className="card" style={{padding:0, overflow:'hidden', marginBottom:16}}>
+          <div style={{padding:'14px 14px 12px', display:'flex',alignItems:'center',gap:12}}>
+            <div className="icon-tile" style={{width:42,height:42,borderRadius:11, display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <Ic name="graduation-cap" size={22}/>
+            </div>
+            <div style={{flex:1}}>
+              <div className="ov">Due now</div>
+              <div style={{fontSize:17, fontWeight:600, letterSpacing:'-0.3px'}}>23 cards across 3 decks</div>
+              <div style={{fontSize:13, color:'var(--memox-on-surface-variant)', marginTop:2}}>About 8 minutes</div>
+            </div>
+          </div>
+          <div style={{padding:'0 16px 16px'}}>
+            <button className="pill-btn primary" style={{width:'100%'}} onClick={() => go('study')}>
+              Start review <Ic name="arrow-right" size={18} color="#fff"/>
+            </button>
+          </div>
+        </div>
+
+        {/* Streak + mastery row */}
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:16}}>
+          <div className="card">
+            <div style={{display:'flex',alignItems:'center',gap:8, color:'var(--memox-streak)', marginBottom:6}}>
+              <Ic name="flame" size={20} color="#F97316"/>
+              <span style={{fontSize:11, fontWeight:700, letterSpacing:1.2, textTransform:'uppercase'}}>Streak</span>
+            </div>
+            <div style={{fontSize:28, fontWeight:700, letterSpacing:'-0.6px', fontVariantNumeric:'tabular-nums'}}>7<span style={{fontSize:14, color:'var(--memox-on-surface-variant)', fontWeight:500, marginLeft:4}}>days</span></div>
+          </div>
+          <div className="card">
+            <div style={{color:'var(--memox-mastery)', marginBottom:6, fontSize:11, fontWeight:700, letterSpacing:1.2, textTransform:'uppercase'}}>Mastered</div>
+            <div style={{fontSize:28, fontWeight:700, letterSpacing:'-0.6px', fontVariantNumeric:'tabular-nums'}}>512<span style={{fontSize:14, color:'var(--memox-on-surface-variant)', fontWeight:500, marginLeft:4}}>cards</span></div>
+          </div>
+        </div>
+
+        {/* Pick up */}
+        <div className="ov" style={{marginBottom:8}}>Pick up where you left off</div>
+        <div className="card" style={{marginBottom:10, display:'grid', gridTemplateColumns:'40px 1fr auto', gap:12, alignItems:'center'}} onClick={()=>go('deck')}>
+          <div className="icon-tile" style={{width:36,height:36,borderRadius:10, display:'flex',alignItems:'center',justifyContent:'center'}}><Ic name="book-open" size={18}/></div>
+          <div>
+            <div style={{fontSize:15, fontWeight:600}}>TOPIK II — Vocab</div>
+            <div style={{fontSize:12, color:'var(--memox-on-surface-variant)'}}>23 due · 142 cards</div>
+          </div>
+          <Ic name="chevron-right" size={20} color="var(--memox-on-surface-variant)"/>
+        </div>
+        <div className="card" style={{marginBottom:10, display:'grid', gridTemplateColumns:'40px 1fr auto', gap:12, alignItems:'center'}}>
+          <div style={{width:40,height:40,borderRadius:10, background:'rgba(77,182,172,0.14)', color:'#2A8880', display:'flex',alignItems:'center',justifyContent:'center'}}><Ic name="book-open" size={18}/></div>
+          <div>
+            <div style={{fontSize:15, fontWeight:600}}>Genki Ch. 1–5</div>
+            <div style={{fontSize:12, color:'var(--memox-on-surface-variant)'}}>All caught up · next due tomorrow</div>
+          </div>
+          <Ic name="chevron-right" size={20} color="var(--memox-on-surface-variant)"/>
+        </div>
+      </div>
+
+      <BottomNav active="home" onChange={(k) => go(k)}/>
+    </div>
+  );
+}
+
+/* ─────── Screen: Library ─────── */
+function LibraryScreen({go}){
+  const [filter, setFilter] = useState('all');
+  const filters = ['all','Korean','Japanese','Mandarin'];
+  const decks = [
+    {n:'TOPIK II — Vocab', cards:142, due:23, pct:0.75, col:'#5265F5'},
+    {n:'Genki Ch. 1–5', cards:86, due:0, pct:0.52, col:'#2BA88B'},
+    {n:'HSK 1', cards:210, due:48, pct:0.18, col:'#F59E0B'},
+    {n:'Hanja Roots', cards:64, due:6, pct:0.88, col:'#8B6FF5'},
+  ];
+  return (
+    <div className="app">
+      <StatusBar/>
+      <div className="appbar appbar-lg" style={{justifyContent:'space-between'}}>
+        <div className="h2" style={{fontSize:24, fontWeight:700, letterSpacing:'-0.5px'}}>Library</div>
+        <button className="icon-btn"><Ic name="search" size={20}/></button>
+      </div>
+      <div style={{padding:'0 14px 10px'}}>
+        <div className="scroll-x" style={{display:'flex', gap:8}}>
+          {filters.map(f => (
+            <button key={f} className="pill-btn" style={{
+              height:32, padding:'0 14px', borderRadius:999, fontSize:13,
+              background: filter===f?'var(--memox-primary)':'var(--memox-surface-container-lowest)',
+              color: filter===f?'var(--memox-on-primary)':'var(--memox-on-surface)',
+              border: filter===f?'none':'var(--memox-border-ghost)',
+              flexShrink:0,
+            }} onClick={()=>setFilter(f)}>{f==='all'?'All decks':f}</button>
+          ))}
+        </div>
+      </div>
+      <div className="scroll">
+        {decks.map((d,i) => (
+          <div key={i} className="card" style={{marginBottom:10, display:'grid', gridTemplateColumns:'48px 1fr auto', gap:14, alignItems:'center'}} onClick={() => go('deck')}>
+            <div style={{width:42,height:42,borderRadius:11, background:`${d.col}1F`, color:d.col, display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <Ic name="layers" size={20} color={d.col}/>
+            </div>
+            <div>
+              <div style={{fontSize:15, fontWeight:600}}>{d.n}</div>
+              <div style={{fontSize:12, color:'var(--memox-on-surface-variant)', marginTop:2}}>
+                {d.cards} cards · {d.due>0 ? `${d.due} due` : 'All caught up'}
+              </div>
+              <div style={{marginTop:8, height:6, background:'var(--memox-surface-container)', borderRadius:999, overflow:'hidden'}}>
+                <div style={{height:'100%', width:`${d.pct*100}%`, background: masteryColor(d.pct)}}/>
+              </div>
+            </div>
+            <Ic name="chevron-right" size={20} color="var(--memox-on-surface-variant)"/>
+          </div>
+        ))}
+      </div>
+      {/* FAB */}
+      <div style={{position:'absolute', bottom:88, right:16, width:48, height:48, borderRadius:14, background:'var(--memox-primary)', color:'#fff', display:'flex',alignItems:'center',justifyContent:'center', boxShadow:'0 8px 20px rgba(36,56,156,0.32)'}}>
+        <Ic name="plus" size={22} color="#fff"/>
+      </div>
+      <BottomNav active="library" onChange={go}/>
+    </div>
+  );
+}
+
+/* ─────── Screen: Deck Detail ─────── */
+function DeckScreen({go}){
+  return (
+    <div className="app">
+      <StatusBar/>
+      <div className="appbar">
+        <button className="icon-btn" onClick={() => go('library')}><Ic name="arrow-left" size={22}/></button>
+        <div className="title" style={{fontSize:16}}>TOPIK II — Vocab</div>
+        <button className="icon-btn"><Ic name="more-horizontal" size={22}/></button>
+      </div>
+      <Breadcrumb segments={[
+        {label:'Library'},
+        {label:'Korean'},
+        {label:'TOPIK II — Vocab'},
+      ]}/>
+      <div className="scroll">
+        <div style={{display:'flex', gap:20, alignItems:'center', margin:'4px 0 18px'}}>
+          <svg width="72" height="72" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="17" fill="none" stroke="var(--memox-surface-container-high)" strokeWidth="3"/>
+            <circle cx="20" cy="20" r="17" fill="none" stroke="var(--memox-mastery)" strokeWidth="3" strokeLinecap="round" strokeDasharray="106.8" strokeDashoffset="27" transform="rotate(-90 20 20)"/>
+            <text x="20" y="22.5" textAnchor="middle" fontSize="9" fontWeight="700" fill="var(--memox-mastery)" style={{fontFamily:'var(--memox-font-sans)'}}>75%</text>
+          </svg>
+          <div>
+            <div className="ov">Mastery</div>
+            <div style={{fontSize:14, marginTop:4}}>106 of 142 cards mastered</div>
+            <div style={{fontSize:12, color:'var(--memox-on-surface-variant)', marginTop:2}}>Last studied 2h ago</div>
+          </div>
+        </div>
+
+        {/* Mode selector */}
+        <div className="ov" style={{marginBottom:8}}>Study modes</div>
+
+        {/* Mix — hero card spanning full width */}
+        <div className="card" style={{
+          marginBottom: 8,
+          padding: 12,
+          background: 'linear-gradient(135deg, rgba(82,101,245,0.08), rgba(139,111,245,0.14))',
+          borderColor: 'var(--memox-accent)',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          display: 'flex', flexDirection: 'column', gap: 8,
+          cursor: 'pointer',
+        }}>
+          <div style={{display:'flex', alignItems:'center', gap:10}}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 10,
+              background: 'var(--memox-accent)',
+              color: 'var(--memox-on-accent)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
+              <Ic name="shuffle" size={18} color="var(--memox-on-accent)"/>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontSize: 15, fontWeight: 700, letterSpacing: '-0.2px'}}>Mix</div>
+              <div style={{fontSize: 11, color: 'var(--memox-on-surface-variant)'}}>All 5 modes, one session</div>
+            </div>
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase',
+              color: 'var(--memox-accent)', padding: '3px 8px',
+              border: '1px solid var(--memox-accent)', borderRadius: 999,
+            }}>Adaptive</div>
+          </div>
+          <div style={{display:'flex', gap:10, color:'var(--memox-on-surface-variant)', paddingTop:8, borderTop:'1px solid var(--memox-outline-variant)', alignItems:'center'}}>
+            <Ic name="layers" size={15} color="var(--memox-on-surface-variant)"/>
+            <Ic name="arrow-left-right" size={15} color="var(--memox-on-surface-variant)"/>
+            <Ic name="help-circle" size={15} color="var(--memox-on-surface-variant)"/>
+            <Ic name="brain-circuit" size={15} color="var(--memox-on-surface-variant)"/>
+            <Ic name="type" size={15} color="var(--memox-on-surface-variant)"/>
+            <span style={{fontSize:10, fontWeight:600, letterSpacing:0.4, marginLeft:'auto', color:'var(--memox-on-surface-variant)'}}>Review · Match · Guess · Recall · Fill</span>
+          </div>
+        </div>
+
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:14}}>
+          {[
+            {n:'Review', ic:'layers', sub:'23 due', col:'var(--memox-primary)'},
+            {n:'Match', ic:'arrow-left-right', sub:'Pair fronts & backs', col:'var(--memox-primary)'},
+            {n:'Guess', ic:'help-circle', sub:'A / B / C / D', col:'var(--memox-primary)'},
+            {n:'Recall', ic:'brain-circuit', sub:'Write from memory', col:'var(--memox-mastery)'},
+            {n:'Fill', ic:'type', sub:'Complete the blank', col:'var(--memox-mastery)'},
+          ].map((m,i) => (
+            <div key={i} className="card" style={{padding:12, display:'flex', flexDirection:'column', gap:4}}>
+              <div style={{color:m.col}}><Ic name={m.ic} size={18} color={m.col}/></div>
+              <div style={{fontSize:14, fontWeight:600}}>{m.n}</div>
+              <div style={{fontSize:11, color:'var(--memox-on-surface-variant)'}}>{m.sub}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="ov" style={{marginBottom:8}}>Card breakdown</div>
+        <div className="card" style={{padding:0, overflow:'hidden'}}>
+          {[
+            {n:'Mastered', c:106, col:'#1F8A5B'},
+            {n:'Reviewing', c:24, col:'#5265F5'},
+            {n:'Learning', c:8, col:'#F59E0B'},
+            {n:'New', c:4, col:'#8C95B8'},
+          ].map((r,i,a) => (
+            <div key={i} style={{padding:'14px 16px', display:'flex', alignItems:'center', justifyContent:'space-between', borderBottom: i<a.length-1?'var(--memox-border-ghost)':'none'}}>
+              <div className="row"><span className="status-dot" style={{background:r.col}}/><span style={{fontSize:14, fontWeight:500}}>{r.n}</span></div>
+              <span style={{fontSize:14, fontWeight:600, fontVariantNumeric:'tabular-nums'}}>{r.c}</span>
+            </div>
+          ))}
+        </div>
+
+        <button className="pill-btn primary" style={{width:'100%', marginTop:14, height:44}} onClick={()=>go('study')}>
+          Start review · 23 cards
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─────── Screen: Cards (flashcard management) ─────── */
+function CardsScreen({go}){
+  const [filter, setFilter] = useState('all');
+  const filters = [
+    {id:'all', label:'All', count:142},
+    {id:'flagged', label:'Flagged', count:6},
+    {id:'new', label:'New', count:4},
+    {id:'learning', label:'Learning', count:8},
+    {id:'mastered', label:'Mastered', count:106},
+  ];
+  const cards = [
+    {front:'공부하다', back:'to study', status:'mastered', flag:false, next:'in 4d'},
+    {front:'먹다', back:'to eat', status:'reviewing', flag:false, next:'in 1d'},
+    {front:'도서관', back:'library', status:'learning', flag:true, next:'10m'},
+    {front:'하늘', back:'sky', status:'mastered', flag:false, next:'in 2w'},
+    {front:'친구', back:'friend, close companion', status:'reviewing', flag:false, next:'6h'},
+    {front:'영화', back:'movie / film', status:'new', flag:false, next:'now'},
+    {front:'바다', back:'sea, ocean', status:'learning', flag:true, next:'15m'},
+    {front:'음식', back:'food', status:'mastered', flag:false, next:'in 8d'},
+    {front:'시간', back:'time, hour', status:'reviewing', flag:false, next:'2d'},
+    {front:'노래', back:'song', status:'mastered', flag:false, next:'in 3w'},
+  ];
+  const statusToken = {
+    new: 'var(--memox-status-new)',
+    learning: 'var(--memox-status-learning)',
+    reviewing: 'var(--memox-status-reviewing)',
+    mastered: 'var(--memox-status-mastered)',
+  };
+  const visible = cards.filter(c => {
+    if (filter === 'all') return true;
+    if (filter === 'flagged') return c.flag;
+    return c.status === filter;
+  });
+  const total = visible.length;
+
+  return (
+    <div className="app">
+      <StatusBar/>
+      <div className="appbar">
+        <button className="icon-btn" onClick={() => go('deck')}><Ic name="arrow-left" size={20}/></button>
+        <div className="title" style={{fontSize:17}}>Cards</div>
+        <button className="icon-btn"><Ic name="search" size={18}/></button>
+        <button className="icon-btn"><Ic name="arrow-up-down" size={18}/></button>
+      </div>
+
+      <Breadcrumb segments={[
+        {label:'Library'},
+        {label:'Korean'},
+        {label:'TOPIK II — Vocab'},
+        {label:'Cards'},
+      ]}/>
+
+      {/* Filter chips */}
+      <div style={{padding:'0 14px 10px'}}>
+        <div className="scroll-x" style={{display:'flex', gap:6}}>
+          {filters.map(f => {
+            const active = filter === f.id;
+            return (
+              <button key={f.id} className="pill-btn" onClick={()=>setFilter(f.id)} style={{
+                height:30, padding:'0 12px', borderRadius:999, fontSize:12, gap:6,
+                background: active?'var(--memox-primary)':'var(--memox-surface-container-lowest)',
+                color: active?'var(--memox-on-primary)':'var(--memox-on-surface)',
+                border: active?'none':'var(--memox-border-ghost)',
+                flexShrink:0,
+              }}>
+                {f.id === 'flagged' && <Ic name="flag" size={12} color={active?'var(--memox-on-primary)':'var(--memox-on-surface-variant)'}/>}
+                {f.label}
+                <span style={{
+                  fontSize:10, fontWeight:700, opacity: active ? 0.7 : 0.55,
+                  fontVariantNumeric:'tabular-nums'
+                }}>{f.count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Count meta */}
+      <div style={{padding:'0 14px 8px'}}>
+        <span className="ov" style={{letterSpacing:1.0}}>{total} cards · sorted by date added</span>
+      </div>
+
+      {/* Cards list — match Library breathing room */}
+      <div className="scroll" style={{padding:'0 14px 80px'}}>
+        {visible.map((c, i) => (
+          <div key={i} className="card" style={{
+            marginBottom: 8,
+            padding: '12px 14px',
+            display:'grid',
+            gridTemplateColumns:'10px 1fr auto',
+            gap: 12,
+            alignItems:'center',
+          }}>
+            <span className="status-dot" style={{background: statusToken[c.status]}}/>
+            <div style={{minWidth:0}}>
+              <div style={{fontSize:15, fontWeight:600, lineHeight:1.3, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{c.front}</div>
+              <div style={{fontSize:12, color:'var(--memox-on-surface-variant)', marginTop:3, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{c.back}</div>
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4}}>
+              {c.flag && <Ic name="flag" size={13} color="var(--memox-warning)"/>}
+              <span style={{fontSize:11, color:'var(--memox-on-surface-variant)', fontVariantNumeric:'tabular-nums', fontWeight:600}}>{c.next}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* FAB — add card */}
+      <div style={{
+        position:'absolute', bottom:20, right:14,
+        width:48, height:48, borderRadius:14,
+        background:'var(--memox-primary)', color:'var(--memox-on-primary)',
+        display:'flex',alignItems:'center',justifyContent:'center',
+        boxShadow:'0 8px 20px rgba(82,101,245,0.40)',
+      }}>
+        <Ic name="plus" size={22} color="var(--memox-on-primary)"/>
+      </div>
+    </div>
+  );
+}
+
+/* ─────── Screen: Study (term + meaning visible together, swipe to next) ─────── */
+function StudyScreen({go}){
+  const cards = [
+    { front: '공부하다', back: 'to study', example: '저는 매일 한국어를 공부해요.', lang: 'Korean' },
+    { front: '먹다', back: 'to eat', example: '아침을 먹었어요.', lang: 'Korean' },
+    { front: '도서관', back: 'library', example: '저는 도서관에서 책을 읽어요.', lang: 'Korean' },
+  ];
+  const total = 23;
+  const [idx, setIdx] = useState(7);
+  const card = cards[idx % cards.length];
+  const cardRef = React.useRef(null);
+  const [dragX, setDragX] = useState(0);
+  const dragRef = React.useRef({startX: null, captured: false});
+
+  const advance = (dir = 1) => {
+    setIdx(prev => Math.min(prev + dir, total - 1));
+  };
+
+  React.useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const onDown = (e) => {
+      dragRef.current.startX = e.touches ? e.touches[0].clientX : e.clientX;
+      dragRef.current.captured = true;
+    };
+    const onMove = (e) => {
+      if (!dragRef.current.captured) return;
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      setDragX(x - dragRef.current.startX);
+    };
+    const onUp = () => {
+      if (!dragRef.current.captured) return;
+      const dx = dragX;
+      dragRef.current.captured = false;
+      dragRef.current.startX = null;
+      if (Math.abs(dx) > 70) {
+        // animate out then advance
+        setDragX(dx > 0 ? 500 : -500);
+        setTimeout(() => { advance(1); setDragX(0); }, 180);
+      } else {
+        setDragX(0);
+      }
+    };
+    el.addEventListener('mousedown', onDown);
+    el.addEventListener('touchstart', onDown, {passive: true});
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, {passive: true});
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchend', onUp);
+    return () => {
+      el.removeEventListener('mousedown', onDown);
+      el.removeEventListener('touchstart', onDown);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, [dragX]);
+
+  const isSwiping = Math.abs(dragX) > 4;
+  const transform = `translateX(${dragX}px) rotate(${dragX * 0.025}deg)`;
+  const opacity = 1 - Math.min(Math.abs(dragX) / 400, 0.5);
+
+  return (
+    <div className="app">
+      <StatusBar/>
+      <div className="appbar" style={{justifyContent:'space-between'}}>
+        <button className="icon-btn" onClick={() => go('deck')}><Ic name="x" size={22}/></button>
+        <div style={{flex:1, margin:'0 16px', height:4, background:'var(--memox-surface-container)', borderRadius:999, overflow:'hidden'}}>
+          <div style={{height:'100%', width:`${((idx+1)/total)*100}%`, background:'var(--memox-primary)', transition:'width 200ms cubic-bezier(0.2,0,0,1)'}}/>
+        </div>
+        <div style={{fontSize:13, fontWeight:600, fontVariantNumeric:'tabular-nums', color:'var(--memox-on-surface-variant)'}}>{idx+1} / {total}</div>
+      </div>
+
+      <div style={{flex:1, padding:'6px 14px 12px', display:'flex', flexDirection:'column', gap:14}}>
+        <div
+          ref={cardRef}
+          className="card"
+          style={{
+            flex: 1,
+            padding: 0,
+            display:'flex', flexDirection:'column',
+            cursor: 'grab',
+            userSelect: 'none',
+            transform,
+            opacity,
+            transition: isSwiping ? 'none' : 'transform 220ms cubic-bezier(0.05,0.7,0.1,1), opacity 220ms cubic-bezier(0.2,0,0,1)',
+            touchAction: 'pan-y',
+          }}
+        >
+          {/* Top half — term */}
+          <div style={{flex: 1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'20px 16px 8px', position:'relative'}}>
+            <div className="ov" style={{position:'absolute', top:16, left:20}}>{card.lang}</div>
+            <div style={{fontSize:32, fontWeight:700, letterSpacing:'-0.5px', textAlign:'center', lineHeight:1.15}}>{card.front}</div>
+          </div>
+
+          {/* Divider */}
+          <div style={{height:1, background:'var(--memox-outline-variant)', opacity:0.5, margin:'0 20px'}}/>
+
+          {/* Bottom half — meaning + example */}
+          <div style={{flex: 1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'8px 16px 20px', position:'relative', gap:14}}>
+            <div className="ov" style={{position:'absolute', top:16, left:20}}>Meaning</div>
+            <div style={{fontSize:24, fontWeight:600, letterSpacing:'-0.3px', textAlign:'center'}}>{card.back}</div>
+            <div style={{
+              padding:'10px 14px',
+              background:'var(--memox-surface-container-low)',
+              borderRadius:10,
+              fontSize:14,
+              lineHeight:1.5,
+              color:'var(--memox-on-surface-variant)',
+              textAlign:'center',
+              maxWidth:280,
+            }}>
+              {card.example}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom controls */}
+        <div style={{display:'flex', alignItems:'center', gap:10}}>
+          <div style={{flex:1, fontSize:12, color:'var(--memox-on-surface-variant)', display:'flex', alignItems:'center', gap:6, letterSpacing:0.4}}>
+            <Ic name="chevrons-right" size={16} color="var(--memox-on-surface-variant)"/>
+            Swipe or tap Next
+          </div>
+          <button
+            className="pill-btn primary"
+            style={{height:44, padding:'0 18px'}}
+            onClick={() => { setDragX(-500); setTimeout(() => { advance(1); setDragX(0); }, 180); }}
+          >
+            Next <Ic name="arrow-right" size={18} color="var(--memox-on-primary)"/>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────── Shared: Study top bar (close + mode badge + progress + counter) ─────── */
+function StudyTopBar({mode, accent='var(--memox-primary)', accentBg='rgba(82,101,245,0.10)', current, total, onClose}){
+  return (
+    <div className="appbar" style={{justifyContent:'space-between'}}>
+      <button className="icon-btn" onClick={onClose}><Ic name="x" size={20}/></button>
+      <div style={{display:'flex', alignItems:'center', gap:8, flex:1, margin:'0 6px'}}>
+        <span style={{
+          fontSize:10, fontWeight:700, letterSpacing:1.2, textTransform:'uppercase',
+          color: accent, padding:'3px 8px', background: accentBg, borderRadius:999,
+        }}>{mode}</span>
+        <div style={{flex:1, height:4, background:'var(--memox-surface-container)', borderRadius:999, overflow:'hidden'}}>
+          <div style={{height:'100%', width:`${(current/total)*100}%`, background: accent, transition:'width 200ms cubic-bezier(0.2,0,0,1)'}}/>
+        </div>
+      </div>
+      <div style={{fontSize:12, fontWeight:600, fontVariantNumeric:'tabular-nums', color:'var(--memox-on-surface-variant)'}}>{current} / {total}</div>
+    </div>
+  );
+}
+
+/* ─────── Screen: Match (pair fronts & backs) ─────── */
+function MatchScreen({go}){
+  // 8 tiles → 4 pairs. State per tile: 'idle' | 'selected' | 'matched'
+  const initial = [
+    {id: 1, text: '공부하다', kind:'front', pair: 1, state:'matched'},
+    {id: 2, text: 'to study', kind:'back',  pair: 1, state:'matched'},
+    {id: 3, text: '먹다',     kind:'front', pair: 2, state:'idle'},
+    {id: 4, text: 'to eat',   kind:'back',  pair: 2, state:'selected'},
+    {id: 5, text: '하늘',     kind:'front', pair: 3, state:'idle'},
+    {id: 6, text: 'sky',      kind:'back',  pair: 3, state:'idle'},
+    {id: 7, text: '도서관',   kind:'front', pair: 4, state:'idle'},
+    {id: 8, text: 'library',  kind:'back',  pair: 4, state:'idle'},
+  ];
+  const [tiles, setTiles] = useState(initial);
+  const pairsLeft = 4 - tiles.filter(t => t.state==='matched').length / 2;
+
+  return (
+    <div className="app">
+      <StatusBar/>
+      <StudyTopBar mode="Match" current={2} total={4} onClose={() => go('deck')}/>
+
+      <div style={{padding:'4px 14px 0'}}>
+        <div className="ov" style={{textAlign:'center', padding:'4px 0 10px'}}>Board 1 of 3 · {pairsLeft} pairs left</div>
+      </div>
+
+      <div className="scroll" style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, alignContent:'start', padding:'0 14px 14px'}}>
+        {tiles.map(t => {
+          const matched = t.state === 'matched';
+          const selected = t.state === 'selected';
+          return (
+            <div key={t.id} style={{
+              minHeight: 78,
+              borderRadius: 12,
+              padding: '14px 12px',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              textAlign:'center',
+              background: matched
+                ? 'rgba(31,138,91,0.12)'
+                : selected
+                  ? 'var(--memox-primary)'
+                  : 'var(--memox-surface-container-lowest)',
+              color: matched
+                ? 'var(--memox-mastery)'
+                : selected
+                  ? 'var(--memox-on-primary)'
+                  : 'var(--memox-on-surface)',
+              border: matched
+                ? '1px solid rgba(31,138,91,0.30)'
+                : selected
+                  ? '1px solid var(--memox-primary)'
+                  : 'var(--memox-border-ghost)',
+              fontSize: t.kind==='front' ? 18 : 14,
+              fontWeight: t.kind==='front' ? 700 : 600,
+              letterSpacing: t.kind==='front' ? '-0.4px' : 0,
+              opacity: matched ? 0.7 : 1,
+              transition: 'all 200ms cubic-bezier(0.2,0,0,1)',
+            }}>
+              {matched && <Ic name="check" size={14} color="var(--memox-mastery)"/>}
+              <span style={{marginLeft: matched ? 6 : 0}}>{t.text}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{padding:'0 14px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:11, color:'var(--memox-on-surface-variant)'}}>
+        <span style={{display:'flex', gap:6, alignItems:'center'}}><Ic name="timer" size={14} color="var(--memox-on-surface-variant)"/> 0:42</span>
+        <span>1 mistake</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─────── Screen: Guess (multiple choice A/B/C/D/E, auto-advance) ─────── */
+function GuessScreen({go}){
+  const prompt = '도서관';
+  const options = [
+    {l:'A', text:'kitchen',   state:'fade'},
+    {l:'B', text:'library — public building or room with a collection of books for reading or borrowing', state:'correct'},
+    {l:'C', text:'school — institution for educating children',    state:'wrong'},
+    {l:'D', text:'office',    state:'fade'},
+    {l:'E', text:'classroom', state:'fade'},
+  ];
+  return (
+    <div className="app">
+      <StatusBar/>
+      <StudyTopBar mode="Guess" current={5} total={20} onClose={() => go('deck')}/>
+
+      {/* Outer scroller — content centers when it fits, scrolls when long answers push past. */}
+      <div style={{flex:1, overflowY:'auto', display:'flex', flexDirection:'column', minHeight:0}}>
+        <div style={{margin:'auto 0', padding:'8px 14px 0', display:'flex', flexDirection:'column', gap:14}}>
+          {/* Prompt */}
+          <div className="card" style={{padding:'34px 14px 32px', textAlign:'center', flexShrink:0, minHeight:180, display:'flex', flexDirection:'column', justifyContent:'center', gap:10}}>
+            <div className="ov">What is this?</div>
+            <div style={{fontSize:32, fontWeight:700, letterSpacing:'-0.5px', lineHeight:1.15}}>{prompt}</div>
+          </div>
+
+          {/* Options — split term + explanation, vertical-centered prefix */}
+          <div style={{display:'flex', flexDirection:'column', gap:8, flexShrink:0}}>
+            {options.map((o,i) => {
+              const styles = {
+                idle: {
+                  bg:'var(--memox-surface-container-lowest)',
+                  fg:'var(--memox-on-surface)',
+                  border:'var(--memox-border-ghost)',
+                },
+                correct: {
+                  bg:'rgba(31,138,91,0.14)',
+                  fg:'var(--memox-mastery)',
+                  border:'1px solid rgba(31,138,91,0.40)',
+                },
+                wrong: {
+                  bg:'rgba(220,45,78,0.10)',
+                  fg:'var(--memox-error)',
+                  border:'1px solid rgba(220,45,78,0.35)',
+                },
+                fade: {
+                  bg:'var(--memox-surface-container-lowest)',
+                  fg:'var(--memox-on-surface-variant)',
+                  border:'var(--memox-border-ghost)',
+                  opacity: 0.36,
+                },
+              }[o.state];
+              // Split "term — explanation" into separate parts
+              const split = o.text.split(' — ');
+              const term = split[0];
+              const def = split.length > 1 ? split.slice(1).join(' — ') : null;
+              return (
+                <div key={i} style={{
+                  minHeight: 60,
+                  background: styles.bg,
+                  color: styles.fg,
+                  border: styles.border,
+                  borderRadius: 12,
+                  padding: '12px 14px',
+                  display:'flex', alignItems:'center', gap:12,
+                  opacity: styles.opacity ?? 1,
+                  transition: 'all 200ms cubic-bezier(0.2,0,0,1)',
+                }}>
+                  <span style={{
+                    width:28, height:28, borderRadius:999,
+                    border: '1.5px solid currentColor',
+                    display:'inline-flex', alignItems:'center', justifyContent:'center',
+                    fontSize:11, fontWeight:700,
+                    opacity: 0.85, flexShrink: 0,
+                  }}>{o.l}</span>
+                  <div style={{flex:1, display:'flex', flexDirection:'column', gap:2, minWidth:0}}>
+                    <div style={{fontSize:15, fontWeight:700, letterSpacing:'-0.1px', lineHeight:1.25}}>{term}</div>
+                    {def && (
+                      <div style={{
+                        fontSize:12, fontWeight:400, lineHeight:1.4,
+                        opacity: 0.72,
+                        textWrap: 'pretty',
+                      }}>{def}</div>
+                    )}
+                  </div>
+                  {o.state === 'correct' && <Ic name="check" size={18} color="var(--memox-mastery)"/>}
+                  {o.state === 'wrong' && <Ic name="x" size={18} color="var(--memox-error)"/>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Auto-advance footer — static snapshot of the countdown (not looping) */}
+      <div style={{padding:'10px 14px 14px', display:'flex', flexDirection:'column', gap:6, flexShrink:0}}>
+        <div style={{
+          fontSize:10, fontWeight:600, letterSpacing:1.2, textTransform:'uppercase',
+          color:'var(--memox-on-surface-variant)',
+          textAlign:'center',
+        }}>
+          Next card in 0.8s
+        </div>
+        <div style={{height:3, background:'var(--memox-surface-container)', borderRadius:999, overflow:'hidden'}}>
+          <div style={{height:'100%', width:'46%', background:'var(--memox-mastery)'}}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────── Screen: Recall (term card + hidden meaning card, reveal CTA) ─────── */
+function RecallScreen({go, initialRevealed = false}){
+  const accent = 'var(--memox-mastery)';
+  const accentBg = 'rgba(31,138,91,0.12)';
+  const [revealed, setRevealed] = useState(initialRevealed);
+  const meaning = 'Researcher / Nhà nghiên cứu — person who conducts research. Hán-Việt: Nghiên cứu giả (硏究者). 연구 = research, 자 = person.';
+  return (
+    <div className="app">
+      <StatusBar/>
+      <StudyTopBar mode="Recall" accent={accent} accentBg={accentBg} current={8} total={12} onClose={() => go('deck')}/>
+
+      <div style={{flex:1, padding:'8px 14px 0', display:'flex', flexDirection:'column', gap:10, minHeight:0}}>
+        {/* Term card — always visible; this is the prompt */}
+        <div className="card" style={{
+          flex: 1, padding: '14px',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          position:'relative', minHeight: 160,
+        }}>
+          <button className="icon-btn" style={{position:'absolute', top:8, right:8, width:32, height:32}}>
+            <Ic name="pencil" size={16} color="var(--memox-on-surface-variant)"/>
+          </button>
+          <div style={{fontSize:32, fontWeight:700, letterSpacing:'-0.5px', lineHeight:1.15, textAlign:'center'}}>
+            연구자
+          </div>
+          <button className="icon-btn" style={{position:'absolute', bottom:8, right:8, width:32, height:32}}>
+            <Ic name="volume-2" size={16} color="var(--memox-on-surface-variant)"/>
+          </button>
+        </div>
+
+        {/* Meaning card — hidden (blurred) before reveal; user recalls the meaning */}
+        <div className="card" style={{
+          flex: 1, padding: '16px',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          minHeight: 160,
+          background: 'var(--memox-surface-container-low)',
+        }}>
+          {revealed ? (
+            <div style={{fontSize:14, lineHeight:1.55, textAlign:'center', color:'var(--memox-on-surface)', textWrap:'pretty'}}>
+              {meaning}
+            </div>
+          ) : (
+            <div style={{
+              width: 140, height: 14, borderRadius: 999,
+              background: 'var(--memox-surface-container-high)',
+              opacity: 0.7, filter: 'blur(2px)',
+            }}/>
+          )}
+        </div>
+      </div>
+
+      <div style={{padding:'14px 14px 16px', display:'flex', justifyContent:'center', gap:10, flexShrink:0}}>
+        {!revealed && (
+          <button onClick={() => setRevealed(true)} className="pill-btn primary" style={{
+            height: 42, padding: '0 36px', borderRadius: 999,
+          }}>
+            Show answer
+          </button>
+        )}
+        {revealed && (
+          <>
+            <button onClick={() => setRevealed(false)} className="pill-btn primary" style={{
+              flex: 1, maxWidth: 160, height: 44, borderRadius: 999,
+            }}>
+              Forgot
+            </button>
+            <button onClick={() => setRevealed(false)} className="pill-btn primary" style={{
+              flex: 1, maxWidth: 160, height: 44, borderRadius: 999,
+            }}>
+              Got it
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─────── Screen: Fill (meaning prompt + term input) ─────── */
+function FillScreen({go, initialState = 'input'}){
+  const accent = 'var(--memox-mastery)';
+  const accentBg = 'rgba(31,138,91,0.12)';
+  const meaning = 'Make someone laugh / Làm cho cười, gây cười, buồn cười (Động từ, là dạng sai khiến của động từ "웃다 – cười", mang nghĩa khiến người khác bật cười hoặc thấy buồn cười).';
+  const [state, setState] = useState(initialState); // 'input' | 'wrong' | 'correct'
+  return (
+    <div className="app">
+      <StatusBar/>
+      <StudyTopBar mode="Fill" accent={accent} accentBg={accentBg} current={12} total={15} onClose={() => go('deck')}/>
+
+      <div style={{flex:1, padding:'8px 14px 0', display:'flex', flexDirection:'column', gap:10, minHeight:0}}>
+        {/* Meaning card — prompt the user reads */}
+        <div className="card" style={{
+          flex:1, padding:'18px 16px',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          position:'relative', minHeight: 160,
+        }}>
+          <button className="icon-btn" style={{position:'absolute', top:8, right:8, width:32, height:32}}>
+            <Ic name="pencil" size={16} color="var(--memox-on-surface-variant)"/>
+          </button>
+          <div style={{
+            fontSize:14, lineHeight:1.55, textAlign:'center',
+            color:'var(--memox-on-surface)', textWrap:'pretty',
+          }}>
+            {meaning}
+          </div>
+        </div>
+
+        {/* Answer card — input cursor in 'input' state, wrong+correct stacked in 'wrong' */}
+        <div className="card" style={{
+          flex:1, padding:'14px',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          position:'relative',
+          minHeight: 160,
+          background:'var(--memox-surface-container-low)',
+        }}>
+          {state === 'wrong' && (
+            <>
+              <button className="icon-btn" style={{position:'absolute', top:8, right:8, width:32, height:32}}>
+                <Ic name="volume-2" size={16} color="var(--memox-on-surface-variant)"/>
+              </button>
+              <button className="icon-btn" style={{position:'absolute', bottom:8, left:8, width:32, height:32}}>
+                <Ic name="rotate-ccw" size={16} color="var(--memox-on-surface-variant)"/>
+              </button>
+            </>
+          )}
+
+          {state === 'input' && (
+            <div style={{
+              fontSize:32, fontWeight:700, letterSpacing:'-0.4px',
+              display:'inline-flex', alignItems:'center', gap:4,
+            }}>
+              <span>웃기</span>
+              <span style={{
+                display:'inline-block', width:2, height:30,
+                background: accent,
+                animation:'fillCursorBlink 1s infinite',
+              }}/>
+            </div>
+          )}
+
+          {state === 'wrong' && (
+            <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:6}}>
+              <div style={{
+                fontSize:24, fontWeight:700, letterSpacing:'-0.3px',
+                color:'var(--memox-rating-again)',
+                textDecoration:'line-through',
+                textDecorationThickness:1,
+              }}>우겨다</div>
+              <div style={{fontSize:24, fontWeight:700, letterSpacing:'-0.3px'}}>웃기다</div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* CTAs — depends on state */}
+      <div style={{padding:'14px 14px 16px', display:'flex', justifyContent:'center', gap:10, flexShrink:0}}>
+        {state === 'input' && (
+          <>
+            <button onClick={() => setState('wrong')} className="pill-btn" style={{
+              flex:1, maxWidth:160, height:44, borderRadius:999,
+              background:'transparent', color:'var(--memox-primary)',
+              border:'1px solid var(--memox-primary)',
+            }}>Hint</button>
+            <button onClick={() => setState('wrong')} className="pill-btn primary" style={{
+              flex:1, maxWidth:160, height:44, borderRadius:999,
+            }}>Check</button>
+          </>
+        )}
+        {state === 'wrong' && (
+          <>
+            <button onClick={() => setState('input')} className="pill-btn" style={{
+              flex:1, maxWidth:160, height:44, borderRadius:999,
+              background:'transparent', color:'var(--memox-primary)',
+              border:'1px solid var(--memox-primary)',
+            }}>Mark correct</button>
+            <button onClick={() => setState('input')} className="pill-btn primary" style={{
+              flex:1, maxWidth:160, height:44, borderRadius:999,
+            }}>Try again</button>
+          </>
+        )}
+      </div>
+
+      <style>{`@keyframes fillCursorBlink { 0%, 50% { opacity:1; } 50.01%, 100% { opacity:0; } }`}</style>
+    </div>
+  );
+}
+
+/* ─────── Screen: Stats ─────── */
+function StatsScreen({go}){
+  const bars = [3,5,8,4,9,6,11];
+  const days = ['M','T','W','T','F','S','S'];
+  return (
+    <div className="app">
+      <StatusBar/>
+      <div className="appbar appbar-lg"><div style={{fontSize:24, fontWeight:700, letterSpacing:'-0.5px'}}>Stats</div></div>
+      <div className="scroll">
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:16}}>
+          <div className="card">
+            <div className="ov">Reviews today</div>
+            <div style={{fontSize:28, fontWeight:700, letterSpacing:'-0.6px', fontVariantNumeric:'tabular-nums'}}>47</div>
+            <div style={{fontSize:12, color:'var(--memox-mastery)', fontWeight:600}}>+12 vs yesterday</div>
+          </div>
+          <div className="card">
+            <div className="ov">Retention</div>
+            <div style={{fontSize:28, fontWeight:700, letterSpacing:'-0.6px', fontVariantNumeric:'tabular-nums'}}>88<span style={{fontSize:16, color:'var(--memox-on-surface-variant)'}}>%</span></div>
+            <div style={{fontSize:12, color:'var(--memox-on-surface-variant)'}}>7-day rolling</div>
+          </div>
+        </div>
+
+        <div className="card" style={{marginBottom:16}}>
+          <div className="ov" style={{marginBottom:12}}>This week</div>
+          <div style={{display:'flex', alignItems:'flex-end', gap:10, height:120, padding:'4px 0'}}>
+            {bars.map((b,i) => (
+              <div key={i} style={{flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6, height:'100%', justifyContent:'flex-end'}}>
+                <div style={{width:'100%', height:`${b/12*100}%`, background:'var(--memox-primary)', borderRadius:6}}/>
+                <div style={{fontSize:11, color:'var(--memox-on-surface-variant)', fontWeight:600}}>{days[i]}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="ov" style={{marginBottom:8}}>Mastery by deck</div>
+        <div className="card" style={{padding:0, overflow:'hidden'}}>
+          {[
+            {n:'TOPIK II Vocab', p:0.75},
+            {n:'Genki Ch. 1–5', p:0.52},
+            {n:'HSK 1', p:0.18},
+            {n:'Hanja Roots', p:0.88},
+          ].map((d,i,a) => (
+            <div key={i} style={{padding:'14px 16px', borderBottom: i<a.length-1?'var(--memox-border-ghost)':'none'}}>
+              <div style={{display:'flex', justifyContent:'space-between', marginBottom:6, fontSize:14}}>
+                <span style={{fontWeight:500}}>{d.n}</span>
+                <span style={{fontWeight:700, fontVariantNumeric:'tabular-nums'}}>{Math.round(d.p*100)}%</span>
+              </div>
+              <div style={{height:6, background:'var(--memox-surface-container)', borderRadius:999, overflow:'hidden'}}>
+                <div style={{height:'100%', width:`${d.p*100}%`, background: masteryColor(d.p)}}/>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <BottomNav active="stats" onChange={go}/>
+    </div>
+  );
+}
+
+/* ─────── App wrapper with multiple phones ─────── */
+function Phone({label, children}){
+  return (
+    <div className="phone-col">
+      <div className="phone">{children}</div>
+      <div className="phone-label">{label}</div>
+    </div>
+  );
+}
+
+function App(){
+  const [dark, setDark] = React.useState(() => {
+    try { return localStorage.getItem('memox-kit-dark') === '1'; } catch { return false; }
+  });
+  React.useEffect(() => {
+    try { localStorage.setItem('memox-kit-dark', dark ? '1' : '0'); } catch {}
+    document.body.classList.toggle('stage-dark', dark);
+  }, [dark]);
+
+  const screens = [
+    {label:'01 · Home', el: <HomeScreen go={()=>{}}/>},
+    {label:'02 · Library', el: <LibraryScreen go={()=>{}}/>},
+    {label:'03 · Deck detail', el: <DeckScreen go={()=>{}}/>},
+    {label:'04 · Cards (manage)', el: <CardsScreen go={()=>{}}/>},
+    {label:'05 · Study · Review', el: <StudyScreen go={()=>{}}/>},
+    {label:'06 · Study · Match', el: <MatchScreen go={()=>{}}/>},
+    {label:'07 · Study · Guess', el: <GuessScreen go={()=>{}}/>},
+    {label:'08a · Study · Recall (hidden)', el: <RecallScreen go={()=>{}} initialRevealed={false}/>},
+    {label:'08b · Study · Recall (revealed)', el: <RecallScreen go={()=>{}} initialRevealed={true}/>},
+    {label:'09a · Study · Fill (input)', el: <FillScreen go={()=>{}} initialState="input"/>},
+    {label:'09b · Study · Fill (wrong)', el: <FillScreen go={()=>{}} initialState="wrong"/>},
+    {label:'10 · Stats', el: <StatsScreen go={()=>{}}/>},
+  ];
+  return (
+    <>
+      <div className="stage-header" style={{paddingTop:20}}>
+        <div className="mode-toggle" role="tablist" aria-label="Theme">
+          <button className={!dark?'active':''} onClick={()=>setDark(false)} role="tab" aria-selected={!dark}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            Light
+          </button>
+          <button className={dark?'active':''} onClick={()=>setDark(true)} role="tab" aria-selected={dark}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+            Dark
+          </button>
+        </div>
+      </div>
+      <div className={"stage " + (dark ? 'memox-dark' : '')}>
+        {screens.map((s, i) => (
+          <Phone key={i} label={s.label}>{s.el}</Phone>
+        ))}
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — On-Surface & Outline</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--memox-surface-container-low); }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .tile { border-radius: var(--memox-radius-md); border: var(--memox-border-ghost); background: #fff; padding: 14px; height: 96px; display: flex; flex-direction: column; justify-content: space-between; }
+  .dot { width: 40px; height: 40px; border-radius: 999px; }
+  .nm { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: var(--memox-ls-section); }
+  .hx { font-size: 10px; color: var(--memox-on-surface-variant); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="tile"><div class="dot" style="background:#0F1638"></div><div><div class="nm">On-Surface</div><div class="hx">#0F1638</div></div></div>
+    <div class="tile"><div class="dot" style="background:#4A5278"></div><div><div class="nm">On-Surface Var</div><div class="hx">#4A5278</div></div></div>
+    <div class="tile"><div class="dot" style="background:#7C85AB"></div><div><div class="nm">Outline</div><div class="hx">#7C85AB</div></div></div>
+    <div class="tile"><div class="dot" style="background:#C5CBE3"></div><div><div class="nm">Outline Var</div><div class="hx">#C5CBE3</div></div></div>
+  </div>
+</body>
+</html>

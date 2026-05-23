@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Toast</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: var(--memox-surface-container-low); font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .stack { display:flex; flex-direction:column; gap: 8px; }
+  .toast { display:flex; align-items:center; gap: 10px; padding: 12px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; }
+  .neutral { background: #0F1638; color: #F7F9FB; }
+  .success { background: rgba(31,138,91,0.14); color: var(--memox-mastery); border: 1px solid rgba(31,138,91,0.30); }
+  .err { background: rgba(220,45,78,0.10); color: var(--memox-error); border: 1px solid rgba(220,45,78,0.30); }
+  .action { margin-left: auto; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; font-size: 11px; cursor: pointer; }
+  .icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink:0; }
+</style>
+</head>
+<body>
+  <div class="stack">
+    <div class="toast neutral"><svg class="icon" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Card flagged for later<span class="action" style="color:#9FB4FF">Undo</span></div>
+    <div class="toast success"><svg class="icon" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Saved 12 cards</div>
+    <div class="toast err"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>Couldn't load deck<span class="action">Retry</span></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Radius Scale</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .row { display:grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .tile { height: 96px; border: var(--memox-border-ghost); background: var(--memox-surface-container-low); display:flex; align-items:flex-end; padding: 10px; }
+  .lbl { font-size: 10px; font-weight: 700; color: var(--memox-on-surface-variant); letter-spacing: 1.2px; text-transform: uppercase; }
+  .use { font-size: 10px; color: var(--memox-on-surface-variant); margin-top:6px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div><div class="tile" style="border-radius:4px"><span class="lbl">xs · 4</span></div><div class="use">—</div></div>
+    <div><div class="tile" style="border-radius:8px"><span class="lbl">sm · 8</span></div><div class="use">—</div></div>
+    <div><div class="tile" style="border-radius:12px"><span class="lbl">md · 12</span></div><div class="use">buttons · inputs</div></div>
+    <div><div class="tile" style="border-radius:16px"><span class="lbl">lg · 16</span></div><div class="use">cards · sheets</div></div>
+    <div><div class="tile" style="border-radius:24px"><span class="lbl">xl · 24</span></div><div class="use">dialogs</div></div>
+    <div><div class="tile" style="border-radius:28px"><span class="lbl">xxl · 28</span></div><div class="use">FAB</div></div>
+    <div><div class="tile" style="border-radius:999px"><span class="lbl">full</span></div><div class="use">chips · pills</div></div>
+  </div>
+</body>
+</html>

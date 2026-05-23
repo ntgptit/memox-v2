@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Duration & Easing</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .row { display:grid; grid-template-columns: 100px 1fr 120px; align-items:center; gap: 14px; padding: 4px 0; }
+  .lbl { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); font-variant-numeric: tabular-nums; }
+  .bar { height: 10px; background: var(--memox-primary); border-radius: 999px; }
+  .meta { font-size: 11px; color: var(--memox-on-surface-variant); text-align:right; }
+  hr { border: none; border-top: var(--memox-border-ghost); margin: 10px 0; }
+  .easing { font-size: 13px; }
+</style>
+</head>
+<body>
+  <div class="row"><div class="lbl">fast · 100</div><div class="bar" style="width:10%"></div><div class="meta">state change</div></div>
+  <div class="row"><div class="lbl">normal · 200</div><div class="bar" style="width:20%"></div><div class="meta">content switch</div></div>
+  <div class="row"><div class="lbl">slow · 300</div><div class="bar" style="width:30%"></div><div class="meta">page transition</div></div>
+  <div class="row"><div class="lbl">flip · 350</div><div class="bar" style="width:35%"></div><div class="meta">card flip</div></div>
+  <div class="row"><div class="lbl">chart · 600</div><div class="bar" style="width:60%"></div><div class="meta">chart draw</div></div>
+  <hr />
+  <div class="easing"><b>standard</b> cubic-bezier(0.2, 0, 0, 1) · <b>emphasized</b> cubic-bezier(0.05, 0.7, 0.1, 1) · <span style="color:var(--memox-error)">no bounce, no elastic</span></div>
+</body>
+</html>

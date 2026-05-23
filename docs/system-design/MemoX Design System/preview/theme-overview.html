@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Theme System: Tokyo Pure Light & Tokyo Nebula</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 24px; background: #DDE2EF; font-family: var(--memox-font-sans); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .mode {
+    border-radius: 24px;
+    padding: 24px;
+    min-height: 380px;
+    display: flex; flex-direction: column; gap: 18px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(15, 22, 56, 0.10);
+  }
+  .light {
+    background: #F7F9FE;
+    color: #0F1638;
+  }
+  .dark {
+    background: #0A0E27;
+    color: #E4E8FA;
+  }
+  /* glow effect for dark moodboard */
+  .dark::before {
+    content:''; position:absolute; top:-60px; right:-40px;
+    width:200px; height:200px; border-radius:999px;
+    background: radial-gradient(circle, rgba(181,160,255,0.35), transparent 65%);
+    filter: blur(8px);
+  }
+  .dark::after {
+    content:''; position:absolute; bottom:-50px; left:-40px;
+    width:160px; height:160px; border-radius:999px;
+    background: radial-gradient(circle, rgba(82,101,245,0.35), transparent 65%);
+    filter: blur(8px);
+  }
+  .mode > * { position: relative; z-index: 1; }
+  .head { display:flex; align-items:baseline; justify-content:space-between; }
+  .name { font-size: 22px; font-weight: 800; letter-spacing: -0.6px; }
+  .role { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; opacity: 0.7; }
+  .vibe { font-size: 13px; line-height: 1.5; opacity: 0.85; max-width: 360px; }
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .sw { aspect-ratio: 1; border-radius: 14px; display:flex; align-items:flex-end; padding: 8px; font-size: 9px; font-weight: 700; letter-spacing: 0.8px; }
+  .card-sample {
+    border-radius: 18px;
+    padding: 16px;
+    display:flex; flex-direction: column; gap: 10px;
+  }
+  .light .card-sample {
+    background: #FFFFFF;
+    border: 1px solid rgba(82, 101, 245, 0.14);
+  }
+  .dark .card-sample {
+    background: #131A3A;
+    border: 1px solid rgba(139, 154, 255, 0.16);
+  }
+  .ttl { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+  .sub { font-size: 12px; opacity: 0.7; }
+  .row-btns { display: flex; gap: 10px; align-items: center; }
+  .btn {
+    border: none; height: 44px; padding: 0 18px; border-radius: 12px;
+    font-family: inherit; font-weight: 700; font-size: 13px; letter-spacing: 0.1px;
+    display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  }
+  .light .btn.primary { background: #5265F5; color: #fff; box-shadow: 0 4px 14px rgba(82,101,245,0.32); }
+  .dark .btn.primary { background: #8B9AFF; color: #0A0E27; box-shadow: 0 4px 14px rgba(139,154,255,0.30); }
+  .light .btn.accent { background: rgba(139,111,245,0.12); color: #6B4FE0; }
+  .dark .btn.accent { background: rgba(181,160,255,0.18); color: #C7B6FF; }
+  .meta-row { display:flex; gap: 14px; align-items: center; }
+  .ring {
+    width: 36px; height: 36px;
+  }
+  .quote { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; font-weight: 700; opacity: 0.55; }
+</style>
+</head>
+<body>
+  <div class="pair">
+    <!-- Tokyo Pure Light -->
+    <div class="mode light">
+      <div class="head">
+        <div>
+          <div class="role">Light · Day</div>
+          <div class="name">Tokyo Pure Light</div>
+        </div>
+        <span class="quote">A.M.</span>
+      </div>
+      <div class="vibe">White paper with a cool blue cast. Navy ink, vibrant indigo action. Outlines are softly blue, never gray — like winter morning light through glass.</div>
+
+      <div class="swatches">
+        <div class="sw" style="background:#F7F9FE; color:#4A5278; border:1px solid rgba(82,101,245,0.14)">F7F9FE</div>
+        <div class="sw" style="background:#FFFFFF; color:#4A5278; border:1px solid rgba(82,101,245,0.14)">FFFFFF</div>
+        <div class="sw" style="background:#5265F5; color:#fff">5265F5</div>
+        <div class="sw" style="background:#0F1638; color:#fff">0F1638</div>
+      </div>
+
+      <div class="card-sample">
+        <div class="meta-row">
+          <svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#E2E7F3" stroke-width="3"/><circle cx="18" cy="18" r="15" fill="none" stroke="#5265F5" stroke-width="3" stroke-linecap="round" stroke-dasharray="94" stroke-dashoffset="28" transform="rotate(-90 18 18)"/></svg>
+          <div>
+            <div class="ttl">23 cards due today</div>
+            <div class="sub">About 8 minutes · 7-day streak</div>
+          </div>
+        </div>
+        <div class="row-btns">
+          <button class="btn primary">Start review</button>
+          <button class="btn accent">Skip</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tokyo Nebula -->
+    <div class="mode dark">
+      <div class="head">
+        <div>
+          <div class="role">Dark · Night</div>
+          <div class="name">Tokyo Nebula</div>
+        </div>
+        <span class="quote">P.M.</span>
+      </div>
+      <div class="vibe">Deep navy night sky with paper-indigo cards floating in it. Violet for accent, indigo for action. Outlines are faded indigo — never gray. Quizlet-mobile energy at 11pm.</div>
+
+      <div class="swatches">
+        <div class="sw" style="background:#0A0E27; color:#A4ACD0; border:1px solid rgba(139,154,255,0.16)">0A0E27</div>
+        <div class="sw" style="background:#131A3A; color:#A4ACD0; border:1px solid rgba(139,154,255,0.16)">131A3A</div>
+        <div class="sw" style="background:#8B9AFF; color:#0A0E27">8B9AFF</div>
+        <div class="sw" style="background:#B5A0FF; color:#0A0E27">B5A0FF</div>
+      </div>
+
+      <div class="card-sample">
+        <div class="meta-row">
+          <svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#232B5A" stroke-width="3"/><circle cx="18" cy="18" r="15" fill="none" stroke="#6FE0BD" stroke-width="3" stroke-linecap="round" stroke-dasharray="94" stroke-dashoffset="28" transform="rotate(-90 18 18)"/></svg>
+          <div>
+            <div class="ttl">23 cards due tonight</div>
+            <div class="sub" style="color:#A4ACD0">About 8 minutes · 7-day streak</div>
+          </div>
+        </div>
+        <div class="row-btns">
+          <button class="btn primary">Start review</button>
+          <button class="btn accent">Skip</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

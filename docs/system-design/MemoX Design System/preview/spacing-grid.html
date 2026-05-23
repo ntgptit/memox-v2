@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Spacing Grid</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .row { display:grid; grid-template-columns: 90px 1fr 110px; align-items:center; gap: 14px; padding: 5px 0; }
+  .lbl { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); font-variant-numeric: tabular-nums; }
+  .bar { height: 12px; background: var(--memox-primary); border-radius: 4px; }
+  .meta { font-size: 11px; color: var(--memox-on-surface-variant); font-variant-numeric: tabular-nums; text-align:right; }
+</style>
+</head>
+<body>
+  <div class="row"><div class="lbl">xxs · 2</div><div class="bar" style="width:2px"></div><div class="meta">hairline</div></div>
+  <div class="row"><div class="lbl">xs · 4</div><div class="bar" style="width:4px"></div><div class="meta">grid unit</div></div>
+  <div class="row"><div class="lbl">sm · 8</div><div class="bar" style="width:8px"></div><div class="meta">list gap</div></div>
+  <div class="row"><div class="lbl">md · 12</div><div class="bar" style="width:12px"></div><div class="meta">inline</div></div>
+  <div class="row"><div class="lbl">lg · 16</div><div class="bar" style="width:16px"></div><div class="meta">card pad</div></div>
+  <div class="row"><div class="lbl">xl · 24</div><div class="bar" style="width:24px"></div><div class="meta">screen pad</div></div>
+  <div class="row"><div class="lbl">xxl · 32</div><div class="bar" style="width:32px"></div><div class="meta">section gap</div></div>
+  <div class="row"><div class="lbl">xxxl · 48</div><div class="bar" style="width:48px"></div><div class="meta">hero gap</div></div>
+</body>
+</html>

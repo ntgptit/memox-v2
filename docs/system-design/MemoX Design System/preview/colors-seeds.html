@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=700" />
+<title>MemoX — Colors: Primary & Seeds</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--memox-surface-container-low); }
+  .row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr; gap: 10px; align-items: stretch; }
+  .swatch { border-radius: var(--memox-radius-md); padding: 12px; height: 110px; display: flex; flex-direction: column; justify-content: space-between; border: var(--memox-border-ghost); }
+  .swatch .name { font-size: 12px; font-weight: 700; letter-spacing: var(--memox-ls-section); text-transform: uppercase; }
+  .swatch .hex { font-size: 11px; font-variant-numeric: tabular-nums; opacity: .9; }
+  .on-dark { color: #fff; }
+  .primary-card { background: var(--memox-primary); box-shadow: 0 6px 18px rgba(82,101,245,0.32); }
+  .label-meta { font-size: 10px; letter-spacing: var(--memox-ls-section); text-transform: uppercase; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="swatch primary-card on-dark" style="grid-column: span 2;">
+      <div>
+        <div class="label-meta" style="opacity:.8">Brand · Tokyo Pure Light</div>
+        <div class="name" style="font-size:14px; margin-top:6px">Primary Indigo</div>
+      </div>
+      <div class="hex">#5265F5</div>
+    </div>
+    <div class="swatch on-dark" style="background:#8B6FF5"><div class="name">Violet</div><div class="hex">#8B6FF5</div></div>
+    <div class="swatch on-dark" style="background:#2BA88B"><div class="name">Teal</div><div class="hex">#2BA88B</div></div>
+    <div class="swatch on-dark" style="background:#E57373"><div class="name">Rose</div><div class="hex">#E57373</div></div>
+    <div class="swatch on-dark" style="background:#F59E0B"><div class="name">Amber</div><div class="hex">#F59E0B</div></div>
+    <div class="swatch on-dark" style="background:#81C784"><div class="name">Sage</div><div class="hex">#81C784</div></div>
+  </div>
+</body>
+</html>

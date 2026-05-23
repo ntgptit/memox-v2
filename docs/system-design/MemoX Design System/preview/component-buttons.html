@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Buttons</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .row { display:flex; gap: 10px; align-items:center; flex-wrap:wrap; margin-bottom: 14px; }
+  .btn { height: 42px; padding: 0 18px; border-radius: 10px; font: 600 13px var(--memox-font-sans); border: none; cursor: pointer; display:inline-flex; align-items:center; gap:6px; }
+  .primary { background: var(--memox-primary); color: #fff; }
+  .secondary { background: var(--memox-surface-container); color: var(--memox-on-surface); }
+  .outline { background: transparent; color: var(--memox-primary); border: 1px solid var(--memox-primary); }
+  .text { background: transparent; color: var(--memox-primary); padding: 0 12px; }
+  .pill { border-radius: 999px; padding: 0 24px; }
+  .disabled { opacity: 0.38; }
+  .lbl { font-size: 10px; font-weight:700; letter-spacing:1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); margin-right: 10px; min-width:60px; }
+</style>
+</head>
+<body>
+  <div class="row"><span class="lbl">Filled</span>
+    <button class="btn primary">Start review</button>
+    <button class="btn primary pill">Show answer</button>
+    <button class="btn primary disabled">Disabled</button>
+  </div>
+  <div class="row"><span class="lbl">Tonal</span>
+    <button class="btn secondary">Skip</button>
+    <button class="btn outline">Hint</button>
+    <button class="btn outline pill">Mark correct</button>
+    <button class="btn text">Undo</button>
+  </div>
+</body>
+</html>

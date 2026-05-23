@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Opacity Tokens</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .row { display:grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .tile { height: 96px; border-radius: 12px; border: var(--memox-border-ghost); padding: 10px; display:flex; flex-direction:column; justify-content:space-between; position: relative; overflow:hidden; background:#fff; }
+  .fill { position:absolute; inset:0; background: var(--memox-primary); }
+  .nm, .hx { position:relative; z-index:1; }
+  .nm { font-size: 11px; font-weight:700; letter-spacing: 1.2px; text-transform: uppercase; color:#fff; mix-blend-mode: difference; }
+  .hx { font-size: 10px; color:#fff; font-variant-numeric: tabular-nums; mix-blend-mode: difference; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="tile"><div class="fill" style="opacity:0.08"></div><div class="nm" style="color:var(--memox-on-surface); mix-blend-mode:normal">Hover</div><div class="hx" style="color:var(--memox-on-surface-variant); mix-blend-mode:normal">0.08</div></div>
+    <div class="tile"><div class="fill" style="opacity:0.12"></div><div class="nm" style="color:var(--memox-on-surface); mix-blend-mode:normal">Focus</div><div class="hx" style="color:var(--memox-on-surface-variant); mix-blend-mode:normal">0.12</div></div>
+    <div class="tile"><div class="fill" style="opacity:0.18"></div><div class="nm" style="color:var(--memox-on-surface); mix-blend-mode:normal">Selected</div><div class="hx" style="color:var(--memox-on-surface-variant); mix-blend-mode:normal">0.18</div></div>
+    <div class="tile"><div class="fill" style="opacity:0.38; background:#000"></div><div class="nm" style="color:var(--memox-on-surface); mix-blend-mode:normal">Disabled</div><div class="hx" style="color:var(--memox-on-surface-variant); mix-blend-mode:normal">0.38</div></div>
+    <div class="tile"><div class="fill" style="opacity:0.84; background:var(--memox-surface)"></div><div class="nm" style="color:var(--memox-on-surface); mix-blend-mode:normal">Glass</div><div class="hx" style="color:var(--memox-on-surface-variant); mix-blend-mode:normal">0.84</div></div>
+    <div class="tile"><div class="fill" style="opacity:0.32; background:#000"></div><div class="nm" style="color:var(--memox-on-surface); mix-blend-mode:normal">Scrim</div><div class="hx" style="color:var(--memox-on-surface-variant); mix-blend-mode:normal">0.32</div></div>
+  </div>
+</body>
+</html>

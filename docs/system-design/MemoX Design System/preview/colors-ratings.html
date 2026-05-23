@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Rating Palette (Review mode)</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 20px; background: var(--memox-surface-container-low); font-family: var(--memox-font-sans); }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .btn { border-radius: var(--memox-radius-md); padding: 14px; height: 110px; color: #fff; display: flex; flex-direction: column; justify-content: space-between; }
+  .btn.amber { color: var(--memox-on-surface); }
+  .lbl { font-size: 16px; font-weight: 700; }
+  .hint { font-size: 11px; opacity: .9; }
+  .hx { font-size: 10px; font-variant-numeric: tabular-nums; text-transform: uppercase; letter-spacing: var(--memox-ls-section); font-weight:700; opacity:.9; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="btn" style="background:#E57373"><div><div class="lbl">Again</div><div class="hint">Didn't know</div></div><div class="hx">#E57373</div></div>
+    <div class="btn amber" style="background:#F59E0B"><div><div class="lbl">Hard</div><div class="hint">Took effort</div></div><div class="hx">#F59E0B</div></div>
+    <div class="btn" style="background:#5265F5"><div><div class="lbl">Good</div><div class="hint">Remembered</div></div><div class="hx">#5265F5</div></div>
+    <div class="btn" style="background:#2BA88B"><div><div class="lbl">Easy</div><div class="hint">Instant</div></div><div class="hx">#2BA88B</div></div>
+  </div>
+</body>
+</html>

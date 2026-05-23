@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Inputs</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .group { display:flex; flex-direction:column; gap: 12px; }
+  .field { display:flex; flex-direction:column; gap: 4px; }
+  .lbl { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: var(--memox-on-surface-variant); text-transform: uppercase; }
+  .input { height: 44px; background: var(--memox-surface-container-low); border-radius: 10px; border: 1px solid transparent; padding: 0 14px; font: 500 14px var(--memox-font-sans); color: var(--memox-on-surface); display:flex; align-items:center; }
+  .input.focused { border-color: var(--memox-primary); background:#fff; }
+  .input.error { border-color: var(--memox-error); }
+  .helper { font-size: 11px; color: var(--memox-on-surface-variant); }
+  .helper.err { color: var(--memox-error); }
+  .search { display:flex; align-items:center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 999px; background: var(--memox-surface-container-low); color: var(--memox-on-surface-variant); font-size: 13px; }
+  .search svg { width: 16px; height: 16px; stroke: var(--memox-on-surface-variant); stroke-width: 2; fill: none; }
+</style>
+</head>
+<body>
+  <div class="group">
+    <div class="field">
+      <span class="lbl">Deck name</span>
+      <div class="input focused">Korean TOPIK II — Vocab</div>
+    </div>
+    <div class="field">
+      <span class="lbl">Tag</span>
+      <div class="input error">topik-</div>
+      <span class="helper err">Tags may not end with a hyphen.</span>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <span>Search your decks…</span>
+    </div>
+  </div>
+</body>
+</html>

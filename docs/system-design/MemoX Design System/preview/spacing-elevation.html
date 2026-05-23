@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Elevation</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 26px; background: var(--memox-surface-container-low); font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .row { display:grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .tile { height: 86px; border-radius: 12px; background: #fff; border: var(--memox-border-ghost); padding: 12px; display:flex; flex-direction:column; justify-content: space-between; }
+  .e0 { box-shadow: none; }
+  .e1 { box-shadow: 0 1px 2px rgba(25, 28, 30, 0.04), 0 1px 1px rgba(25, 28, 30, 0.03); }
+  .e2 { box-shadow: 0 4px 12px rgba(25, 28, 30, 0.04); }
+  .e3 { box-shadow: 0 12px 32px rgba(25, 28, 30, 0.06); }
+  .nm { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--memox-on-surface-variant); }
+  .use { font-size: 11px; color: var(--memox-on-surface-variant); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="tile e0"><div class="nm">Level 0</div><div class="use">cards · default</div></div>
+    <div class="tile e1"><div class="nm">Level 1</div><div class="use">lifted card</div></div>
+    <div class="tile e2"><div class="nm">Level 2</div><div class="use">FAB · menu</div></div>
+    <div class="tile e3"><div class="nm">Level 3</div><div class="use">dialog · sheet</div></div>
+  </div>
+</body>
+</html>

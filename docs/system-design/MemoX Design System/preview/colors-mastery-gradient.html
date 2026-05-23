@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>MemoX — Mastery Thresholds</title>
+<link rel="stylesheet" href="../colors_and_type.css" />
+<style>
+  body { margin: 0; padding: 22px; background: #fff; font-family: var(--memox-font-sans); color: var(--memox-on-surface); }
+  .rows { display: flex; flex-direction: column; gap: 12px; }
+  .row { display:grid; grid-template-columns: 130px 1fr 50px; align-items:center; gap: 14px; }
+  .name { font-size: 13px; font-weight: 600; }
+  .bar { height: 6px; border-radius: 999px; background: var(--memox-surface-container); overflow:hidden; }
+  .fill { height: 100%; border-radius: 999px; }
+  .pct { text-align:right; font-size: 12px; font-weight:700; font-variant-numeric: tabular-nums; color: var(--memox-on-surface-variant); }
+  .legend { display:flex; gap:16px; margin-top: 18px; padding-top: 14px; border-top: var(--memox-border-ghost); font-size: 11px; color: var(--memox-on-surface-variant); }
+  .legend span { display:flex; align-items:center; gap:6px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; }
+  .dot { width: 8px; height: 8px; border-radius: 999px; }
+</style>
+</head>
+<body>
+  <div class="rows">
+    <div class="row"><div class="name">TOPIK II Vocab</div><div class="bar"><div class="fill" style="width:86%; background:var(--memox-status-mastered)"></div></div><div class="pct">86%</div></div>
+    <div class="row"><div class="name">Genki Ch. 1–5</div><div class="bar"><div class="fill" style="width:52%; background:var(--memox-status-reviewing)"></div></div><div class="pct">52%</div></div>
+    <div class="row"><div class="name">HSK 1</div><div class="bar"><div class="fill" style="width:18%; background:var(--memox-status-learning)"></div></div><div class="pct">18%</div></div>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--memox-status-learning)"></span>0–33% Learning</span>
+    <span><span class="dot" style="background:var(--memox-status-reviewing)"></span>34–66% Reviewing</span>
+    <span><span class="dot" style="background:var(--memox-status-mastered)"></span>67–100% Mastered</span>
+  </div>
+</body>
+</html>
