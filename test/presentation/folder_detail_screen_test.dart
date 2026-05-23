@@ -176,6 +176,41 @@ void main() {
   );
 
   testWidgets(
+    'DT6 onDisplay: compact unlocked header hides explanatory summary',
+    (WidgetTester tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(412, 915);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('New branch'), findsWidgets);
+      expect(
+        find.text('This folder is empty and can hold subfolders or decks.'),
+        findsNothing,
+      );
+      expect(find.text('This folder is empty'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'DT4 onDisplay: header back and more actions use toolbar icon buttons',
     (WidgetTester tester) async {
       const folderId = 'folder-001';

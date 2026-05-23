@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -25,8 +26,10 @@ class DashboardContent extends StatelessWidget {
       key: const ValueKey('dashboard_content'),
       padding: const EdgeInsets.only(bottom: MxSpace.xxl),
       children: [
-        const DashboardGreetingHeader(),
-        const MxGap(MxSpace.lg),
+        if (context.showsSupportingCopy) ...[
+          const DashboardGreetingHeader(),
+          const MxGap(MxSpace.lg),
+        ],
         MxSectionHeader(title: AppLocalizations.of(context).dashboardHeading),
         const MxGap(MxSpace.lg),
         DashboardActionList(state: state),
@@ -54,11 +57,13 @@ class _DashboardDeckEmptyState extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           MxText(l10n.dashboardStartDeckTitle, role: MxTextRole.sectionTitle),
-          const MxGap(MxSpace.sm),
-          MxText(
-            l10n.dashboardNewStudyEmptyMessage,
-            role: MxTextRole.contentBody,
-          ),
+          if (context.showsSupportingCopy) ...[
+            const MxGap(MxSpace.sm),
+            MxText(
+              l10n.dashboardNewStudyEmptyMessage,
+              role: MxTextRole.contentBody,
+            ),
+          ],
           const MxGap(MxSpace.md),
           MxSecondaryButton(
             label: l10n.dashboardOpenLibraryAction,

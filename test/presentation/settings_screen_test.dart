@@ -529,6 +529,9 @@ void main() {
           tester.view.physicalSize.height / tester.view.devicePixelRatio;
 
       expect(find.text('Account'), findsOneWidget);
+      expect(find.text('MemoX User'), findsOneWidget);
+      expect(find.text('user@example.com'), findsOneWidget);
+      expect(find.textContaining('Google Drive ready'), findsNothing);
       expect(find.text('Personalization'), findsOneWidget);
       expect(find.text('Appearance'), findsOneWidget);
       expect(find.text('Language'), findsOneWidget);

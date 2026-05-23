@@ -102,6 +102,9 @@ class LibraryOverviewView extends ConsumerWidget {
                     subtitle: StringUtils.isBlank(toolbarState.searchTerm)
                         ? l10n.libraryManageFoldersSubtitle
                         : l10n.librarySearchResultsSubtitle,
+                    showSubtitle:
+                        context.showsSupportingCopy ||
+                        StringUtils.isNotBlank(toolbarState.searchTerm),
                   ),
                 ),
                 const MxSliverGap(MxSpace.md),
@@ -153,10 +156,15 @@ List<Widget> _buildFolderListSlivers(
 }
 
 class _LibrarySectionHeader extends StatelessWidget {
-  const _LibrarySectionHeader({required this.title, required this.subtitle});
+  const _LibrarySectionHeader({
+    required this.title,
+    required this.subtitle,
+    required this.showSubtitle,
+  });
 
   final String title;
   final String subtitle;
+  final bool showSubtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -164,8 +172,10 @@ class _LibrarySectionHeader extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxText(title, role: MxTextRole.sectionTitle),
-        const MxGap(MxSpace.xxs),
-        MxText(subtitle, role: MxTextRole.sectionSubtitle),
+        if (showSubtitle) ...[
+          const MxGap(MxSpace.xxs),
+          MxText(subtitle, role: MxTextRole.sectionSubtitle),
+        ],
       ],
     );
   }

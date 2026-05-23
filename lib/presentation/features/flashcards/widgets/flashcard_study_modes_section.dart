@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -35,7 +36,9 @@ class FlashcardStudyModesSection extends StatelessWidget {
       children: [
         MxSectionHeader(
           title: l10n.studyFlowTitle,
-          subtitle: l10n.flashcardsStudyModesTitle,
+          subtitle: context.showsSupportingCopy
+              ? l10n.flashcardsStudyModesTitle
+              : null,
         ),
         const MxGap(MxSpace.md),
         _StudyModeListCard(modes: modes, enabled: enabled),

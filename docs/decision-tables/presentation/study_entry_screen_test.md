@@ -17,6 +17,7 @@ Test file: `test/presentation/study_entry_screen_test.dart`
 | DT3 | resume candidate exists and restart must not be hidden behind the primary CTA label | loaded state has `entryType=deck`, one active resume candidate, and default settings | study entry renders the resume branch | `Continue` and `Start` are visible, while `Restart` is hidden | C0+C1 |
 | DT4 | New Study batch size is already at its maximum | loaded deck state uses New Study defaults with batch size 20 | user taps the increase control | batch size remains `20`, the range `5-20 cards` is visible, and no value above the New Study max is rendered | C0+C1 |
 | DT5 | SRS Review batch size is already at its maximum | loaded today state uses review defaults with batch size 50 | user taps the increase control | batch size remains `50`, the range `5-50 cards` is visible, and no value above the review max is rendered | C0+C1 |
+| DT6 | compact study entry hides generic helper subtitle while preserving controls | deck study entry renders at logical size `412x915` with both study flows available | study entry renders loaded deck branch | `Start a study session`, `New Study`, and `Session settings` remain visible, while `Choose a flow and snapshot settings for this session.` is hidden | C0+C1 |
 
 ## Decision table: onSelect
 

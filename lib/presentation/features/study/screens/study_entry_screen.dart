@@ -88,8 +88,10 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
           dataBuilder: (context, state) => ListView(
             children: [
               MxText(l10n.studyEntryHeading, role: MxTextRole.pageTitle),
-              const MxGap(MxSpace.sm),
-              MxText(l10n.studyEntrySubtitle, role: MxTextRole.contentBody),
+              if (context.showsSupportingCopy) ...[
+                const MxGap(MxSpace.sm),
+                MxText(l10n.studyEntrySubtitle, role: MxTextRole.contentBody),
+              ],
               const MxGap(MxSpace.xl),
               if (state.resumeCandidate != null) ...[
                 _ResumeCard(candidate: state.resumeCandidate!),

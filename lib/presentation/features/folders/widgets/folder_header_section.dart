@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../core/theme/responsive/app_breakpoints.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_breadcrumb_bar.dart';
@@ -27,6 +28,8 @@ class FolderHeaderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final summaryLine = _resolveSummary(l10n);
+    final showSummary =
+        context.showsSupportingCopy || state.mode != FolderDetailMode.unlocked;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,13 +56,15 @@ class FolderHeaderSection extends StatelessWidget {
               ),
           ],
         ),
-        const MxGap(MxSpace.xs),
-        MxText(
-          summaryLine,
-          role: MxTextRole.sectionSubtitle,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
+        if (showSummary) ...[
+          const MxGap(MxSpace.xs),
+          MxText(
+            summaryLine,
+            role: MxTextRole.sectionSubtitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ],
     );
   }

@@ -129,13 +129,15 @@ class _DashboardLibraryProgressDetails extends StatelessWidget {
           ],
         ),
         const MxGap(MxSpace.xs),
-        MxText(
-          l10n.dashboardLibraryProgressMessage(percent),
-          role: MxTextRole.contentBody,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const MxGap(MxSpace.xs),
+        if (context.showsSupportingCopy) ...[
+          MxText(
+            l10n.dashboardLibraryProgressMessage(percent),
+            role: MxTextRole.contentBody,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const MxGap(MxSpace.xs),
+        ],
         MxText(
           l10n.dashboardLibraryHealthSummary(
             state.folderCount,

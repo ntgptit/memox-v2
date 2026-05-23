@@ -350,6 +350,12 @@ abstract class AppLocalizations {
   /// **'No review cards are due. Open your library to add cards.'**
   String get dashboardReviewEmptyMessage;
 
+  /// No description provided for @dashboardReviewCompactStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 due} =1{1 due} other{{count} due}}'**
+  String dashboardReviewCompactStatus(int count);
+
   /// No description provided for @dashboardReviewNowAction.
   ///
   /// In en, this message translates to:
@@ -380,6 +386,12 @@ abstract class AppLocalizations {
   /// **'Add or import cards before starting a new study session.'**
   String get dashboardNewStudyEmptyMessage;
 
+  /// No description provided for @dashboardNewStudyCompactStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 new} =1{1 new} other{{count} new}}'**
+  String dashboardNewStudyCompactStatus(int count);
+
   /// No description provided for @dashboardStartNewStudyAction.
   ///
   /// In en, this message translates to:
@@ -409,6 +421,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No active session. Start studying to resume later.'**
   String get dashboardResumeEmptyMessage;
+
+  /// No description provided for @dashboardResumeCompactStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 active} =1{1 active} other{{count} active}}'**
+  String dashboardResumeCompactStatus(int count);
 
   /// No description provided for @dashboardContinueSessionAction.
   ///

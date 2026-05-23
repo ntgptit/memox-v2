@@ -5,13 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/router/route_names.dart';
-import 'package:memox/core/theme/responsive/app_layout.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/folders/models/library_folder.dart';
 import 'package:memox/presentation/features/folders/screens/library_overview_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/library_overview_viewmodel.dart';
 import 'package:memox/presentation/features/folders/widgets/library_folder_list.dart';
-import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
 
@@ -68,10 +66,10 @@ void main() {
   testWidgets(
     'DT1 onResponsive: keeps library first viewport dense on Samsung 412x915',
     (WidgetTester tester) async {
-      await tester.binding.setSurfaceSize(const Size(412, 915));
-      addTearDown(() async {
-        await tester.binding.setSurfaceSize(null);
-      });
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(412, 915);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         ProviderScope(
@@ -85,16 +83,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Good morning, Lan'), findsOneWidget);
+      expect(find.text('Good morning, Lan'), findsNothing);
+      expect(find.text('Library'), findsOneWidget);
       expect(find.text('Folders'), findsOneWidget);
+      expect(find.text('Manage your folder tree'), findsNothing);
       expect(find.text('Korean1'), findsOneWidget);
-
-      final heroCard = find.byType(MxCard).first;
-      final heroContext = tester.element(heroCard);
-      expect(
-        tester.widget<MxCard>(heroCard).padding,
-        AppLayout.heroPadding(heroContext),
-      );
+      expect(find.text('Due today: 3'), findsNothing);
     },
   );
 

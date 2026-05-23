@@ -36,6 +36,7 @@ Test file: `test/presentation/folder_detail_screen_test.dart`
 | DT3 | deck mode has no decks and no search term | folder detail state has `mode=decks`, no items, and empty `searchTerm` | folder detail renders empty deck branch | `No decks yet` and `New deck` are visible, while `New subfolder` is hidden | C0+C1 |
 | DT4 | folder header has normal back and more actions | loaded folder detail state renders header actions | folder detail renders loaded data | the back and more actions are both `MxIconButtonVariant.toolbar` buttons, not framed default icon buttons | C0+C1 |
 | DT5 | deck mode has active decks and deck metadata must stay content-only | folder detail state contains deck `Vitamin B1` with one card, one due card, and forty-two percent mastery | folder detail renders loaded deck mode | `1 card` is visible, `1 cards · 1 due today` is absent, and the due count remains available on the deck study action badge | C0+C1 |
+| DT6 | compact unlocked folder header should not repeat empty-state explanation | unlocked folder `New branch` renders at logical size `412x915` with no subfolders or decks | folder detail renders loaded unlocked mode | folder title/breadcrumb remain visible, the header summary `This folder is empty and can hold subfolders or decks.` is hidden, and the actionable empty state `This folder is empty` remains visible | C0+C1 |
 
 ## Decision table: onInsert
 

@@ -289,16 +289,25 @@ void main() {
   testWidgets(
     'DT1 onResponsive: keeps dashboard dense on Samsung 412x915 viewport',
     (tester) async {
-      await tester.binding.setSurfaceSize(const Size(412, 915));
-      addTearDown(() async {
-        await tester.binding.setSurfaceSize(null);
-      });
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(412, 915);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await _pumpDashboard(tester, _studyReadyDashboardState);
 
+      expect(find.text('Hello 👋'), findsNothing);
+      expect(find.text('Ready to study today?'), findsNothing);
       expect(find.text('Today Review'), findsOneWidget);
       expect(find.text('New Study'), findsOneWidget);
       expect(find.text('Resume'), findsWidgets);
+      expect(find.text('5 due'), findsOneWidget);
+      expect(find.text('7 new'), findsOneWidget);
+      expect(find.text('1 active'), findsOneWidget);
+      expect(find.text('7 new cards are ready.'), findsNothing);
+      expect(find.text('New cards available: 7'), findsNothing);
+      expect(find.text('30% mastery'), findsNothing);
+      expect(find.text('2 folders · 3 decks · 20 cards'), findsOneWidget);
 
       final progressRing = find.byType(MxProgressRing);
       expect(progressRing, findsOneWidget);

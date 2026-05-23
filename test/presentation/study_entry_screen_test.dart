@@ -63,6 +63,38 @@ void main() {
     expect(find.text('Session settings'), findsOneWidget);
   });
 
+  testWidgets('DT6 onDisplay: compact entry hides generic helper subtitle', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(412, 915);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyEntryStateProvider(
+            'deck',
+            'deck-001',
+          ).overrideWith((ref) => Future.value(_deckEntryState)),
+        ],
+        child: const _TestApp(
+          child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Start a study session'), findsOneWidget);
+    expect(
+      find.text('Choose a flow and snapshot settings for this session.'),
+      findsNothing,
+    );
+    expect(find.text('New Study'), findsOneWidget);
+    expect(find.text('Session settings'), findsOneWidget);
+  });
+
   testWidgets('DT2 onDisplay: today entry locks the flow to SRS Review', (
     tester,
   ) async {

@@ -19,7 +19,7 @@ Test file: `test/presentation/library_overview_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | library overview renders on compact-mobile density target | loaded library overview state renders at logical size `412x915` | library overview lays out the first viewport | greeting, folder section, and first folder remain visible, and the hero card padding equals `AppLayout.heroPadding(context)` for compact-mobile density | C0+C1 |
+| DT1 | library overview renders decision-first copy on compact-mobile density target | loaded library overview state renders at logical size `412x915` | library overview lays out the first viewport | generic greeting hero, due-today hero copy, and folder-management subtitle are hidden, while `Library`, `Folders`, and the first folder remain visible | C0+C1 |
 
 ## Decision table: onInsert
 

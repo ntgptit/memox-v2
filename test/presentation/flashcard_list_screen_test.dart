@@ -214,10 +214,10 @@ void main() {
   testWidgets(
     'DT4 onDisplay: compact layout renders study, progress, and toolbar sections',
     (WidgetTester tester) async {
-      await tester.binding.setSurfaceSize(const Size(390, 844));
-      addTearDown(() async {
-        await tester.binding.setSurfaceSize(null);
-      });
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(390, 844);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
 
       const deckId = 'deck-001';
       final container = ProviderContainer(
@@ -243,8 +243,13 @@ void main() {
       expect(find.text('Cards'), findsOneWidget);
       await _scrollToText(tester, 'Your progress');
       expect(find.text('Your progress'), findsOneWidget);
-      await _scrollToText(tester, 'Study modes');
-      expect(find.text('Study modes'), findsOneWidget);
+      expect(
+        find.text("Progress is derived from this deck's SRS state."),
+        findsNothing,
+      );
+      await _scrollToText(tester, 'Study flow');
+      expect(find.text('Study flow'), findsOneWidget);
+      expect(find.text('Study modes'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );

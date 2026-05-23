@@ -143,6 +143,18 @@ class AppLocalizationsVi extends AppLocalizations {
       'Hiện không có thẻ cần ôn. Mở Thư viện để thêm thẻ.';
 
   @override
+  String dashboardReviewCompactStatus(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đến hạn',
+      one: '1 đến hạn',
+      zero: '0 đến hạn',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get dashboardReviewNowAction => 'Ôn';
 
   @override
@@ -161,6 +173,18 @@ class AppLocalizationsVi extends AppLocalizations {
       'Hãy thêm hoặc import thẻ trước khi bắt đầu phiên học mới.';
 
   @override
+  String dashboardNewStudyCompactStatus(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mới',
+      one: '1 mới',
+      zero: '0 mới',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get dashboardStartNewStudyAction => 'Bắt đầu';
 
   @override
@@ -177,6 +201,18 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get dashboardResumeEmptyMessage =>
       'Hiện không có phiên học đang mở. Bắt đầu học để tiếp tục sau.';
+
+  @override
+  String dashboardResumeCompactStatus(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đang mở',
+      one: '1 đang mở',
+      zero: '0 đang mở',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get dashboardContinueSessionAction => 'Tiếp tục';

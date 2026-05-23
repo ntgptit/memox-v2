@@ -56,6 +56,14 @@
     }
   },
   "dashboardReviewEmptyMessage": "Hiện không có thẻ cần ôn. Mở Thư viện để thêm thẻ.",
+  "dashboardReviewCompactStatus": "{count, plural, =0{0 đến hạn} =1{1 đến hạn} other{{count} đến hạn}}",
+  "@dashboardReviewCompactStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboardReviewNowAction": "Ôn",
   "dashboardNewStudyTitle": "Học mới",
   "dashboardNewCardsLabel": "Thẻ mới có thể học",
@@ -68,6 +76,14 @@
     }
   },
   "dashboardNewStudyEmptyMessage": "Hãy thêm hoặc import thẻ trước khi bắt đầu phiên học mới.",
+  "dashboardNewStudyCompactStatus": "{count, plural, =0{0 mới} =1{1 mới} other{{count} mới}}",
+  "@dashboardNewStudyCompactStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboardStartNewStudyAction": "Bắt đầu",
   "dashboardResumeTitle": "Tiếp tục",
   "dashboardActiveSessionsLabel": "Phiên đang mở",
@@ -80,6 +96,14 @@
     }
   },
   "dashboardResumeEmptyMessage": "Hiện không có phiên học đang mở. Bắt đầu học để tiếp tục sau.",
+  "dashboardResumeCompactStatus": "{count, plural, =0{0 đang mở} =1{1 đang mở} other{{count} đang mở}}",
+  "@dashboardResumeCompactStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboardContinueSessionAction": "Tiếp tục",
   "dashboardLibraryHealthTitle": "Sức khỏe thư viện",
   "dashboardLibraryHealthSummary": "{folderCount} thư mục · {deckCount} bộ thẻ · {cardCount} thẻ",

@@ -17,6 +17,10 @@ class LibraryHeroSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    if (!context.showsSupportingCopy) {
+      return MxText(l10n.libraryTitle, role: MxTextRole.pageTitle);
+    }
+
     return MxCard(
       variant: MxCardVariant.elevated,
       padding: AppLayout.heroPadding(context),

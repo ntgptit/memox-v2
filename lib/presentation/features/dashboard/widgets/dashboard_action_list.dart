@@ -3,6 +3,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/extensions/theme_extensions.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -54,6 +55,7 @@ class DashboardActionList extends StatelessWidget {
         message: state.hasReviewCards
             ? l10n.dashboardReviewReadyMessage(state.reviewCount)
             : l10n.dashboardReviewEmptyMessage,
+        compactStatus: l10n.dashboardReviewCompactStatus(state.reviewCount),
         metrics: [
           _DashboardMetric(
             label: l10n.dashboardOverdueLabel,
@@ -76,6 +78,7 @@ class DashboardActionList extends StatelessWidget {
         message: state.hasNewCards
             ? l10n.dashboardNewStudyMessage(state.newCardCount)
             : l10n.dashboardNewStudyEmptyMessage,
+        compactStatus: l10n.dashboardNewStudyCompactStatus(state.newCardCount),
         metrics: [
           _DashboardMetric(
             label: l10n.dashboardNewCardsLabel,
@@ -94,6 +97,9 @@ class DashboardActionList extends StatelessWidget {
         message: state.hasActiveSessions
             ? l10n.dashboardResumeMessage(state.activeSessionCount)
             : l10n.dashboardResumeEmptyMessage,
+        compactStatus: l10n.dashboardResumeCompactStatus(
+          state.activeSessionCount,
+        ),
         metrics: [
           _DashboardMetric(
             label: l10n.dashboardActiveSessionsLabel,
@@ -126,6 +132,7 @@ class _DashboardActionSpec {
     required this.icon,
     required this.title,
     required this.message,
+    required this.compactStatus,
     required this.metrics,
     required this.actionLabel,
     required this.actionKey,
@@ -137,6 +144,7 @@ class _DashboardActionSpec {
   final IconData icon;
   final String title;
   final String message;
+  final String compactStatus;
   final List<_DashboardMetric> metrics;
   final String actionLabel;
   final Key actionKey;
@@ -246,19 +254,33 @@ class _DashboardActionDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showSupportingCopy = context.showsSupportingCopy;
+    final statusChildren = showSupportingCopy
+        ? <Widget>[
+            MxText(
+              action.message,
+              role: MxTextRole.contentBody,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const MxGap(MxSpace.xs),
+            _MetricList(metrics: action.metrics),
+          ]
+        : <Widget>[
+            MxText(
+              action.compactStatus,
+              role: MxTextRole.tileMeta,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxText(action.title, role: MxTextRole.sectionTitle),
         const MxGap(MxSpace.xs),
-        MxText(
-          action.message,
-          role: MxTextRole.contentBody,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const MxGap(MxSpace.xs),
-        _MetricList(metrics: action.metrics),
+        ...statusChildren,
       ],
     );
   }

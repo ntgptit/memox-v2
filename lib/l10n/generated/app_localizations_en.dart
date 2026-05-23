@@ -144,6 +144,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'No review cards are due. Open your library to add cards.';
 
   @override
+  String dashboardReviewCompactStatus(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count due',
+      one: '1 due',
+      zero: '0 due',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get dashboardReviewNowAction => 'Review';
 
   @override
@@ -162,6 +174,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add or import cards before starting a new study session.';
 
   @override
+  String dashboardNewStudyCompactStatus(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new',
+      one: '1 new',
+      zero: '0 new',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get dashboardStartNewStudyAction => 'Start';
 
   @override
@@ -178,6 +202,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get dashboardResumeEmptyMessage =>
       'No active session. Start studying to resume later.';
+
+  @override
+  String dashboardResumeCompactStatus(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count active',
+      one: '1 active',
+      zero: '0 active',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get dashboardContinueSessionAction => 'Resume';

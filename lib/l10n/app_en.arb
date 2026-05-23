@@ -56,6 +56,14 @@
     }
   },
   "dashboardReviewEmptyMessage": "No review cards are due. Open your library to add cards.",
+  "dashboardReviewCompactStatus": "{count, plural, =0{0 due} =1{1 due} other{{count} due}}",
+  "@dashboardReviewCompactStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboardReviewNowAction": "Review",
   "dashboardNewStudyTitle": "New Study",
   "dashboardNewCardsLabel": "New cards available",
@@ -68,6 +76,14 @@
     }
   },
   "dashboardNewStudyEmptyMessage": "Add or import cards before starting a new study session.",
+  "dashboardNewStudyCompactStatus": "{count, plural, =0{0 new} =1{1 new} other{{count} new}}",
+  "@dashboardNewStudyCompactStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboardStartNewStudyAction": "Start",
   "dashboardResumeTitle": "Resume",
   "dashboardActiveSessionsLabel": "Active sessions",
@@ -80,6 +96,14 @@
     }
   },
   "dashboardResumeEmptyMessage": "No active session. Start studying to resume later.",
+  "dashboardResumeCompactStatus": "{count, plural, =0{0 active} =1{1 active} other{{count} active}}",
+  "@dashboardResumeCompactStatus": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboardContinueSessionAction": "Resume",
   "dashboardLibraryHealthTitle": "Library health",
   "dashboardLibraryHealthSummary": "{folderCount, plural, =0{0 folders} =1{1 folder} other{{folderCount} folders}} · {deckCount, plural, =0{0 decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}",

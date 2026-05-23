@@ -150,6 +150,7 @@ Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt 
 - App bar and header actions should use toolbar icon styling. Do not use filled, outlined, or card-like buttons for normal Back, Close, More, settings, or audio actions unless the action is explicitly selected/active/destructive.
 - Prefer shared layout primitives such as `MxAdaptiveScaffold`, `MxScaffold`, and `MxContentShell`.
 - Use spacing, radius, and sizing tokens from `lib/core/theme/**` instead of raw literals when a token already exists.
+- Compact mobile UI should be decision-first: use shared helpers such as `context.showsSupportingCopy`, keep titles/statuses/actions that drive the next decision, and hide repeated helper copy or duplicate metrics. Preserve error recovery copy, empty-state recovery actions, disabled/destructive reasons, account/sync warnings, and accessibility text scaling.
 
 ## Database Contract
 

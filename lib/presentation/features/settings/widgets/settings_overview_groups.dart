@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../../domain/services/tts_service.dart';
@@ -36,16 +37,20 @@ class AccountSettingsOverviewGroup extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final account = ref.watch(accountSettingsControllerProvider);
 
-    return account.when(
-      loading: () => SettingsGroup(
+    return MxRetainedAsyncState<AccountSettingsState>(
+      data: account.value,
+      isLoading: account.isLoading,
+      error: account.hasError ? account.error : null,
+      stackTrace: account.hasError ? account.stackTrace : null,
+      skeletonBuilder: (_) => SettingsGroup(
         title: l10n.settingsAccountTitle,
         child: const MxLoadingState(),
       ),
-      error: (_, _) => SettingsGroup(
+      errorBuilder: (_, _, _) => SettingsGroup(
         title: l10n.settingsAccountTitle,
         child: MxText(l10n.errorUnexpected, role: MxTextRole.formHelper),
       ),
-      data: (state) => SettingsGroup(
+      dataBuilder: (_, state) => SettingsGroup(
         title: l10n.settingsAccountTitle,
         onTap: context.pushSettingsAccount,
         child: _AccountOverviewRow(state: state),
@@ -158,6 +163,7 @@ class _AccountOverviewRow extends StatelessWidget {
       icon: Icons.account_circle_outlined,
       title: _accountStatusText(l10n, state),
       subtitle: _accountSubtitle(l10n, state),
+      preserveSubtitleOnCompact: _preservesAccountSubtitle(state),
     );
   }
 }
@@ -173,8 +179,14 @@ class _LinkedAccountOverviewRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final displayName = link.displayName ?? link.email;
     final scheme = Theme.of(context).colorScheme;
+    final subtitle = context.showsSupportingCopy
+        ? l10n.settingsAccountOverviewSubtitle(statusLabel, link.email)
+        : (statusLabel == l10n.settingsAccountDriveReconnectRequired
+              ? statusLabel
+              : link.email);
 
     return Row(
       key: _accountOverviewRowKey,
@@ -202,11 +214,9 @@ class _LinkedAccountOverviewRow extends StatelessWidget {
               ),
               const MxGap(MxSpace.xxs),
               MxText(
-                AppLocalizations.of(
-                  context,
-                ).settingsAccountOverviewSubtitle(statusLabel, link.email),
+                subtitle,
                 role: MxTextRole.listSubtitle,
-                maxLines: 2,
+                maxLines: context.showsSupportingCopy ? 2 : 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
@@ -241,16 +251,21 @@ class _OverviewFocusContent extends StatelessWidget {
     required this.icon,
     required this.title,
     this.subtitle,
+    this.preserveSubtitleOnCompact = false,
     super.key,
   });
 
   final IconData icon;
   final String title;
   final String? subtitle;
+  final bool preserveSubtitleOnCompact;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final showSubtitle =
+        subtitle != null &&
+        (context.showsSupportingCopy || preserveSubtitleOnCompact);
 
     return ConstrainedBox(
       constraints: const BoxConstraints(
@@ -271,12 +286,12 @@ class _OverviewFocusContent extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                if (subtitle != null) ...[
+                if (showSubtitle) ...[
                   const MxGap(MxSpace.xxs),
                   MxText(
                     subtitle!,
                     role: MxTextRole.listSubtitle,
-                    maxLines: 2,
+                    maxLines: context.showsSupportingCopy ? 2 : 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -293,6 +308,16 @@ class _OverviewFocusContent extends StatelessWidget {
       ),
     );
   }
+}
+
+bool _preservesAccountSubtitle(AccountSettingsState state) {
+  return switch (state.status) {
+    AccountLinkStatus.needsDriveAuthorization ||
+    AccountLinkStatus.unconfigured ||
+    AccountLinkStatus.unsupported ||
+    AccountLinkStatus.error => true,
+    AccountLinkStatus.signedIn || AccountLinkStatus.signedOut => false,
+  };
 }
 
 String _accountStatusLabel(AppLocalizations l10n, AccountSettingsState state) {

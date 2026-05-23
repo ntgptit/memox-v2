@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -37,7 +38,9 @@ class FlashcardProgressSection extends StatelessWidget {
       children: [
         MxSectionHeader(
           title: l10n.flashcardsProgressTitle,
-          subtitle: l10n.flashcardsProgressSubtitle,
+          subtitle: context.showsSupportingCopy
+              ? l10n.flashcardsProgressSubtitle
+              : null,
         ),
         const MxGap(MxSpace.md),
         MxCard(

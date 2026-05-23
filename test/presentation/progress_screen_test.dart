@@ -34,6 +34,44 @@ void main() {
     expect(find.text('View library'), findsOneWidget);
   });
 
+  testWidgets('DT5 onDisplay: compact progress hides generic helper subtitles', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(412, 915);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressOverviewProvider.overrideWith(
+            (ref) => Future.value(_overview(sessions: const [])),
+          ),
+        ],
+        child: const _TestApp(child: ProgressScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Learning overview'), findsOneWidget);
+    expect(
+      find.text(
+        'Track review pressure, library mastery, and open session recovery.',
+      ),
+      findsNothing,
+    );
+    expect(find.text('Active sessions'), findsOneWidget);
+    expect(
+      find.text(
+        'Resume, finalize, retry, or cancel the study sessions that are still open.',
+      ),
+      findsNothing,
+    );
+    expect(find.text('No active study sessions'), findsOneWidget);
+    expect(find.text('View library'), findsOneWidget);
+  });
+
   testWidgets('DT2 onDisplay: active sessions show overview and actions', (
     tester,
   ) async {

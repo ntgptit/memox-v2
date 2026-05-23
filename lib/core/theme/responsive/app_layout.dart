@@ -242,6 +242,14 @@ abstract final class AppLayout {
       textScale >= _sectionActionLargeTextScale ||
       (hasBoundedWidth && maxWidth < _sectionActionInlineWidthFloor);
 
+  /// Whether compact surfaces should render explanatory/supporting copy.
+  ///
+  /// Compact mobile keeps decision-critical labels, statuses, actions, errors,
+  /// empty-state recovery, and destructive warnings. Generic helper copy that
+  /// repeats adjacent metrics should be hidden by the caller.
+  static bool showsSupportingCopy(BuildContext context) =>
+      !context.isCompactMobile;
+
   /// Default card padding for the active density.
   static EdgeInsets cardPadding(BuildContext context) =>
       context.isCompactMobile ? AppSpacing.listItem : AppSpacing.card;
@@ -327,4 +335,5 @@ extension LayoutContext on BuildContext {
   int gridColumns({int base = 1}) =>
       AppLayout.gridColumns(windowSize, base: base);
   double get dialogMaxWidth => AppLayout.dialogMaxWidth(windowSize);
+  bool get showsSupportingCopy => AppLayout.showsSupportingCopy(this);
 }
