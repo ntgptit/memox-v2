@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../tokens/app_elevation.dart';
 import '../tokens/app_opacity.dart';
 import '../tokens/app_radius.dart';
+import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class DialogThemeBuilder {
@@ -22,7 +23,10 @@ abstract final class DialogThemeBuilder {
       contentTextStyle: AppTypography.bodyMedium.copyWith(
         color: scheme.onSurfaceVariant,
       ),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      insetPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.xxl,
+      ),
     );
   }
 

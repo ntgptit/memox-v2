@@ -14,7 +14,6 @@ abstract final class NavigationBarThemeBuilder {
       ),
       shadowColor: scheme.shadow,
       elevation: AppElevation.navigationBar,
-      height: 76,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       iconTheme: WidgetStateProperty.resolveWith(
         (states) => IconThemeData(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../tokens/app_elevation.dart';
 import '../tokens/app_opacity.dart';
+import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class AppBarThemeBuilder {
@@ -16,8 +17,7 @@ abstract final class AppBarThemeBuilder {
       elevation: AppElevation.appBar,
       scrolledUnderElevation: AppElevation.appBarScrolled,
       centerTitle: false,
-      titleSpacing: 8,
-      toolbarHeight: 60,
+      titleSpacing: AppSpacing.lg,
       iconTheme: IconThemeData(color: scheme.onSurface, size: 24),
       actionsIconTheme: IconThemeData(color: scheme.onSurfaceVariant, size: 24),
       titleTextStyle: AppTypography.titleLarge.copyWith(

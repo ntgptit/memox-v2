@@ -37,27 +37,31 @@ abstract final class ButtonThemeBuilder {
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
         textStyle: AppTypography.labelLarge,
         animationDuration: const Duration(milliseconds: 150),
-      ),
+        side: BorderSide.none,
+      ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onPrimary)),
     );
   }
 
   static FilledButtonThemeData tonal(ColorScheme scheme) {
     return FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        backgroundColor: scheme.primaryContainer,
-        foregroundColor: scheme.onPrimaryContainer,
-        disabledBackgroundColor: scheme.onSurface.withValues(
-          alpha: AppOpacity.disabledSurface,
-        ),
-        disabledForegroundColor: scheme.onSurface.withValues(
-          alpha: AppOpacity.disabled,
-        ),
-        minimumSize: const Size(0, _minHeight),
-        padding: _padding,
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
-        textStyle: AppTypography.labelLarge,
-        side: BorderSide(color: scheme.outline),
-      ),
+      style:
+          FilledButton.styleFrom(
+            backgroundColor: scheme.primaryContainer,
+            foregroundColor: scheme.onPrimaryContainer,
+            disabledBackgroundColor: scheme.onSurface.withValues(
+              alpha: AppOpacity.disabledSurface,
+            ),
+            disabledForegroundColor: scheme.onSurface.withValues(
+              alpha: AppOpacity.disabled,
+            ),
+            minimumSize: const Size(0, _minHeight),
+            padding: _padding,
+            shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
+            textStyle: AppTypography.labelLarge,
+            side: BorderSide.none,
+          ).copyWith(
+            overlayColor: AppFocus.overlayProperty(scheme.onPrimaryContainer),
+          ),
     );
   }
 
@@ -73,7 +77,7 @@ abstract final class ButtonThemeBuilder {
         side: BorderSide(color: scheme.outline),
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
         textStyle: AppTypography.labelLarge,
-      ),
+      ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.primary)),
     );
   }
 
@@ -88,7 +92,8 @@ abstract final class ButtonThemeBuilder {
         padding: _textPadding,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
         textStyle: AppTypography.labelLarge,
-      ),
+        side: BorderSide.none,
+      ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.primary)),
     );
   }
 

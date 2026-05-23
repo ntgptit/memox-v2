@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/responsive/app_layout.dart';
@@ -65,38 +67,59 @@ class MxDialog extends StatelessWidget {
           )
         : Text(title, style: titleStyle);
 
-    final resolvedMaxWidth = maxWidth ?? context.dialogMaxWidth;
-
-    return Dialog(
-      clipBehavior: Clip.antiAlias,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: resolvedMaxWidth),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xxl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              titleWidget,
-              const MxGap(AppSpacing.md),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: DefaultTextStyle(style: contentStyle, child: child),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final resolvedMaxWidth = _resolveMaxWidth(context, constraints);
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: resolvedMaxWidth),
+            child: Dialog(
+              clipBehavior: Clip.antiAlias,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xxl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    titleWidget,
+                    const MxGap(AppSpacing.md),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: DefaultTextStyle(
+                          style: contentStyle,
+                          child: child,
+                        ),
+                      ),
+                    ),
+                    if (actions.isNotEmpty) ...[
+                      const MxGap(AppSpacing.xxl),
+                      OverflowBar(
+                        alignment: MainAxisAlignment.end,
+                        spacing: AppSpacing.sm,
+                        overflowSpacing: AppSpacing.sm,
+                        children: actions,
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              if (actions.isNotEmpty) ...[
-                const MxGap(AppSpacing.xxl),
-                OverflowBar(
-                  alignment: MainAxisAlignment.end,
-                  spacing: AppSpacing.sm,
-                  overflowSpacing: AppSpacing.sm,
-                  children: actions,
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
+  }
+
+  double _resolveMaxWidth(BuildContext context, BoxConstraints constraints) {
+    final themeInset = Theme.of(context).dialogTheme.insetPadding;
+    final inset = themeInset ?? EdgeInsets.zero;
+    final viewportWidth = MediaQuery.sizeOf(context).width;
+    final viewportMaxWidth = math.max(0.0, viewportWidth - inset.horizontal);
+    final availableWidth = constraints.hasBoundedWidth
+        ? math.min(constraints.maxWidth, viewportMaxWidth)
+        : viewportMaxWidth;
+    final themeMaxWidth = maxWidth ?? context.dialogMaxWidth;
+    if (!themeMaxWidth.isFinite) return availableWidth;
+    return math.min(themeMaxWidth, availableWidth);
   }
 }

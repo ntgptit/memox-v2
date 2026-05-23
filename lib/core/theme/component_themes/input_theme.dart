@@ -13,17 +13,18 @@ abstract final class InputThemeBuilder {
       isDense: false,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
+        vertical: AppSpacing.lg,
       ),
       hintStyle: AppTypography.bodyMedium.copyWith(
         color: scheme.onSurfaceVariant,
       ),
       labelStyle: AppTypography.bodyMedium.copyWith(
         color: scheme.onSurfaceVariant,
+        fontWeight: FontWeight.w400,
       ),
       floatingLabelStyle: AppTypography.bodySmall.copyWith(
         color: scheme.primary,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w400,
       ),
       helperStyle: AppTypography.bodySmall.copyWith(
         color: scheme.onSurfaceVariant,

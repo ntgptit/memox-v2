@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../tokens/app_elevation.dart';
-import '../tokens/app_opacity.dart';
 import '../tokens/app_radius.dart';
 
 abstract final class CardThemeBuilder {
@@ -11,9 +10,7 @@ abstract final class CardThemeBuilder {
       shadowColor: scheme.shadow.withValues(
         alpha: scheme.brightness == Brightness.light ? 0.32 : 0.60,
       ),
-      surfaceTintColor: scheme.surfaceTint.withValues(
-        alpha: AppOpacity.transparent,
-      ),
+      surfaceTintColor: scheme.surfaceTint,
       elevation: AppElevation.card,
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,

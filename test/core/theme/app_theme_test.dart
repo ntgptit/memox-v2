@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:memox/core/theme/app_theme.dart';
+import 'package:memox/core/theme/component_themes/focus_theme.dart';
 import 'package:memox/core/theme/extensions/theme_extensions.dart';
 import 'package:memox/core/theme/tokens/app_colors.dart';
 import 'package:memox/core/theme/tokens/app_radius.dart';
+import 'package:memox/core/theme/tokens/app_spacing.dart';
 import 'package:memox/core/theme/tokens/app_typography.dart';
 
 void main() {
@@ -188,6 +190,84 @@ void main() {
       expect(menuButtonShape.borderRadius, AppRadius.buttonSmall);
       expect(tooltipDecoration.borderRadius, AppRadius.borderMd);
     });
+
+    test('DT2 onDisplay: button themes expose M3 state contracts', () {
+      final theme = AppTheme.light();
+      final scheme = theme.colorScheme;
+
+      _expectButtonSide(theme.elevatedButtonTheme.style, BorderSide.none);
+      _expectButtonSide(theme.filledButtonTheme.style, BorderSide.none);
+      _expectButtonSide(
+        theme.outlinedButtonTheme.style,
+        BorderSide(color: scheme.outline),
+      );
+      _expectButtonSide(theme.textButtonTheme.style, BorderSide.none);
+
+      _expectButtonShape(theme.elevatedButtonTheme.style);
+      _expectButtonShape(theme.filledButtonTheme.style);
+      _expectButtonShape(theme.outlinedButtonTheme.style);
+      _expectButtonShape(theme.textButtonTheme.style);
+
+      _expectButtonOverlay(theme.elevatedButtonTheme.style, scheme.onPrimary);
+      _expectButtonOverlay(
+        theme.filledButtonTheme.style,
+        scheme.onPrimaryContainer,
+      );
+      _expectButtonOverlay(theme.outlinedButtonTheme.style, scheme.primary);
+      _expectButtonOverlay(theme.textButtonTheme.style, scheme.primary);
+    });
+
+    test('DT3 onDisplay: input theme separates label and focus states', () {
+      final theme = AppTheme.light();
+      final scheme = theme.colorScheme;
+      final inputTheme = theme.inputDecorationTheme;
+      final enabledBorder = inputTheme.enabledBorder as OutlineInputBorder;
+      final focusedBorder = inputTheme.focusedBorder as OutlineInputBorder;
+      final errorBorder = inputTheme.errorBorder as OutlineInputBorder;
+      final focusedErrorBorder =
+          inputTheme.focusedErrorBorder as OutlineInputBorder;
+
+      expect(inputTheme.labelStyle?.fontWeight, FontWeight.w400);
+      expect(inputTheme.floatingLabelStyle?.fontWeight, FontWeight.w400);
+      expect(
+        inputTheme.contentPadding,
+        const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
+        ),
+      );
+      expect(enabledBorder.borderRadius, AppRadius.input);
+      expect(enabledBorder.borderSide.color, scheme.outlineVariant);
+      expect(enabledBorder.borderSide.width, 1);
+      expect(focusedBorder.borderRadius, AppRadius.input);
+      expect(focusedBorder.borderSide.color, scheme.primary);
+      expect(focusedBorder.borderSide.width, 2);
+      expect(errorBorder.borderSide.color, scheme.error);
+      expect(errorBorder.borderSide.width, 1);
+      expect(focusedErrorBorder.borderSide.color, scheme.error);
+      expect(focusedErrorBorder.borderSide.width, 2);
+    });
+
+    test('DT4 onDisplay: app chrome themes avoid hard-coded heights', () {
+      final theme = AppTheme.light();
+      final scheme = theme.colorScheme;
+
+      expect(theme.cardTheme.surfaceTintColor, scheme.surfaceTint);
+      expect(theme.appBarTheme.titleSpacing, AppSpacing.lg);
+      expect(theme.appBarTheme.toolbarHeight, isNull);
+      expect(theme.navigationBarTheme.height, isNull);
+      expect(
+        theme.navigationBarTheme.labelBehavior,
+        NavigationDestinationLabelBehavior.alwaysShow,
+      );
+      expect(
+        theme.dialogTheme.insetPadding,
+        const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.xxl,
+        ),
+      );
+    });
   });
 
   group('AppTheme typography', () {
@@ -359,4 +439,29 @@ void _expectTextRole(TextStyle? actual, TextStyle expected) {
   expect(actual?.fontWeight, expected.fontWeight);
   expect(actual?.height, expected.height);
   expect(actual?.letterSpacing, expected.letterSpacing);
+}
+
+void _expectButtonSide(ButtonStyle? style, BorderSide expected) {
+  expect(style?.side?.resolve(<WidgetState>{}), expected);
+}
+
+void _expectButtonShape(ButtonStyle? style) {
+  final shape = style?.shape?.resolve(<WidgetState>{});
+  expect(shape, isA<RoundedRectangleBorder>());
+  expect((shape as RoundedRectangleBorder).borderRadius, AppRadius.button);
+}
+
+void _expectButtonOverlay(ButtonStyle? style, Color base) {
+  expect(
+    style?.overlayColor?.resolve({WidgetState.hovered}),
+    AppFocus.overlay(base, {WidgetState.hovered}),
+  );
+  expect(
+    style?.overlayColor?.resolve({WidgetState.focused}),
+    AppFocus.overlay(base, {WidgetState.focused}),
+  );
+  expect(
+    style?.overlayColor?.resolve({WidgetState.pressed}),
+    AppFocus.overlay(base, {WidgetState.pressed}),
+  );
 }
