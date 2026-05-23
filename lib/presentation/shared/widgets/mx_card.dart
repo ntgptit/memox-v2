@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_elevation.dart';
 import '../../../core/theme/tokens/app_radius.dart';
-import '../../../core/theme/tokens/app_spacing.dart';
 import 'mx_tappable.dart';
 
 enum MxCardVariant { filled, elevated, outlined }
@@ -13,7 +13,7 @@ class MxCard extends StatelessWidget {
   const MxCard({
     required this.child,
     this.variant = MxCardVariant.filled,
-    this.padding = AppSpacing.card,
+    this.padding,
     this.onTap,
     this.onLongPress,
     this.clipBehavior,
@@ -25,7 +25,7 @@ class MxCard extends StatelessWidget {
 
   final Widget child;
   final MxCardVariant variant;
-  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final Clip? clipBehavior;
@@ -39,6 +39,7 @@ class MxCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final cardTheme = theme.cardTheme;
     final resolvedBorderRadius = _resolvedBorderRadius(cardTheme);
+    final resolvedPadding = padding ?? AppLayout.cardPadding(context);
     final resolvedClipBehavior =
         clipBehavior ?? cardTheme.clipBehavior ?? Clip.antiAlias;
     final cardColor = backgroundColor ?? _backgroundColor(cardTheme, scheme);
@@ -57,7 +58,7 @@ class MxCard extends StatelessWidget {
       margin: cardTheme.margin ?? EdgeInsets.zero,
       clipBehavior: resolvedClipBehavior,
       shape: cardShape,
-      child: Padding(padding: padding, child: child),
+      child: Padding(padding: resolvedPadding, child: child),
     );
 
     if (onTap == null && onLongPress == null) return content;
@@ -74,7 +75,7 @@ class MxCard extends StatelessWidget {
         shape: cardShape,
         onTap: onTap,
         onLongPress: onLongPress,
-        child: Padding(padding: padding, child: child),
+        child: Padding(padding: resolvedPadding, child: child),
       ),
     );
   }

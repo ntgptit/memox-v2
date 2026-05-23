@@ -53,6 +53,10 @@ class MxStudySetTile extends StatelessWidget {
 
     final tile = LayoutBuilder(
       builder: (context, constraints) {
+        final iconTileSize = AppLayout.studySetTileIconSize(context);
+        final contentGap = context.isCompactMobile
+            ? AppSpacing.md
+            : _contentGap;
         final stackTrailing =
             trailing != null &&
             AppLayout.stacksStudySetTileTrailing(
@@ -60,37 +64,37 @@ class MxStudySetTile extends StatelessWidget {
               maxWidth: constraints.maxWidth,
             );
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.md,
+        return ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: kMinInteractiveDimension,
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width:
-                    AppIconSizes.xxl, // guard:raw-size-reviewed icon tile token
-                height:
-                    AppIconSizes.xxl, // guard:raw-size-reviewed icon tile token
-                decoration: BoxDecoration(
-                  color: iconBackground ?? scheme.primaryContainer,
-                  borderRadius: AppRadius.borderLg,
+          child: Padding(
+            padding: AppLayout.listTilePadding(context),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: iconTileSize,
+                  height: iconTileSize,
+                  decoration: BoxDecoration(
+                    color: iconBackground ?? scheme.primaryContainer,
+                    borderRadius: AppRadius.borderLg,
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    icon,
+                    size: AppIconSizes.md,
+                    color: iconColor ?? scheme.onPrimaryContainer,
+                  ),
                 ),
-                alignment: Alignment.center,
-                child: Icon(
-                  icon,
-                  size: AppIconSizes.md,
-                  color: iconColor ?? scheme.onPrimaryContainer,
-                ),
-              ),
-              const MxGap(_contentGap),
-              Expanded(child: _buildTextColumn(stackTrailing: stackTrailing)),
-              if (trailing != null && !stackTrailing) ...[
-                const MxGap(AppSpacing.sm),
-                trailing!,
+                MxGap(contentGap),
+                Expanded(child: _buildTextColumn(stackTrailing: stackTrailing)),
+                if (trailing != null && !stackTrailing) ...[
+                  const MxGap(AppSpacing.sm),
+                  trailing!,
+                ],
               ],
-            ],
+            ),
           ),
         );
       },

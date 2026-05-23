@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
@@ -41,13 +42,14 @@ class MxListTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
     final listTileTheme = theme.listTileTheme;
+    final leadingSize = AppLayout.listTileIconSize(context);
 
     final effectiveLeading =
         leading ??
         (leadingIcon != null
             ? Container(
-                width: AppSpacing.xxxxl, // 40
-                height: AppSpacing.xxxxl, // 40
+                width: leadingSize,
+                height: leadingSize,
                 decoration: BoxDecoration(
                   color: enabled
                       ? scheme.primaryContainer
@@ -112,12 +114,9 @@ class MxListTile extends StatelessWidget {
       selectedTileColor:
           listTileTheme.selectedTileColor ??
           scheme.secondaryContainer.withValues(alpha: AppOpacity.half),
-      contentPadding:
-          listTileTheme.contentPadding ??
-          const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.xs,
-          ),
+      contentPadding: context.isCompactMobile
+          ? AppLayout.listTilePadding(context)
+          : listTileTheme.contentPadding ?? AppLayout.listTilePadding(context),
       visualDensity: dense
           ? VisualDensity.compact
           : listTileTheme.visualDensity,

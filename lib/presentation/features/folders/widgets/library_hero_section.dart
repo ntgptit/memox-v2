@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -18,7 +19,7 @@ class LibraryHeroSection extends StatelessWidget {
 
     return MxCard(
       variant: MxCardVariant.elevated,
-      padding: const EdgeInsets.all(MxSpace.xl),
+      padding: AppLayout.heroPadding(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

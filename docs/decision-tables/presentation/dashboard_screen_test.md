@@ -28,6 +28,12 @@ Test file: `test/presentation/dashboard_screen_test.dart`
 
 _Disabled action visuals are driven by `ThemeData` / `ButtonTheme` tokens only — feature code must not wrap dashboard action buttons in `Opacity`._
 
+## Decision table: onResponsive
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | dashboard renders on compact-mobile density target | loaded dashboard state renders at logical size `412x915` | dashboard lays out the first viewport | Today Review, New Study, Resume, and Library progress are visible, the progress ring uses `AppLayout.dashboardChartSize(context)`, and the action list card stays within the viewport width | C0+C1 |
+
 ## Decision table: onNavigate
 
 | ID | Branch / condition | Given | When | Then | Coverage |

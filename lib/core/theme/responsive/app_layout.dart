@@ -33,10 +33,38 @@ enum MxContentWidth {
 /// 3. Only `core/theme/` + `presentation/shared/layouts/` should hold raw
 ///    pixel numbers. Features describe layout through roles and tokens.
 abstract final class AppLayout {
+  /// guard:raw-size-reviewed phone width where the app switches from normal
+  /// compact-window spacing to denser mobile component spacing.
+  static const double _compactMobileWidth = 430;
+
   /// guard:raw-size-reviewed compact button content threshold keeps icon-label
   /// rows from overflowing when a parent surface becomes narrower than a
   /// comfortable mobile button.
   static const double _buttonIconWidthFloor = 72;
+
+  /// guard:raw-size-reviewed compact Material 3 navigation bar height keeps
+  /// destination labels visible while returning vertical room to phone screens.
+  static const double _compactNavigationBarHeight = 68;
+
+  /// guard:raw-size-reviewed normal dashboard/chart diameter used outside
+  /// compact-mobile density.
+  static const double _dashboardChartSize = 132;
+
+  /// guard:raw-size-reviewed compact dashboard/chart diameter.
+  static const double _compactDashboardChartSize = 112;
+
+  /// guard:raw-size-reviewed normal dashboard/chart stroke width used outside
+  /// compact-mobile density.
+  static const double _dashboardChartStrokeWidth = 16;
+
+  /// guard:raw-size-reviewed compact dashboard/chart stroke width.
+  static const double _compactDashboardChartStrokeWidth = 12;
+
+  /// guard:raw-size-reviewed normal state illustration circle.
+  static const double _stateIllustrationSize = 72;
+
+  /// guard:raw-size-reviewed compact state illustration circle.
+  static const double _compactStateIllustrationSize = 60;
 
   /// guard:raw-size-reviewed very narrow host width where empty state content
   /// must spend less horizontal space on padding so the action remains tappable.
@@ -67,14 +95,19 @@ abstract final class AppLayout {
   /// Width of the extended navigation rail (drawer-style) on large screens.
   static const double railWidth = 256;
 
+  /// Whether a physical viewport width should use compact-mobile density.
+  static bool isCompactMobileWidth(double width) => width < _compactMobileWidth;
+
   // --- Page padding --------------------------------------------------------
 
   /// Horizontal padding for a top-level page gutter. Grows with window size
   /// so desktop layouts don't look cramped against the viewport edge.
-  static EdgeInsets pagePadding(WindowSize size) {
+  static EdgeInsets pagePadding(WindowSize size, {bool compactMobile = false}) {
     switch (size) {
       case WindowSize.compact:
-        return const EdgeInsets.symmetric(horizontal: AppSpacing.lg);
+        return EdgeInsets.symmetric(
+          horizontal: compactMobile ? AppSpacing.md : AppSpacing.lg,
+        );
       case WindowSize.medium:
         return const EdgeInsets.symmetric(horizontal: AppSpacing.xl);
       case WindowSize.expanded:
@@ -85,21 +118,35 @@ abstract final class AppLayout {
   }
 
   /// Top padding for a top-level page body.
-  static double pageTopPadding(WindowSize size) =>
-      size.index >= WindowSize.expanded.index ? AppSpacing.xl : AppSpacing.lg;
+  static double pageTopPadding(WindowSize size, {bool compactMobile = false}) {
+    if (compactMobile) return AppSpacing.md;
+    return size.index >= WindowSize.expanded.index
+        ? AppSpacing.xl
+        : AppSpacing.lg;
+  }
 
   /// Bottom padding for a top-level page body.
-  static double pageBottomPadding(WindowSize size, {bool hasFab = false}) =>
-      hasFab ? AppSpacing.xxxl : AppSpacing.xl;
+  static double pageBottomPadding(
+    WindowSize size, {
+    bool hasFab = false,
+    bool compactMobile = false,
+  }) {
+    if (hasFab) return compactMobile ? AppSpacing.xxl : AppSpacing.xxxl;
+    return compactMobile ? AppSpacing.lg : AppSpacing.xl;
+  }
 
   /// Full page insets for a scrollable body.
-  static EdgeInsets pageInsets(WindowSize size, {bool hasFab = false}) {
-    final horizontal = pagePadding(size);
+  static EdgeInsets pageInsets(
+    WindowSize size, {
+    bool hasFab = false,
+    bool compactMobile = false,
+  }) {
+    final horizontal = pagePadding(size, compactMobile: compactMobile);
     return EdgeInsets.fromLTRB(
       horizontal.left,
-      pageTopPadding(size),
+      pageTopPadding(size, compactMobile: compactMobile),
       horizontal.right,
-      pageBottomPadding(size, hasFab: hasFab),
+      pageBottomPadding(size, hasFab: hasFab, compactMobile: compactMobile),
     );
   }
 
@@ -123,8 +170,12 @@ abstract final class AppLayout {
   // --- Section gap ---------------------------------------------------------
 
   /// Vertical gap between top-level sections on a page.
-  static double sectionGap(WindowSize size) =>
-      size.index >= WindowSize.expanded.index ? AppSpacing.xxl : AppSpacing.lg;
+  static double sectionGap(WindowSize size, {bool compactMobile = false}) {
+    if (compactMobile) return AppSpacing.md;
+    return size.index >= WindowSize.expanded.index
+        ? AppSpacing.xxl
+        : AppSpacing.lg;
+  }
 
   // --- Grid columns ---------------------------------------------------------
 
@@ -190,20 +241,89 @@ abstract final class AppLayout {
   }) =>
       textScale >= _sectionActionLargeTextScale ||
       (hasBoundedWidth && maxWidth < _sectionActionInlineWidthFloor);
+
+  /// Default card padding for the active density.
+  static EdgeInsets cardPadding(BuildContext context) =>
+      context.isCompactMobile ? AppSpacing.listItem : AppSpacing.card;
+
+  /// Larger card padding for visually prominent study/hero surfaces.
+  static EdgeInsets prominentCardPadding(BuildContext context) =>
+      EdgeInsets.all(context.isCompactMobile ? AppSpacing.lg : AppSpacing.xxl);
+
+  /// Feature hero surface padding for the active density.
+  static EdgeInsets heroPadding(BuildContext context) =>
+      EdgeInsets.all(context.isCompactMobile ? AppSpacing.lg : AppSpacing.xl);
+
+  /// List tile padding for the active density.
+  static EdgeInsets listTilePadding(BuildContext context) =>
+      EdgeInsets.symmetric(
+        horizontal: context.isCompactMobile ? AppSpacing.md : AppSpacing.lg,
+        vertical: AppSpacing.xs,
+      );
+
+  /// Study-set leading icon tile size for the active density.
+  static double studySetTileIconSize(BuildContext context) =>
+      context.isCompactMobile ? 36 : 40;
+
+  /// Default icon tile size for regular shared list rows.
+  static double listTileIconSize(BuildContext context) =>
+      context.isCompactMobile ? 36 : 40;
+
+  /// Horizontal button padding for the active density.
+  static double buttonHorizontalPadding(
+    BuildContext context, {
+    required double regular,
+  }) => context.isCompactMobile ? AppSpacing.md : regular;
+
+  /// Compact bottom navigation bar height. Returns null outside compact mobile
+  /// so Material 3 keeps its standard desktop/tablet behavior.
+  static double? navigationBarHeight(BuildContext context) =>
+      context.isCompactMobile ? _compactNavigationBarHeight : null;
+
+  /// Dashboard progress chart diameter for the active density.
+  static double dashboardChartSize(BuildContext context) =>
+      context.isCompactMobile
+      ? _compactDashboardChartSize
+      : _dashboardChartSize;
+
+  /// Dashboard progress chart stroke for the active density.
+  static double dashboardChartStrokeWidth(BuildContext context) =>
+      context.isCompactMobile
+      ? _compactDashboardChartStrokeWidth
+      : _dashboardChartStrokeWidth;
+
+  /// State illustration circle size for empty/error states.
+  static double stateIllustrationSize(BuildContext context) =>
+      context.isCompactMobile
+      ? _compactStateIllustrationSize
+      : _stateIllustrationSize;
 }
 
 /// Ergonomics: read layout specs straight off [BuildContext] so feature code
 /// doesn't keep re-deriving the window size.
 extension LayoutContext on BuildContext {
-  EdgeInsets get pagePadding => AppLayout.pagePadding(windowSize);
-  double get pageTopPadding => AppLayout.pageTopPadding(windowSize);
+  bool get isCompactMobile =>
+      AppLayout.isCompactMobileWidth(MediaQuery.sizeOf(this).width);
+  bool get compactDensity => isCompactMobile;
+  EdgeInsets get pagePadding =>
+      AppLayout.pagePadding(windowSize, compactMobile: isCompactMobile);
+  double get pageTopPadding =>
+      AppLayout.pageTopPadding(windowSize, compactMobile: isCompactMobile);
   double pageBottomPadding({bool hasFab = false}) =>
-      AppLayout.pageBottomPadding(windowSize, hasFab: hasFab);
-  EdgeInsets pageInsets({bool hasFab = false}) =>
-      AppLayout.pageInsets(windowSize, hasFab: hasFab);
+      AppLayout.pageBottomPadding(
+        windowSize,
+        hasFab: hasFab,
+        compactMobile: isCompactMobile,
+      );
+  EdgeInsets pageInsets({bool hasFab = false}) => AppLayout.pageInsets(
+    windowSize,
+    hasFab: hasFab,
+    compactMobile: isCompactMobile,
+  );
   double contentMaxWidth(MxContentWidth role) =>
       AppLayout.contentMaxWidth(role, windowSize);
-  double get sectionGap => AppLayout.sectionGap(windowSize);
+  double get sectionGap =>
+      AppLayout.sectionGap(windowSize, compactMobile: isCompactMobile);
   int gridColumns({int base = 1}) =>
       AppLayout.gridColumns(windowSize, base: base);
   double get dialogMaxWidth => AppLayout.dialogMaxWidth(windowSize);

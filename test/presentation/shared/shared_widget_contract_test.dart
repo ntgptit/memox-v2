@@ -1508,9 +1508,10 @@ void main() {
           ),
         )
         .map((padding) => padding.padding);
+    final context = tester.element(find.byKey(cardKey));
 
     expect(find.byKey(childKey), findsOneWidget);
-    expect(paddings, contains(AppSpacing.card));
+    expect(paddings, contains(AppLayout.cardPadding(context)));
   });
 
   testWidgets('DT2 onCard: resolves visual tokens for card variants', (
@@ -2784,7 +2785,7 @@ void main() {
       );
       expect(
         _gapSizes(tester, emptyKey),
-        containsAll(<double>[AppSpacing.xl, AppSpacing.sm]),
+        containsAll(<double>[AppSpacing.lg, AppSpacing.sm]),
       );
     },
   );
@@ -2827,7 +2828,7 @@ void main() {
     expect(icon.size, AppIconSizes.xl);
     expect(
       _gapSizes(tester, errorKey),
-      containsAll(<double>[AppSpacing.xl, AppSpacing.sm]),
+      containsAll(<double>[AppSpacing.lg, AppSpacing.sm]),
     );
 
     await tester.tap(
@@ -3239,7 +3240,7 @@ void main() {
   testWidgets('DT1 onResponsive: renders important widgets at compact widths', (
     tester,
   ) async {
-    const widths = <double>[320, 360, 390, 430];
+    const widths = <double>[320, 360, 390, 412, 430];
 
     for (final width in widths) {
       for (final entry in _responsiveWidthCases) {
@@ -3473,9 +3474,14 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byType(NavigationBar), findsOneWidget);
 
+      final navigationBar = tester.widget<NavigationBar>(
+        find.byType(NavigationBar),
+      );
       final bodyBottom = tester.getBottomLeft(find.byKey(bodyKey)).dy;
       final navTop = tester.getTopLeft(find.byType(NavigationBar)).dy;
+      final navContext = tester.element(find.byType(NavigationBar));
 
+      expect(navigationBar.height, AppLayout.navigationBarHeight(navContext));
       expect(bodyBottom, lessThanOrEqualTo(navTop));
     },
   );
@@ -4119,10 +4125,7 @@ final List<_ButtonStyleCase> _buttonStyleCases = [
         MxPrimaryButton(key: key, label: 'Continue', onPressed: _noop),
     findButton: _elevatedButtonFinder,
     style: (tester, finder) => tester.widget<ElevatedButton>(finder).style,
-    expectedPadding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.xl,
-      vertical: AppSpacing.md,
-    ),
+    expectedPadding: const EdgeInsets.all(AppSpacing.md),
   ),
   _ButtonStyleCase(
     name: 'MxSecondaryButton.outlined',
@@ -4130,10 +4133,7 @@ final List<_ButtonStyleCase> _buttonStyleCases = [
         MxSecondaryButton(key: key, label: 'Cancel', onPressed: _noop),
     findButton: _outlinedButtonFinder,
     style: (tester, finder) => tester.widget<OutlinedButton>(finder).style,
-    expectedPadding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.xl,
-      vertical: AppSpacing.md,
-    ),
+    expectedPadding: const EdgeInsets.all(AppSpacing.md),
   ),
   _ButtonStyleCase(
     name: 'MxSecondaryButton.tonal',
@@ -4145,10 +4145,7 @@ final List<_ButtonStyleCase> _buttonStyleCases = [
     ),
     findButton: _filledButtonFinder,
     style: (tester, finder) => tester.widget<FilledButton>(finder).style,
-    expectedPadding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.xl,
-      vertical: AppSpacing.md,
-    ),
+    expectedPadding: const EdgeInsets.all(AppSpacing.md),
   ),
   _ButtonStyleCase(
     name: 'MxSecondaryButton.text',
@@ -4160,10 +4157,7 @@ final List<_ButtonStyleCase> _buttonStyleCases = [
     ),
     findButton: _textButtonFinder,
     style: (tester, finder) => tester.widget<TextButton>(finder).style,
-    expectedPadding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.md,
-      vertical: AppSpacing.sm,
-    ),
+    expectedPadding: const EdgeInsets.all(AppSpacing.md),
   ),
 ];
 
@@ -4259,7 +4253,7 @@ const Key _goldenSurfaceKey = ValueKey('shared-widget-golden-surface');
 const Key _goldenTickerModeKey = ValueKey('shared-widget-golden-ticker-mode');
 const bool _goldenTickerModeEnabled = false;
 const double _stateIllustrationSize =
-    72; // guard:raw-size-reviewed shared state illustration size
+    60; // guard:raw-size-reviewed compact shared state illustration size
 
 const Set<String> _widgetsRequiringInteractionCoverage = {
   'MxActionSheetList',

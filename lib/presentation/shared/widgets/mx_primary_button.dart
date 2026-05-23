@@ -59,7 +59,7 @@ class MxPrimaryButton extends StatelessWidget {
 
     final button = ElevatedButton(
       onPressed: effectiveOnPressed,
-      style: _resolvedStyle(theme, textTheme, mxColors),
+      style: _resolvedStyle(context, theme, textTheme, mxColors),
       child: child,
     );
 
@@ -101,6 +101,7 @@ class MxPrimaryButton extends StatelessWidget {
   }
 
   ButtonStyle? _resolvedStyle(
+    BuildContext context,
     ThemeData theme,
     TextTheme textTheme,
     MxColorsExtension mxColors,
@@ -108,26 +109,50 @@ class MxPrimaryButton extends StatelessWidget {
     return _mergeButtonStyles(
       _mergeButtonStyles(
         theme.elevatedButtonTheme.style,
-        _sizeStyle(size, textTheme),
+        _sizeStyle(context, size, textTheme),
       ),
       _toneStyle(theme, mxColors),
     );
   }
 
-  ButtonStyle? _sizeStyle(MxButtonSize size, TextTheme textTheme) {
+  ButtonStyle? _sizeStyle(
+    BuildContext context,
+    MxButtonSize size,
+    TextTheme textTheme,
+  ) {
     return switch (size) {
       MxButtonSize.small => ButtonStyle(
         minimumSize: const WidgetStatePropertyAll(Size(0, 36)),
-        padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        padding: WidgetStatePropertyAll(
+          EdgeInsets.symmetric(
+            horizontal: AppLayout.buttonHorizontalPadding(
+              context,
+              regular: AppSpacing.lg,
+            ),
+          ),
         ),
         textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelMedium),
       ),
-      MxButtonSize.medium => null,
+      MxButtonSize.medium =>
+        context.isCompactMobile
+            ? ButtonStyle(
+                padding: const WidgetStatePropertyAll(
+                  EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.md,
+                  ),
+                ),
+              )
+            : null,
       MxButtonSize.large => ButtonStyle(
         minimumSize: const WidgetStatePropertyAll(Size(0, 52)),
-        padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
+        padding: WidgetStatePropertyAll(
+          EdgeInsets.symmetric(
+            horizontal: AppLayout.buttonHorizontalPadding(
+              context,
+              regular: AppSpacing.xxl,
+            ),
+          ),
         ),
         textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
       ),

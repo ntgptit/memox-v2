@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/router/route_names.dart';
+import 'package:memox/core/theme/responsive/app_layout.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/dashboard/screens/dashboard_screen.dart';
 import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
@@ -16,29 +17,28 @@ import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
 const _maximumCompactDashboardActionButtonWidth = 160.0;
 
 void main() {
-  testWidgets(
-    'DT1 onOpen: shows skeleton while dashboard overview loads',
-    (tester) async {
-      final completer = Completer<DashboardOverviewState>();
-      addTearDown(() {
-        if (!completer.isCompleted) {
-          completer.complete(_studyReadyDashboardState);
-        }
-      });
+  testWidgets('DT1 onOpen: shows skeleton while dashboard overview loads', (
+    tester,
+  ) async {
+    final completer = Completer<DashboardOverviewState>();
+    addTearDown(() {
+      if (!completer.isCompleted) {
+        completer.complete(_studyReadyDashboardState);
+      }
+    });
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            dashboardOverviewProvider.overrideWith((ref) => completer.future),
-          ],
-          child: const _TestApp(child: DashboardScreen()),
-        ),
-      );
-      await tester.pump();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          dashboardOverviewProvider.overrideWith((ref) => completer.future),
+        ],
+        child: const _TestApp(child: DashboardScreen()),
+      ),
+    );
+    await tester.pump();
 
-      expect(find.byType(DashboardSkeleton), findsOneWidget);
-    },
-  );
+    expect(find.byType(DashboardSkeleton), findsOneWidget);
+  });
 
   testWidgets(
     'DT1 onSearchFilterSort: shows retryable error state when dashboard overview fails',
@@ -287,7 +287,7 @@ void main() {
   });
 
   testWidgets(
-    'renders dashboard without overflow on Samsung 412x915 viewport',
+    'DT1 onResponsive: keeps dashboard dense on Samsung 412x915 viewport',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(412, 915));
       addTearDown(() async {
@@ -299,7 +299,14 @@ void main() {
       expect(find.text('Today Review'), findsOneWidget);
       expect(find.text('New Study'), findsOneWidget);
       expect(find.text('Resume'), findsWidgets);
-      expect(find.byType(MxProgressRing), findsOneWidget);
+
+      final progressRing = find.byType(MxProgressRing);
+      expect(progressRing, findsOneWidget);
+      final progressContext = tester.element(progressRing);
+      expect(
+        tester.getSize(progressRing),
+        Size.square(AppLayout.dashboardChartSize(progressContext)),
+      );
 
       final actionListCard = find.byKey(
         const ValueKey('dashboard_action_list_card'),

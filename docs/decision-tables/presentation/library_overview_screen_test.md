@@ -15,6 +15,12 @@ Test file: `test/presentation/library_overview_screen_test.dart`
 | DT1 | loaded library overview has greeting data and one root folder with structural metadata | state contains greeting `Good morning, Lan` and folder `Korean1` with one subfolder, one deck, seventeen cards, three due cards, five new cards, and nineteen percent mastery | library overview renders loaded branch | greeting, `Folders`, folder title, `1 subfolder · 1 deck · 17 cards`, and `Mastery 19%` are visible, while `17 cards · 3 due · 5 new` is absent | C0+C1 |
 | DT2 | loaded library overview receives a legacy folder object whose new `subfolderCount` field is null | state contains folder `Korean1` with null subfolder count, one deck, and seventeen cards | library overview renders loaded branch | folder title is visible and metadata falls back to `0 subfolders · 1 deck · 17 cards` without throwing | C0+C1 |
 
+## Decision table: onResponsive
+
+| ID | Branch / condition | Given | When | Then | Coverage |
+| --- | --- | --- | --- | --- | --- |
+| DT1 | library overview renders on compact-mobile density target | loaded library overview state renders at logical size `412x915` | library overview lays out the first viewport | greeting, folder section, and first folder remain visible, and the hero card padding equals `AppLayout.heroPadding(context)` for compact-mobile density | C0+C1 |
+
 ## Decision table: onInsert
 
 | ID | Branch / condition | Given | When | Then | Coverage |

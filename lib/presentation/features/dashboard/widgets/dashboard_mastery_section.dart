@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -11,10 +12,6 @@ import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
 
-const _dashboardChartSize =
-    132.0; // guard:raw-size-reviewed fixed dashboard chart diameter
-const _dashboardChartStrokeWidth =
-    16.0; // guard:raw-size-reviewed dashboard mastery ring thickness
 const _dashboardPercentMax = 100;
 
 class DashboardLibraryProgressCard extends StatelessWidget {
@@ -27,6 +24,7 @@ class DashboardLibraryProgressCard extends StatelessWidget {
     final masteryPercent = state.masteryPercent
         .clamp(0, _dashboardPercentMax)
         .toInt();
+    final chartGap = context.isCompactMobile ? MxSpace.lg : MxSpace.xl;
 
     return MxCard(
       key: const ValueKey('dashboard_library_progress_card'),
@@ -35,7 +33,7 @@ class DashboardLibraryProgressCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _DashboardMasteryChart(percent: masteryPercent),
-          const MxGap(MxSpace.xl),
+          MxGap(chartGap),
           Expanded(
             child: _DashboardLibraryProgressDetails(
               state: state,
@@ -64,14 +62,14 @@ class _DashboardMasteryChart extends StatelessWidget {
       label: l10n.dashboardLibraryProgressMessage(percent),
       child: ExcludeSemantics(
         child: SizedBox.square(
-          dimension: _dashboardChartSize,
+          dimension: AppLayout.dashboardChartSize(context),
           child: Stack(
             alignment: Alignment.center,
             children: [
               MxProgressRing(
                 value: progress,
-                size: _dashboardChartSize,
-                strokeWidth: _dashboardChartStrokeWidth,
+                size: AppLayout.dashboardChartSize(context),
+                strokeWidth: AppLayout.dashboardChartStrokeWidth(context),
                 showLabel: false,
                 trackColor: scheme.surfaceContainerHighest,
               ),

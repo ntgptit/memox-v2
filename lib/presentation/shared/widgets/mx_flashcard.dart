@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
@@ -42,13 +43,14 @@ class MxFlashcard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
+    final inset = context.isCompactMobile ? AppSpacing.lg : AppSpacing.xl;
 
     return AspectRatio(
       aspectRatio: aspectRatio,
       child: MxCard(
         variant: MxCardVariant.elevated,
         borderRadius: AppRadius.cardLarge,
-        padding: const EdgeInsets.all(AppSpacing.xxl),
+        padding: AppLayout.prominentCardPadding(context),
         onTap: onTap,
         child: Stack(
           children: [
@@ -64,12 +66,12 @@ class MxFlashcard extends StatelessWidget {
             Positioned.fill(
               child: Padding(
                 padding: EdgeInsets.only(
-                  top: language != null ? AppSpacing.xl : AppSpacing.none,
+                  top: language != null ? inset : AppSpacing.none,
                 ),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     final bottomInset = onFullscreen != null
-                        ? AppIconSizes.lg + AppSpacing.xl
+                        ? AppIconSizes.lg + inset
                         : AppSpacing.none;
                     final minHeight = constraints.maxHeight > bottomInset
                         ? constraints.maxHeight - bottomInset

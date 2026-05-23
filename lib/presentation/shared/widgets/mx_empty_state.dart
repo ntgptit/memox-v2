@@ -35,6 +35,8 @@ class MxEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final illustrationSize = AppLayout.stateIllustrationSize(context);
+    final majorGap = context.isCompactMobile ? AppSpacing.lg : AppSpacing.xl;
 
     return Center(
       child: LayoutBuilder(
@@ -53,8 +55,8 @@ class MxEmptyState extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 72, // guard:raw-size-reviewed illustration circle
-                    height: 72, // guard:raw-size-reviewed illustration circle
+                    width: illustrationSize,
+                    height: illustrationSize,
                     decoration: BoxDecoration(
                       color: scheme.secondaryContainer,
                       borderRadius: AppRadius.borderFull,
@@ -66,7 +68,7 @@ class MxEmptyState extends StatelessWidget {
                       color: scheme.onSecondaryContainer,
                     ),
                   ),
-                  const MxGap(AppSpacing.xl),
+                  MxGap(majorGap),
                   MxText(
                     title,
                     role: MxTextRole.stateTitle,
@@ -81,7 +83,7 @@ class MxEmptyState extends StatelessWidget {
                     ),
                   ],
                   if (actionLabel != null && onAction != null) ...[
-                    const MxGap(AppSpacing.xl),
+                    MxGap(majorGap),
                     MxPrimaryButton(
                       label: actionLabel!,
                       leadingIcon: actionLeadingIcon,

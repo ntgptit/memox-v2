@@ -85,6 +85,7 @@ class MxAdaptiveScaffold extends StatelessWidget {
         floatingActionButton: floatingActionButton,
         floatingActionButtonLocation: floatingActionButtonLocation,
         bottomNavigationBar: NavigationBar(
+          height: AppLayout.navigationBarHeight(context),
           selectedIndex: selectedIndex,
           onDestinationSelected: onDestinationSelected,
           destinations: [

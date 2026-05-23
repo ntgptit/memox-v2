@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
@@ -43,6 +44,8 @@ class _MxErrorStateState extends State<MxErrorState> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
+    final illustrationSize = AppLayout.stateIllustrationSize(context);
+    final majorGap = context.isCompactMobile ? AppSpacing.lg : AppSpacing.xl;
 
     return Center(
       child: LayoutBuilder(
@@ -59,8 +62,8 @@ class _MxErrorStateState extends State<MxErrorState> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 72, // guard:raw-size-reviewed illustration circle
-                    height: 72, // guard:raw-size-reviewed illustration circle
+                    width: illustrationSize,
+                    height: illustrationSize,
                     decoration: BoxDecoration(
                       color: scheme.errorContainer,
                       borderRadius: AppRadius.borderFull,
@@ -72,7 +75,7 @@ class _MxErrorStateState extends State<MxErrorState> {
                       color: scheme.onErrorContainer,
                     ),
                   ),
-                  const MxGap(AppSpacing.xl),
+                  MxGap(majorGap),
                   MxText(
                     widget.title ?? l10n.sharedErrorTitle,
                     role: MxTextRole.stateTitle,
@@ -86,7 +89,7 @@ class _MxErrorStateState extends State<MxErrorState> {
                       textAlign: TextAlign.center,
                     ),
                   ],
-                  const MxGap(AppSpacing.xl),
+                  MxGap(majorGap),
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final stackActions =

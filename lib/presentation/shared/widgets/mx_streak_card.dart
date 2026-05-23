@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
@@ -46,10 +47,11 @@ class MxStreakCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final custom = context.mxColors;
     final l10n = AppLocalizations.of(context);
+    final majorGap = context.isCompactMobile ? AppSpacing.lg : AppSpacing.xl;
 
     return MxCard(
       variant: MxCardVariant.outlined,
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: AppLayout.heroPadding(context),
       child: Column(
         children: [
           Text(
@@ -70,7 +72,7 @@ class MxStreakCard extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const MxGap(AppSpacing.xl),
+          MxGap(majorGap),
           Row(
             children: [
               for (final label in weekDays)
