@@ -10,6 +10,10 @@ import 'mx_button_size.dart';
 
 enum MxPrimaryButtonTone { primary, success, danger }
 
+/// Visual silhouette of the button. `rounded` keeps the themed corner radius;
+/// `pill` clamps to a [StadiumBorder] for Quizlet-style hero CTAs.
+enum MxPrimaryButtonShape { rounded, pill }
+
 /// Primary CTA button. Renders as an [ElevatedButton] backed by
 /// [ColorScheme.primary]. Supports loading and leading/trailing icons.
 class MxPrimaryButton extends StatelessWidget {
@@ -20,8 +24,10 @@ class MxPrimaryButton extends StatelessWidget {
     this.trailingIcon,
     this.size = MxButtonSize.medium,
     this.tone = MxPrimaryButtonTone.primary,
+    this.shape = MxPrimaryButtonShape.rounded,
     this.isLoading = false,
     this.fullWidth = false,
+    this.stretchOnCompact = true,
     super.key,
   });
 
@@ -31,8 +37,14 @@ class MxPrimaryButton extends StatelessWidget {
   final IconData? trailingIcon;
   final MxButtonSize size;
   final MxPrimaryButtonTone tone;
+  final MxPrimaryButtonShape shape;
   final bool isLoading;
   final bool fullWidth;
+
+  /// When the host is in compact-mobile density and [size] is
+  /// [MxButtonSize.large], force `fullWidth` so the CTA spans the gutter.
+  /// Defaults to true — Quizlet-style mobile primary actions never sit narrow.
+  final bool stretchOnCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +69,19 @@ class MxPrimaryButton extends StatelessWidget {
           )
         : _buildLabel();
 
+    final shouldStretch =
+        fullWidth ||
+        (stretchOnCompact &&
+            context.isCompactMobile &&
+            size == MxButtonSize.large);
+
     final button = ElevatedButton(
       onPressed: effectiveOnPressed,
       style: _resolvedStyle(context, theme, textTheme, mxColors),
       child: child,
     );
 
-    if (fullWidth) {
+    if (shouldStretch) {
       return SizedBox(width: double.infinity, child: button);
     }
     return button;
@@ -108,10 +126,20 @@ class MxPrimaryButton extends StatelessWidget {
   ) {
     return _mergeButtonStyles(
       _mergeButtonStyles(
-        theme.elevatedButtonTheme.style,
-        _sizeStyle(context, size, textTheme),
+        _mergeButtonStyles(
+          theme.elevatedButtonTheme.style,
+          _sizeStyle(context, size, textTheme),
+        ),
+        _toneStyle(theme, mxColors),
       ),
-      _toneStyle(theme, mxColors),
+      _shapeStyle(),
+    );
+  }
+
+  ButtonStyle? _shapeStyle() {
+    if (shape != MxPrimaryButtonShape.pill) return null;
+    return const ButtonStyle(
+      shape: WidgetStatePropertyAll<OutlinedBorder>(StadiumBorder()),
     );
   }
 
@@ -135,17 +163,20 @@ class MxPrimaryButton extends StatelessWidget {
       ),
       MxButtonSize.medium =>
         context.isCompactMobile
-            ? ButtonStyle(
-                padding: const WidgetStatePropertyAll(
+            ? const ButtonStyle(
+                minimumSize: WidgetStatePropertyAll(Size(0, 48)),
+                padding: WidgetStatePropertyAll(
                   EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
+                    horizontal: AppSpacing.lg,
                     vertical: AppSpacing.md,
                   ),
                 ),
               )
             : null,
       MxButtonSize.large => ButtonStyle(
-        minimumSize: const WidgetStatePropertyAll(Size(0, 52)),
+        minimumSize: WidgetStatePropertyAll(
+          Size(0, context.isCompactMobile ? 56 : 52),
+        ),
         padding: WidgetStatePropertyAll(
           EdgeInsets.symmetric(
             horizontal: AppLayout.buttonHorizontalPadding(

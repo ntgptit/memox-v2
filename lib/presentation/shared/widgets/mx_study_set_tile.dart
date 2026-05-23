@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
@@ -50,6 +51,7 @@ class MxStudySetTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final palette = _resolveIconPalette(context, scheme);
 
     final tile = LayoutBuilder(
       builder: (context, constraints) {
@@ -77,14 +79,14 @@ class MxStudySetTile extends StatelessWidget {
                   width: iconTileSize,
                   height: iconTileSize,
                   decoration: BoxDecoration(
-                    color: iconBackground ?? scheme.primaryContainer,
+                    color: iconBackground ?? palette.background,
                     borderRadius: AppRadius.borderLg,
                   ),
                   alignment: Alignment.center,
                   child: Icon(
                     icon,
                     size: AppIconSizes.md,
-                    color: iconColor ?? scheme.onPrimaryContainer,
+                    color: iconColor ?? palette.foreground,
                   ),
                 ),
                 MxGap(contentGap),
@@ -108,6 +110,27 @@ class MxStudySetTile extends StatelessWidget {
       overlayBaseColor: scheme.primary,
       child: tile,
     );
+  }
+
+  _IconTilePalette _resolveIconPalette(
+    BuildContext context,
+    ColorScheme scheme,
+  ) {
+    final mx = context.mxColors;
+    // Tonal palette derived from theme tokens — gives each study set a stable
+    // identity color without ever touching raw RGB. Index picked from the
+    // tile title hash so the same deck always reads with the same tone.
+    final palettes = <_IconTilePalette>[
+      _IconTilePalette(scheme.primaryContainer, scheme.onPrimaryContainer),
+      _IconTilePalette(scheme.secondaryContainer, scheme.onSecondaryContainer),
+      _IconTilePalette(scheme.tertiaryContainer, scheme.onTertiaryContainer),
+      _IconTilePalette(mx.successContainer, mx.onSuccessContainer),
+      _IconTilePalette(mx.warningContainer, mx.onWarningContainer),
+      _IconTilePalette(mx.infoContainer, mx.onInfoContainer),
+    ];
+    final seed = title.isEmpty ? 0 : title.hashCode;
+    final index = seed.abs() % palettes.length;
+    return palettes[index];
   }
 
   Widget _buildTextColumn({required bool stackTrailing}) {
@@ -159,4 +182,11 @@ class MxStudySetTile extends StatelessWidget {
       ],
     );
   }
+}
+
+class _IconTilePalette {
+  const _IconTilePalette(this.background, this.foreground);
+
+  final Color background;
+  final Color foreground;
 }

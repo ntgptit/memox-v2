@@ -41,30 +41,32 @@ class DashboardActionList extends StatelessWidget {
 
   List<_DashboardActionSpec> _actions(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // Mobile-feel: only surface action cards that are actionable. An empty,
+    // disabled "Review" / "Resume" card at the top of Home reads like dead UI
+    // — keep the New Study card as the always-visible primary CTA.
     return [
-      _DashboardActionSpec(
-        icon: Icons.event_available_outlined,
-        title: l10n.dashboardTodayReviewTitle,
-        message: state.hasReviewCards
-            ? l10n.dashboardReviewReadyMessage(state.reviewCount)
-            : l10n.dashboardReviewEmptyMessage,
-        compactStatus: l10n.dashboardReviewCompactStatus(state.reviewCount),
-        metrics: [
-          _DashboardMetric(
-            label: l10n.dashboardOverdueLabel,
-            value: '${state.overdueCount}',
-          ),
-          _DashboardMetric(
-            label: l10n.dashboardDueTodayTitle,
-            value: '${state.dueTodayCount}',
-          ),
-        ],
-        actionLabel: l10n.dashboardReviewNowAction,
-        actionKey: const ValueKey('dashboard_review_now_action'),
-        actionIcon: Icons.play_arrow_rounded,
-        isPrimary: false,
-        onAction: state.hasReviewCards ? () => context.goStudyToday() : null,
-      ),
+      if (state.hasReviewCards)
+        _DashboardActionSpec(
+          icon: Icons.event_available_outlined,
+          title: l10n.dashboardTodayReviewTitle,
+          message: l10n.dashboardReviewReadyMessage(state.reviewCount),
+          compactStatus: l10n.dashboardReviewCompactStatus(state.reviewCount),
+          metrics: [
+            _DashboardMetric(
+              label: l10n.dashboardOverdueLabel,
+              value: '${state.overdueCount}',
+            ),
+            _DashboardMetric(
+              label: l10n.dashboardDueTodayTitle,
+              value: '${state.dueTodayCount}',
+            ),
+          ],
+          actionLabel: l10n.dashboardReviewNowAction,
+          actionKey: const ValueKey('dashboard_review_now_action'),
+          actionIcon: Icons.play_arrow_rounded,
+          isPrimary: false,
+          onAction: () => context.goStudyToday(),
+        ),
       _DashboardActionSpec(
         icon: Icons.auto_stories_outlined,
         title: l10n.dashboardNewStudyTitle,
@@ -84,29 +86,26 @@ class DashboardActionList extends StatelessWidget {
         isPrimary: true,
         onAction: state.hasNewCards ? () => context.goLibrary() : null,
       ),
-      _DashboardActionSpec(
-        icon: Icons.play_circle_outline,
-        title: l10n.dashboardResumeTitle,
-        message: state.hasActiveSessions
-            ? l10n.dashboardResumeMessage(state.activeSessionCount)
-            : l10n.dashboardResumeEmptyMessage,
-        compactStatus: l10n.dashboardResumeCompactStatus(
-          state.activeSessionCount,
-        ),
-        metrics: [
-          _DashboardMetric(
-            label: l10n.dashboardActiveSessionsLabel,
-            value: '${state.activeSessionCount}',
+      if (state.hasActiveSessions)
+        _DashboardActionSpec(
+          icon: Icons.play_circle_outline,
+          title: l10n.dashboardResumeTitle,
+          message: l10n.dashboardResumeMessage(state.activeSessionCount),
+          compactStatus: l10n.dashboardResumeCompactStatus(
+            state.activeSessionCount,
           ),
-        ],
-        actionLabel: l10n.dashboardContinueSessionAction,
-        actionKey: const ValueKey('dashboard_continue_session_action'),
-        actionIcon: Icons.play_arrow_rounded,
-        isPrimary: false,
-        onAction: state.hasActiveSessions
-            ? () => _continueSession(context)
-            : null,
-      ),
+          metrics: [
+            _DashboardMetric(
+              label: l10n.dashboardActiveSessionsLabel,
+              value: '${state.activeSessionCount}',
+            ),
+          ],
+          actionLabel: l10n.dashboardContinueSessionAction,
+          actionKey: const ValueKey('dashboard_continue_session_action'),
+          actionIcon: Icons.play_arrow_rounded,
+          isPrimary: false,
+          onAction: () => _continueSession(context),
+        ),
     ];
   }
 

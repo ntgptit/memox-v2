@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../shared/widgets/mx_divider.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../core/theme/tokens/app_spacing.dart';
+import '../../../shared/layouts/mx_gap.dart';
+import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_deck_card.dart';
 import '../../../shared/widgets/mx_folder_tile.dart';
 import '../../../shared/widgets/mx_study_progress_action.dart';
-import '../../../shared/widgets/mx_study_set_tile.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 
 /// Sliver-based renderer for a folder's children (subfolders or decks).
@@ -38,16 +41,24 @@ class FolderTreeSliver extends StatelessWidget {
           onOpenSubfolder: onOpenSubfolder,
           onOpenActions: onOpenSubfolderActions,
         ),
-        separatorBuilder: (context, index) => const MxDivider(),
+        separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
       );
     }
 
     final decks = state.decks;
-    return SliverList.separated(
-      itemCount: decks.length,
-      itemBuilder: (context, index) =>
-          _DeckRow(item: decks[index], onOpenActions: onOpenDeckActions),
-      separatorBuilder: (context, index) => const MxDivider(),
+    final columns = context.gridColumns(base: 2);
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columns,
+        crossAxisSpacing: AppSpacing.md,
+        mainAxisSpacing: AppSpacing.md,
+        childAspectRatio: 0.88,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) =>
+            _DeckCard(item: decks[index], onOpenActions: onOpenDeckActions),
+        childCount: decks.length,
+      ),
     );
   }
 }
@@ -88,8 +99,8 @@ class _SubfolderRow extends StatelessWidget {
   }
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.item, this.onOpenActions});
+class _DeckCard extends StatelessWidget {
+  const _DeckCard({required this.item, this.onOpenActions});
 
   final FolderDeckItem item;
   final ValueChanged<FolderDeckItem>? onOpenActions;
@@ -97,20 +108,13 @@ class _DeckRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return MxStudySetTile(
+    return MxDeckCard(
       title: item.name,
       icon: Icons.style_outlined,
       metaLine: l10n.foldersDeckStats(item.cardCount),
+      masteryPercent: item.masteryPercent,
       onTap: () => context.pushFlashcardList(item.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(item),
-      trailing: MxStudyProgressAction(
-        key: ValueKey('deck_study_${item.id}'),
-        masteryPercent: item.masteryPercent,
-        badgeCount: item.dueToday,
-        tooltip: l10n.studyStartAction,
-        onPressed: () =>
-            context.goStudyEntry(entryType: 'deck', entryRefId: item.id),
-      ),
     );
   }
 }

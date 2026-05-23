@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_elevation.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
-import '../../../core/theme/tokens/app_radius.dart';
 import 'mx_tappable.dart';
 
 enum MxCardVariant { filled, elevated, outlined }
@@ -46,7 +45,7 @@ class MxCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
     final cardTheme = theme.cardTheme;
-    final resolvedBorderRadius = _resolvedBorderRadius(cardTheme);
+    final resolvedBorderRadius = _resolvedBorderRadius(context, cardTheme);
     final resolvedPadding = padding ?? AppLayout.cardPadding(context);
     final resolvedClipBehavior =
         clipBehavior ?? cardTheme.clipBehavior ?? Clip.antiAlias;
@@ -124,12 +123,15 @@ class MxCard extends StatelessWidget {
     };
   }
 
-  BorderRadius _resolvedBorderRadius(CardThemeData cardTheme) {
+  BorderRadius _resolvedBorderRadius(
+    BuildContext context,
+    CardThemeData cardTheme,
+  ) {
     if (borderRadius != null) return borderRadius!;
     final shape = cardTheme.shape;
     if (shape is RoundedRectangleBorder && shape.borderRadius is BorderRadius) {
       return shape.borderRadius as BorderRadius;
     }
-    return AppRadius.card;
+    return AppLayout.cardRadius(context);
   }
 }

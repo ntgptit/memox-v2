@@ -28,6 +28,7 @@ import '../widgets/folder_detail_skeleton.dart';
 import '../widgets/folder_empty_state_section.dart';
 import '../widgets/folder_header_section.dart';
 import '../widgets/folder_reorder_section.dart';
+import '../widgets/folder_stat_strip.dart';
 import '../widgets/folder_tree_section.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
 
@@ -97,6 +98,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
           ? MxFab(
               icon: Icons.add,
               tooltip: _resolveFabTooltip(l10n, queryData),
+              extendedLabel: _resolveFabTooltip(l10n, queryData),
               onPressed: _isReorderMode
                   ? null
                   : () {
@@ -149,7 +151,13 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                         context.goFolderDetail(folderId),
                   ),
                 ),
-                const MxSliverGap(MxSpace.xl),
+                if (state.isDeckMode && state.decks.isNotEmpty) ...[
+                  const MxSliverGap(MxSpace.md),
+                  SliverToBoxAdapter(
+                    child: FolderStatStrip(decks: state.decks),
+                  ),
+                ],
+                const MxSliverGap(MxSpace.md),
                 SliverToBoxAdapter(
                   child: MxSearchSortToolbar<ContentSortMode>(
                     searchHintText: l10n.commonSearch,
@@ -192,7 +200,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                         : const <Widget>[],
                   ),
                 ),
-                const MxSliverGap(MxSpace.xl),
+                const MxSliverGap(MxSpace.sm),
                 ..._buildBodySlivers(state),
               ],
             );

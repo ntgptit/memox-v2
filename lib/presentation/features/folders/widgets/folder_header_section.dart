@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../core/theme/responsive/app_breakpoints.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
@@ -31,38 +30,48 @@ class FolderHeaderSection extends StatelessWidget {
     final showSummary =
         context.showsSupportingCopy || state.mode != FolderDetailMode.unlocked;
 
+    // The current folder is already shown by the page title above, so drop the
+    // trailing breadcrumb crumb when it just repeats the title.
+    final crumbs = state.header.breadcrumb;
+    final lastCrumbIsTitle =
+        crumbs.isNotEmpty && crumbs.last.label == state.header.name;
+    final visibleCrumbs = lastCrumbIsTitle
+        ? crumbs.sublist(0, crumbs.length - 1)
+        : crumbs;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _FolderHeaderTitleRow(
           title: state.header.name,
-          isCompact: context.isCompact,
           onBack: onBack,
           onOpenActions: onOpenActions,
         ),
-        const MxGap(MxSpace.sm),
-        MxBreadcrumbBar(
-          items: [
-            for (var index = 0; index < state.header.breadcrumb.length; index++)
-              MxBreadcrumb(
-                label: state.header.breadcrumb[index].label,
-                onTap:
-                    index == state.header.breadcrumb.length - 1 ||
-                        state.header.breadcrumb[index].folderId == null
-                    ? null
-                    : () => onOpenBreadcrumb(
-                        state.header.breadcrumb[index].folderId!,
-                      ),
-              ),
-          ],
-        ),
         if (showSummary) ...[
-          const MxGap(MxSpace.xs),
+          const MxGap(MxSpace.xxs),
           MxText(
             summaryLine,
-            role: MxTextRole.sectionSubtitle,
+            role: MxTextRole.pageSubtitle,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
+          ),
+        ],
+        if (visibleCrumbs.isNotEmpty) ...[
+          const MxGap(MxSpace.xs),
+          MxBreadcrumbBar(
+            items: [
+              for (var index = 0; index < visibleCrumbs.length; index++)
+                MxBreadcrumb(
+                  label: visibleCrumbs[index].label,
+                  onTap:
+                      index == visibleCrumbs.length - 1 ||
+                          visibleCrumbs[index].folderId == null
+                      ? null
+                      : () => onOpenBreadcrumb(
+                          visibleCrumbs[index].folderId!,
+                        ),
+                ),
+            ],
           ),
         ],
       ],
@@ -86,13 +95,11 @@ class FolderHeaderSection extends StatelessWidget {
 class _FolderHeaderTitleRow extends StatelessWidget {
   const _FolderHeaderTitleRow({
     required this.title,
-    required this.isCompact,
     required this.onBack,
     required this.onOpenActions,
   });
 
   final String title;
-  final bool isCompact;
   final VoidCallback onBack;
   final VoidCallback onOpenActions;
 
@@ -110,22 +117,11 @@ class _FolderHeaderTitleRow extends StatelessWidget {
       onPressed: onOpenActions,
     );
 
-    if (isCompact) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: MxSpace.sm,
-            runSpacing: MxSpace.xs,
-            children: [back, more],
-          ),
-          const MxGap(MxSpace.xs),
-          MxText(title, role: MxTextRole.pageTitle),
-        ],
-      );
-    }
-
+    // Compact + wider tiers now share the same AppBar-style layout: back,
+    // title, more on a single line. The previous compact branch stacked back/
+    // more above the title, which made the header eat ~25% of the viewport.
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         back,
         const MxGap(MxSpace.sm),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
@@ -97,12 +98,12 @@ class _MxSearchFieldState extends State<MxSearchField> {
           borderRadius: AppRadius.input,
           borderSide: BorderSide(color: scheme.primary, width: focusedWidth),
         ),
-        contentPadding:
-            theme.inputDecorationTheme.contentPadding ??
-            const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.md,
-            ),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          // Compact-mobile shortens the search field so the toolbar reads
+          // like a phone search row, not a desktop input panel.
+          vertical: context.isCompactMobile ? AppSpacing.sm : AppSpacing.md,
+        ),
       ),
     );
   }

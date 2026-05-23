@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../shared/widgets/mx_divider.dart';
+import '../../../shared/layouts/mx_gap.dart';
+import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_folder_tile.dart';
 import '../../../shared/widgets/mx_study_progress_action.dart';
 import '../models/library_folder.dart';
@@ -33,7 +34,7 @@ class LibraryFolderSliver extends StatelessWidget {
         onStartStudy: onStartStudy,
         onOpenActions: onOpenActions,
       ),
-      separatorBuilder: (context, index) => const MxDivider(),
+      separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
     );
   }
 }
@@ -62,7 +63,6 @@ class _LibraryFolderRow extends StatelessWidget {
         folder.deckCount,
         folder.itemCount,
       ),
-      supportingCaption: l10n.libraryFolderMastery(folder.masteryPercent),
       onTap: () => onOpenFolder(folder.id),
       onLongPress: onOpenActions == null ? null : () => onOpenActions!(folder),
       trailing: MxStudyProgressAction(

@@ -116,7 +116,7 @@ Tokens live in `lib/core/theme/` as **separate files**, not a single barrel:
 - No `MediaQuery`-based font scaling in feature/widget code. Tier-aware typography is applied ONCE in `MemoxApp.builder` via `AppTypography.scaledTextTheme(...)`; shared widgets and features read `Theme.of(context).textTheme.*` and inherit the scaled values automatically. Screen-percentage layouts only inside dialog/sheet/overlay/fullscreen-modal widgets.
 - Repetition colors: always via `customColors.repetitionColor(repetitionOrder.repetitionColorRole)`. Never rotate a raw palette list.
 - Do not wrap interactive widgets in `Opacity` to simulate disabled state. Use `onPressed: null` (or equivalent) and rely on `disabledForegroundColor` / `disabledBackgroundColor` from component themes.
-- On dark theme, prefer `MxCardVariant.outlined` for busy stacked screens (Dashboard, Library listings, filter panels). Reserve `MxCardVariant.filled` for ambient single surfaces (dialogs, sheets, hero blocks).
+- On dark theme **at `expanded` tier or wider**, prefer `MxCardVariant.outlined` for busy stacked screens (Dashboard, Library listings, filter panels) — desktop layouts need the stroke to separate dense surfaces. On **compact-mobile** (phone), default to `MxCardVariant.filled` even on dark: the Quizlet-mobile silhouette relies on tonal fills + larger radius (`AppLayout.cardRadius`), not strokes. Reserve `MxCardVariant.filled` at any tier for ambient single surfaces (dialogs, sheets, hero blocks).
 
 ---
 
@@ -128,7 +128,7 @@ Dark mode targets a **deep-navy + indigo accent** aesthetic, not flat grey:
 - Card layers: `darkNavy15 → darkNavy25 → darkNavy40` mapped to `surfaceContainerLow → surfaceContainerHigh → surfaceBright`.
 - Outline: `darkNavyOutline` / `darkNavyOutlineVariant` — faint indigo strokes, not grey.
 - Primary accent: unchanged Indigo palette (`primary50/60/70`).
-- Card surfaces in dark mode **must read with a subtle stroke** on busy screens — prefer `MxCardVariant.outlined` for library listings, filter panels, streak cards. Keep `.filled` for ambient containers.
+- Card surfaces in dark mode **at expanded+ tiers must read with a subtle stroke** on busy screens — prefer `MxCardVariant.outlined` for library listings, filter panels, streak cards. On compact-mobile, dark cards use `.filled` with the bumped `AppLayout.cardRadius(context)` so the surface feels like Quizlet-mobile, not a desktop data table. Keep `.filled` at every tier for ambient containers.
 - Text: `onSurface` uses `neutral95` for brighter contrast on navy.
 
 **Rules**:

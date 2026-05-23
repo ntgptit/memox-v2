@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'app_breakpoints.dart';
+import '../tokens/app_radius.dart';
 import '../tokens/app_spacing.dart';
 
 /// Role-based width for centered content columns.
@@ -252,9 +253,16 @@ abstract final class AppLayout {
   static bool showsSupportingCopy(BuildContext context) =>
       !context.isCompactMobile;
 
-  /// Default card padding for the active density.
-  static EdgeInsets cardPadding(BuildContext context) =>
-      context.isCompactMobile ? AppSpacing.listItem : AppSpacing.card;
+  /// Default card padding for the active density. Compact-mobile uses the
+  /// 16-dp `card` inset so Quizlet-style filled cards feel airy instead of
+  /// table-row dense.
+  static EdgeInsets cardPadding(BuildContext context) => AppSpacing.card;
+
+  /// Default card corner radius for the active tier. Compact-mobile bumps to
+  /// `xxl (24)` for the rounded Quizlet-mobile silhouette; ≥ medium keeps the
+  /// `xl (20)` standard so wider layouts read as cards, not pills.
+  static BorderRadius cardRadius(BuildContext context) =>
+      context.isCompactMobile ? AppRadius.borderXxl : AppRadius.card;
 
   /// Larger card padding for visually prominent study/hero surfaces.
   static EdgeInsets prominentCardPadding(BuildContext context) =>
@@ -264,20 +272,26 @@ abstract final class AppLayout {
   static EdgeInsets heroPadding(BuildContext context) =>
       EdgeInsets.all(context.isCompactMobile ? AppSpacing.lg : AppSpacing.xl);
 
-  /// List tile padding for the active density.
+  /// List tile padding for the active density. Compact gets a chunkier
+  /// vertical inset so rows read as tappable mobile cards, not table rows.
   static EdgeInsets listTilePadding(BuildContext context) =>
       EdgeInsets.symmetric(
-        horizontal: context.isCompactMobile ? AppSpacing.md : AppSpacing.lg,
-        vertical: AppSpacing.xs,
+        horizontal: AppSpacing.lg,
+        vertical: context.isCompactMobile ? AppSpacing.sm : AppSpacing.xs,
       );
+
+  /// Minimum vertical padding inside a shared list tile. Drives the overall
+  /// row height; compact-mobile gets the larger Quizlet-style ~64-dp row.
+  static double listTileMinVerticalPadding(BuildContext context) =>
+      context.isCompactMobile ? AppSpacing.md : AppSpacing.sm;
 
   /// Study-set leading icon tile size for the active density.
   static double studySetTileIconSize(BuildContext context) =>
-      context.isCompactMobile ? 36 : 40;
+      context.isCompactMobile ? 44 : 40;
 
   /// Default icon tile size for regular shared list rows.
   static double listTileIconSize(BuildContext context) =>
-      context.isCompactMobile ? 36 : 40;
+      context.isCompactMobile ? 44 : 40;
 
   /// Horizontal button padding for the active density.
   static double buttonHorizontalPadding(

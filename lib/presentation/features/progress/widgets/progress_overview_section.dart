@@ -123,6 +123,37 @@ class _MetricCardGroup extends StatelessWidget {
       );
     }
 
+    // Compact phones: 2-up grid keeps stats glanceable instead of stretching
+    // a single column of full-width cards down the screen (web-feel).
+    if (fourth != null) {
+      return Column(
+        children: [
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: first),
+                const MxGap(MxSpace.md),
+                Expanded(child: second),
+              ],
+            ),
+          ),
+          const MxGap(MxSpace.md),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: third),
+                const MxGap(MxSpace.md),
+                Expanded(child: fourth!),
+              ],
+            ),
+          ),
+          const MxGap(MxSpace.lg),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -131,7 +162,6 @@ class _MetricCardGroup extends StatelessWidget {
         second,
         const MxGap(MxSpace.md),
         third,
-        if (fourth != null) ...[const MxGap(MxSpace.md), fourth!],
         const MxGap(MxSpace.lg),
       ],
     );

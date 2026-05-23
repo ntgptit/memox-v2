@@ -5,6 +5,7 @@ import '../../../core/theme/extensions/theme_extensions.dart';
 enum MxTextRole {
   displayLarge,
   pageTitle,
+  pageSubtitle,
   pageGreeting,
   heroAccent,
   sectionTitle,
@@ -48,6 +49,9 @@ abstract final class MxTextStyles {
         color: scheme.onSurface,
       ),
       MxTextRole.pageTitle => textTheme.titleLarge!.copyWith(
+        color: scheme.onSurface,
+      ),
+      MxTextRole.pageSubtitle => textTheme.bodyMedium!.copyWith(
         color: scheme.onSurface,
       ),
       MxTextRole.pageGreeting => textTheme.bodyMedium!.copyWith(

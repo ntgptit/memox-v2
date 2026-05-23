@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
@@ -11,20 +12,15 @@ import 'mx_tappable.dart';
 
 /// Calm, low-chrome folder row for library listings.
 ///
-/// Layout: rounded-square tonal icon tile, title + caption, optional trailing
-/// mastery ring. No card, no shadow, no explicit border — relies on an
-/// indented divider between rows for separation.
-///
-/// Sizing tokens are intentional:
-/// - tile 48×48, icon 24 → readable on compact + expanded tiers.
-/// - vertical padding `md` (12) + min row height 64 → comfortable tap target
-///   and stops the mastery ring from crowding the caption.
+/// Mirrors [MxStudySetTile] geometry so folder rows and deck rows feel like
+/// the same family: identical leading tile size, padding, identity palette,
+/// and trailing slot. Layout: tonal icon tile (color picked from the folder
+/// name hash) + title + optional single caption + optional trailing widget.
 class MxFolderTile extends StatelessWidget {
   const MxFolderTile({
     required this.name,
     required this.icon,
     this.caption,
-    this.supportingCaption,
     this.masteryPercent,
     this.tileColor,
     this.iconColor,
@@ -34,26 +30,19 @@ class MxFolderTile extends StatelessWidget {
     super.key,
   });
 
-  /// guard:raw-size-reviewed minimum row height keeps tap target ≥ 48 dp even
-  /// when caption is absent; not a theme token because it is row-geometry.
-  static const double _minRowHeight = 64;
-
   final String name;
   final IconData icon;
 
   /// Single-line secondary line, e.g. `5 decks · 128 items`.
   final String? caption;
 
-  /// Optional extra secondary line for compact status detail.
-  final String? supportingCaption;
-
   /// Mastery in `[0, 100]`. `null` hides the trailing ring.
   final int? masteryPercent;
 
-  /// Tonal container color. Defaults to `colorScheme.primaryContainer`.
+  /// Tonal container color. Defaults to a hash-derived identity color.
   final Color? tileColor;
 
-  /// Icon color. Defaults to `colorScheme.onPrimaryContainer`.
+  /// Icon color. Defaults to the identity palette foreground.
   final Color? iconColor;
 
   final VoidCallback? onTap;
@@ -64,6 +53,7 @@ class MxFolderTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final palette = _resolveIconPalette(context, scheme);
 
     final row = LayoutBuilder(
       builder: (context, constraints) {
@@ -75,33 +65,36 @@ class MxFolderTile extends StatelessWidget {
           hasBoundedWidth: constraints.hasBoundedWidth,
           maxWidth: constraints.maxWidth,
         );
+        final iconTileSize = AppLayout.listTileIconSize(context);
+        final contentGap = context.isCompactMobile
+            ? AppSpacing.md
+            : AppSpacing.lg;
 
         return ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: _minRowHeight),
+          constraints: const BoxConstraints(
+            minHeight: kMinInteractiveDimension,
+          ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.md,
-            ),
+            padding: AppLayout.listTilePadding(context),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (showLeading) ...[
                   Container(
-                    width: AppIconSizes.xxxl,
-                    height: AppIconSizes.xxxl,
+                    width: iconTileSize,
+                    height: iconTileSize,
                     decoration: BoxDecoration(
-                      color: tileColor ?? scheme.primaryContainer,
+                      color: tileColor ?? palette.background,
                       borderRadius: AppRadius.borderLg,
                     ),
                     alignment: Alignment.center,
                     child: Icon(
                       icon,
-                      size: AppIconSizes.lg,
-                      color: iconColor ?? scheme.onPrimaryContainer,
+                      size: AppIconSizes.md,
+                      color: iconColor ?? palette.foreground,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.md),
+                  SizedBox(width: contentGap),
                 ],
                 Expanded(
                   child: Column(
@@ -119,15 +112,6 @@ class MxFolderTile extends StatelessWidget {
                         const MxGap(AppSpacing.xxs),
                         MxText(
                           caption!,
-                          role: MxTextRole.tileMeta,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                      if (supportingCaption != null) ...[
-                        const MxGap(AppSpacing.xxs),
-                        MxText(
-                          supportingCaption!,
                           role: MxTextRole.tileMeta,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -160,4 +144,32 @@ class MxFolderTile extends StatelessWidget {
       child: row,
     );
   }
+
+  _IconTilePalette _resolveIconPalette(
+    BuildContext context,
+    ColorScheme scheme,
+  ) {
+    final mx = context.mxColors;
+    // Same identity ramp as [MxStudySetTile] — folder + deck rows that
+    // belong together pick from one shared palette so the Library reads as
+    // a single family of cards.
+    final palettes = <_IconTilePalette>[
+      _IconTilePalette(scheme.primaryContainer, scheme.onPrimaryContainer),
+      _IconTilePalette(scheme.secondaryContainer, scheme.onSecondaryContainer),
+      _IconTilePalette(scheme.tertiaryContainer, scheme.onTertiaryContainer),
+      _IconTilePalette(mx.successContainer, mx.onSuccessContainer),
+      _IconTilePalette(mx.warningContainer, mx.onWarningContainer),
+      _IconTilePalette(mx.infoContainer, mx.onInfoContainer),
+    ];
+    final seed = name.isEmpty ? 0 : name.hashCode;
+    final index = seed.abs() % palettes.length;
+    return palettes[index];
+  }
+}
+
+class _IconTilePalette {
+  const _IconTilePalette(this.background, this.foreground);
+
+  final Color background;
+  final Color foreground;
 }

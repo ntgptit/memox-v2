@@ -18,15 +18,15 @@ class MxStudyProgressAction extends StatelessWidget {
     super.key,
   });
 
-  // guard:raw-size-reviewed fixed-size action mirrors an icon button target
-  // while leaving enough room for `100%` and a small count badge.
-  static const double _pillWidth = 88;
-  static const double _pillHeight = 48;
-  static const double _stackWidth = 98;
-  static const double _stackHeight = 56;
-  static const double _strokeWidth = 3;
-  static const double _badgeWidthFloor = 22;
-  static const double _badgeHeight = 18;
+  // guard:raw-size-reviewed compact trailing action — smaller pill so deck
+  // rows stay balanced on phone widths; still leaves room for `100%` + badge.
+  static const double _pillWidth = 72;
+  static const double _pillHeight = 36;
+  static const double _stackWidth = 80;
+  static const double _stackHeight = 44;
+  static const double _strokeWidth = 2.5;
+  static const double _badgeWidthFloor = 20;
+  static const double _badgeHeight = 16;
 
   final int? masteryPercent;
   final int? badgeCount;
@@ -42,7 +42,11 @@ class MxStudyProgressAction extends StatelessWidget {
     final safeBadgeCount = badgeCount ?? 0;
     final clampedPercent = safeMasteryPercent.clamp(0, 100);
     final progress = clampedPercent / 100;
-    final progressColor = mx.masteryProgress(progress);
+    // Not-started decks (0%) should read as neutral, not alarming red — the
+    // mastery ramp only kicks in once the learner has begun the deck.
+    final progressColor = clampedPercent == 0
+        ? scheme.primary
+        : mx.masteryProgress(progress);
     final badgeLabel = safeBadgeCount > 99 ? '99+' : '$safeBadgeCount';
 
     return SizedBox(
@@ -75,16 +79,16 @@ class MxStudyProgressAction extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.play_arrow_rounded,
-                        size: AppIconSizes.lg,
+                        size: AppIconSizes.sm,
                         color: progressColor,
                       ),
-                      const SizedBox(width: AppSpacing.xs),
+                      const SizedBox(width: AppSpacing.xxs),
                       Flexible(
                         child: Text(
                           '$clampedPercent%',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: textTheme.labelLarge?.copyWith(
+                          style: textTheme.labelMedium?.copyWith(
                             color: progressColor,
                           ),
                         ),

@@ -3386,7 +3386,6 @@ void main() {
             name: 'Very long constrained folder title',
             icon: Icons.folder_outlined,
             caption: '999 subfolders · 999 decks · 999 cards',
-            supportingCaption: 'Mastery 100%',
             masteryPercent: 100,
             onTap: _noop,
             trailing: const Icon(Icons.more_horiz),

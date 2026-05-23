@@ -117,6 +117,7 @@ class MxListTile extends StatelessWidget {
       contentPadding: context.isCompactMobile
           ? AppLayout.listTilePadding(context)
           : listTileTheme.contentPadding ?? AppLayout.listTilePadding(context),
+      minVerticalPadding: AppLayout.listTileMinVerticalPadding(context),
       visualDensity: dense
           ? VisualDensity.compact
           : listTileTheme.visualDensity,

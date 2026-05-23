@@ -32,6 +32,7 @@ Widget buildLibraryOverviewFab(BuildContext context, WidgetRef ref) {
   return MxFab(
     icon: Icons.add,
     tooltip: l10n.libraryCreateFolderTooltip,
+    extendedLabel: l10n.libraryCreateFolderTooltip,
     onPressed: () => _handleCreateFolder(context, ref),
   );
 }

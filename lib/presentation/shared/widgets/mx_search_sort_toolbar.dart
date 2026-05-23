@@ -4,6 +4,7 @@ import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
 import 'mx_button_size.dart';
+import 'mx_icon_button.dart';
 import 'mx_search_field.dart';
 import 'mx_secondary_button.dart';
 
@@ -81,17 +82,39 @@ class MxSearchSortToolbar<T> extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isStacked = constraints.maxWidth < 640;
+        // Compact + only the sort menu → drop the chip and inline an icon-only
+        // sort trigger next to the search field, the Quizlet-mobile pattern.
+        // Trailing actions (eg. "Save order" while reordering) still stack.
+        final inlineSortOnly =
+            isStacked &&
+            trailing.isEmpty &&
+            sortOptions.isNotEmpty &&
+            actionWidgets.length == 1;
+        if (inlineSortOnly) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(child: searchField),
+              const MxGap(AppSpacing.sm),
+              _buildSortIconTrigger(context),
+            ],
+          );
+        }
+
+        final stackedAlignment = actionWidgets.length > 1
+            ? WrapAlignment.end
+            : WrapAlignment.start;
         final actions = Wrap(
           spacing: AppSpacing.sm,
           runSpacing: AppSpacing.sm,
-          alignment: WrapAlignment.end,
+          alignment: isStacked ? stackedAlignment : WrapAlignment.end,
           children: actionWidgets,
         );
 
         if (isStacked) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [searchField, const MxGap(AppSpacing.md), actions],
+            children: [searchField, const MxGap(AppSpacing.sm), actions],
           );
         }
 
@@ -106,6 +129,31 @@ class MxSearchSortToolbar<T> extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildSortIconTrigger(BuildContext context) {
+    final selectedOption = _selectedOption;
+    final tooltipLabel =
+        selectedOption?.label ?? sortLabel ?? sortOptions.first.label;
+    return MenuAnchor(
+      builder: (context, controller, _) => MxIconButton(
+        icon: selectedOption?.icon ?? Icons.swap_vert_rounded,
+        tooltip: tooltipLabel,
+        variant: MxIconButtonVariant.standard,
+        onPressed: () =>
+            controller.isOpen ? controller.close() : controller.open(),
+      ),
+      menuChildren: [
+        for (final option in sortOptions)
+          MenuItemButton(
+            leadingIcon: option.icon != null
+                ? Icon(option.icon, size: AppIconSizes.sm)
+                : null,
+            onPressed: () => onSortSelected?.call(option.value),
+            child: Text(option.label),
+          ),
+      ],
     );
   }
 
