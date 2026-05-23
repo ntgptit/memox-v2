@@ -101,23 +101,23 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
   );
 
   static const dark = MxColorsExtension(
-    success: AppColors.success80,
-    onSuccess: AppColors.neutral10,
-    successContainer: AppColors.success30,
-    onSuccessContainer: AppColors.success90,
-    warning: AppColors.warning80,
-    onWarning: AppColors.neutral10,
-    warningContainer: AppColors.warning30,
-    onWarningContainer: AppColors.warning90,
-    info: AppColors.info80,
-    onInfo: AppColors.neutral10,
-    infoContainer: AppColors.info30,
-    onInfoContainer: AppColors.info90,
-    ratingAgain: AppColors.ratingAgain,
-    ratingGood: AppColors.ratingGood,
-    ratingEasy: AppColors.ratingEasy,
-    mastery: AppColors.success80,
-    streak: AppColors.warning80,
+    success: AppColors.darkSuccess80,
+    onSuccess: AppColors.darkNeutral10,
+    successContainer: AppColors.darkSuccess30,
+    onSuccessContainer: AppColors.darkSuccess90,
+    warning: AppColors.darkWarning80,
+    onWarning: AppColors.darkNeutral10,
+    warningContainer: AppColors.darkWarning30,
+    onWarningContainer: AppColors.darkWarning90,
+    info: AppColors.darkInfo80,
+    onInfo: AppColors.darkNeutral10,
+    infoContainer: AppColors.darkInfo30,
+    onInfoContainer: AppColors.darkInfo90,
+    ratingAgain: AppColors.darkRatingAgain,
+    ratingGood: AppColors.darkRatingGood,
+    ratingEasy: AppColors.darkRatingEasy,
+    mastery: AppColors.darkSuccess80,
+    streak: AppColors.darkWarning80,
   );
 
   @override
@@ -209,8 +209,9 @@ extension MxColorsContext on BuildContext {
 
 /// Semantic disabled foreground on [ColorScheme.onSurface] (token-backed).
 extension MxColorSchemeSemantics on BuildContext {
-  Color get mxOnSurfaceDisabled =>
-      Theme.of(this).colorScheme.onSurface.withValues(alpha: AppOpacity.disabled);
+  Color get mxOnSurfaceDisabled => Theme.of(
+    this,
+  ).colorScheme.onSurface.withValues(alpha: AppOpacity.disabled);
 }
 
 // ---------------------------------------------------------------------------

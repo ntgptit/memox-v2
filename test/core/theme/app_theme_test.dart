@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:memox/core/theme/app_theme.dart';
+import 'package:memox/core/theme/tokens/app_colors.dart';
 import 'package:memox/core/theme/tokens/app_radius.dart';
 import 'package:memox/core/theme/tokens/app_typography.dart';
 
@@ -13,11 +14,11 @@ void main() {
         final theme = AppTheme.light();
         final scheme = theme.colorScheme;
 
-        expect(scheme.surface, const Color(0xFFF2F5F9));
-        expect(scheme.surfaceContainerLow, const Color(0xFFFFFFFF));
-        expect(scheme.primary, const Color(0xFF5265F5));
-        expect(scheme.onSurface, const Color(0xFF223354));
-        expect(scheme.outlineVariant, const Color(0xFFD8DEEB));
+        expect(scheme.surface, AppColors.lightSurface);
+        expect(scheme.surfaceContainerLow, AppColors.lightSurfaceContainerLow);
+        expect(scheme.primary, AppColors.lightPrimary40);
+        expect(scheme.onSurface, AppColors.lightNeutral10);
+        expect(scheme.outlineVariant, AppColors.lightNeutralVariant90);
         expect(theme.cardTheme.color, scheme.surfaceContainerLow);
         expect(
           theme.inputDecorationTheme.fillColor,
@@ -37,11 +38,11 @@ void main() {
         final theme = AppTheme.dark();
         final scheme = theme.colorScheme;
 
-        expect(scheme.surface, const Color(0xFF070C27));
-        expect(scheme.surfaceContainerLow, const Color(0xFF111633));
-        expect(scheme.primary, const Color(0xFF8C7CF0));
-        expect(scheme.onSurfaceVariant, const Color(0xFF9EA4C1));
-        expect(scheme.outlineVariant, const Color(0xFF272C48));
+        expect(scheme.surface, AppColors.darkNavy5);
+        expect(scheme.surfaceContainerLow, AppColors.darkNavy15);
+        expect(scheme.primary, AppColors.darkPrimary80);
+        expect(scheme.onSurfaceVariant, AppColors.darkNeutral70);
+        expect(scheme.outlineVariant, AppColors.darkNavyOutlineVariant);
         expect(theme.cardTheme.color, scheme.surfaceContainerLow);
         expect(
           theme.inputDecorationTheme.fillColor,
