@@ -7,6 +7,11 @@ import '../tokens/app_opacity.dart';
 /// the standard [ColorScheme] (success / warning / info / rating / mastery /
 /// streak).
 ///
+/// Do not duplicate standard M3 roles here. Roles such as `primary`,
+/// `onPrimary`, `surfaceContainerHigh`, and `outlineVariant` belong in
+/// `ColorScheme`; this extension only carries app-domain color meaning that
+/// Material does not name.
+///
 /// Each field here has at least one widget consumer. When adding a new
 /// field, wire the consumer in the same change — unused fields are
 /// intentionally not carried.

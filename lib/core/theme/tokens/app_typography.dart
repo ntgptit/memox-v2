@@ -7,6 +7,11 @@ import '../responsive/app_breakpoints.dart';
 /// Uses Plus Jakarta Sans as the single app-wide sans family. The bundled
 /// asset is resolved centrally here so feature code keeps consuming
 /// `Theme.of(context).textTheme.*` without local font overrides.
+///
+/// Each Material 3 role below must keep an explicit `fontSize`, `fontWeight`,
+/// `height`, `letterSpacing`, and `fontFamily`. Treat this file as the fixed
+/// typography contract; disabled or state-specific color belongs in shared
+/// widgets and component themes, not in the base type scale.
 abstract final class AppTypography {
   static const String fontFamily = 'Plus Jakarta Sans';
   static const String? monoFontFamily = null;

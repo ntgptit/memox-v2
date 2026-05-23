@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/extensions/theme_extensions.dart';
+
 enum MxTextRole {
   displayLarge,
   pageTitle,
@@ -161,6 +163,8 @@ class MxText extends StatelessWidget {
     this.data, {
     required this.role,
     this.color,
+    this.enabled = true,
+    this.disabledColor,
     this.maxLines,
     this.overflow,
     this.textAlign,
@@ -171,6 +175,8 @@ class MxText extends StatelessWidget {
   final String data;
   final MxTextRole role;
   final Color? color;
+  final bool enabled;
+  final Color? disabledColor;
   final int? maxLines;
   final TextOverflow? overflow;
   final TextAlign? textAlign;
@@ -179,7 +185,12 @@ class MxText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var style = MxTextStyles.resolve(context, role);
-    if (color != null) {
+    if (!enabled) {
+      style = style.copyWith(
+        color: disabledColor ?? context.mxOnSurfaceDisabled,
+      );
+    }
+    if (enabled && color != null) {
       style = style.copyWith(color: color);
     }
 

@@ -18,6 +18,8 @@ Test file: `test/presentation/shared/mx_text_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT1 | explicit color override should win over semantic role color | `MxText` is built with breadcrumb role and `Colors.deepOrange` override | text renders | rendered `Text.style.color` equals the override color | C0+C1 |
 | DT2 | `MxSection` should render title and subtitle through semantic `MxText` roles | section has title `Folders` and subtitle `Manage your folder tree` | section renders | title uses `MxTextRole.sectionTitle` and subtitle uses `MxTextRole.sectionSubtitle` | C0+C1 |
+| DT3 | disabled text should use the theme semantic disabled foreground | `MxText` is built with `enabled: false` and no disabled color override | text renders | rendered `Text.style.color` equals `context.mxOnSurfaceDisabled` | C0+C1 |
+| DT4 | disabled text color override should win over semantic disabled foreground | `MxText` is built with `enabled: false` and `disabledColor: Colors.purple` | text renders | rendered `Text.style.color` equals the disabled color override | C0+C1 |
 
 ## Decision table: onNavigate
 

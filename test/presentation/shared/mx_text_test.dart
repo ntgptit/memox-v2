@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/core/theme/extensions/theme_extensions.dart';
 import 'package:memox/presentation/shared/layouts/mx_section.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
@@ -212,6 +213,57 @@ void main() {
     final text = tester.widget<Text>(find.text('Folders'));
 
     expect(text.style?.color, overrideColor);
+  });
+
+  testWidgets('DT3 onDisplay: MxText applies semantic disabled color', (
+    tester,
+  ) async {
+    late Color expectedColor;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) {
+              expectedColor = context.mxOnSurfaceDisabled;
+              return const MxText(
+                'Unavailable',
+                role: MxTextRole.formHelper,
+                enabled: false,
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    final text = tester.widget<Text>(find.text('Unavailable'));
+
+    expect(text.style?.color, expectedColor);
+  });
+
+  testWidgets('DT4 onDisplay: MxText applies disabled color override', (
+    tester,
+  ) async {
+    const disabledOverride = Colors.purple;
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: MxText(
+            'Unavailable',
+            role: MxTextRole.formHelper,
+            enabled: false,
+            disabledColor: disabledOverride,
+            color: Colors.deepOrange,
+          ),
+        ),
+      ),
+    );
+
+    final text = tester.widget<Text>(find.text('Unavailable'));
+
+    expect(text.style?.color, disabledOverride);
   });
 
   testWidgets(

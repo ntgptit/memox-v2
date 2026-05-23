@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:memox/core/theme/app_theme.dart';
+import 'package:memox/core/theme/extensions/theme_extensions.dart';
 import 'package:memox/core/theme/tokens/app_colors.dart';
 import 'package:memox/core/theme/tokens/app_radius.dart';
 import 'package:memox/core/theme/tokens/app_typography.dart';
@@ -18,6 +19,7 @@ void main() {
         expect(scheme.surfaceContainerLow, AppColors.lightSurfaceContainerLow);
         expect(scheme.primary, AppColors.lightPrimary40);
         expect(scheme.onSurface, AppColors.lightNeutral10);
+        expect(scheme.onSurfaceVariant, AppColors.lightNeutral20);
         expect(scheme.outlineVariant, AppColors.lightNeutralVariant90);
         expect(theme.cardTheme.color, scheme.surfaceContainerLow);
         expect(
@@ -55,6 +57,93 @@ void main() {
         expect(theme.navigationBarTheme.indicatorColor, scheme.primary);
       },
     );
+
+    test(
+      'DT5 onUpdate: light theme foreground roles meet WCAG AA contrast',
+      () {
+        final theme = AppTheme.light();
+        final scheme = theme.colorScheme;
+        final customColors = theme.extension<MxColorsExtension>()!;
+
+        _expectMinimumNormalTextContrast(
+          label: 'onPrimary / primary',
+          foreground: scheme.onPrimary,
+          background: scheme.primary,
+        );
+        _expectMinimumNormalTextContrast(
+          label: 'onSurface / surface',
+          foreground: scheme.onSurface,
+          background: scheme.surface,
+        );
+        _expectMinimumNormalTextContrast(
+          label: 'onSurfaceVariant / surface',
+          foreground: scheme.onSurfaceVariant,
+          background: scheme.surface,
+        );
+        _expectMinimumNormalTextContrast(
+          label: 'onError / error',
+          foreground: scheme.onError,
+          background: scheme.error,
+        );
+        _expectMinimumNormalTextContrast(
+          label: 'onSuccess / success',
+          foreground: customColors.onSuccess,
+          background: customColors.success,
+        );
+        _expectMinimumNormalTextContrast(
+          label: 'onWarning / warning',
+          foreground: customColors.onWarning,
+          background: customColors.warning,
+        );
+        _expectMinimumNormalTextContrast(
+          label: 'onInfo / info',
+          foreground: customColors.onInfo,
+          background: customColors.info,
+        );
+      },
+    );
+
+    test('DT6 onUpdate: dark theme foreground roles meet WCAG AA contrast', () {
+      final theme = AppTheme.dark();
+      final scheme = theme.colorScheme;
+      final customColors = theme.extension<MxColorsExtension>()!;
+
+      _expectMinimumNormalTextContrast(
+        label: 'onPrimary / primary',
+        foreground: scheme.onPrimary,
+        background: scheme.primary,
+      );
+      _expectMinimumNormalTextContrast(
+        label: 'onSurface / surface',
+        foreground: scheme.onSurface,
+        background: scheme.surface,
+      );
+      _expectMinimumNormalTextContrast(
+        label: 'onSurfaceVariant / surface',
+        foreground: scheme.onSurfaceVariant,
+        background: scheme.surface,
+      );
+      _expectMinimumNormalTextContrast(
+        label: 'onError / error',
+        foreground: scheme.onError,
+        background: scheme.error,
+      );
+      _expectMinimumNormalTextContrast(
+        label: 'onSuccess / success',
+        foreground: customColors.onSuccess,
+        background: customColors.success,
+      );
+      _expectMinimumNormalTextContrast(
+        label: 'onWarning / warning',
+        foreground: customColors.onWarning,
+        background: customColors.warning,
+      );
+      _expectMinimumNormalTextContrast(
+        label: 'onInfo / info',
+        foreground: customColors.onInfo,
+        background: customColors.info,
+      );
+    });
 
     test('DT1 onDisplay: component shapes use soft MemoX radii', () {
       final theme = AppTheme.light();
@@ -213,5 +302,61 @@ void main() {
         );
       },
     );
+
+    test('DT7 onUpdate: Material 3 type scale remains fixed', () {
+      final theme = AppTypography.textTheme;
+
+      _expectTextRole(theme.displayLarge, AppTypography.displayLarge);
+      _expectTextRole(theme.displayMedium, AppTypography.displayMedium);
+      _expectTextRole(theme.displaySmall, AppTypography.displaySmall);
+      _expectTextRole(theme.headlineLarge, AppTypography.headlineLarge);
+      _expectTextRole(theme.headlineMedium, AppTypography.headlineMedium);
+      _expectTextRole(theme.headlineSmall, AppTypography.headlineSmall);
+      _expectTextRole(theme.titleLarge, AppTypography.titleLarge);
+      _expectTextRole(theme.titleMedium, AppTypography.titleMedium);
+      _expectTextRole(theme.titleSmall, AppTypography.titleSmall);
+      _expectTextRole(theme.bodyLarge, AppTypography.bodyLarge);
+      _expectTextRole(theme.bodyMedium, AppTypography.bodyMedium);
+      _expectTextRole(theme.bodySmall, AppTypography.bodySmall);
+      _expectTextRole(theme.labelLarge, AppTypography.labelLarge);
+      _expectTextRole(theme.labelMedium, AppTypography.labelMedium);
+      _expectTextRole(theme.labelSmall, AppTypography.labelSmall);
+    });
   });
+}
+
+const double _minimumNormalTextContrast = 4.5;
+
+void _expectMinimumNormalTextContrast({
+  required String label,
+  required Color foreground,
+  required Color background,
+}) {
+  final ratio = _contrastRatio(foreground, background);
+  expect(
+    ratio,
+    greaterThanOrEqualTo(_minimumNormalTextContrast),
+    reason: '$label contrast ratio ${ratio.toStringAsFixed(2)} is below AA',
+  );
+}
+
+double _contrastRatio(Color foreground, Color background) {
+  final foregroundLuminance = foreground.computeLuminance();
+  final backgroundLuminance = background.computeLuminance();
+  final lighter = foregroundLuminance > backgroundLuminance
+      ? foregroundLuminance
+      : backgroundLuminance;
+  final darker = foregroundLuminance > backgroundLuminance
+      ? backgroundLuminance
+      : foregroundLuminance;
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+void _expectTextRole(TextStyle? actual, TextStyle expected) {
+  expect(actual?.fontFamily, AppTypography.fontFamily);
+  expect(actual?.fontSize, expected.fontSize);
+  expect(actual?.fontWeight, expected.fontWeight);
+  expect(actual?.height, expected.height);
+  expect(actual?.letterSpacing, expected.letterSpacing);
 }

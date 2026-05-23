@@ -22,6 +22,10 @@ import '../component_themes/toggle_theme.dart';
 import '../component_themes/tooltip_theme.dart';
 
 /// Light [ColorScheme] derived from the MemoX brand palette.
+///
+/// This file is the Material 3 role layer. Keep role names here aligned with
+/// M3 (`primary`, `onPrimary`, `surfaceContainerHigh`, `outlineVariant`, ...),
+/// while `AppColors` remains the source palette/tonal-token layer.
 const ColorScheme _lightScheme = ColorScheme(
   brightness: Brightness.light,
   primary: AppColors.lightPrimary40,
@@ -42,7 +46,7 @@ const ColorScheme _lightScheme = ColorScheme(
   onErrorContainer: AppColors.lightError10,
   surface: AppColors.lightSurface,
   onSurface: AppColors.lightNeutral10,
-  onSurfaceVariant: AppColors.lightNeutral40,
+  onSurfaceVariant: AppColors.lightNeutral20,
   surfaceContainerLowest: AppColors.lightSurfaceContainerLowest,
   surfaceContainerLow: AppColors.lightSurfaceContainerLow,
   surfaceContainer: AppColors.lightSurfaceContainer,

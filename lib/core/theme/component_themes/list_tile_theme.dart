@@ -13,7 +13,6 @@ abstract final class ListTileThemeBuilder {
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.xs,
       ),
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
       selectedColor: scheme.primary,
       selectedTileColor: scheme.primaryContainer.withValues(
         alpha: AppOpacity.half,

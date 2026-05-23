@@ -22,6 +22,10 @@ import '../component_themes/toggle_theme.dart';
 import '../component_themes/tooltip_theme.dart';
 
 /// Dark [ColorScheme] derived from the MemoX brand palette.
+///
+/// This file is the Material 3 role layer. Keep role names here aligned with
+/// M3 (`primary`, `onPrimary`, `surfaceContainerHigh`, `outlineVariant`, ...),
+/// while `AppColors` remains the source palette/tonal-token layer.
 const ColorScheme _darkScheme = ColorScheme(
   brightness: Brightness.dark,
   primary: AppColors.darkPrimary80,
