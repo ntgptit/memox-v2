@@ -1,10 +1,6 @@
 # MemoX Design System
 
-This directory is the **trusted design source** for MemoX. When Flutter UI, shared widgets, theme tokens, visual QA, decks, mocks, marketing surfaces, or prototypes need design direction, read this document before older prompt files, generic UI checklists, or ad hoc implementation notes.
-
-The Design System defines brand intent and visual behavior. The Flutter implementation must express it through `lib/core/theme/**`, `lib/presentation/shared/**`, and `lib/l10n/*.arb`; do not bypass those layers with one-off colors, type styles, spacing, components, or copy tone.
-
-A design system for **MemoX** — a personal flashcard learning app built in Flutter with 5 study modes (Review, Match, Guess, Recall, Fill), SRS spaced repetition, and Google Drive backup. Runtime versions follow the repository Flutter/Dart config and root `AGENTS.md`.
+A design system for **MemoX** — a personal flashcard learning app built in Flutter 3.24+ / Dart 3.5+ with 5 study modes (Review, Match, Guess, Recall, Fill), SRS spaced repetition, and Google Drive backup.
 
 This repo contains the brand foundations, tokens, and a high-fidelity UI kit for designing consistent new surfaces, marketing pages, decks, and prototypes for MemoX.
 
@@ -13,7 +9,7 @@ This repo contains the brand foundations, tokens, and a high-fidelity UI kit for
 MemoX is a calm, focused learning tool. It treats studying as a durable daily practice — the product shell stays quiet so the *cards* themselves can be the loudest thing on screen. The architecture mandates a strict, tokenized design language:
 
 - **Feature-first Clean Architecture** in Flutter. Presentation → Domain ← Data.
-- **Material 3** with a seeded `ColorScheme` — the current primary action token is indigo (`#5265F5`) in light mode.
+- **Material 3** with a seeded `ColorScheme` — the default seed is a deep indigo (`#24389C`).
 - **Plus Jakarta Sans** (Google Fonts) everywhere. One family, seven sizes.
 - **Tokens are law.** No raw hex, no raw `TextField`, no raw `InkWell`, no raw `else`. Every color, size, radius, duration, and string routes through a typed token or l10n key.
 - **Collapsed type scale**: `48 / 32 / 24 / 20 / 16 / 14 / 12`. Nothing in between.
@@ -34,14 +30,12 @@ Five supported study modes and their semantic colors:
 Everything in this system was pulled from the MemoX monorepo:
 
 - **Repo:** `github.com/ntgptit/memox` (default branch `main`, sha `1a2d41e2567a`)
-- **Design tokens:** `lib/core/theme/tokens/` — `app_colors.dart`, `app_typography.dart`, `app_spacing.dart`, `app_radius.dart`, `app_elevation.dart`, `app_motion.dart`, `app_opacity.dart`, `app_icon_sizes.dart`
-- **Color schemes:** `lib/core/theme/schemes/{light_theme,dark_theme}.dart`
-- **Theme extensions:** `lib/core/theme/extensions/theme_extensions.dart`
-- **Responsive layout:** `lib/core/theme/responsive/{app_breakpoints,app_layout}.dart`
-- **Component themes:** `lib/core/theme/component_themes/**`
-- **Shared widgets:** `lib/presentation/shared/**` — buttons, cards, chips, inputs, dialogs, layouts, navigation, feedback, progress, states
-- **Copy (l10n):** `lib/l10n/*.arb`
-- **Repository rules:** root `AGENTS.md`, `CLAUDE.md`, and `code-verification-guard/registries/projects/memox/**`
+- **Design tokens:** `lib/core/theme/tokens/` — `color_tokens.dart`, `typography_tokens.dart`, `spacing_tokens.dart`, `radius_tokens.dart`, `elevation_tokens.dart`, `duration_tokens.dart`, `easing_tokens.dart`, `opacity_tokens.dart`, `size_tokens.dart`
+- **Color schemes:** `lib/core/theme/color_schemes/{app_color_scheme,custom_colors}.dart`
+- **Text themes:** `lib/core/theme/text_themes/{app_text_theme,custom_text_styles}.dart`
+- **Shared widgets:** `lib/shared/widgets/**` (~80 files — buttons, cards, chips, inputs, dialogs, navigation, feedback, progress)
+- **Copy (l10n):** `l10n/app_en.arb` (and `app_ko.arb`, `app_vi.arb` for Korean + Vietnamese)
+- **Design rules:** `docs/memox-ui-design-rules.md`, `docs/memox-typography-usage-rules.md`, `docs/memox-guard-rules-quickref.md`, `docs/memox-reference.md`
 - **Prior web preview:** `docs/memox-design-system/src/App.tsx` + `index.css` — a Tailwind "Theme Foundation Board" that the original authors built to communicate the system. We borrowed the structure but rebuilt the card set from source tokens.
 
 No Figma was attached for this system.
@@ -79,14 +73,14 @@ No Figma was attached for this system.
 
 **Two themes:** *Tokyo Pure Light* (day) and *Tokyo Nebula* (night). Quizlet-mobile energy, not dashboard-web restraint.
 
-- **Tokyo Pure Light** — page is `#F2F5F9` (white with a cool blue cast), cards are pure white with a soft indigo ghost border, text is cool navy `#223354`, primary is vibrant indigo `#5265F5`. Outlines lean cool/blue, never warm gray.
-- **Tokyo Nebula** — page is deep navy `#0B102D` (night sky), paper-indigo cards sit on it (`#111633` / `#1D2344`), primary lifts to violet-indigo `#8C7CF0` for contrast, and outlines are *faded indigo* (`#4A5180` / `#2F3658`), never gray — that's the signature.
+- **Tokyo Pure Light** — page is `#F7F9FE` (white with a cool blue cast), cards are pure white with a soft indigo ghost border, text is deep navy `#0F1638`, primary is vibrant indigo `#5265F5`. Outlines lean cool/blue, never warm gray.
+- **Tokyo Nebula** — page is deep navy `#0A0E27` (night sky), paper-indigo cards sit on it (`#131A3A`), primary lifts to `#8B9AFF` for AA contrast, and a violet accent `#B5A0FF` enters the system. Outlines are *faded indigo* `#2A3267`, never gray — that's the signature.
 - **Seed**: `#5265F5` indigo. The whole light `ColorScheme` is derived from this seed via `ColorScheme.fromSeed`, then primary is darkened slightly so it reads as decisive rather than Material's default bluish primary.
 - **Alternate seeds** (user-pickable in Settings): violet `#8B6FF5`, teal `#2BA88B`, rose `#E57373`, amber `#F59E0B`, sage `#81C784`.
-- **Surface ladder (Tokyo Pure Light)** — a cool-blue stack: `#FFFFFF` -> `#F9FAFD` -> `#F5F7FB` -> `#EAF0F7`, on page `#F2F5F9`.
-- **Surface ladder (Tokyo Nebula)** — `#070C27` -> `#0B102D` (page) -> `#111633` -> `#1D2344` -> `#353B61`.
-- **Semantic**: success/mastery/easy green `#57CA22`, warning/streak amber `#FFA319`, info/rating-good cyan `#33C2FF`, error/rating-again red `#FF1943`. Dark mode keeps the same semantic accents where current tokens require it.
-- **Mastery direction**: error/again red -> info/good cyan -> success/easy green as learning deepens.
+- **Surface ladder (Tokyo Pure Light)** — a 6-step cool-blue stack: `#FFFFFF` → `#F7F9FE` (page) → `#F1F4FB` → `#E9EDF7` → `#E2E7F3` → `#DAE0EF`.
+- **Surface ladder (Tokyo Nebula)** — `#060925` → `#0A0E27` (page) → `#0F1530` → `#131A3A` (paper) → `#1B2249` → `#232B5A`.
+- **Semantic**: success/easy teal `#2BA88B`, mastery green `#1F8A5B`, warning amber `#F59E0B`, error red `#DC2D4E`, streak orange `#F97316`. Nebula maps these to softer night-friendly values (`#6FE0BD`, `#FFC658`, `#FF8FA3`, `#FFAE6E`).
+- **Mastery gradient**: coral `#E57373` → amber `#F59E0B` → mastery green `#1F8A5B` — left to right as learning deepens.
 
 ### Typography
 - **One family:** Plus Jakarta Sans (400/500/600/700/800). Loaded via `google_fonts` at runtime; the CSS in this repo loads the same family from Google Fonts CDN.

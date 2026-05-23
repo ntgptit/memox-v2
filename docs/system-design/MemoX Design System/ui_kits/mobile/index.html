@@ -616,6 +616,479 @@ function CardsScreen({go}){
   );
 }
 
+/* ─────── Screen: Create card (form to add a new flashcard) ───────
+   Mirrors the Recall/Fill two-card visual so the author sees what the
+   learner will see. Front + Back are the two big cards; example, tags,
+   level and pronunciation sit underneath in compact form rows. */
+function CreateCardScreen({go, initialState = 'empty'}){
+  // 'empty' | 'filled' | 'advanced'
+  const [state, setState] = useState(initialState);
+  const [advanced, setAdvanced] = useState(initialState === 'advanced');
+  const filled = state !== 'empty';
+
+  const front = filled ? '연구자' : '';
+  const back  = filled ? 'Researcher / Nhà nghiên cứu' : '';
+  const example = filled ? '그는 유명한 언어학 연구자이다.' : '';
+  const tags = filled ? ['TOPIK II', 'noun', 'people'] : [];
+
+  const FieldLabel = ({children, count}) => (
+    <div style={{
+      display:'flex', justifyContent:'space-between', alignItems:'baseline',
+      padding:'0 4px 6px',
+    }}>
+      <span className="ov">{children}</span>
+      {count != null && (
+        <span style={{
+          fontSize:10, fontWeight:600, letterSpacing:0.2,
+          color:'var(--memox-on-surface-variant)',
+          fontVariantNumeric:'tabular-nums',
+        }}>{count}</span>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="app">
+      <StatusBar/>
+      <div className="appbar">
+        <button className="icon-btn" onClick={() => go('cards')}><Ic name="x" size={20}/></button>
+        <div className="title" style={{fontSize:16, fontWeight:700}}>New card</div>
+        <button className="icon-btn" title="Save & add another">
+          <Ic name="corner-down-left" size={18} color="var(--memox-on-surface-variant)"/>
+        </button>
+      </div>
+
+      <Breadcrumb segments={[
+        {label:'Library'},
+        {label:'Korean'},
+        {label:'TOPIK II — Vocab'},
+        {label:'New card'},
+      ]}/>
+
+      <div className="scroll" style={{padding:'0 14px 14px'}}>
+
+        {/* Deck pill — confirms destination, tappable to change */}
+        <div style={{
+          display:'inline-flex', alignItems:'center', gap:8,
+          padding:'6px 12px 6px 8px',
+          background:'var(--memox-surface-container-lowest)',
+          border:'var(--memox-border-ghost)',
+          borderRadius:999,
+          fontSize:12, fontWeight:600,
+          marginBottom:14,
+        }}>
+          <span style={{
+            width:22, height:22, borderRadius:7,
+            background:'rgba(82,101,245,0.10)', color:'var(--memox-primary)',
+            display:'inline-flex', alignItems:'center', justifyContent:'center',
+          }}><Ic name="layers" size={13} color="var(--memox-primary)"/></span>
+          <span>TOPIK II — Vocab</span>
+          <Ic name="chevron-down" size={14} color="var(--memox-on-surface-variant)"/>
+        </div>
+
+        {/* Front — the term the learner sees first; sized like an input, not a study card */}
+        <FieldLabel count={filled ? `${front.length} / 60` : null}>Front · Korean</FieldLabel>
+        <div className="card" style={{
+          padding:'12px 14px', minHeight:56,
+          display:'flex', alignItems:'center',
+          position:'relative',
+          borderColor: !filled ? 'var(--memox-primary)' : undefined,
+          borderWidth: !filled ? 1 : undefined,
+          borderStyle: !filled ? 'solid' : undefined,
+          marginBottom:14,
+          paddingRight:42,
+        }}>
+          {filled ? (
+            <div style={{fontSize:18, fontWeight:500, lineHeight:1.3}}>
+              {front}
+            </div>
+          ) : (
+            <div style={{
+              fontSize:16, fontWeight:500,
+              color:'var(--memox-on-surface-variant)', opacity:0.6,
+              display:'inline-flex', alignItems:'center', gap:2,
+            }}>
+              <span>Type the term</span>
+              <span style={{
+                display:'inline-block', width:2, height:16,
+                background:'var(--memox-primary)',
+                animation:'fillCursorBlink 1s infinite',
+                marginLeft:2,
+              }}/>
+            </div>
+          )}
+          <button className="icon-btn" style={{position:'absolute', top:'50%', transform:'translateY(-50%)', right:6, width:30, height:30}} title="Record pronunciation">
+            <Ic name="mic" size={15} color="var(--memox-on-surface-variant)"/>
+          </button>
+        </div>
+
+        {/* Back — multi-line meaning field */}
+        <FieldLabel count={filled ? `${back.length} / 240` : null}>Back · Meaning</FieldLabel>
+        <div className="card" style={{
+          padding:'12px 14px', minHeight: 68,
+          background:'var(--memox-surface-container-low)',
+          display:'flex', alignItems: filled ? 'flex-start' : 'center',
+          marginBottom:14,
+        }}>
+          {filled ? (
+            <div style={{fontSize:15, fontWeight:500, lineHeight:1.45}}>
+              {back}
+            </div>
+          ) : (
+            <div style={{
+              fontSize:13, color:'var(--memox-on-surface-variant)',
+              opacity:0.7, lineHeight:1.5,
+            }}>
+              English, Vietnamese, or both — comma-separated reads cleanest.
+            </div>
+          )}
+        </div>
+
+        {/* Example sentence — single-line input height */}
+        <FieldLabel>Example sentence · optional</FieldLabel>
+        <div style={{
+          background:'var(--memox-surface-container-lowest)',
+          border:'var(--memox-border-ghost)',
+          borderRadius:12,
+          padding:'10px 14px',
+          fontSize:14, lineHeight:1.5,
+          color: filled ? 'var(--memox-on-surface)' : 'var(--memox-on-surface-variant)',
+          opacity: filled ? 1 : 0.55,
+          marginBottom:14,
+          minHeight:40,
+          display:'flex', alignItems:'center',
+        }}>
+          {filled ? example : 'Add a sentence using this term…'}
+        </div>
+
+        {/* Tags row */}
+        <FieldLabel>Tags · optional</FieldLabel>
+        <div style={{
+          display:'flex', flexWrap:'wrap', gap:6,
+          marginBottom:14,
+        }}>
+          {tags.map((t,i) => (
+            <span key={i} style={{
+              height:28, padding:'0 10px 0 12px',
+              background:'rgba(82,101,245,0.10)',
+              color:'var(--memox-primary)',
+              borderRadius:999,
+              fontSize:12, fontWeight:600,
+              display:'inline-flex', alignItems:'center', gap:6,
+            }}>
+              {t}
+              <Ic name="x" size={11} color="var(--memox-primary)"/>
+            </span>
+          ))}
+          <button style={{
+            height:28, padding:'0 10px',
+            background:'transparent',
+            color:'var(--memox-on-surface-variant)',
+            border:'1px dashed var(--memox-outline-variant)',
+            borderRadius:999,
+            fontSize:12, fontWeight:600,
+            display:'inline-flex', alignItems:'center', gap:4,
+            fontFamily:'inherit',
+          }}>
+            <Ic name="plus" size={12} color="var(--memox-on-surface-variant)"/>
+            Add tag
+          </button>
+        </div>
+
+        {/* Advanced toggle */}
+        <button onClick={() => setAdvanced(a => !a)} style={{
+          width:'100%',
+          background:'transparent', border:'none',
+          color:'var(--memox-primary)',
+          fontSize:13, fontWeight:600,
+          padding:'8px 4px',
+          display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+          fontFamily:'inherit', cursor:'pointer',
+          marginBottom: advanced ? 10 : 0,
+        }}>
+          <Ic name={advanced ? 'chevron-up' : 'chevron-down'} size={14} color="var(--memox-primary)"/>
+          {advanced ? 'Hide advanced' : 'Show advanced fields'}
+        </button>
+
+        {advanced && (
+          <div style={{display:'flex', flexDirection:'column', gap:14}}>
+            {/* Pronunciation */}
+            <div>
+              <FieldLabel>Pronunciation · romanization</FieldLabel>
+              <div style={{
+                background:'var(--memox-surface-container-lowest)',
+                border:'var(--memox-border-ghost)',
+                borderRadius:12,
+                padding:'10px 14px',
+                fontSize:14,
+                fontVariantNumeric:'tabular-nums',
+                color: filled ? 'var(--memox-on-surface)' : 'var(--memox-on-surface-variant)',
+                opacity: filled ? 1 : 0.55,
+                minHeight:40,
+                display:'flex', alignItems:'center', justifyContent:'space-between',
+              }}>
+                <span>{filled ? 'yeon-gu-ja' : 'yeon-gu-ja'}</span>
+                <button className="icon-btn" style={{width:28, height:28}}>
+                  <Ic name="volume-2" size={15} color="var(--memox-on-surface-variant)"/>
+                </button>
+              </div>
+            </div>
+
+            {/* Hint */}
+            <div>
+              <FieldLabel>Hint · shown after wrong answer</FieldLabel>
+              <div style={{
+                background:'var(--memox-surface-container-lowest)',
+                border:'var(--memox-border-ghost)',
+                borderRadius:12,
+                padding:'10px 14px',
+                fontSize:14, lineHeight:1.5,
+                color: filled ? 'var(--memox-on-surface)' : 'var(--memox-on-surface-variant)',
+                opacity: filled ? 1 : 0.55,
+                minHeight:40,
+                display:'flex', alignItems:'center',
+              }}>
+                {filled ? '연구 = research · 자 = person' : 'A clue that should jog memory without giving the answer.'}
+              </div>
+            </div>
+
+            {/* Difficulty / starting status */}
+            <div>
+              <FieldLabel>Starting status</FieldLabel>
+              <div style={{display:'flex', gap:6}}>
+                {[
+                  {id:'new', label:'New', dot:'var(--memox-status-new)', active:true},
+                  {id:'learning', label:'Learning', dot:'var(--memox-status-learning)'},
+                  {id:'reviewing', label:'Reviewing', dot:'var(--memox-status-reviewing)'},
+                ].map(s => (
+                  <button key={s.id} className="pill-btn" style={{
+                    flex:1, height:38, padding:'0 8px', borderRadius:10, fontSize:12, gap:6,
+                    background: s.active ? 'rgba(82,101,245,0.10)' : 'var(--memox-surface-container-lowest)',
+                    color: s.active ? 'var(--memox-primary)' : 'var(--memox-on-surface)',
+                    border: s.active ? '1px solid var(--memox-primary)' : 'var(--memox-border-ghost)',
+                  }}>
+                    <span className="status-dot" style={{background:s.dot}}/>
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Save bar */}
+      <div className="memox-chrome" style={{
+        padding:'10px 14px 16px',
+        borderTop:'var(--memox-border-ghost)',
+        display:'flex', gap:10,
+      }}>
+        <button className="pill-btn outline" style={{
+          flex:1, height:44, borderRadius:12,
+          opacity: filled ? 1 : 0.4,
+          pointerEvents: filled ? 'auto' : 'none',
+        }}>
+          Save & add another
+        </button>
+        <button className="pill-btn primary" style={{
+          flex:1, height:44, borderRadius:12,
+          opacity: filled ? 1 : 0.4,
+          pointerEvents: filled ? 'auto' : 'none',
+        }}>
+          Save card
+        </button>
+      </div>
+
+      <style>{`@keyframes fillCursorBlink { 0%, 50% { opacity:1; } 50.01%, 100% { opacity:0; } }`}</style>
+    </div>
+  );
+}
+
+/* ─────── Screen: Bulk paste (TSV / comma list) ─────── */
+function BulkAddScreen({go}){
+  const [tab, setTab] = useState('paste'); // 'paste' | 'preview'
+  const raw = `연구자\tresearcher / nhà nghiên cứu\n공부하다\tto study\n도서관\tlibrary\n친구\tfriend, close companion\n바다\tsea, ocean`;
+  const rows = raw.split('\n').map(line => {
+    const [f, b] = line.split('\t');
+    return {front: f, back: b};
+  });
+  return (
+    <div className="app">
+      <StatusBar/>
+      <div className="appbar">
+        <button className="icon-btn" onClick={() => go('cards')}><Ic name="x" size={20}/></button>
+        <div className="title" style={{fontSize:16, fontWeight:700}}>Bulk add</div>
+        <button className="icon-btn" title="Help">
+          <Ic name="help-circle" size={18} color="var(--memox-on-surface-variant)"/>
+        </button>
+      </div>
+
+      <Breadcrumb segments={[
+        {label:'Library'},
+        {label:'Korean'},
+        {label:'TOPIK II — Vocab'},
+        {label:'Bulk add'},
+      ]}/>
+
+      {/* Tabs */}
+      <div style={{padding:'0 14px 12px'}}>
+        <div style={{
+          display:'inline-flex', padding:4, gap:2,
+          background:'var(--memox-surface-container)', borderRadius:10,
+        }}>
+          {[
+            {id:'paste', label:'Paste', count:null},
+            {id:'preview', label:'Preview', count:rows.length},
+          ].map(t => {
+            const active = tab === t.id;
+            return (
+              <button key={t.id} onClick={() => setTab(t.id)} style={{
+                height:30, padding:'0 14px', borderRadius:8,
+                background: active ? 'var(--memox-surface-container-lowest)' : 'transparent',
+                border:'none',
+                color: active ? 'var(--memox-on-surface)' : 'var(--memox-on-surface-variant)',
+                fontSize:12, fontWeight:600,
+                fontFamily:'inherit', cursor:'pointer',
+                display:'inline-flex', alignItems:'center', gap:6,
+                boxShadow: active ? '0 1px 2px rgba(25,28,30,0.06)' : 'none',
+              }}>
+                {t.label}
+                {t.count != null && (
+                  <span style={{
+                    fontSize:10, fontWeight:700,
+                    padding:'1px 6px', borderRadius:999,
+                    background: active ? 'rgba(82,101,245,0.14)' : 'rgba(0,0,0,0.06)',
+                    color: active ? 'var(--memox-primary)' : 'var(--memox-on-surface-variant)',
+                    fontVariantNumeric:'tabular-nums',
+                  }}>{t.count}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="scroll" style={{padding:'0 14px 14px'}}>
+        {tab === 'paste' && (
+          <>
+            <div className="card" style={{
+              padding:14,
+              fontFamily:'ui-monospace, "SF Mono", Menlo, monospace',
+              fontSize:13, lineHeight:1.7,
+              minHeight:240,
+              whiteSpace:'pre',
+              overflow:'hidden',
+              color:'var(--memox-on-surface)',
+            }}>
+              <span style={{color:'var(--memox-on-surface)'}}>연구자</span><span style={{color:'var(--memox-outline)'}}>{'\t'}</span><span style={{color:'var(--memox-on-surface-variant)'}}>researcher / nhà nghiên cứu</span>{'\n'}
+              <span style={{color:'var(--memox-on-surface)'}}>공부하다</span><span style={{color:'var(--memox-outline)'}}>{'\t'}</span><span style={{color:'var(--memox-on-surface-variant)'}}>to study</span>{'\n'}
+              <span style={{color:'var(--memox-on-surface)'}}>도서관</span><span style={{color:'var(--memox-outline)'}}>{'\t'}</span><span style={{color:'var(--memox-on-surface-variant)'}}>library</span>{'\n'}
+              <span style={{color:'var(--memox-on-surface)'}}>친구</span><span style={{color:'var(--memox-outline)'}}>{'\t'}</span><span style={{color:'var(--memox-on-surface-variant)'}}>friend, close companion</span>{'\n'}
+              <span style={{color:'var(--memox-on-surface)'}}>바다</span><span style={{color:'var(--memox-outline)'}}>{'\t'}</span><span style={{color:'var(--memox-on-surface-variant)'}}>sea, ocean</span>
+              <span style={{
+                display:'inline-block', width:2, height:18,
+                background:'var(--memox-primary)',
+                marginLeft:2, verticalAlign:'middle',
+                animation:'fillCursorBlink 1s infinite',
+              }}/>
+            </div>
+
+            {/* Format helper */}
+            <div style={{
+              marginTop:14,
+              padding:'12px 14px',
+              background:'rgba(82,101,245,0.06)',
+              border:'1px solid rgba(82,101,245,0.16)',
+              borderRadius:12,
+              display:'flex', gap:10, alignItems:'flex-start',
+            }}>
+              <Ic name="info" size={16} color="var(--memox-primary)"/>
+              <div style={{flex:1, fontSize:12, lineHeight:1.5, color:'var(--memox-on-surface)'}}>
+                One card per line. Separate the term and meaning with a <strong style={{fontWeight:700}}>tab</strong> or two spaces. Paste straight from a spreadsheet — it just works.
+              </div>
+            </div>
+
+            {/* Separator chips */}
+            <div style={{marginTop:14}}>
+              <div className="ov" style={{marginBottom:8}}>Separator</div>
+              <div style={{display:'flex', gap:6}}>
+                {[
+                  {id:'tab', label:'Tab', active:true},
+                  {id:'comma', label:'Comma'},
+                  {id:'pipe', label:'Pipe |'},
+                ].map(s => (
+                  <button key={s.id} className="pill-btn" style={{
+                    height:32, padding:'0 14px', borderRadius:999, fontSize:12,
+                    background: s.active ? 'var(--memox-primary)' : 'var(--memox-surface-container-lowest)',
+                    color: s.active ? 'var(--memox-on-primary)' : 'var(--memox-on-surface)',
+                    border: s.active ? 'none' : 'var(--memox-border-ghost)',
+                  }}>{s.label}</button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {tab === 'preview' && (
+          <>
+            <div style={{
+              display:'flex', alignItems:'center', justifyContent:'space-between',
+              padding:'0 4px 10px',
+            }}>
+              <span className="ov">{rows.length} cards ready</span>
+              <span style={{fontSize:11, color:'var(--memox-mastery)', fontWeight:600, display:'inline-flex', alignItems:'center', gap:4}}>
+                <Ic name="check" size={12} color="var(--memox-mastery)"/>
+                No duplicates
+              </span>
+            </div>
+            <div className="card" style={{padding:0, overflow:'hidden'}}>
+              {rows.map((r, i, a) => (
+                <div key={i} style={{
+                  padding:'12px 14px',
+                  borderBottom: i < a.length - 1 ? 'var(--memox-border-ghost)' : 'none',
+                  display:'grid',
+                  gridTemplateColumns:'24px 1fr 1fr',
+                  gap:12,
+                  alignItems:'center',
+                }}>
+                  <span style={{
+                    fontSize:11, fontWeight:700, color:'var(--memox-on-surface-variant)',
+                    fontVariantNumeric:'tabular-nums',
+                  }}>{i + 1}</span>
+                  <div style={{fontSize:15, fontWeight:600, letterSpacing:'-0.2px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>
+                    {r.front}
+                  </div>
+                  <div style={{fontSize:13, color:'var(--memox-on-surface-variant)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>
+                    {r.back}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="memox-chrome" style={{
+        padding:'10px 14px 16px',
+        borderTop:'var(--memox-border-ghost)',
+        display:'flex', gap:10, alignItems:'center',
+      }}>
+        <div style={{flex:1, fontSize:12, color:'var(--memox-on-surface-variant)'}}>
+          <span style={{fontWeight:700, color:'var(--memox-on-surface)'}}>{rows.length}</span> cards · TOPIK II — Vocab
+        </div>
+        <button className="pill-btn primary" style={{
+          height:44, padding:'0 22px', borderRadius:12,
+        }}>
+          Add {rows.length} cards
+        </button>
+      </div>
+
+      <style>{`@keyframes fillCursorBlink { 0%, 50% { opacity:1; } 50.01%, 100% { opacity:0; } }`}</style>
+    </div>
+  );
+}
+
 /* ─────── Screen: Study (term + meaning visible together, swipe to next) ─────── */
 function StudyScreen({go}){
   const cards = [
@@ -1222,14 +1695,18 @@ function App(){
     {label:'02 · Library', el: <LibraryScreen go={()=>{}}/>},
     {label:'03 · Deck detail', el: <DeckScreen go={()=>{}}/>},
     {label:'04 · Cards (manage)', el: <CardsScreen go={()=>{}}/>},
-    {label:'05 · Study · Review', el: <StudyScreen go={()=>{}}/>},
-    {label:'06 · Study · Match', el: <MatchScreen go={()=>{}}/>},
-    {label:'07 · Study · Guess', el: <GuessScreen go={()=>{}}/>},
-    {label:'08a · Study · Recall (hidden)', el: <RecallScreen go={()=>{}} initialRevealed={false}/>},
-    {label:'08b · Study · Recall (revealed)', el: <RecallScreen go={()=>{}} initialRevealed={true}/>},
-    {label:'09a · Study · Fill (input)', el: <FillScreen go={()=>{}} initialState="input"/>},
-    {label:'09b · Study · Fill (wrong)', el: <FillScreen go={()=>{}} initialState="wrong"/>},
-    {label:'10 · Stats', el: <StatsScreen go={()=>{}}/>},
+    {label:'05a · Create card (empty)', el: <CreateCardScreen go={()=>{}} initialState="empty"/>},
+    {label:'05b · Create card (filled)', el: <CreateCardScreen go={()=>{}} initialState="filled"/>},
+    {label:'05c · Create card (advanced)', el: <CreateCardScreen go={()=>{}} initialState="advanced"/>},
+    {label:'05d · Bulk add (paste)', el: <BulkAddScreen go={()=>{}}/>},
+    {label:'06 · Study · Review', el: <StudyScreen go={()=>{}}/>},
+    {label:'07 · Study · Match', el: <MatchScreen go={()=>{}}/>},
+    {label:'08 · Study · Guess', el: <GuessScreen go={()=>{}}/>},
+    {label:'09a · Study · Recall (hidden)', el: <RecallScreen go={()=>{}} initialRevealed={false}/>},
+    {label:'09b · Study · Recall (revealed)', el: <RecallScreen go={()=>{}} initialRevealed={true}/>},
+    {label:'10a · Study · Fill (input)', el: <FillScreen go={()=>{}} initialState="input"/>},
+    {label:'10b · Study · Fill (wrong)', el: <FillScreen go={()=>{}} initialState="wrong"/>},
+    {label:'11 · Stats', el: <StatsScreen go={()=>{}}/>},
   ];
   return (
     <>
