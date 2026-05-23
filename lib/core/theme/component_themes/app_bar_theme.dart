@@ -7,13 +7,13 @@ import '../tokens/app_typography.dart';
 abstract final class AppBarThemeBuilder {
   static AppBarTheme build(ColorScheme scheme) {
     return AppBarTheme(
-      backgroundColor: scheme.surface,
+      backgroundColor: scheme.surfaceContainerLow,
       foregroundColor: scheme.onSurface,
       surfaceTintColor: scheme.surfaceTint.withValues(
         alpha: AppOpacity.transparent,
       ),
       shadowColor: scheme.shadow,
-      elevation: AppElevation.level0,
+      elevation: AppElevation.appBar,
       scrolledUnderElevation: AppElevation.appBarScrolled,
       centerTitle: false,
       titleSpacing: 8,

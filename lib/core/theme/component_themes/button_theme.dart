@@ -102,6 +102,8 @@ abstract final class ButtonThemeBuilder {
         minimumSize: const Size.square(_minHeight),
         fixedSize: const Size.square(_minHeight),
         iconSize: AppIconSizes.md,
+        backgroundColor: scheme.surfaceContainerLow,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
       ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onSurface)),
     );
   }
