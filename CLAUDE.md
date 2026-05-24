@@ -311,7 +311,73 @@ If you find yourself writing the same `context.responsive(...)` call on three sc
 - `ref.watch` inside callbacks is forbidden. `ref.read` inside `build()` is forbidden.
 - Widget `build()` must not trigger navigation directly, run multi-step async chains, do collection processing (sort/group/filter/fold across many lines), or accumulate try/catch blocks. Push that work into providers, notifiers, use cases, or presenters.
 - Widgets must not import DAO / Drift / repository implementation files or watch repository providers directly. Go through a domain-facing provider.
-- After `await` in UI code, guard `BuildContext` use with `if (!context.mounted) return;`.
+- After `await` in UI code, guard `BuildContext` use with `if (!mounted) return;` (see UI async guard contract below).
+
+---
+
+## UI async guard contract
+
+Two-tool enforcement. Built-in lint covers the lifecycle half (AST-aware); the guard YAML covers the identity half (regex-friendly).
+
+| Concern | Tool | Where |
+| --- | --- | --- |
+| `context` / inherited-widget use after `await` without `mounted` check | Dart analyzer `use_build_context_synchronously: error` | `analysis_options.yaml` |
+| Identity check (route / family / widget params still match after `await`) | `code-verification-guard` regex rules | `memox-ui-async-guard-rules.yaml` |
+| Ad-hoc helper names (`_isCurrentRequest`, `_canContinue`, etc.) | Guard — banned | same file |
+| Compound `mounted` checks (`!mounted || ...`) | Guard — banned | same file |
+| `mounted` / `context.mounted` leaking into notifiers / viewmodels / use cases | Guard — banned | same file |
+
+### Required pattern in `State` / `ConsumerState` async methods
+
+When an async method awaits **and** later uses any of: `context`, `setState`, `Navigator`, `ScaffoldMessenger`, `Theme.of`, navigation extensions, or relies on `widget.<family-param>` / route arg still matching — write two separate guards:
+
+```dart
+Future<void> _startDirectly() async {
+  // Snapshot identity into a Dart 3 record BEFORE the await.
+  // Required when the post-await branch depends on widget/route/family params.
+  final _snapshot = (
+    entryType: widget.entryType,
+    entryRefId: widget.entryRefId,
+    studyMode: widget.studyMode,
+  );
+
+  final decision = await ref
+      .read(studyEntryActionControllerProvider(
+        widget.entryType,
+        widget.entryRefId,
+      ).notifier)
+      .prepareStart(studyMode: widget.studyMode);
+
+  // Lifecycle guard — satisfies `use_build_context_synchronously`.
+  if (!mounted) return;
+
+  // Identity guard — satisfies the guard YAML, prevents stale-config writes.
+  if (_snapshot !=
+      (
+        entryType: widget.entryType,
+        entryRefId: widget.entryRefId,
+        studyMode: widget.studyMode,
+      )) {
+    return;
+  }
+
+  switch (decision) {
+    case StudyEntryStartSession(:final sessionId):
+      context.replaceStudySession(sessionId);
+    // ...
+  }
+}
+```
+
+### Rules
+
+1. **`mounted` on its own line.** Never `if (!mounted || X)` — split into two guards.
+2. **No ad-hoc helpers.** Banned names include `_isCurrentRequest`, `_isStillCurrent`, `_isSameRequest`, `_isAlive`, `_canContinue`, `_shouldContinue`, `canContinueUi`, `guardUi`. The convention is the inline `_snapshot` record comparison, nothing else.
+3. **No wrapper classes.** Do not introduce `UiAsyncGuard` / `UiMountedGuard` style helpers — they hide `mounted` behind a getter and break `use_build_context_synchronously`.
+4. **`_snapshot` must have 2+ fields.** A single-field record is noise — use a plain `final` local and compare directly.
+5. **Snapshot before the first `await`,** never after.
+6. **No `mounted` / `context.mounted` outside the UI layer.** Notifiers, viewmodels, use cases, repositories must use `ref.onDispose` / cancellation tokens. Enforced by `memox.notifier_no_mounted_leak`.
+7. **When identity does not matter** (e.g. `await showDatePicker(...)` then `setState`), the snapshot is optional — `if (!mounted) return;` alone is sufficient and the built-in lint will enforce it.
 
 ---
 
@@ -339,6 +405,8 @@ If you find yourself writing the same `context.responsive(...)` call on three sc
 1. `python code-verification-guard\guard\run.py check --project .` — must be clean (0 errors, 0 criticals).
 2. `flutter analyze` — must report **No issues found**.
 3. Targeted widget/unit tests for the area touched (when they exist).
+
+If `dart analyze` or `flutter analyze` reports errors, first run Dart's automated fix workflow (`dart fix --apply`) for applicable analyzer diagnostics, then rerun analyze and manually fix any remaining issues.
 
 If a step is skipped or fails, say so explicitly in the response — do not claim completion.
 

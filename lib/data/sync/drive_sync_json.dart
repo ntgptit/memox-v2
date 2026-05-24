@@ -5,12 +5,9 @@ import '../../domain/entities/drive_sync_models.dart';
 abstract final class DriveSyncJson {
   const DriveSyncJson._();
 
-  static String encodeCanonicalJson(Object? value) {
-    return jsonEncode(_canonicalize(value));
-  }
+  static String encodeCanonicalJson(Object? value) => jsonEncode(_canonicalize(value));
 
-  static Map<String, Object?> encodeManifest(DriveSyncManifest manifest) {
-    return <String, Object?>{
+  static Map<String, Object?> encodeManifest(DriveSyncManifest manifest) => <String, Object?>{
       'manifestVersion': manifest.manifestVersion,
       'snapshotFormatVersion': manifest.snapshotFormatVersion,
       'appId': manifest.appId,
@@ -26,7 +23,6 @@ abstract final class DriveSyncJson {
       if (manifest.snapshotFileVersion != null)
         'snapshotFileVersion': manifest.snapshotFileVersion,
     };
-  }
 
   static DriveSyncManifest? decodeManifest(Object? value) {
     if (value is! Map<String, Object?>) {
@@ -83,6 +79,9 @@ abstract final class DriveSyncJson {
       return null;
     } on FormatException {
       return null;
+      // Corrupt Drive payload: defend against type mismatches in user-supplied
+      // JSON. Returning null lets the sync layer fall back to a fresh state.
+      // ignore: avoid_catching_errors
     } on TypeError {
       return null;
     }

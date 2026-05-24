@@ -13,35 +13,28 @@ class TtsSettingsNotifier extends _$TtsSettingsNotifier {
     return store.load();
   }
 
-  Future<void> setAutoPlay(bool value) {
-    // guard:retry-reviewed
-    return _update((settings) => settings.copyWith(autoPlay: value));
-  }
+  // guard:retry-reviewed
+  Future<void> setAutoPlay(bool value) =>
+      _update((settings) => settings.copyWith(autoPlay: value));
 
-  Future<void> setFrontLanguage(TtsLanguage language) {
-    // guard:retry-reviewed
-    return _update(
-      (settings) =>
-          settings.copyWith(frontLanguage: language, clearFrontVoice: true),
-    );
-  }
+  // guard:retry-reviewed
+  Future<void> setFrontLanguage(TtsLanguage language) => _update(
+        (settings) =>
+            settings.copyWith(frontLanguage: language, clearFrontVoice: true),
+      );
 
-  Future<void> setRate(double value) {
-    // guard:retry-reviewed
-    return _update(
-      (settings) => settings.copyWith(rate: TtsSettings.normalizeRate(value)),
-    );
-  }
+  // guard:retry-reviewed
+  Future<void> setRate(double value) => _update(
+        (settings) => settings.copyWith(rate: TtsSettings.normalizeRate(value)),
+      );
 
-  Future<void> setFrontVoiceName(String? voiceName) {
-    // guard:retry-reviewed
-    return _update(
-      (settings) => settings.copyWith(
-        frontVoiceName: voiceName,
-        clearFrontVoice: voiceName == null,
-      ),
-    );
-  }
+  // guard:retry-reviewed
+  Future<void> setFrontVoiceName(String? voiceName) => _update(
+        (settings) => settings.copyWith(
+          frontVoiceName: voiceName,
+          clearFrontVoice: voiceName == null,
+        ),
+      );
 
   Future<void> _update(
     TtsSettings Function(TtsSettings settings) transform,

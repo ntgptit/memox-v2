@@ -101,19 +101,15 @@ class LibraryOverviewActionController
   @override
   FutureOr<void> build() {}
 
-  Future<bool> createFolder(String name) async {
-    // guard:retry-reviewed
-    return _actionRunner.runResult(
-      () => ref.read(createFolderUseCaseProvider).createRoot(name),
-    );
-  }
+  // guard:retry-reviewed
+  Future<bool> createFolder(String name) => _actionRunner.runResult(
+        () => ref.read(createFolderUseCaseProvider).createRoot(name),
+      );
 
-  MxAsyncActionRunner get _actionRunner {
-    return MxAsyncActionRunner(
+  MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(
       isMounted: () => ref.mounted,
       setState: (nextState) => state = nextState,
     );
-  }
 }
 
 LibraryOverviewGreeting _buildGreeting(Clock clock) {

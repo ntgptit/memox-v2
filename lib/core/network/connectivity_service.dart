@@ -60,7 +60,7 @@ class ConnectivityService implements NetworkInfo {
   @mustCallSuper
   void dispose() {
     _pendingEmission?.cancel();
-    _controller.close();
+    unawaited(_controller.close());
   }
 
   void _scheduleEmission(NetworkStatus next) {

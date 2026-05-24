@@ -144,23 +144,19 @@ Future<FolderDetailState> folderDetailQuery(Ref ref, String folderId) async {
 }
 
 @riverpod
-Future<List<FolderMoveTarget>> folderMovePicker(Ref ref, String folderId) {
-  return ref.watch(getFolderMoveTargetsUseCaseProvider).execute(folderId);
-}
+Future<List<FolderMoveTarget>> folderMovePicker(Ref ref, String folderId) => ref.watch(getFolderMoveTargetsUseCaseProvider).execute(folderId);
 
 @riverpod
 class FolderActionController extends _$FolderActionController {
   @override
   FutureOr<void> build(String folderId) {}
 
-  Future<bool> createSubfolder(String name) async {
-    // guard:retry-reviewed
-    return _actionRunner.runResult(
-      () => ref
-          .read(createFolderUseCaseProvider)
-          .createSubfolder(parentFolderId: folderId, name: name),
-    );
-  }
+  // guard:retry-reviewed
+  Future<bool> createSubfolder(String name) => _actionRunner.runResult(
+        () => ref
+            .read(createFolderUseCaseProvider)
+            .createSubfolder(parentFolderId: folderId, name: name),
+      );
 
   Future<String?> createDeck(String name) async {
     final deck = await _actionRunner.runResultValue(
@@ -178,30 +174,23 @@ class FolderActionController extends _$FolderActionController {
     return data.decks.map(_mapFolderDeckItem).toList(growable: false);
   }
 
-  Future<bool> updateFolder(String name) async {
-    return _actionRunner.runResult(
+  Future<bool> updateFolder(String name) async => _actionRunner.runResult(
       () => ref
           .read(updateFolderUseCaseProvider)
           .execute(folderId: folderId, name: name),
     );
-  }
 
-  Future<bool> deleteFolder() async {
-    return _actionRunner.runResult(
+  Future<bool> deleteFolder() async => _actionRunner.runResult(
       () => ref.read(deleteFolderUseCaseProvider).execute(folderId),
     );
-  }
 
-  Future<bool> moveFolder(String? targetParentId) async {
-    return _actionRunner.runResult(
+  Future<bool> moveFolder(String? targetParentId) async => _actionRunner.runResult(
       () => ref
           .read(moveFolderUseCaseProvider)
           .execute(folderId: folderId, targetParentId: targetParentId),
     );
-  }
 
-  Future<bool> reorderSubfolders(List<String> orderedFolderIds) async {
-    return _actionRunner.runResult(
+  Future<bool> reorderSubfolders(List<String> orderedFolderIds) async => _actionRunner.runResult(
       () => ref
           .read(reorderFoldersUseCaseProvider)
           .execute(
@@ -209,29 +198,23 @@ class FolderActionController extends _$FolderActionController {
             orderedFolderIds: orderedFolderIds,
           ),
     );
-  }
 
-  Future<bool> reorderDecks(List<String> orderedDeckIds) async {
-    return _actionRunner.runResult(
+  Future<bool> reorderDecks(List<String> orderedDeckIds) async => _actionRunner.runResult(
       () => ref
           .read(reorderDecksUseCaseProvider)
           .execute(folderId: folderId, orderedDeckIds: orderedDeckIds),
     );
-  }
 
-  MxAsyncActionRunner get _actionRunner {
-    return MxAsyncActionRunner(
+  MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(
       isMounted: () => ref.mounted,
       setState: (nextState) => state = nextState,
     );
-  }
 }
 
 FolderDetailState _mapFolderDetailState(
   FolderDetailReadModel readModel,
   ContentQuery query,
-) {
-  return FolderDetailState(
+) => FolderDetailState(
     header: FolderDetailHeader(
       id: readModel.folder.id,
       name: readModel.folder.name,
@@ -259,10 +242,8 @@ FolderDetailState _mapFolderDetailState(
         .toList(growable: false),
     decks: readModel.decks.map(_mapFolderDeckItem).toList(growable: false),
   );
-}
 
-FolderDeckItem _mapFolderDeckItem(FolderDeckReadModel item) {
-  return FolderDeckItem(
+FolderDeckItem _mapFolderDeckItem(FolderDeckReadModel item) => FolderDeckItem(
     id: item.deck.id,
     name: item.deck.name,
     cardCount: item.cardCount,
@@ -270,25 +251,18 @@ FolderDeckItem _mapFolderDeckItem(FolderDeckReadModel item) {
     masteryPercent: item.masteryPercent,
     lastStudiedAt: item.lastStudiedAt,
   );
-}
 
-bool _canImportFlashcardsInto(FolderContentMode mode) {
-  return mode != FolderContentMode.subfolders;
-}
+bool _canImportFlashcardsInto(FolderContentMode mode) => mode != FolderContentMode.subfolders;
 
-FolderDetailMode _toDetailMode(FolderContentMode mode) {
-  return switch (mode) {
+FolderDetailMode _toDetailMode(FolderContentMode mode) => switch (mode) {
     FolderContentMode.unlocked => FolderDetailMode.unlocked,
     FolderContentMode.subfolders => FolderDetailMode.subfolders,
     FolderContentMode.decks => FolderDetailMode.decks,
   };
-}
 
-AppFailure? folderActionError(AsyncValue<void> actionState) {
-  return actionState.whenOrNull(
+AppFailure? folderActionError(AsyncValue<void> actionState) => actionState.whenOrNull(
     error: (error, _) => error is AppFailure ? error : null,
   );
-}
 
 String folderActionErrorMessage(AppFailure? failure) {
   if (failure == null) {

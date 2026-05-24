@@ -5,17 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/content/flashcard_providers.dart';
-import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/core/errors/result.dart';
+import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/domain/repositories/flashcard_repository.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/deck_import_screen.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_import_viewmodel.dart';
-import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_term_row.dart';
+import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   testWidgets('DT1 onOpen: renders default Excel import flow', (
@@ -731,8 +732,7 @@ const _preparationWithSkippedDuplicates = FlashcardImportPreparation(
   ],
 );
 
-FlashcardImportPreparation _largePreparation() {
-  return FlashcardImportPreparation(
+FlashcardImportPreparation _largePreparation() => FlashcardImportPreparation(
     format: ImportSourceFormat.csv,
     previewItems: List<FlashcardImportPreviewItem>.generate(
       80,
@@ -743,7 +743,6 @@ FlashcardImportPreparation _largePreparation() {
     ),
     issues: const [],
   );
-}
 
 final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
   const _ImportOnlyFlashcardRepository({
@@ -779,8 +778,7 @@ final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
         FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
-  }) {
-    return prepareHandler?.call(
+  }) => prepareHandler?.call(
           deckId: deckId,
           format: format,
           rawContent: rawContent,
@@ -790,16 +788,13 @@ final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
           structuredTextSeparator: structuredTextSeparator,
         ) ??
         Future.value(const Success(_validPreparation));
-  }
 
   @override
   Future<Result<int>> commitImport({
     required String deckId,
     required FlashcardImportPreparation preparation,
-  }) {
-    return commitHandler?.call(deckId: deckId, preparation: preparation) ??
+  }) => commitHandler?.call(deckId: deckId, preparation: preparation) ??
         Future.value(const Success(1));
-  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -809,11 +804,12 @@ final class _TestApp extends StatelessWidget {
   const _TestApp({required this.child, required this.overrides});
 
   final Widget child;
-  final dynamic overrides;
+  // `Override` is exported via `package:riverpod/misc.dart` (not re-exported
+  // by `flutter_riverpod`, so we import it directly).
+  final List<Override> overrides;
 
   @override
-  Widget build(BuildContext context) {
-    return ProviderScope(
+  Widget build(BuildContext context) => ProviderScope(
       overrides: overrides,
       child: MaterialApp(
         theme: AppTheme.light(),
@@ -823,9 +819,6 @@ final class _TestApp extends StatelessWidget {
         home: child,
       ),
     );
-  }
 }
 
-ElevatedButton _primaryButton(WidgetTester tester) {
-  return tester.widget<ElevatedButton>(find.byType(ElevatedButton));
-}
+ElevatedButton _primaryButton(WidgetTester tester) => tester.widget<ElevatedButton>(find.byType(ElevatedButton));

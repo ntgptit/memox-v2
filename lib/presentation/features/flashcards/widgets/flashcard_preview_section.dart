@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
@@ -46,8 +48,7 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
     return Column(
       children: [
         LayoutBuilder(
-          builder: (context, constraints) {
-            return SizedBox(
+          builder: (context, constraints) => SizedBox(
               height: constraints.maxWidth / _previewAspectRatio,
               child: PageView.builder(
                 controller: _controller,
@@ -74,18 +75,19 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
                   );
                 },
               ),
-            );
-          },
+            ),
         ),
         const MxGap(MxSpace.sm),
         MxPageDots(
           count: widget.items.length,
           activeIndex: _activeIndex,
           onDotTap: (index) {
-            _controller.animateToPage(
-              index,
-              duration: MxDurations.quickTransition,
-              curve: Curves.easeOut,
+            unawaited(
+              _controller.animateToPage(
+                index,
+                duration: MxDurations.quickTransition,
+                curve: Curves.easeOut,
+              ),
             );
           },
         ),
@@ -110,8 +112,7 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
       context: context,
       title: l10n.flashcardsPreviewDialogTitle,
       child: StatefulBuilder(
-        builder: (context, setDialogState) {
-          return _PreviewFlashcard(
+        builder: (context, setDialogState) => _PreviewFlashcard(
             item: item,
             showBack: showBack,
             aspectRatio: _fullscreenAspectRatio,
@@ -120,8 +121,7 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
                 showBack = !showBack;
               });
             },
-          );
-        },
+          ),
       ),
     );
   }

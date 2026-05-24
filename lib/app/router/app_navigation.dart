@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
@@ -46,25 +48,31 @@ extension AppNavigation on BuildContext {
   /// Uses `push` so the library stack preserves the overview underneath —
   /// the folder-detail back button expects to pop to the library list.
   void pushFolderDetail(String folderId) {
-    pushNamed(
-      RouteNames.folderDetail,
-      pathParameters: {RoutePaths.folderIdParam: folderId},
+    unawaited(
+      pushNamed(
+        RouteNames.folderDetail,
+        pathParameters: {RoutePaths.folderIdParam: folderId},
+      ),
     );
   }
 
   void pushFlashcardList(String deckId) {
-    push(
-      namedLocation(
-        RouteNames.flashcardList,
-        pathParameters: {RoutePaths.deckIdParam: deckId},
+    unawaited(
+      push(
+        namedLocation(
+          RouteNames.flashcardList,
+          pathParameters: {RoutePaths.deckIdParam: deckId},
+        ),
       ),
     );
   }
 
   void pushFlashcardCreate(String deckId) {
-    pushNamed(
-      RouteNames.flashcardCreate,
-      pathParameters: {RoutePaths.deckIdParam: deckId},
+    unawaited(
+      pushNamed(
+        RouteNames.flashcardCreate,
+        pathParameters: {RoutePaths.deckIdParam: deckId},
+      ),
     );
   }
 
@@ -72,19 +80,23 @@ extension AppNavigation on BuildContext {
     required String deckId,
     required String flashcardId,
   }) {
-    pushNamed(
-      RouteNames.flashcardEdit,
-      pathParameters: {
-        RoutePaths.deckIdParam: deckId,
-        RoutePaths.flashcardIdParam: flashcardId,
-      },
+    unawaited(
+      pushNamed(
+        RouteNames.flashcardEdit,
+        pathParameters: {
+          RoutePaths.deckIdParam: deckId,
+          RoutePaths.flashcardIdParam: flashcardId,
+        },
+      ),
     );
   }
 
   void pushDeckImport(String deckId) {
-    pushNamed(
-      RouteNames.deckImport,
-      pathParameters: {RoutePaths.deckIdParam: deckId},
+    unawaited(
+      pushNamed(
+        RouteNames.deckImport,
+        pathParameters: {RoutePaths.deckIdParam: deckId},
+      ),
     );
   }
 
@@ -93,13 +105,15 @@ extension AppNavigation on BuildContext {
     required String entryRefId,
     String? studyMode,
   }) {
-    pushNamed(
-      RouteNames.studyEntry,
-      pathParameters: {
-        RoutePaths.studyEntryTypeParam: entryType,
-        RoutePaths.studyEntryRefIdParam: entryRefId,
-      },
-      queryParameters: {'mode': ?studyMode},
+    unawaited(
+      pushNamed(
+        RouteNames.studyEntry,
+        pathParameters: {
+          RoutePaths.studyEntryTypeParam: entryType,
+          RoutePaths.studyEntryRefIdParam: entryRefId,
+        },
+        queryParameters: {'mode': ?studyMode},
+      ),
     );
   }
 
@@ -108,13 +122,15 @@ extension AppNavigation on BuildContext {
   }
 
   void pushStudyToday() {
-    pushNamed(RouteNames.studyToday);
+    unawaited(pushNamed(RouteNames.studyToday));
   }
 
   void goStudySession(String sessionId) {
-    pushNamed(
-      RouteNames.studySession,
-      pathParameters: {RoutePaths.studySessionIdParam: sessionId},
+    unawaited(
+      pushNamed(
+        RouteNames.studySession,
+        pathParameters: {RoutePaths.studySessionIdParam: sessionId},
+      ),
     );
   }
 

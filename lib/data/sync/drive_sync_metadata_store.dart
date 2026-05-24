@@ -31,21 +31,20 @@ final class DriveSyncMetadataStore {
       return metadata;
     } on FormatException {
       return null;
+      // Corrupt metadata payload from SharedPreferences — defend against
+      // malformed maps so the user is treated as un-synced rather than crashed.
+      // ignore: avoid_catching_errors
     } on TypeError {
       return null;
     }
   }
 
-  Future<void> save(DriveSyncMetadata metadata) {
-    return _preferences.setString(
+  Future<void> save(DriveSyncMetadata metadata) => _preferences.setString(
       AppConstants.sharedPrefsDriveSyncMetadataKey,
       jsonEncode(_encode(metadata)),
     );
-  }
 
-  Future<void> clear() {
-    return _preferences.remove(AppConstants.sharedPrefsDriveSyncMetadataKey);
-  }
+  Future<void> clear() => _preferences.remove(AppConstants.sharedPrefsDriveSyncMetadataKey);
 
   Future<String> loadOrCreateDeviceId(IdGenerator idGenerator) async {
     final existing = _preferences.getString(
@@ -100,8 +99,7 @@ final class DriveSyncMetadataStore {
     );
   }
 
-  Map<String, Object?> _encode(DriveSyncMetadata metadata) {
-    return <String, Object?>{
+  Map<String, Object?> _encode(DriveSyncMetadata metadata) => <String, Object?>{
       'accountSubjectId': metadata.accountSubjectId,
       'manifestFileId': metadata.manifestFileId,
       'snapshotFileId': metadata.snapshotFileId,
@@ -111,5 +109,4 @@ final class DriveSyncMetadataStore {
       'remoteSnapshotVersion': metadata.remoteSnapshotVersion,
       'lastSyncedAt': metadata.lastSyncedAt,
     };
-  }
 }

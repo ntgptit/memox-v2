@@ -28,25 +28,25 @@ final class CloudAccountStore implements CloudAccountRepository {
       return _decodeLink(decoded);
     } on FormatException {
       return null;
+      // Corrupt SharedPreferences payload: defend against malformed maps that
+      // bypass `FormatException`. Returning null lets callers re-link cleanly.
+      // ignore: avoid_catching_errors
     } on TypeError {
       return null;
+      // ignore: avoid_catching_errors
     } on ArgumentError {
       return null;
     }
   }
 
   @override
-  Future<void> save(CloudAccountLink link) {
-    return _preferences.setString(
+  Future<void> save(CloudAccountLink link) => _preferences.setString(
       AppConstants.sharedPrefsCloudAccountLinkKey,
       jsonEncode(_encodeLink(link)),
     );
-  }
 
   @override
-  Future<void> clear() {
-    return _preferences.remove(AppConstants.sharedPrefsCloudAccountLinkKey);
-  }
+  Future<void> clear() => _preferences.remove(AppConstants.sharedPrefsCloudAccountLinkKey);
 
   CloudAccountLink? _decodeLink(Map<String, Object?> data) {
     final schemaVersion = data['schemaVersion'];
@@ -88,8 +88,7 @@ final class CloudAccountStore implements CloudAccountRepository {
     );
   }
 
-  Map<String, Object?> _encodeLink(CloudAccountLink link) {
-    return <String, Object?>{
+  Map<String, Object?> _encodeLink(CloudAccountLink link) => <String, Object?>{
       'schemaVersion': link.schemaVersion,
       'provider': link.provider.name,
       'subjectId': link.subjectId,
@@ -101,5 +100,4 @@ final class CloudAccountStore implements CloudAccountRepository {
       'linkedAt': link.linkedAt,
       'lastSignedInAt': link.lastSignedInAt,
     };
-  }
 }

@@ -1,0 +1,19 @@
+# Test-tree overrides on top of the project root `analysis_options.yaml`.
+#
+# Tests have legitimate reasons to bend a few rules that are correct for
+# production code:
+#   * fire-and-forget Futures inside non-async test scaffolding
+#   * throwing plain `Object` to simulate arbitrary failure modes
+#   * catching `Error` directly to assert on it
+#
+# Production lints (use_build_context_synchronously, strict-casts, async
+# correctness for real code) remain in force — these overrides only soften
+# style-of-test patterns.
+
+include: ../analysis_options.yaml
+
+linter:
+  rules:
+    discarded_futures: false
+    only_throw_errors: false
+    avoid_catching_errors: false

@@ -177,27 +177,23 @@ class FlashcardActionController extends _$FlashcardActionController {
   @override
   FutureOr<void> build(String deckId) {}
 
-  Future<List<DeckMoveTarget>> loadMoveTargets(List<String> flashcardIds) {
-    return ref
+  Future<List<DeckMoveTarget>> loadMoveTargets(List<String> flashcardIds) => ref
         .read(getFlashcardMoveTargetsUseCaseProvider)
         .execute(deckId: deckId, flashcardIds: flashcardIds);
-  }
 
-  Future<bool> deleteFlashcards(List<String> flashcardIds) async {
-    // guard:retry-reviewed
-    return _actionRunner.runResult(
-      () => ref.read(deleteFlashcardsUseCaseProvider).execute(flashcardIds),
-      onSuccess: (_) {
-        ref.read(flashcardSelectionProvider(deckId).notifier).clear();
-      },
-    );
-  }
+  // guard:retry-reviewed
+  Future<bool> deleteFlashcards(List<String> flashcardIds) =>
+      _actionRunner.runResult(
+        () => ref.read(deleteFlashcardsUseCaseProvider).execute(flashcardIds),
+        onSuccess: (_) {
+          ref.read(flashcardSelectionProvider(deckId).notifier).clear();
+        },
+      );
 
   Future<bool> moveFlashcards({
     required List<String> flashcardIds,
     required String targetDeckId,
-  }) async {
-    return _actionRunner.runResult(
+  }) async => _actionRunner.runResult(
       () => ref
           .read(moveFlashcardsUseCaseProvider)
           .execute(flashcardIds: flashcardIds, targetDeckId: targetDeckId),
@@ -205,35 +201,26 @@ class FlashcardActionController extends _$FlashcardActionController {
         ref.read(flashcardSelectionProvider(deckId).notifier).clear();
       },
     );
-  }
 
-  Future<bool> reorderFlashcards(List<String> orderedFlashcardIds) async {
-    return _actionRunner.runResult(
+  Future<bool> reorderFlashcards(List<String> orderedFlashcardIds) async => _actionRunner.runResult(
       () => ref
           .read(reorderFlashcardsUseCaseProvider)
           .execute(deckId: deckId, orderedFlashcardIds: orderedFlashcardIds),
     );
-  }
 
-  Future<ExportData?> exportFlashcards(List<String> flashcardIds) async {
-    return _actionRunner.runResultValue(
+  Future<ExportData?> exportFlashcards(List<String> flashcardIds) async => _actionRunner.runResultValue(
       () => ref.read(exportFlashcardsUseCaseProvider).execute(flashcardIds),
     );
-  }
 
-  MxAsyncActionRunner get _actionRunner {
-    return MxAsyncActionRunner(
+  MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(
       isMounted: () => ref.mounted,
       setState: (nextState) => state = nextState,
     );
-  }
 }
 
-AppFailure? flashcardActionError(AsyncValue<void> actionState) {
-  return actionState.whenOrNull(
+AppFailure? flashcardActionError(AsyncValue<void> actionState) => actionState.whenOrNull(
     error: (error, _) => error is AppFailure ? error : null,
   );
-}
 
 String flashcardActionErrorMessage(AppFailure? failure) {
   if (failure == null) {

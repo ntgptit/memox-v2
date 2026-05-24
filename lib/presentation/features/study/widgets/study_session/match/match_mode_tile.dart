@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:memox/domain/study/entities/study_models.dart';
@@ -40,7 +42,7 @@ class _MatchModeTileState extends State<MatchModeTile>
       duration: matchResolveDelay,
     );
     if (widget.state == MatchTileState.error) {
-      _shakeController.forward(from: 0);
+      unawaited(_shakeController.forward(from: 0));
     }
   }
 
@@ -49,7 +51,7 @@ class _MatchModeTileState extends State<MatchModeTile>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.state != MatchTileState.error &&
         widget.state == MatchTileState.error) {
-      _shakeController.forward(from: 0);
+      unawaited(_shakeController.forward(from: 0));
     }
   }
 
@@ -91,8 +93,7 @@ class _MatchModeTileState extends State<MatchModeTile>
               padding: const EdgeInsets.all(MxSpace.md),
               onTap: canTap ? widget.onTap : null,
               child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Center(
+                builder: (context, constraints) => Center(
                     child: SizedBox(
                       width: constraints.maxWidth,
                       child: MxText(
@@ -107,8 +108,7 @@ class _MatchModeTileState extends State<MatchModeTile>
                         softWrap: true,
                       ),
                     ),
-                  );
-                },
+                  ),
               ),
             ),
           ),

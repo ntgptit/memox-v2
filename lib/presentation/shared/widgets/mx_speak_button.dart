@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../motion/mx_motion.dart';
@@ -68,15 +70,13 @@ class _MxSpeakButtonState extends State<MxSpeakButton>
     return AnimatedBuilder(
       animation: _scale,
       child: iconButton,
-      builder: (context, child) {
-        return Transform.scale(scale: _scale.value, child: child);
-      },
+      builder: (context, child) => Transform.scale(scale: _scale.value, child: child),
     );
   }
 
   void _syncPulse() {
     if (widget.isSpeaking && widget.onPressed != null) {
-      _controller.repeat(reverse: true);
+      unawaited(_controller.repeat(reverse: true));
       return;
     }
     _controller.stop();

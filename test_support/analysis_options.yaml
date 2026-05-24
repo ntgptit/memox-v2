@@ -1,0 +1,9 @@
+include: ../analysis_options.yaml
+
+# Same relaxations as `test/analysis_options.yaml` — test_support harnesses
+# share the same scaffolding patterns.
+linter:
+  rules:
+    discarded_futures: false
+    only_throw_errors: false
+    avoid_catching_errors: false

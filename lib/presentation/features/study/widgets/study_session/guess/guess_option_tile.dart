@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:memox/domain/study/entities/study_models.dart';
@@ -47,7 +49,7 @@ class _GuessOptionTileState extends State<GuessOptionTile>
       duration: guessFeedbackDelay,
     );
     if (widget.state == GuessOptionState.error) {
-      _shakeController.forward(from: 0);
+      unawaited(_shakeController.forward(from: 0));
     }
   }
 
@@ -56,7 +58,7 @@ class _GuessOptionTileState extends State<GuessOptionTile>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.state != GuessOptionState.error &&
         widget.state == GuessOptionState.error) {
-      _shakeController.forward(from: 0);
+      unawaited(_shakeController.forward(from: 0));
     }
   }
 
@@ -81,8 +83,7 @@ class _GuessOptionTileState extends State<GuessOptionTile>
         tween: ColorTween(end: targetBackground),
         duration: guessColorTransitionDuration,
         curve: Curves.easeOutCubic,
-        builder: (context, backgroundColor, child) {
-          return MxCard(
+        builder: (context, backgroundColor, child) => MxCard(
             variant: MxCardVariant.outlined,
             backgroundColor: backgroundColor,
             borderColor: visual.borderColor,
@@ -125,8 +126,7 @@ class _GuessOptionTileState extends State<GuessOptionTile>
                 ],
               ],
             ),
-          );
-        },
+          ),
       ),
     );
   }
@@ -139,8 +139,7 @@ class _GuessLetterCircle extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       width: _guessLetterCircleDiameter,
       height: _guessLetterCircleDiameter,
       alignment: Alignment.center,
@@ -153,5 +152,4 @@ class _GuessLetterCircle extends StatelessWidget {
       ),
       child: MxText(letter, role: MxTextRole.badge, color: color),
     );
-  }
 }

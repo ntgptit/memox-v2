@@ -47,39 +47,31 @@ Future<List<DeckMoveTarget>> deckMovePicker(
   Ref ref,
   String deckId,
   String excludingFolderId,
-) {
-  return ref
+) => ref
       .watch(getDeckMoveTargetsUseCaseProvider)
       .execute(deckId: deckId, excludingFolderId: excludingFolderId);
-}
 
 @riverpod
 class DeckActionController extends _$DeckActionController {
   @override
   FutureOr<void> build(String deckId) {}
 
-  Future<bool> updateDeck(String name) async {
-    // guard:retry-reviewed
-    return _actionRunner.runResult(
-      () => ref
-          .read(updateDeckUseCaseProvider)
-          .execute(deckId: deckId, name: name),
-    );
-  }
+  // guard:retry-reviewed
+  Future<bool> updateDeck(String name) => _actionRunner.runResult(
+        () => ref
+            .read(updateDeckUseCaseProvider)
+            .execute(deckId: deckId, name: name),
+      );
 
-  Future<bool> deleteDeck() async {
-    return _actionRunner.runResult(
+  Future<bool> deleteDeck() async => _actionRunner.runResult(
       () => ref.read(deleteDeckUseCaseProvider).execute(deckId),
     );
-  }
 
-  Future<bool> moveDeck(String targetFolderId) async {
-    return _actionRunner.runResult(
+  Future<bool> moveDeck(String targetFolderId) async => _actionRunner.runResult(
       () => ref
           .read(moveDeckUseCaseProvider)
           .execute(deckId: deckId, targetFolderId: targetFolderId),
     );
-  }
 
   Future<String?> duplicateDeck(String targetFolderId) async {
     final deck = await _actionRunner.runResultValue(
@@ -90,25 +82,19 @@ class DeckActionController extends _$DeckActionController {
     return deck?.id;
   }
 
-  Future<ExportData?> exportDeck() async {
-    return _actionRunner.runResultValue(
+  Future<ExportData?> exportDeck() async => _actionRunner.runResultValue(
       () => ref.read(exportDeckUseCaseProvider).execute(deckId),
     );
-  }
 
-  MxAsyncActionRunner get _actionRunner {
-    return MxAsyncActionRunner(
+  MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(
       isMounted: () => ref.mounted,
       setState: (nextState) => state = nextState,
     );
-  }
 }
 
-AppFailure? deckActionError(AsyncValue<void> actionState) {
-  return actionState.whenOrNull(
+AppFailure? deckActionError(AsyncValue<void> actionState) => actionState.whenOrNull(
     error: (error, _) => error is AppFailure ? error : null,
   );
-}
 
 String deckActionErrorMessage(AppFailure? failure) {
   if (failure == null) {
