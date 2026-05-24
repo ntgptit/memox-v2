@@ -171,8 +171,7 @@ Widget _buildCreateApp() {
   );
 }
 
-ProviderContainer _editorContainer(_EditorFlashcardRepository repository) {
-  return ProviderContainer(
+ProviderContainer _editorContainer(_EditorFlashcardRepository repository) => ProviderContainer(
     overrides: [
       getFlashcardUseCaseProvider.overrideWithValue(
         GetFlashcardUseCase(repository),
@@ -188,10 +187,8 @@ ProviderContainer _editorContainer(_EditorFlashcardRepository repository) {
       ),
     ],
   );
-}
 
-GoRouter _editorRouter({required String deckId, required String flashcardId}) {
-  return GoRouter(
+GoRouter _editorRouter({required String deckId, required String flashcardId}) => GoRouter(
     initialLocation: '/deck/$deckId/flashcards/$flashcardId/edit',
     routes: [
       GoRoute(
@@ -199,7 +196,7 @@ GoRouter _editorRouter({required String deckId, required String flashcardId}) {
         name: RouteNames.flashcardEdit,
         builder: (context, state) => FlashcardEditorScreen(
           deckId: state.pathParameters[RoutePaths.deckIdParam]!,
-          flashcardId: state.pathParameters[RoutePaths.flashcardIdParam]!,
+          flashcardId: state.pathParameters[RoutePaths.flashcardIdParam],
         ),
       ),
       GoRoute(
@@ -210,10 +207,8 @@ GoRouter _editorRouter({required String deckId, required String flashcardId}) {
       ),
     ],
   );
-}
 
-FlashcardEntity _flashcard({required bool hasLearningProgress}) {
-  return FlashcardEntity(
+FlashcardEntity _flashcard({required bool hasLearningProgress}) => FlashcardEntity(
     id: 'card-001',
     deckId: 'deck-001',
     front: 'Original front',
@@ -224,7 +219,6 @@ FlashcardEntity _flashcard({required bool hasLearningProgress}) {
     updatedAt: 1,
     hasLearningProgress: hasLearningProgress,
   );
-}
 
 final class _EditorFlashcardRepository implements FlashcardRepository {
   _EditorFlashcardRepository({required FlashcardEntity flashcard})
@@ -235,9 +229,7 @@ final class _EditorFlashcardRepository implements FlashcardRepository {
   FlashcardProgressEditPolicy? lastProgressPolicy;
 
   @override
-  Future<FlashcardEntity> getFlashcard(String flashcardId) async {
-    return _flashcard;
-  }
+  Future<FlashcardEntity> getFlashcard(String flashcardId) async => _flashcard;
 
   @override
   Future<Result<FlashcardEntity>> createFlashcard({
@@ -290,8 +282,7 @@ final class _EditorFlashcardRepository implements FlashcardRepository {
 
 final class _StubDeckRepository implements DeckRepository {
   @override
-  Future<DeckActionContextReadModel> getDeckActionContext(String deckId) async {
-    return DeckActionContextReadModel(
+  Future<DeckActionContextReadModel> getDeckActionContext(String deckId) async => DeckActionContextReadModel(
       deck: DeckEntity(
         id: deckId,
         folderId: 'folder-001',
@@ -305,7 +296,6 @@ final class _StubDeckRepository implements DeckRepository {
         BreadcrumbSegmentReadModel(label: 'Sample deck'),
       ],
     );
-  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

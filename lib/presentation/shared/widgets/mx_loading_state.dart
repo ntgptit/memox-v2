@@ -19,8 +19,7 @@ class MxLoadingState extends StatelessWidget {
   final MxProgressSize progressSize;
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
+  Widget build(BuildContext context) => Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -32,7 +31,6 @@ class MxLoadingState extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 /// Skeleton placeholder block with subtle pulse animation.

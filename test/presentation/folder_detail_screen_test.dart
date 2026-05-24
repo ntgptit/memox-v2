@@ -5,16 +5,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memox/app/router/route_names.dart';
 import 'package:memox/domain/enums/content_sort_mode.dart';
 import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
-import 'package:memox/app/router/route_names.dart';
 import 'package:memox/presentation/features/folders/screens/folder_detail_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart';
 import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
-import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 
 void main() {
@@ -738,7 +738,7 @@ void main() {
           folderActionControllerProvider(folderId).overrideWith(
             () => _FakeFolderActionController(
               importTargets: <FolderDeckItem>[
-                FolderDeckItem(
+                const FolderDeckItem(
                   id: deckId,
                   name: 'Existing deck',
                   cardCount: 3,
@@ -1169,11 +1169,9 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     );
-  }
 }

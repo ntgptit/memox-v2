@@ -36,8 +36,7 @@ class StudyAnswerFeedback {
     String? correctAnswer,
     String? submittedAnswer,
     String? selectedOptionId,
-  }) {
-    return StudyAnswerFeedback(
+  }) => StudyAnswerFeedback(
       itemId: itemId ?? this.itemId,
       selectedGrade: selectedGrade ?? this.selectedGrade,
       isCorrect: isCorrect ?? this.isCorrect,
@@ -45,9 +44,6 @@ class StudyAnswerFeedback {
       submittedAnswer: submittedAnswer ?? this.submittedAnswer,
       selectedOptionId: selectedOptionId ?? this.selectedOptionId,
     );
-  }
 
-  StudyAnswerFeedback markCorrected() {
-    return copyWith(selectedGrade: AttemptGrade.correct, isCorrect: true);
-  }
+  StudyAnswerFeedback markCorrected() => copyWith(selectedGrade: AttemptGrade.correct, isCorrect: true);
 }

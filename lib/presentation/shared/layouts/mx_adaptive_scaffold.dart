@@ -168,10 +168,8 @@ class _MxAdaptiveToolbarAppBar extends StatelessWidget
   Size get preferredSize => child.preferredSize;
 
   @override
-  Widget build(BuildContext context) {
-    return IconButtonTheme(
+  Widget build(BuildContext context) => IconButtonTheme(
       data: MxIconButton.toolbarTheme(context),
       child: child,
     );
-  }
 }

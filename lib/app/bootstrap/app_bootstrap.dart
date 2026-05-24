@@ -49,9 +49,7 @@ final class AppBootstrap {
         final app = await builder();
         runApp(app);
       },
-      (error, stackTrace) {
-        errorReporter(error, stackTrace);
-      },
+      errorReporter,
     );
   }
 

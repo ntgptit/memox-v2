@@ -14,8 +14,7 @@ void main() {
         routes: [
           GoRoute(
             path: '/detail',
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.popRoute(
@@ -24,8 +23,7 @@ void main() {
                     child: const Text('Close'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/fallback',
@@ -53,21 +51,18 @@ void main() {
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.push('/detail'),
                     child: const Text('Open detail'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/detail',
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.popRoute(
@@ -76,8 +71,7 @@ void main() {
                     child: const Text('Close'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/fallback',
@@ -109,8 +103,7 @@ void main() {
           GoRoute(
             path: '/${RoutePaths.flashcardListSegment}',
             name: RouteNames.flashcardList,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.goStudyEntry(
@@ -120,14 +113,12 @@ void main() {
                     child: const Text('Deck screen'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/${RoutePaths.studyEntrySegment}',
             name: RouteNames.studyEntry,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.popRoute(
@@ -136,8 +127,7 @@ void main() {
                     child: const Text('Back'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/library',
@@ -169,8 +159,7 @@ void main() {
           GoRoute(
             path: '/${RoutePaths.studySessionSegment}',
             name: RouteNames.studySession,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.popRoute(
@@ -179,22 +168,19 @@ void main() {
                     child: const Text('Study session'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/${RoutePaths.studyEntrySegment}',
             name: RouteNames.studyEntry,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.goStudySession('session-001'),
                     child: const Text('Study entry'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/library',
@@ -226,22 +212,19 @@ void main() {
           GoRoute(
             path: '/${RoutePaths.studySessionSegment}',
             name: RouteNames.studySession,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.goStudyResult('session-001'),
                     child: const Text('Study session'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/${RoutePaths.studyResultSegment}',
             name: RouteNames.studyResult,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.popRoute(
@@ -250,22 +233,19 @@ void main() {
                     child: const Text('Study result'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/${RoutePaths.studyEntrySegment}',
             name: RouteNames.studyEntry,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.goStudySession('session-001'),
                     child: const Text('Study entry'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/library',
@@ -299,8 +279,7 @@ void main() {
         routes: [
           GoRoute(
             path: '/previous',
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () =>
@@ -308,28 +287,24 @@ void main() {
                     child: const Text('Previous route'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/${RoutePaths.studyResultSegment}',
             name: RouteNames.studyResult,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: context.pushStudyToday,
                     child: const Text('Study result'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/${RoutePaths.studyTodaySegment}',
             name: RouteNames.studyToday,
-            builder: (context, state) {
-              return Scaffold(
+            builder: (context, state) => Scaffold(
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.popRoute(
@@ -338,8 +313,7 @@ void main() {
                     child: const Text('Today study'),
                   ),
                 ),
-              );
-            },
+              ),
           ),
           GoRoute(
             path: '/library',

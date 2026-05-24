@@ -24,11 +24,9 @@ class FlashcardEditorArgs {
   bool get isEditing => flashcardId != null;
 
   @override
-  bool operator ==(Object other) {
-    return other is FlashcardEditorArgs &&
+  bool operator ==(Object other) => other is FlashcardEditorArgs &&
         other.deckId == deckId &&
         other.flashcardId == flashcardId;
-  }
 
   @override
   int get hashCode => Object.hash(deckId, flashcardId);
@@ -76,17 +74,12 @@ class FlashcardEditorDraftState {
       StringUtils.trimmed(front).isNotEmpty &&
       StringUtils.trimmed(back).isNotEmpty;
 
-  bool get hasChangedLearningContent {
-    return StringUtils.trimmed(front) != StringUtils.trimmed(originalFront) ||
+  bool get hasChangedLearningContent => StringUtils.trimmed(front) != StringUtils.trimmed(originalFront) ||
         StringUtils.trimmed(back) != StringUtils.trimmed(originalBack);
-  }
 
-  bool get requiresLearningProgressPolicy {
-    return isEditing && hasLearningProgress && hasChangedLearningContent;
-  }
+  bool get requiresLearningProgressPolicy => isEditing && hasLearningProgress && hasChangedLearningContent;
 
-  FlashcardDraft toDraft() {
-    return FlashcardDraft(
+  FlashcardDraft toDraft() => FlashcardDraft(
       front: front,
       back: back,
       note: note,
@@ -96,7 +89,6 @@ class FlashcardEditorDraftState {
       tags: tags,
       startingStatus: startingStatus,
     );
-  }
 
   FlashcardEditorDraftState copyWith({
     String? deckId,
@@ -110,8 +102,7 @@ class FlashcardEditorDraftState {
     String? hint,
     List<String>? tags,
     FlashcardStartingStatus? startingStatus,
-  }) {
-    return FlashcardEditorDraftState(
+  }) => FlashcardEditorDraftState(
       deckId: deckId ?? this.deckId,
       deckName: deckName ?? this.deckName,
       breadcrumb: breadcrumb ?? this.breadcrumb,
@@ -128,7 +119,6 @@ class FlashcardEditorDraftState {
       originalBack: originalBack,
       hasLearningProgress: hasLearningProgress,
     );
-  }
 }
 
 @riverpod
@@ -319,19 +309,15 @@ class FlashcardEditorController extends _$FlashcardEditorController {
     );
   }
 
-  MxAsyncActionRunner get _actionRunner {
-    return MxAsyncActionRunner(
+  MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(
       isMounted: () => ref.mounted,
       setState: (nextState) => state = nextState,
     );
-  }
 }
 
-AppFailure? flashcardEditorError(AsyncValue<void> actionState) {
-  return actionState.whenOrNull(
+AppFailure? flashcardEditorError(AsyncValue<void> actionState) => actionState.whenOrNull(
     error: (error, _) => error is AppFailure ? error : null,
   );
-}
 
 String flashcardEditorErrorMessage(AppFailure? failure) {
   if (failure == null) {
@@ -345,9 +331,7 @@ String flashcardEditorErrorMessage(AppFailure? failure) {
 
 FlashcardEditorDraftState? _currentDraft(
   AsyncValue<FlashcardEditorDraftState> state,
-) {
-  return switch (state) {
+) => switch (state) {
     AsyncData(:final value) => value,
     _ => null,
   };
-}

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import '../../../core/theme/extensions/theme_extensions.dart';
 import '../layouts/mx_gap.dart';
 import '../motion/mx_motion.dart';
 
@@ -21,8 +21,7 @@ abstract final class MxSnackbar {
     VoidCallback? onAction,
     Duration duration = MxDurations.snackbar,
     IconData? icon,
-  }) {
-    return _show(
+  }) => _show(
       ScaffoldMessenger.of(context),
       _snackBar(
         context,
@@ -34,7 +33,6 @@ abstract final class MxSnackbar {
         icon: icon,
       ),
     );
-  }
 
   static MxDeferredSnackbar deferredSuccess(BuildContext c, String message) {
     final messenger = ScaffoldMessenger.of(c);

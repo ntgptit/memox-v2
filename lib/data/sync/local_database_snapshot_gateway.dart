@@ -6,6 +6,4 @@ import 'local_database_snapshot_gateway_stub.dart'
 
 LocalDatabaseSnapshotGateway createLocalDatabaseSnapshotGateway(
   AppDatabase database,
-) {
-  return createPlatformLocalDatabaseSnapshotGateway(database);
-}
+) => createPlatformLocalDatabaseSnapshotGateway(database);

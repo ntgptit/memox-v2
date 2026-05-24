@@ -11,8 +11,8 @@ import '../../data/sync/local_database_snapshot_gateway.dart';
 import '../../data/sync/local_database_snapshot_gateway_contract.dart';
 import '../../domain/repositories/drive_sync_repository.dart';
 import '../../domain/usecases/drive_sync_usecases.dart';
-import '../services/drive_sync_runtime_effects.dart';
 import '../logging/app_talker.dart';
+import '../services/drive_sync_runtime_effects.dart';
 import 'account_providers.dart';
 import 'content/content_core_providers.dart';
 import 'providers.dart';
@@ -27,37 +27,26 @@ http.Client driveSyncHttpClient(Ref ref) {
 }
 
 @riverpod
-DriveAppDataClient googleDriveAppDataClient(Ref ref) {
-  return GoogleDriveAppDataClient(ref.watch(driveSyncHttpClientProvider));
-}
+DriveAppDataClient googleDriveAppDataClient(Ref ref) => GoogleDriveAppDataClient(ref.watch(driveSyncHttpClientProvider));
 
 @riverpod
-DriveSyncSnapshotCodec driveSyncSnapshotCodec(Ref ref) {
-  return const DriveSyncSnapshotCodec();
-}
+DriveSyncSnapshotCodec driveSyncSnapshotCodec(Ref ref) => const DriveSyncSnapshotCodec();
 
 @riverpod
-LocalDatabaseSnapshotGateway localDatabaseSnapshotGateway(Ref ref) {
-  return createLocalDatabaseSnapshotGateway(ref.watch(appDatabaseProvider));
-}
+LocalDatabaseSnapshotGateway localDatabaseSnapshotGateway(Ref ref) => createLocalDatabaseSnapshotGateway(ref.watch(appDatabaseProvider));
 
 @riverpod
-Future<AppSettingsSnapshotStore> appSettingsSnapshotStore(Ref ref) async {
-  return AppSettingsSnapshotStore(
+Future<AppSettingsSnapshotStore> appSettingsSnapshotStore(Ref ref) async => AppSettingsSnapshotStore(
     await ref.watch(sharedPreferencesProvider.future),
   );
-}
 
 @riverpod
-Future<DriveSyncMetadataStore> driveSyncMetadataStore(Ref ref) async {
-  return DriveSyncMetadataStore(
+Future<DriveSyncMetadataStore> driveSyncMetadataStore(Ref ref) async => DriveSyncMetadataStore(
     await ref.watch(sharedPreferencesProvider.future),
   );
-}
 
 @riverpod
-Future<DriveSyncRepository> driveSyncRepository(Ref ref) async {
-  return GoogleDriveSyncRepository(
+Future<DriveSyncRepository> driveSyncRepository(Ref ref) async => GoogleDriveSyncRepository(
     accountRepository: await ref.watch(cloudAccountRepositoryProvider.future),
     authService: ref.watch(googleAccountAuthServiceProvider),
     googleOAuthConfig: ref.watch(googleOAuthConfigProvider),
@@ -72,58 +61,43 @@ Future<DriveSyncRepository> driveSyncRepository(Ref ref) async {
     idGenerator: ref.watch(idGeneratorProvider),
     logger: TalkerAppLogger(ref.watch(talkerProvider)),
   );
-}
 
 @riverpod
-Future<LoadDriveSyncStatusUseCase> loadDriveSyncStatusUseCase(Ref ref) async {
-  return LoadDriveSyncStatusUseCase(
+Future<LoadDriveSyncStatusUseCase> loadDriveSyncStatusUseCase(Ref ref) async => LoadDriveSyncStatusUseCase(
     await ref.watch(driveSyncRepositoryProvider.future),
   );
-}
 
 @riverpod
 Future<SyncGoogleDriveSnapshotUseCase> syncGoogleDriveSnapshotUseCase(
   Ref ref,
-) async {
-  return SyncGoogleDriveSnapshotUseCase(
+) async => SyncGoogleDriveSnapshotUseCase(
     await ref.watch(driveSyncRepositoryProvider.future),
   );
-}
 
 @riverpod
 Future<UploadLocalDriveSnapshotUseCase> uploadLocalDriveSnapshotUseCase(
   Ref ref,
-) async {
-  return UploadLocalDriveSnapshotUseCase(
+) async => UploadLocalDriveSnapshotUseCase(
     await ref.watch(driveSyncRepositoryProvider.future),
   );
-}
 
 @riverpod
-Future<RestoreDriveSnapshotUseCase> restoreDriveSnapshotUseCase(Ref ref) async {
-  return RestoreDriveSnapshotUseCase(
+Future<RestoreDriveSnapshotUseCase> restoreDriveSnapshotUseCase(Ref ref) async => RestoreDriveSnapshotUseCase(
     await ref.watch(driveSyncRepositoryProvider.future),
   );
-}
 
 @riverpod
 Future<ResolveDriveSyncConflictUseCase> resolveDriveSyncConflictUseCase(
   Ref ref,
-) async {
-  return ResolveDriveSyncConflictUseCase(
+) async => ResolveDriveSyncConflictUseCase(
     await ref.watch(driveSyncRepositoryProvider.future),
   );
-}
 
 @riverpod
-AppReloadService appReloadService(Ref ref) {
-  return createAppReloadService();
-}
+AppReloadService appReloadService(Ref ref) => createAppReloadService();
 
 @riverpod
-DriveSyncRuntimeEffects driveSyncRuntimeEffects(Ref ref) {
-  return RiverpodDriveSyncRuntimeEffects(
+DriveSyncRuntimeEffects driveSyncRuntimeEffects(Ref ref) => RiverpodDriveSyncRuntimeEffects(
     ref: ref,
     appReloadService: ref.watch(appReloadServiceProvider),
   );
-}

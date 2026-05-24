@@ -11,13 +11,11 @@ enum TtsLanguage {
   static TtsLanguage fromStorage(
     String? value, {
     TtsLanguage fallback = TtsLanguage.korean,
-  }) {
-    return switch (value) {
+  }) => switch (value) {
       'english' => TtsLanguage.english,
       'korean' => TtsLanguage.korean,
       _ => fallback,
     };
-  }
 
   String get storageValue => name;
 }
@@ -55,13 +53,9 @@ final class TtsSettings {
   final double rate;
   final String? frontVoiceName;
 
-  TtsLanguage languageFor(TtsTextSide side) {
-    return frontLanguage;
-  }
+  TtsLanguage languageFor(TtsTextSide side) => frontLanguage;
 
-  String? voiceNameFor(TtsTextSide side) {
-    return frontVoiceName;
-  }
+  String? voiceNameFor(TtsTextSide side) => frontVoiceName;
 
   TtsSettings copyWith({
     bool? autoPlay,
@@ -69,8 +63,7 @@ final class TtsSettings {
     double? rate,
     String? frontVoiceName,
     bool clearFrontVoice = false,
-  }) {
-    return TtsSettings(
+  }) => TtsSettings(
       autoPlay: autoPlay ?? this.autoPlay,
       frontLanguage: frontLanguage ?? this.frontLanguage,
       rate: normalizeRate(rate ?? this.rate),
@@ -78,11 +71,8 @@ final class TtsSettings {
           ? null
           : frontVoiceName ?? this.frontVoiceName,
     );
-  }
 
-  static double normalizeRate(double value) {
-    return value.clamp(minRate, maxRate).toDouble();
-  }
+  static double normalizeRate(double value) => value.clamp(minRate, maxRate).toDouble();
 }
 
 abstract interface class TtsService {

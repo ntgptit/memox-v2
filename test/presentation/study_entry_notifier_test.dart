@@ -77,14 +77,10 @@ final class _SuccessfulStudyRepo implements StudyRepo {
   int activeSessionLoadCount = 0;
 
   @override
-  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
-    return [_card()];
-  }
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => [_card()];
 
   @override
-  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async {
-    return const <StudyFlashcardRef>[];
-  }
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async => const <StudyFlashcardRef>[];
 
   @override
   Future<List<StudySessionSnapshot>> listActiveSessions() async {
@@ -98,8 +94,7 @@ final class _SuccessfulStudyRepo implements StudyRepo {
     required StudyFlow flow,
     required List<StudyMode> modes,
     required List<StudyFlashcardRef> batch,
-  }) async {
-    return _snapshot(
+  }) async => _snapshot(
       entryType: context.entryType,
       entryRefId: context.entryRefId,
       studyType: context.studyType,
@@ -107,7 +102,6 @@ final class _SuccessfulStudyRepo implements StudyRepo {
       settings: context.settings,
       mode: modes.first,
     );
-  }
 
   @override
   Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context) {
@@ -170,14 +164,10 @@ final class _EmptyStudyRepo implements StudyRepo {
   const _EmptyStudyRepo();
 
   @override
-  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
-    return const <StudyFlashcardRef>[];
-  }
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => const <StudyFlashcardRef>[];
 
   @override
-  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async {
-    return const <StudyFlashcardRef>[];
-  }
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async => const <StudyFlashcardRef>[];
 
   @override
   Future<StudySessionSnapshot?> findResumeCandidate(StudyContext context) {
@@ -304,12 +294,10 @@ StudySessionSnapshot _snapshot({
   );
 }
 
-StudyFlashcardRef _card() {
-  return const StudyFlashcardRef(
+StudyFlashcardRef _card() => const StudyFlashcardRef(
     id: 'card-1',
     deckId: 'deck-1',
     front: 'front 1',
     back: 'back 1',
     sourcePool: SessionItemSourcePool.newCards,
   );
-}

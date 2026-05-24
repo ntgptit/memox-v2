@@ -16,9 +16,7 @@ class MxGap extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) {
-    return gap.Gap(size);
-  }
+  Widget build(BuildContext context) => gap.Gap(size);
 }
 
 /// Sliver counterpart of [MxGap].
@@ -28,7 +26,5 @@ class MxSliverGap extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) {
-    return gap.SliverGap(size);
-  }
+  Widget build(BuildContext context) => gap.SliverGap(size);
 }

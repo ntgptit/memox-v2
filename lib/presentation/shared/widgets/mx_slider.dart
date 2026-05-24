@@ -25,8 +25,7 @@ class MxSlider extends StatelessWidget {
   final ValueChanged<double> onChanged;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
@@ -47,5 +46,4 @@ class MxSlider extends StatelessWidget {
         ),
       ],
     );
-  }
 }

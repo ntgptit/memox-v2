@@ -10,9 +10,9 @@ import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_badge.dart';
-import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_icon_tile.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/account_settings_viewmodel.dart';
@@ -102,8 +102,7 @@ class _AccountSettingsContent extends ConsumerWidget {
     );
   }
 
-  String? _subtitle(AppLocalizations l10n) {
-    return switch (state.status) {
+  String? _subtitle(AppLocalizations l10n) => switch (state.status) {
       AccountLinkStatus.signedIn => null,
       AccountLinkStatus.needsDriveAuthorization =>
         l10n.settingsAccountSubtitleReconnect,
@@ -112,10 +111,8 @@ class _AccountSettingsContent extends ConsumerWidget {
       AccountLinkStatus.error => l10n.settingsAccountSubtitleError,
       AccountLinkStatus.signedOut => l10n.settingsAccountSubtitleSignedOut,
     };
-  }
 
-  String _statusLabel(AppLocalizations l10n) {
-    return switch (state.status) {
+  String _statusLabel(AppLocalizations l10n) => switch (state.status) {
       AccountLinkStatus.signedIn => l10n.settingsAccountDriveReady,
       AccountLinkStatus.needsDriveAuthorization =>
         l10n.settingsAccountDriveReconnectRequired,
@@ -124,10 +121,8 @@ class _AccountSettingsContent extends ConsumerWidget {
       AccountLinkStatus.error ||
       AccountLinkStatus.signedOut => '',
     };
-  }
 
-  String? _message(AppLocalizations l10n) {
-    return switch (state.message) {
+  String? _message(AppLocalizations l10n) => switch (state.message) {
       AccountSettingsMessage.none => null,
       AccountSettingsMessage.signInCanceled =>
         l10n.settingsAccountSignInCanceled,
@@ -136,7 +131,6 @@ class _AccountSettingsContent extends ConsumerWidget {
         l10n.settingsAccountDriveAuthorizationRequired,
       AccountSettingsMessage.signedOut => l10n.settingsAccountSignedOutMessage,
     };
-  }
 
   Widget? _headerAction(
     AppLocalizations l10n, {
@@ -248,14 +242,12 @@ class _AccountStatusText extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) {
-    return SettingsRow(
+  Widget build(BuildContext context) => SettingsRow(
       icon: Icons.account_circle_outlined,
       title: text,
       showChevron: false,
       iconTone: MxIconTileTone.neutral,
     );
-  }
 }
 
 class _AccountActions extends StatelessWidget {

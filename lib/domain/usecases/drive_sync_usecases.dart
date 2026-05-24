@@ -41,7 +41,5 @@ final class ResolveDriveSyncConflictUseCase {
   Future<DriveSyncRunResult> execute(
     DriveSyncConflict conflict,
     DriveSyncConflictChoice choice,
-  ) {
-    return _repository.resolveConflict(conflict, choice);
-  }
+  ) => _repository.resolveConflict(conflict, choice);
 }

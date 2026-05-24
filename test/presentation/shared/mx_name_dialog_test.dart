@@ -12,8 +12,7 @@ void main() {
     await tester.pumpWidget(
       _TestApp(
         child: Builder(
-          builder: (context) {
-            return TextButton(
+          builder: (context) => TextButton(
               onPressed: () async {
                 result = await MxNameDialog.show(
                   context: context,
@@ -24,8 +23,7 @@ void main() {
                 );
               },
               child: const Text('Open dialog'),
-            );
-          },
+            ),
         ),
       ),
     );
@@ -57,8 +55,7 @@ void main() {
     await tester.pumpWidget(
       _TestApp(
         child: Builder(
-          builder: (context) {
-            return TextButton(
+          builder: (context) => TextButton(
               onPressed: () async {
                 result = await MxNameDialog.show(
                   context: context,
@@ -69,8 +66,7 @@ void main() {
                 );
               },
               child: const Text('Open dialog'),
-            );
-          },
+            ),
         ),
       ),
     );
@@ -96,8 +92,7 @@ void main() {
       await tester.pumpWidget(
         _TestApp(
           child: Builder(
-            builder: (context) {
-              return TextButton(
+            builder: (context) => TextButton(
                 onPressed: () async {
                   result = await MxNameDialog.show(
                     context: context,
@@ -108,8 +103,7 @@ void main() {
                   );
                 },
                 child: const Text('Open dialog'),
-              );
-            },
+              ),
           ),
         ),
       );
@@ -133,8 +127,7 @@ void main() {
       await tester.pumpWidget(
         _TestApp(
           child: Builder(
-            builder: (context) {
-              return TextButton(
+            builder: (context) => TextButton(
                 onPressed: () {
                   MxNameDialog.show(
                     context: context,
@@ -146,8 +139,7 @@ void main() {
                   );
                 },
                 child: const Text('Open dialog'),
-              );
-            },
+              ),
           ),
         ),
       );
@@ -170,8 +162,7 @@ void main() {
     await tester.pumpWidget(
       _TestApp(
         child: Builder(
-          builder: (context) {
-            return TextButton(
+          builder: (context) => TextButton(
               onPressed: () {
                 MxNameDialog.show(
                   context: context,
@@ -182,8 +173,7 @@ void main() {
                 );
               },
               child: const Text('Open dialog'),
-            );
-          },
+            ),
         ),
       ),
     );
@@ -205,11 +195,9 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       home: Scaffold(
         body: Padding(padding: const EdgeInsets.all(24), child: child),
       ),
     );
-  }
 }

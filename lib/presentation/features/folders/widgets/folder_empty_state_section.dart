@@ -47,8 +47,7 @@ class FolderEmptyStateSection extends StatelessWidget {
     );
   }
 
-  _FolderEmptyContent _resolveContent(AppLocalizations l10n) {
-    return switch (mode) {
+  _FolderEmptyContent _resolveContent(AppLocalizations l10n) => switch (mode) {
       FolderEmptyStateMode.unlocked => _FolderEmptyContent(
         title: l10n.foldersEmptyTitle,
         message: l10n.foldersEmptyMessage,
@@ -70,10 +69,8 @@ class FolderEmptyStateSection extends StatelessWidget {
         icon: Icons.search_off_outlined,
       ),
     };
-  }
 
-  List<Widget> _buildActions(AppLocalizations l10n) {
-    return switch (mode) {
+  List<Widget> _buildActions(AppLocalizations l10n) => switch (mode) {
       FolderEmptyStateMode.unlocked => const <Widget>[],
       FolderEmptyStateMode.subfolders => [
         MxPrimaryButton(
@@ -97,7 +94,6 @@ class FolderEmptyStateSection extends StatelessWidget {
         ),
       ],
     };
-  }
 }
 
 class _FolderEmptyContent {

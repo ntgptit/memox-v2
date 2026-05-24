@@ -170,13 +170,11 @@ class _SortIconMenu extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MxIconButton(
+  Widget build(BuildContext context) => MxIconButton(
       icon: Icons.sort_rounded,
       tooltip: tooltip,
       onPressed: () => _openSheet(context),
     );
-  }
 }
 
 class _ReorderActionGroup extends StatelessWidget {
@@ -193,8 +191,7 @@ class _ReorderActionGroup extends StatelessWidget {
   final VoidCallback onSave;
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {
           return Column(
@@ -230,5 +227,4 @@ class _ReorderActionGroup extends StatelessWidget {
         );
       },
     );
-  }
 }

@@ -37,8 +37,7 @@ class MxReorderableList extends StatelessWidget {
   final ReorderItemProxyDecorator? proxyDecorator;
 
   @override
-  Widget build(BuildContext context) {
-    return ReorderableListView.builder(
+  Widget build(BuildContext context) => ReorderableListView.builder(
       itemCount: itemCount,
       itemBuilder: (context, index) {
         final child = itemBuilder(context, index);
@@ -57,7 +56,6 @@ class MxReorderableList extends StatelessWidget {
           (child, _, animation) =>
               _MxDefaultReorderProxy(animation: animation, child: child),
     );
-  }
 }
 
 class _MxDefaultReorderProxy extends StatelessWidget {
@@ -67,15 +65,14 @@ class _MxDefaultReorderProxy extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: animation,
       child: child,
       builder: (context, child) {
         final t = Curves.easeOutCubic.transform(animation.value);
 
         return Transform.scale(
-          scale: lerpDouble(1, 1.01, t)!,
+          scale: lerpDouble(1, 1.01, t),
           child: Material(
             color: Theme.of(
               context,
@@ -92,5 +89,4 @@ class _MxDefaultReorderProxy extends StatelessWidget {
         );
       },
     );
-  }
 }

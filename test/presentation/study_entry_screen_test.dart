@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:memox/app/router/route_names.dart';
 import 'package:memox/app/di/study/study_data_providers.dart';
+import 'package:memox/app/router/route_names.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
@@ -248,14 +248,10 @@ class _CapturingStudyRepo implements StudyRepo {
   List<StudyMode>? startedModes;
 
   @override
-  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
-    return [_card()];
-  }
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => [_card()];
 
   @override
-  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async {
-    return [_card(sourcePool: SessionItemSourcePool.due)];
-  }
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async => [_card(sourcePool: SessionItemSourcePool.due)];
 
   @override
   Future<StudySessionSnapshot> startSession({
@@ -279,14 +275,10 @@ class _CapturingStudyRepo implements StudyRepo {
   @override
   Future<StudySessionSnapshot?> findResumeCandidate(
     StudyContext context,
-  ) async {
-    return null;
-  }
+  ) async => null;
 
   @override
-  Future<List<StudySessionSnapshot>> listActiveSessions() async {
-    return const <StudySessionSnapshot>[];
-  }
+  Future<List<StudySessionSnapshot>> listActiveSessions() async => const <StudySessionSnapshot>[];
 
   @override
   Future<StudySessionSnapshot> loadSession(String sessionId) {
@@ -342,14 +334,10 @@ class _CapturingStudyRepo implements StudyRepo {
 
 final class _EmptyStudyRepo extends _CapturingStudyRepo {
   @override
-  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
-    return const <StudyFlashcardRef>[];
-  }
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => const <StudyFlashcardRef>[];
 
   @override
-  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async {
-    return const <StudyFlashcardRef>[];
-  }
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async => const <StudyFlashcardRef>[];
 }
 
 StudySessionSnapshot _snapshot({
@@ -358,8 +346,7 @@ StudySessionSnapshot _snapshot({
   required StudySettingsSnapshot settings,
   required StudyMode mode,
   required StudyFlashcardRef flashcard,
-}) {
-  return StudySessionSnapshot(
+}) => StudySessionSnapshot(
     session: StudySession(
       id: 'session-001',
       entryType: StudyEntryType.deck,
@@ -396,16 +383,13 @@ StudySessionSnapshot _snapshot({
     ),
     canFinalize: false,
   );
-}
 
 StudyFlashcardRef _card({
   SessionItemSourcePool sourcePool = SessionItemSourcePool.newCards,
-}) {
-  return StudyFlashcardRef(
+}) => StudyFlashcardRef(
     id: 'card-${sourcePool.storageValue}',
     deckId: 'deck-001',
     front: 'Front',
     back: 'Back',
     sourcePool: sourcePool,
   );
-}

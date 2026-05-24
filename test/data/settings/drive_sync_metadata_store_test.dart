@@ -76,11 +76,11 @@ void main() {
     () async {
       final preferences = await SharedPreferences.getInstance();
       final store = DriveSyncMetadataStore(preferences);
-      final idGenerator = _FakeIdGenerator('device-1');
+      const idGenerator = _FakeIdGenerator('device-1');
 
       final first = await store.loadOrCreateDeviceId(idGenerator);
       final second = await store.loadOrCreateDeviceId(
-        _FakeIdGenerator('device-2'),
+        const _FakeIdGenerator('device-2'),
       );
 
       expect(first, 'device-1');

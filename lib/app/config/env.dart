@@ -38,9 +38,7 @@ enum AppEnv {
     );
   }
 
-  static AppEnv defaultForBuildMode({required bool isReleaseMode}) {
-    return isReleaseMode ? AppEnv.production : AppEnv.local;
-  }
+  static AppEnv defaultForBuildMode({required bool isReleaseMode}) => isReleaseMode ? AppEnv.production : AppEnv.local;
 
   static AppEnv resolve({
     required bool hasEnvironment,

@@ -6,8 +6,7 @@ import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class InputThemeBuilder {
-  static InputDecorationTheme build(ColorScheme scheme) {
-    return InputDecorationTheme(
+  static InputDecorationTheme build(ColorScheme scheme) => InputDecorationTheme(
       filled: true,
       fillColor: scheme.surfaceContainerLow,
       isDense: false,
@@ -46,12 +45,9 @@ abstract final class InputThemeBuilder {
         scheme.outlineVariant.withValues(alpha: AppOpacity.half),
       ),
     );
-  }
 
-  static OutlineInputBorder _border(Color color, {double width = 1}) {
-    return OutlineInputBorder(
+  static OutlineInputBorder _border(Color color, {double width = 1}) => OutlineInputBorder(
       borderRadius: AppRadius.input,
       borderSide: BorderSide(color: color, width: width),
     );
-  }
 }

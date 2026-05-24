@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_feature_layout.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
 
 const double _folderHeaderActionSize = 40;
 const double _folderHeaderTitleHeight = 28;
@@ -26,8 +26,7 @@ class FolderDetailSkeleton extends StatelessWidget {
   const FolderDetailSkeleton({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
+  Widget build(BuildContext context) => ListView(
       key: const ValueKey('folder_detail_skeleton'),
       children: const [
         _FolderHeaderSkeleton(),
@@ -47,17 +46,15 @@ class FolderDetailSkeleton extends StatelessWidget {
         _FolderTileSkeleton(),
       ],
     );
-  }
 }
 
 class _FolderHeaderSkeleton extends StatelessWidget {
   const _FolderHeaderSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Row(
           children: [
             MxSkeleton(
@@ -87,17 +84,15 @@ class _FolderHeaderSkeleton extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _ToolbarSkeleton extends StatelessWidget {
   const _ToolbarSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         MxSkeleton(
           height: _folderToolbarHeight,
           borderRadius: MxFeatureRadii.full,
@@ -114,7 +109,6 @@ class _ToolbarSkeleton extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _SectionSkeleton extends StatelessWidget {
@@ -129,8 +123,7 @@ class _SectionSkeleton extends StatelessWidget {
   final double bodyHeight;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxSkeleton(height: _folderSectionTitleHeight, width: titleWidth),
@@ -142,15 +135,13 @@ class _SectionSkeleton extends StatelessWidget {
         ],
       ],
     );
-  }
 }
 
 class _FolderTileSkeleton extends StatelessWidget {
   const _FolderTileSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return const Padding(
+  Widget build(BuildContext context) => const Padding(
       padding: EdgeInsets.symmetric(
         horizontal: MxSpace.lg,
         vertical: MxSpace.md,
@@ -182,5 +173,4 @@ class _FolderTileSkeleton extends StatelessWidget {
         ],
       ),
     );
-  }
 }

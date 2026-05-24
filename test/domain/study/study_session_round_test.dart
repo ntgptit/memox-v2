@@ -118,8 +118,7 @@ StudySessionSnapshot _snapshot({
   StudyFlow studyFlow = StudyFlow.newFullCycle,
   List<StudySessionItem> currentRoundItems = const <StudySessionItem>[],
   StudySummary? summary,
-}) {
-  return StudySessionSnapshot(
+}) => StudySessionSnapshot(
     session: StudySession(
       id: 'session-1',
       entryType: StudyEntryType.deck,
@@ -154,14 +153,12 @@ StudySessionSnapshot _snapshot({
         ),
     canFinalize: false,
   );
-}
 
 StudySessionItem _item({
   required String id,
   required int queuePosition,
   SessionItemStatus status = SessionItemStatus.pending,
-}) {
-  return StudySessionItem(
+}) => StudySessionItem(
     id: id,
     sessionId: 'session-1',
     flashcard: StudyFlashcardRef(
@@ -179,4 +176,3 @@ StudySessionItem _item({
     status: status,
     completedAt: status == SessionItemStatus.completed ? 1 : null,
   );
-}

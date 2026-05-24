@@ -93,8 +93,7 @@ class _SectionHeading extends StatelessWidget {
   final MxSectionHeaderStyle style;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         switch (style) {
@@ -111,5 +110,4 @@ class _SectionHeading extends StatelessWidget {
         ],
       ],
     );
-  }
 }

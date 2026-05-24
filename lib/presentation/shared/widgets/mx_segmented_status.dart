@@ -41,8 +41,7 @@ class MxSegmentedStatus<T> extends StatelessWidget {
   final ValueChanged<T> onSelected;
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       children: [
         for (var index = 0; index < options.length; index++) ...[
           if (index > 0) const SizedBox(width: AppSpacing.xs),
@@ -56,7 +55,6 @@ class MxSegmentedStatus<T> extends StatelessWidget {
         ],
       ],
     );
-  }
 }
 
 class _Segment<T> extends StatelessWidget {
@@ -123,11 +121,9 @@ class _StatusDot extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       width: AppSpacing.sm,
       height: AppSpacing.sm,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
-  }
 }

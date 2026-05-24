@@ -13,12 +13,10 @@ class MxAnimatedSwitcher extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
+  Widget build(BuildContext context) => AnimatedSwitcher(
       duration: AppDurations.stateChange,
       switchInCurve: AppCurves.standardDecelerate,
       switchOutCurve: AppCurves.standardAccelerate,
       child: child,
     );
-  }
 }

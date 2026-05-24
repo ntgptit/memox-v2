@@ -12,14 +12,10 @@ import 'providers.dart';
 part 'tts_providers.g.dart';
 
 @riverpod
-TtsPlaybackPolicy ttsPlaybackPolicy(Ref ref) {
-  return const TtsPlaybackPolicy();
-}
+TtsPlaybackPolicy ttsPlaybackPolicy(Ref ref) => const TtsPlaybackPolicy();
 
 @riverpod
-Future<TtsSettingsStore> ttsSettingsStore(Ref ref) async {
-  return TtsSettingsStore(await ref.watch(sharedPreferencesProvider.future));
-}
+Future<TtsSettingsStore> ttsSettingsStore(Ref ref) async => TtsSettingsStore(await ref.watch(sharedPreferencesProvider.future));
 
 @Riverpod(keepAlive: true)
 TtsService ttsService(Ref ref) {
@@ -31,9 +27,7 @@ TtsService ttsService(Ref ref) {
 }
 
 @riverpod
-SpeakFlashcardUseCase speakFlashcardUseCase(Ref ref) {
-  return SpeakFlashcardUseCase(
+SpeakFlashcardUseCase speakFlashcardUseCase(Ref ref) => SpeakFlashcardUseCase(
     ref.watch(ttsServiceProvider),
     playbackPolicy: ref.watch(ttsPlaybackPolicyProvider),
   );
-}

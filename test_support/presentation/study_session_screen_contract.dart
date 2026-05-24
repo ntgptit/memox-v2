@@ -15,12 +15,12 @@ import 'package:memox/domain/study/ports/study_repo.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
-import 'package:memox/presentation/features/study/widgets/study_session/guess/guess_motion.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/fill/fill_motion.dart';
+import 'package:memox/presentation/features/study/widgets/study_session/guess/guess_motion.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/recall/recall_motion.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/study_speak_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/presentation/shared/widgets/mx_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -1781,8 +1781,7 @@ final _terminalSnapshot = StudySessionSnapshot(
   canFinalize: false,
 );
 
-StudySession _session(SessionStatus status) {
-  return StudySession(
+StudySession _session(SessionStatus status) => StudySession(
     id: 'session-001',
     entryType: StudyEntryType.deck,
     entryRefId: 'deck-001',
@@ -1799,10 +1798,8 @@ StudySession _session(SessionStatus status) {
     endedAt: status == SessionStatus.inProgress ? null : 1,
     restartedFromSessionId: null,
   );
-}
 
-StudySession _newStudySession(SessionStatus status) {
-  return StudySession(
+StudySession _newStudySession(SessionStatus status) => StudySession(
     id: 'session-001',
     entryType: StudyEntryType.deck,
     entryRefId: 'deck-001',
@@ -1819,7 +1816,6 @@ StudySession _newStudySession(SessionStatus status) {
     endedAt: status == SessionStatus.inProgress ? null : 1,
     restartedFromSessionId: null,
   );
-}
 
 StudySessionSnapshot _guessSnapshotFor(List<StudyFlashcardRef> cards) {
   final current = cards.first;
@@ -2034,15 +2030,13 @@ StudyFlashcardRef _card({
   required String id,
   required String front,
   required String back,
-}) {
-  return StudyFlashcardRef(
+}) => StudyFlashcardRef(
     id: id,
     deckId: 'deck-001',
     front: front,
     back: back,
     sourcePool: SessionItemSourcePool.due,
   );
-}
 
 Future<void> _pumpStudyScreenData(WidgetTester tester) async {
   await tester.pump();
@@ -2112,34 +2106,23 @@ void _pressFillAction(WidgetTester tester, String key) {
   tester.widget<FilledButton>(tonal).onPressed!();
 }
 
-Future<void> _tapGuessOption(WidgetTester tester, String cardId) {
-  return tester.tap(
+Future<void> _tapGuessOption(WidgetTester tester, String cardId) => tester.tap(
     find.byKey(ValueKey<String>('guess-option-$cardId')),
     warnIfMissed: false,
   );
-}
 
-Future<void> _tapMatchTile(WidgetTester tester, String key) {
-  return tester.tap(find.byKey(ValueKey<String>(key)), warnIfMissed: false);
-}
+Future<void> _tapMatchTile(WidgetTester tester, String key) => tester.tap(find.byKey(ValueKey<String>(key)), warnIfMissed: false);
 
-MxCard _cardForKey(WidgetTester tester, String key) {
-  return tester.widget<MxCard>(_cardFinderForKey(key));
-}
+MxCard _cardForKey(WidgetTester tester, String key) => tester.widget<MxCard>(_cardFinderForKey(key));
 
-double _cardHeightForKey(WidgetTester tester, String key) {
-  return tester.getSize(_cardFinderForKey(key)).height;
-}
+double _cardHeightForKey(WidgetTester tester, String key) => tester.getSize(_cardFinderForKey(key)).height;
 
-Finder _cardFinderForKey(String key) {
-  return find.descendant(
+Finder _cardFinderForKey(String key) => find.descendant(
     of: find.byKey(ValueKey<String>(key)),
     matching: find.byType(MxCard),
   );
-}
 
-double _matchTileOpacity(WidgetTester tester, String key) {
-  return tester
+double _matchTileOpacity(WidgetTester tester, String key) => tester
       .widget<AnimatedOpacity>(
         find.descendant(
           of: find.byKey(ValueKey<String>(key)),
@@ -2147,10 +2130,8 @@ double _matchTileOpacity(WidgetTester tester, String key) {
         ),
       )
       .opacity;
-}
 
-double _matchTileHeight(WidgetTester tester, String key) {
-  return tester
+double _matchTileHeight(WidgetTester tester, String key) => tester
       .getSize(
         find.descendant(
           of: find.byKey(ValueKey<String>(key)),
@@ -2158,7 +2139,6 @@ double _matchTileHeight(WidgetTester tester, String key) {
         ),
       )
       .height;
-}
 
 Future<void> _completeMatchPair(WidgetTester tester, int index) async {
   final itemId = _matchItemId(index);
@@ -2246,9 +2226,7 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) {
-    return Future.value(sessionSnapshot);
-  }
+  Future<StudySessionSnapshot> loadSession(String sessionId) => Future.value(sessionSnapshot);
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({
@@ -2302,8 +2280,7 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: ProviderScope(
@@ -2311,7 +2288,6 @@ class _TestApp extends StatelessWidget {
         child: child,
       ),
     );
-  }
 }
 
 final class _NoopStudyTtsService implements TtsService {
@@ -2319,9 +2295,7 @@ final class _NoopStudyTtsService implements TtsService {
   Stream<TtsState> get state => const Stream<TtsState>.empty();
 
   @override
-  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async {
-    return const <TtsVoice>[];
-  }
+  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async => const <TtsVoice>[];
 
   @override
   Future<void> speak(

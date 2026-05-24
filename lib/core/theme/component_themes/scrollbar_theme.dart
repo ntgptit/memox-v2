@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import '../tokens/app_opacity.dart';
 
 abstract final class ScrollbarThemeBuilder {
-  static ScrollbarThemeData build(ColorScheme scheme) {
-    return ScrollbarThemeData(
+  static ScrollbarThemeData build(ColorScheme scheme) => ScrollbarThemeData(
       thumbVisibility: const WidgetStatePropertyAll(false),
       trackVisibility: const WidgetStatePropertyAll(false),
       thickness: const WidgetStatePropertyAll(8),
@@ -25,5 +24,4 @@ abstract final class ScrollbarThemeBuilder {
       mainAxisMargin: 2,
       interactive: true,
     );
-  }
 }

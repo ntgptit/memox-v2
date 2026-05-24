@@ -24,8 +24,7 @@ class MxDueSummaryCard extends StatelessWidget {
   final Widget action;
 
   @override
-  Widget build(BuildContext context) {
-    return MxCard(
+  Widget build(BuildContext context) => MxCard(
       variant: MxCardVariant.outlined,
       padding: EdgeInsets.zero,
       child: Column(
@@ -80,5 +79,4 @@ class MxDueSummaryCard extends StatelessWidget {
         ],
       ),
     );
-  }
 }

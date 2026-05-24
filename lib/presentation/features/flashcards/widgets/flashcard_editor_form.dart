@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../domain/enums/flashcard_starting_status.dart';
 import '../../../../core/theme/extensions/theme_extensions.dart'
     show RepetitionColorRole;
+import '../../../../domain/enums/flashcard_starting_status.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_deck_pill.dart';

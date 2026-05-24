@@ -7,16 +7,12 @@ final class StudyAttemptDao {
 
   final AppDatabase _database;
 
-  Future<void> insertAttempt(StudyAttemptsCompanion companion) {
-    return _database.into(_database.studyAttempts).insert(companion);
-  }
+  Future<void> insertAttempt(StudyAttemptsCompanion companion) => _database.into(_database.studyAttempts).insert(companion);
 
-  Future<List<StudyAttempt>> listAttempts(String sessionId) {
-    return (_database.select(_database.studyAttempts)
+  Future<List<StudyAttempt>> listAttempts(String sessionId) => (_database.select(_database.studyAttempts)
           ..where((table) => table.sessionId.equals(sessionId))
           ..orderBy([(table) => OrderingTerm.asc(table.answeredAt)]))
         .get();
-  }
 
   Future<List<StudyAttempt>> listAttemptsForItems(List<String> itemIds) {
     if (itemIds.isEmpty) {
@@ -48,8 +44,7 @@ final class StudyAttemptDao {
     required int oldBox,
     required int newBox,
     required int nextDueAt,
-  }) {
-    return (_database.update(
+  }) => (_database.update(
       _database.studyAttempts,
     )..where((table) => table.id.equals(attemptId))).write(
       StudyAttemptsCompanion(
@@ -58,5 +53,4 @@ final class StudyAttemptDao {
         nextDueAt: Value(nextDueAt),
       ),
     );
-  }
 }

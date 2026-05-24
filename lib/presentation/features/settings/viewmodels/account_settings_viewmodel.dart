@@ -58,8 +58,7 @@ class AccountSettingsState {
     bool? isBusy,
     bool? requiresPlatformSignInButton,
     bool? requiresRuntimeReconnect,
-  }) {
-    return AccountSettingsState(
+  }) => AccountSettingsState(
       status: status ?? this.status,
       link: clearLink ? null : link ?? this.link,
       message: message ?? this.message,
@@ -69,7 +68,6 @@ class AccountSettingsState {
       requiresRuntimeReconnect:
           requiresRuntimeReconnect ?? this.requiresRuntimeReconnect,
     );
-  }
 }
 
 @riverpod

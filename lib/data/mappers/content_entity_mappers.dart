@@ -6,8 +6,7 @@ import '../datasources/local/app_database.dart';
 import 'database_enum_codecs.dart';
 
 extension FolderDataMapper on Folder {
-  FolderEntity toDomain() {
-    return FolderEntity(
+  FolderEntity toDomain() => FolderEntity(
       id: id,
       parentId: parentId,
       name: name,
@@ -16,12 +15,10 @@ extension FolderDataMapper on Folder {
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
-  }
 }
 
 extension DeckDataMapper on Deck {
-  DeckEntity toDomain() {
-    return DeckEntity(
+  DeckEntity toDomain() => DeckEntity(
       id: id,
       folderId: folderId,
       name: name,
@@ -29,15 +26,13 @@ extension DeckDataMapper on Deck {
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
-  }
 }
 
 extension FlashcardDataMapper on Flashcard {
   FlashcardEntity toDomain({
     bool hasLearningProgress = false,
     List<String> tags = const <String>[],
-  }) {
-    return FlashcardEntity(
+  }) => FlashcardEntity(
       id: id,
       deckId: deckId,
       front: front,
@@ -52,7 +47,6 @@ extension FlashcardDataMapper on Flashcard {
       updatedAt: updatedAt,
       hasLearningProgress: hasLearningProgress,
     );
-  }
 }
 
 final class FolderDeckAggregateData {
@@ -70,15 +64,13 @@ final class FolderDeckAggregateData {
   final int masteryPercent;
   final int? lastStudiedAt;
 
-  FolderDeckReadModel toReadModel() {
-    return FolderDeckReadModel(
+  FolderDeckReadModel toReadModel() => FolderDeckReadModel(
       deck: deck.toDomain(),
       cardCount: cardCount,
       dueTodayCount: dueTodayCount,
       masteryPercent: masteryPercent,
       lastStudiedAt: lastStudiedAt,
     );
-  }
 }
 
 final class FlashcardListAggregateData {
@@ -90,10 +82,8 @@ final class FlashcardListAggregateData {
   final Flashcard flashcard;
   final int? lastStudiedAt;
 
-  FlashcardListItemReadModel toReadModel() {
-    return FlashcardListItemReadModel(
+  FlashcardListItemReadModel toReadModel() => FlashcardListItemReadModel(
       flashcard: flashcard.toDomain(),
       lastStudiedAt: lastStudiedAt,
     );
-  }
 }

@@ -384,26 +384,20 @@ final class FlashcardRobot extends MemoxRobot {
     await tester.pumpAndSettle();
   }
 
-  Finder _rowText(String text) {
-    return find.descendant(
+  Finder _rowText(String text) => find.descendant(
       of: find.byType(FlashcardDetailCardRow),
       matching: find.text(text),
     );
-  }
 
-  Finder _termRow(String term) {
-    return find.ancestor(of: find.text(term), matching: find.byType(MxTermRow));
-  }
+  Finder _termRow(String term) => find.ancestor(of: find.text(term), matching: find.byType(MxTermRow));
 
-  Finder _verticalScrollable() {
-    return find
+  Finder _verticalScrollable() => find
         .byWidgetPredicate(
           (widget) =>
               widget is Scrollable &&
               widget.axisDirection == AxisDirection.down,
         )
         .first;
-  }
 
   Offset _dragHandleCenterFor(Rect rowRect) {
     final handles = find.byIcon(Icons.drag_handle);

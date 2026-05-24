@@ -26,9 +26,7 @@ final class StudyModeSubmissionPlan {
   final Set<AttemptGrade> acceptedGrades;
   final bool retryIncorrect;
 
-  bool shouldRetry(AttemptGrade grade) {
-    return retryIncorrect && grade.isFailing;
-  }
+  bool shouldRetry(AttemptGrade grade) => retryIncorrect && grade.isFailing;
 }
 
 abstract interface class StudyModeStrategy {
@@ -74,8 +72,7 @@ abstract class AbstractStudyModeStrategy implements StudyModeStrategy {
   bool shouldRetry(AttemptGrade grade) => grade.isFailing;
 
   @override
-  AttemptGrade normalizeUiResult(StudyModeUiResult result) {
-    return switch (result) {
+  AttemptGrade normalizeUiResult(StudyModeUiResult result) => switch (result) {
       StudyModeUiResult.correct ||
       StudyModeUiResult.remembered ||
       StudyModeUiResult.viewed => AttemptGrade.correct,
@@ -84,7 +81,6 @@ abstract class AbstractStudyModeStrategy implements StudyModeStrategy {
       StudyModeUiResult.timeout ||
       StudyModeUiResult.help => AttemptGrade.incorrect,
     };
-  }
 
   @override
   StudyModeSubmissionPlan buildSubmission({
@@ -113,9 +109,7 @@ abstract class AbstractStudyModeStrategy implements StudyModeStrategy {
     );
   }
 
-  String _acceptedGradeLabel() {
-    return acceptedGrades.map((grade) => grade.storageValue).join(' or ');
-  }
+  String _acceptedGradeLabel() => acceptedGrades.map((grade) => grade.storageValue).join(' or ');
 }
 
 final class ReviewModeStrategy extends AbstractStudyModeStrategy {
@@ -131,9 +125,7 @@ final class ReviewModeStrategy extends AbstractStudyModeStrategy {
   Duration get modeCompletionDelay => const Duration(seconds: 2);
 
   @override
-  AttemptGrade normalizeUiResult(StudyModeUiResult result) {
-    return AttemptGrade.correct;
-  }
+  AttemptGrade normalizeUiResult(StudyModeUiResult result) => AttemptGrade.correct;
 
   @override
   bool shouldRetry(AttemptGrade grade) => false;

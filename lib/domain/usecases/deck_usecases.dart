@@ -11,9 +11,7 @@ final class CreateDeckUseCase {
   Future<Result<DeckEntity>> execute({
     required String folderId,
     required String name,
-  }) {
-    return _repository.createDeck(folderId: folderId, name: name);
-  }
+  }) => _repository.createDeck(folderId: folderId, name: name);
 }
 
 final class UpdateDeckUseCase {
@@ -24,9 +22,7 @@ final class UpdateDeckUseCase {
   Future<Result<DeckEntity>> execute({
     required String deckId,
     required String name,
-  }) {
-    return _repository.updateDeck(deckId: deckId, name: name);
-  }
+  }) => _repository.updateDeck(deckId: deckId, name: name);
 }
 
 final class GetDeckMoveTargetsUseCase {
@@ -37,12 +33,10 @@ final class GetDeckMoveTargetsUseCase {
   Future<List<DeckMoveTarget>> execute({
     required String deckId,
     String? excludingFolderId,
-  }) {
-    return _repository.getDeckMoveTargets(
+  }) => _repository.getDeckMoveTargets(
       deckId: deckId,
       excludingFolderId: excludingFolderId,
     );
-  }
 }
 
 final class ListDeckDestinationsUseCase {
@@ -50,9 +44,7 @@ final class ListDeckDestinationsUseCase {
 
   final DeckRepository _repository;
 
-  Future<List<DeckMoveTarget>> execute() {
-    return _repository.getDeckDestinations();
-  }
+  Future<List<DeckMoveTarget>> execute() => _repository.getDeckDestinations();
 }
 
 final class DeleteDeckUseCase {
@@ -60,9 +52,7 @@ final class DeleteDeckUseCase {
 
   final DeckRepository _repository;
 
-  Future<Result<void>> execute(String deckId) {
-    return _repository.deleteDeck(deckId);
-  }
+  Future<Result<void>> execute(String deckId) => _repository.deleteDeck(deckId);
 }
 
 final class MoveDeckUseCase {
@@ -73,9 +63,7 @@ final class MoveDeckUseCase {
   Future<Result<void>> execute({
     required String deckId,
     required String targetFolderId,
-  }) {
-    return _repository.moveDeck(deckId: deckId, targetFolderId: targetFolderId);
-  }
+  }) => _repository.moveDeck(deckId: deckId, targetFolderId: targetFolderId);
 }
 
 final class ReorderDecksUseCase {
@@ -86,12 +74,10 @@ final class ReorderDecksUseCase {
   Future<Result<void>> execute({
     required String folderId,
     required List<String> orderedDeckIds,
-  }) {
-    return _repository.reorderDecks(
+  }) => _repository.reorderDecks(
       folderId: folderId,
       orderedDeckIds: orderedDeckIds,
     );
-  }
 }
 
 final class DuplicateDeckUseCase {
@@ -102,12 +88,10 @@ final class DuplicateDeckUseCase {
   Future<Result<DeckEntity>> execute({
     required String deckId,
     required String targetFolderId,
-  }) {
-    return _repository.duplicateDeck(
+  }) => _repository.duplicateDeck(
       deckId: deckId,
       targetFolderId: targetFolderId,
     );
-  }
 }
 
 final class ExportDeckUseCase {
@@ -115,7 +99,5 @@ final class ExportDeckUseCase {
 
   final DeckRepository _repository;
 
-  Future<Result<ExportData>> execute(String deckId) {
-    return _repository.exportDeck(deckId);
-  }
+  Future<Result<ExportData>> execute(String deckId) => _repository.exportDeck(deckId);
 }

@@ -24,8 +24,7 @@ class ReviewModeCard extends StatelessWidget {
   final Widget? secondaryAction;
 
   @override
-  Widget build(BuildContext context) {
-    return MxCard(
+  Widget build(BuildContext context) => MxCard(
       variant: MxCardVariant.outlined,
       child: Stack(
         children: [
@@ -60,5 +59,4 @@ class ReviewModeCard extends StatelessWidget {
         ],
       ),
     );
-  }
 }

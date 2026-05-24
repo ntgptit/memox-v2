@@ -25,8 +25,7 @@ class MatchBoard extends StatelessWidget {
   final void Function(MatchTileSide side, StudySessionItem item) onTileTap;
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
@@ -50,7 +49,6 @@ class MatchBoard extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _MatchBoardColumn extends StatelessWidget {

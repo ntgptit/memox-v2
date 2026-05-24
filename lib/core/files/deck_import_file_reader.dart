@@ -6,10 +6,6 @@ import 'deck_import_file_reader_memory.dart'
     if (dart.library.io) 'deck_import_file_reader_io.dart'
     as platform;
 
-Future<String?> readDeckImportFileContent(PlatformFile file) async {
-  return platform.readDeckImportFileContent(file);
-}
+Future<String?> readDeckImportFileContent(PlatformFile file) async => platform.readDeckImportFileContent(file);
 
-Future<Uint8List?> readDeckImportFileBytes(PlatformFile file) async {
-  return platform.readDeckImportFileBytes(file);
-}
+Future<Uint8List?> readDeckImportFileBytes(PlatformFile file) async => platform.readDeckImportFileBytes(file);

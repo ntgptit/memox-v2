@@ -20,8 +20,7 @@ class MxBulkActionBar extends StatelessWidget {
   final List<Widget> actions;
 
   @override
-  Widget build(BuildContext context) {
-    return MxCard(
+  Widget build(BuildContext context) => MxCard(
       variant: MxCardVariant.elevated,
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -71,7 +70,6 @@ class MxBulkActionBar extends StatelessWidget {
         },
       ),
     );
-  }
 }
 
 class _InfoBlock extends StatelessWidget {

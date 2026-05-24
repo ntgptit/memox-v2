@@ -24,13 +24,11 @@ final class AppSettingsSnapshotStore {
 
   final SharedPreferences _preferences;
 
-  Map<String, Object?> load() {
-    return <String, Object?>{
+  Map<String, Object?> load() => <String, Object?>{
       for (final entry in _includedKeys.entries)
         if (_preferences.containsKey(entry.key))
           entry.key: _preferences.get(entry.key),
     };
-  }
 
   Future<void> restore(Map<String, Object?> settings) async {
     for (final key in _includedKeys.keys) {

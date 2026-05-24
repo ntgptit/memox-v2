@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:memox/l10n/generated/app_localizations.dart';
-
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
+
 import '../prompt_card.dart';
 import '../study_answer_models.dart';
 

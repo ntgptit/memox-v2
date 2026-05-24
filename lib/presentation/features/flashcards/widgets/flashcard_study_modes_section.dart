@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../core/theme/extensions/theme_extensions.dart';
+import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
@@ -130,8 +130,7 @@ class _StudyModeListCard extends StatelessWidget {
   final ValueChanged<StudyMode?> onStartStudy;
 
   @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
       builder: (context, constraints) {
         final twoColumn =
             constraints.hasBoundedWidth && context.gridColumns(base: 2) > 1;
@@ -159,7 +158,6 @@ class _StudyModeListCard extends StatelessWidget {
         );
       },
     );
-  }
 }
 
 class _StudyModeTile extends StatelessWidget {

@@ -109,8 +109,7 @@ class _MxStudyModeBadge extends StatelessWidget {
   final Color background;
 
   @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
+  Widget build(BuildContext context) => DecoratedBox(
       decoration: BoxDecoration(
         color: background,
         borderRadius: _studyTopBarBadgeRadius,
@@ -130,5 +129,4 @@ class _MxStudyModeBadge extends StatelessWidget {
         ),
       ),
     );
-  }
 }

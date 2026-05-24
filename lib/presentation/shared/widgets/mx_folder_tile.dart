@@ -8,8 +8,8 @@ import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
 import 'mx_progress_indicator.dart';
-import 'mx_text.dart';
 import 'mx_tappable.dart';
+import 'mx_text.dart';
 
 /// How [MxFolderTile] renders its trailing slot.
 enum MxFolderTileTrailing { chevron, none }

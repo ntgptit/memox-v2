@@ -13,8 +13,7 @@ import '../tokens/app_typography.dart';
 /// `scrolledUnderElevation` mechanism) only when content sits under the bar —
 /// we opt out of that here too so the page stays flat end-to-end.
 abstract final class AppBarThemeBuilder {
-  static AppBarTheme build(ColorScheme scheme) {
-    return AppBarTheme(
+  static AppBarTheme build(ColorScheme scheme) => AppBarTheme(
       backgroundColor: scheme.surface,
       foregroundColor: scheme.onSurface,
       surfaceTintColor: scheme.surfaceTint.withValues(
@@ -35,5 +34,4 @@ abstract final class AppBarThemeBuilder {
       ),
       systemOverlayStyle: null,
     );
-  }
 }

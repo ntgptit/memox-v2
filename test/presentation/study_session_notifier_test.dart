@@ -529,14 +529,12 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) async {
-    return _snapshot(
+  Future<StudySessionSnapshot> loadSession(String sessionId) async => _snapshot(
       mode: StudyMode.fill,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
       cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
       shuffleAnswers: false,
     );
-  }
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({
@@ -597,9 +595,7 @@ final class _ResumeCandidateStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) async {
-    return _activeSnapshot();
-  }
+  Future<StudySessionSnapshot> loadSession(String sessionId) async => _activeSnapshot();
 
   @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
@@ -680,15 +676,13 @@ final class _ResumeCandidateStudyRepo implements StudyRepo {
     throw UnimplementedError();
   }
 
-  StudySessionSnapshot _activeSnapshot() {
-    return _snapshot(
+  StudySessionSnapshot _activeSnapshot() => _snapshot(
       mode: StudyMode.fill,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
       cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
       shuffleAnswers: false,
       status: SessionStatus.inProgress,
     );
-  }
 }
 
 final class _ReviewBatchStudyRepo implements StudyRepo {
@@ -698,15 +692,13 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
   List<StudyMode>? lastModes;
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) async {
-    return _snapshot(
+  Future<StudySessionSnapshot> loadSession(String sessionId) async => _snapshot(
       mode: StudyMode.review,
       currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
       cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
       shuffleAnswers: false,
       studyType: StudyType.newStudy,
     );
-  }
 
   @override
   Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
@@ -944,8 +936,7 @@ class _StudyModeHost extends StatelessWidget {
   final ValueChanged<StudyAnswerFeedback>? onMarkCorrect;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
@@ -960,7 +951,6 @@ class _StudyModeHost extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 class _InteractiveStudyModeHost extends StatefulWidget {
@@ -1003,9 +993,7 @@ class _InteractiveStudyModeHostState extends State<_InteractiveStudyModeHost> {
   }
 }
 
-EditableText _editableText(WidgetTester tester) {
-  return tester.widget<EditableText>(find.byType(EditableText));
-}
+EditableText _editableText(WidgetTester tester) => tester.widget<EditableText>(find.byType(EditableText));
 
 StudySessionSnapshot _snapshot({
   required StudyMode mode,
@@ -1016,8 +1004,7 @@ StudySessionSnapshot _snapshot({
   String itemId = 'item-1',
   StudyType studyType = StudyType.srsReview,
   SessionStatus status = SessionStatus.inProgress,
-}) {
-  return StudySessionSnapshot(
+}) => StudySessionSnapshot(
     session: StudySession(
       id: 'session-1',
       entryType: StudyEntryType.deck,
@@ -1062,15 +1049,13 @@ StudySessionSnapshot _snapshot({
     ),
     canFinalize: false,
   );
-}
 
 StudySessionItem _sessionItem({
   required String id,
   required StudyMode mode,
   required StudyFlashcardRef card,
   required int queuePosition,
-}) {
-  return StudySessionItem(
+}) => StudySessionItem(
     id: id,
     sessionId: 'session-1',
     flashcard: card,
@@ -1082,18 +1067,15 @@ StudySessionItem _sessionItem({
     status: SessionItemStatus.pending,
     completedAt: null,
   );
-}
 
 StudyFlashcardRef _card({
   required String id,
   required String front,
   required String back,
-}) {
-  return StudyFlashcardRef(
+}) => StudyFlashcardRef(
     id: id,
     deckId: 'deck-1',
     front: front,
     back: back,
     sourcePool: SessionItemSourcePool.due,
   );
-}

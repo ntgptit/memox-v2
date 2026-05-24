@@ -57,8 +57,7 @@ final class DriveSyncSettingsState {
     bool? isBusy,
     String? technicalMessage,
     bool clearTechnicalMessage = false,
-  }) {
-    return DriveSyncSettingsState(
+  }) => DriveSyncSettingsState(
       status: status ?? this.status,
       pendingConflict: clearPendingConflict
           ? null
@@ -69,7 +68,6 @@ final class DriveSyncSettingsState {
           ? null
           : technicalMessage ?? this.technicalMessage,
     );
-  }
 }
 
 @riverpod
@@ -220,8 +218,7 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
     state = AsyncData(_stateFromResult(result));
   }
 
-  DriveSyncSettingsState _stateFromResult(DriveSyncRunResult result) {
-    return DriveSyncSettingsState(
+  DriveSyncSettingsState _stateFromResult(DriveSyncRunResult result) => DriveSyncSettingsState(
       status: result.status,
       pendingConflict: result.conflict,
       message: switch (result.kind) {
@@ -236,14 +233,11 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
       },
       technicalMessage: result.message ?? result.status.message,
     );
-  }
 
-  DriveSyncSettingsState _stateFromStatus(DriveSyncStatus status) {
-    return DriveSyncSettingsState(
+  DriveSyncSettingsState _stateFromStatus(DriveSyncStatus status) => DriveSyncSettingsState(
       status: status,
       technicalMessage: status.message,
     );
-  }
 
   DriveSyncSettingsState _stateFromUnexpectedError(
     Object error, {

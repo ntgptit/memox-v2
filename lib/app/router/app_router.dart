@@ -35,12 +35,10 @@ GoRouter appRouter(Ref ref) {
     routes: [
       GoRoute(path: '/', redirect: guards.rootRedirect),
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) {
-          return AppShell(
+        builder: (context, state, navigationShell) => AppShell(
             navigationShell: navigationShell,
             hideNavigation: _shouldHideShellNavigation(state),
-          );
-        },
+          ),
         branches: [
           StatefulShellBranch(routes: dashboardBranchRoutes()),
           StatefulShellBranch(
@@ -104,8 +102,7 @@ class _RouterErrorView extends StatelessWidget {
     );
   }
 
-  String _localizedMessage(AppLocalizations l10n) {
-    return switch (failure.code) {
+  String _localizedMessage(AppLocalizations l10n) => switch (failure.code) {
       FailureCodes.invalidAppEnvironment => l10n.errorConfiguration,
       FailureCodes.requestTimedOut => l10n.errorRequestTimedOut,
       FailureCodes.invalidData => l10n.errorInvalidData,
@@ -120,5 +117,4 @@ class _RouterErrorView extends StatelessWidget {
         FailureType.unknown => l10n.errorUnexpected,
       },
     };
-  }
 }

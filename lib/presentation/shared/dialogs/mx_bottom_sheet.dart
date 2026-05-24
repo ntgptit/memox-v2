@@ -30,8 +30,7 @@ class MxBottomSheet extends StatelessWidget {
     bool enableDrag = true,
     bool useRootNavigator = false,
     bool isScrollControlled = true,
-  }) {
-    return showModalBottomSheet<T>(
+  }) => showModalBottomSheet<T>(
       context: context,
       isDismissible: isDismissible,
       enableDrag: enableDrag,
@@ -41,7 +40,6 @@ class MxBottomSheet extends StatelessWidget {
       builder: (_) =>
           MxBottomSheet(title: title, trailing: trailing, child: child),
     );
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@ import 'package:memox/app/router/route_names.dart';
 
 void main() {
   group('AppRouteGuards.redirectLocationFor', () {
-    final guards = AppRouteGuards(
+    const guards = AppRouteGuards(
       initialLocation: RouteDefaults.initialLocation,
     );
 

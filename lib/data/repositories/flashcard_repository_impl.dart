@@ -122,22 +122,19 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
   Future<Result<FlashcardEntity>> createFlashcard({
     required String deckId,
     required FlashcardDraft draft,
-  }) {
-    return runRepositoryAction(() async {
+  }) => runRepositoryAction(() async {
       await _requireDeck(deckId);
       final now = _clock.nowEpochMillis();
       final sortOrder = await _flashcardDao.nextSortOrder(deckId);
       final id = _idGenerator.nextId();
-      await _transactionRunner.write((_) {
-        return _flashcardDao.insertFlashcard(
+      await _transactionRunner.write((_) => _flashcardDao.insertFlashcard(
           id: id,
           deckId: deckId,
           draft: _normalizeDraft(draft),
           sortOrder: sortOrder,
           createdAt: now,
           updatedAt: now,
-        );
-      });
+        ));
       final normalized = _normalizeDraft(draft);
       return FlashcardEntity(
         id: id,
@@ -155,7 +152,6 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
         updatedAt: now,
       );
     });
-  }
 
   @override
   Future<Result<FlashcardEntity>> updateFlashcard({
@@ -163,8 +159,7 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     required FlashcardDraft draft,
     FlashcardProgressEditPolicy progressPolicy =
         FlashcardProgressEditPolicy.keepProgress,
-  }) {
-    return runRepositoryAction(() async {
+  }) => runRepositoryAction(() async {
       final flashcard = await _requireFlashcard(flashcardId);
       final normalized = _normalizeDraft(draft);
       final now = _clock.nowEpochMillis();
@@ -201,55 +196,44 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
         hasLearningProgress: _hasLearningProgress(progress),
       );
     });
-  }
 
   @override
-  Future<Result<void>> deleteFlashcards(List<String> flashcardIds) {
-    return runRepositoryAction(() async {
+  Future<Result<void>> deleteFlashcards(List<String> flashcardIds) => runRepositoryAction(() async {
       if (flashcardIds.isEmpty) {
         return;
       }
-      await _transactionRunner.write((_) {
-        return _flashcardDao.deleteFlashcards(flashcardIds);
-      });
+      await _transactionRunner.write((_) => _flashcardDao.deleteFlashcards(flashcardIds));
     });
-  }
 
   @override
   Future<Result<void>> moveFlashcards({
     required List<String> flashcardIds,
     required String targetDeckId,
-  }) {
-    return runRepositoryAction(() async {
+  }) => runRepositoryAction(() async {
       if (flashcardIds.isEmpty) {
         return;
       }
       await _requireDeck(targetDeckId);
       final nextSortOrder = await _flashcardDao.nextSortOrder(targetDeckId);
-      await _transactionRunner.write((_) {
-        return _flashcardDao.moveFlashcards(
+      await _transactionRunner.write((_) => _flashcardDao.moveFlashcards(
           flashcardIds: flashcardIds,
           targetDeckId: targetDeckId,
           startingSortOrder: nextSortOrder,
           updatedAt: _clock.nowEpochMillis(),
-        );
-      });
+        ));
     });
-  }
 
   @override
   Future<Result<void>> reorderFlashcards({
     required String deckId,
     required List<String> orderedFlashcardIds,
-  }) {
-    return runRepositoryAction(() async {
+  }) => runRepositoryAction(() async {
       await _flashcardDao.reorderFlashcards(
         deckId: deckId,
         orderedFlashcardIds: orderedFlashcardIds,
         updatedAt: _clock.nowEpochMillis(),
       );
     });
-  }
 
   @override
   Future<Result<FlashcardImportPreparation>> prepareImport({
@@ -262,8 +246,7 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
         FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
-  }) {
-    return runRepositoryAction(() async {
+  }) => runRepositoryAction(() async {
       await _requireDeck(deckId);
       final preparation = FlashcardImportSupport.parse(
         format: format,
@@ -278,14 +261,12 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
         duplicatePolicy: duplicatePolicy,
       );
     });
-  }
 
   @override
   Future<Result<int>> commitImport({
     required String deckId,
     required FlashcardImportPreparation preparation,
-  }) {
-    return runRepositoryAction(() async {
+  }) => runRepositoryAction(() async {
       final importablePreparation = await _applyImportDuplicatePolicy(
         deckId: deckId,
         preparation: preparation,
@@ -314,11 +295,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       });
       return importablePreparation.previewItems.length;
     });
-  }
 
   @override
-  Future<Result<ExportData>> exportFlashcards(List<String> flashcardIds) {
-    return runRepositoryAction(() async {
+  Future<Result<ExportData>> exportFlashcards(List<String> flashcardIds) => runRepositoryAction(() async {
       final flashcards = await _flashcardDao.listFlashcardsByIds(flashcardIds);
       final lines = <String>[
         'front,back,note',
@@ -335,7 +314,6 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
         content: lines.join('\n'),
       );
     });
-  }
 
   Future<Deck> _requireDeck(String deckId) async {
     final deck = await _deckDao.findById(deckId);
@@ -369,12 +347,10 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     required String deckId,
     required FlashcardImportPreparation preparation,
     required FlashcardImportDuplicatePolicy duplicatePolicy,
-  }) async {
-    return switch (duplicatePolicy) {
+  }) async => switch (duplicatePolicy) {
       FlashcardImportDuplicatePolicy.skipExactDuplicates =>
         _skipExactImportDuplicates(deckId, preparation),
     };
-  }
 
   Future<FlashcardImportPreparation> _skipExactImportDuplicates(
     String deckId,
@@ -425,10 +401,8 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     );
   }
 
-  String _duplicateKey({required String front, required String back}) {
-    return '${StringUtils.normalizedForComparison(front)}\u0001'
+  String _duplicateKey({required String front, required String back}) => '${StringUtils.normalizedForComparison(front)}\u0001'
         '${StringUtils.normalizedForComparison(back)}';
-  }
 
   FlashcardDraft _normalizeDraft(FlashcardDraft draft) {
     final front = StringUtils.trimmed(draft.front);

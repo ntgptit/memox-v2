@@ -70,8 +70,7 @@ final class DriveSyncManifest {
     int? snapshotSizeBytes,
     String? snapshotFileId,
     String? snapshotFileVersion,
-  }) {
-    return DriveSyncManifest(
+  }) => DriveSyncManifest(
       manifestVersion: manifestVersion,
       snapshotFormatVersion: snapshotFormatVersion,
       appId: appId,
@@ -85,7 +84,6 @@ final class DriveSyncManifest {
       snapshotFileId: snapshotFileId ?? this.snapshotFileId,
       snapshotFileVersion: snapshotFileVersion ?? this.snapshotFileVersion,
     );
-  }
 }
 
 final class DriveSyncSnapshot {

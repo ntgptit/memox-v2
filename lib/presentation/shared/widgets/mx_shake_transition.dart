@@ -18,8 +18,7 @@ class MxShakeTransition extends StatelessWidget {
   final int cycles;
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
+  Widget build(BuildContext context) => AnimatedBuilder(
       animation: animation,
       child: child,
       builder: (context, child) {
@@ -30,5 +29,4 @@ class MxShakeTransition extends StatelessWidget {
         return Transform.translate(offset: Offset(dx, 0), child: child);
       },
     );
-  }
 }

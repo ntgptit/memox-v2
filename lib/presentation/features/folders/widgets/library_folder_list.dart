@@ -22,8 +22,7 @@ class LibraryFolderSliver extends StatelessWidget {
   final ValueChanged<LibraryFolder>? onOpenActions;
 
   @override
-  Widget build(BuildContext context) {
-    return SliverList.separated(
+  Widget build(BuildContext context) => SliverList.separated(
       itemCount: folders.length,
       itemBuilder: (context, index) => _LibraryFolderRow(
         folder: folders[index],
@@ -32,7 +31,6 @@ class LibraryFolderSliver extends StatelessWidget {
       ),
       separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
     );
-  }
 }
 
 class _LibraryFolderRow extends StatelessWidget {

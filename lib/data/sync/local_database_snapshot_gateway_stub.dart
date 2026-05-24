@@ -3,9 +3,7 @@ import 'local_database_snapshot_gateway_contract.dart';
 
 LocalDatabaseSnapshotGateway createPlatformLocalDatabaseSnapshotGateway(
   AppDatabase database,
-) {
-  return _UnsupportedLocalDatabaseSnapshotGateway(database);
-}
+) => _UnsupportedLocalDatabaseSnapshotGateway(database);
 
 final class _UnsupportedLocalDatabaseSnapshotGateway
     implements LocalDatabaseSnapshotGateway {

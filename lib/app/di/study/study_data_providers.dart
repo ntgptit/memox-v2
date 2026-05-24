@@ -15,28 +15,19 @@ import '../providers.dart';
 part 'study_data_providers.g.dart';
 
 @riverpod
-StudySessionDao studySessionDao(Ref ref) {
-  return StudySessionDao(ref.watch(appDatabaseProvider));
-}
+StudySessionDao studySessionDao(Ref ref) => StudySessionDao(ref.watch(appDatabaseProvider));
 
 @riverpod
-StudySessionItemDao studySessionItemDao(Ref ref) {
-  return StudySessionItemDao(ref.watch(appDatabaseProvider));
-}
+StudySessionItemDao studySessionItemDao(Ref ref) => StudySessionItemDao(ref.watch(appDatabaseProvider));
 
 @riverpod
-StudyAttemptDao studyAttemptDao(Ref ref) {
-  return StudyAttemptDao(ref.watch(appDatabaseProvider));
-}
+StudyAttemptDao studyAttemptDao(Ref ref) => StudyAttemptDao(ref.watch(appDatabaseProvider));
 
 @riverpod
-Random studyShuffleRandom(Ref ref) {
-  return Random();
-}
+Random studyShuffleRandom(Ref ref) => Random();
 
 @riverpod
-StudyRepo studyRepo(Ref ref) {
-  return StudyRepoImpl(
+StudyRepo studyRepo(Ref ref) => StudyRepoImpl(
     database: ref.watch(appDatabaseProvider),
     studySessionDao: ref.watch(studySessionDaoProvider),
     studySessionItemDao: ref.watch(studySessionItemDaoProvider),
@@ -48,4 +39,3 @@ StudyRepo studyRepo(Ref ref) {
     shuffleRandom: ref.watch(studyShuffleRandomProvider),
     logger: TalkerAppLogger(ref.watch(talkerProvider)),
   );
-}

@@ -15,14 +15,10 @@ import '../logging/app_talker.dart';
 part 'providers.g.dart';
 
 @Riverpod(keepAlive: true)
-Future<SharedPreferences> sharedPreferences(Ref ref) {
-  return SharedPreferences.getInstance();
-}
+Future<SharedPreferences> sharedPreferences(Ref ref) => SharedPreferences.getInstance();
 
 @Riverpod(keepAlive: true)
-AppEnv appEnv(Ref ref) {
-  return AppEnv.fromEnvironment();
-}
+AppEnv appEnv(Ref ref) => AppEnv.fromEnvironment();
 
 @Riverpod(keepAlive: true)
 AppConfig appConfig(Ref ref) {
@@ -46,9 +42,7 @@ ConnectivityService connectivityService(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-NetworkInfo networkInfo(Ref ref) {
-  return ref.watch(connectivityServiceProvider);
-}
+NetworkInfo networkInfo(Ref ref) => ref.watch(connectivityServiceProvider);
 
 @Riverpod(keepAlive: true)
 AppDatabase appDatabase(Ref ref) {

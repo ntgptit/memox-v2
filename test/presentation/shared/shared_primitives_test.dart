@@ -5,20 +5,20 @@ import 'package:memox/core/theme/extensions/theme_extensions.dart';
 import 'package:memox/core/theme/tokens/app_radius.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/dialogs/mx_action_sheet_list.dart';
-import 'package:memox/presentation/shared/dialogs/mx_destination_picker_sheet.dart';
 import 'package:memox/presentation/shared/dialogs/mx_bottom_sheet.dart';
-import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
+import 'package:memox/presentation/shared/dialogs/mx_destination_picker_sheet.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_due_summary_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_flashcard.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_tile.dart';
+import 'package:memox/presentation/shared/widgets/mx_inline_toggle.dart';
 import 'package:memox/presentation/shared/widgets/mx_pickup_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_reorderable_list.dart';
 import 'package:memox/presentation/shared/widgets/mx_search_sort_toolbar.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_flashcard.dart';
-import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_inline_toggle.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:memox/presentation/shared/widgets/mx_speak_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_stat_card.dart';
@@ -144,8 +144,7 @@ void main() {
     await tester.pumpWidget(
       _TestApp(
         child: Builder(
-          builder: (context) {
-            return ElevatedButton(
+          builder: (context) => ElevatedButton(
               onPressed: () async {
                 selectedAction = await MxBottomSheet.show<String>(
                   context: context,
@@ -167,8 +166,7 @@ void main() {
                 );
               },
               child: const Text('Open'),
-            );
-          },
+            ),
         ),
       ),
     );
@@ -190,8 +188,7 @@ void main() {
       await tester.pumpWidget(
         _TestApp(
           child: Builder(
-            builder: (context) {
-              return ElevatedButton(
+            builder: (context) => ElevatedButton(
                 onPressed: () async {
                   selectedDestination =
                       await MxDestinationPickerSheet.show<String>(
@@ -214,8 +211,7 @@ void main() {
                       );
                 },
                 child: const Text('Pick destination'),
-              );
-            },
+              ),
           ),
         ),
       );
@@ -521,8 +517,7 @@ void main() {
       await tester.pumpWidget(
         _TestApp(
           child: StatefulBuilder(
-            builder: (context, setState) {
-              return SizedBox(
+            builder: (context, setState) => SizedBox(
                 width: 180,
                 child: MxSegmentedControl<int>(
                   adaptive: true,
@@ -534,8 +529,7 @@ void main() {
                   selected: selected,
                   onChanged: (value) => setState(() => selected = value),
                 ),
-              );
-            },
+              ),
           ),
         ),
       );
@@ -560,8 +554,7 @@ void main() {
           child: Theme(
             data: AppTheme.light(),
             child: StatefulBuilder(
-              builder: (context, setState) {
-                return SizedBox(
+              builder: (context, setState) => SizedBox(
                   width: 320,
                   child: MxSegmentedControl<int>(
                     adaptive: true,
@@ -578,8 +571,7 @@ void main() {
                     selected: selected,
                     onChanged: (value) => setState(() => selected = value),
                   ),
-                );
-              },
+                ),
             ),
           ),
         ),
@@ -758,12 +750,10 @@ void main() {
           height: 320,
           child: MxReorderableList.builder(
             itemCount: items.length,
-            itemBuilder: (context, index) {
-              return ListTile(
+            itemBuilder: (context, index) => ListTile(
                 key: ValueKey(items[index]),
                 title: Text(items[index]),
-              );
-            },
+              ),
             onReorder: (oldIndex, newIndex) {},
           ),
         ),
@@ -782,13 +772,11 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: Padding(padding: const EdgeInsets.all(24), child: child),
       ),
     );
-  }
 }

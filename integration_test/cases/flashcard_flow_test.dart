@@ -791,8 +791,7 @@ Future<_FlashcardFlowHarness> _pumpEmptyDailyDeck(
   WidgetTester tester, {
   String deckName = 'Daily Words',
   File? databaseFile,
-}) {
-  return _pumpFlashcardFlow(
+}) => _pumpFlashcardFlow(
     tester,
     databaseFile: databaseFile,
     seedData: (app) => app.seedDeckWithoutFlashcards(
@@ -802,25 +801,21 @@ Future<_FlashcardFlowHarness> _pumpEmptyDailyDeck(
       deckName: deckName,
     ),
   );
-}
 
 Future<_FlashcardFlowHarness> _pumpDailyDeck(
   WidgetTester tester, {
   required List<_SeedCard> cards,
   File? databaseFile,
-}) {
-  return _pumpFlashcardFlow(
+}) => _pumpFlashcardFlow(
     tester,
     databaseFile: databaseFile,
     seedData: (app) => _seedDailyDeck(app, cards: cards),
   );
-}
 
 Future<_FlashcardFlowHarness> _pumpOrderedCards(
   WidgetTester tester, {
   File? databaseFile,
-}) {
-  return _pumpDailyDeck(
+}) => _pumpDailyDeck(
     tester,
     databaseFile: databaseFile,
     cards: const [
@@ -834,7 +829,6 @@ Future<_FlashcardFlowHarness> _pumpOrderedCards(
       _SeedCard(id: 'card-eat', front: '먹다', back: 'ăn', sortOrder: 2),
     ],
   );
-}
 
 Future<_FlashcardFlowHarness> _pumpFlashcardFlow(
   WidgetTester tester, {

@@ -412,9 +412,7 @@ void _expectPrimaryButtonSurface(Key key) {
   );
 }
 
-Size _dashboardActionButtonSize(WidgetTester tester, Key key) {
-  return tester.getSize(find.byKey(key));
-}
+Size _dashboardActionButtonSize(WidgetTester tester, Key key) => tester.getSize(find.byKey(key));
 
 void _expectDashboardActionLabel(Key key, String label) {
   expect(
@@ -423,8 +421,7 @@ void _expectDashboardActionLabel(Key key, String label) {
   );
 }
 
-GoRouter _dashboardRouter() {
-  return GoRouter(
+GoRouter _dashboardRouter() => GoRouter(
     initialLocation: RoutePaths.home,
     routes: [
       GoRoute(
@@ -468,7 +465,6 @@ GoRouter _dashboardRouter() {
       ),
     ],
   );
-}
 
 class _TestApp extends StatelessWidget {
   const _TestApp({required this.child});
@@ -476,14 +472,12 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
       home: child,
     );
-  }
 }
 
 const _studyReadyDashboardState = DashboardOverviewState(

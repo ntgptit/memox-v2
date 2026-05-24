@@ -273,8 +273,7 @@ void main() {
   });
 }
 
-Future<void> _insertValidFolder(AppDatabase database, {required String id}) {
-  return database.customInsert(
+Future<void> _insertValidFolder(AppDatabase database, {required String id}) => database.customInsert(
     '''
     INSERT INTO folders
       (id, name, content_mode, sort_order, created_at, updated_at)
@@ -289,7 +288,6 @@ Future<void> _insertValidFolder(AppDatabase database, {required String id}) {
       const Variable<int>(1),
     ],
   );
-}
 
 const List<String> _legacyV1Statements = <String>[
   '''

@@ -10,8 +10,7 @@ import 'content_data_providers.dart';
 part 'deck_providers.g.dart';
 
 @riverpod
-DeckRepository deckRepository(Ref ref) {
-  return DeckRepositoryImpl(
+DeckRepository deckRepository(Ref ref) => DeckRepositoryImpl(
     deckDao: ref.watch(deckDaoProvider),
     flashcardDao: ref.watch(flashcardDaoProvider),
     folderDao: ref.watch(folderDaoProvider),
@@ -20,59 +19,36 @@ DeckRepository deckRepository(Ref ref) {
     clock: ref.watch(clockProvider),
     idGenerator: ref.watch(idGeneratorProvider),
   );
-}
 
 @riverpod
-GetDeckActionContextUseCase getDeckActionContextUseCase(Ref ref) {
-  return GetDeckActionContextUseCase(ref.watch(deckRepositoryProvider));
-}
+GetDeckActionContextUseCase getDeckActionContextUseCase(Ref ref) => GetDeckActionContextUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-GetDeckHighlightsUseCase getDeckHighlightsUseCase(Ref ref) {
-  return GetDeckHighlightsUseCase(ref.watch(deckRepositoryProvider));
-}
+GetDeckHighlightsUseCase getDeckHighlightsUseCase(Ref ref) => GetDeckHighlightsUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-CreateDeckUseCase createDeckUseCase(Ref ref) {
-  return CreateDeckUseCase(ref.watch(deckRepositoryProvider));
-}
+CreateDeckUseCase createDeckUseCase(Ref ref) => CreateDeckUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-GetDeckMoveTargetsUseCase getDeckMoveTargetsUseCase(Ref ref) {
-  return GetDeckMoveTargetsUseCase(ref.watch(deckRepositoryProvider));
-}
+GetDeckMoveTargetsUseCase getDeckMoveTargetsUseCase(Ref ref) => GetDeckMoveTargetsUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-ListDeckDestinationsUseCase listDeckDestinationsUseCase(Ref ref) {
-  return ListDeckDestinationsUseCase(ref.watch(deckRepositoryProvider));
-}
+ListDeckDestinationsUseCase listDeckDestinationsUseCase(Ref ref) => ListDeckDestinationsUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-UpdateDeckUseCase updateDeckUseCase(Ref ref) {
-  return UpdateDeckUseCase(ref.watch(deckRepositoryProvider));
-}
+UpdateDeckUseCase updateDeckUseCase(Ref ref) => UpdateDeckUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-DeleteDeckUseCase deleteDeckUseCase(Ref ref) {
-  return DeleteDeckUseCase(ref.watch(deckRepositoryProvider));
-}
+DeleteDeckUseCase deleteDeckUseCase(Ref ref) => DeleteDeckUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-MoveDeckUseCase moveDeckUseCase(Ref ref) {
-  return MoveDeckUseCase(ref.watch(deckRepositoryProvider));
-}
+MoveDeckUseCase moveDeckUseCase(Ref ref) => MoveDeckUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-ReorderDecksUseCase reorderDecksUseCase(Ref ref) {
-  return ReorderDecksUseCase(ref.watch(deckRepositoryProvider));
-}
+ReorderDecksUseCase reorderDecksUseCase(Ref ref) => ReorderDecksUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-DuplicateDeckUseCase duplicateDeckUseCase(Ref ref) {
-  return DuplicateDeckUseCase(ref.watch(deckRepositoryProvider));
-}
+DuplicateDeckUseCase duplicateDeckUseCase(Ref ref) => DuplicateDeckUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-ExportDeckUseCase exportDeckUseCase(Ref ref) {
-  return ExportDeckUseCase(ref.watch(deckRepositoryProvider));
-}
+ExportDeckUseCase exportDeckUseCase(Ref ref) => ExportDeckUseCase(ref.watch(deckRepositoryProvider));

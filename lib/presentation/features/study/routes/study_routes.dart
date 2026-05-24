@@ -5,8 +5,7 @@ import '../screens/study_entry_screen.dart';
 import '../screens/study_result_screen.dart';
 import '../screens/study_session_screen.dart';
 
-List<RouteBase> studyLibraryRoutes() {
-  return [
+List<RouteBase> studyLibraryRoutes() => [
     GoRoute(
       path: RoutePaths.studyTodaySegment,
       name: RouteNames.studyToday,
@@ -44,4 +43,3 @@ List<RouteBase> studyLibraryRoutes() {
       ),
     ),
   ];
-}

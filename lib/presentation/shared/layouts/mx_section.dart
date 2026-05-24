@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import 'mx_gap.dart';
 import '../widgets/mx_text.dart';
+import 'mx_gap.dart';
 
 /// Grouping header + optional action + body. Useful on dashboards and
 /// settings pages to delineate logical groups.
@@ -26,8 +26,7 @@ class MxSection extends StatelessWidget {
   final double spacing;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
+  Widget build(BuildContext context) => Padding(
       padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,7 +67,6 @@ class MxSection extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 class _SectionHeading extends StatelessWidget {
@@ -78,8 +76,7 @@ class _SectionHeading extends StatelessWidget {
   final String? subtitle;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxText(title, role: MxTextRole.sectionTitle),
@@ -89,5 +86,4 @@ class _SectionHeading extends StatelessWidget {
         ],
       ],
     );
-  }
 }

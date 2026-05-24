@@ -73,8 +73,7 @@ void main() {
         theme: AppTheme.light(),
         home: Scaffold(
           body: Builder(
-            builder: (context) {
-              return TextButton(
+            builder: (context) => TextButton(
                 onPressed: () {
                   MxDialog.show<void>(
                     context: context,
@@ -83,8 +82,7 @@ void main() {
                   );
                 },
                 child: const Text('Open dialog'),
-              );
-            },
+              ),
           ),
         ),
       ),

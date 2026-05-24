@@ -74,8 +74,7 @@ class MxDestinationPickerSheet<T> extends StatefulWidget {
     bool isDismissible = true,
     bool enableDrag = true,
     bool useRootNavigator = false,
-  }) {
-    return MxBottomSheet.show<T>(
+  }) => MxBottomSheet.show<T>(
       context: context,
       title: title,
       isDismissible: isDismissible,
@@ -94,7 +93,6 @@ class MxDestinationPickerSheet<T> extends StatefulWidget {
         initialQuery: initialQuery,
       ),
     );
-  }
 
   @override
   State<MxDestinationPickerSheet<T>> createState() =>

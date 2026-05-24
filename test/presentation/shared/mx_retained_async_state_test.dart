@@ -14,8 +14,8 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      _TestApp(
-        child: const MxRetainedAsyncState<String>(
+      const _TestApp(
+        child: MxRetainedAsyncState<String>(
           isLoading: true,
           dataBuilder: _buildData,
         ),
@@ -239,11 +239,9 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: child),
     );
-  }
 }

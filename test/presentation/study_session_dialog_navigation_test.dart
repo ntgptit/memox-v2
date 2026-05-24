@@ -64,8 +64,7 @@ class _TestRouterApp extends StatelessWidget {
       routes: [
         GoRoute(
           path: '/previous',
-          builder: (context, state) {
-            return Scaffold(
+          builder: (context, state) => Scaffold(
               body: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -78,14 +77,12 @@ class _TestRouterApp extends StatelessWidget {
                   ],
                 ),
               ),
-            );
-          },
+            ),
         ),
         GoRoute(
           path: '/${RoutePaths.studyResultSegment}',
           name: RouteNames.studyResult,
-          builder: (context, state) {
-            return Scaffold(
+          builder: (context, state) => Scaffold(
               body: Center(
                 child: TextButton(
                   onPressed: () =>
@@ -93,21 +90,16 @@ class _TestRouterApp extends StatelessWidget {
                   child: const Text('Result back'),
                 ),
               ),
-            );
-          },
+            ),
         ),
         GoRoute(
           path: '/${RoutePaths.studySessionSegment}',
           name: RouteNames.studySession,
-          builder: (context, state) {
-            return const StudySessionScreen(sessionId: 'session-001');
-          },
+          builder: (context, state) => const StudySessionScreen(sessionId: 'session-001'),
         ),
         GoRoute(
           path: '/library',
-          builder: (context, state) {
-            return const Scaffold(body: Center(child: Text('Library')));
-          },
+          builder: (context, state) => const Scaffold(body: Center(child: Text('Library'))),
         ),
       ],
     );
@@ -154,9 +146,7 @@ final class _CancelDialogStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) {
-    return Future.value(_activeFillSnapshot);
-  }
+  Future<StudySessionSnapshot> loadSession(String sessionId) => Future.value(_activeFillSnapshot);
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({

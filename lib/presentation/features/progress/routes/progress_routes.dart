@@ -3,8 +3,7 @@ import 'package:memox/app/router/route_names.dart';
 
 import '../screens/progress_screen.dart';
 
-List<RouteBase> progressBranchRoutes() {
-  return [
+List<RouteBase> progressBranchRoutes() => [
     GoRoute(
       path: RoutePaths.progress,
       name: RouteNames.progress,
@@ -12,4 +11,3 @@ List<RouteBase> progressBranchRoutes() {
           const NoTransitionPage(child: ProgressScreen()),
     ),
   ];
-}

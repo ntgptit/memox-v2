@@ -22,20 +22,6 @@ class AppConfig {
     GoogleOAuthConfig? googleOAuthConfig,
   }) : _googleOAuthConfig = googleOAuthConfig;
 
-  final AppEnv env;
-  final String initialLocation;
-  final bool showDebugBanner;
-  final bool enableRouterDiagnostics;
-  final bool enableTalkerConsoleLogs;
-  final bool enableTalkerRouteLogging;
-  final bool enableRiverpodDiagnostics;
-  final bool exposeInternalErrorDetails;
-  final GoogleOAuthConfig? _googleOAuthConfig;
-
-  GoogleOAuthConfig get googleOAuthConfig {
-    return _googleOAuthConfig ?? GoogleOAuthConfig.empty;
-  }
-
   factory AppConfig.fromEnv(AppEnv env) {
     final enableLocalDiagnostics = env.isLocalLike;
     return AppConfig(
@@ -50,4 +36,16 @@ class AppConfig {
       googleOAuthConfig: GoogleOAuthConfig.fromEnvironment(),
     );
   }
+
+  final AppEnv env;
+  final String initialLocation;
+  final bool showDebugBanner;
+  final bool enableRouterDiagnostics;
+  final bool enableTalkerConsoleLogs;
+  final bool enableTalkerRouteLogging;
+  final bool enableRiverpodDiagnostics;
+  final bool exposeInternalErrorDetails;
+  final GoogleOAuthConfig? _googleOAuthConfig;
+
+  GoogleOAuthConfig get googleOAuthConfig => _googleOAuthConfig ?? GoogleOAuthConfig.empty;
 }

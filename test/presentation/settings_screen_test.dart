@@ -6,9 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/di/account_providers.dart';
+import 'package:memox/app/di/study/study_settings_providers.dart';
 import 'package:memox/app/di/sync_providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
-import 'package:memox/app/di/study/study_settings_providers.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/app/services/drive_sync_runtime_effects.dart';
 import 'package:memox/core/config/google_oauth_config.dart';
@@ -32,11 +32,11 @@ import 'package:memox/presentation/features/settings/viewmodels/drive_sync_setti
 import 'package:memox/presentation/features/settings/viewmodels/study_settings_defaults_viewmodel.dart';
 import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
-import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_badge.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -1158,8 +1158,8 @@ void main() {
   ) async {
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
-      uploadResult: DriveSyncRunResult.uploadedLocal(
-        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      uploadResult: const DriveSyncRunResult.uploadedLocal(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced),
       ),
     );
     await _pumpSettings(
@@ -1221,8 +1221,8 @@ void main() {
   ) async {
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
-      uploadResult: DriveSyncRunResult.uploadedLocal(
-        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      uploadResult: const DriveSyncRunResult.uploadedLocal(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced),
       ),
     );
     await _pumpSettings(
@@ -1295,8 +1295,8 @@ void main() {
       const diagnostic = 'Google Drive API has not been used in project.';
       final repository = _FakeDriveSyncRepository(
         loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
-        uploadResult: DriveSyncRunResult.failed(
-          const DriveSyncStatus.failure(diagnostic),
+        uploadResult: const DriveSyncRunResult.failed(
+          DriveSyncStatus.failure(diagnostic),
           diagnostic,
         ),
       );
@@ -1464,16 +1464,12 @@ final class _SettingsHarness {
   final _FakeTtsService tts;
 }
 
-MxCard _overviewCardForKey(WidgetTester tester, String key) {
-  return tester.widget<MxCard>(_overviewCardFinderForKey(key).first);
-}
+MxCard _overviewCardForKey(WidgetTester tester, String key) => tester.widget<MxCard>(_overviewCardFinderForKey(key).first);
 
-Finder _overviewCardFinderForKey(String key) {
-  return find.ancestor(
+Finder _overviewCardFinderForKey(String key) => find.ancestor(
     of: find.byKey(ValueKey<String>(key)),
     matching: find.byType(MxCard),
   );
-}
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   _FakeDriveSyncRepository({
@@ -1488,16 +1484,16 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
        _loadStatusResults = loadStatusResults?.toList() ?? <DriveSyncStatus>[],
        syncResult =
            syncResult ??
-           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        uploadResult =
            uploadResult ??
-           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        restoreResult =
            restoreResult ??
-           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        resolveResult =
            resolveResult ??
-           DriveSyncRunResult.canceled(const DriveSyncStatus.ready());
+           const DriveSyncRunResult.canceled(DriveSyncStatus.ready());
 
   DriveSyncStatus loadStatusResult;
   final List<DriveSyncStatus> _loadStatusResults;
@@ -1544,9 +1540,7 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   Future<DriveSyncRunResult> resolveConflict(
     DriveSyncConflict conflict,
     DriveSyncConflictChoice choice,
-  ) async {
-    return resolveResult;
-  }
+  ) async => resolveResult;
 }
 
 final class _FakeDriveSyncRuntimeEffects implements DriveSyncRuntimeEffects {
@@ -1571,9 +1565,8 @@ const _driveReadyLink = CloudAccountLink(
   lastSignedInAt: 1,
 );
 
-DriveSyncRemoteSnapshot _remoteSnapshot() {
-  return DriveSyncRemoteSnapshot(
-    manifest: const DriveSyncManifest(
+DriveSyncRemoteSnapshot _remoteSnapshot() => const DriveSyncRemoteSnapshot(
+    manifest: DriveSyncManifest(
       manifestVersion: DriveSyncManifest.currentManifestVersion,
       snapshotFormatVersion: DriveSyncManifest.currentSnapshotFormatVersion,
       appId: DriveSyncManifest.currentAppId,
@@ -1591,7 +1584,6 @@ DriveSyncRemoteSnapshot _remoteSnapshot() {
     snapshotFileVersion: 'snapshot-version',
     modifiedAt: 1,
   );
-}
 
 const _driveMissingLink = CloudAccountLink(
   provider: CloudProvider.google,
@@ -1608,8 +1600,7 @@ const _driveMissingLink = CloudAccountLink(
 GoogleAccountAuthSession _session({
   required Set<String> grantedScopes,
   required DriveAuthorizationState driveAuthorizationState,
-}) {
-  return GoogleAccountAuthSession(
+}) => GoogleAccountAuthSession(
     profile: const GoogleAccountProfile(
       subjectId: 'google-user-001',
       email: 'user@example.com',
@@ -1619,7 +1610,6 @@ GoogleAccountAuthSession _session({
     grantedScopes: grantedScopes,
     driveAuthorizationState: driveAuthorizationState,
   );
-}
 
 final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   _FakeGoogleAccountAuthService({
@@ -1649,32 +1639,24 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   Future<GoogleAccountAuthResult> restoreLightweightSession(
     GoogleOAuthConfig config,
-  ) async {
-    return restoreResult;
-  }
+  ) async => restoreResult;
 
   @override
   Future<GoogleAccountAuthResult> signInAndAuthorizeDriveAppData(
     GoogleOAuthConfig config,
-  ) async {
-    return signInResult;
-  }
+  ) async => signInResult;
 
   @override
   Future<GoogleAccountAuthResult> authorizeDriveAppData(
     GoogleOAuthConfig config,
     CloudAccountLink link,
-  ) async {
-    return signInResult;
-  }
+  ) async => signInResult;
 
   @override
   Future<DriveAccessTokenResult> getDriveAppDataAccessToken(
     GoogleOAuthConfig config,
     CloudAccountLink link,
-  ) async {
-    return const DriveAccessTokenResult.reauthorizationRequired();
-  }
+  ) async => const DriveAccessTokenResult.reauthorizationRequired();
 
   @override
   Future<void> signOutLocal() async {
@@ -1761,13 +1743,11 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     );
-  }
 }
 
 class _RouterTestApp extends StatelessWidget {
@@ -1776,11 +1756,9 @@ class _RouterTestApp extends StatelessWidget {
   final GoRouter router;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
+  Widget build(BuildContext context) => MaterialApp.router(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
     );
-  }
 }

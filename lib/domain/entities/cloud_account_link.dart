@@ -54,8 +54,7 @@ class CloudAccountLink {
     Set<String>? grantedScopes,
     DriveAuthorizationState? driveAuthorizationState,
     int? lastSignedInAt,
-  }) {
-    return CloudAccountLink(
+  }) => CloudAccountLink(
       provider: provider,
       subjectId: subjectId,
       email: email,
@@ -68,5 +67,4 @@ class CloudAccountLink {
       lastSignedInAt: lastSignedInAt ?? this.lastSignedInAt,
       schemaVersion: schemaVersion,
     );
-  }
 }

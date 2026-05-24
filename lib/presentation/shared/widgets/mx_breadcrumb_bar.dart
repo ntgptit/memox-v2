@@ -4,8 +4,8 @@ import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
-import 'mx_text.dart';
 import 'mx_tappable.dart';
+import 'mx_text.dart';
 
 class MxBreadcrumb {
   const MxBreadcrumb({required this.label, this.onTap, this.icon});

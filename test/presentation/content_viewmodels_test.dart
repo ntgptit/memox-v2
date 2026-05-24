@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:memox/app/di/content/content_core_providers.dart';
 import 'package:memox/app/di/content/content_revision_providers.dart';
 import 'package:memox/app/di/content/deck_providers.dart';
@@ -482,15 +481,13 @@ void main() {
   });
 }
 
-ProviderContainer _createContainer(ContentRepositoryHarness harness) {
-  return ProviderContainer(
+ProviderContainer _createContainer(ContentRepositoryHarness harness) => ProviderContainer(
     overrides: [
       appDatabaseProvider.overrideWithValue(harness.database),
       clockProvider.overrideWithValue(harness.clock),
       idGeneratorProvider.overrideWithValue(harness.idGenerator),
     ],
   );
-}
 
 final class _PendingCreateFlashcardRepository implements FlashcardRepository {
   final Completer<void> _createCompleter = Completer<void>();

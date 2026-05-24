@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
+import '../../../core/theme/tokens/app_icon_sizes.dart';
 
 /// Size scale for [MxProgressRing].
 ///

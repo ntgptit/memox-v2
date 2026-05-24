@@ -52,8 +52,7 @@ void main() {
 AppConfig _testConfig({
   required AppEnv env,
   required bool enableRiverpodDiagnostics,
-}) {
-  return AppConfig(
+}) => AppConfig(
     env: env,
     initialLocation: RouteDefaults.initialLocation,
     showDebugBanner: false,
@@ -64,4 +63,3 @@ AppConfig _testConfig({
     exposeInternalErrorDetails: false,
     googleOAuthConfig: GoogleOAuthConfig.fromValues(),
   );
-}

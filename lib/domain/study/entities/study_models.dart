@@ -153,8 +153,7 @@ final class StudySummary {
     int? masteredCardCount,
     int? retryCardCount,
     int? totalModeCount,
-  }) {
-    return StudySummary(
+  }) => StudySummary(
       totalCards: totalCards,
       masteredCardCount: masteredCardCount ?? this.masteredCardCount,
       retryCardCount: retryCardCount ?? this.retryCardCount,
@@ -166,7 +165,6 @@ final class StudySummary {
       remainingCount: remainingCount,
       totalModeCount: totalModeCount ?? this.totalModeCount,
     );
-  }
 }
 
 final class StudySessionSnapshot {
@@ -186,8 +184,7 @@ final class StudySessionSnapshot {
   final StudySummary summary;
   final bool canFinalize;
 
-  StudySessionSnapshot copyWith({StudySummary? summary}) {
-    return StudySessionSnapshot(
+  StudySessionSnapshot copyWith({StudySummary? summary}) => StudySessionSnapshot(
       session: session,
       currentItem: currentItem,
       currentRoundItems: currentRoundItems,
@@ -195,5 +192,4 @@ final class StudySessionSnapshot {
       summary: summary ?? this.summary,
       canFinalize: canFinalize,
     );
-  }
 }

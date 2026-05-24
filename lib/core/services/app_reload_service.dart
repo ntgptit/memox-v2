@@ -5,6 +5,4 @@ abstract interface class AppReloadService {
   void reload();
 }
 
-AppReloadService createAppReloadService() {
-  return createPlatformAppReloadService();
-}
+AppReloadService createAppReloadService() => createPlatformAppReloadService();

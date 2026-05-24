@@ -46,7 +46,7 @@ class MxSelectField<T> extends StatelessWidget {
         helperText: helperText,
         hintText: placeholder,
       ),
-      onChanged: enabled ? (value) => _handleChanged(value) : null,
+      onChanged: enabled ? _handleChanged : null,
     );
   }
 

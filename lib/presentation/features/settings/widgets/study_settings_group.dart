@@ -10,13 +10,13 @@ import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_loading_state.dart';
-import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_badge.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_icon_tile.dart';
 import '../../../shared/widgets/mx_inline_toggle.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/study_settings_defaults_viewmodel.dart';
 import 'settings_group.dart';
@@ -165,9 +165,7 @@ class _StudySettingRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
-  }
+  Widget build(BuildContext context) => SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
 }
 
 class _StudyDefaultsSummary extends StatelessWidget {
@@ -224,8 +222,7 @@ class _StudyMetric extends StatelessWidget {
   final String value;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxIconTile(icon: icon),
@@ -240,7 +237,6 @@ class _StudyMetric extends StatelessWidget {
         MxBadge(label: value, tone: MxBadgeTone.primary),
       ],
     );
-  }
 }
 
 class _BatchSizeSheet extends ConsumerWidget {

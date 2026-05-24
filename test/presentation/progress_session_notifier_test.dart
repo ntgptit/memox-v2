@@ -5,8 +5,8 @@ import 'package:memox/app/di/content/folder_providers.dart';
 import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/core/errors/result.dart';
 import 'package:memox/domain/entities/folder_entity.dart';
-import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/enums/folder_content_mode.dart';
+import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/repositories/folder_repository.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
@@ -170,8 +170,7 @@ final class _ProgressFolderRepo implements FolderRepository {
   @override
   Future<LibraryOverviewReadModel> getLibraryOverview(
     ContentQuery query,
-  ) async {
-    return LibraryOverviewReadModel(
+  ) async => LibraryOverviewReadModel(
       overdueCount: 2,
       dueTodayCount: 3,
       newCardCount: 4,
@@ -181,7 +180,6 @@ final class _ProgressFolderRepo implements FolderRepository {
         _folderReadModel(id: 'folder-2', itemCount: 6, masteryPercent: 67),
       ],
     );
-  }
 
   @override
   Future<Result<FolderEntity>> createRootFolder(String name) {
@@ -243,8 +241,7 @@ LibraryFolderReadModel _folderReadModel({
   required String id,
   required int itemCount,
   required int masteryPercent,
-}) {
-  return LibraryFolderReadModel(
+}) => LibraryFolderReadModel(
     folder: FolderEntity(
       id: id,
       parentId: null,
@@ -263,7 +260,6 @@ LibraryFolderReadModel _folderReadModel({
     masteryPercent: masteryPercent,
     lastStudiedAt: null,
   );
-}
 
 final class _ProgressStudyRepo implements StudyRepo {
   _ProgressStudyRepo({required this.activeSessions});
@@ -278,9 +274,7 @@ final class _ProgressStudyRepo implements StudyRepo {
   StudyType? lastRetriedStudyType;
 
   @override
-  Future<List<StudySessionSnapshot>> listActiveSessions() async {
-    return activeSessions;
-  }
+  Future<List<StudySessionSnapshot>> listActiveSessions() async => activeSessions;
 
   @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
@@ -426,12 +420,10 @@ StudySessionSnapshot _snapshot({
   );
 }
 
-StudyFlashcardRef _card() {
-  return const StudyFlashcardRef(
+StudyFlashcardRef _card() => const StudyFlashcardRef(
     id: 'card-1',
     deckId: 'deck-1',
     front: 'front 1',
     back: 'back 1',
     sourcePool: SessionItemSourcePool.due,
   );
-}

@@ -83,14 +83,12 @@ final class _AppDatabaseMigrationRunner {
     );
   }
 
-  Future<bool> _hasRequiredFlashcardProgressColumns() async {
-    return await _hasColumn(_TableName.flashcardProgress, 'current_box') &&
+  Future<bool> _hasRequiredFlashcardProgressColumns() async => await _hasColumn(_TableName.flashcardProgress, 'current_box') &&
         await _hasColumn(_TableName.flashcardProgress, 'review_count') &&
         await _hasColumn(_TableName.flashcardProgress, 'lapse_count') &&
         await _hasColumn(_TableName.flashcardProgress, 'last_result') &&
         await _hasColumn(_TableName.flashcardProgress, 'created_at') &&
         await _hasColumn(_TableName.flashcardProgress, 'updated_at');
-  }
 
   Future<void> _resetLegacyStudyTablesIfNeeded() async {
     if (!await _needsStudyTableReset()) {
@@ -267,8 +265,7 @@ final class _AppDatabaseMigrationRunner {
     await _alterTable(TableMigration(database.flashcards));
   }
 
-  Future<bool> _hasRequiredFlashcardColumns() async {
-    return await _hasColumn(_TableName.flashcards, 'id') &&
+  Future<bool> _hasRequiredFlashcardColumns() async => await _hasColumn(_TableName.flashcards, 'id') &&
         await _hasColumn(_TableName.flashcards, 'deck_id') &&
         await _hasColumn(_TableName.flashcards, 'front') &&
         await _hasColumn(_TableName.flashcards, 'back') &&
@@ -276,7 +273,6 @@ final class _AppDatabaseMigrationRunner {
         await _hasColumn(_TableName.flashcards, 'sort_order') &&
         await _hasColumn(_TableName.flashcards, 'created_at') &&
         await _hasColumn(_TableName.flashcards, 'updated_at');
-  }
 
   Future<void> _dropAndCreateFlashcardContentTables() async {
     await _runWithoutForeignKeys(() async {

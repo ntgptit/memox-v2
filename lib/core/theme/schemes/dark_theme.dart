@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../tokens/app_colors.dart';
-import '../tokens/app_typography.dart';
-import '../extensions/theme_extensions.dart';
 import '../component_themes/app_bar_theme.dart';
 import '../component_themes/button_theme.dart';
 import '../component_themes/card_theme.dart';
@@ -20,6 +17,9 @@ import '../component_themes/segmented_button_theme.dart';
 import '../component_themes/text_selection_theme.dart';
 import '../component_themes/toggle_theme.dart';
 import '../component_themes/tooltip_theme.dart';
+import '../extensions/theme_extensions.dart';
+import '../tokens/app_colors.dart';
+import '../tokens/app_typography.dart';
 
 /// Dark [ColorScheme] derived from the MemoX brand palette.
 ///

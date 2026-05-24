@@ -52,8 +52,7 @@ class MxTagInput extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Wrap(
+  Widget build(BuildContext context) => Wrap(
       spacing: AppSpacing.xs,
       runSpacing: AppSpacing.xs,
       crossAxisAlignment: WrapCrossAlignment.center,
@@ -70,7 +69,6 @@ class MxTagInput extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _AddTagTrigger extends StatelessWidget {
@@ -82,7 +80,7 @@ class _AddTagTrigger extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final shape = const StadiumBorder();
+    const shape = StadiumBorder();
     return MxTappable(
       shape: shape,
       onTap: onTap,
@@ -161,12 +159,10 @@ class _DashedStadiumPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _DashedStadiumPainter old) {
-    return old.color != color ||
+  bool shouldRepaint(covariant _DashedStadiumPainter old) => old.color != color ||
         old.strokeWidth != strokeWidth ||
         old.dashLength != dashLength ||
         old.gapLength != gapLength;
-  }
 }
 
 class _TagInputSheetBody extends StatefulWidget {
@@ -201,8 +197,7 @@ class _TagInputSheetBodyState extends State<_TagInputSheetBody> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -222,6 +217,5 @@ class _TagInputSheetBodyState extends State<_TagInputSheetBody> {
         ),
       ],
     );
-  }
 }
 

@@ -9,17 +9,13 @@ final class DeckDao {
 
   final AppDatabase _database;
 
-  Future<Deck?> findById(String deckId) {
-    return (_database.select(
+  Future<Deck?> findById(String deckId) => (_database.select(
       _database.decks,
     )..where((table) => table.id.equals(deckId))).getSingleOrNull();
-  }
 
-  Future<List<Deck>> listAllDecks() {
-    return (_database.select(
+  Future<List<Deck>> listAllDecks() => (_database.select(
       _database.decks,
     )..orderBy([(table) => OrderingTerm.asc(table.createdAt)])).get();
-  }
 
   Future<List<Deck>> listDecksInFolder({
     required String folderId,
@@ -60,8 +56,7 @@ final class DeckDao {
     required int sortOrder,
     required int createdAt,
     required int updatedAt,
-  }) {
-    return _database
+  }) => _database
         .into(_database.decks)
         .insert(
           DecksCompanion.insert(
@@ -73,25 +68,21 @@ final class DeckDao {
             updatedAt: updatedAt,
           ),
         );
-  }
 
   Future<void> updateDeckName({
     required String deckId,
     required String name,
     required int updatedAt,
-  }) {
-    return (_database.update(_database.decks)
+  }) => (_database.update(_database.decks)
           ..where((table) => table.id.equals(deckId)))
         .write(DecksCompanion(name: Value(name), updatedAt: Value(updatedAt)));
-  }
 
   Future<void> updateDeckFolder({
     required String deckId,
     required String folderId,
     required int sortOrder,
     required int updatedAt,
-  }) {
-    return (_database.update(
+  }) => (_database.update(
       _database.decks,
     )..where((table) => table.id.equals(deckId))).write(
       DecksCompanion(
@@ -100,13 +91,10 @@ final class DeckDao {
         updatedAt: Value(updatedAt),
       ),
     );
-  }
 
-  Future<void> deleteDeck(String deckId) {
-    return (_database.delete(
+  Future<void> deleteDeck(String deckId) => (_database.delete(
       _database.decks,
     )..where((table) => table.id.equals(deckId))).go();
-  }
 
   Future<void> reorderDecks({
     required String folderId,
@@ -193,10 +181,8 @@ final class DeckDao {
         .toList(growable: false);
   }
 
-  Future<List<Flashcard>> listDeckFlashcards(String deckId) {
-    return (_database.select(_database.flashcards)
+  Future<List<Flashcard>> listDeckFlashcards(String deckId) => (_database.select(_database.flashcards)
           ..where((table) => table.deckId.equals(deckId))
           ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
         .get();
-  }
 }

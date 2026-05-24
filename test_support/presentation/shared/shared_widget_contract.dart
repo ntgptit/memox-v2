@@ -25,11 +25,6 @@ import 'package:memox/presentation/shared/layouts/mx_content_shell.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_scaffold.dart';
 import 'package:memox/presentation/shared/layouts/mx_section.dart';
-import 'package:memox/presentation/shared/widgets/mx_empty_state.dart';
-import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
-import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
-import 'package:memox/presentation/shared/widgets/mx_offline_state.dart';
-import 'package:memox/presentation/shared/widgets/mx_retained_async_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_animated_switcher.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
@@ -37,11 +32,14 @@ import 'package:memox/presentation/shared/widgets/mx_badge.dart';
 import 'package:memox/presentation/shared/widgets/mx_bottom_nav.dart';
 import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
+import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_chip.dart';
 import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_divider.dart';
 import 'package:memox/presentation/shared/widgets/mx_due_summary_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_empty_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_fab.dart';
 import 'package:memox/presentation/shared/widgets/mx_flashcard.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
@@ -49,13 +47,15 @@ import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_inline_toggle.dart';
 import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
+import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_offline_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_page_dots.dart';
 import 'package:memox/presentation/shared/widgets/mx_pickup_tile.dart';
-import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_indicator.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
 import 'package:memox/presentation/shared/widgets/mx_reorderable_list.dart';
+import 'package:memox/presentation/shared/widgets/mx_retained_async_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_search_field.dart';
 import 'package:memox/presentation/shared/widgets/mx_search_sort_toolbar.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
@@ -281,7 +281,7 @@ void registerSharedWidgetContractTests() {
           key: key,
           label: '12 selected flashcards with long names',
           subtitle: longText,
-          actions: [
+          actions: const [
             MxSecondaryButton(label: 'Move selected cards', onPressed: _noop),
             MxPrimaryButton(label: 'Archive selected cards', onPressed: _noop),
           ],
@@ -369,10 +369,10 @@ void registerSharedWidgetContractTests() {
 
     await _pumpLayoutWidget(
       tester,
-      SizedBox(
+      const SizedBox(
         width: 288,
         child: MxAnswerOptionCard(
-          key: const ValueKey('long-content-answer-inspect'),
+          key: ValueKey('long-content-answer-inspect'),
           label: longText,
           selected: true,
           onPressed: _noop,
@@ -390,10 +390,10 @@ void registerSharedWidgetContractTests() {
 
     await _pumpLayoutWidget(
       tester,
-      SizedBox(
+      const SizedBox(
         width: 288,
         child: MxFlashcard(
-          key: const ValueKey('long-content-flashcard-inspect'),
+          key: ValueKey('long-content-flashcard-inspect'),
           content: longText,
         ),
       ),
@@ -514,10 +514,10 @@ void registerSharedWidgetContractTests() {
 
       await _pumpLayoutWidget(
         tester,
-        Column(
+        const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const MxCard(
+            MxCard(
               key: cardKey,
               variant: MxCardVariant.outlined,
               child: MxText('Theme text', role: MxTextRole.tileTitle),
@@ -527,7 +527,7 @@ void registerSharedWidgetContractTests() {
               icon: Icons.search,
               onPressed: _noop,
             ),
-            const MxDivider(key: dividerKey),
+            MxDivider(key: dividerKey),
             MxAnswerOptionCard(
               key: answerKey,
               label: 'Answer option',
@@ -540,7 +540,7 @@ void registerSharedWidgetContractTests() {
               metaLine: '12 cards',
               onTap: _noop,
             ),
-            const MxSkeleton(key: skeletonKey, width: 96, height: 20),
+            MxSkeleton(key: skeletonKey, width: 96, height: 20),
           ],
         ),
       );
@@ -672,11 +672,11 @@ void registerSharedWidgetContractTests() {
 
       await _pumpLayoutWidget(
         tester,
-        MxTappable(
+        const MxTappable(
           key: tappableKey,
-          shape: const StadiumBorder(),
+          shape: StadiumBorder(),
           onTap: _noop,
-          child: const SizedBox(
+          child: SizedBox(
             width: kMinInteractiveDimension,
             height: kMinInteractiveDimension,
           ),
@@ -726,7 +726,7 @@ void registerSharedWidgetContractTests() {
               onChanged: (_) {},
             ),
             const MxGap(AppSpacing.md),
-            MxSectionHeader(
+            const MxSectionHeader(
               key: headerKey,
               title: 'Recent',
               subtitle: 'Updated today',
@@ -1029,7 +1029,7 @@ void registerSharedWidgetContractTests() {
 
     await _pumpLayoutWidget(
       tester,
-      Column(
+      const Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           MxPrimaryButton(
@@ -1039,7 +1039,7 @@ void registerSharedWidgetContractTests() {
             trailingIcon: Icons.arrow_forward,
             onPressed: _noop,
           ),
-          const MxGap(AppSpacing.md),
+          MxGap(AppSpacing.md),
           MxSecondaryButton(
             key: secondaryKey,
             label: 'Cancel',
@@ -1969,8 +1969,7 @@ void registerSharedWidgetContractTests() {
     await _pumpLayoutWidget(
       tester,
       Builder(
-        builder: (context) {
-          return MxPrimaryButton(
+        builder: (context) => MxPrimaryButton(
             key: openKey,
             label: 'Open dialog',
             onPressed: () {
@@ -2002,8 +2001,7 @@ void registerSharedWidgetContractTests() {
                 ],
               );
             },
-          );
-        },
+          ),
       ),
     );
 
@@ -2036,8 +2034,7 @@ void registerSharedWidgetContractTests() {
     await _pumpLayoutWidget(
       tester,
       Builder(
-        builder: (context) {
-          return Column(
+        builder: (context) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               MxPrimaryButton(
@@ -2074,8 +2071,7 @@ void registerSharedWidgetContractTests() {
                 },
               ),
             ],
-          );
-        },
+          ),
       ),
     );
 
@@ -2110,8 +2106,7 @@ void registerSharedWidgetContractTests() {
     await _pumpLayoutWidget(
       tester,
       Builder(
-        builder: (context) {
-          return MxPrimaryButton(
+        builder: (context) => MxPrimaryButton(
             key: openKey,
             label: 'Open sheet',
             onPressed: () {
@@ -2156,8 +2151,7 @@ void registerSharedWidgetContractTests() {
                 ),
               );
             },
-          );
-        },
+          ),
       ),
     );
 
@@ -2193,8 +2187,7 @@ void registerSharedWidgetContractTests() {
     await _pumpLayoutWidget(
       tester,
       Builder(
-        builder: (context) {
-          return Column(
+        builder: (context) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               MxPrimaryButton(
@@ -2230,8 +2223,7 @@ void registerSharedWidgetContractTests() {
                 },
               ),
             ],
-          );
-        },
+          ),
       ),
     );
 
@@ -2260,13 +2252,13 @@ void registerSharedWidgetContractTests() {
 
     await _pumpLayoutWidget(
       tester,
-      Column(
+      const Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           MxDialog(
             key: dialogKey,
             title: 'Geometry',
-            child: const Text('Dialog'),
+            child: Text('Dialog'),
           ),
           MxGap(AppSpacing.lg),
           SizedBox(
@@ -2525,7 +2517,7 @@ void registerSharedWidgetContractTests() {
 
     await _pumpLayoutWidget(
       tester,
-      MxErrorState(
+      const MxErrorState(
         key: errorKey,
         title: 'Could not load',
         message: 'Try again later',
@@ -2937,7 +2929,7 @@ void registerSharedWidgetContractTests() {
       try {
         await _pumpLayoutWidget(
           tester,
-          Row(
+          const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               MxIconButton(
@@ -2946,7 +2938,7 @@ void registerSharedWidgetContractTests() {
                 tooltip: 'Search cards',
                 onPressed: _noop,
               ),
-              const MxGap(AppSpacing.md),
+              MxGap(AppSpacing.md),
               MxSpeakButton(
                 key: speakButtonKey,
                 tooltip: 'Speak term',
@@ -3063,15 +3055,15 @@ void registerSharedWidgetContractTests() {
 
     await _pumpLayoutWidget(
       tester,
-      Column(
+      const Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const MxAnswerOptionCard(
+          MxAnswerOptionCard(
             key: selectedKey,
             label: 'Selected answer',
             selected: true,
           ),
-          const MxGap(AppSpacing.lg),
+          MxGap(AppSpacing.lg),
           MxPageDots(key: dotsKey, count: 3, activeIndex: 1),
         ],
       ),
@@ -3233,7 +3225,7 @@ void registerSharedWidgetContractTests() {
 
     await _pumpLayoutWidget(
       tester,
-      MxBanner(
+      const MxBanner(
         key: bannerKey,
         title: 'Offline',
         message: 'Changes will sync when the connection returns.',
@@ -3383,7 +3375,7 @@ void registerSharedWidgetContractTests() {
 
     await _pumpLayoutWidget(
       tester,
-      Column(
+      const Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           MxEmptyState(
@@ -3394,7 +3386,7 @@ void registerSharedWidgetContractTests() {
             actionLeadingIcon: Icons.add,
             onAction: _noop,
           ),
-          const MxGap(AppSpacing.md),
+          MxGap(AppSpacing.md),
           MxFolderTile(
             key: folderKey,
             name: 'Very long constrained folder title',
@@ -3402,9 +3394,9 @@ void registerSharedWidgetContractTests() {
             caption: '999 subfolders · 999 decks · 999 cards',
             masteryPercent: 100,
             onTap: _noop,
-            trailing: const Icon(Icons.more_horiz),
+            trailing: Icon(Icons.more_horiz),
           ),
-          const MxGap(AppSpacing.md),
+          MxGap(AppSpacing.md),
           MxPrimaryButton(
             key: buttonKey,
             label: 'Create folder',
@@ -3553,7 +3545,7 @@ void registerSharedWidgetContractTests() {
 
       await _pumpLayoutWidget(
         tester,
-        MxSecondaryButton(
+        const MxSecondaryButton(
           key: buttonKey,
           label: 'Create',
           leadingIcon: Icons.add,
@@ -3588,7 +3580,7 @@ void registerSharedWidgetContractTests() {
 
       await _pumpLayoutWidget(
         tester,
-        Column(
+        const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             MxSectionHeader(
@@ -3596,15 +3588,15 @@ void registerSharedWidgetContractTests() {
               actionLabel: headerAction,
               onAction: _noop,
             ),
-            const MxGap(AppSpacing.lg),
+            MxGap(AppSpacing.lg),
             MxSection(
               title: sectionTitle,
               action: TextButton(
                 key: sectionActionKey,
                 onPressed: _noop,
-                child: const Text('Open activity'),
+                child: Text('Open activity'),
               ),
-              child: const Text('Section body'),
+              child: Text('Section body'),
             ),
           ],
         ),
@@ -3905,12 +3897,10 @@ class _SharedWidgetCase {
   final _WidgetHost host;
   final bool scrollableHost;
 
-  Widget build(_CatalogVariant variant, Key key) {
-    return switch (variant) {
+  Widget build(_CatalogVariant variant, Key key) => switch (variant) {
       _CatalogVariant.minimal => minimal(key),
       _CatalogVariant.full => full(key),
     };
-  }
 }
 
 class _LayoutCase {
@@ -3995,27 +3985,20 @@ Future<void> _pumpLayoutWidget(
   expect(tester.takeException(), isNull, reason: scenario.label);
 }
 
-Icon _buttonIcon(WidgetTester tester, Key key, IconData icon) {
-  return tester.widget<Icon>(
+Icon _buttonIcon(WidgetTester tester, Key key, IconData icon) => tester.widget<Icon>(
     find.descendant(of: find.byKey(key), matching: find.byIcon(icon)),
   );
-}
 
-List<double> _buttonGapSizes(WidgetTester tester, Key key) {
-  return _gapSizes(tester, key);
-}
+List<double> _buttonGapSizes(WidgetTester tester, Key key) => _gapSizes(tester, key);
 
-List<double> _gapSizes(WidgetTester tester, Key key) {
-  return tester
+List<double> _gapSizes(WidgetTester tester, Key key) => tester
       .widgetList<MxGap>(
         find.descendant(of: find.byKey(key), matching: find.byType(MxGap)),
       )
       .map((gap) => gap.size)
       .toList();
-}
 
-MxText _mxTextInside(WidgetTester tester, Key key, String data) {
-  return tester.widget<MxText>(
+MxText _mxTextInside(WidgetTester tester, Key key, String data) => tester.widget<MxText>(
     find.descendant(
       of: find.byKey(key),
       matching: find.byWidgetPredicate(
@@ -4023,60 +4006,41 @@ MxText _mxTextInside(WidgetTester tester, Key key, String data) {
       ),
     ),
   );
-}
 
-Size _stateContentColumnSize(WidgetTester tester, Key key) {
-  return tester.getSize(
+Size _stateContentColumnSize(WidgetTester tester, Key key) => tester.getSize(
     find.descendant(of: find.byKey(key), matching: find.byType(Column)).first,
   );
-}
 
-ElevatedButton _elevatedButton(WidgetTester tester, Key key) {
-  return tester.widget<ElevatedButton>(_elevatedButtonFinder(key));
-}
+ElevatedButton _elevatedButton(WidgetTester tester, Key key) => tester.widget<ElevatedButton>(_elevatedButtonFinder(key));
 
-OutlinedButton _outlinedButton(WidgetTester tester, Key key) {
-  return tester.widget<OutlinedButton>(_outlinedButtonFinder(key));
-}
+OutlinedButton _outlinedButton(WidgetTester tester, Key key) => tester.widget<OutlinedButton>(_outlinedButtonFinder(key));
 
-IconButton _iconButton(WidgetTester tester, Key key) {
-  return tester.widget<IconButton>(_iconButtonFinder(key));
-}
+IconButton _iconButton(WidgetTester tester, Key key) => tester.widget<IconButton>(_iconButtonFinder(key));
 
-Finder _elevatedButtonFinder(Key key) {
-  return find.descendant(
+Finder _elevatedButtonFinder(Key key) => find.descendant(
     of: find.byKey(key),
     matching: find.byType(ElevatedButton),
   );
-}
 
-Finder _outlinedButtonFinder(Key key) {
-  return find.descendant(
+Finder _outlinedButtonFinder(Key key) => find.descendant(
     of: find.byKey(key),
     matching: find.byType(OutlinedButton),
   );
-}
 
-Finder _filledButtonFinder(Key key) {
-  return find.descendant(
+Finder _filledButtonFinder(Key key) => find.descendant(
     of: find.byKey(key),
     matching: find.byType(FilledButton),
   );
-}
 
-Finder _textButtonFinder(Key key) {
-  return find.descendant(
+Finder _textButtonFinder(Key key) => find.descendant(
     of: find.byKey(key),
     matching: find.byType(TextButton),
   );
-}
 
-Finder _iconButtonFinder(Key key) {
-  return find.descendant(
+Finder _iconButtonFinder(Key key) => find.descendant(
     of: find.byKey(key),
     matching: find.byType(IconButton),
   );
-}
 
 void _expectSharedButtonStyle(
   ButtonStyle? style,
@@ -4111,8 +4075,7 @@ void _expectSharedButtonStyle(
   );
 }
 
-ButtonStyle _hostileButtonBaseStyle(Color color) {
-  return ButtonStyle(
+ButtonStyle _hostileButtonBaseStyle(Color color) => ButtonStyle(
     minimumSize: const WidgetStatePropertyAll(Size(0, 72)),
     padding: const WidgetStatePropertyAll(
       EdgeInsets.symmetric(horizontal: AppSpacing.xs),
@@ -4121,7 +4084,6 @@ ButtonStyle _hostileButtonBaseStyle(Color color) {
     foregroundColor: WidgetStatePropertyAll(color),
     side: WidgetStatePropertyAll(BorderSide(color: color)),
   );
-}
 
 class _ButtonStyleCase {
   const _ButtonStyleCase({
@@ -4182,13 +4144,9 @@ final List<_ButtonStyleCase> _buttonStyleCases = [
   ),
 ];
 
-Finder _cardFinder(Key key) {
-  return find.descendant(of: find.byKey(key), matching: find.byType(Card));
-}
+Finder _cardFinder(Key key) => find.descendant(of: find.byKey(key), matching: find.byType(Card));
 
-Card _materialCard(WidgetTester tester, Key key) {
-  return tester.widget<Card>(_cardFinder(key));
-}
+Card _materialCard(WidgetTester tester, Key key) => tester.widget<Card>(_cardFinder(key));
 
 RoundedRectangleBorder _cardShape(Card card) {
   final shape = card.shape;
@@ -4226,35 +4184,29 @@ const List<_CardVisualCase> _cardVisualCases = [
   ),
 ];
 
-TextField _sharedTextField(WidgetTester tester, Key key) {
-  return tester.widget<TextField>(
+TextField _sharedTextField(WidgetTester tester, Key key) => tester.widget<TextField>(
     find.descendant(of: find.byKey(key), matching: find.byType(TextField)),
   );
-}
 
 OutlineInputBorder _outlineInputBorder(InputBorder? border) {
   expect(border, isA<OutlineInputBorder>());
   return border! as OutlineInputBorder;
 }
 
-List<EdgeInsetsGeometry> _paddingValues(WidgetTester tester, Key key) {
-  return tester
+List<EdgeInsetsGeometry> _paddingValues(WidgetTester tester, Key key) => tester
       .widgetList<Padding>(
         find.descendant(of: find.byKey(key), matching: find.byType(Padding)),
       )
       .map((padding) => padding.padding)
       .toList();
-}
 
-List<Widget> _longContentRows(String label, int count) {
-  return List<Widget>.generate(
+List<Widget> _longContentRows(String label, int count) => List<Widget>.generate(
     count,
     (index) => Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Text('$label ${index + 1}'),
     ),
   );
-}
 
 Finder _scrollableInside(Key key) {
   expect(
@@ -4517,8 +4469,7 @@ class _GoldenHost extends StatelessWidget {
   }
 }
 
-Widget _buildNormalGoldenContent() {
-  return const Column(
+Widget _buildNormalGoldenContent() => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -4570,10 +4521,8 @@ Widget _buildNormalGoldenContent() {
       ),
     ],
   );
-}
 
-Widget _buildButtonNormalGoldenContent() {
-  return const Column(
+Widget _buildButtonNormalGoldenContent() => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -4622,10 +4571,8 @@ Widget _buildButtonNormalGoldenContent() {
       ),
     ],
   );
-}
 
-Widget _buildButtonStateGoldenContent() {
-  return const Column(
+Widget _buildButtonStateGoldenContent() => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -4670,10 +4617,8 @@ Widget _buildButtonStateGoldenContent() {
       ),
     ],
   );
-}
 
-Widget _buildStateGoldenContent() {
-  return const Column(
+Widget _buildStateGoldenContent() => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -4708,10 +4653,8 @@ Widget _buildStateGoldenContent() {
       ),
     ],
   );
-}
 
-Widget _buildTextScaleGoldenContent() {
-  return const Column(
+Widget _buildTextScaleGoldenContent() => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -4743,10 +4686,8 @@ Widget _buildTextScaleGoldenContent() {
       ),
     ],
   );
-}
 
-Widget _buildCardGoldenContent() {
-  return const Column(
+Widget _buildCardGoldenContent() => const Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     mainAxisSize: MainAxisSize.min,
     children: [
@@ -4796,7 +4737,6 @@ Widget _buildCardGoldenContent() {
       ),
     ],
   );
-}
 
 class _AppHarness extends StatelessWidget {
   const _AppHarness({
@@ -6334,7 +6274,7 @@ final List<_LayoutCase> _responsiveWidthCases = [
       key: key,
       label: '3 selected',
       subtitle: 'Ready to move',
-      actions: [
+      actions: const [
         MxSecondaryButton(label: 'Cancel', onPressed: _noop),
         MxPrimaryButton(label: 'Move', onPressed: _noop),
       ],
@@ -6419,7 +6359,7 @@ final List<_LayoutCase> _responsiveLongDataCases = [
           icon: Icons.sort_by_alpha,
         ),
       ],
-      trailing: [MxChip(label: 'Due today and overdue', onTap: _noop)],
+      trailing: const [MxChip(label: 'Due today and overdue', onTap: _noop)],
     ),
   ),
   _LayoutCase(
@@ -6429,7 +6369,7 @@ final List<_LayoutCase> _responsiveLongDataCases = [
       label: '12 selected flashcards with long names',
       subtitle:
           'These selected cards include several long prompts and definitions.',
-      actions: [
+      actions: const [
         MxSecondaryButton(label: 'Move selected cards', onPressed: _noop),
         MxPrimaryButton(label: 'Archive selected cards', onPressed: _noop),
       ],
@@ -6521,9 +6461,7 @@ List<File> _sharedStateSourceFiles() {
   return files;
 }
 
-Set<String> _sharedWidgetCatalogNames() {
-  return _sharedWidgetCases.map((entry) => entry.name).toSet();
-}
+Set<String> _sharedWidgetCatalogNames() => _sharedWidgetCases.map((entry) => entry.name).toSet();
 
 Set<String> _sharedWidgetClassNames() {
   final names = <String>{};
@@ -6542,47 +6480,31 @@ Set<String> _sharedWidgetClassNames() {
   return names;
 }
 
-Set<String> _interactionCoverageWidgetNames() {
-  return {
+Set<String> _interactionCoverageWidgetNames() => {
     ..._interactionCaseNames(_tapCallbackCases),
     ..._dedicatedInteractionCoverageWidgetNames,
   };
-}
 
-Set<String> _stateCoverageWidgetNames() {
-  return {
+Set<String> _stateCoverageWidgetNames() => {
     ..._interactionCaseNames(_disabledInteractionCases),
     ..._interactionCaseNames(_loadingInteractionCases),
     ..._dedicatedStateCoverageWidgetNames,
   };
-}
 
-Set<String> _layoutCoverageWidgetNames() {
-  return _sharedWidgetCatalogNames();
-}
+Set<String> _layoutCoverageWidgetNames() => _sharedWidgetCatalogNames();
 
-Set<String> _themeCoverageWidgetNames() {
-  return _sharedWidgetCatalogNames();
-}
+Set<String> _themeCoverageWidgetNames() => _sharedWidgetCatalogNames();
 
-Set<String> _accessibilityCoverageWidgetNames() {
-  return {
+Set<String> _accessibilityCoverageWidgetNames() => {
     ..._layoutCaseNames(_accessibilityTextScaleCases),
     ..._dedicatedAccessibilityCoverageWidgetNames,
   };
-}
 
-Set<String> _interactionCaseNames(List<_InteractionCase> cases) {
-  return cases.map((entry) => entry.name).toSet();
-}
+Set<String> _interactionCaseNames(List<_InteractionCase> cases) => cases.map((entry) => entry.name).toSet();
 
-Set<String> _layoutCaseNames(List<_LayoutCase> cases) {
-  return cases.map((entry) => entry.name).toSet();
-}
+Set<String> _layoutCaseNames(List<_LayoutCase> cases) => cases.map((entry) => entry.name).toSet();
 
-List<String> _missingCoverage(Set<String> required, Set<String> actual) {
-  return required.difference(actual).toList()..sort();
-}
+List<String> _missingCoverage(Set<String> required, Set<String> actual) => required.difference(actual).toList()..sort();
 
 List<String> _findGoldenNondeterminism() {
   final source = _goldenSourceUnderTest();
@@ -6624,11 +6546,9 @@ String _goldenSourceUnderTest() {
   return source.substring(start, end);
 }
 
-String _stripComments(String source) {
-  return source
+String _stripComments(String source) => source
       .replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '')
       .replaceAll(RegExp(r'//.*$', multiLine: true), '');
-}
 
 List<String> _findRawEdgeInsets(File file, String source) {
   final violations = <String>[];

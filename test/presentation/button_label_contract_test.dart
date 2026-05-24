@@ -168,16 +168,12 @@ Map<String, String> _arbMessages(String path) {
   return messages;
 }
 
-int _semanticWordCount(String value) {
-  return _normalizeLabel(
+int _semanticWordCount(String value) => _normalizeLabel(
     value,
   ).split(RegExp(r'\s+')).where((word) => word.isNotEmpty).length;
-}
 
-String _normalizeLabel(String value) {
-  return value
+String _normalizeLabel(String value) => value
       .replaceAll(RegExp(r'\{[^}]+\}'), ' ')
       .replaceAll(RegExp(r'[+&/.,:;!?()\[\]<>|\\-]+'), ' ')
       .trim()
       .toLowerCase();
-}

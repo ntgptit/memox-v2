@@ -1523,8 +1523,7 @@ class _IntegrationHarness {
         );
   }
 
-  Future<void> setSessionStatus(String sessionId, SessionStatus status) {
-    return (database.update(
+  Future<void> setSessionStatus(String sessionId, SessionStatus status) => (database.update(
       database.studySessions,
     )..where((table) => table.id.equals(sessionId))).write(
       StudySessionsCompanion(
@@ -1532,7 +1531,6 @@ class _IntegrationHarness {
         endedAt: Value(clock.nowEpochMillis()),
       ),
     );
-  }
 
   Future<String> sessionStatus(String sessionId) async {
     final session = await (database.select(
@@ -1548,8 +1546,7 @@ class _IntegrationHarness {
     return progress.currentBox;
   }
 
-  Future<int> activeSessionCount() {
-    return (database.select(database.studySessions)..where(
+  Future<int> activeSessionCount() => (database.select(database.studySessions)..where(
           (table) => table.status.isIn(const <String>[
             'in_progress',
             'ready_to_finalize',
@@ -1558,7 +1555,6 @@ class _IntegrationHarness {
         ))
         .get()
         .then((sessions) => sessions.length);
-  }
 
   Future<String> singleActiveSessionId() async {
     final sessions =
@@ -1695,8 +1691,7 @@ class _StudyDriver {
   Future<StudySessionSnapshot> startNewStudy({
     StudyEntryType entryType = StudyEntryType.deck,
     int batchSize = 2,
-  }) {
-    return _start.execute(
+  }) => _start.execute(
       StudyContext(
         entryType: entryType,
         entryRefId: _entryRefId(entryType),
@@ -1709,7 +1704,6 @@ class _StudyDriver {
         ),
       ),
     );
-  }
 
   Future<StudySessionSnapshot> startReadySrsReview() async {
     final session = await _start.execute(
@@ -1732,12 +1726,10 @@ class _StudyDriver {
     );
   }
 
-  Future<StudySessionSnapshot> finalize(StudySessionSnapshot snapshot) {
-    return _finalize.execute(
+  Future<StudySessionSnapshot> finalize(StudySessionSnapshot snapshot) => _finalize.execute(
       sessionId: snapshot.session.id,
       studyType: snapshot.session.studyType,
     );
-  }
 
   StartStudySessionUseCase get _start => StartStudySessionUseCase(
     repository: _repo,
@@ -1779,8 +1771,7 @@ class _IntegrationApp extends ConsumerWidget {
   const _IntegrationApp();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp.router(
+  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: AppTheme.light(),
@@ -1789,7 +1780,6 @@ class _IntegrationApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: ref.watch(appRouterProvider),
     );
-  }
 }
 
 const _surfaceSize = Size(900, 1200);
@@ -1800,22 +1790,16 @@ const _alphaBack = 'Alpha answer';
 const _betaFront = 'Beta prompt';
 const _betaBack = 'Beta answer';
 
-String _flashcardListLocation(String deckId) {
-  return '${RoutePaths.library}/deck/$deckId/flashcards';
-}
+String _flashcardListLocation(String deckId) => '${RoutePaths.library}/deck/$deckId/flashcards';
 
 String _studyEntryLocation(StudyEntryType entryType) {
   final entryRefId = _entryRefId(entryType);
   return '${RoutePaths.library}/study/${entryType.storageValue}/$entryRefId';
 }
 
-String _studyResultLocation(String sessionId) {
-  return '${RoutePaths.library}/study/session/$sessionId/result';
-}
+String _studyResultLocation(String sessionId) => '${RoutePaths.library}/study/session/$sessionId/result';
 
-String _studySessionLocation(String sessionId) {
-  return '${RoutePaths.library}/study/session/$sessionId';
-}
+String _studySessionLocation(String sessionId) => '${RoutePaths.library}/study/session/$sessionId';
 
 String _entryRefId(StudyEntryType entryType) {
   if (entryType == StudyEntryType.folder) {
@@ -1824,8 +1808,7 @@ String _entryRefId(StudyEntryType entryType) {
   return _deckId;
 }
 
-AppConfig _testConfig({required String initialLocation}) {
-  return AppConfig(
+AppConfig _testConfig({required String initialLocation}) => AppConfig(
     env: AppEnv.local,
     initialLocation: initialLocation,
     showDebugBanner: false,
@@ -1836,4 +1819,3 @@ AppConfig _testConfig({required String initialLocation}) {
     exposeInternalErrorDetails: true,
     googleOAuthConfig: GoogleOAuthConfig.fromValues(),
   );
-}

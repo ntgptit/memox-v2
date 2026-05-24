@@ -5,8 +5,7 @@ import '../tokens/app_radius.dart';
 import '../tokens/app_spacing.dart';
 
 abstract final class ListTileThemeBuilder {
-  static ListTileThemeData build(ColorScheme scheme) {
-    return ListTileThemeData(
+  static ListTileThemeData build(ColorScheme scheme) => ListTileThemeData(
       iconColor: scheme.onSurfaceVariant,
       textColor: scheme.onSurface,
       contentPadding: const EdgeInsets.symmetric(
@@ -25,5 +24,4 @@ abstract final class ListTileThemeBuilder {
       style: ListTileStyle.list,
       enableFeedback: true,
     );
-  }
 }

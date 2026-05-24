@@ -5,8 +5,7 @@ import '../tokens/app_radius.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class ChipThemeBuilder {
-  static ChipThemeData build(ColorScheme scheme) {
-    return ChipThemeData(
+  static ChipThemeData build(ColorScheme scheme) => ChipThemeData(
       backgroundColor: scheme.surfaceContainerLow,
       disabledColor: scheme.onSurface.withValues(alpha: 0.08),
       selectedColor: scheme.primaryContainer,
@@ -28,11 +27,8 @@ abstract final class ChipThemeBuilder {
         alpha: AppOpacity.transparent,
       ),
     );
-  }
 
-  static ChipThemeData pill(ColorScheme scheme) {
-    return build(scheme).copyWith(
+  static ChipThemeData pill(ColorScheme scheme) => build(scheme).copyWith(
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.chip),
     );
-  }
 }

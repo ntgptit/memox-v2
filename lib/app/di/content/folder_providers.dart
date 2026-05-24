@@ -10,8 +10,7 @@ import 'content_data_providers.dart';
 part 'folder_providers.g.dart';
 
 @riverpod
-FolderRepository folderRepository(Ref ref) {
-  return FolderRepositoryImpl(
+FolderRepository folderRepository(Ref ref) => FolderRepositoryImpl(
     folderDao: ref.watch(folderDaoProvider),
     deckDao: ref.watch(deckDaoProvider),
     transactionRunner: ref.watch(localTransactionRunnerProvider),
@@ -19,44 +18,27 @@ FolderRepository folderRepository(Ref ref) {
     clock: ref.watch(clockProvider),
     idGenerator: ref.watch(idGeneratorProvider),
   );
-}
 
 @riverpod
-WatchLibraryOverviewUseCase watchLibraryOverviewUseCase(Ref ref) {
-  return WatchLibraryOverviewUseCase(ref.watch(folderRepositoryProvider));
-}
+WatchLibraryOverviewUseCase watchLibraryOverviewUseCase(Ref ref) => WatchLibraryOverviewUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-WatchFolderDetailUseCase watchFolderDetailUseCase(Ref ref) {
-  return WatchFolderDetailUseCase(ref.watch(folderRepositoryProvider));
-}
+WatchFolderDetailUseCase watchFolderDetailUseCase(Ref ref) => WatchFolderDetailUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-CreateFolderUseCase createFolderUseCase(Ref ref) {
-  return CreateFolderUseCase(ref.watch(folderRepositoryProvider));
-}
+CreateFolderUseCase createFolderUseCase(Ref ref) => CreateFolderUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-GetFolderMoveTargetsUseCase getFolderMoveTargetsUseCase(Ref ref) {
-  return GetFolderMoveTargetsUseCase(ref.watch(folderRepositoryProvider));
-}
+GetFolderMoveTargetsUseCase getFolderMoveTargetsUseCase(Ref ref) => GetFolderMoveTargetsUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-UpdateFolderUseCase updateFolderUseCase(Ref ref) {
-  return UpdateFolderUseCase(ref.watch(folderRepositoryProvider));
-}
+UpdateFolderUseCase updateFolderUseCase(Ref ref) => UpdateFolderUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-DeleteFolderUseCase deleteFolderUseCase(Ref ref) {
-  return DeleteFolderUseCase(ref.watch(folderRepositoryProvider));
-}
+DeleteFolderUseCase deleteFolderUseCase(Ref ref) => DeleteFolderUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-MoveFolderUseCase moveFolderUseCase(Ref ref) {
-  return MoveFolderUseCase(ref.watch(folderRepositoryProvider));
-}
+MoveFolderUseCase moveFolderUseCase(Ref ref) => MoveFolderUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-ReorderFoldersUseCase reorderFoldersUseCase(Ref ref) {
-  return ReorderFoldersUseCase(ref.watch(folderRepositoryProvider));
-}
+ReorderFoldersUseCase reorderFoldersUseCase(Ref ref) => ReorderFoldersUseCase(ref.watch(folderRepositoryProvider));

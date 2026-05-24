@@ -58,8 +58,7 @@ final class ErrorMapper {
     );
   }
 
-  static AppFailure _fromAppException(AppException error) {
-    return switch (error.type) {
+  static AppFailure _fromAppException(AppException error) => switch (error.type) {
       AppExceptionType.configuration => AppFailure(
         type: FailureType.configuration,
         message: error.message,
@@ -110,5 +109,4 @@ final class ErrorMapper {
         technicalDetails: error.technicalDetails,
       ),
     };
-  }
 }

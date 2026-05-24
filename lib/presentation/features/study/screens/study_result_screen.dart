@@ -4,19 +4,19 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
-import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_error_state.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
-import '../../../shared/widgets/mx_retained_async_state.dart';
-import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_progress_indicator.dart';
 import '../../../shared/widgets/mx_progress_ring.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/study_session_notifier.dart';
@@ -119,8 +119,7 @@ class StudyResultScreen extends ConsumerWidget {
     );
   }
 
-  String _statusLabel(AppLocalizations l10n, SessionStatus status) {
-    return switch (status) {
+  String _statusLabel(AppLocalizations l10n, SessionStatus status) => switch (status) {
       SessionStatus.completed => l10n.studyResultCompleted,
       SessionStatus.cancelled => l10n.studyResultCancelled,
       SessionStatus.failedToFinalize => l10n.studyResultFailedFinalize,
@@ -128,7 +127,6 @@ class StudyResultScreen extends ConsumerWidget {
       SessionStatus.inProgress => l10n.studyResultInProgress,
       SessionStatus.draft => l10n.studyResultDraft,
     };
-  }
 }
 
 class _ResultProgressSummary extends StatelessWidget {
@@ -249,9 +247,7 @@ class _StudyResultLoadingView extends StatelessWidget {
   const _StudyResultLoadingView();
 
   @override
-  Widget build(BuildContext context) {
-    return const MxLoadingState();
-  }
+  Widget build(BuildContext context) => const MxLoadingState();
 }
 
 class _MetricRow extends StatelessWidget {
@@ -261,8 +257,7 @@ class _MetricRow extends StatelessWidget {
   final String value;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
+  Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.symmetric(vertical: MxSpace.xs),
       child: Row(
         children: [
@@ -271,5 +266,4 @@ class _MetricRow extends StatelessWidget {
         ],
       ),
     );
-  }
 }

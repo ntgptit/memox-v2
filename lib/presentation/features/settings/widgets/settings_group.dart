@@ -134,7 +134,7 @@ class SettingsRow extends StatelessWidget {
             if (value != null) ...[
               const MxGap(MxSpace.sm),
               Flexible(
-                child: MxBadge(label: value!, tone: valueTone),
+                child: MxBadge(label: value, tone: valueTone),
               ),
             ],
             if (showChevron) ...[

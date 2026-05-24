@@ -25,8 +25,7 @@ class FlashcardItemsSection extends StatelessWidget {
   final ValueChanged<FlashcardListItemState> onSpeak;
 
   @override
-  Widget build(BuildContext context) {
-    return SliverList.separated(
+  Widget build(BuildContext context) => SliverList.separated(
       key: const ValueKey('flashcard_lazy_items'),
       itemCount: state.items.length,
       itemBuilder: (context, index) => _FlashcardItemRow(
@@ -39,7 +38,6 @@ class FlashcardItemsSection extends StatelessWidget {
       ),
       separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
     );
-  }
 }
 
 class _FlashcardItemRow extends StatelessWidget {
@@ -60,8 +58,7 @@ class _FlashcardItemRow extends StatelessWidget {
   final ValueChanged<FlashcardListItemState> onSpeak;
 
   @override
-  Widget build(BuildContext context) {
-    return FlashcardDetailCardRow(
+  Widget build(BuildContext context) => FlashcardDetailCardRow(
       item: item,
       selected: selection.contains(item.id),
       onTap: () {
@@ -81,5 +78,4 @@ class _FlashcardItemRow extends StatelessWidget {
       onSpeak: () => onSpeak(item),
       onSelect: () => onToggleSelection(item.id),
     );
-  }
 }

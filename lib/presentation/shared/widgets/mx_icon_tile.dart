@@ -54,8 +54,7 @@ class MxIconTile extends StatelessWidget {
     );
   }
 
-  (Color, Color) _toneColors(BuildContext context, ColorScheme scheme) {
-    return switch (tone) {
+  (Color, Color) _toneColors(BuildContext context, ColorScheme scheme) => switch (tone) {
       MxIconTileTone.neutral => (
         scheme.surfaceContainerHighest,
         scheme.onSurfaceVariant,
@@ -70,5 +69,4 @@ class MxIconTile extends StatelessWidget {
         context.mxOnSurfaceDisabled,
       ),
     };
-  }
 }

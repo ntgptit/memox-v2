@@ -173,9 +173,7 @@ final class _FakeTtsService implements TtsService {
   }
 
   @override
-  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async {
-    return [TtsVoice(name: '${language.name} voice', language: language)];
-  }
+  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async => [TtsVoice(name: '${language.name} voice', language: language)];
 
   @override
   Future<void> speak(

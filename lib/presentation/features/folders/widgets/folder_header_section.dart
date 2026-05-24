@@ -71,8 +71,7 @@ class FolderHeaderSection extends StatelessWidget {
     );
   }
 
-  String _resolveSummary(AppLocalizations l10n) {
-    return switch (state.mode) {
+  String _resolveSummary(AppLocalizations l10n) => switch (state.mode) {
       FolderDetailMode.unlocked => l10n.foldersSummaryUnlocked,
       FolderDetailMode.subfolders => l10n.foldersStatusSubfolders(
         state.subfolders.length,
@@ -82,7 +81,6 @@ class FolderHeaderSection extends StatelessWidget {
         state.decks.fold<int>(0, (sum, item) => sum + item.cardCount),
       ),
     };
-  }
 }
 
 class _FolderHeaderTitleRow extends StatelessWidget {

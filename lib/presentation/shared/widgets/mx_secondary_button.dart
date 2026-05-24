@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import 'mx_button_size.dart';
 import '../layouts/mx_gap.dart';
+import 'mx_button_size.dart';
 
 enum MxSecondaryVariant { tonal, outlined, text }
 
@@ -87,8 +87,7 @@ class MxSecondaryButton extends StatelessWidget {
     return button;
   }
 
-  Widget _buildLabel() {
-    return LayoutBuilder(
+  Widget _buildLabel() => LayoutBuilder(
       builder: (context, constraints) {
         final canShowIcons = AppLayout.showsButtonIcons(
           hasBoundedWidth: constraints.hasBoundedWidth,
@@ -116,7 +115,6 @@ class MxSecondaryButton extends StatelessWidget {
         );
       },
     );
-  }
 
   ButtonStyle? _resolvedStyle(
     BuildContext context,
@@ -138,8 +136,7 @@ class MxSecondaryButton extends StatelessWidget {
     BuildContext context,
     MxButtonSize size,
     TextTheme textTheme,
-  ) {
-    return switch (size) {
+  ) => switch (size) {
       MxButtonSize.xsmall => ButtonStyle(
         minimumSize: const WidgetStatePropertyAll(Size(0, 32)),
         padding: WidgetStatePropertyAll(
@@ -178,8 +175,8 @@ class MxSecondaryButton extends StatelessWidget {
       ),
       MxButtonSize.medium =>
         context.isCompactMobile
-            ? ButtonStyle(
-                padding: const WidgetStatePropertyAll(
+            ? const ButtonStyle(
+                padding: WidgetStatePropertyAll(
                   EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
                     vertical: AppSpacing.md,
@@ -200,7 +197,6 @@ class MxSecondaryButton extends StatelessWidget {
         textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
       ),
     };
-  }
 
   ButtonStyle? _mergeButtonStyles(ButtonStyle? base, ButtonStyle? overrides) {
     if (base == null) return overrides;

@@ -151,8 +151,7 @@ void main() {
   });
 }
 
-StudySessionSnapshot _snapshot(SessionStatus status) {
-  return StudySessionSnapshot(
+StudySessionSnapshot _snapshot(SessionStatus status) => StudySessionSnapshot(
     session: StudySession(
       id: 'session-001',
       entryType: StudyEntryType.deck,
@@ -185,7 +184,6 @@ StudySessionSnapshot _snapshot(SessionStatus status) {
     ),
     canFinalize: false,
   );
-}
 
 class _TestApp extends StatelessWidget {
   const _TestApp({required this.child});
@@ -193,13 +191,11 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     );
-  }
 }
 
 class _TestRouterApp extends StatelessWidget {
@@ -212,8 +208,7 @@ class _TestRouterApp extends StatelessWidget {
       routes: [
         GoRoute(
           path: '/previous',
-          builder: (context, state) {
-            return Scaffold(
+          builder: (context, state) => Scaffold(
               body: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -227,21 +222,17 @@ class _TestRouterApp extends StatelessWidget {
                   ],
                 ),
               ),
-            );
-          },
+            ),
         ),
         GoRoute(
           path: '/${RoutePaths.studyResultSegment}',
           name: RouteNames.studyResult,
-          builder: (context, state) {
-            return const StudyResultScreen(sessionId: 'session-001');
-          },
+          builder: (context, state) => const StudyResultScreen(sessionId: 'session-001'),
         ),
         GoRoute(
           path: '/${RoutePaths.studyTodaySegment}',
           name: RouteNames.studyToday,
-          builder: (context, state) {
-            return Scaffold(
+          builder: (context, state) => Scaffold(
               body: Center(
                 child: TextButton(
                   onPressed: () =>
@@ -249,14 +240,11 @@ class _TestRouterApp extends StatelessWidget {
                   child: const Text('Today back'),
                 ),
               ),
-            );
-          },
+            ),
         ),
         GoRoute(
           path: '/library',
-          builder: (context, state) {
-            return const Scaffold(body: Center(child: Text('Library')));
-          },
+          builder: (context, state) => const Scaffold(body: Center(child: Text('Library'))),
         ),
       ],
     );

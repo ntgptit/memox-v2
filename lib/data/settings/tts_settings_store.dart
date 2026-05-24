@@ -9,8 +9,7 @@ final class TtsSettingsStore {
 
   final SharedPreferences _preferences;
 
-  TtsSettings load() {
-    return TtsSettings(
+  TtsSettings load() => TtsSettings(
       autoPlay:
           _preferences.getBool(AppConstants.sharedPrefsTtsAutoPlayKey) ??
           TtsSettings.defaults.autoPlay,
@@ -26,7 +25,6 @@ final class TtsSettingsStore {
         _preferences.getString(AppConstants.sharedPrefsTtsFrontVoiceNameKey),
       ),
     );
-  }
 
   Future<void> save(TtsSettings settings) async {
     await _preferences.setBool(

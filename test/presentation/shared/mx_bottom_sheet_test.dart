@@ -63,12 +63,10 @@ class _TestApp extends StatelessWidget {
   final EdgeInsets viewInsets;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       home: MediaQuery(
         data: MediaQueryData(viewInsets: viewInsets),
         child: Material(child: child),
       ),
     );
-  }
 }

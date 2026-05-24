@@ -11,13 +11,13 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/motion/mx_motion.dart';
+import '../../../shared/widgets/mx_divider.dart';
+import '../../../shared/widgets/mx_icon_button.dart';
+import '../../../shared/widgets/mx_inline_toggle.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
-import '../../../shared/widgets/mx_divider.dart';
-import '../../../shared/widgets/mx_inline_toggle.dart';
-import '../../../shared/widgets/mx_icon_button.dart';
-import '../../../shared/widgets/mx_select_field.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
+import '../../../shared/widgets/mx_select_field.dart';
 import '../../../shared/widgets/mx_slider.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../../../shared/widgets/mx_text_field.dart';
@@ -142,9 +142,7 @@ class _SpeechSettingRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
-  }
+  Widget build(BuildContext context) => SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
 }
 
 class _SpeechDetailsSheet extends ConsumerStatefulWidget {
@@ -318,8 +316,7 @@ class _SpeechActionRow extends StatelessWidget {
   final VoidCallback onToggleVoiceOptions;
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         MxIconButton.compact(
@@ -337,7 +334,6 @@ class _SpeechActionRow extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _PreviewTextField extends StatefulWidget {
@@ -446,8 +442,7 @@ class _VoiceOptions extends StatelessWidget {
   final ValueChanged<String> onChanged;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const MxGap(MxSpace.md),
@@ -460,7 +455,6 @@ class _VoiceOptions extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _VoiceSelect extends StatelessWidget {
@@ -529,12 +523,10 @@ String? _voiceSelectHelperText({
   return null;
 }
 
-String _languageLabel(AppLocalizations l10n, TtsLanguage language) {
-  return switch (language) {
+String _languageLabel(AppLocalizations l10n, TtsLanguage language) => switch (language) {
     TtsLanguage.korean => l10n.settingsSpeechKorean,
     TtsLanguage.english => l10n.settingsSpeechEnglish,
   };
-}
 
 String _voiceSelectionValue(AppLocalizations l10n, TtsSettings settings) {
   final voiceName = settings.frontVoiceName;
@@ -544,9 +536,7 @@ String _voiceSelectionValue(AppLocalizations l10n, TtsSettings settings) {
   return l10n.settingsSpeechSystemVoice;
 }
 
-String _previewText(AppLocalizations l10n, TtsLanguage language) {
-  return switch (language) {
+String _previewText(AppLocalizations l10n, TtsLanguage language) => switch (language) {
     TtsLanguage.korean => l10n.settingsSpeechKoreanPreviewText,
     TtsLanguage.english => l10n.settingsSpeechEnglishPreviewText,
   };
-}

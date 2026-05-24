@@ -16,8 +16,7 @@ class DashboardContent extends StatelessWidget {
   final DashboardOverviewState state;
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
+  Widget build(BuildContext context) => ListView(
       key: const ValueKey('dashboard_content'),
       padding: const EdgeInsets.only(bottom: MxSpace.xxl),
       children: [
@@ -32,7 +31,6 @@ class DashboardContent extends StatelessWidget {
         if (state.deckHighlights.isEmpty) const _DashboardDeckEmptyState(),
       ],
     );
-  }
 }
 
 class _DashboardDeckEmptyState extends StatelessWidget {
@@ -47,7 +45,7 @@ class _DashboardDeckEmptyState extends StatelessWidget {
       children: [
         MxText(l10n.dashboardPickUpTitle, role: MxTextRole.formLabel),
         const MxGap(MxSpace.sm),
-        DashboardEmptyDeckCard(),
+        const DashboardEmptyDeckCard(),
       ],
     );
   }

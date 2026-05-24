@@ -201,15 +201,13 @@ class _MetricCard extends StatelessWidget {
   final String? unit;
 
   @override
-  Widget build(BuildContext context) {
-    return MxStatCard(
+  Widget build(BuildContext context) => MxStatCard(
       label: label,
       value: value,
       unit: unit,
       icon: icon,
       tone: tone,
     );
-  }
 }
 
 class _LearningSummaryCard extends StatelessWidget {

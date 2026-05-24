@@ -7,20 +7,16 @@ import '../../../domain/study/strategy/study_strategy_factory.dart';
 part 'study_strategy_providers.g.dart';
 
 @riverpod
-StudyFlowStrategyFactory studyStrategyFactory(Ref ref) {
-  return StudyFlowStrategyFactory(const <StudyFlowStrategy>[
+StudyFlowStrategyFactory studyStrategyFactory(Ref ref) => StudyFlowStrategyFactory(const <StudyFlowStrategy>[
     NewStudyStrategy(),
     SrsReviewStrategy(),
   ]);
-}
 
 @riverpod
-StudyModeStrategyFactory studyModeStrategyFactory(Ref ref) {
-  return StudyModeStrategyFactory(const <StudyModeStrategy>[
+StudyModeStrategyFactory studyModeStrategyFactory(Ref ref) => StudyModeStrategyFactory(const <StudyModeStrategy>[
     ReviewModeStrategy(),
     MatchModeStrategy(),
     GuessModeStrategy(),
     RecallModeStrategy(),
     FillModeStrategy(),
   ]);
-}

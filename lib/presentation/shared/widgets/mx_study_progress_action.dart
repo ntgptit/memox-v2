@@ -2,10 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import '../../../core/theme/extensions/theme_extensions.dart';
 import 'mx_tappable.dart';
 
 /// Compact study action that combines start, mastery progress, and a count badge.
@@ -199,10 +199,8 @@ class _PillProgressPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _PillProgressPainter oldDelegate) {
-    return oldDelegate.value != value ||
+  bool shouldRepaint(covariant _PillProgressPainter oldDelegate) => oldDelegate.value != value ||
         oldDelegate.color != color ||
         oldDelegate.trackColor != trackColor ||
         oldDelegate.strokeWidth != strokeWidth;
-  }
 }

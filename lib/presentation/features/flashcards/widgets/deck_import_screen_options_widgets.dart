@@ -139,16 +139,13 @@ class _ImportActionButton extends StatelessWidget {
 String _duplicatePolicyLabel(
   AppLocalizations l10n,
   FlashcardImportDuplicatePolicy policy,
-) {
-  return switch (policy) {
+) => switch (policy) {
     FlashcardImportDuplicatePolicy.skipExactDuplicates =>
       l10n.importDuplicatePolicySkipExact,
   };
-}
 
 List<MxActionSheetItem<_ImportDuplicatePolicyChoice>>
-_buildImportDuplicatePolicyActions(AppLocalizations l10n) {
-  return [
+_buildImportDuplicatePolicyActions(AppLocalizations l10n) => [
     MxActionSheetItem<_ImportDuplicatePolicyChoice>(
       value: _ImportDuplicatePolicyChoice.skipExactDuplicates,
       label: l10n.importDuplicatePolicySkipExact,
@@ -156,16 +153,13 @@ _buildImportDuplicatePolicyActions(AppLocalizations l10n) {
       icon: Icons.filter_alt_outlined,
     ),
   ];
-}
 
 _ImportDuplicatePolicyChoice _duplicatePolicyChoice(
   FlashcardImportDuplicatePolicy policy,
-) {
-  return switch (policy) {
+) => switch (policy) {
     FlashcardImportDuplicatePolicy.skipExactDuplicates =>
       _ImportDuplicatePolicyChoice.skipExactDuplicates,
   };
-}
 
 class _ImportSeparatorRow extends StatelessWidget {
   const _ImportSeparatorRow({
@@ -193,8 +187,7 @@ class _ImportSeparatorRow extends StatelessWidget {
 }
 
 List<MxActionSheetItem<ImportStructuredTextSeparator>>
-_buildImportSeparatorActions(AppLocalizations l10n) {
-  return [
+_buildImportSeparatorActions(AppLocalizations l10n) => [
     for (final separator in ImportStructuredTextSeparator.values)
       MxActionSheetItem(
         value: separator,
@@ -203,13 +196,11 @@ _buildImportSeparatorActions(AppLocalizations l10n) {
         icon: _separatorIcon(separator),
       ),
   ];
-}
 
 String _separatorLabel(
   AppLocalizations l10n,
   ImportStructuredTextSeparator separator,
-) {
-  return switch (separator) {
+) => switch (separator) {
     ImportStructuredTextSeparator.auto => l10n.importSeparatorAuto,
     ImportStructuredTextSeparator.tab => l10n.importSeparatorTab,
     ImportStructuredTextSeparator.colon => l10n.importSeparatorColon,
@@ -217,13 +208,11 @@ String _separatorLabel(
     ImportStructuredTextSeparator.semicolon => l10n.importSeparatorSemicolon,
     ImportStructuredTextSeparator.pipe => l10n.importSeparatorPipe,
   };
-}
 
 String _separatorDescription(
   AppLocalizations l10n,
   ImportStructuredTextSeparator separator,
-) {
-  return switch (separator) {
+) => switch (separator) {
     ImportStructuredTextSeparator.auto => l10n.importSeparatorAutoDescription,
     ImportStructuredTextSeparator.tab => l10n.importSeparatorTabDescription,
     ImportStructuredTextSeparator.colon => l10n.importSeparatorColonDescription,
@@ -232,10 +221,8 @@ String _separatorDescription(
       l10n.importSeparatorSemicolonDescription,
     ImportStructuredTextSeparator.pipe => l10n.importSeparatorPipeDescription,
   };
-}
 
-IconData _separatorIcon(ImportStructuredTextSeparator separator) {
-  return switch (separator) {
+IconData _separatorIcon(ImportStructuredTextSeparator separator) => switch (separator) {
     ImportStructuredTextSeparator.auto => Icons.auto_awesome_outlined,
     ImportStructuredTextSeparator.tab => Icons.keyboard_tab_outlined,
     ImportStructuredTextSeparator.colon => Icons.more_vert_outlined,
@@ -243,15 +230,12 @@ IconData _separatorIcon(ImportStructuredTextSeparator separator) {
     ImportStructuredTextSeparator.semicolon => Icons.data_array_outlined,
     ImportStructuredTextSeparator.pipe => Icons.vertical_align_center_outlined,
   };
-}
 
-bool _hasImportSource(FlashcardImportDraftState draft) {
-  return switch (draft.format) {
+bool _hasImportSource(FlashcardImportDraftState draft) => switch (draft.format) {
     ImportSourceFormat.excel => draft.sourceBytes != null,
     ImportSourceFormat.csv || ImportSourceFormat.structuredText =>
       StringUtils.isNotBlank(draft.rawContent),
   };
-}
 
 String _fileSummary(
   AppLocalizations l10n,
@@ -267,34 +251,26 @@ String _fileSummary(
   return l10n.importDetectedRowsLabel(rowCount);
 }
 
-String _rulesText(AppLocalizations l10n, ImportSourceFormat format) {
-  return switch (format) {
+String _rulesText(AppLocalizations l10n, ImportSourceFormat format) => switch (format) {
     ImportSourceFormat.csv => l10n.importCsvRulesText,
     ImportSourceFormat.excel => l10n.importExcelRulesText,
     ImportSourceFormat.structuredText => l10n.importTextRulesText,
   };
-}
 
-List<String> _allowedImportFileExtensions(ImportSourceFormat format) {
-  return switch (format) {
+List<String> _allowedImportFileExtensions(ImportSourceFormat format) => switch (format) {
     ImportSourceFormat.csv => const <String>['csv'],
     ImportSourceFormat.excel => const <String>['xlsx'],
     ImportSourceFormat.structuredText => const <String>['txt'],
   };
-}
 
-String _contentLabel(AppLocalizations l10n, ImportSourceFormat format) {
-  return switch (format) {
+String _contentLabel(AppLocalizations l10n, ImportSourceFormat format) => switch (format) {
     ImportSourceFormat.csv => l10n.importCsvContentLabel,
     ImportSourceFormat.excel => l10n.importExcelFileLabel,
     ImportSourceFormat.structuredText => l10n.importTextContentLabel,
   };
-}
 
-String _contentHint(AppLocalizations l10n, ImportSourceFormat format) {
-  return switch (format) {
+String _contentHint(AppLocalizations l10n, ImportSourceFormat format) => switch (format) {
     ImportSourceFormat.csv => l10n.importCsvHint,
     ImportSourceFormat.excel => l10n.importExcelRulesText,
     ImportSourceFormat.structuredText => l10n.importTextHint,
   };
-}

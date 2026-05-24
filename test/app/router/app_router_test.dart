@@ -138,13 +138,11 @@ class _RouterApp extends ConsumerWidget {
   const _RouterApp();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp.router(
+  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: ref.watch(appRouterProvider),
     );
-  }
 }
 
 final _activeSnapshot = StudySessionSnapshot(
@@ -189,8 +187,7 @@ const _settings = StudySettingsSnapshot(
   prioritizeOverdue: true,
 );
 
-StudySession _session(SessionStatus status) {
-  return StudySession(
+StudySession _session(SessionStatus status) => StudySession(
     id: 'session-001',
     entryType: StudyEntryType.deck,
     entryRefId: 'deck-001',
@@ -202,21 +199,18 @@ StudySession _session(SessionStatus status) {
     endedAt: null,
     restartedFromSessionId: null,
   );
-}
 
 StudyFlashcardRef _card({
   required String id,
   required String front,
   required String back,
-}) {
-  return StudyFlashcardRef(
+}) => StudyFlashcardRef(
     id: id,
     deckId: 'deck-001',
     front: front,
     back: back,
     sourcePool: SessionItemSourcePool.due,
   );
-}
 
 final _configuredGoogle = GoogleOAuthConfig.fromValues(
   webClientId: 'web-client-id.apps.googleusercontent.com',
@@ -240,32 +234,24 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   Future<GoogleAccountAuthResult> restoreLightweightSession(
     GoogleOAuthConfig config,
-  ) async {
-    return const GoogleAccountAuthResult.signedOut();
-  }
+  ) async => const GoogleAccountAuthResult.signedOut();
 
   @override
   Future<GoogleAccountAuthResult> signInAndAuthorizeDriveAppData(
     GoogleOAuthConfig config,
-  ) async {
-    return const GoogleAccountAuthResult.canceled();
-  }
+  ) async => const GoogleAccountAuthResult.canceled();
 
   @override
   Future<GoogleAccountAuthResult> authorizeDriveAppData(
     GoogleOAuthConfig config,
     CloudAccountLink link,
-  ) async {
-    return const GoogleAccountAuthResult.canceled();
-  }
+  ) async => const GoogleAccountAuthResult.canceled();
 
   @override
   Future<DriveAccessTokenResult> getDriveAppDataAccessToken(
     GoogleOAuthConfig config,
     CloudAccountLink link,
-  ) async {
-    return const DriveAccessTokenResult.reauthorizationRequired();
-  }
+  ) async => const DriveAccessTokenResult.reauthorizationRequired();
 
   @override
   Future<void> signOutLocal() async {}
@@ -273,30 +259,20 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   @override
-  Future<DriveSyncStatus> loadStatus() async {
-    return const DriveSyncStatus.signedOut();
-  }
+  Future<DriveSyncStatus> loadStatus() async => const DriveSyncStatus.signedOut();
 
   @override
-  Future<DriveSyncRunResult> syncNow() async {
-    return DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut());
-  }
+  Future<DriveSyncRunResult> syncNow() async => const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
 
   @override
-  Future<DriveSyncRunResult> uploadLocalSnapshot() async {
-    return DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut());
-  }
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async => const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
 
   @override
-  Future<DriveSyncRunResult> restoreDriveSnapshot() async {
-    return DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut());
-  }
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async => const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
 
   @override
   Future<DriveSyncRunResult> resolveConflict(
     DriveSyncConflict conflict,
     DriveSyncConflictChoice choice,
-  ) async {
-    return DriveSyncRunResult.canceled(const DriveSyncStatus.signedOut());
-  }
+  ) async => const DriveSyncRunResult.canceled(DriveSyncStatus.signedOut());
 }

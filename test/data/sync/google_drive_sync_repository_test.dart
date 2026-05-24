@@ -472,7 +472,7 @@ final class _RepositoryHarness {
     final metadata = DriveSyncMetadataStore(preferences);
     final logger = _RecordingAppLogger();
     final repository = GoogleDriveSyncRepository(
-      accountRepository: _FakeCloudAccountRepository(_account),
+      accountRepository: const _FakeCloudAccountRepository(_account),
       authService: _FakeGoogleAccountAuthService(tokenResult),
       googleOAuthConfig: GoogleOAuthConfig.fromValues(
         serverClientId: 'server-client-id.apps.googleusercontent.com',
@@ -537,8 +537,7 @@ DriveSyncSnapshot _snapshotFor({
   required Uint8List databaseBytes,
   required Map<String, Object?> settings,
   int appDatabaseSchemaVersion = 6,
-}) {
-  return const DriveSyncSnapshotCodec().encode(
+}) => const DriveSyncSnapshotCodec().encode(
     databaseBytes: databaseBytes,
     settings: settings,
     appDatabaseSchemaVersion: appDatabaseSchemaVersion,
@@ -546,7 +545,6 @@ DriveSyncSnapshot _snapshotFor({
     deviceId: 'remote-device',
     deviceLabel: 'Remote device',
   );
-}
 
 final class _FakeDriveAppDataClient implements DriveAppDataClient {
   _FakeDriveAppDataClient({this.failure});
@@ -713,9 +711,7 @@ final class _FakeLocalDatabaseSnapshotGateway
   int get currentSchemaVersion => 6;
 
   @override
-  Future<Uint8List> exportDatabase() async {
-    return databaseBytes;
-  }
+  Future<Uint8List> exportDatabase() async => databaseBytes;
 
   @override
   Future<DriveSyncRestoreEffect> restoreDatabase(
@@ -760,17 +756,13 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   Future<GoogleAccountAuthResult> authorizeDriveAppData(
     GoogleOAuthConfig config,
     CloudAccountLink link,
-  ) async {
-    return const GoogleAccountAuthResult.signedOut();
-  }
+  ) async => const GoogleAccountAuthResult.signedOut();
 
   @override
   Future<DriveAccessTokenResult> getDriveAppDataAccessToken(
     GoogleOAuthConfig config,
     CloudAccountLink link,
-  ) async {
-    return tokenResult;
-  }
+  ) async => tokenResult;
 
   @override
   Future<void> initialize(GoogleOAuthConfig config) async {}
@@ -778,9 +770,7 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   Future<GoogleAccountAuthResult> restoreLightweightSession(
     GoogleOAuthConfig config,
-  ) async {
-    return const GoogleAccountAuthResult.signedOut();
-  }
+  ) async => const GoogleAccountAuthResult.signedOut();
 
   @override
   Future<void> signOutLocal() async {}
@@ -788,9 +778,7 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   Future<GoogleAccountAuthResult> signInAndAuthorizeDriveAppData(
     GoogleOAuthConfig config,
-  ) async {
-    return const GoogleAccountAuthResult.signedOut();
-  }
+  ) async => const GoogleAccountAuthResult.signedOut();
 }
 
 final class _FakeClock implements Clock {

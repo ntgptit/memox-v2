@@ -255,37 +255,29 @@ final class FlashcardExcelImportParser {
     return null;
   }
 
-  static Iterable<XmlElement> _allElements(XmlNode node, String localName) {
-    return node.descendants.whereType<XmlElement>().where(
+  static Iterable<XmlElement> _allElements(XmlNode node, String localName) => node.descendants.whereType<XmlElement>().where(
       (element) => element.name.local == localName,
     );
-  }
 
   static Iterable<XmlElement> _childElements(
     XmlElement element,
     String localName,
-  ) {
-    return element.childElements.where(
+  ) => element.childElements.where(
       (child) => child.name.local == localName,
     );
-  }
 
-  static String _textDescendants(XmlElement element, String localName) {
-    return _allElements(
+  static String _textDescendants(XmlElement element, String localName) => _allElements(
       element,
       localName,
     ).map((text) => text.innerText).join();
-  }
 
-  static FlashcardImportPreparation _issue(String message) {
-    return FlashcardImportPreparation(
+  static FlashcardImportPreparation _issue(String message) => FlashcardImportPreparation(
       format: ImportSourceFormat.excel,
       previewItems: const <FlashcardImportPreviewItem>[],
       issues: <ImportValidationIssue>[
         ImportValidationIssue(lineNumber: 1, message: message),
       ],
     );
-  }
 }
 
 final class _ExcelRow {

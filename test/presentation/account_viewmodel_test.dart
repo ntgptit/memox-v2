@@ -629,8 +629,7 @@ const _driveMissingLink = CloudAccountLink(
 GoogleAccountAuthSession _session({
   required Set<String> grantedScopes,
   required DriveAuthorizationState driveAuthorizationState,
-}) {
-  return GoogleAccountAuthSession(
+}) => GoogleAccountAuthSession(
     profile: const GoogleAccountProfile(
       subjectId: 'google-user-001',
       email: 'user@example.com',
@@ -640,7 +639,6 @@ GoogleAccountAuthSession _session({
     grantedScopes: grantedScopes,
     driveAuthorizationState: driveAuthorizationState,
   );
-}
 
 final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   _FakeGoogleAccountAuthService({
@@ -684,32 +682,24 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   Future<GoogleAccountAuthResult> restoreLightweightSession(
     GoogleOAuthConfig config,
-  ) async {
-    return restoreResult;
-  }
+  ) async => restoreResult;
 
   @override
   Future<GoogleAccountAuthResult> signInAndAuthorizeDriveAppData(
     GoogleOAuthConfig config,
-  ) async {
-    return signInResult;
-  }
+  ) async => signInResult;
 
   @override
   Future<GoogleAccountAuthResult> authorizeDriveAppData(
     GoogleOAuthConfig config,
     CloudAccountLink link,
-  ) async {
-    return authorizeResult ?? signInResult;
-  }
+  ) async => authorizeResult ?? signInResult;
 
   @override
   Future<DriveAccessTokenResult> getDriveAppDataAccessToken(
     GoogleOAuthConfig config,
     CloudAccountLink link,
-  ) async {
-    return accessTokenResult;
-  }
+  ) async => accessTokenResult;
 
   @override
   Future<void> signOutLocal() async {}
@@ -726,9 +716,7 @@ final class _AuthServiceSwitcher
   final _FakeGoogleAccountAuthService _initial;
 
   @override
-  _FakeGoogleAccountAuthService build() {
-    return _initial;
-  }
+  _FakeGoogleAccountAuthService build() => _initial;
 
   void replace(_FakeGoogleAccountAuthService next) {
     state = next;
@@ -782,30 +770,22 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   Future<DriveSyncRunResult> resolveConflict(
     DriveSyncConflict conflict,
     DriveSyncConflictChoice choice,
-  ) async {
-    return DriveSyncRunResult.canceled(
-      const DriveSyncStatus.needsDriveAuthorization(),
+  ) async => const DriveSyncRunResult.canceled(
+      DriveSyncStatus.needsDriveAuthorization(),
     );
-  }
 
   @override
-  Future<DriveSyncRunResult> syncNow() async {
-    return DriveSyncRunResult.noChanges(
-      const DriveSyncStatus.needsDriveAuthorization(),
+  Future<DriveSyncRunResult> syncNow() async => const DriveSyncRunResult.noChanges(
+      DriveSyncStatus.needsDriveAuthorization(),
     );
-  }
 
   @override
-  Future<DriveSyncRunResult> uploadLocalSnapshot() async {
-    return DriveSyncRunResult.noChanges(
-      const DriveSyncStatus.needsDriveAuthorization(),
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async => const DriveSyncRunResult.noChanges(
+      DriveSyncStatus.needsDriveAuthorization(),
     );
-  }
 
   @override
-  Future<DriveSyncRunResult> restoreDriveSnapshot() async {
-    return DriveSyncRunResult.noChanges(
-      const DriveSyncStatus.needsDriveAuthorization(),
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async => const DriveSyncRunResult.noChanges(
+      DriveSyncStatus.needsDriveAuthorization(),
     );
-  }
 }

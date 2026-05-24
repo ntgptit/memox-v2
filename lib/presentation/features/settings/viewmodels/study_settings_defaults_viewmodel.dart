@@ -27,13 +27,10 @@ final class StudyDefaultsSettingsState {
 @Riverpod(keepAlive: true)
 class StudyDefaultsSettings extends _$StudyDefaultsSettings {
   @override
-  Future<StudyDefaultsSettingsState> build() async {
-    return _load();
-  }
+  Future<StudyDefaultsSettingsState> build() async => _load();
 
   // guard:retry-reviewed
-  Future<void> setNewStudyBatchSize(int value) {
-    return _update(
+  Future<void> setNewStudyBatchSize(int value) => _update(
       (current) => StudyDefaultsSettingsState(
         newStudyDefaults: _copySettings(
           current.newStudyDefaults,
@@ -45,11 +42,9 @@ class StudyDefaultsSettings extends _$StudyDefaultsSettings {
         reviewDefaults: current.reviewDefaults,
       ),
     );
-  }
 
   // guard:retry-reviewed
-  Future<void> setReviewBatchSize(int value) {
-    return _update(
+  Future<void> setReviewBatchSize(int value) => _update(
       (current) => StudyDefaultsSettingsState(
         newStudyDefaults: current.newStudyDefaults,
         reviewDefaults: _copySettings(
@@ -61,22 +56,15 @@ class StudyDefaultsSettings extends _$StudyDefaultsSettings {
         ),
       ),
     );
-  }
 
   // guard:retry-reviewed
-  Future<void> setShuffleFlashcards(bool value) {
-    return _updateShared(shuffleFlashcards: value);
-  }
+  Future<void> setShuffleFlashcards(bool value) => _updateShared(shuffleFlashcards: value);
 
   // guard:retry-reviewed
-  Future<void> setShuffleAnswers(bool value) {
-    return _updateShared(shuffleAnswers: value);
-  }
+  Future<void> setShuffleAnswers(bool value) => _updateShared(shuffleAnswers: value);
 
   // guard:retry-reviewed
-  Future<void> setPrioritizeOverdue(bool value) {
-    return _updateShared(prioritizeOverdue: value);
-  }
+  Future<void> setPrioritizeOverdue(bool value) => _updateShared(prioritizeOverdue: value);
 
   Future<StudyDefaultsSettingsState> _load() async {
     final store = await ref.watch(studySettingsStoreProvider.future);
@@ -120,8 +108,7 @@ class StudyDefaultsSettings extends _$StudyDefaultsSettings {
     bool? shuffleFlashcards,
     bool? shuffleAnswers,
     bool? prioritizeOverdue,
-  }) {
-    return _update((current) {
+  }) => _update((current) {
       final nextNewStudy = _copySettings(
         current.newStudyDefaults,
         shuffleFlashcards:
@@ -144,7 +131,6 @@ class StudyDefaultsSettings extends _$StudyDefaultsSettings {
         reviewDefaults: nextReview,
       );
     });
-  }
 }
 
 StudySettingsSnapshot _copySettings(
@@ -153,11 +139,9 @@ StudySettingsSnapshot _copySettings(
   bool? shuffleFlashcards,
   bool? shuffleAnswers,
   bool? prioritizeOverdue,
-}) {
-  return StudySettingsSnapshot(
+}) => StudySettingsSnapshot(
     batchSize: batchSize ?? settings.batchSize,
     shuffleFlashcards: shuffleFlashcards ?? settings.shuffleFlashcards,
     shuffleAnswers: shuffleAnswers ?? settings.shuffleAnswers,
     prioritizeOverdue: prioritizeOverdue ?? settings.prioritizeOverdue,
   );
-}

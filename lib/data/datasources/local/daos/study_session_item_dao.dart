@@ -13,8 +13,7 @@ final class StudySessionItemDao {
     });
   }
 
-  Future<StudySessionItem?> findCurrentPending(String sessionId) {
-    return (_database.select(_database.studySessionItems)
+  Future<StudySessionItem?> findCurrentPending(String sessionId) => (_database.select(_database.studySessionItems)
           ..where(
             (table) =>
                 table.sessionId.equals(sessionId) &
@@ -27,10 +26,8 @@ final class StudySessionItemDao {
           ])
           ..limit(1))
         .getSingleOrNull();
-  }
 
-  Future<List<StudySessionItem>> listItems(String sessionId) {
-    return (_database.select(_database.studySessionItems)
+  Future<List<StudySessionItem>> listItems(String sessionId) => (_database.select(_database.studySessionItems)
           ..where((table) => table.sessionId.equals(sessionId))
           ..orderBy([
             (table) => OrderingTerm.asc(table.modeOrder),
@@ -38,14 +35,12 @@ final class StudySessionItemDao {
             (table) => OrderingTerm.asc(table.queuePosition),
           ]))
         .get();
-  }
 
   Future<List<StudySessionItem>> listModeRoundItems({
     required String sessionId,
     required int modeOrder,
     required int roundIndex,
-  }) {
-    return (_database.select(_database.studySessionItems)
+  }) => (_database.select(_database.studySessionItems)
           ..where(
             (table) =>
                 table.sessionId.equals(sessionId) &
@@ -54,10 +49,8 @@ final class StudySessionItemDao {
           )
           ..orderBy([(table) => OrderingTerm.asc(table.queuePosition)]))
         .get();
-  }
 
-  Future<List<StudySessionItem>> listOriginalBatchItems(String sessionId) {
-    return (_database.select(_database.studySessionItems)
+  Future<List<StudySessionItem>> listOriginalBatchItems(String sessionId) => (_database.select(_database.studySessionItems)
           ..where(
             (table) =>
                 table.sessionId.equals(sessionId) &
@@ -66,13 +59,11 @@ final class StudySessionItemDao {
           )
           ..orderBy([(table) => OrderingTerm.asc(table.queuePosition)]))
         .get();
-  }
 
   Future<void> completeItem({
     required String itemId,
     required int completedAt,
-  }) {
-    return (_database.update(
+  }) => (_database.update(
       _database.studySessionItems,
     )..where((table) => table.id.equals(itemId))).write(
       StudySessionItemsCompanion(
@@ -80,16 +71,13 @@ final class StudySessionItemDao {
         completedAt: Value(completedAt),
       ),
     );
-  }
 
   Future<void> requeuePendingItem({
     required String itemId,
     required int queuePosition,
-  }) {
-    return (_database.update(_database.studySessionItems)
+  }) => (_database.update(_database.studySessionItems)
           ..where((table) => table.id.equals(itemId)))
         .write(StudySessionItemsCompanion(queuePosition: Value(queuePosition)));
-  }
 
   Future<int> maxQueuePosition({
     required String sessionId,
@@ -126,12 +114,10 @@ final class StudySessionItemDao {
     return (row.read(_database.studySessionItems.id.count()) ?? 0) > 0;
   }
 
-  Future<void> abandonPending(String sessionId) {
-    return (_database.update(_database.studySessionItems)..where(
+  Future<void> abandonPending(String sessionId) => (_database.update(_database.studySessionItems)..where(
           (table) =>
               table.sessionId.equals(sessionId) &
               table.status.equals('pending'),
         ))
         .write(const StudySessionItemsCompanion(status: Value('abandoned')));
-  }
 }

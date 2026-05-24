@@ -54,9 +54,7 @@ class MxIconButton extends StatelessWidget {
   final double size;
   final bool isSelected;
 
-  static IconButtonThemeData toolbarTheme(BuildContext context) {
-    return IconButtonThemeData(style: toolbarStyle(context));
-  }
+  static IconButtonThemeData toolbarTheme(BuildContext context) => IconButtonThemeData(style: toolbarStyle(context));
 
   static ButtonStyle toolbarStyle(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;

@@ -121,18 +121,14 @@ final class NewStudyStrategy extends AbstractStudyFlowStrategy {
   StudyFinalizePolicy buildFinalizePolicy() => StudyFinalizePolicy.newStudy;
 
   @override
-  bool supportsEntry(StudyEntryType entryType) {
-    return entryType == StudyEntryType.deck ||
+  bool supportsEntry(StudyEntryType entryType) => entryType == StudyEntryType.deck ||
         entryType == StudyEntryType.folder;
-  }
 
   @override
   Future<List<StudyFlashcardRef>> loadBatch(
     StudyContext context,
     StudyRepo repo,
-  ) {
-    return repo.loadNewCards(context);
-  }
+  ) => repo.loadNewCards(context);
 }
 
 final class SrsReviewStrategy extends AbstractStudyFlowStrategy {
@@ -151,19 +147,15 @@ final class SrsReviewStrategy extends AbstractStudyFlowStrategy {
   StudyFinalizePolicy buildFinalizePolicy() => StudyFinalizePolicy.srsReview;
 
   @override
-  bool supportsEntry(StudyEntryType entryType) {
-    return entryType == StudyEntryType.deck ||
+  bool supportsEntry(StudyEntryType entryType) => entryType == StudyEntryType.deck ||
         entryType == StudyEntryType.folder ||
         entryType == StudyEntryType.today;
-  }
 
   @override
   Future<List<StudyFlashcardRef>> loadBatch(
     StudyContext context,
     StudyRepo repo,
-  ) {
-    return repo.loadDueCards(context);
-  }
+  ) => repo.loadDueCards(context);
 }
 
 StudyFlow studyFlowForModes(StudyType studyType, List<StudyMode> modes) {
@@ -197,8 +189,7 @@ StudyFlow studyFlowForModes(StudyType studyType, List<StudyMode> modes) {
   };
 }
 
-List<StudyMode> studyModesForFlow(StudyFlow flow) {
-  return switch (flow) {
+List<StudyMode> studyModesForFlow(StudyFlow flow) => switch (flow) {
     StudyFlow.newFullCycle => const <StudyMode>[
       StudyMode.review,
       StudyMode.match,
@@ -213,7 +204,6 @@ List<StudyMode> studyModesForFlow(StudyFlow flow) {
     StudyFlow.newFillOnly => const <StudyMode>[StudyMode.fill],
     StudyFlow.srsFillReview => const <StudyMode>[StudyMode.fill],
   };
-}
 
 bool _sameModes(List<StudyMode> left, List<StudyMode> right) {
   if (left.length != right.length) {

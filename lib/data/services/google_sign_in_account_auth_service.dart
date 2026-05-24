@@ -32,9 +32,7 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
   bool get requiresPlatformSignInButton => !supportsInteractiveSignIn;
 
   @override
-  Future<void> initialize(GoogleOAuthConfig config) {
-    return _initializeFuture ??= _initialize(config);
-  }
+  Future<void> initialize(GoogleOAuthConfig config) => _initializeFuture ??= _initialize(config);
 
   Future<void> _initialize(GoogleOAuthConfig config) async {
     await _signIn.initialize(
@@ -286,8 +284,7 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
     GoogleSignInAccount account, {
     required Set<String> grantedScopes,
     required DriveAuthorizationState driveAuthorizationState,
-  }) {
-    return GoogleAccountAuthSession(
+  }) => GoogleAccountAuthSession(
       profile: GoogleAccountProfile(
         subjectId: account.id,
         email: account.email,
@@ -297,10 +294,8 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
       grantedScopes: grantedScopes,
       driveAuthorizationState: driveAuthorizationState,
     );
-  }
 
-  GoogleAccountAuthResult _mapGoogleException(GoogleSignInException error) {
-    return switch (error.code) {
+  GoogleAccountAuthResult _mapGoogleException(GoogleSignInException error) => switch (error.code) {
       GoogleSignInExceptionCode.canceled ||
       GoogleSignInExceptionCode.interrupted =>
         const GoogleAccountAuthResult.canceled(),
@@ -314,5 +309,4 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
         error.description,
       ),
     };
-  }
 }

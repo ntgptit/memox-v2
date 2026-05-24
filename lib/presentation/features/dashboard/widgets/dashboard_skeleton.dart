@@ -25,8 +25,7 @@ class DashboardSkeleton extends StatelessWidget {
   const DashboardSkeleton({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
+  Widget build(BuildContext context) => ListView(
       key: const ValueKey('dashboard_skeleton'),
       children: const [
         _GreetingSkeleton(),
@@ -42,15 +41,13 @@ class DashboardSkeleton extends StatelessWidget {
         _ProgressSkeleton(),
       ],
     );
-  }
 }
 
 class _GreetingSkeleton extends StatelessWidget {
   const _GreetingSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return const Column(
+  Widget build(BuildContext context) => const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxSkeleton(
@@ -64,27 +61,23 @@ class _GreetingSkeleton extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _HeadingSkeleton extends StatelessWidget {
   const _HeadingSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return const MxSkeleton(
+  Widget build(BuildContext context) => const MxSkeleton(
       height: _dashboardHeadingHeight,
       width: _dashboardHeadingWidth,
     );
-  }
 }
 
 class _ActionRowSkeleton extends StatelessWidget {
   const _ActionRowSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return const Column(
+  Widget build(BuildContext context) => const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -116,15 +109,13 @@ class _ActionRowSkeleton extends StatelessWidget {
         MxSkeleton(height: _dashboardActionButtonHeight),
       ],
     );
-  }
 }
 
 class _ProgressSkeleton extends StatelessWidget {
   const _ProgressSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return const Row(
+  Widget build(BuildContext context) => const Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         MxSkeleton(
@@ -170,5 +161,4 @@ class _ProgressSkeleton extends StatelessWidget {
         ),
       ],
     );
-  }
 }

@@ -98,8 +98,7 @@ Future<DashboardOverviewState> dashboardOverview(Ref ref) async {
   );
 }
 
-DashboardDeckHighlightItem _mapDeckHighlight(DeckHighlightReadModel item) {
-  return DashboardDeckHighlightItem(
+DashboardDeckHighlightItem _mapDeckHighlight(DeckHighlightReadModel item) => DashboardDeckHighlightItem(
     id: item.deck.id,
     name: item.deck.name,
     cardCount: item.cardCount,
@@ -107,4 +106,3 @@ DashboardDeckHighlightItem _mapDeckHighlight(DeckHighlightReadModel item) {
     masteryPercent: item.masteryPercent,
     lastStudiedAt: item.lastStudiedAt,
   );
-}

@@ -6,8 +6,7 @@ import '../screens/audio_speech_settings_screen.dart';
 import '../screens/learning_settings_screen.dart';
 import '../screens/settings_screen.dart';
 
-List<RouteBase> settingsBranchRoutes() {
-  return [
+List<RouteBase> settingsBranchRoutes() => [
     GoRoute(
       path: RoutePaths.settings,
       name: RouteNames.settings,
@@ -35,4 +34,3 @@ List<RouteBase> settingsBranchRoutes() {
       ],
     ),
   ];
-}

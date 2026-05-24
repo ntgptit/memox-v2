@@ -184,12 +184,9 @@ Size? _parseWindowSize(String value) {
   return Size(width.toDouble(), height.toDouble());
 }
 
-String _formatWindowSize(Size size) {
-  return '${size.width.toInt()}x${size.height.toInt()}';
-}
+String _formatWindowSize(Size size) => '${size.width.toInt()}x${size.height.toInt()}';
 
-AppConfig integrationTestConfig({required String initialLocation}) {
-  return AppConfig(
+AppConfig integrationTestConfig({required String initialLocation}) => AppConfig(
     env: AppEnv.local,
     initialLocation: initialLocation,
     showDebugBanner: false,
@@ -200,7 +197,6 @@ AppConfig integrationTestConfig({required String initialLocation}) {
     exposeInternalErrorDetails: true,
     googleOAuthConfig: GoogleOAuthConfig.fromValues(),
   );
-}
 
 final class IntegrationTestAppHandle {
   IntegrationTestAppHandle._({
@@ -491,57 +487,41 @@ final class IntegrationTestAppHandle {
         );
   }
 
-  Future<Folder> findFolderByName(String name) {
-    return (database.select(
+  Future<Folder> findFolderByName(String name) => (database.select(
       database.folders,
     )..where((table) => table.name.equals(name))).getSingle();
-  }
 
-  Future<Folder?> findFolderByNameOrNull(String name) {
-    return (database.select(
+  Future<Folder?> findFolderByNameOrNull(String name) => (database.select(
       database.folders,
     )..where((table) => table.name.equals(name))).getSingleOrNull();
-  }
 
-  Future<Deck> findDeckByName(String name) {
-    return (database.select(
+  Future<Deck> findDeckByName(String name) => (database.select(
       database.decks,
     )..where((table) => table.name.equals(name))).getSingle();
-  }
 
-  Future<Deck?> findDeckByNameOrNull(String name) {
-    return (database.select(
+  Future<Deck?> findDeckByNameOrNull(String name) => (database.select(
       database.decks,
     )..where((table) => table.name.equals(name))).getSingleOrNull();
-  }
 
-  Future<List<Deck>> listDecksInFolder(String folderId) {
-    return (database.select(database.decks)
+  Future<List<Deck>> listDecksInFolder(String folderId) => (database.select(database.decks)
           ..where((table) => table.folderId.equals(folderId))
           ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
         .get();
-  }
 
-  Future<List<Flashcard>> listFlashcardsInDeck(String deckId) {
-    return (database.select(database.flashcards)
+  Future<List<Flashcard>> listFlashcardsInDeck(String deckId) => (database.select(database.flashcards)
           ..where((table) => table.deckId.equals(deckId))
           ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
         .get();
-  }
 
-  Future<FlashcardProgressData> findProgressByFlashcardId(String flashcardId) {
-    return (database.select(
+  Future<FlashcardProgressData> findProgressByFlashcardId(String flashcardId) => (database.select(
       database.flashcardProgress,
     )..where((table) => table.flashcardId.equals(flashcardId))).getSingle();
-  }
 
   Future<FlashcardProgressData?> findProgressByFlashcardIdOrNull(
     String flashcardId,
-  ) {
-    return (database.select(database.flashcardProgress)
+  ) => (database.select(database.flashcardProgress)
           ..where((table) => table.flashcardId.equals(flashcardId)))
         .getSingleOrNull();
-  }
 
   Future<List<String>> latestOriginalStudySessionFlashcardIds() async {
     final session =
@@ -570,8 +550,7 @@ final class IntegrationTestAppHandle {
     int lapseCount = 0,
     int? lastStudiedAt,
     int? dueAt,
-  }) {
-    return database
+  }) => database
         .into(database.flashcardProgress)
         .insert(
           FlashcardProgressCompanion.insert(
@@ -585,7 +564,6 @@ final class IntegrationTestAppHandle {
             dueAt: Value(dueAt),
           ),
         );
-  }
 
   Future<void> dispose() async {
     if (_disposed) {
@@ -632,9 +610,7 @@ final class NoopTtsService implements TtsService {
   Stream<TtsState> get state => _stateController.stream;
 
   @override
-  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async {
-    return const <TtsVoice>[];
-  }
+  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async => const <TtsVoice>[];
 
   @override
   Future<void> speak(

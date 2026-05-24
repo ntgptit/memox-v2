@@ -244,8 +244,8 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
     );
     final snapshot = _snapshotCodec.decode(archiveBytes);
     if (snapshot == null || snapshot.fingerprint != remote.fingerprint) {
-      final status = DriveSyncStatus.failure('Drive snapshot is invalid.');
-      return DriveSyncRunResult.failed(status, 'Drive snapshot is invalid.');
+      const status = DriveSyncStatus.failure('Drive snapshot is invalid.');
+      return const DriveSyncRunResult.failed(status, 'Drive snapshot is invalid.');
     }
 
     await _settingsSnapshotStore.restore(snapshot.settings);
@@ -272,8 +272,7 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
     required String accountSubjectId,
     required String localFingerprint,
     required DriveSyncRemoteSnapshot remote,
-  }) {
-    return _metadataStore.save(
+  }) => _metadataStore.save(
       DriveSyncMetadata(
         accountSubjectId: accountSubjectId,
         manifestFileId: remote.manifestFileId,
@@ -285,15 +284,12 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
         lastSyncedAt: _clock.nowEpochMillis(),
       ),
     );
-  }
 
-  DriveSyncStatus _syncedStatus(DriveSyncRemoteSnapshot remote) {
-    return DriveSyncStatus(
+  DriveSyncStatus _syncedStatus(DriveSyncRemoteSnapshot remote) => DriveSyncStatus(
       kind: DriveSyncStatusKind.synced,
       lastSyncedAt: _clock.nowEpochMillis(),
       remote: remote,
     );
-  }
 }
 
 final class _DriveSyncContext {

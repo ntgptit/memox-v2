@@ -6,8 +6,7 @@ import '../screens/deck_import_screen.dart';
 import '../screens/flashcard_editor_screen.dart';
 import '../screens/flashcard_list_screen.dart';
 
-List<RouteBase> flashcardLibraryRoutes() {
-  return [
+List<RouteBase> flashcardLibraryRoutes() => [
     GoRoute(
       path: RoutePaths.flashcardCreateSegment,
       name: RouteNames.flashcardCreate,
@@ -26,7 +25,7 @@ List<RouteBase> flashcardLibraryRoutes() {
       pageBuilder: (_, state) => NoTransitionPage(
         child: FlashcardEditorScreen(
           deckId: state.pathParameters[RoutePaths.deckIdParam]!,
-          flashcardId: state.pathParameters[RoutePaths.flashcardIdParam]!,
+          flashcardId: state.pathParameters[RoutePaths.flashcardIdParam],
           key: ValueKey(
             'edit-${state.pathParameters[RoutePaths.flashcardIdParam]}',
           ),
@@ -55,4 +54,3 @@ List<RouteBase> flashcardLibraryRoutes() {
       ),
     ),
   ];
-}

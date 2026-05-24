@@ -5,8 +5,7 @@ import '../tokens/app_radius.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class SegmentedButtonThemeBuilder {
-  static SegmentedButtonThemeData build(ColorScheme scheme) {
-    return SegmentedButtonThemeData(
+  static SegmentedButtonThemeData build(ColorScheme scheme) => SegmentedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -39,5 +38,4 @@ abstract final class SegmentedButtonThemeBuilder {
         minimumSize: WidgetStateProperty.all(const Size(0, 40)),
       ),
     );
-  }
 }

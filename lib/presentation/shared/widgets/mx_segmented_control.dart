@@ -68,8 +68,7 @@ class MxSegmentedControl<T> extends StatelessWidget {
     return _buildSegmentedButton(context);
   }
 
-  Widget _buildSegmentedButton(BuildContext context) {
-    return SegmentedButton<T>(
+  Widget _buildSegmentedButton(BuildContext context) => SegmentedButton<T>(
       style: _style(context),
       segments: segments
           .map(
@@ -93,22 +92,21 @@ class MxSegmentedControl<T> extends StatelessWidget {
       emptySelectionAllowed: emptySelectionAllowed,
       showSelectedIcon: showSelectedIcon,
     );
-  }
 
   ButtonStyle? _style(BuildContext context) {
     if (density != MxSegmentedControlDensity.compact) {
       return null;
     }
 
-    final compactStyle = ButtonStyle(
-      iconSize: const WidgetStatePropertyAll(AppIconSizes.sm),
-      padding: const WidgetStatePropertyAll(
+    const compactStyle = ButtonStyle(
+      iconSize: WidgetStatePropertyAll(AppIconSizes.sm),
+      padding: WidgetStatePropertyAll(
         EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.xs,
         ),
       ),
-      minimumSize: const WidgetStatePropertyAll(Size(0, AppSpacing.xxxxl)),
+      minimumSize: WidgetStatePropertyAll(Size(0, AppSpacing.xxxxl)),
       visualDensity: VisualDensity.compact,
     );
 
@@ -179,8 +177,7 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
     return Column(mainAxisSize: MainAxisSize.min, children: children);
   }
 
-  Widget _buildRadioTile(MxSegment<T> segment) {
-    return RadioListTile<T>(
+  Widget _buildRadioTile(MxSegment<T> segment) => RadioListTile<T>(
       value: segment.value,
       toggleable: emptySelectionAllowed,
       title: Text(segment.label),
@@ -195,10 +192,8 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
       selected: selected.contains(segment.value),
       dense: density == MxSegmentedControlDensity.compact,
     );
-  }
 
-  Widget _buildCheckboxTile(MxSegment<T> segment) {
-    return CheckboxListTile(
+  Widget _buildCheckboxTile(MxSegment<T> segment) => CheckboxListTile(
       value: selected.contains(segment.value),
       title: Text(segment.label),
       secondary: segment.icon != null
@@ -222,5 +217,4 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
         onChanged(next);
       },
     );
-  }
 }

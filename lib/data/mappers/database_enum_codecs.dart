@@ -5,97 +5,75 @@ import '../../domain/enums/study_enums.dart';
 abstract final class DatabaseEnumCodecs {
   const DatabaseEnumCodecs._();
 
-  static FolderContentMode folderContentModeFromStorage(String raw) {
-    return FolderContentMode.values.firstWhere(
+  static FolderContentMode folderContentModeFromStorage(String raw) => FolderContentMode.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () => throw ValidationException(
         message: 'Unsupported folder content mode: $raw',
       ),
     );
-  }
 
-  static StudyType studyTypeFromStorage(String raw) {
-    return StudyType.values.firstWhere(
+  static StudyType studyTypeFromStorage(String raw) => StudyType.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () =>
           throw ValidationException(message: 'Unsupported study type: $raw'),
     );
-  }
 
-  static StudyEntryType studyEntryTypeFromStorage(String raw) {
-    return StudyEntryType.values.firstWhere(
+  static StudyEntryType studyEntryTypeFromStorage(String raw) => StudyEntryType.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () => throw ValidationException(
         message: 'Unsupported study entry type: $raw',
       ),
     );
-  }
 
-  static StudyFlow studyFlowFromStorage(String raw) {
-    return StudyFlow.values.firstWhere(
+  static StudyFlow studyFlowFromStorage(String raw) => StudyFlow.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () =>
           throw ValidationException(message: 'Unsupported study flow: $raw'),
     );
-  }
 
-  static StudyMode studyModeFromStorage(String raw) {
-    return StudyMode.values.firstWhere(
+  static StudyMode studyModeFromStorage(String raw) => StudyMode.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () =>
           throw ValidationException(message: 'Unsupported study mode: $raw'),
     );
-  }
 
-  static SessionStatus sessionStatusFromStorage(String raw) {
-    return SessionStatus.values.firstWhere(
+  static SessionStatus sessionStatusFromStorage(String raw) => SessionStatus.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () => throw ValidationException(
         message: 'Unsupported session status: $raw',
       ),
     );
-  }
 
-  static SessionItemSourcePool sessionItemSourcePoolFromStorage(String raw) {
-    return SessionItemSourcePool.values.firstWhere(
+  static SessionItemSourcePool sessionItemSourcePoolFromStorage(String raw) => SessionItemSourcePool.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () => throw ValidationException(
         message: 'Unsupported session item source pool: $raw',
       ),
     );
-  }
 
-  static SessionItemStatus sessionItemStatusFromStorage(String raw) {
-    return SessionItemStatus.values.firstWhere(
+  static SessionItemStatus sessionItemStatusFromStorage(String raw) => SessionItemStatus.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () => throw ValidationException(
         message: 'Unsupported session item status: $raw',
       ),
     );
-  }
 
-  static RawStudyResult rawStudyResultFromStorage(String raw) {
-    return RawStudyResult.values.firstWhere(
+  static RawStudyResult rawStudyResultFromStorage(String raw) => RawStudyResult.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () => throw ValidationException(
         message: 'Unsupported raw study result: $raw',
       ),
     );
-  }
 
-  static AttemptGrade attemptGradeFromStorage(String raw) {
-    return AttemptGrade.values.firstWhere(
+  static AttemptGrade attemptGradeFromStorage(String raw) => AttemptGrade.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () =>
           throw ValidationException(message: 'Unsupported attempt grade: $raw'),
     );
-  }
 
-  static ReviewResult reviewResultFromStorage(String raw) {
-    return ReviewResult.values.firstWhere(
+  static ReviewResult reviewResultFromStorage(String raw) => ReviewResult.values.firstWhere(
       (value) => value.storageValue == raw,
       orElse: () =>
           throw ValidationException(message: 'Unsupported review result: $raw'),
     );
-  }
 }

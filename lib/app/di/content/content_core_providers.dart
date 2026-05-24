@@ -8,16 +8,10 @@ import '../providers.dart';
 part 'content_core_providers.g.dart';
 
 @riverpod
-Clock clock(Ref ref) {
-  return const SystemClock();
-}
+Clock clock(Ref ref) => const SystemClock();
 
 @riverpod
-IdGenerator idGenerator(Ref ref) {
-  return RandomIdGenerator();
-}
+IdGenerator idGenerator(Ref ref) => RandomIdGenerator();
 
 @riverpod
-LocalTransactionRunner localTransactionRunner(Ref ref) {
-  return LocalTransactionRunner(ref.watch(appDatabaseProvider));
-}
+LocalTransactionRunner localTransactionRunner(Ref ref) => LocalTransactionRunner(ref.watch(appDatabaseProvider));

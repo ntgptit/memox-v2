@@ -34,23 +34,13 @@ class AppFailure {
     this.isRetryable = false,
   });
 
-  final FailureType type;
-  final String message;
-  final String? code;
-  final Object? cause;
-  final StackTrace? stackTrace;
-  final String? technicalDetails;
-  final FailureSeverity severity;
-  final bool isRetryable;
-
   factory AppFailure.unknown({
     String message = 'Something went wrong.',
     String? code,
     Object? cause,
     StackTrace? stackTrace,
     String? technicalDetails,
-  }) {
-    return AppFailure(
+  }) => AppFailure(
       type: FailureType.unknown,
       message: message,
       code: code,
@@ -59,5 +49,13 @@ class AppFailure {
       technicalDetails: technicalDetails,
       severity: FailureSeverity.critical,
     );
-  }
+
+  final FailureType type;
+  final String message;
+  final String? code;
+  final Object? cause;
+  final StackTrace? stackTrace;
+  final String? technicalDetails;
+  final FailureSeverity severity;
+  final bool isRetryable;
 }

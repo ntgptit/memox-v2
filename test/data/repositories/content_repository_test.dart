@@ -1487,8 +1487,7 @@ Future<void> _setHighlightProgress(
 Future<void> _setLearnedProgress(
   ContentRepositoryHarness harness, {
   required String flashcardId,
-}) {
-  return (harness.database.update(
+}) => (harness.database.update(
     harness.database.flashcardProgress,
   )..where((table) => table.flashcardId.equals(flashcardId))).write(
     const FlashcardProgressCompanion(
@@ -1500,4 +1499,3 @@ Future<void> _setLearnedProgress(
       dueAt: Value(1713945600000),
     ),
   );
-}

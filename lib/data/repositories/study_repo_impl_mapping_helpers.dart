@@ -102,8 +102,7 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
     }).length;
   }
 
-  int _requiredModeCount(local.StudySession session) {
-    return switch (DatabaseEnumCodecs.studyFlowFromStorage(session.studyFlow)) {
+  int _requiredModeCount(local.StudySession session) => switch (DatabaseEnumCodecs.studyFlowFromStorage(session.studyFlow)) {
       StudyFlow.newFullCycle => 5,
       StudyFlow.newReviewOnly ||
       StudyFlow.newMatchOnly ||
@@ -112,10 +111,8 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
       StudyFlow.newFillOnly => 1,
       StudyFlow.srsFillReview => 1,
     };
-  }
 
-  StudySession _mapSession(local.StudySession row) {
-    return StudySession(
+  StudySession _mapSession(local.StudySession row) => StudySession(
       id: row.id,
       entryType: DatabaseEnumCodecs.studyEntryTypeFromStorage(row.entryType),
       entryRefId: row.entryRefId,
@@ -132,10 +129,8 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
       endedAt: row.endedAt,
       restartedFromSessionId: row.restartedFromSessionId,
     );
-  }
 
-  Future<StudySessionItem> _mapItem(local.StudySessionItem row) async {
-    return StudySessionItem(
+  Future<StudySessionItem> _mapItem(local.StudySessionItem row) async => StudySessionItem(
       id: row.id,
       sessionId: row.sessionId,
       flashcard: await _flashcardRefForItem(row),
@@ -149,7 +144,6 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
       status: DatabaseEnumCodecs.sessionItemStatusFromStorage(row.status),
       completedAt: row.completedAt,
     );
-  }
 
   Future<List<StudySessionItem>> _mapItems(
     List<local.StudySessionItem> rows,
@@ -181,15 +175,13 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
   StudyFlashcardRef _flashcardRefFromRow(
     QueryRow row, {
     required SessionItemSourcePool sourcePool,
-  }) {
-    return StudyFlashcardRef(
+  }) => StudyFlashcardRef(
       id: row.read<String>('id'),
       deckId: row.read<String>('deck_id'),
       front: row.read<String>('front'),
       back: row.read<String>('back'),
       sourcePool: sourcePool,
     );
-  }
 
   Future<local.StudySession> _requireSession(String sessionId) async {
     final session = await _studySessionDao.findById(sessionId);
@@ -230,7 +222,7 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
     final status = DatabaseEnumCodecs.sessionStatusFromStorage(session.status);
     if (status == SessionStatus.completed ||
         status == SessionStatus.cancelled) {
-      throw ValidationException(
+      throw const ValidationException(
         message: 'Cannot cancel a terminal study session.',
       );
     }
@@ -315,8 +307,7 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
     ).toUtc().millisecondsSinceEpoch;
   }
 
-  Duration _intervalForBox(int box) {
-    return switch (box) {
+  Duration _intervalForBox(int box) => switch (box) {
       1 => Duration.zero,
       2 => const Duration(days: 1),
       3 => const Duration(days: 3),
@@ -327,7 +318,6 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
       8 => const Duration(days: 120),
       _ => throw ValidationException(message: 'Unsupported SRS box: $box.'),
     };
-  }
 
   String _requireEntryRef(StudyContext context) {
     final refId = context.entryRefId;
@@ -340,6 +330,4 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
   }
 }
 
-String _studyRepoPlaceholders(int count) {
-  return List<String>.filled(count, '?').join(', ');
-}
+String _studyRepoPlaceholders(int count) => List<String>.filled(count, '?').join(', ');

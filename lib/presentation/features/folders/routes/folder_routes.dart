@@ -4,8 +4,7 @@ import 'package:memox/app/router/route_names.dart';
 import '../screens/folder_detail_screen.dart';
 import '../screens/library_overview_screen.dart';
 
-List<RouteBase> libraryBranchRoutes({required List<RouteBase> childRoutes}) {
-  return [
+List<RouteBase> libraryBranchRoutes({required List<RouteBase> childRoutes}) => [
     GoRoute(
       path: RoutePaths.library,
       name: RouteNames.library,
@@ -25,4 +24,3 @@ List<RouteBase> libraryBranchRoutes({required List<RouteBase> childRoutes}) {
       ],
     ),
   ];
-}

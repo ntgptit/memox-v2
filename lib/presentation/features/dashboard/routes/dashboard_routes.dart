@@ -3,8 +3,7 @@ import 'package:memox/app/router/route_names.dart';
 
 import '../screens/dashboard_screen.dart';
 
-List<RouteBase> dashboardBranchRoutes() {
-  return [
+List<RouteBase> dashboardBranchRoutes() => [
     GoRoute(
       path: RoutePaths.home,
       name: RouteNames.home,
@@ -12,4 +11,3 @@ List<RouteBase> dashboardBranchRoutes() {
           const NoTransitionPage(child: DashboardScreen()),
     ),
   ];
-}

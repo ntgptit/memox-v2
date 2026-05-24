@@ -6,8 +6,7 @@ import '../tokens/app_typography.dart';
 import 'focus_theme.dart';
 
 abstract final class PopupMenuThemeBuilder {
-  static PopupMenuThemeData build(ColorScheme scheme) {
-    return PopupMenuThemeData(
+  static PopupMenuThemeData build(ColorScheme scheme) => PopupMenuThemeData(
       color: scheme.surfaceContainerLow,
       surfaceTintColor: scheme.surfaceTint.withValues(
         alpha: AppOpacity.transparent,
@@ -16,10 +15,8 @@ abstract final class PopupMenuThemeBuilder {
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
       textStyle: AppTypography.bodyMedium.copyWith(color: scheme.onSurface),
     );
-  }
 
-  static MenuThemeData menu(ColorScheme scheme) {
-    return MenuThemeData(
+  static MenuThemeData menu(ColorScheme scheme) => MenuThemeData(
       style: MenuStyle(
         backgroundColor: WidgetStatePropertyAll(scheme.surfaceContainerHigh),
         shadowColor: WidgetStatePropertyAll(scheme.shadow),
@@ -32,10 +29,8 @@ abstract final class PopupMenuThemeBuilder {
         ),
       ),
     );
-  }
 
-  static MenuButtonThemeData menuButton(ColorScheme scheme) {
-    return MenuButtonThemeData(
+  static MenuButtonThemeData menuButton(ColorScheme scheme) => MenuButtonThemeData(
       style: ButtonStyle(
         foregroundColor: WidgetStatePropertyAll(scheme.onSurface),
         iconColor: WidgetStatePropertyAll(scheme.onSurfaceVariant),
@@ -48,5 +43,4 @@ abstract final class PopupMenuThemeBuilder {
         ),
       ),
     );
-  }
 }

@@ -66,7 +66,7 @@ void main() {
           height: 20,
           child: ListView(
             scrollDirection: Axis.horizontal,
-            children: [
+            children: const [
               SizedBox(key: firstKey, width: 10, height: 10),
               MxGap(20),
               SizedBox(key: secondKey, width: 10, height: 10),
@@ -121,11 +121,9 @@ class _Host extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       home: Scaffold(
         body: Align(alignment: Alignment.topLeft, child: child),
       ),
     );
-  }
 }

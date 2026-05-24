@@ -7,8 +7,7 @@ import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class DialogThemeBuilder {
-  static DialogThemeData dialog(ColorScheme scheme) {
-    return DialogThemeData(
+  static DialogThemeData dialog(ColorScheme scheme) => DialogThemeData(
       backgroundColor: scheme.surfaceContainerLow,
       surfaceTintColor: scheme.surfaceTint.withValues(
         alpha: AppOpacity.transparent,
@@ -28,10 +27,8 @@ abstract final class DialogThemeBuilder {
         vertical: AppSpacing.xxl,
       ),
     );
-  }
 
-  static BottomSheetThemeData bottomSheet(ColorScheme scheme) {
-    return BottomSheetThemeData(
+  static BottomSheetThemeData bottomSheet(ColorScheme scheme) => BottomSheetThemeData(
       backgroundColor: scheme.surfaceContainerLow,
       modalBackgroundColor: scheme.surfaceContainerLow,
       surfaceTintColor: scheme.surfaceTint.withValues(
@@ -46,10 +43,8 @@ abstract final class DialogThemeBuilder {
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.bottomSheet),
       clipBehavior: Clip.antiAlias,
     );
-  }
 
-  static SnackBarThemeData snackbar(ColorScheme scheme) {
-    return SnackBarThemeData(
+  static SnackBarThemeData snackbar(ColorScheme scheme) => SnackBarThemeData(
       backgroundColor: scheme.inverseSurface,
       actionTextColor: scheme.inversePrimary,
       contentTextStyle: AppTypography.bodyMedium.copyWith(
@@ -61,5 +56,4 @@ abstract final class DialogThemeBuilder {
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.banner),
       showCloseIcon: false,
     );
-  }
 }

@@ -144,8 +144,7 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
     Color? ratingEasy,
     Color? mastery,
     Color? streak,
-  }) {
-    return MxColorsExtension(
+  }) => MxColorsExtension(
       success: success ?? this.success,
       onSuccess: onSuccess ?? this.onSuccess,
       successContainer: successContainer ?? this.successContainer,
@@ -164,7 +163,6 @@ class MxColorsExtension extends ThemeExtension<MxColorsExtension> {
       mastery: mastery ?? this.mastery,
       streak: streak ?? this.streak,
     );
-  }
 
   @override
   MxColorsExtension lerp(ThemeExtension<MxColorsExtension>? other, double t) {
@@ -258,6 +256,4 @@ extension RepetitionOrderRole on RepetitionOrder {
 Color getRepetitionColor(
   RepetitionOrder repetitionOrder,
   MxColorsExtension customColors,
-) {
-  return customColors.repetitionColor(repetitionOrder.repetitionColorRole);
-}
+) => customColors.repetitionColor(repetitionOrder.repetitionColorRole);

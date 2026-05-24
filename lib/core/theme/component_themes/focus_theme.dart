@@ -62,7 +62,5 @@ abstract final class AppFocus {
   }
 
   /// `WidgetStateProperty<Color?>` factory for overlay tint from [base].
-  static WidgetStateProperty<Color?> overlayProperty(Color base) {
-    return WidgetStateProperty.resolveWith((states) => overlay(base, states));
-  }
+  static WidgetStateProperty<Color?> overlayProperty(Color base) => WidgetStateProperty.resolveWith((states) => overlay(base, states));
 }

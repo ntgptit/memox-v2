@@ -18,8 +18,7 @@ class FlashcardReorderList extends StatelessWidget {
   final ReorderCallback onReorder;
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
+  Widget build(BuildContext context) => SizedBox(
       height: MxFeatureSizes.flashcardReorderPanelHeightFor(context),
       child: MxReorderableList.builder(
         itemCount: orderedIds.length,
@@ -40,5 +39,4 @@ class FlashcardReorderList extends StatelessWidget {
         },
       ),
     );
-  }
 }

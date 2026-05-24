@@ -6,8 +6,7 @@ import '../widgets/mx_search_sort_toolbar.dart';
 
 List<MxSortOption<ContentSortMode>> buildContentSortOptions(
   AppLocalizations l10n,
-) {
-  return <MxSortOption<ContentSortMode>>[
+) => <MxSortOption<ContentSortMode>>[
     MxSortOption(
       value: ContentSortMode.manual,
       label: l10n.sortManual,
@@ -29,4 +28,3 @@ List<MxSortOption<ContentSortMode>> buildContentSortOptions(
       icon: Icons.history_rounded,
     ),
   ];
-}

@@ -10,8 +10,7 @@ import 'content_data_providers.dart';
 part 'flashcard_providers.g.dart';
 
 @riverpod
-FlashcardRepository flashcardRepository(Ref ref) {
-  return FlashcardRepositoryImpl(
+FlashcardRepository flashcardRepository(Ref ref) => FlashcardRepositoryImpl(
     flashcardDao: ref.watch(flashcardDaoProvider),
     deckDao: ref.watch(deckDaoProvider),
     folderDao: ref.watch(folderDaoProvider),
@@ -19,59 +18,36 @@ FlashcardRepository flashcardRepository(Ref ref) {
     clock: ref.watch(clockProvider),
     idGenerator: ref.watch(idGeneratorProvider),
   );
-}
 
 @riverpod
-WatchFlashcardListUseCase watchFlashcardListUseCase(Ref ref) {
-  return WatchFlashcardListUseCase(ref.watch(flashcardRepositoryProvider));
-}
+WatchFlashcardListUseCase watchFlashcardListUseCase(Ref ref) => WatchFlashcardListUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-CreateFlashcardUseCase createFlashcardUseCase(Ref ref) {
-  return CreateFlashcardUseCase(ref.watch(flashcardRepositoryProvider));
-}
+CreateFlashcardUseCase createFlashcardUseCase(Ref ref) => CreateFlashcardUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-GetFlashcardUseCase getFlashcardUseCase(Ref ref) {
-  return GetFlashcardUseCase(ref.watch(flashcardRepositoryProvider));
-}
+GetFlashcardUseCase getFlashcardUseCase(Ref ref) => GetFlashcardUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-GetFlashcardMoveTargetsUseCase getFlashcardMoveTargetsUseCase(Ref ref) {
-  return GetFlashcardMoveTargetsUseCase(ref.watch(flashcardRepositoryProvider));
-}
+GetFlashcardMoveTargetsUseCase getFlashcardMoveTargetsUseCase(Ref ref) => GetFlashcardMoveTargetsUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-UpdateFlashcardUseCase updateFlashcardUseCase(Ref ref) {
-  return UpdateFlashcardUseCase(ref.watch(flashcardRepositoryProvider));
-}
+UpdateFlashcardUseCase updateFlashcardUseCase(Ref ref) => UpdateFlashcardUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-DeleteFlashcardsUseCase deleteFlashcardsUseCase(Ref ref) {
-  return DeleteFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
-}
+DeleteFlashcardsUseCase deleteFlashcardsUseCase(Ref ref) => DeleteFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-MoveFlashcardsUseCase moveFlashcardsUseCase(Ref ref) {
-  return MoveFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
-}
+MoveFlashcardsUseCase moveFlashcardsUseCase(Ref ref) => MoveFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-ReorderFlashcardsUseCase reorderFlashcardsUseCase(Ref ref) {
-  return ReorderFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
-}
+ReorderFlashcardsUseCase reorderFlashcardsUseCase(Ref ref) => ReorderFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-PrepareFlashcardImportUseCase prepareFlashcardImportUseCase(Ref ref) {
-  return PrepareFlashcardImportUseCase(ref.watch(flashcardRepositoryProvider));
-}
+PrepareFlashcardImportUseCase prepareFlashcardImportUseCase(Ref ref) => PrepareFlashcardImportUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-CommitFlashcardImportUseCase commitFlashcardImportUseCase(Ref ref) {
-  return CommitFlashcardImportUseCase(ref.watch(flashcardRepositoryProvider));
-}
+CommitFlashcardImportUseCase commitFlashcardImportUseCase(Ref ref) => CommitFlashcardImportUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-ExportFlashcardsUseCase exportFlashcardsUseCase(Ref ref) {
-  return ExportFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
-}
+ExportFlashcardsUseCase exportFlashcardsUseCase(Ref ref) => ExportFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));

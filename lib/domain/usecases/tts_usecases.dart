@@ -45,11 +45,9 @@ final class SpeakFlashcardUseCase {
     );
   }
 
-  String _textFor(StudyFlashcardRef flashcard, TtsTextSide side) {
-    return switch (side) {
+  String _textFor(StudyFlashcardRef flashcard, TtsTextSide side) => switch (side) {
       TtsTextSide.front => flashcard.front,
       TtsTextSide.back => flashcard.back,
       TtsTextSide.note => '',
     };
-  }
 }

@@ -55,8 +55,7 @@ class AppDatabase extends _$AppDatabase {
     await customSelect('SELECT 1 AS ready').getSingle();
   }
 
-  static QueryExecutor _openConnection() {
-    return driftDatabase(
+  static QueryExecutor _openConnection() => driftDatabase(
       name: AppConstants.localDatabaseName,
       native: DriftNativeOptions(
         shareAcrossIsolates: true,
@@ -70,5 +69,4 @@ class AppDatabase extends _$AppDatabase {
         driftWorker: Uri.parse('drift_worker.dart.js'),
       ),
     );
-  }
 }

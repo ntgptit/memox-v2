@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_feature_layout.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 
@@ -27,8 +27,7 @@ class FlashcardListSkeleton extends StatelessWidget {
   const FlashcardListSkeleton({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
+  Widget build(BuildContext context) => ListView(
       key: const ValueKey('flashcard_list_skeleton'),
       children: const [
         _FlashcardHeaderSkeleton(),
@@ -42,17 +41,15 @@ class FlashcardListSkeleton extends StatelessWidget {
         _TermRowSkeleton(),
       ],
     );
-  }
 }
 
 class _FlashcardHeaderSkeleton extends StatelessWidget {
   const _FlashcardHeaderSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Row(
           children: [
             MxSkeleton(
@@ -76,17 +73,15 @@ class _FlashcardHeaderSkeleton extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _FlashcardToolbarSkeleton extends StatelessWidget {
   const _FlashcardToolbarSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         MxSkeleton(
           height: _flashcardToolbarHeight,
           borderRadius: MxFeatureRadii.full,
@@ -115,15 +110,13 @@ class _FlashcardToolbarSkeleton extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _TermRowSkeleton extends StatelessWidget {
   const _TermRowSkeleton();
 
   @override
-  Widget build(BuildContext context) {
-    return const Padding(
+  Widget build(BuildContext context) => const Padding(
       padding: EdgeInsets.all(MxSpace.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,5 +138,4 @@ class _TermRowSkeleton extends StatelessWidget {
         ],
       ),
     );
-  }
 }

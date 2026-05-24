@@ -5,8 +5,7 @@ import '../tokens/app_spacing.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class TooltipThemeBuilder {
-  static TooltipThemeData build(ColorScheme scheme) {
-    return TooltipThemeData(
+  static TooltipThemeData build(ColorScheme scheme) => TooltipThemeData(
       decoration: BoxDecoration(
         color: scheme.inverseSurface.withValues(alpha: 0.92),
         borderRadius: AppRadius.borderMd,
@@ -23,5 +22,4 @@ abstract final class TooltipThemeBuilder {
       showDuration: const Duration(milliseconds: 1500),
       preferBelow: true,
     );
-  }
 }

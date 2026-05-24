@@ -19,8 +19,7 @@ abstract final class ButtonThemeBuilder {
     vertical: AppSpacing.sm,
   );
 
-  static ElevatedButtonThemeData filled(ColorScheme scheme) {
-    return ElevatedButtonThemeData(
+  static ElevatedButtonThemeData filled(ColorScheme scheme) => ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: scheme.primary,
         foregroundColor: scheme.onPrimary,
@@ -40,10 +39,8 @@ abstract final class ButtonThemeBuilder {
         side: BorderSide.none,
       ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onPrimary)),
     );
-  }
 
-  static FilledButtonThemeData tonal(ColorScheme scheme) {
-    return FilledButtonThemeData(
+  static FilledButtonThemeData tonal(ColorScheme scheme) => FilledButtonThemeData(
       style:
           FilledButton.styleFrom(
             backgroundColor: scheme.primaryContainer,
@@ -63,10 +60,8 @@ abstract final class ButtonThemeBuilder {
             overlayColor: AppFocus.overlayProperty(scheme.onPrimaryContainer),
           ),
     );
-  }
 
-  static OutlinedButtonThemeData outlined(ColorScheme scheme) {
-    return OutlinedButtonThemeData(
+  static OutlinedButtonThemeData outlined(ColorScheme scheme) => OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: scheme.primary,
         disabledForegroundColor: scheme.onSurface.withValues(
@@ -79,10 +74,8 @@ abstract final class ButtonThemeBuilder {
         textStyle: AppTypography.labelLarge,
       ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.primary)),
     );
-  }
 
-  static TextButtonThemeData text(ColorScheme scheme) {
-    return TextButtonThemeData(
+  static TextButtonThemeData text(ColorScheme scheme) => TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: scheme.primary,
         disabledForegroundColor: scheme.onSurface.withValues(
@@ -95,10 +88,8 @@ abstract final class ButtonThemeBuilder {
         side: BorderSide.none,
       ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.primary)),
     );
-  }
 
-  static IconButtonThemeData icon(ColorScheme scheme) {
-    return IconButtonThemeData(
+  static IconButtonThemeData icon(ColorScheme scheme) => IconButtonThemeData(
       style: IconButton.styleFrom(
         foregroundColor: scheme.onSurfaceVariant,
         disabledForegroundColor: scheme.onSurface.withValues(
@@ -111,10 +102,8 @@ abstract final class ButtonThemeBuilder {
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
       ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onSurface)),
     );
-  }
 
-  static FloatingActionButtonThemeData fab(ColorScheme scheme) {
-    return FloatingActionButtonThemeData(
+  static FloatingActionButtonThemeData fab(ColorScheme scheme) => FloatingActionButtonThemeData(
       backgroundColor: scheme.primaryContainer,
       foregroundColor: scheme.onPrimaryContainer,
       elevation: AppElevation.fab,
@@ -123,5 +112,4 @@ abstract final class ButtonThemeBuilder {
       highlightElevation: AppElevation.fabPressed,
       shape: const RoundedRectangleBorder(borderRadius: AppRadius.cardLarge),
     );
-  }
 }

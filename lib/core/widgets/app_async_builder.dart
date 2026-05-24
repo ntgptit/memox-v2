@@ -20,11 +20,9 @@ class AppAsyncBuilder<T> extends StatelessWidget {
   final AppAsyncDataBuilder<T> data;
 
   @override
-  Widget build(BuildContext context) {
-    return value.when(
+  Widget build(BuildContext context) => value.when(
       loading: () => loading(context),
       error: (error, stackTrace) => this.error(context, error, stackTrace),
       data: (value) => data(context, value),
     );
-  }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
-import 'app_breakpoints.dart';
 import '../tokens/app_radius.dart';
 import '../tokens/app_spacing.dart';
+import 'app_breakpoints.dart';
 
 /// Role-based width for centered content columns.
 ///

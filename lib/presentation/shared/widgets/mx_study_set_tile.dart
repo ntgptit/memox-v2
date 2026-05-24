@@ -6,10 +6,10 @@ import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import 'mx_avatar.dart';
 import '../layouts/mx_gap.dart';
-import 'mx_text.dart';
+import 'mx_avatar.dart';
 import 'mx_tappable.dart';
+import 'mx_text.dart';
 
 /// List tile for a study set / folder / class entry in library listings.
 /// Layout: colored icon tile on the left, title + meta rows on the right.
@@ -147,8 +147,7 @@ class MxStudySetTile extends StatelessWidget {
     );
   }
 
-  Widget _buildTextColumn({required bool stackTrailing}) {
-    return Column(
+  Widget _buildTextColumn({required bool stackTrailing}) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxText(
@@ -191,11 +190,10 @@ class MxStudySetTile extends StatelessWidget {
         ],
         if (trailing != null && stackTrailing) ...[
           const MxGap(AppSpacing.sm),
-          Align(alignment: Alignment.centerRight, child: trailing!),
+          Align(alignment: Alignment.centerRight, child: trailing),
         ],
       ],
     );
-  }
 }
 
 class _IconTilePalette {

@@ -219,9 +219,7 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
     return _decodeFile(decoded);
   }
 
-  Map<String, String> _headers(String accessToken) {
-    return <String, String>{'Authorization': 'Bearer $accessToken'};
-  }
+  Map<String, String> _headers(String accessToken) => <String, String>{'Authorization': 'Bearer $accessToken'};
 
   void _throwIfUnsuccessful(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -299,7 +297,5 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
     return DateTime.tryParse(value)?.toUtc().millisecondsSinceEpoch;
   }
 
-  String _escapeQueryString(String value) {
-    return value.replaceAll("'", "\\'");
-  }
+  String _escapeQueryString(String value) => value.replaceAll("'", "\\'");
 }

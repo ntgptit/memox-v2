@@ -23,14 +23,14 @@ class SettingsScreen extends StatelessWidget {
         applyVerticalPadding: true,
         child: ListView(
           key: const ValueKey<String>('settings_content'),
-          children: [
-            const AccountSettingsOverviewGroup(),
-            const MxGap(MxSpace.xxl),
-            const PersonalizationSettingsGroup(),
-            const MxGap(MxSpace.xxl),
-            const LearningSettingsOverviewGroup(),
-            const MxGap(MxSpace.xxl),
-            const AudioSpeechSettingsOverviewGroup(),
+          children: const [
+            AccountSettingsOverviewGroup(),
+            MxGap(MxSpace.xxl),
+            PersonalizationSettingsGroup(),
+            MxGap(MxSpace.xxl),
+            LearningSettingsOverviewGroup(),
+            MxGap(MxSpace.xxl),
+            AudioSpeechSettingsOverviewGroup(),
           ],
         ),
       ),

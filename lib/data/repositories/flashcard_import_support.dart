@@ -15,8 +15,7 @@ final class FlashcardImportSupport {
     bool excelHasHeader = true,
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
-  }) {
-    return switch (format) {
+  }) => switch (format) {
       ImportSourceFormat.csv => _parseCsv(rawContent),
       ImportSourceFormat.excel => FlashcardExcelImportParser.parse(
         sourceBytes,
@@ -27,7 +26,6 @@ final class FlashcardImportSupport {
         structuredTextSeparator,
       ),
     };
-  }
 
   static FlashcardImportPreparation _parseCsv(String rawContent) {
     final lines = rawContent
@@ -294,8 +292,7 @@ final class FlashcardImportSupport {
     String line,
     ImportStructuredTextSeparator separator, {
     required bool clearOnly,
-  }) {
-    return switch (separator) {
+  }) => switch (separator) {
       ImportStructuredTextSeparator.auto => null,
       ImportStructuredTextSeparator.tab => _firstIndex(line, '\t'),
       ImportStructuredTextSeparator.colon =>
@@ -307,7 +304,6 @@ final class FlashcardImportSupport {
       ImportStructuredTextSeparator.pipe =>
         clearOnly ? _spacedTokenIndex(line, '|') : _firstIndex(line, '|'),
     };
-  }
 
   static int? _firstIndex(String line, String token) {
     final index = line.indexOf(token);

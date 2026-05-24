@@ -10,8 +10,7 @@ import 'focus_theme.dart';
 /// contract (primary when on, onSurfaceVariant when off, disabled at
 /// [AppOpacity.disabled]).
 abstract final class ToggleThemeBuilder {
-  static SwitchThemeData switchTheme(ColorScheme scheme) {
-    return SwitchThemeData(
+  static SwitchThemeData switchTheme(ColorScheme scheme) => SwitchThemeData(
       thumbColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
           return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
@@ -29,10 +28,8 @@ abstract final class ToggleThemeBuilder {
       trackOutlineColor: WidgetStatePropertyAll(scheme.outline),
       overlayColor: AppFocus.overlayProperty(scheme.primary),
     );
-  }
 
-  static CheckboxThemeData checkbox(ColorScheme scheme) {
-    return CheckboxThemeData(
+  static CheckboxThemeData checkbox(ColorScheme scheme) => CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
           return scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface);
@@ -44,10 +41,8 @@ abstract final class ToggleThemeBuilder {
       side: BorderSide(color: scheme.outline, width: 2),
       overlayColor: AppFocus.overlayProperty(scheme.primary),
     );
-  }
 
-  static RadioThemeData radio(ColorScheme scheme) {
-    return RadioThemeData(
+  static RadioThemeData radio(ColorScheme scheme) => RadioThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
           return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
@@ -57,10 +52,8 @@ abstract final class ToggleThemeBuilder {
       }),
       overlayColor: AppFocus.overlayProperty(scheme.primary),
     );
-  }
 
-  static SliderThemeData slider(ColorScheme scheme) {
-    return SliderThemeData(
+  static SliderThemeData slider(ColorScheme scheme) => SliderThemeData(
       activeTrackColor: scheme.primary,
       inactiveTrackColor: scheme.primary.withValues(
         alpha: AppOpacity.disabledSurface,
@@ -73,5 +66,4 @@ abstract final class ToggleThemeBuilder {
       ),
       trackHeight: 4,
     );
-  }
 }

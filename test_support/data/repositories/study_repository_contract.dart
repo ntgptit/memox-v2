@@ -2519,8 +2519,7 @@ final class _StudyHarness {
     }
   }
 
-  Future<StudySessionSnapshot> startOneCardNewStudy() {
-    return start.execute(
+  Future<StudySessionSnapshot> startOneCardNewStudy() => start.execute(
       const StudyContext(
         entryType: StudyEntryType.deck,
         entryRefId: 'deck-1',
@@ -2533,13 +2532,11 @@ final class _StudyHarness {
         ),
       ),
     );
-  }
 
   Future<void> setSessionStatus({
     required String sessionId,
     required SessionStatus status,
-  }) {
-    return (database.update(
+  }) => (database.update(
       database.studySessions,
     )..where((table) => table.id.equals(sessionId))).write(
       StudySessionsCompanion(
@@ -2547,7 +2544,6 @@ final class _StudyHarness {
         endedAt: Value(clock.nowEpochMillis()),
       ),
     );
-  }
 
   Future<void> dispose() => database.close();
 }

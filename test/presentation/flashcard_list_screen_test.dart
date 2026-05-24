@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/di/content/flashcard_providers.dart';
 import 'package:memox/app/router/route_names.dart';
-import 'package:memox/core/theme/tokens/app_icon_sizes.dart';
 import 'package:memox/core/errors/result.dart';
+import 'package:memox/core/theme/tokens/app_icon_sizes.dart';
 import 'package:memox/domain/entities/flashcard_entity.dart';
 import 'package:memox/domain/enums/content_sort_mode.dart';
 import 'package:memox/domain/repositories/flashcard_repository.dart';
@@ -19,8 +19,8 @@ import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/flashcard_list_screen.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
-import 'package:memox/presentation/features/flashcards/widgets/flashcard_detail_card_row.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_deck_summary_section.dart';
+import 'package:memox/presentation/features/flashcards/widgets/flashcard_detail_card_row.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_preview_section.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_study_modes_section.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_toolbar_section.dart';
@@ -863,8 +863,8 @@ void main() {
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
         getFlashcardMoveTargetsUseCaseProvider.overrideWithValue(
-          GetFlashcardMoveTargetsUseCase(
-            const _MoveTargetsFlashcardRepository([
+          const GetFlashcardMoveTargetsUseCase(
+            _MoveTargetsFlashcardRepository([
               DeckMoveTarget(
                 id: 'deck-target-001',
                 name: 'Target deck',
@@ -1017,8 +1017,7 @@ const _emptyFlashcardState = FlashcardListState(
   items: <FlashcardListItemState>[],
 );
 
-FlashcardListState _largeFlashcardState() {
-  return FlashcardListState(
+FlashcardListState _largeFlashcardState() => FlashcardListState(
     deckId: 'deck-001',
     folderId: 'folder-001',
     deckName: 'Korean deck',
@@ -1045,34 +1044,24 @@ FlashcardListState _largeFlashcardState() {
       ),
     ),
   );
-}
 
-Finder _rowText(String text) {
-  return find.descendant(
+Finder _rowText(String text) => find.descendant(
     of: find.byType(FlashcardDetailCardRow),
     matching: find.text(text),
   );
-}
 
-Finder _rowForText(String text) {
-  return find
+Finder _rowForText(String text) => find
       .ancestor(
         of: _rowText(text),
         matching: find.byType(FlashcardDetailCardRow),
       )
       .first;
-}
 
-Finder _rowIcon(String rowText, IconData icon) {
-  return find.descendant(of: _rowForText(rowText), matching: find.byIcon(icon));
-}
+Finder _rowIcon(String rowText, IconData icon) => find.descendant(of: _rowForText(rowText), matching: find.byIcon(icon));
 
-Finder _studyModeSection() {
-  return find.byType(FlashcardStudyModesSection);
-}
+Finder _studyModeSection() => find.byType(FlashcardStudyModesSection);
 
-Finder _studyModeTiles() {
-  return find.descendant(
+Finder _studyModeTiles() => find.descendant(
     of: _studyModeSection(),
     matching: find.byWidgetPredicate(
       (widget) =>
@@ -1081,16 +1070,13 @@ Finder _studyModeTiles() {
           (widget.key! as ValueKey<String>).value.startsWith('study_mode_'),
     ),
   );
-}
 
-Finder _verticalScrollable() {
-  return find
+Finder _verticalScrollable() => find
       .byWidgetPredicate(
         (widget) =>
             widget is Scrollable && widget.axisDirection == AxisDirection.down,
       )
       .first;
-}
 
 Future<void> _scrollToText(WidgetTester tester, String text) async {
   await _scrollUntilAny(tester, find.text(text));
@@ -1120,13 +1106,11 @@ class _TestApp extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: child,
     );
-  }
 }
 
 final class _MoveTargetsFlashcardRepository implements FlashcardRepository {
@@ -1138,9 +1122,7 @@ final class _MoveTargetsFlashcardRepository implements FlashcardRepository {
   Future<List<DeckMoveTarget>> getFlashcardMoveTargets({
     required String deckId,
     required List<String> flashcardIds,
-  }) async {
-    return targets;
-  }
+  }) async => targets;
 
   @override
   Future<FlashcardEntity> getFlashcard(String flashcardId) {

@@ -31,8 +31,7 @@ class MxNameDialog extends StatefulWidget {
     required String hintText,
     required String confirmLabel,
     String? initialValue,
-  }) {
-    return showDialog<String>(
+  }) => showDialog<String>(
       context: context,
       barrierDismissible: false,
       builder: (_) => MxNameDialog(
@@ -43,7 +42,6 @@ class MxNameDialog extends StatefulWidget {
         initialValue: initialValue,
       ),
     );
-  }
 
   @override
   State<MxNameDialog> createState() => _MxNameDialogState();

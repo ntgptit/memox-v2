@@ -9,21 +9,13 @@ import '../providers.dart';
 part 'content_data_providers.g.dart';
 
 @riverpod
-FolderDao folderDao(Ref ref) {
-  return FolderDao(ref.watch(appDatabaseProvider));
-}
+FolderDao folderDao(Ref ref) => FolderDao(ref.watch(appDatabaseProvider));
 
 @riverpod
-DeckDao deckDao(Ref ref) {
-  return DeckDao(ref.watch(appDatabaseProvider));
-}
+DeckDao deckDao(Ref ref) => DeckDao(ref.watch(appDatabaseProvider));
 
 @riverpod
-FlashcardDao flashcardDao(Ref ref) {
-  return FlashcardDao(ref.watch(appDatabaseProvider));
-}
+FlashcardDao flashcardDao(Ref ref) => FlashcardDao(ref.watch(appDatabaseProvider));
 
 @riverpod
-FolderStructureService folderStructureService(Ref ref) {
-  return const FolderStructureService();
-}
+FolderStructureService folderStructureService(Ref ref) => const FolderStructureService();

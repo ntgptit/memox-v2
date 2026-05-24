@@ -54,8 +54,7 @@ LibraryFolderReadModel _folderReadModel({
   required int deckCount,
   required int itemCount,
   required int masteryPercent,
-}) {
-  return LibraryFolderReadModel(
+}) => LibraryFolderReadModel(
     folder: FolderEntity(
       id: id,
       parentId: null,
@@ -74,4 +73,3 @@ LibraryFolderReadModel _folderReadModel({
     masteryPercent: masteryPercent,
     lastStudiedAt: null,
   );
-}

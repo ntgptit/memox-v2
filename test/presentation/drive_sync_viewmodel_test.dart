@@ -25,8 +25,8 @@ void main() {
   test('DT2 onSync: sync upload result becomes uploaded message', () async {
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
-      syncResult: DriveSyncRunResult.uploadedLocal(
-        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      syncResult: const DriveSyncRunResult.uploadedLocal(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced),
       ),
     );
     final container = _container(repository: repository);
@@ -46,8 +46,8 @@ void main() {
   test('DT13 onUploadLocal: upload command exposes uploaded message', () async {
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
-      uploadResult: DriveSyncRunResult.uploadedLocal(
-        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      uploadResult: const DriveSyncRunResult.uploadedLocal(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced),
       ),
     );
     final container = _container(repository: repository);
@@ -304,8 +304,8 @@ void main() {
       loadStatusResult: const DriveSyncStatus.failure(
         'Google Drive API is disabled.',
       ),
-      syncResult: DriveSyncRunResult.uploadedLocal(
-        const DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      syncResult: const DriveSyncRunResult.uploadedLocal(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced),
       ),
     );
     final container = _container(repository: repository);
@@ -390,8 +390,7 @@ void main() {
 ProviderContainer _container({
   required _FakeDriveSyncRepository repository,
   _FakeDriveSyncRuntimeEffects? effects,
-}) {
-  return ProviderContainer(
+}) => ProviderContainer(
     overrides: [
       driveSyncRepositoryProvider.overrideWith((ref) async => repository),
       driveSyncRuntimeEffectsProvider.overrideWithValue(
@@ -399,7 +398,6 @@ ProviderContainer _container({
       ),
     ],
   );
-}
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   _FakeDriveSyncRepository({
@@ -416,16 +414,16 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
        _loadStatusResults = loadStatusResults?.toList() ?? <DriveSyncStatus>[],
        syncResult =
            syncResult ??
-           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        uploadResult =
            uploadResult ??
-           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        restoreResult =
            restoreResult ??
-           DriveSyncRunResult.noChanges(const DriveSyncStatus.signedOut()),
+           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        resolveResult =
            resolveResult ??
-           DriveSyncRunResult.canceled(const DriveSyncStatus.ready());
+           const DriveSyncRunResult.canceled(DriveSyncStatus.ready());
 
   final DriveSyncStatus loadStatusResult;
   final List<DriveSyncStatus> _loadStatusResults;
@@ -498,17 +496,14 @@ final class _FakeDriveSyncRuntimeEffects implements DriveSyncRuntimeEffects {
   }
 }
 
-DriveSyncConflict _conflict() {
-  return DriveSyncConflict(
+DriveSyncConflict _conflict() => DriveSyncConflict(
     localFingerprint: 'local',
     remote: _remoteSnapshot(),
     reason: 'test conflict',
   );
-}
 
-DriveSyncRemoteSnapshot _remoteSnapshot() {
-  return DriveSyncRemoteSnapshot(
-    manifest: const DriveSyncManifest(
+DriveSyncRemoteSnapshot _remoteSnapshot() => const DriveSyncRemoteSnapshot(
+    manifest: DriveSyncManifest(
       manifestVersion: DriveSyncManifest.currentManifestVersion,
       snapshotFormatVersion: DriveSyncManifest.currentSnapshotFormatVersion,
       appId: DriveSyncManifest.currentAppId,
@@ -526,4 +521,3 @@ DriveSyncRemoteSnapshot _remoteSnapshot() {
     snapshotFileVersion: 'snapshot-version',
     modifiedAt: 1,
   );
-}

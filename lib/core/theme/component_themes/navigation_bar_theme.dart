@@ -5,8 +5,7 @@ import '../tokens/app_opacity.dart';
 import '../tokens/app_typography.dart';
 
 abstract final class NavigationBarThemeBuilder {
-  static NavigationBarThemeData bar(ColorScheme scheme) {
-    return NavigationBarThemeData(
+  static NavigationBarThemeData bar(ColorScheme scheme) => NavigationBarThemeData(
       backgroundColor: scheme.surfaceContainerLow,
       indicatorColor: scheme.primary,
       surfaceTintColor: scheme.surfaceTint.withValues(
@@ -34,10 +33,8 @@ abstract final class NavigationBarThemeBuilder {
         ),
       ),
     );
-  }
 
-  static NavigationRailThemeData rail(ColorScheme scheme) {
-    return NavigationRailThemeData(
+  static NavigationRailThemeData rail(ColorScheme scheme) => NavigationRailThemeData(
       backgroundColor: scheme.surfaceContainerLow,
       indicatorColor: scheme.primary,
       selectedIconTheme: IconThemeData(color: scheme.onPrimary, size: 24),
@@ -55,5 +52,4 @@ abstract final class NavigationBarThemeBuilder {
       useIndicator: true,
       labelType: NavigationRailLabelType.all,
     );
-  }
 }

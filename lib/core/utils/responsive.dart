@@ -97,21 +97,17 @@ extension ResponsiveContext on BuildContext {
     T? expanded,
     T? large,
     T? extraLarge,
-  }) {
-    return ResponsiveValue<T>(
+  }) => ResponsiveValue<T>(
       compact: compact,
       medium: medium,
       expanded: expanded,
       large: large,
       extraLarge: extraLarge,
     ).resolve(windowSize);
-  }
 
   /// Short-circuit for the common "phone vs everything else" split.
   ///
   /// Prefer `isExpandedOrLarger` directly when you only need the boolean.
   /// Use `adaptive` when you need to pick between two values inline.
-  T adaptive<T>({required T compact, required T expanded}) {
-    return isExpandedOrLarger ? expanded : compact;
-  }
+  T adaptive<T>({required T compact, required T expanded}) => isExpandedOrLarger ? expanded : compact;
 }

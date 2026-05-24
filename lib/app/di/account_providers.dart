@@ -14,14 +14,10 @@ import 'providers.dart';
 part 'account_providers.g.dart';
 
 @riverpod
-GoogleOAuthConfig googleOAuthConfig(Ref ref) {
-  return ref.watch(appConfigProvider).googleOAuthConfig;
-}
+GoogleOAuthConfig googleOAuthConfig(Ref ref) => ref.watch(appConfigProvider).googleOAuthConfig;
 
 @riverpod
-Future<CloudAccountRepository> cloudAccountRepository(Ref ref) async {
-  return CloudAccountStore(await ref.watch(sharedPreferencesProvider.future));
-}
+Future<CloudAccountRepository> cloudAccountRepository(Ref ref) async => CloudAccountStore(await ref.watch(sharedPreferencesProvider.future));
 
 @Riverpod(keepAlive: true)
 GoogleAccountAuthService googleAccountAuthService(Ref ref) {
@@ -33,66 +29,52 @@ GoogleAccountAuthService googleAccountAuthService(Ref ref) {
 }
 
 @riverpod
-Future<LoadCloudAccountLinkUseCase> loadCloudAccountLinkUseCase(Ref ref) async {
-  return LoadCloudAccountLinkUseCase(
+Future<LoadCloudAccountLinkUseCase> loadCloudAccountLinkUseCase(Ref ref) async => LoadCloudAccountLinkUseCase(
     await ref.watch(cloudAccountRepositoryProvider.future),
   );
-}
 
 @riverpod
-Future<RestoreGoogleAccountUseCase> restoreGoogleAccountUseCase(Ref ref) async {
-  return RestoreGoogleAccountUseCase(
+Future<RestoreGoogleAccountUseCase> restoreGoogleAccountUseCase(Ref ref) async => RestoreGoogleAccountUseCase(
     repository: await ref.watch(cloudAccountRepositoryProvider.future),
     authService: ref.watch(googleAccountAuthServiceProvider),
     config: ref.watch(googleOAuthConfigProvider),
     clock: ref.watch(clockProvider),
   );
-}
 
 @riverpod
-Future<SignInGoogleAccountUseCase> signInGoogleAccountUseCase(Ref ref) async {
-  return SignInGoogleAccountUseCase(
+Future<SignInGoogleAccountUseCase> signInGoogleAccountUseCase(Ref ref) async => SignInGoogleAccountUseCase(
     repository: await ref.watch(cloudAccountRepositoryProvider.future),
     authService: ref.watch(googleAccountAuthServiceProvider),
     config: ref.watch(googleOAuthConfigProvider),
     clock: ref.watch(clockProvider),
   );
-}
 
 @riverpod
-Future<AuthorizeGoogleDriveUseCase> authorizeGoogleDriveUseCase(Ref ref) async {
-  return AuthorizeGoogleDriveUseCase(
+Future<AuthorizeGoogleDriveUseCase> authorizeGoogleDriveUseCase(Ref ref) async => AuthorizeGoogleDriveUseCase(
     repository: await ref.watch(cloudAccountRepositoryProvider.future),
     authService: ref.watch(googleAccountAuthServiceProvider),
     config: ref.watch(googleOAuthConfigProvider),
     clock: ref.watch(clockProvider),
   );
-}
 
 @riverpod
-Future<SignOutGoogleAccountUseCase> signOutGoogleAccountUseCase(Ref ref) async {
-  return SignOutGoogleAccountUseCase(
+Future<SignOutGoogleAccountUseCase> signOutGoogleAccountUseCase(Ref ref) async => SignOutGoogleAccountUseCase(
     repository: await ref.watch(cloudAccountRepositoryProvider.future),
     authService: ref.watch(googleAccountAuthServiceProvider),
   );
-}
 
 @riverpod
 Future<PersistGoogleAccountAuthResultUseCase>
-persistGoogleAccountAuthResultUseCase(Ref ref) async {
-  return PersistGoogleAccountAuthResultUseCase(
+persistGoogleAccountAuthResultUseCase(Ref ref) async => PersistGoogleAccountAuthResultUseCase(
     repository: await ref.watch(cloudAccountRepositoryProvider.future),
     clock: ref.watch(clockProvider),
   );
-}
 
 @riverpod
 Future<GetDriveAppDataAccessTokenUseCase> getDriveAppDataAccessTokenUseCase(
   Ref ref,
-) async {
-  return GetDriveAppDataAccessTokenUseCase(
+) async => GetDriveAppDataAccessTokenUseCase(
     repository: await ref.watch(cloudAccountRepositoryProvider.future),
     authService: ref.watch(googleAccountAuthServiceProvider),
     config: ref.watch(googleOAuthConfigProvider),
   );
-}

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/extensions/theme_extensions.dart';
 import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
-import '../../../core/theme/extensions/theme_extensions.dart';
 import '../layouts/mx_gap.dart';
 import 'mx_button_size.dart';
 
@@ -87,8 +87,7 @@ class MxPrimaryButton extends StatelessWidget {
     return button;
   }
 
-  Widget _buildLabel() {
-    return LayoutBuilder(
+  Widget _buildLabel() => LayoutBuilder(
       builder: (context, constraints) {
         final canShowIcons = AppLayout.showsButtonIcons(
           hasBoundedWidth: constraints.hasBoundedWidth,
@@ -116,15 +115,13 @@ class MxPrimaryButton extends StatelessWidget {
         );
       },
     );
-  }
 
   ButtonStyle? _resolvedStyle(
     BuildContext context,
     ThemeData theme,
     TextTheme textTheme,
     MxColorsExtension mxColors,
-  ) {
-    return _mergeButtonStyles(
+  ) => _mergeButtonStyles(
       _mergeButtonStyles(
         _mergeButtonStyles(
           theme.elevatedButtonTheme.style,
@@ -134,7 +131,6 @@ class MxPrimaryButton extends StatelessWidget {
       ),
       _shapeStyle(),
     );
-  }
 
   ButtonStyle? _shapeStyle() {
     if (shape != MxPrimaryButtonShape.pill) return null;
@@ -147,8 +143,7 @@ class MxPrimaryButton extends StatelessWidget {
     BuildContext context,
     MxButtonSize size,
     TextTheme textTheme,
-  ) {
-    return switch (size) {
+  ) => switch (size) {
       MxButtonSize.xsmall => ButtonStyle(
         minimumSize: const WidgetStatePropertyAll(Size(0, 32)),
         padding: WidgetStatePropertyAll(
@@ -212,7 +207,6 @@ class MxPrimaryButton extends StatelessWidget {
         textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
       ),
     };
-  }
 
   ButtonStyle? _toneStyle(ThemeData theme, MxColorsExtension mxColors) {
     final scheme = theme.colorScheme;

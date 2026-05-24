@@ -38,14 +38,12 @@ final class RestoreGoogleAccountUseCase {
 
   Future<CloudAccountActionResult> _persistAuthResult(
     GoogleAccountAuthResult result,
-  ) async {
-    return persistCloudAccountAuthResult(
+  ) async => persistCloudAccountAuthResult(
       result: result,
       repository: _repository,
       clock: _clock,
       clearOnSignedOut: false,
     );
-  }
 }
 
 final class SignInGoogleAccountUseCase {
@@ -139,14 +137,12 @@ final class PersistGoogleAccountAuthResultUseCase {
   Future<CloudAccountActionResult> execute(
     GoogleAccountAuthResult result, {
     bool clearOnSignedOut = false,
-  }) {
-    return persistCloudAccountAuthResult(
+  }) => persistCloudAccountAuthResult(
       result: result,
       repository: _repository,
       clock: _clock,
       clearOnSignedOut: clearOnSignedOut,
     );
-  }
 }
 
 final class GetDriveAppDataAccessTokenUseCase {
