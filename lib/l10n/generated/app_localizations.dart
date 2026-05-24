@@ -1368,6 +1368,30 @@ abstract class AppLocalizations {
   /// **'{value}x'**
   String settingsSpeechRateValue(double value);
 
+  /// No description provided for @settingsSpeechPitchLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice pitch'**
+  String get settingsSpeechPitchLabel;
+
+  /// No description provided for @settingsSpeechPitchValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}x'**
+  String settingsSpeechPitchValue(double value);
+
+  /// No description provided for @settingsSpeechVolumeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get settingsSpeechVolumeLabel;
+
+  /// No description provided for @settingsSpeechVolumeValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{value}%'**
+  String settingsSpeechVolumeValue(int value);
+
   /// No description provided for @settingsSpeechFrontVoiceLabel.
   ///
   /// In en, this message translates to:
@@ -1379,6 +1403,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System voice'**
   String get settingsSpeechSystemVoice;
+
+  /// No description provided for @settingsSpeechVoiceMale.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get settingsSpeechVoiceMale;
+
+  /// No description provided for @settingsSpeechVoiceFemale.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get settingsSpeechVoiceFemale;
 
   /// No description provided for @settingsSpeechLoadingVoices.
   ///

@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../data/datasources/local/daos/tts_settings_dao.dart';
+import '../../data/repositories/tts_settings_repository_impl.dart';
 import '../../data/services/flutter_tts_service.dart';
-import '../../data/settings/tts_settings_store.dart';
+import '../../domain/repositories/tts_settings_repository.dart';
 import '../../domain/services/tts_playback_policy.dart';
 import '../../domain/services/tts_service.dart';
 import '../../domain/usecases/tts_usecases.dart';
@@ -15,7 +17,8 @@ part 'tts_providers.g.dart';
 TtsPlaybackPolicy ttsPlaybackPolicy(Ref ref) => const TtsPlaybackPolicy();
 
 @riverpod
-Future<TtsSettingsStore> ttsSettingsStore(Ref ref) async => TtsSettingsStore(await ref.watch(sharedPreferencesProvider.future));
+Future<TtsSettingsRepository> ttsSettingsRepository(Ref ref) async =>
+    TtsSettingsRepositoryImpl(TtsSettingsDao(ref.watch(appDatabaseProvider)));
 
 @Riverpod(keepAlive: true)
 TtsService ttsService(Ref ref) {
@@ -28,6 +31,6 @@ TtsService ttsService(Ref ref) {
 
 @riverpod
 SpeakFlashcardUseCase speakFlashcardUseCase(Ref ref) => SpeakFlashcardUseCase(
-    ref.watch(ttsServiceProvider),
-    playbackPolicy: ref.watch(ttsPlaybackPolicyProvider),
-  );
+  ref.watch(ttsServiceProvider),
+  playbackPolicy: ref.watch(ttsPlaybackPolicyProvider),
+);

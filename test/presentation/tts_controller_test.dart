@@ -3,17 +3,20 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/tts_providers.dart';
-import 'package:memox/core/constants/app_constants.dart';
+import 'package:memox/domain/repositories/tts_settings_repository.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/presentation/features/tts/providers/tts_controller_notifier.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   test('DT1 build: follows service state stream updates', () async {
-    SharedPreferences.setMockInitialValues({});
     final fake = _FakeTtsService();
     final container = ProviderContainer(
-      overrides: [ttsServiceProvider.overrideWithValue(fake)],
+      overrides: [
+        ttsServiceProvider.overrideWithValue(fake),
+        ttsSettingsRepositoryProvider.overrideWith(
+          (ref) async => _FakeTtsSettingsRepository(),
+        ),
+      ],
     );
     addTearDown(container.dispose);
     addTearDown(fake.dispose);
@@ -31,10 +34,14 @@ void main() {
   });
 
   test('DT1 speakText: rejects blank text without calling service', () async {
-    SharedPreferences.setMockInitialValues({});
     final fake = _FakeTtsService();
     final container = ProviderContainer(
-      overrides: [ttsServiceProvider.overrideWithValue(fake)],
+      overrides: [
+        ttsServiceProvider.overrideWithValue(fake),
+        ttsSettingsRepositoryProvider.overrideWith(
+          (ref) async => _FakeTtsSettingsRepository(),
+        ),
+      ],
     );
     addTearDown(container.dispose);
     addTearDown(fake.dispose);
@@ -48,15 +55,25 @@ void main() {
   });
 
   test(
-    'DT2 speakText: sends exact text language rate and voice to service',
+    'DT2 speakText: sends exact text language rate pitch volume and voice to service',
     () async {
-      SharedPreferences.setMockInitialValues({
-        AppConstants.sharedPrefsTtsRateKey: 0.6,
-        AppConstants.sharedPrefsTtsFrontVoiceNameKey: 'Korean Voice',
-      });
       final fake = _FakeTtsService();
       final container = ProviderContainer(
-        overrides: [ttsServiceProvider.overrideWithValue(fake)],
+        overrides: [
+          ttsServiceProvider.overrideWithValue(fake),
+          ttsSettingsRepositoryProvider.overrideWith(
+            (ref) async => _FakeTtsSettingsRepository(
+              settings: const TtsSettings(
+                autoPlay: false,
+                frontLanguage: TtsLanguage.korean,
+                rate: 0.6,
+                pitch: 1.2,
+                volume: 0.8,
+                frontVoiceName: 'Korean Voice',
+              ),
+            ),
+          ),
+        ],
       );
       addTearDown(container.dispose);
       addTearDown(fake.dispose);
@@ -74,15 +91,21 @@ void main() {
       expect(fake.speakCalls.single.text, '안녕하세요');
       expect(fake.speakCalls.single.language, TtsLanguage.korean);
       expect(fake.speakCalls.single.rate, 0.6);
+      expect(fake.speakCalls.single.pitch, 1.2);
+      expect(fake.speakCalls.single.volume, 0.8);
       expect(fake.speakCalls.single.voiceName, 'Korean Voice');
     },
   );
 
   test('DT3 speakText: maps service error to controller error state', () async {
-    SharedPreferences.setMockInitialValues({});
     final fake = _FakeTtsService(throwOnSpeak: true);
     final container = ProviderContainer(
-      overrides: [ttsServiceProvider.overrideWithValue(fake)],
+      overrides: [
+        ttsServiceProvider.overrideWithValue(fake),
+        ttsSettingsRepositoryProvider.overrideWith(
+          (ref) async => _FakeTtsSettingsRepository(),
+        ),
+      ],
     );
     addTearDown(container.dispose);
     addTearDown(fake.dispose);
@@ -98,10 +121,14 @@ void main() {
   test(
     'DT4 speakText: rejects non-front side without calling service',
     () async {
-      SharedPreferences.setMockInitialValues({});
       final fake = _FakeTtsService();
       final container = ProviderContainer(
-        overrides: [ttsServiceProvider.overrideWithValue(fake)],
+        overrides: [
+          ttsServiceProvider.overrideWithValue(fake),
+          ttsSettingsRepositoryProvider.overrideWith(
+            (ref) async => _FakeTtsSettingsRepository(),
+          ),
+        ],
       );
       addTearDown(container.dispose);
       addTearDown(fake.dispose);
@@ -120,10 +147,14 @@ void main() {
   );
 
   test('DT1 stop: stops service and resets state to idle', () async {
-    SharedPreferences.setMockInitialValues({});
     final fake = _FakeTtsService();
     final container = ProviderContainer(
-      overrides: [ttsServiceProvider.overrideWithValue(fake)],
+      overrides: [
+        ttsServiceProvider.overrideWithValue(fake),
+        ttsSettingsRepositoryProvider.overrideWith(
+          (ref) async => _FakeTtsSettingsRepository(),
+        ),
+      ],
     );
     addTearDown(container.dispose);
     addTearDown(fake.dispose);
@@ -144,13 +175,32 @@ final class _SpeakCall {
     required this.text,
     required this.language,
     required this.rate,
+    required this.pitch,
+    required this.volume,
     this.voiceName,
   });
 
   final String text;
   final TtsLanguage language;
   final double rate;
+  final double pitch;
+  final double volume;
   final String? voiceName;
+}
+
+final class _FakeTtsSettingsRepository implements TtsSettingsRepository {
+  _FakeTtsSettingsRepository({TtsSettings? settings})
+    : settings = settings ?? TtsSettings.defaults;
+
+  TtsSettings settings;
+
+  @override
+  Future<TtsSettings> load() async => settings;
+
+  @override
+  Future<void> save(TtsSettings settings) async {
+    this.settings = settings;
+  }
 }
 
 final class _FakeTtsService implements TtsService {
@@ -173,13 +223,17 @@ final class _FakeTtsService implements TtsService {
   }
 
   @override
-  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async => [TtsVoice(name: '${language.name} voice', language: language)];
+  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async => [
+    TtsVoice(name: '${language.name} voice', language: language),
+  ];
 
   @override
   Future<void> speak(
     String text, {
     required TtsLanguage language,
     required double rate,
+    required double pitch,
+    required double volume,
     String? voiceName,
   }) async {
     if (throwOnSpeak) {
@@ -190,6 +244,8 @@ final class _FakeTtsService implements TtsService {
         text: text,
         language: language,
         rate: rate,
+        pitch: pitch,
+        volume: volume,
         voiceName: voiceName,
       ),
     );

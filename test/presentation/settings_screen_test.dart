@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/di/account_providers.dart';
+import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/di/study/study_settings_providers.dart';
 import 'package:memox/app/di/sync_providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
@@ -13,12 +15,13 @@ import 'package:memox/app/router/route_names.dart';
 import 'package:memox/app/services/drive_sync_runtime_effects.dart';
 import 'package:memox/core/config/google_oauth_config.dart';
 import 'package:memox/core/constants/app_constants.dart';
+import 'package:memox/data/datasources/local/app_database.dart';
 import 'package:memox/data/settings/cloud_account_store.dart';
 import 'package:memox/data/settings/study_settings_store.dart';
-import 'package:memox/data/settings/tts_settings_store.dart';
 import 'package:memox/domain/entities/cloud_account_link.dart';
 import 'package:memox/domain/entities/drive_sync_models.dart';
 import 'package:memox/domain/repositories/drive_sync_repository.dart';
+import 'package:memox/domain/repositories/tts_settings_repository.dart';
 import 'package:memox/domain/services/google_account_auth_service.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
@@ -111,12 +114,10 @@ void main() {
   testWidgets(
     'DT3 onOpen: renders speech settings through shared loading state',
     (tester) async {
-      final completer = Completer<TtsSettingsStore>();
+      final completer = Completer<TtsSettingsRepository>();
       addTearDown(() async {
         if (!completer.isCompleted) {
-          completer.complete(
-            TtsSettingsStore(await SharedPreferences.getInstance()),
-          );
+          completer.complete(_FakeTtsSettingsRepository());
         }
       });
 
@@ -124,7 +125,7 @@ void main() {
         tester,
         child: const AudioSpeechSettingsScreen(),
         settle: false,
-        ttsSettingsStoreFuture: completer.future,
+        ttsSettingsRepositoryFuture: completer.future,
       );
       await tester.pump();
 
@@ -853,13 +854,20 @@ void main() {
       languageControls.first.onChanged({TtsLanguage.english});
       await tester.pumpAndSettle();
 
-      tester.widget<Slider>(find.byType(Slider)).onChanged?.call(0.7);
+      final sliders = tester.widgetList<Slider>(find.byType(Slider)).toList();
+      sliders[0].onChanged?.call(0.7);
+      await tester.pumpAndSettle();
+      sliders[1].onChanged?.call(1.3);
+      await tester.pumpAndSettle();
+      sliders[2].onChanged?.call(0.6);
       await tester.pumpAndSettle();
 
       final settings = await harness.container.read(ttsSettingsProvider.future);
       expect(settings.autoPlay, isTrue);
       expect(settings.frontLanguage, TtsLanguage.english);
       expect(settings.rate, 0.7);
+      expect(settings.pitch, 1.3);
+      expect(settings.volume, 0.6);
 
       await tester.ensureVisible(find.byKey(_speechPreviewButtonKey));
       await tester.pumpAndSettle();
@@ -869,6 +877,8 @@ void main() {
       expect(harness.tts.speakCalls, hasLength(1));
       expect(harness.tts.speakCalls.single.language, TtsLanguage.english);
       expect(harness.tts.speakCalls.single.rate, 0.7);
+      expect(harness.tts.speakCalls.single.pitch, 1.3);
+      expect(harness.tts.speakCalls.single.volume, 0.6);
     },
   );
 
@@ -899,6 +909,11 @@ void main() {
       expect(find.text('Hide voice options'), findsNothing);
       expect(find.byTooltip('Hide voice options'), findsOneWidget);
       expect(find.text('Front voice'), findsOneWidget);
+      await tester.tap(find.byType(DropdownButtonFormField<String>).last);
+      await tester.pumpAndSettle();
+      expect(find.text('korean system voice · Male'), findsOneWidget);
+      await tester.tap(find.text('korean system voice · Male'));
+      await tester.pumpAndSettle();
       expect(find.text('Back voice'), findsNothing);
       expect(harness.tts.availableVoiceRequests, [TtsLanguage.korean]);
     },
@@ -1326,13 +1341,14 @@ Future<_SettingsHarness> _pumpSettings(
   Widget child = const SettingsScreen(),
   MediaQueryData? mediaQueryData,
   Future<StudySettingsStore>? studySettingsStoreFuture,
-  Future<TtsSettingsStore>? ttsSettingsStoreFuture,
+  Future<TtsSettingsRepository>? ttsSettingsRepositoryFuture,
   GoogleOAuthConfig? googleConfig,
   GoogleAccountAuthService? googleAuth,
   DriveSyncRepository? driveSyncRepository,
   bool settle = true,
 }) async {
   final fakeTts = _FakeTtsService();
+  final database = AppDatabase(executor: NativeDatabase.memory());
   final effectiveGoogleAuth = googleAuth ?? _FakeGoogleAccountAuthService();
   final effectiveDriveSyncRepository =
       driveSyncRepository ??
@@ -1341,6 +1357,7 @@ Future<_SettingsHarness> _pumpSettings(
       );
   final container = ProviderContainer(
     overrides: [
+      appDatabaseProvider.overrideWithValue(database),
       ttsServiceProvider.overrideWithValue(fakeTts),
       driveSyncRepositoryProvider.overrideWith(
         (ref) async => effectiveDriveSyncRepository,
@@ -1355,11 +1372,14 @@ Future<_SettingsHarness> _pumpSettings(
         studySettingsStoreProvider.overrideWith(
           (ref) => studySettingsStoreFuture,
         ),
-      if (ttsSettingsStoreFuture != null)
-        ttsSettingsStoreProvider.overrideWith((ref) => ttsSettingsStoreFuture),
+      if (ttsSettingsRepositoryFuture != null)
+        ttsSettingsRepositoryProvider.overrideWith(
+          (ref) => ttsSettingsRepositoryFuture,
+        ),
     ],
   );
   addTearDown(container.dispose);
+  addTearDown(database.close);
   addTearDown(fakeTts.dispose);
   if (effectiveGoogleAuth is _FakeGoogleAccountAuthService) {
     addTearDown(effectiveGoogleAuth.dispose);
@@ -1391,6 +1411,7 @@ Future<_SettingsHarness> _pumpSettingsRouter(
   DriveSyncRepository? driveSyncRepository,
 }) async {
   final fakeTts = _FakeTtsService();
+  final database = AppDatabase(executor: NativeDatabase.memory());
   final effectiveGoogleAuth = googleAuth ?? _FakeGoogleAccountAuthService();
   final effectiveDriveSyncRepository =
       driveSyncRepository ??
@@ -1399,6 +1420,7 @@ Future<_SettingsHarness> _pumpSettingsRouter(
       );
   final container = ProviderContainer(
     overrides: [
+      appDatabaseProvider.overrideWithValue(database),
       ttsServiceProvider.overrideWithValue(fakeTts),
       driveSyncRepositoryProvider.overrideWith(
         (ref) async => effectiveDriveSyncRepository,
@@ -1440,6 +1462,7 @@ Future<_SettingsHarness> _pumpSettingsRouter(
   );
 
   addTearDown(container.dispose);
+  addTearDown(database.close);
   addTearDown(router.dispose);
   addTearDown(fakeTts.dispose);
   if (effectiveGoogleAuth is _FakeGoogleAccountAuthService) {
@@ -1464,12 +1487,28 @@ final class _SettingsHarness {
   final _FakeTtsService tts;
 }
 
-MxCard _overviewCardForKey(WidgetTester tester, String key) => tester.widget<MxCard>(_overviewCardFinderForKey(key).first);
+final class _FakeTtsSettingsRepository implements TtsSettingsRepository {
+  _FakeTtsSettingsRepository({TtsSettings? settings})
+    : settings = settings ?? TtsSettings.defaults;
+
+  TtsSettings settings;
+
+  @override
+  Future<TtsSettings> load() async => settings;
+
+  @override
+  Future<void> save(TtsSettings settings) async {
+    this.settings = settings;
+  }
+}
+
+MxCard _overviewCardForKey(WidgetTester tester, String key) =>
+    tester.widget<MxCard>(_overviewCardFinderForKey(key).first);
 
 Finder _overviewCardFinderForKey(String key) => find.ancestor(
-    of: find.byKey(ValueKey<String>(key)),
-    matching: find.byType(MxCard),
-  );
+  of: find.byKey(ValueKey<String>(key)),
+  matching: find.byType(MxCard),
+);
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   _FakeDriveSyncRepository({
@@ -1566,24 +1605,24 @@ const _driveReadyLink = CloudAccountLink(
 );
 
 DriveSyncRemoteSnapshot _remoteSnapshot() => const DriveSyncRemoteSnapshot(
-    manifest: DriveSyncManifest(
-      manifestVersion: DriveSyncManifest.currentManifestVersion,
-      snapshotFormatVersion: DriveSyncManifest.currentSnapshotFormatVersion,
-      appId: DriveSyncManifest.currentAppId,
-      appDatabaseSchemaVersion: 6,
-      createdAt: 1,
-      deviceId: 'remote-device',
-      deviceLabel: 'Remote device',
-      databaseSha256: 'db',
-      settingsSha256: 'settings',
-      snapshotSizeBytes: 2,
-    ),
-    manifestFileId: 'manifest-file',
-    manifestFileVersion: 'manifest-version',
-    snapshotFileId: 'snapshot-file',
-    snapshotFileVersion: 'snapshot-version',
-    modifiedAt: 1,
-  );
+  manifest: DriveSyncManifest(
+    manifestVersion: DriveSyncManifest.currentManifestVersion,
+    snapshotFormatVersion: DriveSyncManifest.currentSnapshotFormatVersion,
+    appId: DriveSyncManifest.currentAppId,
+    appDatabaseSchemaVersion: 6,
+    createdAt: 1,
+    deviceId: 'remote-device',
+    deviceLabel: 'Remote device',
+    databaseSha256: 'db',
+    settingsSha256: 'settings',
+    snapshotSizeBytes: 2,
+  ),
+  manifestFileId: 'manifest-file',
+  manifestFileVersion: 'manifest-version',
+  snapshotFileId: 'snapshot-file',
+  snapshotFileVersion: 'snapshot-version',
+  modifiedAt: 1,
+);
 
 const _driveMissingLink = CloudAccountLink(
   provider: CloudProvider.google,
@@ -1601,15 +1640,15 @@ GoogleAccountAuthSession _session({
   required Set<String> grantedScopes,
   required DriveAuthorizationState driveAuthorizationState,
 }) => GoogleAccountAuthSession(
-    profile: const GoogleAccountProfile(
-      subjectId: 'google-user-001',
-      email: 'user@example.com',
-      displayName: 'MemoX User',
-      photoUrl: null,
-    ),
-    grantedScopes: grantedScopes,
-    driveAuthorizationState: driveAuthorizationState,
-  );
+  profile: const GoogleAccountProfile(
+    subjectId: 'google-user-001',
+    email: 'user@example.com',
+    displayName: 'MemoX User',
+    photoUrl: null,
+  ),
+  grantedScopes: grantedScopes,
+  driveAuthorizationState: driveAuthorizationState,
+);
 
 final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   _FakeGoogleAccountAuthService({
@@ -1675,12 +1714,16 @@ final class _SpeakCall {
     required this.text,
     required this.language,
     required this.rate,
+    required this.pitch,
+    required this.volume,
     this.voiceName,
   });
 
   final String text;
   final TtsLanguage language;
   final double rate;
+  final double pitch;
+  final double volume;
   final String? voiceName;
 }
 
@@ -1699,7 +1742,11 @@ final class _FakeTtsService implements TtsService {
   Future<List<TtsVoice>> availableVoices(TtsLanguage language) async {
     availableVoiceRequests.add(language);
     return [
-      TtsVoice(name: '${language.name} system voice', language: language),
+      TtsVoice(
+        name: '${language.name} system voice',
+        language: language,
+        gender: 'male',
+      ),
     ];
   }
 
@@ -1708,6 +1755,8 @@ final class _FakeTtsService implements TtsService {
     String text, {
     required TtsLanguage language,
     required double rate,
+    required double pitch,
+    required double volume,
     String? voiceName,
   }) async {
     speakCalls.add(
@@ -1715,6 +1764,8 @@ final class _FakeTtsService implements TtsService {
         text: text,
         language: language,
         rate: rate,
+        pitch: pitch,
+        volume: volume,
         voiceName: voiceName,
       ),
     );
@@ -1744,10 +1795,10 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: child,
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: child,
+  );
 }
 
 class _RouterTestApp extends StatelessWidget {
@@ -1757,8 +1808,8 @@ class _RouterTestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: router,
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    routerConfig: router,
+  );
 }

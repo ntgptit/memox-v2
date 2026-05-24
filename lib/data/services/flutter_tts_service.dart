@@ -47,7 +47,7 @@ final class FlutterTtsService implements TtsService {
         TtsVoice(
           name: rawName,
           language: language,
-          gender: rawGender is String ? rawGender : null,
+          gender: _normalizeGender(rawGender),
         ),
       );
     }
@@ -62,6 +62,8 @@ final class FlutterTtsService implements TtsService {
     String text, {
     required TtsLanguage language,
     required double rate,
+    required double pitch,
+    required double volume,
     String? voiceName,
   }) async {
     if (StringUtils.isBlank(text)) {
@@ -77,8 +79,14 @@ final class FlutterTtsService implements TtsService {
       () => _flutterTts.setSpeechRate(TtsSettings.normalizeRate(rate)),
       label: 'setSpeechRate',
     );
-    await _runOnEngine(() => _flutterTts.setVolume(1.0), label: 'setVolume');
-    await _runOnEngine(() => _flutterTts.setPitch(1.0), label: 'setPitch');
+    await _runOnEngine(
+      () => _flutterTts.setVolume(TtsSettings.normalizeVolume(volume)),
+      label: 'setVolume',
+    );
+    await _runOnEngine(
+      () => _flutterTts.setPitch(TtsSettings.normalizePitch(pitch)),
+      label: 'setPitch',
+    );
     if (StringUtils.isNotBlank(voiceName)) {
       await _runOnEngine(
         () => _flutterTts.setVoice(<String, String>{
@@ -130,6 +138,18 @@ final class FlutterTtsService implements TtsService {
         label: 'setIosAudioCategory',
       );
     }
+  }
+
+  String? _normalizeGender(Object? rawGender) {
+    if (rawGender is! String) {
+      return null;
+    }
+    final normalized = StringUtils.normalizedForComparison(rawGender);
+    return switch (normalized) {
+      'male' || 'm' || '1' => 'male',
+      'female' || 'f' || '2' => 'female',
+      _ => null,
+    };
   }
 
   Future<void> _runOnEngine(

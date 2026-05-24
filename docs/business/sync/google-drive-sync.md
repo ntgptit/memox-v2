@@ -22,7 +22,7 @@ Google Drive Sync V1 cho phép user tự bấm `Sync now` trong Settings, chọn
 - Theme mode nếu key đã có trong SharedPreferences.
 - Locale override nếu key đã có trong SharedPreferences.
 - Study defaults: new/review batch size, shuffle flashcards, shuffle answers, prioritize overdue.
-- TTS settings được user chọn.
+- TTS settings được user chọn nằm trong SQLite snapshot (`tts_settings`), không còn nằm trong `settings.json`.
 
 ## Settings không được sync
 - Google account link.

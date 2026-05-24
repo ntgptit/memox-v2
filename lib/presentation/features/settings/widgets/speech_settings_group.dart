@@ -24,6 +24,7 @@ import '../../../shared/widgets/mx_text_field.dart';
 import '../../tts/providers/tts_controller_notifier.dart';
 import '../../tts/providers/tts_settings_notifier.dart';
 import 'settings_group.dart';
+import 'speech_audio_sliders.dart';
 
 const _speechPreviewButtonKey = ValueKey<String>(
   'settings-speech-preview-button',
@@ -142,7 +143,8 @@ class _SpeechSettingRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
+  Widget build(BuildContext context) =>
+      SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
 }
 
 class _SpeechDetailsSheet extends ConsumerStatefulWidget {
@@ -188,6 +190,10 @@ class _SpeechDetailsSheetState extends ConsumerState<_SpeechDetailsSheet> {
         ),
         const MxGap(MxSpace.md),
         _SpeechRateSlider(settings: settings, notifier: notifier),
+        const MxGap(MxSpace.md),
+        SpeechPitchSlider(settings: settings, notifier: notifier),
+        const MxGap(MxSpace.md),
+        SpeechVolumeSlider(settings: settings, notifier: notifier),
         const MxGap(MxSpace.lg),
         _PreviewTextField(
           controller: widget.controller,
@@ -317,23 +323,23 @@ class _SpeechActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        MxIconButton.compact(
-          key: _speechPreviewButtonKey,
-          icon: Icons.volume_up_rounded,
-          tooltip: previewLabel,
-          onPressed: onPreview,
-        ),
-        const MxGap(MxSpace.xs),
-        MxIconButton.compact(
-          key: _speechVoiceOptionsButtonKey,
-          icon: Icons.tune_rounded,
-          tooltip: voiceOptionsLabel,
-          onPressed: onToggleVoiceOptions,
-        ),
-      ],
-    );
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      MxIconButton.compact(
+        key: _speechPreviewButtonKey,
+        icon: Icons.volume_up_rounded,
+        tooltip: previewLabel,
+        onPressed: onPreview,
+      ),
+      const MxGap(MxSpace.xs),
+      MxIconButton.compact(
+        key: _speechVoiceOptionsButtonKey,
+        icon: Icons.tune_rounded,
+        tooltip: voiceOptionsLabel,
+        onPressed: onToggleVoiceOptions,
+      ),
+    ],
+  );
 }
 
 class _PreviewTextField extends StatefulWidget {
@@ -443,18 +449,18 @@ class _VoiceOptions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const MxGap(MxSpace.md),
-        _VoiceSelect(
-          label: AppLocalizations.of(context).settingsSpeechFrontVoiceLabel,
-          language: settings.frontLanguage,
-          voices: voices,
-          selectedVoiceName: settings.frontVoiceName,
-          onChanged: onChanged,
-        ),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const MxGap(MxSpace.md),
+      _VoiceSelect(
+        label: AppLocalizations.of(context).settingsSpeechFrontVoiceLabel,
+        language: settings.frontLanguage,
+        voices: voices,
+        selectedVoiceName: settings.frontVoiceName,
+        onChanged: onChanged,
+      ),
+    ],
+  );
 }
 
 class _VoiceSelect extends StatelessWidget {
@@ -498,12 +504,22 @@ class _VoiceSelect extends StatelessWidget {
           label: l10n.settingsSpeechSystemVoice,
         ),
         for (final voice in voiceItems)
-          MxSelectOption<String>(value: voice.name, label: voice.name),
+          MxSelectOption<String>(
+            value: voice.name,
+            label: _voiceLabel(l10n, voice),
+          ),
       ],
       onChanged: onChanged,
     );
   }
 }
+
+String _voiceLabel(AppLocalizations l10n, TtsVoice voice) =>
+    switch (voice.gender) {
+      'male' => '${voice.name} · ${l10n.settingsSpeechVoiceMale}',
+      'female' => '${voice.name} · ${l10n.settingsSpeechVoiceFemale}',
+      _ => voice.name,
+    };
 
 String? _voiceSelectHelperText({
   required AppLocalizations l10n,
@@ -523,10 +539,11 @@ String? _voiceSelectHelperText({
   return null;
 }
 
-String _languageLabel(AppLocalizations l10n, TtsLanguage language) => switch (language) {
-    TtsLanguage.korean => l10n.settingsSpeechKorean,
-    TtsLanguage.english => l10n.settingsSpeechEnglish,
-  };
+String _languageLabel(AppLocalizations l10n, TtsLanguage language) =>
+    switch (language) {
+      TtsLanguage.korean => l10n.settingsSpeechKorean,
+      TtsLanguage.english => l10n.settingsSpeechEnglish,
+    };
 
 String _voiceSelectionValue(AppLocalizations l10n, TtsSettings settings) {
   final voiceName = settings.frontVoiceName;
@@ -536,7 +553,8 @@ String _voiceSelectionValue(AppLocalizations l10n, TtsSettings settings) {
   return l10n.settingsSpeechSystemVoice;
 }
 
-String _previewText(AppLocalizations l10n, TtsLanguage language) => switch (language) {
-    TtsLanguage.korean => l10n.settingsSpeechKoreanPreviewText,
-    TtsLanguage.english => l10n.settingsSpeechEnglishPreviewText,
-  };
+String _previewText(AppLocalizations l10n, TtsLanguage language) =>
+    switch (language) {
+      TtsLanguage.korean => l10n.settingsSpeechKoreanPreviewText,
+      TtsLanguage.english => l10n.settingsSpeechEnglishPreviewText,
+    };

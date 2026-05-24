@@ -50,6 +50,9 @@ final class _AppDatabaseMigrationRunner {
     if (from < 8) {
       await _allowSingleModeStudyFlowsForSchemaV8();
     }
+    if (from < 9) {
+      await _createTtsSettingsForSchemaV9();
+    }
   }
 
   Future<void> _rebuildLegacyFlashcardProgressIfNeeded() async {
@@ -83,12 +86,13 @@ final class _AppDatabaseMigrationRunner {
     );
   }
 
-  Future<bool> _hasRequiredFlashcardProgressColumns() async => await _hasColumn(_TableName.flashcardProgress, 'current_box') &&
-        await _hasColumn(_TableName.flashcardProgress, 'review_count') &&
-        await _hasColumn(_TableName.flashcardProgress, 'lapse_count') &&
-        await _hasColumn(_TableName.flashcardProgress, 'last_result') &&
-        await _hasColumn(_TableName.flashcardProgress, 'created_at') &&
-        await _hasColumn(_TableName.flashcardProgress, 'updated_at');
+  Future<bool> _hasRequiredFlashcardProgressColumns() async =>
+      await _hasColumn(_TableName.flashcardProgress, 'current_box') &&
+      await _hasColumn(_TableName.flashcardProgress, 'review_count') &&
+      await _hasColumn(_TableName.flashcardProgress, 'lapse_count') &&
+      await _hasColumn(_TableName.flashcardProgress, 'last_result') &&
+      await _hasColumn(_TableName.flashcardProgress, 'created_at') &&
+      await _hasColumn(_TableName.flashcardProgress, 'updated_at');
 
   Future<void> _resetLegacyStudyTablesIfNeeded() async {
     if (!await _needsStudyTableReset()) {
@@ -189,6 +193,12 @@ final class _AppDatabaseMigrationRunner {
     }
   }
 
+  Future<void> _createTtsSettingsForSchemaV9() async {
+    if (!await _hasTable(_TableName.ttsSettings)) {
+      await migrator.createTable(database.ttsSettingsRecords);
+    }
+  }
+
   Future<void> _ensureFlashcardAuthorColumns() async {
     if (!await _hasTable(_TableName.flashcards)) {
       await migrator.createTable(database.flashcards);
@@ -265,14 +275,15 @@ final class _AppDatabaseMigrationRunner {
     await _alterTable(TableMigration(database.flashcards));
   }
 
-  Future<bool> _hasRequiredFlashcardColumns() async => await _hasColumn(_TableName.flashcards, 'id') &&
-        await _hasColumn(_TableName.flashcards, 'deck_id') &&
-        await _hasColumn(_TableName.flashcards, 'front') &&
-        await _hasColumn(_TableName.flashcards, 'back') &&
-        await _hasColumn(_TableName.flashcards, 'note') &&
-        await _hasColumn(_TableName.flashcards, 'sort_order') &&
-        await _hasColumn(_TableName.flashcards, 'created_at') &&
-        await _hasColumn(_TableName.flashcards, 'updated_at');
+  Future<bool> _hasRequiredFlashcardColumns() async =>
+      await _hasColumn(_TableName.flashcards, 'id') &&
+      await _hasColumn(_TableName.flashcards, 'deck_id') &&
+      await _hasColumn(_TableName.flashcards, 'front') &&
+      await _hasColumn(_TableName.flashcards, 'back') &&
+      await _hasColumn(_TableName.flashcards, 'note') &&
+      await _hasColumn(_TableName.flashcards, 'sort_order') &&
+      await _hasColumn(_TableName.flashcards, 'created_at') &&
+      await _hasColumn(_TableName.flashcards, 'updated_at');
 
   Future<void> _dropAndCreateFlashcardContentTables() async {
     await _runWithoutForeignKeys(() async {
@@ -351,6 +362,7 @@ abstract final class _TableName {
   static const String studyAttempts = 'study_attempts';
   static const String studySessionItems = 'study_session_items';
   static const String studySessions = 'study_sessions';
+  static const String ttsSettings = 'tts_settings';
 }
 
 abstract final class _Pragma {

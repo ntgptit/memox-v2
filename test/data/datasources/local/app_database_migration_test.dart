@@ -24,6 +24,20 @@ void main() {
       final attemptColumns = await _columnNames(database, 'study_attempts');
       expect(attemptColumns, contains('attempt_number'));
 
+      final ttsColumns = await _columnNames(database, 'tts_settings');
+      expect(
+        ttsColumns,
+        containsAll(<String>[
+          'id',
+          'auto_play',
+          'front_language',
+          'rate',
+          'pitch',
+          'volume',
+          'front_voice_name',
+        ]),
+      );
+
       final flashcardColumns = await _columnNames(database, 'flashcards');
       expect(flashcardColumns, isNot(contains('title')));
       final flashcard = await database.select(database.flashcards).getSingle();

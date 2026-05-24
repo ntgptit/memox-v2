@@ -9,6 +9,7 @@ SQLite là source of truth cho:
 - `study_sessions`
 - `study_session_items`
 - `study_attempts`
+- `tts_settings`
 
 ## 2. SharedPreferences
 `SharedPreferences` chỉ nên giữ app settings nhỏ, không phải dữ liệu học.
@@ -23,15 +24,11 @@ SQLite là source of truth cho:
 | `settings.study.shuffle_flashcards` | mặc định có trộn thẻ hay không |
 | `settings.study.shuffle_answers` | mặc định có trộn đáp án hay không |
 | `settings.study.prioritize_overdue` | mặc định ưu tiên overdue |
-| `settings.tts.auto_play` | mặc định có tự phát âm front side trong Study UI hay không |
-| `settings.tts.front_language` | ngôn ngữ TTS cho front side, hiện là `korean` hoặc `english` |
-| `settings.tts.rate` | tốc độ phát âm đã clamp trong khoảng TTS hợp lệ |
-| `settings.tts.front_voice_name` | tên voice platform cho front side; vắng key nghĩa là dùng system voice |
 | `settings.account.cloud_link` | metadata Google account đã liên kết và trạng thái scope Drive `appDataFolder`; không chứa token |
 | `settings.sync.google_drive.metadata` | baseline fingerprint/version của lần sync Drive gần nhất; không chứa dữ liệu học hoặc token |
 | `settings.sync.google_drive.device_id` | id cục bộ để nhận diện thiết bị trong sync manifest |
 
-Các key TTS back-side cũ nếu tồn tại trong code không phải persisted contract hiện tại. TTS v1 chỉ lưu và restore front-side settings; store hiện tại xóa các key back-side khi save.
+TTS v1 không còn dùng SharedPreferences. Các key TTS cũ nếu còn tồn tại trên thiết bị được bỏ qua; Drift table `tts_settings` là source of truth hiện tại.
 
 ## 3. Google Drive appDataFolder
 Manual Google Drive sync V1 lưu artifact trong Drive `appDataFolder` của Google account đã liên kết:

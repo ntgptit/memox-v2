@@ -428,8 +428,28 @@
       }
     }
   },
+  "settingsSpeechPitchLabel": "Voice pitch",
+  "settingsSpeechPitchValue": "{value}x",
+  "@settingsSpeechPitchValue": {
+    "placeholders": {
+      "value": {
+        "type": "double"
+      }
+    }
+  },
+  "settingsSpeechVolumeLabel": "Volume",
+  "settingsSpeechVolumeValue": "{value}%",
+  "@settingsSpeechVolumeValue": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
   "settingsSpeechFrontVoiceLabel": "Front voice",
   "settingsSpeechSystemVoice": "System voice",
+  "settingsSpeechVoiceMale": "Male",
+  "settingsSpeechVoiceFemale": "Female",
   "settingsSpeechLoadingVoices": "Loading voices...",
   "settingsSpeechNoVoices": "No {language} voice was reported by this device.",
   "@settingsSpeechNoVoices": {

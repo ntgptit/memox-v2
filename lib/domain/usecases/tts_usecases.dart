@@ -25,6 +25,8 @@ final class SpeakFlashcardUseCase {
       StringUtils.trimmed(text),
       language: language,
       rate: settings.rate,
+      pitch: settings.pitch,
+      volume: settings.volume,
       voiceName: voiceName,
     );
   }
@@ -45,9 +47,10 @@ final class SpeakFlashcardUseCase {
     );
   }
 
-  String _textFor(StudyFlashcardRef flashcard, TtsTextSide side) => switch (side) {
-      TtsTextSide.front => flashcard.front,
-      TtsTextSide.back => flashcard.back,
-      TtsTextSide.note => '',
-    };
+  String _textFor(StudyFlashcardRef flashcard, TtsTextSide side) =>
+      switch (side) {
+        TtsTextSide.front => flashcard.front,
+        TtsTextSide.back => flashcard.back,
+        TtsTextSide.note => '',
+      };
 }

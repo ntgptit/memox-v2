@@ -13,7 +13,7 @@ Test file: `test/presentation/tts_controller_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | text is blank | TTS settings are default and fake service records calls | `speakText` receives only whitespace | result is `false` and service `speak` is not called | C0+C1 |
-| DT2 | text is present and service succeeds | persisted settings contain rate `0.6` and front voice `Korean Voice` | `speakText` receives Korean text for front side | result is `true` and service receives the exact text, Korean language, rate, and voice name | C0+C1 |
+| DT2 | text is present and service succeeds | repository settings contain rate `0.6`, pitch `1.2`, volume `0.8`, and front voice `Korean Voice` | `speakText` receives Korean text for front side | result is `true` and service receives the exact text, Korean language, rate, pitch, volume, and voice name | C0+C1 |
 | DT3 | service throws while speaking | fake service is configured to throw on speak | `speakText` receives nonblank text | result is `false` and controller state becomes `error` | C0+C1 |
 | DT4 | non-front card side is requested | TTS settings are default and fake service records calls | `speakText` receives side `back` | result is `false` and service `speak` is not called | C0+C1 |
 

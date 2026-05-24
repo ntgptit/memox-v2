@@ -867,10 +867,32 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsSpeechPitchLabel => 'Voice pitch';
+
+  @override
+  String settingsSpeechPitchValue(double value) {
+    return '${value}x';
+  }
+
+  @override
+  String get settingsSpeechVolumeLabel => 'Volume';
+
+  @override
+  String settingsSpeechVolumeValue(int value) {
+    return '$value%';
+  }
+
+  @override
   String get settingsSpeechFrontVoiceLabel => 'Front voice';
 
   @override
   String get settingsSpeechSystemVoice => 'System voice';
+
+  @override
+  String get settingsSpeechVoiceMale => 'Male';
+
+  @override
+  String get settingsSpeechVoiceFemale => 'Female';
 
   @override
   String get settingsSpeechLoadingVoices => 'Loading voices...';

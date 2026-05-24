@@ -51,7 +51,6 @@ Future<IntegrationTestAppHandle> pumpTestApp(
     AppConstants.sharedPrefsShuffleFlashcardsKey: false,
     AppConstants.sharedPrefsShuffleAnswersKey: false,
     AppConstants.sharedPrefsPrioritizeOverdueKey: false,
-    AppConstants.sharedPrefsTtsAutoPlayKey: false,
     ...sharedPreferencesOverrides,
   });
   final sharedPreferences = await SharedPreferences.getInstance();
@@ -617,6 +616,8 @@ final class NoopTtsService implements TtsService {
     String text, {
     required TtsLanguage language,
     required double rate,
+    required double pitch,
+    required double volume,
     String? voiceName,
   }) async {
     _stateController.add(TtsState.speaking);

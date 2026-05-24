@@ -99,6 +99,7 @@ Trình tự:
 3. query aggregate cho library và folder detail
 4. `study_sessions`, `study_session_items`, `study_attempts`
 5. `SharedPreferences` datasource cho theme, locale, default study settings
+6. Drift-backed TTS settings trong `tts_settings`
 
 ## Test Nên Có
 - Tạo deck trong folder `unlocked` sẽ khóa folder sang `decks`

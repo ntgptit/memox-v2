@@ -16,7 +16,6 @@ void main() {
         AppConstants.sharedPrefsLocaleKey: 'vi',
         AppConstants.sharedPrefsDefaultNewBatchSizeKey: 12,
         AppConstants.sharedPrefsShuffleFlashcardsKey: false,
-        AppConstants.sharedPrefsTtsRateKey: 0.8,
         AppConstants.sharedPrefsCloudAccountLinkKey:
             '{"email":"user@example.com"}',
         AppConstants.sharedPrefsDriveSyncMetadataKey:
@@ -32,7 +31,6 @@ void main() {
       expect(snapshot[AppConstants.sharedPrefsLocaleKey], 'vi');
       expect(snapshot[AppConstants.sharedPrefsDefaultNewBatchSizeKey], 12);
       expect(snapshot[AppConstants.sharedPrefsShuffleFlashcardsKey], isFalse);
-      expect(snapshot[AppConstants.sharedPrefsTtsRateKey], 0.8);
       expect(
         snapshot,
         isNot(contains(AppConstants.sharedPrefsCloudAccountLinkKey)),
@@ -60,7 +58,6 @@ void main() {
         AppConstants.sharedPrefsLocaleKey: 'vi',
         AppConstants.sharedPrefsDefaultReviewBatchSizeKey: 25,
         AppConstants.sharedPrefsShuffleFlashcardsKey: 'invalid',
-        AppConstants.sharedPrefsTtsRateKey: 0.75,
         AppConstants.sharedPrefsCloudAccountLinkKey: 'ignored',
       });
 
@@ -81,7 +78,6 @@ void main() {
         preferences.getBool(AppConstants.sharedPrefsShuffleFlashcardsKey),
         isNull,
       );
-      expect(preferences.getDouble(AppConstants.sharedPrefsTtsRateKey), 0.75);
       expect(
         preferences.getString(AppConstants.sharedPrefsCloudAccountLinkKey),
         '{"subjectId":"google-user"}',

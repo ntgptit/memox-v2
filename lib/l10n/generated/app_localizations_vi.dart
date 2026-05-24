@@ -793,10 +793,32 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get settingsSpeechPitchLabel => 'Cao độ giọng';
+
+  @override
+  String settingsSpeechPitchValue(double value) {
+    return '${value}x';
+  }
+
+  @override
+  String get settingsSpeechVolumeLabel => 'Âm lượng';
+
+  @override
+  String settingsSpeechVolumeValue(int value) {
+    return '$value%';
+  }
+
+  @override
   String get settingsSpeechFrontVoiceLabel => 'Giọng mặt trước';
 
   @override
   String get settingsSpeechSystemVoice => 'Giọng hệ thống';
+
+  @override
+  String get settingsSpeechVoiceMale => 'Nam';
+
+  @override
+  String get settingsSpeechVoiceFemale => 'Nữ';
 
   @override
   String get settingsSpeechLoadingVoices => 'Đang tải danh sách giọng...';

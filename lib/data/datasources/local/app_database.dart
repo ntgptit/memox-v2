@@ -11,6 +11,7 @@ import 'tables/folders_table.dart';
 import 'tables/study_attempts_table.dart';
 import 'tables/study_session_items_table.dart';
 import 'tables/study_sessions_table.dart';
+import 'tables/tts_settings_records_table.dart';
 
 part 'app_database.g.dart';
 part 'migrations/app_database_migrations.dart';
@@ -25,12 +26,13 @@ part 'migrations/app_database_migrations.dart';
     StudySessions,
     StudySessionItems,
     StudyAttempts,
+    TtsSettingsRecords,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
-  static const int currentSchemaVersion = 8;
+  static const int currentSchemaVersion = 9;
 
   @override
   int get schemaVersion => currentSchemaVersion;
@@ -56,17 +58,17 @@ class AppDatabase extends _$AppDatabase {
   }
 
   static QueryExecutor _openConnection() => driftDatabase(
-      name: AppConstants.localDatabaseName,
-      native: DriftNativeOptions(
-        shareAcrossIsolates: true,
-        setup: (database) {
-          database.execute('PRAGMA foreign_keys = ON');
-          database.execute('PRAGMA journal_mode = WAL');
-        },
-      ),
-      web: DriftWebOptions(
-        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-        driftWorker: Uri.parse('drift_worker.dart.js'),
-      ),
-    );
+    name: AppConstants.localDatabaseName,
+    native: DriftNativeOptions(
+      shareAcrossIsolates: true,
+      setup: (database) {
+        database.execute('PRAGMA foreign_keys = ON');
+        database.execute('PRAGMA journal_mode = WAL');
+      },
+    ),
+    web: DriftWebOptions(
+      sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+      driftWorker: Uri.parse('drift_worker.dart.js'),
+    ),
+  );
 }

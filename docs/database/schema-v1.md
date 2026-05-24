@@ -21,6 +21,15 @@ erDiagram
     STUDY_SESSION_ITEMS ||--o{ STUDY_ATTEMPTS : answered_by
     FLASHCARDS ||--o{ STUDY_ATTEMPTS : answered
     STUDY_SESSIONS ||--o{ STUDY_ATTEMPTS : logs
+    TTS_SETTINGS {
+        TEXT id PK
+        INTEGER auto_play
+        TEXT front_language
+        REAL rate
+        REAL pitch
+        REAL volume
+        TEXT front_voice_name
+    }
 ```
 
 ## 1. `folders`
@@ -224,6 +233,25 @@ erDiagram
 - `folder.lastStudiedAt`: `MAX(flashcard_progress.last_studied_at)` trong subtree
 - `deck.lastStudiedAt`: `MAX(flashcard_progress.last_studied_at)` trong deck
 - `masteryPercent`: tính từ progress, không lưu cố định
+
+## 8. `tts_settings`
+
+| Column | Type | Null | Notes |
+| --- | --- | --- | --- |
+| `id` | TEXT | no | PK, current row cố định là `default` |
+| `auto_play` | INTEGER | no | 0 hoặc 1 |
+| `front_language` | TEXT | no | `korean` hoặc `english`; giá trị lạ fallback về Korean ở repository |
+| `rate` | REAL | no | clamp trong khoảng `0.3..0.7` |
+| `pitch` | REAL | no | clamp trong khoảng `0.7..1.5` |
+| `volume` | REAL | no | clamp trong khoảng `0.0..1.0` |
+| `front_voice_name` | TEXT | yes | tên voice platform cho front side; null nghĩa là system voice |
+
+### Rule
+
+- Chỉ có một row active với `id=default`.
+- TTS v1 chỉ cấu hình và phát front/term side; không lưu setting cho back/note.
+- Nếu row chưa tồn tại, repository trả `TtsSettings.defaults`.
+- SharedPreferences TTS keys cũ không được migrate; user bắt đầu lại từ defaults khi table mới chưa có row.
 
 ## Chưa đưa vào core schema v1
 

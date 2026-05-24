@@ -17,6 +17,8 @@ default đã lưu của user.
 - bật hoặc tắt auto-play phát âm trong Study UI
 - chọn ngôn ngữ TTS cho mặt trước: chỉ `Korean` hoặc `English`
 - chỉnh tốc độ phát âm TTS trong khoảng `0.3x` đến `0.7x`
+- chỉnh cao độ giọng TTS trong khoảng `0.7x` đến `1.5x`
+- chỉnh âm lượng TTS trong khoảng `0%` đến `100%`
 - chọn voice hệ thống nếu platform có voice cho `ko-KR` hoặc `en-US`
 
 ## Rule áp dụng cơ bản
@@ -50,9 +52,10 @@ default đã lưu của user.
   - `English` map tới locale `en-US`
 - TTS không support tiếng Việt trong v1, kể cả khi app language đang là Vietnamese.
 - Chỉ front / term được phép phát âm. Back / meaning không có nút phát và không auto-play.
-- Default: `frontLanguage = Korean`, `rate = 0.5`, `autoPlay = false`.
-- Cấu hình Speech v1 là global user preference lưu bằng SharedPreferences; không ghi vào DB deck/folder và không cần migration.
+- Default: `frontLanguage = Korean`, `rate = 0.5`, `pitch = 1.0`, `volume = 1.0`, `autoPlay = false`.
+- Cấu hình Speech v1 là global user preference lưu trong Drift table `tts_settings`; không ghi vào DB deck/folder.
 - Nếu platform không có voice cho `ko-KR` hoặc `en-US`, voice picker hiển thị empty/disabled state nhưng nút phát vẫn best-effort theo engine mặc định của platform.
+- Nếu platform trả gender metadata cho voice, UI hiển thị nam/nữ cạnh tên voice; nếu không có metadata thì chỉ hiển thị tên voice.
 - Khi user bấm phát âm nhiều lần, app phải stop audio đang phát trước khi speak lượt mới để tránh overlap.
 - Auto-play chỉ phát nội dung đã hiển thị hoặc vừa reveal trong Study UI; không thay đổi grading, retry, session progress hoặc SRS.
 

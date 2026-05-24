@@ -83,7 +83,7 @@ Nếu thiếu các điều kiện trên, UI hiển thị signed out, unconfigure
 ### Dữ liệu được sync
 Snapshot Drive gồm:
 - SQLite database local hiện tại
-- app settings được phép sync: study defaults, TTS settings, theme/locale keys nếu có trong SharedPreferences
+- app settings được phép sync: study defaults, theme/locale keys nếu có trong SharedPreferences; TTS settings nằm trong SQLite snapshot
 - manifest để kiểm tra app id, format version, DB schema version, fingerprint DB/settings, device id/label và version file Drive
 
 Snapshot Drive không gồm:
@@ -174,6 +174,8 @@ Audio & Speech quản lý Text-to-Speech on-device cho Study UI. V1 không dùng
 | Text-to-Speech auto-play | Off | Khi bật, Study UI có thể tự phát âm nội dung front side theo policy hiện tại. |
 | Front language | Korean | Chỉ hỗ trợ Korean `ko-KR` và English `en-US`. |
 | Speech rate | 0.5 | Clamp trong khoảng 0.3 đến 0.7. |
+| Voice pitch | 1.0 | Clamp trong khoảng 0.7 đến 1.5 để tránh méo tiếng quá mức. |
+| Volume | 1.0 | Clamp trong khoảng 0.0 đến 1.0. |
 | Front voice | System voice | Có thể chọn voice platform trả về cho ngôn ngữ đang chọn; nếu không chọn thì dùng system voice. |
 
 ### Rule phát âm
@@ -189,6 +191,7 @@ Audio & Speech quản lý Text-to-Speech on-device cho Study UI. V1 không dùng
 Voice picker là progressive disclosure:
 - Mặc định chỉ hiện hàng Voice selection.
 - Trong bottom sheet, user có thể mở Voice options để app query danh sách voice từ platform.
+- Nếu platform trả metadata gender, voice option hiển thị nhãn nam/nữ; nếu thiếu metadata thì chỉ hiển thị tên voice.
 - Nếu platform không trả voice phù hợp, UI hiển thị empty/helper state và vẫn có thể phát best-effort bằng system voice.
 - Khi user đổi front language, selected front voice bị clear để tránh dùng voice không khớp locale.
 
@@ -198,7 +201,7 @@ Voice picker là progressive disclosure:
 | Theme mode | Riverpod memory state | Chưa persist qua app restart trong implementation hiện tại. |
 | Locale override | Riverpod memory state | Chưa persist qua app restart trong implementation hiện tại. |
 | Study defaults | SharedPreferences | Được copy vào session khi tạo session mới. |
-| TTS settings | SharedPreferences | Được Study UI đọc khi speak/autoplay. |
+| TTS settings | SQLite/Drift `tts_settings` | Được Study UI đọc khi speak/autoplay và đi theo DB snapshot. |
 | Google account link | SharedPreferences | Chỉ metadata, không token. |
 | Drive sync metadata | SharedPreferences | Baseline/fingerprint cho lần sync gần nhất, không sync lên Drive. |
 | Folder/deck/flashcard/progress/session | SQLite/Drift | Settings không trực tiếp sửa nội dung học. |
@@ -223,6 +226,8 @@ Voice picker là progressive disclosure:
 - `lib/presentation/features/settings/widgets/*settings*_group.dart`
 - `lib/presentation/features/settings/viewmodels/*settings*_viewmodel.dart`
 - `lib/presentation/features/tts/providers/tts_settings_notifier.dart`
+- `lib/data/datasources/local/daos/tts_settings_dao.dart`
+- `lib/data/repositories/tts_settings_repository_impl.dart`
 - `lib/data/settings/*_store.dart`
 - `lib/data/sync/app_settings_snapshot_store.dart`
 - `lib/data/repositories/google_drive_sync_repository.dart`

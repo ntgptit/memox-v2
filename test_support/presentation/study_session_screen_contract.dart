@@ -2302,6 +2302,8 @@ final class _NoopStudyTtsService implements TtsService {
     String text, {
     required TtsLanguage language,
     required double rate,
+    required double pitch,
+    required double volume,
     String? voiceName,
   }) async {}
 

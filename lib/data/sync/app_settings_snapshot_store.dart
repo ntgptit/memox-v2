@@ -16,19 +16,15 @@ final class AppSettingsSnapshotStore {
     AppConstants.sharedPrefsShuffleFlashcardsKey: _SnapshotSettingType.bool,
     AppConstants.sharedPrefsShuffleAnswersKey: _SnapshotSettingType.bool,
     AppConstants.sharedPrefsPrioritizeOverdueKey: _SnapshotSettingType.bool,
-    AppConstants.sharedPrefsTtsAutoPlayKey: _SnapshotSettingType.bool,
-    AppConstants.sharedPrefsTtsFrontLanguageKey: _SnapshotSettingType.string,
-    AppConstants.sharedPrefsTtsRateKey: _SnapshotSettingType.double,
-    AppConstants.sharedPrefsTtsFrontVoiceNameKey: _SnapshotSettingType.string,
   };
 
   final SharedPreferences _preferences;
 
   Map<String, Object?> load() => <String, Object?>{
-      for (final entry in _includedKeys.entries)
-        if (_preferences.containsKey(entry.key))
-          entry.key: _preferences.get(entry.key),
-    };
+    for (final entry in _includedKeys.entries)
+      if (_preferences.containsKey(entry.key))
+        entry.key: _preferences.get(entry.key),
+  };
 
   Future<void> restore(Map<String, Object?> settings) async {
     for (final key in _includedKeys.keys) {

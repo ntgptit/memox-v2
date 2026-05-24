@@ -9,8 +9,8 @@ part 'tts_settings_notifier.g.dart';
 class TtsSettingsNotifier extends _$TtsSettingsNotifier {
   @override
   Future<TtsSettings> build() async {
-    final store = await ref.watch(ttsSettingsStoreProvider.future);
-    return store.load();
+    final repository = await ref.watch(ttsSettingsRepositoryProvider.future);
+    return repository.load();
   }
 
   Future<void> setAutoPlay(bool value) =>
@@ -23,6 +23,14 @@ class TtsSettingsNotifier extends _$TtsSettingsNotifier {
 
   Future<void> setRate(double value) => _update(
     (settings) => settings.copyWith(rate: TtsSettings.normalizeRate(value)),
+  );
+
+  Future<void> setPitch(double value) => _update(
+    (settings) => settings.copyWith(pitch: TtsSettings.normalizePitch(value)),
+  );
+
+  Future<void> setVolume(double value) => _update(
+    (settings) => settings.copyWith(volume: TtsSettings.normalizeVolume(value)),
   );
 
   Future<void> setFrontVoiceName(String? voiceName) => _update(
@@ -41,11 +49,11 @@ class TtsSettingsNotifier extends _$TtsSettingsNotifier {
       error: (_, _) => TtsSettings.defaults,
     );
     final next = transform(current);
-    final store = await ref.read(ttsSettingsStoreProvider.future);
+    final repository = await ref.read(ttsSettingsRepositoryProvider.future);
     if (!ref.mounted) {
       return;
     }
-    await store.save(next);
+    await repository.save(next);
     if (!ref.mounted) {
       return;
     }
