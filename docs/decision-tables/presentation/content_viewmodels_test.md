@@ -16,6 +16,7 @@ Test file: `test/presentation/content_viewmodels_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT1 | folder action deck creation must expose the created deck id for import routing | unlocked root folder exists and id generator will return `deck-import-new` | `folderActionControllerProvider(root.id).createDeck('Imported deck')` succeeds | returned deck id is `deck-import-new` and controller state has no error | C0+C1 |
+| DT2 | flashcard editor create is already saving and must ignore a second save request | editor draft has valid front/back and create repository is still pending from the first save | `flashcardEditorControllerProvider(args).save()` is called twice before the first insert completes | first save succeeds, second save returns false, and repository create is called once | C0+C1 |
 
 ## Decision table: onUpdate
 

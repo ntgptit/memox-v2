@@ -81,6 +81,9 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
       },
     );
 
+    final actionState = ref.watch(
+      flashcardEditorControllerProvider(widget.args),
+    );
     final draftState = ref.watch(flashcardEditorDraftProvider(widget.args));
     final draftNotifier = ref.read(
       flashcardEditorDraftProvider(widget.args).notifier,
@@ -90,7 +93,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     );
 
     final draft = draftState.value;
-    final canSave = draft?.canSave ?? false;
+    final canSave = (draft?.canSave ?? false) && !actionState.isLoading;
 
     return MxScaffold(
       bottomNavigationBar: draft == null
@@ -152,10 +155,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
         : l10n.flashcardsNewTitle;
 
     final breadcrumbItems = <MxBreadcrumb>[
-      MxBreadcrumb(
-        label: l10n.libraryTitle,
-        onTap: () => context.goLibrary(),
-      ),
+      MxBreadcrumb(label: l10n.libraryTitle, onTap: () => context.goLibrary()),
       for (final segment in draft.breadcrumb) MxBreadcrumb(label: segment),
       MxBreadcrumb(label: title),
     ];
@@ -168,8 +168,10 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
             fallback: () => context.goFlashcardList(widget.deckId),
           ),
           onQuickSave: !draft.isEditing && canSave
-              ? () =>
-                    _saveAndAddNext(actionController: actionController, l10n: l10n)
+              ? () => _saveAndAddNext(
+                  actionController: actionController,
+                  l10n: l10n,
+                )
               : null,
           quickSaveTooltip: l10n.flashcardsSaveAndAddNextTooltip,
         ),
@@ -228,7 +230,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     if (!mounted || !success) {
       return;
     }
-    MxSnackbar.success(
+    final showSavedMessage = MxSnackbar.deferredSuccess(
       context,
       draft.isEditing
           ? l10n.flashcardsUpdatedMessage
@@ -237,6 +239,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     await context.popRoute(
       fallback: () => context.goFlashcardList(widget.deckId),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) => showSavedMessage());
   }
 
   Future<FlashcardProgressEditPolicy?> _resolveProgressPolicy({

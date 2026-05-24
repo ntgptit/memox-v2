@@ -51,10 +51,10 @@ final class StudyRobot extends MemoxRobot {
     required String back,
   }) async {
     await tapVisible(find.text('Add flashcard'));
-    await waitUntilVisible(find.text('New flashcard'));
+    await waitUntilVisible(find.text('New card'));
     await enterText(find.byType(TextField).at(0), front);
     await enterText(find.byType(TextField).at(1), back);
-    await tapVisible(find.widgetWithText(ElevatedButton, 'Save').last);
+    await tapVisible(find.text('Save card').last);
     await waitUntilVisible(find.text(front));
   }
 

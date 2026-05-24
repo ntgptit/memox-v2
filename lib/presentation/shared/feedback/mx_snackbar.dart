@@ -8,9 +8,62 @@ import '../motion/mx_motion.dart';
 
 enum MxSnackbarTone { neutral, success, warning, error }
 
+typedef MxDeferredSnackbar =
+    ScaffoldFeatureController<SnackBar, SnackBarClosedReason> Function();
+
 /// Helpers to show themed snackbars with consistent tone + icon.
 abstract final class MxSnackbar {
   static ScaffoldFeatureController<SnackBar, SnackBarClosedReason> show(
+    BuildContext context, {
+    required String message,
+    MxSnackbarTone tone = MxSnackbarTone.neutral,
+    String? actionLabel,
+    VoidCallback? onAction,
+    Duration duration = MxDurations.snackbar,
+    IconData? icon,
+  }) {
+    return _show(
+      ScaffoldMessenger.of(context),
+      _snackBar(
+        context,
+        message: message,
+        tone: tone,
+        actionLabel: actionLabel,
+        onAction: onAction,
+        duration: duration,
+        icon: icon,
+      ),
+    );
+  }
+
+  static MxDeferredSnackbar deferredSuccess(BuildContext c, String message) {
+    final messenger = ScaffoldMessenger.of(c);
+    final snackBar = _snackBar(
+      c,
+      message: message,
+      tone: MxSnackbarTone.success,
+    );
+    return () => _show(messenger, snackBar);
+  }
+
+  static void success(BuildContext c, String message) =>
+      show(c, message: message, tone: MxSnackbarTone.success);
+
+  static void warning(BuildContext c, String message) =>
+      show(c, message: message, tone: MxSnackbarTone.warning);
+
+  static void error(BuildContext c, String message) =>
+      show(c, message: message, tone: MxSnackbarTone.error);
+
+  static ScaffoldFeatureController<SnackBar, SnackBarClosedReason> _show(
+    ScaffoldMessengerState messenger,
+    SnackBar snackBar,
+  ) {
+    messenger.clearSnackBars();
+    return messenger.showSnackBar(snackBar);
+  }
+
+  static SnackBar _snackBar(
     BuildContext context, {
     required String message,
     MxSnackbarTone tone = MxSnackbarTone.neutral,
@@ -46,42 +99,28 @@ abstract final class MxSnackbar {
       ),
     };
 
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-
-    return messenger.showSnackBar(
-      SnackBar(
-        backgroundColor: bg,
-        duration: duration,
-        content: Row(
-          children: [
-            Icon(icon ?? defaultIcon, color: fg, size: AppIconSizes.md),
-            const MxGap(AppSpacing.md),
-            Expanded(
-              child: Text(
-                message,
-                style: textTheme.bodyMedium?.copyWith(color: fg),
-              ),
+    return SnackBar(
+      backgroundColor: bg,
+      duration: duration,
+      content: Row(
+        children: [
+          Icon(icon ?? defaultIcon, color: fg, size: AppIconSizes.md),
+          const MxGap(AppSpacing.md),
+          Expanded(
+            child: Text(
+              message,
+              style: textTheme.bodyMedium?.copyWith(color: fg),
             ),
-          ],
-        ),
-        action: (actionLabel != null && onAction != null)
-            ? SnackBarAction(
-                label: actionLabel,
-                textColor: fg,
-                onPressed: onAction,
-              )
-            : null,
+          ),
+        ],
       ),
+      action: (actionLabel != null && onAction != null)
+          ? SnackBarAction(
+              label: actionLabel,
+              textColor: fg,
+              onPressed: onAction,
+            )
+          : null,
     );
   }
-
-  static void success(BuildContext c, String message) =>
-      show(c, message: message, tone: MxSnackbarTone.success);
-
-  static void warning(BuildContext c, String message) =>
-      show(c, message: message, tone: MxSnackbarTone.warning);
-
-  static void error(BuildContext c, String message) =>
-      show(c, message: message, tone: MxSnackbarTone.error);
 }

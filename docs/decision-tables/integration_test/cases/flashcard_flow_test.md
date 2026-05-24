@@ -14,7 +14,7 @@ Test file: `integration_test/cases/flashcard_flow_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | TC-FLASHCARD-004 valid front and back create one flashcard | user is in empty deck `Daily Words` | user opens add, enters `사과` / `quả táo`, and saves | editor closes and `사과` appears in the deck | C0+C1 |
+| DT1 | TC-FLASHCARD-004 valid front and back create one flashcard and one success message | user is in empty deck `Daily Words` | user opens add, enters `사과` / `quả táo`, and saves | editor closes, `사과` appears in the deck, and exactly one `Flashcard created.` message is visible | C0+C1 |
 | DT2 | TC-FLASHCARD-005 optional note is saved with the new flashcard | user is in deck `Daily Words` | user creates `먹다` / `ăn` with note `Động từ bất quy tắc không đặc biệt` | `먹다` appears, and opening edit/detail shows the note text | C0+C1 |
 | DT3 | TC-FLASHCARD-006 blank note is accepted | user is in deck `Daily Words` | user creates `학교` / `trường học` and leaves Note empty | `학교` appears in the deck | C0+C1 |
 | DT4 | TC-FLASHCARD-007 front text is empty | user opens new flashcard editor | user leaves Front empty, enters Back, and saves | validation message `front and back are required.` is visible and the editor stays open | C0+C1 |

@@ -1,10 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:memox/app/di/content/content_core_providers.dart';
 import 'package:memox/app/di/content/content_revision_providers.dart';
+import 'package:memox/app/di/content/deck_providers.dart';
+import 'package:memox/app/di/content/flashcard_providers.dart';
 import 'package:memox/app/di/providers.dart';
+import 'package:memox/core/errors/result.dart';
+import 'package:memox/domain/entities/flashcard_entity.dart';
+import 'package:memox/domain/repositories/flashcard_repository.dart';
+import 'package:memox/domain/usecases/content_query_usecases.dart';
+import 'package:memox/domain/usecases/flashcard_usecases.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
 import 'package:memox/domain/value_objects/content_queries.dart';
 import 'package:memox/presentation/features/decks/viewmodels/deck_action_viewmodel.dart';
@@ -220,6 +229,61 @@ void main() {
     );
 
     test(
+      'DT2 onInsert: ignores duplicate flashcard create while save is pending',
+      () async {
+        final harness = ContentRepositoryHarness.create(
+          ids: ['folder-root', 'deck-root'],
+        );
+        final repository = _PendingCreateFlashcardRepository();
+        final container = ProviderContainer(
+          overrides: [
+            getDeckActionContextUseCaseProvider.overrideWithValue(
+              GetDeckActionContextUseCase(harness.deckRepository),
+            ),
+            createFlashcardUseCaseProvider.overrideWithValue(
+              CreateFlashcardUseCase(repository),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+        addTearDown(harness.dispose);
+
+        final root = (await harness.folderRepository.createRootFolder(
+          'Japanese N5',
+        )).valueOrNull!;
+        final deck = (await harness.deckRepository.createDeck(
+          folderId: root.id,
+          name: 'Core vocabulary',
+        )).valueOrNull!;
+        final args = FlashcardEditorArgs(deckId: deck.id);
+
+        await container.read(flashcardEditorDraftProvider(args).future);
+        final draftNotifier = container.read(
+          flashcardEditorDraftProvider(args).notifier,
+        );
+        draftNotifier.setFront('Hello');
+        draftNotifier.setBack('Xin chao');
+
+        final controller = container.read(
+          flashcardEditorControllerProvider(args).notifier,
+        );
+        final firstSave = controller.save();
+        final secondSave = await controller.save();
+
+        expect(secondSave, isFalse);
+        expect(repository.createCount, 1);
+
+        repository.completeCreate();
+        expect(await firstSave, isTrue);
+        expect(repository.createCount, 1);
+        expect(
+          container.read(flashcardEditorControllerProvider(args)).hasError,
+          isFalse,
+        );
+      },
+    );
+
+    test(
       'DT1 onUpdate: deck action controller updates deck without provider error',
       () async {
         final harness = ContentRepositoryHarness.create(
@@ -426,6 +490,41 @@ ProviderContainer _createContainer(ContentRepositoryHarness harness) {
       idGeneratorProvider.overrideWithValue(harness.idGenerator),
     ],
   );
+}
+
+final class _PendingCreateFlashcardRepository implements FlashcardRepository {
+  final Completer<void> _createCompleter = Completer<void>();
+  int createCount = 0;
+
+  void completeCreate() {
+    if (!_createCompleter.isCompleted) {
+      _createCompleter.complete();
+    }
+  }
+
+  @override
+  Future<Result<FlashcardEntity>> createFlashcard({
+    required String deckId,
+    required FlashcardDraft draft,
+  }) async {
+    createCount += 1;
+    await _createCompleter.future;
+    return Success(
+      FlashcardEntity(
+        id: 'flashcard-001',
+        deckId: deckId,
+        front: draft.front,
+        back: draft.back,
+        note: draft.note,
+        sortOrder: 0,
+        createdAt: 1,
+        updatedAt: 1,
+      ),
+    );
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 Future<void> _flush(ProviderContainer container) async {

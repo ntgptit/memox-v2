@@ -8,6 +8,11 @@ import 'memox_robot.dart';
 final class FlashcardRobot extends MemoxRobot {
   const FlashcardRobot(super.tester);
 
+  static const String _newCardTitle = 'New card';
+  static const String _editCardTitle = 'Edit card';
+  static const String _saveCardLabel = 'Save card';
+  static const String _saveChangesLabel = 'Save changes';
+
   Future<void> expectEmptyDeck() async {
     await waitUntilVisible(find.text('No flashcards yet'));
     await waitUntilVisible(find.text('Add'));
@@ -24,7 +29,8 @@ final class FlashcardRobot extends MemoxRobot {
     await openCreateFlashcard();
     await enterCurrentDraft(front: front, back: back, note: note);
     await tapEditorSave();
-    await waitUntilAbsent(find.text('New flashcard'));
+    await waitUntilAbsent(find.text(_newCardTitle));
+    expect(find.text('Flashcard created.'), findsOneWidget);
     await expectFlashcardVisible(expectedFront ?? front.trim());
     await waitUntilVisible(find.text(expectedBack ?? back.trim()));
     if (expectedNote != null) {
@@ -40,7 +46,7 @@ final class FlashcardRobot extends MemoxRobot {
     await openCreateFlashcard();
     await enterCurrentDraft(front: front, back: back, note: note);
     await tapVisible(find.text('Save + next'));
-    await waitUntilVisible(find.text('New flashcard'));
+    await waitUntilVisible(find.text(_newCardTitle));
     await waitUntilEditorFieldsCleared();
     expect(find.text(front), findsNothing);
   }
@@ -50,10 +56,10 @@ final class FlashcardRobot extends MemoxRobot {
     required String back,
     String? note,
   }) async {
-    await waitUntilVisible(find.text('New flashcard'));
+    await waitUntilVisible(find.text(_newCardTitle));
     await enterCurrentDraft(front: front, back: back, note: note);
     await tapEditorSave();
-    await waitUntilAbsent(find.text('New flashcard'));
+    await waitUntilAbsent(find.text(_newCardTitle));
     await expectFlashcardVisible(front.trim());
     await waitUntilVisible(find.text(back.trim()));
   }
@@ -73,7 +79,7 @@ final class FlashcardRobot extends MemoxRobot {
 
   Future<void> openCreateFlashcard() async {
     await tapVisible(find.byTooltip('Add flashcard'));
-    await waitUntilVisible(find.text('New flashcard'));
+    await waitUntilVisible(find.text(_newCardTitle));
   }
 
   Future<void> enterCurrentDraft({
@@ -96,13 +102,13 @@ final class FlashcardRobot extends MemoxRobot {
     await enterCurrentDraft(front: front, back: back);
     await tapEditorSave();
     await waitUntilVisible(find.text('front and back are required.'));
-    await waitUntilVisible(find.text('New flashcard'));
+    await waitUntilVisible(find.text(_newCardTitle));
   }
 
   Future<void> openFlashcardForEdit(String front) async {
     await scrollToFlashcard(front);
     await tapVisible(_rowText(front).first);
-    await waitUntilVisible(find.text('Edit flashcard'));
+    await waitUntilVisible(find.text(_editCardTitle));
   }
 
   Future<void> expectCurrentEditorFields({
@@ -110,7 +116,7 @@ final class FlashcardRobot extends MemoxRobot {
     required String back,
     String note = '',
   }) async {
-    await waitUntilVisible(find.text('Edit flashcard'));
+    await waitUntilVisible(find.text(_editCardTitle));
     expect(_textFieldTextAt(0), front);
     expect(_textFieldTextAt(1), back);
     expect(_textFieldTextAt(2), note);
@@ -122,10 +128,10 @@ final class FlashcardRobot extends MemoxRobot {
     required String toBack,
     String? toNote,
   }) async {
-    await waitUntilVisible(find.text('Edit flashcard'));
+    await waitUntilVisible(find.text(_editCardTitle));
     await enterCurrentDraft(front: toFront, back: toBack, note: toNote);
     await tapEditorSave();
-    await waitUntilAbsent(find.text('Edit flashcard'));
+    await waitUntilAbsent(find.text(_editCardTitle));
     await expectFlashcardVisible(toFront.trim());
     await waitUntilVisible(find.text(toBack.trim()));
     if (fromFront != toFront.trim()) {
@@ -138,16 +144,16 @@ final class FlashcardRobot extends MemoxRobot {
     required String back,
     String? note,
   }) async {
-    await waitUntilVisible(find.text('Edit flashcard'));
+    await waitUntilVisible(find.text(_editCardTitle));
     await enterCurrentDraft(front: front, back: back, note: note);
     await tapEditorSave();
     await waitUntilVisible(find.text('front and back are required.'));
-    await waitUntilVisible(find.text('Edit flashcard'));
+    await waitUntilVisible(find.text(_editCardTitle));
   }
 
   Future<void> cancelCurrentEdit() async {
     await tapVisible(find.byTooltip('Back'));
-    await waitUntilAbsent(find.text('Edit flashcard'));
+    await waitUntilAbsent(find.text(_editCardTitle));
   }
 
   Future<void> deleteFlashcard(
@@ -183,7 +189,7 @@ final class FlashcardRobot extends MemoxRobot {
   Future<void> editFlashcardFromActions(String front) async {
     await openFlashcardActions(front);
     await tapVisible(find.text('Edit'));
-    await waitUntilVisible(find.text('Edit flashcard'));
+    await waitUntilVisible(find.text(_editCardTitle));
   }
 
   Future<void> selectFlashcard(String front) async {
@@ -330,7 +336,13 @@ final class FlashcardRobot extends MemoxRobot {
   }
 
   Future<void> tapEditorSave() async {
-    await tapVisible(find.widgetWithText(ElevatedButton, 'Save').last);
+    final saveCard = find.text(_saveCardLabel);
+    if (saveCard.evaluate().isNotEmpty) {
+      await tapVisible(saveCard.last);
+      return;
+    }
+
+    await tapVisible(find.text(_saveChangesLabel).last);
   }
 
   Future<void> scrollToFlashcard(String front) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/presentation/shared/dialogs/mx_destination_picker_sheet.dart';
+import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
 
 import 'memox_robot.dart';
@@ -89,7 +90,7 @@ final class DeckRobot extends MemoxRobot {
 
   Future<void> openDeck(String name) async {
     await _tapDeckTileBody(name);
-    await waitUntilVisible(find.text('No flashcards yet'));
+    await waitUntilVisible(find.byTooltip('Add flashcard'));
   }
 
   Future<void> openDeckWithFlashcard({
@@ -369,7 +370,9 @@ final class DeckRobot extends MemoxRobot {
   Finder _deckTile(String name) {
     return find.ancestor(
       of: find.text(name),
-      matching: find.byType(MxStudySetTile),
+      matching: find.byWidgetPredicate(
+        (widget) => widget is MxDeckCard || widget is MxStudySetTile,
+      ),
     );
   }
 

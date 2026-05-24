@@ -181,7 +181,8 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
     );
   }
 
-  void setFront(String value) => _patch((draft) => draft.copyWith(front: value));
+  void setFront(String value) =>
+      _patch((draft) => draft.copyWith(front: value));
 
   void setBack(String value) => _patch((draft) => draft.copyWith(back: value));
 
@@ -260,6 +261,10 @@ class FlashcardEditorController extends _$FlashcardEditorController {
     FlashcardProgressEditPolicy progressPolicy =
         FlashcardProgressEditPolicy.keepProgress,
   }) async {
+    if (state.isLoading) {
+      return false;
+    }
+
     // guard:retry-reviewed
     final draftState = _currentDraft(
       ref.read(flashcardEditorDraftProvider(args)),
