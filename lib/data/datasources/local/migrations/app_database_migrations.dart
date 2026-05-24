@@ -44,6 +44,9 @@ final class _AppDatabaseMigrationRunner {
     if (from < 6) {
       await _repairMissingFlashcardProgressForSchemaV6();
     }
+    if (from < 7) {
+      await _addFlashcardAuthorFieldsForSchemaV7();
+    }
   }
 
   Future<void> _rebuildLegacyFlashcardProgressIfNeeded() async {
@@ -165,6 +168,32 @@ final class _AppDatabaseMigrationRunner {
     }
 
     await database.customStatement(_migrateLegacyNewStudyPerfectResultsSql);
+  }
+
+  Future<void> _addFlashcardAuthorFieldsForSchemaV7() async {
+    await _ensureFlashcardAuthorColumns();
+    if (!await _hasTable(_TableName.flashcardTags)) {
+      await migrator.createTable(database.flashcardTags);
+    }
+  }
+
+  Future<void> _ensureFlashcardAuthorColumns() async {
+    if (!await _hasTable(_TableName.flashcards)) {
+      await migrator.createTable(database.flashcards);
+      return;
+    }
+    if (!await _hasColumn(_TableName.flashcards, 'example')) {
+      await migrator.addColumn(database.flashcards, database.flashcards.example);
+    }
+    if (!await _hasColumn(_TableName.flashcards, 'pronunciation')) {
+      await migrator.addColumn(
+        database.flashcards,
+        database.flashcards.pronunciation,
+      );
+    }
+    if (!await _hasColumn(_TableName.flashcards, 'hint')) {
+      await migrator.addColumn(database.flashcards, database.flashcards.hint);
+    }
   }
 
   Future<void> _repairMissingFlashcardProgressForSchemaV6() async {
@@ -305,6 +334,7 @@ abstract final class _TableName {
 
   static const String flashcards = 'flashcards';
   static const String flashcardProgress = 'flashcard_progress';
+  static const String flashcardTags = 'flashcard_tags';
   static const String studyAttempts = 'study_attempts';
   static const String studySessionItems = 'study_session_items';
   static const String studySessions = 'study_sessions';

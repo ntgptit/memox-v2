@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../app/di/content/deck_providers.dart';
 import '../../../../app/di/content/flashcard_providers.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/string_utils.dart';
+import '../../../../domain/enums/flashcard_starting_status.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
@@ -36,25 +38,43 @@ class FlashcardEditorArgs {
 class FlashcardEditorDraftState {
   const FlashcardEditorDraftState({
     required this.deckId,
+    required this.deckName,
+    required this.breadcrumb,
     required this.flashcardId,
     required this.front,
     required this.back,
     required this.note,
+    required this.example,
+    required this.pronunciation,
+    required this.hint,
+    required this.tags,
+    required this.startingStatus,
     required this.originalFront,
     required this.originalBack,
     required this.hasLearningProgress,
   });
 
   final String deckId;
+  final String deckName;
+  final List<String> breadcrumb;
   final String? flashcardId;
   final String front;
   final String back;
   final String note;
+  final String example;
+  final String pronunciation;
+  final String hint;
+  final List<String> tags;
+  final FlashcardStartingStatus startingStatus;
   final String originalFront;
   final String originalBack;
   final bool hasLearningProgress;
 
   bool get isEditing => flashcardId != null;
+
+  bool get canSave =>
+      StringUtils.trimmed(front).isNotEmpty &&
+      StringUtils.trimmed(back).isNotEmpty;
 
   bool get hasChangedLearningContent {
     return StringUtils.trimmed(front) != StringUtils.trimmed(originalFront) ||
@@ -66,20 +86,41 @@ class FlashcardEditorDraftState {
   }
 
   FlashcardDraft toDraft() {
-    return FlashcardDraft(front: front, back: back, note: note);
+    return FlashcardDraft(
+      front: front,
+      back: back,
+      note: note,
+      example: example,
+      pronunciation: pronunciation,
+      hint: hint,
+      tags: tags,
+      startingStatus: startingStatus,
+    );
   }
 
   FlashcardEditorDraftState copyWith({
     String? front,
     String? back,
     String? note,
+    String? example,
+    String? pronunciation,
+    String? hint,
+    List<String>? tags,
+    FlashcardStartingStatus? startingStatus,
   }) {
     return FlashcardEditorDraftState(
       deckId: deckId,
+      deckName: deckName,
+      breadcrumb: breadcrumb,
       flashcardId: flashcardId,
       front: front ?? this.front,
       back: back ?? this.back,
       note: note ?? this.note,
+      example: example ?? this.example,
+      pronunciation: pronunciation ?? this.pronunciation,
+      hint: hint ?? this.hint,
+      tags: tags ?? this.tags,
+      startingStatus: startingStatus ?? this.startingStatus,
       originalFront: originalFront,
       originalBack: originalBack,
       hasLearningProgress: hasLearningProgress,
@@ -91,13 +132,27 @@ class FlashcardEditorDraftState {
 class FlashcardEditorDraft extends _$FlashcardEditorDraft {
   @override
   Future<FlashcardEditorDraftState> build(FlashcardEditorArgs args) async {
+    final deckContext = await ref
+        .read(getDeckActionContextUseCaseProvider)
+        .execute(args.deckId);
+    final breadcrumb = <String>[
+      for (final segment in deckContext.breadcrumb) segment.label,
+    ];
+
     if (!args.isEditing) {
       return FlashcardEditorDraftState(
         deckId: args.deckId,
+        deckName: deckContext.deck.name,
+        breadcrumb: breadcrumb,
         flashcardId: null,
         front: '',
         back: '',
         note: '',
+        example: '',
+        pronunciation: '',
+        hint: '',
+        tags: const <String>[],
+        startingStatus: FlashcardStartingStatus.newCard,
         originalFront: '',
         originalBack: '',
         hasLearningProgress: false,
@@ -109,38 +164,55 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
         .execute(args.flashcardId!);
     return FlashcardEditorDraftState(
       deckId: flashcard.deckId,
+      deckName: deckContext.deck.name,
+      breadcrumb: breadcrumb,
       flashcardId: flashcard.id,
       front: flashcard.front,
       back: flashcard.back,
       note: flashcard.note ?? '',
+      example: flashcard.example ?? '',
+      pronunciation: flashcard.pronunciation ?? '',
+      hint: flashcard.hint ?? '',
+      tags: List<String>.unmodifiable(flashcard.tags),
+      startingStatus: flashcard.startingStatus,
       originalFront: flashcard.front,
       originalBack: flashcard.back,
       hasLearningProgress: flashcard.hasLearningProgress,
     );
   }
 
-  void setFront(String value) {
-    final current = _currentDraft(state);
-    if (current == null) {
-      return;
-    }
-    state = AsyncData(current.copyWith(front: value));
+  void setFront(String value) => _patch((draft) => draft.copyWith(front: value));
+
+  void setBack(String value) => _patch((draft) => draft.copyWith(back: value));
+
+  void setNote(String value) => _patch((draft) => draft.copyWith(note: value));
+
+  void setExample(String value) =>
+      _patch((draft) => draft.copyWith(example: value));
+
+  void setPronunciation(String value) =>
+      _patch((draft) => draft.copyWith(pronunciation: value));
+
+  void setHint(String value) => _patch((draft) => draft.copyWith(hint: value));
+
+  void setStartingStatus(FlashcardStartingStatus value) =>
+      _patch((draft) => draft.copyWith(startingStatus: value));
+
+  void addTag(String tag) {
+    final trimmed = StringUtils.trimmed(tag);
+    if (trimmed.isEmpty) return;
+    _patch((draft) {
+      if (draft.tags.contains(trimmed)) return draft;
+      return draft.copyWith(tags: <String>[...draft.tags, trimmed]);
+    });
   }
 
-  void setBack(String value) {
-    final current = _currentDraft(state);
-    if (current == null) {
-      return;
-    }
-    state = AsyncData(current.copyWith(back: value));
-  }
-
-  void setNote(String value) {
-    final current = _currentDraft(state);
-    if (current == null) {
-      return;
-    }
-    state = AsyncData(current.copyWith(note: value));
+  void removeTag(String tag) {
+    _patch((draft) {
+      if (!draft.tags.contains(tag)) return draft;
+      final next = List<String>.from(draft.tags)..remove(tag);
+      return draft.copyWith(tags: next);
+    });
   }
 
   void clearForNext() {
@@ -151,15 +223,30 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
     state = AsyncData(
       FlashcardEditorDraftState(
         deckId: current.deckId,
+        deckName: current.deckName,
+        breadcrumb: current.breadcrumb,
         flashcardId: null,
         front: '',
         back: '',
         note: '',
+        example: '',
+        pronunciation: '',
+        hint: '',
+        tags: const <String>[],
+        startingStatus: current.startingStatus,
         originalFront: '',
         originalBack: '',
         hasLearningProgress: false,
       ),
     );
+  }
+
+  void _patch(
+    FlashcardEditorDraftState Function(FlashcardEditorDraftState draft) update,
+  ) {
+    final current = _currentDraft(state);
+    if (current == null) return;
+    state = AsyncData(update(current));
   }
 }
 

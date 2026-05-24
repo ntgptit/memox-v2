@@ -2,51 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memox/app/di/content/deck_providers.dart';
 import 'package:memox/app/di/content/flashcard_providers.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/core/errors/result.dart';
+import 'package:memox/domain/entities/deck_entity.dart';
 import 'package:memox/domain/entities/flashcard_entity.dart';
+import 'package:memox/domain/repositories/deck_repository.dart';
 import 'package:memox/domain/repositories/flashcard_repository.dart';
+import 'package:memox/domain/usecases/content_query_usecases.dart';
 import 'package:memox/domain/usecases/flashcard_usecases.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
+import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/flashcard_editor_screen.dart';
+import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_editor_viewmodel.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
 void main() {
-  testWidgets('DT1 onOpen: opens a new flashcard draft for the deck route', (
+  testWidgets('DT1 onOpen: opens a new card draft for the deck route', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      const _TestApp(child: FlashcardEditorScreen(deckId: 'deck-001')),
-    );
+    await tester.pumpWidget(_buildCreateApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('New flashcard'), findsOneWidget);
-    expect(find.text('Save + next'), findsOneWidget);
-    expect(find.text('Save'), findsOneWidget);
+    expect(find.text('New card'), findsWidgets);
+    expect(find.text('Save & add another'), findsOneWidget);
+    expect(find.text('Save card'), findsOneWidget);
   });
 
-  testWidgets('DT1 onDisplay: renders multiline front back and note fields', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      const _TestApp(child: FlashcardEditorScreen(deckId: 'deck-001')),
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'DT1 onDisplay: renders front back example tags fields + advanced toggle',
+    (tester) async {
+      await tester.pumpWidget(_buildCreateApp());
+      await tester.pumpAndSettle();
 
-    expect(find.byType(TextFormField), findsNWidgets(3));
-    expect(find.text('Front'), findsOneWidget);
-    expect(find.text('Back'), findsOneWidget);
-    expect(find.text('Note'), findsOneWidget);
-    expect(
-      find.text(
-        'Supports multiple lines. Keep the full answer readable during study.',
-      ),
-      findsNWidgets(2),
-    );
-  });
+      // Front, Back, Example = 3 visible TextFormFields. Tags use a bottom-
+      // sheet trigger instead of an inline field.
+      expect(find.byType(TextFormField), findsNWidgets(3));
+      expect(find.text('Add tag'), findsOneWidget);
+      expect(find.text('Show advanced fields'), findsOneWidget);
+    },
+  );
 
   testWidgets(
     'DT1 onUpdate: learned content edit asks whether to reset progress',
@@ -75,7 +73,7 @@ void main() {
 
       await tester.enterText(find.byType(TextFormField).at(0), 'Changed front');
       await tester.pump();
-      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save'));
+      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save changes'));
       await tester.pumpAndSettle();
 
       expect(find.text('You changed the learning content.'), findsOneWidget);
@@ -126,9 +124,23 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextFormField).at(2), 'Updated note');
+      // Note field lives inside the "Show advanced fields" section and would
+      // require scrolling + advanced-toggle interaction in the rendered form.
+      // For this Decision-Table test we only care that a learned note-only
+      // edit skips the policy dialog, so we drive the draft notifier directly
+      // through the provider container.
+      container
+          .read(
+            flashcardEditorDraftProvider(
+              const FlashcardEditorArgs(
+                deckId: deckId,
+                flashcardId: flashcardId,
+              ),
+            ).notifier,
+          )
+          .setNote('Updated note');
       await tester.pump();
-      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save'));
+      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save changes'));
       await tester.pumpAndSettle();
 
       expect(find.text('You changed the learning content.'), findsNothing);
@@ -145,21 +157,18 @@ void main() {
   );
 }
 
-class _TestApp extends StatelessWidget {
-  const _TestApp({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return ProviderScope(
-      child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: child,
-      ),
-    );
-  }
+Widget _buildCreateApp() {
+  final container = _editorContainer(
+    _EditorFlashcardRepository(flashcard: _flashcard(hasLearningProgress: false)),
+  );
+  return UncontrolledProviderScope(
+    container: container,
+    child: const MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: FlashcardEditorScreen(deckId: 'deck-001'),
+    ),
+  );
 }
 
 ProviderContainer _editorContainer(_EditorFlashcardRepository repository) {
@@ -170,6 +179,12 @@ ProviderContainer _editorContainer(_EditorFlashcardRepository repository) {
       ),
       updateFlashcardUseCaseProvider.overrideWithValue(
         UpdateFlashcardUseCase(repository),
+      ),
+      createFlashcardUseCaseProvider.overrideWithValue(
+        CreateFlashcardUseCase(repository),
+      ),
+      getDeckActionContextUseCaseProvider.overrideWithValue(
+        GetDeckActionContextUseCase(_StubDeckRepository()),
       ),
     ],
   );
@@ -225,6 +240,26 @@ final class _EditorFlashcardRepository implements FlashcardRepository {
   }
 
   @override
+  Future<Result<FlashcardEntity>> createFlashcard({
+    required String deckId,
+    required FlashcardDraft draft,
+  }) async {
+    lastDraft = draft;
+    return Success(
+      FlashcardEntity(
+        id: 'new-card',
+        deckId: deckId,
+        front: draft.front,
+        back: draft.back,
+        note: draft.note,
+        sortOrder: 0,
+        createdAt: 1,
+        updatedAt: 1,
+      ),
+    );
+  }
+
+  @override
   Future<Result<FlashcardEntity>> updateFlashcard({
     required String flashcardId,
     required FlashcardDraft draft,
@@ -247,6 +282,29 @@ final class _EditorFlashcardRepository implements FlashcardRepository {
           _flashcard.hasLearningProgress,
     );
     return Success(_flashcard);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+final class _StubDeckRepository implements DeckRepository {
+  @override
+  Future<DeckActionContextReadModel> getDeckActionContext(String deckId) async {
+    return DeckActionContextReadModel(
+      deck: DeckEntity(
+        id: deckId,
+        folderId: 'folder-001',
+        name: 'Sample deck',
+        sortOrder: 0,
+        createdAt: 1,
+        updatedAt: 1,
+      ),
+      breadcrumb: const <BreadcrumbSegmentReadModel>[
+        BreadcrumbSegmentReadModel(label: 'Sample folder'),
+        BreadcrumbSegmentReadModel(label: 'Sample deck'),
+      ],
+    );
   }
 
   @override

@@ -1,3 +1,5 @@
+import '../enums/flashcard_starting_status.dart';
+
 final class FolderMoveTarget {
   const FolderMoveTarget({
     required this.id,
@@ -47,11 +49,25 @@ enum FlashcardImportDuplicateSource { importFile, deck }
 enum FlashcardProgressEditPolicy { keepProgress, resetProgress }
 
 final class FlashcardDraft {
-  const FlashcardDraft({required this.front, required this.back, this.note});
+  const FlashcardDraft({
+    required this.front,
+    required this.back,
+    this.note,
+    this.example,
+    this.pronunciation,
+    this.hint,
+    this.tags = const <String>[],
+    this.startingStatus = FlashcardStartingStatus.newCard,
+  });
 
   final String front;
   final String back;
   final String? note;
+  final String? example;
+  final String? pronunciation;
+  final String? hint;
+  final List<String> tags;
+  final FlashcardStartingStatus startingStatus;
 }
 
 final class ImportValidationIssue {

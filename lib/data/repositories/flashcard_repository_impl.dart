@@ -47,8 +47,10 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
   Future<FlashcardEntity> getFlashcard(String flashcardId) async {
     final flashcard = await _requireFlashcard(flashcardId);
     final progress = await _flashcardDao.findProgressByFlashcardId(flashcardId);
+    final tags = await _flashcardDao.findTagsForFlashcard(flashcardId);
     return flashcard.toDomain(
       hasLearningProgress: _hasLearningProgress(progress),
+      tags: tags,
     );
   }
 
@@ -136,13 +138,19 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
           updatedAt: now,
         );
       });
+      final normalized = _normalizeDraft(draft);
       return FlashcardEntity(
         id: id,
         deckId: deckId,
-        front: StringUtils.trimmed(draft.front),
-        back: StringUtils.trimmed(draft.back),
-        note: StringUtils.trimToNull(draft.note),
+        front: normalized.front,
+        back: normalized.back,
+        note: normalized.note,
         sortOrder: sortOrder,
+        example: normalized.example,
+        pronunciation: normalized.pronunciation,
+        hint: normalized.hint,
+        tags: normalized.tags,
+        startingStatus: normalized.startingStatus,
         createdAt: now,
         updatedAt: now,
       );
@@ -179,10 +187,15 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       return FlashcardEntity(
         id: flashcard.id,
         deckId: flashcard.deckId,
-        front: StringUtils.trimmed(normalized.front),
-        back: StringUtils.trimmed(normalized.back),
-        note: StringUtils.trimToNull(normalized.note),
+        front: normalized.front,
+        back: normalized.back,
+        note: normalized.note,
         sortOrder: flashcard.sortOrder,
+        example: normalized.example,
+        pronunciation: normalized.pronunciation,
+        hint: normalized.hint,
+        tags: normalized.tags,
+        startingStatus: normalized.startingStatus,
         createdAt: flashcard.createdAt,
         updatedAt: now,
         hasLearningProgress: _hasLearningProgress(progress),
@@ -423,10 +436,22 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     if (front.isEmpty || back.isEmpty) {
       throw const ValidationException(message: 'front and back are required.');
     }
+    final cleanedTags = <String>{};
+    for (final tag in draft.tags) {
+      final trimmed = StringUtils.trimmed(tag);
+      if (trimmed.isNotEmpty) {
+        cleanedTags.add(trimmed);
+      }
+    }
     return FlashcardDraft(
       front: front,
       back: back,
       note: StringUtils.trimToNull(draft.note),
+      example: StringUtils.trimToNull(draft.example),
+      pronunciation: StringUtils.trimToNull(draft.pronunciation),
+      hint: StringUtils.trimToNull(draft.hint),
+      tags: cleanedTags.toList(growable: false),
+      startingStatus: draft.startingStatus,
     );
   }
 

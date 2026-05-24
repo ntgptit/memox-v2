@@ -33,7 +33,10 @@ extension DeckDataMapper on Deck {
 }
 
 extension FlashcardDataMapper on Flashcard {
-  FlashcardEntity toDomain({bool hasLearningProgress = false}) {
+  FlashcardEntity toDomain({
+    bool hasLearningProgress = false,
+    List<String> tags = const <String>[],
+  }) {
     return FlashcardEntity(
       id: id,
       deckId: deckId,
@@ -41,6 +44,10 @@ extension FlashcardDataMapper on Flashcard {
       back: back,
       note: note,
       sortOrder: sortOrder,
+      example: example,
+      pronunciation: pronunciation,
+      hint: hint,
+      tags: tags,
       createdAt: createdAt,
       updatedAt: updatedAt,
       hasLearningProgress: hasLearningProgress,

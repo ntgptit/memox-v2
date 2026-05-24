@@ -21,6 +21,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonCancel => 'Cancel';
 
   @override
+  String get commonClose => 'Close';
+
+  @override
   String get commonCreate => 'Create';
 
   @override
@@ -1344,28 +1347,102 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsDeletedMessage => 'Flashcards deleted.';
 
   @override
-  String get flashcardsEditTitle => 'Edit flashcard';
+  String get flashcardsEditTitle => 'Edit card';
 
   @override
-  String get flashcardsNewTitle => 'New flashcard';
+  String get flashcardsNewTitle => 'New card';
 
   @override
   String get flashcardsFieldFrontLabel => 'Front';
 
   @override
-  String get flashcardsFieldFrontHint => 'Prompt or question';
+  String get flashcardsFieldFrontHint => 'Type the term';
 
   @override
   String get flashcardsFieldBackLabel => 'Back';
 
   @override
-  String get flashcardsFieldBackHint => 'Answer or definition';
+  String get flashcardsFieldBackHint =>
+      'English, Vietnamese, or both — comma-separated reads cleanest.';
 
   @override
   String get flashcardsFieldNoteLabel => 'Note';
 
   @override
   String get flashcardsFieldNoteHint => 'Optional extra note';
+
+  @override
+  String get flashcardsFieldExampleLabel => 'Example sentence';
+
+  @override
+  String get flashcardsFieldExampleHint => 'Add a sentence using this term…';
+
+  @override
+  String get flashcardsFieldTagsLabel => 'Tags';
+
+  @override
+  String get flashcardsFieldTagsHint => 'Add tag';
+
+  @override
+  String get flashcardsFieldPronunciationLabel => 'Pronunciation';
+
+  @override
+  String get flashcardsFieldPronunciationHint =>
+      'Romanization or phonetic spelling';
+
+  @override
+  String get flashcardsFieldHintLabel => 'Hint';
+
+  @override
+  String get flashcardsFieldHintHint =>
+      'A clue that jogs memory without giving the answer.';
+
+  @override
+  String get flashcardsFieldStartingStatusLabel => 'Starting status';
+
+  @override
+  String get flashcardsStatusNew => 'New';
+
+  @override
+  String get flashcardsStatusLearning => 'Learning';
+
+  @override
+  String get flashcardsStatusReviewing => 'Reviewing';
+
+  @override
+  String get flashcardsRecordPronunciationTooltip => 'Record pronunciation';
+
+  @override
+  String get flashcardsListenPronunciationTooltip => 'Listen to pronunciation';
+
+  @override
+  String get flashcardsTagsAddAction => 'Add tag';
+
+  @override
+  String get flashcardsTagsSheetTitle => 'Add tag';
+
+  @override
+  String get flashcardsTagsConfirmAction => 'Add';
+
+  @override
+  String get flashcardsOptionalSuffix => 'optional';
+
+  @override
+  String flashcardsFieldLabelOptional(String label) {
+    return '$label · optional';
+  }
+
+  @override
+  String get flashcardsShowAdvanced => 'Show advanced fields';
+
+  @override
+  String get flashcardsHideAdvanced => 'Hide advanced';
+
+  @override
+  String get flashcardsDeckPickerLabel => 'Saving to';
+
+  @override
+  String get flashcardsSaveAndAddNextTooltip => 'Save and add another';
 
   @override
   String get flashcardsLongContentHelper =>
@@ -1376,16 +1453,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Optional context, examples, or memory hints.';
 
   @override
-  String get flashcardsSaveAndAddNext => 'Save + next';
+  String get flashcardsSaveAndAddNext => 'Save & add another';
 
   @override
   String get flashcardsSavedMessage => 'Flashcard saved.';
 
   @override
-  String get flashcardsSaveChanges => 'Save';
+  String get flashcardsSaveChanges => 'Save changes';
 
   @override
-  String get flashcardsSaveAction => 'Save';
+  String get flashcardsSaveAction => 'Save card';
 
   @override
   String get flashcardsLearningContentChangedTitle =>

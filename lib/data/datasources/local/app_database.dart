@@ -5,6 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import 'database_schema_support.dart';
 import 'tables/decks_table.dart';
 import 'tables/flashcard_progress_table.dart';
+import 'tables/flashcard_tags_table.dart';
 import 'tables/flashcards_table.dart';
 import 'tables/folders_table.dart';
 import 'tables/study_attempts_table.dart';
@@ -20,6 +21,7 @@ part 'migrations/app_database_migrations.dart';
     Decks,
     Flashcards,
     FlashcardProgress,
+    FlashcardTags,
     StudySessions,
     StudySessionItems,
     StudyAttempts,
@@ -28,7 +30,7 @@ part 'migrations/app_database_migrations.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
-  static const int currentSchemaVersion = 6;
+  static const int currentSchemaVersion = 7;
 
   @override
   int get schemaVersion => currentSchemaVersion;

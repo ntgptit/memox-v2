@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
+import '../../../../domain/enums/flashcard_starting_status.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../app_database.dart';
@@ -25,7 +26,17 @@ final class FlashcardDao {
 
   final AppDatabase _database;
   static const int _initialSrsBox = 1;
+  static const int _learningStartingSrsBox = 3;
+  static const int _reviewingStartingSrsBox = 6;
   static const int _masteredSrsBox = 8;
+
+  static int initialBoxFor(FlashcardStartingStatus status) {
+    return switch (status) {
+      FlashcardStartingStatus.newCard => _initialSrsBox,
+      FlashcardStartingStatus.learning => _learningStartingSrsBox,
+      FlashcardStartingStatus.reviewing => _reviewingStartingSrsBox,
+    };
+  }
 
   Future<Flashcard?> findById(String flashcardId) {
     return (_database.select(
@@ -149,17 +160,21 @@ final class FlashcardDao {
             front: StringUtils.trimmed(draft.front),
             back: StringUtils.trimmed(draft.back),
             note: Value(StringUtils.trimToNull(draft.note)),
+            example: Value(StringUtils.trimToNull(draft.example)),
+            pronunciation: Value(StringUtils.trimToNull(draft.pronunciation)),
+            hint: Value(StringUtils.trimToNull(draft.hint)),
             sortOrder: sortOrder,
             createdAt: createdAt,
             updatedAt: updatedAt,
           ),
         );
+    await _replaceTagsForFlashcard(flashcardId: id, tags: draft.tags);
     await _database
         .into(_database.flashcardProgress)
         .insert(
           FlashcardProgressCompanion.insert(
             flashcardId: id,
-            currentBox: 1,
+            currentBox: initialBoxFor(draft.startingStatus),
             reviewCount: 0,
             lapseCount: 0,
             createdAt: createdAt,
@@ -172,17 +187,74 @@ final class FlashcardDao {
     required String flashcardId,
     required FlashcardDraft draft,
     required int updatedAt,
-  }) {
-    return (_database.update(
+  }) async {
+    await (_database.update(
       _database.flashcards,
     )..where((table) => table.id.equals(flashcardId))).write(
       FlashcardsCompanion(
         front: Value(StringUtils.trimmed(draft.front)),
         back: Value(StringUtils.trimmed(draft.back)),
         note: Value(StringUtils.trimToNull(draft.note)),
+        example: Value(StringUtils.trimToNull(draft.example)),
+        pronunciation: Value(StringUtils.trimToNull(draft.pronunciation)),
+        hint: Value(StringUtils.trimToNull(draft.hint)),
         updatedAt: Value(updatedAt),
       ),
     );
+    await _replaceTagsForFlashcard(flashcardId: flashcardId, tags: draft.tags);
+  }
+
+  Future<List<String>> findTagsForFlashcard(String flashcardId) async {
+    final rows = await (_database.select(_database.flashcardTags)
+          ..where((table) => table.flashcardId.equals(flashcardId))
+          ..orderBy([(table) => OrderingTerm.asc(table.tag)]))
+        .get();
+    return rows.map((row) => row.tag).toList(growable: false);
+  }
+
+  Future<Map<String, List<String>>> findTagsForFlashcards(
+    List<String> flashcardIds,
+  ) async {
+    if (flashcardIds.isEmpty) {
+      return const <String, List<String>>{};
+    }
+    final rows = await (_database.select(_database.flashcardTags)
+          ..where((table) => table.flashcardId.isIn(flashcardIds))
+          ..orderBy([(table) => OrderingTerm.asc(table.tag)]))
+        .get();
+    final result = <String, List<String>>{};
+    for (final row in rows) {
+      result.putIfAbsent(row.flashcardId, () => <String>[]).add(row.tag);
+    }
+    return result;
+  }
+
+  Future<void> _replaceTagsForFlashcard({
+    required String flashcardId,
+    required List<String> tags,
+  }) async {
+    await (_database.delete(
+      _database.flashcardTags,
+    )..where((table) => table.flashcardId.equals(flashcardId))).go();
+    final cleaned = <String>{};
+    for (final tag in tags) {
+      final trimmed = StringUtils.trimmed(tag);
+      if (trimmed.isNotEmpty) {
+        cleaned.add(trimmed);
+      }
+    }
+    if (cleaned.isEmpty) {
+      return;
+    }
+    await _database.batch((batch) {
+      batch.insertAll(
+        _database.flashcardTags,
+        [
+          for (final tag in cleaned)
+            FlashcardTagsCompanion.insert(flashcardId: flashcardId, tag: tag),
+        ],
+      );
+    });
   }
 
   Future<void> resetFlashcardProgress({

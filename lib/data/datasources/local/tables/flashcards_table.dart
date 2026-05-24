@@ -22,6 +22,12 @@ class Flashcards extends Table {
 
   TextColumn get note => text().nullable()();
 
+  TextColumn get example => text().nullable()();
+
+  TextColumn get pronunciation => text().nullable()();
+
+  TextColumn get hint => text().nullable()();
+
   IntColumn get sortOrder =>
       integer().named('sort_order').check(sortOrder.isBiggerOrEqualValue(0))();
 

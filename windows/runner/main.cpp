@@ -10,8 +10,13 @@
 
 namespace {
 
-constexpr int kDefaultWindowWidth = 1280;
-constexpr int kDefaultWindowHeight = 720;
+// Match the mobile portrait preview (Pixel-class ~6.1" device, 415×912 dp) so
+// `flutter run -d windows` launches at the same logical size we design for in
+// the MemoX Design System mobile UI kit. Override at launch with the
+// `MEMOX_E2E_WINDOW_SIZE` env var (e.g. `1280x720`) when a wider desktop
+// surface is needed.
+constexpr int kDefaultWindowWidth = 415;
+constexpr int kDefaultWindowHeight = 912;
 constexpr wchar_t kE2EWindowSizeEnv[] = L"MEMOX_E2E_WINDOW_SIZE";
 constexpr DWORD kWindowSizeEnvBufferLength = 32;
 

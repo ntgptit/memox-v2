@@ -69,6 +69,8 @@ GoRouter appRouter(Ref ref) {
 bool _shouldHideShellNavigation(GoRouterState state) {
   const hiddenRoutes = {
     RouteNames.deckImport,
+    RouteNames.flashcardCreate,
+    RouteNames.flashcardEdit,
     RouteNames.settingsAccount,
     RouteNames.settingsLearning,
     RouteNames.settingsAudioSpeech,

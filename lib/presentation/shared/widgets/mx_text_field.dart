@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_radius.dart';
 import 'mx_text.dart';
 
 enum MxTextFieldVariant { outlined, borderless }
@@ -37,6 +38,7 @@ class MxTextField extends StatelessWidget {
     this.textAlignVertical,
     this.textRole,
     this.expands = false,
+    this.accentBorder,
     super.key,
   });
 
@@ -67,6 +69,12 @@ class MxTextField extends StatelessWidget {
   final TextAlignVertical? textAlignVertical;
   final MxTextRole? textRole;
   final bool expands;
+
+  /// When non-null, overrides the enabled-state border with this color while
+  /// keeping the focused border untouched. Use to draw extra attention to a
+  /// field that is awaiting input (per Design System "05 · Create card" where
+  /// the empty Front field uses a primary-tinted border as a focus invite).
+  final Color? accentBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +129,7 @@ class MxTextField extends StatelessWidget {
       );
     }
 
+    final accent = accentBorder;
     return InputDecoration(
       labelText: label,
       hintText: hintText,
@@ -130,6 +139,12 @@ class MxTextField extends StatelessWidget {
           ? Icon(prefixIcon, size: AppIconSizes.md)
           : null,
       suffixIcon: suffixIcon,
+      enabledBorder: accent == null
+          ? null
+          : OutlineInputBorder(
+              borderRadius: AppRadius.input,
+              borderSide: BorderSide(color: accent),
+            ),
     );
   }
 }

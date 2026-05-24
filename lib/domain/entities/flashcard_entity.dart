@@ -1,3 +1,4 @@
+import '../enums/flashcard_starting_status.dart';
 import 'base_entity.dart';
 
 final class FlashcardEntity extends BaseEntity {
@@ -10,6 +11,11 @@ final class FlashcardEntity extends BaseEntity {
     required this.back,
     required this.note,
     required this.sortOrder,
+    this.example,
+    this.pronunciation,
+    this.hint,
+    this.tags = const <String>[],
+    this.startingStatus = FlashcardStartingStatus.newCard,
     this.hasLearningProgress = false,
   });
 
@@ -18,6 +24,11 @@ final class FlashcardEntity extends BaseEntity {
   final String back;
   final String? note;
   final int sortOrder;
+  final String? example;
+  final String? pronunciation;
+  final String? hint;
+  final List<String> tags;
+  final FlashcardStartingStatus startingStatus;
   final bool hasLearningProgress;
 
   String get displayName => front;

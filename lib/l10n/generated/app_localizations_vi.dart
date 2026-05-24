@@ -21,6 +21,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get commonCancel => 'Hủy';
 
   @override
+  String get commonClose => 'Đóng';
+
+  @override
   String get commonCreate => 'Tạo';
 
   @override
@@ -1235,28 +1238,102 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flashcardsDeletedMessage => 'Đã xóa flashcard.';
 
   @override
-  String get flashcardsEditTitle => 'Chỉnh sửa flashcard';
+  String get flashcardsEditTitle => 'Sửa thẻ';
 
   @override
-  String get flashcardsNewTitle => 'Flashcard mới';
+  String get flashcardsNewTitle => 'Thẻ mới';
 
   @override
   String get flashcardsFieldFrontLabel => 'Mặt trước';
 
   @override
-  String get flashcardsFieldFrontHint => 'Prompt hoặc câu hỏi';
+  String get flashcardsFieldFrontHint => 'Nhập thuật ngữ';
 
   @override
   String get flashcardsFieldBackLabel => 'Mặt sau';
 
   @override
-  String get flashcardsFieldBackHint => 'Đáp án hoặc định nghĩa';
+  String get flashcardsFieldBackHint =>
+      'Tiếng Anh, tiếng Việt hoặc cả hai — phân cách bằng dấu phẩy.';
 
   @override
   String get flashcardsFieldNoteLabel => 'Ghi chú';
 
   @override
   String get flashcardsFieldNoteHint => 'Ghi chú bổ sung tùy chọn';
+
+  @override
+  String get flashcardsFieldExampleLabel => 'Câu ví dụ';
+
+  @override
+  String get flashcardsFieldExampleHint =>
+      'Thêm một câu sử dụng thuật ngữ này…';
+
+  @override
+  String get flashcardsFieldTagsLabel => 'Thẻ phân loại';
+
+  @override
+  String get flashcardsFieldTagsHint => 'Thêm tag';
+
+  @override
+  String get flashcardsFieldPronunciationLabel => 'Phát âm';
+
+  @override
+  String get flashcardsFieldPronunciationHint =>
+      'Phiên âm hoặc chữ La-tinh hóa';
+
+  @override
+  String get flashcardsFieldHintLabel => 'Gợi ý';
+
+  @override
+  String get flashcardsFieldHintHint => 'Gợi ý giúp nhớ mà không lộ đáp án.';
+
+  @override
+  String get flashcardsFieldStartingStatusLabel => 'Trạng thái bắt đầu';
+
+  @override
+  String get flashcardsStatusNew => 'Mới';
+
+  @override
+  String get flashcardsStatusLearning => 'Đang học';
+
+  @override
+  String get flashcardsStatusReviewing => 'Đang ôn';
+
+  @override
+  String get flashcardsRecordPronunciationTooltip => 'Ghi âm phát âm';
+
+  @override
+  String get flashcardsListenPronunciationTooltip => 'Nghe phát âm';
+
+  @override
+  String get flashcardsTagsAddAction => 'Thêm tag';
+
+  @override
+  String get flashcardsTagsSheetTitle => 'Thêm tag';
+
+  @override
+  String get flashcardsTagsConfirmAction => 'Thêm';
+
+  @override
+  String get flashcardsOptionalSuffix => 'tùy chọn';
+
+  @override
+  String flashcardsFieldLabelOptional(String label) {
+    return '$label · tùy chọn';
+  }
+
+  @override
+  String get flashcardsShowAdvanced => 'Hiện trường nâng cao';
+
+  @override
+  String get flashcardsHideAdvanced => 'Ẩn nâng cao';
+
+  @override
+  String get flashcardsDeckPickerLabel => 'Lưu vào';
+
+  @override
+  String get flashcardsSaveAndAddNextTooltip => 'Lưu và thêm thẻ khác';
 
   @override
   String get flashcardsLongContentHelper =>
@@ -1267,16 +1344,16 @@ class AppLocalizationsVi extends AppLocalizations {
       'Ngữ cảnh, ví dụ hoặc gợi ý ghi nhớ tùy chọn.';
 
   @override
-  String get flashcardsSaveAndAddNext => 'Lưu + tiếp';
+  String get flashcardsSaveAndAddNext => 'Lưu & thêm thẻ khác';
 
   @override
-  String get flashcardsSavedMessage => 'Đã lưu flashcard.';
+  String get flashcardsSavedMessage => 'Đã lưu thẻ.';
 
   @override
-  String get flashcardsSaveChanges => 'Lưu';
+  String get flashcardsSaveChanges => 'Lưu thay đổi';
 
   @override
-  String get flashcardsSaveAction => 'Lưu';
+  String get flashcardsSaveAction => 'Lưu thẻ';
 
   @override
   String get flashcardsLearningContentChangedTitle =>

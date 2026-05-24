@@ -122,6 +122,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get commonCancel;
 
+  /// No description provided for @commonClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get commonClose;
+
   /// No description provided for @commonCreate.
   ///
   /// In en, this message translates to:
@@ -2157,13 +2163,13 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsEditTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit flashcard'**
+  /// **'Edit card'**
   String get flashcardsEditTitle;
 
   /// No description provided for @flashcardsNewTitle.
   ///
   /// In en, this message translates to:
-  /// **'New flashcard'**
+  /// **'New card'**
   String get flashcardsNewTitle;
 
   /// No description provided for @flashcardsFieldFrontLabel.
@@ -2175,7 +2181,7 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsFieldFrontHint.
   ///
   /// In en, this message translates to:
-  /// **'Prompt or question'**
+  /// **'Type the term'**
   String get flashcardsFieldFrontHint;
 
   /// No description provided for @flashcardsFieldBackLabel.
@@ -2187,7 +2193,7 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsFieldBackHint.
   ///
   /// In en, this message translates to:
-  /// **'Answer or definition'**
+  /// **'English, Vietnamese, or both — comma-separated reads cleanest.'**
   String get flashcardsFieldBackHint;
 
   /// No description provided for @flashcardsFieldNoteLabel.
@@ -2201,6 +2207,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Optional extra note'**
   String get flashcardsFieldNoteHint;
+
+  /// No description provided for @flashcardsFieldExampleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Example sentence'**
+  String get flashcardsFieldExampleLabel;
+
+  /// No description provided for @flashcardsFieldExampleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a sentence using this term…'**
+  String get flashcardsFieldExampleHint;
+
+  /// No description provided for @flashcardsFieldTagsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get flashcardsFieldTagsLabel;
+
+  /// No description provided for @flashcardsFieldTagsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag'**
+  String get flashcardsFieldTagsHint;
+
+  /// No description provided for @flashcardsFieldPronunciationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pronunciation'**
+  String get flashcardsFieldPronunciationLabel;
+
+  /// No description provided for @flashcardsFieldPronunciationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Romanization or phonetic spelling'**
+  String get flashcardsFieldPronunciationHint;
+
+  /// No description provided for @flashcardsFieldHintLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Hint'**
+  String get flashcardsFieldHintLabel;
+
+  /// No description provided for @flashcardsFieldHintHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A clue that jogs memory without giving the answer.'**
+  String get flashcardsFieldHintHint;
+
+  /// No description provided for @flashcardsFieldStartingStatusLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting status'**
+  String get flashcardsFieldStartingStatusLabel;
+
+  /// No description provided for @flashcardsStatusNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get flashcardsStatusNew;
+
+  /// No description provided for @flashcardsStatusLearning.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning'**
+  String get flashcardsStatusLearning;
+
+  /// No description provided for @flashcardsStatusReviewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewing'**
+  String get flashcardsStatusReviewing;
+
+  /// No description provided for @flashcardsRecordPronunciationTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Record pronunciation'**
+  String get flashcardsRecordPronunciationTooltip;
+
+  /// No description provided for @flashcardsListenPronunciationTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen to pronunciation'**
+  String get flashcardsListenPronunciationTooltip;
+
+  /// No description provided for @flashcardsTagsAddAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag'**
+  String get flashcardsTagsAddAction;
+
+  /// No description provided for @flashcardsTagsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag'**
+  String get flashcardsTagsSheetTitle;
+
+  /// No description provided for @flashcardsTagsConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get flashcardsTagsConfirmAction;
+
+  /// No description provided for @flashcardsOptionalSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'optional'**
+  String get flashcardsOptionalSuffix;
+
+  /// No description provided for @flashcardsFieldLabelOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} · optional'**
+  String flashcardsFieldLabelOptional(String label);
+
+  /// No description provided for @flashcardsShowAdvanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Show advanced fields'**
+  String get flashcardsShowAdvanced;
+
+  /// No description provided for @flashcardsHideAdvanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide advanced'**
+  String get flashcardsHideAdvanced;
+
+  /// No description provided for @flashcardsDeckPickerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to'**
+  String get flashcardsDeckPickerLabel;
+
+  /// No description provided for @flashcardsSaveAndAddNextTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and add another'**
+  String get flashcardsSaveAndAddNextTooltip;
 
   /// No description provided for @flashcardsLongContentHelper.
   ///
@@ -2217,7 +2361,7 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsSaveAndAddNext.
   ///
   /// In en, this message translates to:
-  /// **'Save + next'**
+  /// **'Save & add another'**
   String get flashcardsSaveAndAddNext;
 
   /// No description provided for @flashcardsSavedMessage.
@@ -2229,13 +2373,13 @@ abstract class AppLocalizations {
   /// No description provided for @flashcardsSaveChanges.
   ///
   /// In en, this message translates to:
-  /// **'Save'**
+  /// **'Save changes'**
   String get flashcardsSaveChanges;
 
   /// No description provided for @flashcardsSaveAction.
   ///
   /// In en, this message translates to:
-  /// **'Save'**
+  /// **'Save card'**
   String get flashcardsSaveAction;
 
   /// No description provided for @flashcardsLearningContentChangedTitle.
