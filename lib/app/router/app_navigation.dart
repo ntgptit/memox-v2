@@ -88,13 +88,18 @@ extension AppNavigation on BuildContext {
     );
   }
 
-  void goStudyEntry({required String entryType, required String entryRefId}) {
+  void goStudyEntry({
+    required String entryType,
+    required String entryRefId,
+    String? studyMode,
+  }) {
     pushNamed(
       RouteNames.studyEntry,
       pathParameters: {
         RoutePaths.studyEntryTypeParam: entryType,
         RoutePaths.studyEntryRefIdParam: entryRefId,
       },
+      queryParameters: {'mode': ?studyMode},
     );
   }
 
@@ -108,6 +113,13 @@ extension AppNavigation on BuildContext {
 
   void goStudySession(String sessionId) {
     pushNamed(
+      RouteNames.studySession,
+      pathParameters: {RoutePaths.studySessionIdParam: sessionId},
+    );
+  }
+
+  void replaceStudySession(String sessionId) {
+    replaceNamed(
       RouteNames.studySession,
       pathParameters: {RoutePaths.studySessionIdParam: sessionId},
     );

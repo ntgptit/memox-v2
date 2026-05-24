@@ -165,3 +165,64 @@ final class SrsReviewStrategy extends AbstractStudyFlowStrategy {
     return repo.loadDueCards(context);
   }
 }
+
+StudyFlow studyFlowForModes(StudyType studyType, List<StudyMode> modes) {
+  if (studyType == StudyType.srsReview) {
+    if (_sameModes(modes, const <StudyMode>[StudyMode.fill])) {
+      return StudyFlow.srsFillReview;
+    }
+    throw const FormatException('SRS Review only supports Fill mode.');
+  }
+
+  if (_sameModes(modes, const <StudyMode>[
+    StudyMode.review,
+    StudyMode.match,
+    StudyMode.guess,
+    StudyMode.recall,
+    StudyMode.fill,
+  ])) {
+    return StudyFlow.newFullCycle;
+  }
+
+  if (modes.length != 1) {
+    throw const FormatException('New Study supports mix or one selected mode.');
+  }
+
+  return switch (modes.single) {
+    StudyMode.review => StudyFlow.newReviewOnly,
+    StudyMode.match => StudyFlow.newMatchOnly,
+    StudyMode.guess => StudyFlow.newGuessOnly,
+    StudyMode.recall => StudyFlow.newRecallOnly,
+    StudyMode.fill => StudyFlow.newFillOnly,
+  };
+}
+
+List<StudyMode> studyModesForFlow(StudyFlow flow) {
+  return switch (flow) {
+    StudyFlow.newFullCycle => const <StudyMode>[
+      StudyMode.review,
+      StudyMode.match,
+      StudyMode.guess,
+      StudyMode.recall,
+      StudyMode.fill,
+    ],
+    StudyFlow.newReviewOnly => const <StudyMode>[StudyMode.review],
+    StudyFlow.newMatchOnly => const <StudyMode>[StudyMode.match],
+    StudyFlow.newGuessOnly => const <StudyMode>[StudyMode.guess],
+    StudyFlow.newRecallOnly => const <StudyMode>[StudyMode.recall],
+    StudyFlow.newFillOnly => const <StudyMode>[StudyMode.fill],
+    StudyFlow.srsFillReview => const <StudyMode>[StudyMode.fill],
+  };
+}
+
+bool _sameModes(List<StudyMode> left, List<StudyMode> right) {
+  if (left.length != right.length) {
+    return false;
+  }
+  for (var index = 0; index < left.length; index += 1) {
+    if (left[index] != right[index]) {
+      return false;
+    }
+  }
+  return true;
+}

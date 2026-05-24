@@ -19,6 +19,11 @@ enum StudyEntryType {
 
 enum StudyFlow {
   newFullCycle('new_full_cycle'),
+  newReviewOnly('new_review_only'),
+  newMatchOnly('new_match_only'),
+  newGuessOnly('new_guess_only'),
+  newRecallOnly('new_recall_only'),
+  newFillOnly('new_fill_only'),
   srsFillReview('srs_fill_review');
 
   const StudyFlow(this.storageValue);

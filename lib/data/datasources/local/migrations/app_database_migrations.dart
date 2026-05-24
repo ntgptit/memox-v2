@@ -47,6 +47,9 @@ final class _AppDatabaseMigrationRunner {
     if (from < 7) {
       await _addFlashcardAuthorFieldsForSchemaV7();
     }
+    if (from < 8) {
+      await _allowSingleModeStudyFlowsForSchemaV8();
+    }
   }
 
   Future<void> _rebuildLegacyFlashcardProgressIfNeeded() async {
@@ -177,13 +180,27 @@ final class _AppDatabaseMigrationRunner {
     }
   }
 
+  Future<void> _allowSingleModeStudyFlowsForSchemaV8() async {
+    if (!await _hasTable(_TableName.studySessions)) {
+      await migrator.createTable(database.studySessions);
+      return;
+    }
+    final tableSql = await _tableSql(_TableName.studySessions) ?? '';
+    if (!tableSql.contains("'new_review_only'")) {
+      await _alterTable(TableMigration(database.studySessions));
+    }
+  }
+
   Future<void> _ensureFlashcardAuthorColumns() async {
     if (!await _hasTable(_TableName.flashcards)) {
       await migrator.createTable(database.flashcards);
       return;
     }
     if (!await _hasColumn(_TableName.flashcards, 'example')) {
-      await migrator.addColumn(database.flashcards, database.flashcards.example);
+      await migrator.addColumn(
+        database.flashcards,
+        database.flashcards.example,
+      );
     }
     if (!await _hasColumn(_TableName.flashcards, 'pronunciation')) {
       await migrator.addColumn(

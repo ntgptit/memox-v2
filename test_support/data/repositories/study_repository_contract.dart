@@ -875,6 +875,44 @@ void registerStudyRepositoryTests() {
     );
 
     test(
+      'DT16 repositoryFlow: single-mode New Study completes without next Mix mode',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+          modes: const <StudyMode>[StudyMode.review],
+        );
+
+        final answered = await harness.answerBatch.execute(
+          sessionId: started.session.id,
+          studyType: started.session.studyType,
+        );
+
+        final items = await harness.database
+            .select(harness.database.studySessionItems)
+            .get();
+
+        expect(started.session.studyFlow, StudyFlow.newReviewOnly);
+        expect(answered.session.status, SessionStatus.readyToFinalize);
+        expect(answered.currentItem, isNull);
+        expect(items.map((item) => item.studyMode), <String>[
+          StudyMode.review.storageValue,
+        ]);
+      },
+    );
+
+    test(
       'DT6 repositoryFlow: batch review submit fails fast outside Review mode',
       () async {
         await harness.seedDeckWithCards(cardCount: 1);

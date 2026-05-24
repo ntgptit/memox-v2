@@ -6,21 +6,13 @@ Test file: `test/presentation/study_entry_screen_test.dart`
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | `studyEntryStateProvider(entryType, entryRefId)` is unresolved and the shared async state enters first-load loading | deck study entry opens with a pending `Completer<StudyEntryState>` | the first frame is pumped before the future completes | `MxLoadingState` is rendered exactly once | C0+C1 |
+| DT1 | direct-start entry state is unresolved | deck study entry opens with a pending `Completer<StudyEntryState>` | the first frame is pumped before the future completes | `MxLoadingState` is rendered exactly once while no mode-selection screen is shown | C0+C1 |
 
-## Decision table: onDisplay
-
-| ID | Branch / condition | Given | When | Then | Coverage |
-| --- | --- | --- | --- | --- | --- |
-| DT1 | deck entry type supports both New Study and SRS Review flows | loaded state has `entryType=deck`, `entryRefId=deck-001`, no resume candidate, and both default settings snapshots | study entry renders flow choices | `Start a study session`, `New Study`, `SRS Review`, and `Session settings` are visible | C0+C1 |
-| DT2 | today entry type is review-only and hides New Study | loaded state has `entryType=today`, `entryRefId=null`, and review defaults | study entry renders flow choices | `SRS Review` is visible, `New Study` is hidden, and today-only copy is visible | C0+C1 |
-| DT3 | resume candidate exists and restart must not be hidden behind the primary CTA label | loaded state has `entryType=deck`, one active resume candidate, and default settings | study entry renders the resume branch | `Continue` and `Start` are visible, while `Restart` is hidden | C0+C1 |
-| DT4 | New Study batch size is already at its maximum | loaded deck state uses New Study defaults with batch size 20 | user taps the increase control | batch size remains `20`, the range `5-20 cards` is visible, and no value above the New Study max is rendered | C0+C1 |
-| DT5 | SRS Review batch size is already at its maximum | loaded today state uses review defaults with batch size 50 | user taps the increase control | batch size remains `50`, the range `5-50 cards` is visible, and no value above the review max is rendered | C0+C1 |
-| DT6 | compact study entry hides generic helper subtitle while preserving controls | deck study entry renders at logical size `412x915` with both study flows available | study entry renders loaded deck branch | `Start a study session`, `New Study`, and `Session settings` remain visible, while `Choose a flow and snapshot settings for this session.` is hidden | C0+C1 |
-
-## Decision table: onSelect
+## Decision table: onNavigate
 
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
-| DT1 | `Start` is selected while an unfinished resume candidate exists | loaded deck state has one resume candidate | user taps `Start` | confirmation dialog states `Starting a new session will cancel the current unfinished session.` before restart can proceed | C0+C1 |
+| DT1 | mix mode is requested by omitting the mode query | loaded deck state has no resume candidate and New Study defaults | study entry route opens at `/study/deck/deck-001` | route replaces itself with the study session, starts `new_full_cycle`, and queues modes `review`, `match`, `guess`, `recall`, `fill` | C0+C1 |
+| DT2 | a single mode is requested by query parameter | loaded deck state has no resume candidate and the route query is `mode=match` | study entry route opens | route replaces itself with the study session, starts `new_match_only`, and queues only `match` | C0+C1 |
+| DT3 | resume candidate exists for the entry | loaded deck state contains `resume-session-001` | study entry route opens | route replaces itself with `resume-session-001` and does not start a new session | C0+C1 |
+| DT4 | start is rejected because no eligible flashcards are available | loaded deck state has no resume candidate and repository returns an empty eligible batch | study entry route opens | `MxErrorState` shows the no-eligible-flashcards message with retry instead of navigating | C0+C1 |

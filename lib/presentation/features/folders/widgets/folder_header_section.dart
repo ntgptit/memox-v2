@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
@@ -30,7 +31,22 @@ class FolderHeaderSection extends StatelessWidget {
     final showSummary =
         context.showsSupportingCopy || state.mode != FolderDetailMode.unlocked;
 
-    final visibleCrumbs = state.header.breadcrumb;
+    final folderCrumbs = state.header.breadcrumb;
+    final breadcrumbItems = <MxBreadcrumb>[
+      MxBreadcrumb(
+        label: l10n.libraryTitle,
+        onTap: () => context.goLibrary(),
+      ),
+      for (var index = 0; index < folderCrumbs.length; index++)
+        MxBreadcrumb(
+          label: folderCrumbs[index].label,
+          onTap:
+              index == folderCrumbs.length - 1 ||
+                  folderCrumbs[index].folderId == null
+              ? null
+              : () => onOpenBreadcrumb(folderCrumbs[index].folderId!),
+        ),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,6 +56,8 @@ class FolderHeaderSection extends StatelessWidget {
           onBack: onBack,
           onOpenActions: onOpenActions,
         ),
+        const MxGap(MxSpace.xs),
+        MxBreadcrumbBar(items: breadcrumbItems),
         if (showSummary) ...[
           const MxGap(MxSpace.xxs),
           MxText(
@@ -47,22 +65,6 @@ class FolderHeaderSection extends StatelessWidget {
             role: MxTextRole.pageSubtitle,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-          ),
-        ],
-        if (visibleCrumbs.isNotEmpty) ...[
-          const MxGap(MxSpace.xs),
-          MxBreadcrumbBar(
-            items: [
-              for (var index = 0; index < visibleCrumbs.length; index++)
-                MxBreadcrumb(
-                  label: visibleCrumbs[index].label,
-                  onTap:
-                      index == visibleCrumbs.length - 1 ||
-                          visibleCrumbs[index].folderId == null
-                      ? null
-                      : () => onOpenBreadcrumb(visibleCrumbs[index].folderId!),
-                ),
-            ],
           ),
         ],
       ],

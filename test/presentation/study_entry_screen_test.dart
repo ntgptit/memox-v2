@@ -3,15 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:memox/app/router/route_names.dart';
+import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/ports/study_repo.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_entry_screen.dart';
+import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 
 void main() {
-  testWidgets('DT1 onOpen: shows loading state while study entry loads', (
+  testWidgets('DT1 onOpen: shows loading state while direct start loads', (
     tester,
   ) async {
     final completer = Completer<StudyEntryState>();
@@ -29,9 +34,7 @@ void main() {
             'deck-001',
           ).overrideWith((ref) => completer.future),
         ],
-        child: const _TestApp(
-          child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
-        ),
+        child: _TestRouterApp(initialLocation: _deckEntryLocation()),
       ),
     );
     await tester.pump();
@@ -39,215 +42,112 @@ void main() {
     expect(find.byType(MxLoadingState), findsOneWidget);
   });
 
-  testWidgets('DT1 onDisplay: deck entry shows new and review study flows', (
+  testWidgets('DT1 onNavigate: mix starts full-cycle study session directly', (
     tester,
   ) async {
+    final repo = _CapturingStudyRepo();
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          studyRepoProvider.overrideWithValue(repo),
           studyEntryStateProvider(
             'deck',
             'deck-001',
           ).overrideWith((ref) => Future.value(_deckEntryState)),
         ],
-        child: const _TestApp(
-          child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
-        ),
+        child: _TestRouterApp(initialLocation: _deckEntryLocation()),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Start a study session'), findsOneWidget);
-    expect(find.text('New Study'), findsOneWidget);
-    expect(find.text('SRS Review'), findsOneWidget);
-    expect(find.text('Session settings'), findsOneWidget);
+    expect(find.text('Session session-001'), findsOneWidget);
+    expect(repo.startedFlow, StudyFlow.newFullCycle);
+    expect(repo.startedModes, <StudyMode>[
+      StudyMode.review,
+      StudyMode.match,
+      StudyMode.guess,
+      StudyMode.recall,
+      StudyMode.fill,
+    ]);
   });
 
-  testWidgets('DT6 onDisplay: compact entry hides generic helper subtitle', (
+  testWidgets('DT2 onNavigate: selected mode starts that mode directly', (
     tester,
   ) async {
-    tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = const Size(412, 915);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    addTearDown(tester.view.resetPhysicalSize);
+    final repo = _CapturingStudyRepo();
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          studyRepoProvider.overrideWithValue(repo),
           studyEntryStateProvider(
             'deck',
             'deck-001',
           ).overrideWith((ref) => Future.value(_deckEntryState)),
         ],
-        child: const _TestApp(
-          child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
+        child: _TestRouterApp(
+          initialLocation: _deckEntryLocation(studyMode: StudyMode.match),
         ),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Start a study session'), findsOneWidget);
-    expect(
-      find.text('Choose a flow and snapshot settings for this session.'),
-      findsNothing,
-    );
-    expect(find.text('New Study'), findsOneWidget);
-    expect(find.text('Session settings'), findsOneWidget);
+    expect(find.text('Session session-001'), findsOneWidget);
+    expect(repo.startedFlow, StudyFlow.newMatchOnly);
+    expect(repo.startedModes, <StudyMode>[StudyMode.match]);
   });
 
-  testWidgets('DT2 onDisplay: today entry locks the flow to SRS Review', (
+  testWidgets('DT3 onNavigate: resume candidate opens existing session', (
     tester,
   ) async {
+    final repo = _CapturingStudyRepo();
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          studyRepoProvider.overrideWithValue(repo),
           studyEntryStateProvider(
-            'today',
-            null,
-          ).overrideWith((ref) => Future.value(_todayEntryState)),
+            'deck',
+            'deck-001',
+          ).overrideWith((ref) => Future.value(_resumeEntryState)),
         ],
-        child: const _TestApp(
-          child: StudyEntryScreen(entryType: 'today', entryRefId: null),
-        ),
+        child: _TestRouterApp(initialLocation: _deckEntryLocation()),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('SRS Review'), findsOneWidget);
-    expect(find.text('New Study'), findsNothing);
-    expect(
-      find.text('Today supports SRS Review due and overdue cards in v1.'),
-      findsOneWidget,
-    );
+    expect(find.text('Session resume-session-001'), findsOneWidget);
+    expect(repo.startCount, 0);
   });
 
-  testWidgets(
-    'DT3 onDisplay: shows separate continue and start-new actions for resume candidate',
-    (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            studyEntryStateProvider(
-              'deck',
-              'deck-001',
-            ).overrideWith((ref) => Future.value(_resumeEntryState)),
-          ],
-          child: const _TestApp(
-            child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Session in progress'), findsOneWidget);
-      expect(find.text('Continue'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.text('Start'),
-        300,
-        scrollable: find.byType(Scrollable),
-      );
-      expect(find.text('Start'), findsOneWidget);
-      expect(find.text('Restart'), findsNothing);
-    },
-  );
-
-  testWidgets('DT4 onDisplay: keeps New Study batch size within 5-20', (
+  testWidgets('DT4 onNavigate: empty eligible batch shows recovery error', (
     tester,
   ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          studyRepoProvider.overrideWithValue(_EmptyStudyRepo()),
           studyEntryStateProvider(
             'deck',
             'deck-001',
           ).overrideWith((ref) => Future.value(_deckEntryState)),
         ],
-        child: const _TestApp(
-          child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
-        ),
+        child: _TestRouterApp(initialLocation: _deckEntryLocation()),
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Batch size: 20'), findsOneWidget);
-    expect(find.text('5-20 cards'), findsOneWidget);
-
-    await tester.tap(
-      find.byTooltip('Increase batch size'),
-      warnIfMissed: false,
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Batch size: 20'), findsOneWidget);
-    expect(find.text('Batch size: 21'), findsNothing);
+    expect(find.byType(MxErrorState), findsOneWidget);
+    expect(find.textContaining('No eligible flashcards'), findsOneWidget);
   });
+}
 
-  testWidgets('DT5 onDisplay: keeps SRS Review batch size within 5-50', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          studyEntryStateProvider(
-            'today',
-            null,
-          ).overrideWith((ref) => Future.value(_todayMaxReviewEntryState)),
-        ],
-        child: const _TestApp(
-          child: StudyEntryScreen(entryType: 'today', entryRefId: null),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Batch size: 50'), findsOneWidget);
-    expect(find.text('5-50 cards'), findsOneWidget);
-
-    await tester.tap(
-      find.byTooltip('Increase batch size'),
-      warnIfMissed: false,
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Batch size: 50'), findsOneWidget);
-    expect(find.text('Batch size: 51'), findsNothing);
-  });
-
-  testWidgets(
-    'DT1 onSelect: confirms before starting new session over a resume candidate',
-    (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            studyEntryStateProvider(
-              'deck',
-              'deck-001',
-            ).overrideWith((ref) => Future.value(_resumeEntryState)),
-          ],
-          child: const _TestApp(
-            child: StudyEntryScreen(entryType: 'deck', entryRefId: 'deck-001'),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.scrollUntilVisible(
-        find.text('Start'),
-        300,
-        scrollable: find.byType(Scrollable),
-      );
-      await tester.tap(find.text('Start'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Start a new session?'), findsOneWidget);
-      expect(
-        find.text(
-          'Starting a new session will cancel the current unfinished session.',
-        ),
-        findsOneWidget,
-      );
-    },
-  );
+String _deckEntryLocation({StudyMode? studyMode}) {
+  final mode = studyMode?.storageValue;
+  return mode == null
+      ? '/study/deck/deck-001'
+      : '/study/deck/deck-001?mode=$mode';
 }
 
 const _newDefaults = StudySettingsSnapshot(
@@ -272,29 +172,6 @@ const _deckEntryState = StudyEntryState(
   resumeCandidate: null,
 );
 
-const _todayEntryState = StudyEntryState(
-  entryType: StudyEntryType.today,
-  entryRefId: null,
-  newStudyDefaults: _newDefaults,
-  reviewDefaults: _reviewDefaults,
-  resumeCandidate: null,
-);
-
-const _reviewMaxDefaults = StudySettingsSnapshot(
-  batchSize: 50,
-  shuffleFlashcards: false,
-  shuffleAnswers: false,
-  prioritizeOverdue: true,
-);
-
-const _todayMaxReviewEntryState = StudyEntryState(
-  entryType: StudyEntryType.today,
-  entryRefId: null,
-  newStudyDefaults: _newDefaults,
-  reviewDefaults: _reviewMaxDefaults,
-  resumeCandidate: null,
-);
-
 const _resumeEntryState = StudyEntryState(
   entryType: StudyEntryType.deck,
   entryRefId: 'deck-001',
@@ -305,7 +182,7 @@ const _resumeEntryState = StudyEntryState(
 
 const _resumeSnapshot = StudySessionSnapshot(
   session: StudySession(
-    id: 'session-001',
+    id: 'resume-session-001',
     entryType: StudyEntryType.deck,
     entryRefId: 'deck-001',
     studyType: StudyType.newStudy,
@@ -316,50 +193,219 @@ const _resumeSnapshot = StudySessionSnapshot(
     endedAt: null,
     restartedFromSessionId: null,
   ),
-  currentItem: StudySessionItem(
-    id: 'item-001',
-    sessionId: 'session-001',
-    flashcard: _resumeFlashcard,
-    studyMode: StudyMode.review,
-    modeOrder: 1,
-    roundIndex: 1,
-    queuePosition: 1,
-    sourcePool: SessionItemSourcePool.newCards,
-    status: SessionItemStatus.pending,
-    completedAt: null,
-  ),
-  sessionFlashcards: [_resumeFlashcard],
+  currentItem: null,
+  sessionFlashcards: <StudyFlashcardRef>[],
   summary: StudySummary(
-    totalCards: 1,
+    totalCards: 0,
     completedAttempts: 0,
     correctAttempts: 0,
     incorrectAttempts: 0,
     increasedBoxCount: 0,
     decreasedBoxCount: 0,
-    remainingCount: 1,
+    remainingCount: 0,
   ),
   canFinalize: false,
 );
 
-const _resumeFlashcard = StudyFlashcardRef(
-  id: 'card-001',
-  deckId: 'deck-001',
-  front: 'Front',
-  back: 'Back',
-  sourcePool: SessionItemSourcePool.newCards,
-);
+class _TestRouterApp extends StatelessWidget {
+  const _TestRouterApp({required this.initialLocation});
 
-class _TestApp extends StatelessWidget {
-  const _TestApp({required this.child});
-
-  final Widget child;
+  final String initialLocation;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final router = GoRouter(
+      initialLocation: initialLocation,
+      routes: [
+        GoRoute(
+          path: '/study/:entryType/:entryRefId',
+          name: RouteNames.studyEntry,
+          builder: (_, state) => StudyEntryScreen(
+            entryType: state.pathParameters['entryType']!,
+            entryRefId: state.pathParameters['entryRefId'],
+            studyMode: state.uri.queryParameters['mode'],
+          ),
+        ),
+        GoRoute(
+          path: '/session/:sessionId',
+          name: RouteNames.studySession,
+          builder: (_, state) =>
+              Text('Session ${state.pathParameters['sessionId']}'),
+        ),
+      ],
+    );
+    return MaterialApp.router(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: child,
+      routerConfig: router,
     );
   }
+}
+
+class _CapturingStudyRepo implements StudyRepo {
+  int startCount = 0;
+  StudyFlow? startedFlow;
+  List<StudyMode>? startedModes;
+
+  @override
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
+    return [_card()];
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async {
+    return [_card(sourcePool: SessionItemSourcePool.due)];
+  }
+
+  @override
+  Future<StudySessionSnapshot> startSession({
+    required StudyContext context,
+    required StudyFlow flow,
+    required List<StudyMode> modes,
+    required List<StudyFlashcardRef> batch,
+  }) async {
+    startCount += 1;
+    startedFlow = flow;
+    startedModes = modes;
+    return _snapshot(
+      studyType: context.studyType,
+      studyFlow: flow,
+      settings: context.settings,
+      mode: modes.first,
+      flashcard: batch.first,
+    );
+  }
+
+  @override
+  Future<StudySessionSnapshot?> findResumeCandidate(
+    StudyContext context,
+  ) async {
+    return null;
+  }
+
+  @override
+  Future<List<StudySessionSnapshot>> listActiveSessions() async {
+    return const <StudySessionSnapshot>[];
+  }
+
+  @override
+  Future<StudySessionSnapshot> loadSession(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentItem({
+    required String sessionId,
+    required AttemptGrade grade,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
+    required String sessionId,
+    required Map<String, AttemptGrade> itemGrades,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> skipCurrentItem(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> cancelSession(String sessionId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> finalizeSession({
+    required String sessionId,
+    required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<StudySessionSnapshot> retryFinalize({
+    required String sessionId,
+    required StudyType studyType,
+    required StudyFinalizePolicy finalizePolicy,
+  }) {
+    throw UnimplementedError();
+  }
+}
+
+final class _EmptyStudyRepo extends _CapturingStudyRepo {
+  @override
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
+    return const <StudyFlashcardRef>[];
+  }
+
+  @override
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async {
+    return const <StudyFlashcardRef>[];
+  }
+}
+
+StudySessionSnapshot _snapshot({
+  required StudyType studyType,
+  required StudyFlow studyFlow,
+  required StudySettingsSnapshot settings,
+  required StudyMode mode,
+  required StudyFlashcardRef flashcard,
+}) {
+  return StudySessionSnapshot(
+    session: StudySession(
+      id: 'session-001',
+      entryType: StudyEntryType.deck,
+      entryRefId: 'deck-001',
+      studyType: studyType,
+      studyFlow: studyFlow,
+      settings: settings,
+      status: SessionStatus.inProgress,
+      startedAt: 0,
+      endedAt: null,
+      restartedFromSessionId: null,
+    ),
+    currentItem: StudySessionItem(
+      id: 'item-001',
+      sessionId: 'session-001',
+      flashcard: flashcard,
+      studyMode: mode,
+      modeOrder: 1,
+      roundIndex: 1,
+      queuePosition: 1,
+      sourcePool: flashcard.sourcePool,
+      status: SessionItemStatus.pending,
+      completedAt: null,
+    ),
+    sessionFlashcards: [flashcard],
+    summary: const StudySummary(
+      totalCards: 1,
+      completedAttempts: 0,
+      correctAttempts: 0,
+      incorrectAttempts: 0,
+      increasedBoxCount: 0,
+      decreasedBoxCount: 0,
+      remainingCount: 1,
+    ),
+    canFinalize: false,
+  );
+}
+
+StudyFlashcardRef _card({
+  SessionItemSourcePool sourcePool = SessionItemSourcePool.newCards,
+}) {
+  return StudyFlashcardRef(
+    id: 'card-${sourcePool.storageValue}',
+    deckId: 'deck-001',
+    front: 'Front',
+    back: 'Back',
+    sourcePool: sourcePool,
+  );
 }

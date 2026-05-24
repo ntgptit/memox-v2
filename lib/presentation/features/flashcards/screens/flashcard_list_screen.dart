@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/services/tts_service.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../shared/layouts/mx_gap.dart';
@@ -171,14 +172,14 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                   child: FlashcardDeckSummarySection(
                     state: state,
                     studyEnabled: state.items.isNotEmpty,
-                    onStartStudy: () => _goStudyEntry(state),
+                    onStartStudy: () => _goStudyEntry(state, null),
                   ),
                 ),
                 const MxSliverGap(MxSpace.xl),
                 SliverToBoxAdapter(
                   child: FlashcardStudyModesSection(
                     enabled: state.items.isNotEmpty,
-                    onStartStudy: () => _goStudyEntry(state),
+                    onStartStudy: (mode) => _goStudyEntry(state, mode),
                   ),
                 ),
                 const MxSliverGap(MxSpace.xl),
@@ -467,8 +468,12 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     ];
   }
 
-  void _goStudyEntry(FlashcardListState state) {
-    context.goStudyEntry(entryType: 'deck', entryRefId: state.deckId);
+  void _goStudyEntry(FlashcardListState state, StudyMode? studyMode) {
+    context.goStudyEntry(
+      entryType: 'deck',
+      entryRefId: state.deckId,
+      studyMode: studyMode?.storageValue,
+    );
   }
 
   void _speakFront(FlashcardListItemState item) {

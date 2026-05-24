@@ -59,7 +59,7 @@ class StudySessions extends Table {
     'CHECK (ended_at IS NULL OR ended_at >= started_at)',
     "CHECK ((entry_type = 'today' AND entry_ref_id IS NULL) OR (entry_type IN ('deck', 'folder') AND entry_ref_id IS NOT NULL))",
     "CHECK ((status IN ('draft', 'in_progress') AND ended_at IS NULL) OR (status IN ('ready_to_finalize', 'completed', 'failed_to_finalize', 'cancelled')))",
-    "CHECK ((study_type = 'new' AND study_flow = 'new_full_cycle') OR (study_type = 'srs_review' AND study_flow = 'srs_fill_review'))",
+    "CHECK ((study_type = 'new' AND study_flow IN ('new_full_cycle', 'new_review_only', 'new_match_only', 'new_guess_only', 'new_recall_only', 'new_fill_only')) OR (study_type = 'srs_review' AND study_flow = 'srs_fill_review'))",
     'CHECK (restarted_from_session_id IS NULL OR restarted_from_session_id != id)',
   ];
 }

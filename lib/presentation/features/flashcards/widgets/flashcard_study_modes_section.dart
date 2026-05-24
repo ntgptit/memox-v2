@@ -3,6 +3,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../core/theme/extensions/theme_extensions.dart';
+import '../../../../domain/enums/study_enums.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_card.dart';
@@ -18,7 +19,7 @@ class FlashcardStudyModesSection extends StatelessWidget {
   });
 
   final bool enabled;
-  final VoidCallback onStartStudy;
+  final ValueChanged<StudyMode?> onStartStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -28,30 +29,35 @@ class FlashcardStudyModesSection extends StatelessWidget {
         label: l10n.studyModeReview,
         subtitle: l10n.studyModeReviewSubtitle,
         icon: Icons.style_outlined,
+        studyMode: StudyMode.review,
         masteryTone: false,
       ),
       _ModeTileData(
         label: l10n.studyModeMatch,
         subtitle: l10n.studyModeMatchSubtitle,
         icon: Icons.compare_arrows_rounded,
+        studyMode: StudyMode.match,
         masteryTone: false,
       ),
       _ModeTileData(
         label: l10n.studyModeGuess,
         subtitle: l10n.studyModeGuessSubtitle,
         icon: Icons.quiz_outlined,
+        studyMode: StudyMode.guess,
         masteryTone: false,
       ),
       _ModeTileData(
         label: l10n.studyModeRecall,
         subtitle: l10n.studyModeRecallSubtitle,
         icon: Icons.psychology_alt_outlined,
+        studyMode: StudyMode.recall,
         masteryTone: true,
       ),
       _ModeTileData(
         label: l10n.studyModeFill,
         subtitle: l10n.studyModeFillSubtitle,
         icon: Icons.edit_note_rounded,
+        studyMode: StudyMode.fill,
         masteryTone: true,
       ),
     ];
@@ -78,7 +84,7 @@ class FlashcardStudyModesSection extends StatelessWidget {
               Icons.edit_note_rounded,
             ],
             modesSummary: l10n.studyModeMixSummary,
-            onTap: onStartStudy,
+            onTap: () => onStartStudy(null),
           ),
           const MxGap(MxSpace.sm),
         ],
@@ -101,12 +107,14 @@ class _ModeTileData {
     required this.label,
     required this.subtitle,
     required this.icon,
+    required this.studyMode,
     required this.masteryTone,
   });
 
   final String label;
   final String subtitle;
   final IconData icon;
+  final StudyMode studyMode;
   final bool masteryTone;
 }
 
@@ -119,7 +127,7 @@ class _StudyModeListCard extends StatelessWidget {
 
   final List<_ModeTileData> modes;
   final bool enabled;
-  final VoidCallback onStartStudy;
+  final ValueChanged<StudyMode?> onStartStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +171,7 @@ class _StudyModeTile extends StatelessWidget {
 
   final _ModeTileData mode;
   final bool enabled;
-  final VoidCallback onStartStudy;
+  final ValueChanged<StudyMode?> onStartStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +184,7 @@ class _StudyModeTile extends StatelessWidget {
       backgroundColor: enabled
           ? scheme.surfaceContainerLowest
           : scheme.surfaceContainerHighest,
-      onTap: enabled ? onStartStudy : null,
+      onTap: enabled ? () => onStartStudy(mode.studyMode) : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

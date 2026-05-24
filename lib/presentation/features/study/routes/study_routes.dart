@@ -39,6 +39,7 @@ List<RouteBase> studyLibraryRoutes() {
         child: StudyEntryScreen(
           entryType: state.pathParameters[RoutePaths.studyEntryTypeParam]!,
           entryRefId: state.pathParameters[RoutePaths.studyEntryRefIdParam],
+          studyMode: state.uri.queryParameters['mode'],
         ),
       ),
     ),

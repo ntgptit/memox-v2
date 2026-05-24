@@ -16,7 +16,10 @@ final class StartStudySessionUseCase {
   final StudyRepo _repository;
   final StudyFlowStrategyFactory _strategyFactory;
 
-  Future<StudySessionSnapshot> execute(StudyContext context) async {
+  Future<StudySessionSnapshot> execute(
+    StudyContext context, {
+    List<StudyMode>? modes,
+  }) async {
     final strategy = _strategyFactory.of(context.studyType);
     if (!strategy.supportsEntry(context.entryType)) {
       throw ValidationException(
@@ -24,6 +27,8 @@ final class StartStudySessionUseCase {
             '${context.studyType.name} does not support ${context.entryType.name}.',
       );
     }
+    final effectiveModes = modes ?? strategy.modes;
+    final flow = _flowForModes(context.studyType, effectiveModes);
 
     final batch = await strategy.loadBatch(context, _repository);
     if (batch.isEmpty) {
@@ -34,11 +39,11 @@ final class StartStudySessionUseCase {
 
     final snapshot = await _repository.startSession(
       context: context,
-      flow: strategy.flow,
-      modes: strategy.modes,
+      flow: flow,
+      modes: effectiveModes,
       batch: batch,
     );
-    return _withFlowPlan(snapshot, strategy.flowPlan);
+    return _withFlowPlan(snapshot, _flowPlan(context.studyType, flow));
   }
 }
 
@@ -58,6 +63,7 @@ final class ResumeStudySessionUseCase {
   }
 
   Future<StudySessionSnapshot?> findCandidate(StudyContext context) async {
+    _strategyFactory.of(context.studyType);
     final snapshot = await _repository.findResumeCandidate(context);
     return snapshot == null ? null : _withRegisteredFlowPlan(snapshot);
   }
@@ -67,8 +73,10 @@ final class ResumeStudySessionUseCase {
   }
 
   StudySessionSnapshot _withRegisteredFlowPlan(StudySessionSnapshot snapshot) {
-    final strategy = _strategyFactory.of(snapshot.session.studyType);
-    return _withFlowPlan(snapshot, strategy.flowPlan);
+    return _withFlowPlan(
+      snapshot,
+      _flowPlan(snapshot.session.studyType, snapshot.session.studyFlow),
+    );
   }
 }
 
@@ -117,7 +125,7 @@ final class RestartStudySessionUseCase {
       modes: strategy.modes,
       batch: batch,
     );
-    return _withFlowPlan(snapshot, strategy.flowPlan);
+    return _withFlowPlan(snapshot, _flowPlan(context.studyType, strategy.flow));
   }
 
   void _requireSameEntry(StudySession session, StudyContext context) {
@@ -157,13 +165,18 @@ final class AnswerFlashcardUseCase {
     required StudyType studyType,
     required AttemptGrade grade,
   }) async {
-    final strategy = _strategyFactory.of(studyType);
+    _strategyFactory.of(studyType);
+    final currentSnapshot = await _repository.loadSession(sessionId);
+    final modes = studyModesForFlow(currentSnapshot.session.studyFlow);
     final snapshot = await _repository.answerCurrentItem(
       sessionId: sessionId,
       grade: grade,
-      modes: strategy.modes,
+      modes: modes,
     );
-    return _withFlowPlan(snapshot, strategy.flowPlan);
+    return _withFlowPlan(
+      snapshot,
+      _flowPlan(snapshot.session.studyType, snapshot.session.studyFlow),
+    );
   }
 }
 
@@ -185,8 +198,9 @@ final class AnswerCurrentModeBatchUseCase {
     required StudyType studyType,
     StudyModeUiResult uiResult = StudyModeUiResult.viewed,
   }) async {
-    final strategy = _flowStrategyFactory.of(studyType);
+    _flowStrategyFactory.of(studyType);
     final currentSnapshot = await _repository.loadSession(sessionId);
+    final modes = studyModesForFlow(currentSnapshot.session.studyFlow);
     final modeStrategy = _modeStrategy(currentSnapshot);
     if (modeStrategy.handleType != StudyMode.review) {
       throw const ValidationException(
@@ -204,9 +218,12 @@ final class AnswerCurrentModeBatchUseCase {
     final result = await _repository.answerCurrentModeItemGradesBatch(
       sessionId: sessionId,
       itemGrades: submission.itemGrades,
-      modes: strategy.modes,
+      modes: modes,
     );
-    return _withFlowPlan(result, strategy.flowPlan);
+    return _withFlowPlan(
+      result,
+      _flowPlan(result.session.studyType, result.session.studyFlow),
+    );
   }
 
   StudyModeStrategy _modeStrategy(StudySessionSnapshot snapshot) {
@@ -236,8 +253,9 @@ final class AnswerCurrentModeItemGradesBatchUseCase {
     required StudyType studyType,
     required Map<String, AttemptGrade> itemGrades,
   }) async {
-    final strategy = _flowStrategyFactory.of(studyType);
+    _flowStrategyFactory.of(studyType);
     final currentSnapshot = await _repository.loadSession(sessionId);
+    final modes = studyModesForFlow(currentSnapshot.session.studyFlow);
     final mode = currentSnapshot.currentItem?.studyMode;
     if (mode == null) {
       throw const ValidationException(message: 'No pending study item.');
@@ -250,9 +268,12 @@ final class AnswerCurrentModeItemGradesBatchUseCase {
     final result = await _repository.answerCurrentModeItemGradesBatch(
       sessionId: sessionId,
       itemGrades: submission.itemGrades,
-      modes: strategy.modes,
+      modes: modes,
     );
-    return _withFlowPlan(result, strategy.flowPlan);
+    return _withFlowPlan(
+      result,
+      _flowPlan(result.session.studyType, result.session.studyFlow),
+    );
   }
 }
 
@@ -274,9 +295,10 @@ final class AnswerCurrentMatchModeBatchUseCase {
     required StudyType studyType,
     required Map<String, AttemptGrade> itemGrades,
   }) async {
-    final strategy = _flowStrategyFactory.of(studyType);
+    _flowStrategyFactory.of(studyType);
     final modeStrategy = _modeStrategyFactory.of(StudyMode.match);
     final currentSnapshot = await _repository.loadSession(sessionId);
+    final modes = studyModesForFlow(currentSnapshot.session.studyFlow);
     if (currentSnapshot.currentItem?.studyMode != StudyMode.match) {
       throw const ValidationException(
         message: 'Match batch answer is only available for Match mode.',
@@ -289,9 +311,12 @@ final class AnswerCurrentMatchModeBatchUseCase {
     final result = await _repository.answerCurrentModeItemGradesBatch(
       sessionId: sessionId,
       itemGrades: submission.itemGrades,
-      modes: strategy.modes,
+      modes: modes,
     );
-    return _withFlowPlan(result, strategy.flowPlan);
+    return _withFlowPlan(
+      result,
+      _flowPlan(result.session.studyType, result.session.studyFlow),
+    );
   }
 }
 
@@ -369,6 +394,22 @@ StudySessionSnapshot _withFlowPlan(
 ) {
   return snapshot.copyWith(
     summary: snapshot.summary.copyWith(totalModeCount: flowPlan.totalModeCount),
+  );
+}
+
+StudyFlow _flowForModes(StudyType studyType, List<StudyMode> modes) {
+  try {
+    return studyFlowForModes(studyType, modes);
+  } on FormatException catch (error) {
+    throw ValidationException(message: error.message);
+  }
+}
+
+StudyFlowPlan _flowPlan(StudyType studyType, StudyFlow flow) {
+  return StudyFlowPlan(
+    studyType: studyType,
+    flow: flow,
+    modes: studyModesForFlow(flow),
   );
 }
 

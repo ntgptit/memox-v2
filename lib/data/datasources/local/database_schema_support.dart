@@ -17,6 +17,11 @@ abstract final class DatabaseEnumValues {
 
   static const List<String> studyFlows = <String>[
     'new_full_cycle',
+    'new_review_only',
+    'new_match_only',
+    'new_guess_only',
+    'new_recall_only',
+    'new_fill_only',
     'srs_fill_review',
   ];
 

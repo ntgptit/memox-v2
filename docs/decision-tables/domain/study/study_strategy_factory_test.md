@@ -9,6 +9,7 @@ Test file: `test/domain/study/study_strategy_factory_test.dart`
 | DT1 | strategy factory receives each supported study type | strategy registry contains implementations for the supported study types | factory selects a strategy for each type | returned strategy matches the requested study type | C0+C1 |
 | DT2 | strategy entry support is queried for v1 entry points | new-study and SRS-review strategies are registered | supported entry points are inspected | New Study supports deck/folder only, while SRS Review also supports today | C0+C1 |
 | DT3 | mode strategy factory receives each supported study mode | mode strategy registry contains Review, Match, Guess, Recall, and Fill implementations | factory selects a strategy for each mode | returned mode strategy matches the requested mode and exposes mode-specific hooks such as Match batch size and feedback delays | C0+C1 |
+| DT4 | study flow is derived from Mix and single-mode selections | New Study requests either all five modes or one selected mode, and SRS Review requests Fill | flow and mode helpers are queried | Mix maps to `new_full_cycle`, each single mode maps to its matching `new_<mode>_only` flow, and SRS Review maps to `srs_fill_review` | C0+C1 |
 
 ## Decision table: selectStrategy
 

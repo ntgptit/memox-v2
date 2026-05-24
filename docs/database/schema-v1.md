@@ -122,7 +122,7 @@ erDiagram
 | `entry_type` | TEXT | no | `deck`, `folder`, `today` |
 | `entry_ref_id` | TEXT | yes | id deck hoặc folder nếu có |
 | `study_type` | TEXT | no | `new`, `srs_review` |
-| `study_flow` | TEXT | no | `new_full_cycle`, `srs_fill_review` |
+| `study_flow` | TEXT | no | `new_full_cycle`, `new_review_only`, `new_match_only`, `new_guess_only`, `new_recall_only`, `new_fill_only`, `srs_fill_review` |
 | `batch_size` | INTEGER | no | snapshot batch size hiệu lực khi tạo session |
 | `shuffle_flashcards` | INTEGER | no | 0 hoặc 1 |
 | `shuffle_answers` | INTEGER | no | 0 hoặc 1 |
@@ -145,7 +145,8 @@ erDiagram
 - `restart` không sửa history cũ, mà tạo session mới; session cũ được đánh dấu `cancelled` và new session giữ `restarted_from_session_id` trỏ về session cũ (session cũ xem như superseded)
 - Session `completed` là terminal — không được quay lại trạng thái khác
 - UI label `SRS Review` của study type được map vào giá trị schema `srs_review`
-- `study_type=new` dùng `study_flow=new_full_cycle` và chạy đủ 5 mode theo thứ tự `review`, `match`, `guess`, `recall`, `fill`
+- `study_type=new` dùng `study_flow=new_full_cycle` cho Mix và chạy đủ 5 mode theo thứ tự `review`, `match`, `guess`, `recall`, `fill`
+- `study_type=new` cũng có thể dùng một flow mode riêng lẻ: `new_review_only`, `new_match_only`, `new_guess_only`, `new_recall_only`, hoặc `new_fill_only`
 - `study_type=srs_review` dùng `study_flow=srs_fill_review` và chỉ chạy `fill`
 - Mode hiện tại được xác định từ `study_session_items.mode_order`, `study_session_items.study_mode` và các item còn `pending`
 

@@ -105,6 +105,11 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
   int _requiredModeCount(local.StudySession session) {
     return switch (DatabaseEnumCodecs.studyFlowFromStorage(session.studyFlow)) {
       StudyFlow.newFullCycle => 5,
+      StudyFlow.newReviewOnly ||
+      StudyFlow.newMatchOnly ||
+      StudyFlow.newGuessOnly ||
+      StudyFlow.newRecallOnly ||
+      StudyFlow.newFillOnly => 1,
       StudyFlow.srsFillReview => 1,
     };
   }

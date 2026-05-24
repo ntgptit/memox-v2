@@ -76,6 +76,7 @@ class StudyEntryActionController extends _$StudyEntryActionController {
   Future<StudyEntryStartResult?> start({
     required StudyType studyType,
     required StudySettingsSnapshot settings,
+    List<StudyMode>? modes,
     String? restartedFromSessionId,
   }) async {
     state = const AsyncLoading<void>();
@@ -87,7 +88,9 @@ class StudyEntryActionController extends _$StudyEntryActionController {
         settings: settings,
       );
       final snapshot = restartedFromSessionId == null
-          ? await ref.read(startStudySessionUseCaseProvider).execute(context)
+          ? await ref
+                .read(startStudySessionUseCaseProvider)
+                .execute(context, modes: modes)
           : await ref
                 .read(restartStudySessionUseCaseProvider)
                 .execute(sessionId: restartedFromSessionId, context: context);

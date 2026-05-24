@@ -69,7 +69,7 @@ Trình tự:
 | Import CSV/text | validate ngoài DB, nếu hợp lệ thì insert flashcards + progress trong transaction |
 | Export deck/flashcard | read-only query, không cần lưu job row |
 | Reorder folder/deck/flashcard | update `sort_order` của các sibling trong cùng scope |
-| Create New Study session draft | insert `study_sessions` với `study_type=new`, `study_flow=new_full_cycle`, `status=draft`, snapshot batch học mới, tạo queue cho mode `review` |
+| Create New Study session draft | insert `study_sessions` với `study_type=new`, `study_flow=new_full_cycle` cho Mix hoặc `new_<mode>_only` cho mode riêng lẻ, `status=draft`, snapshot batch học mới, tạo queue cho mode đầu tiên đã chọn |
 | Create SRS Review session draft | insert `study_sessions` với `study_type=srs_review`, `study_flow=srs_fill_review`, `status=draft`, snapshot batch review, tạo queue cho mode `fill` |
 | Start session | transition `status` từ `draft` sang `in_progress` khi user trả lời lượt đầu tiên |
 | Resume session | load `study_sessions` có `status` trong (`in_progress`, `ready_to_finalize`, `failed_to_finalize`) + item `pending` theo `mode_order`, `round_index`, `queue_position` |

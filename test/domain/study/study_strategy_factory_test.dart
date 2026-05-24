@@ -42,6 +42,58 @@ void main() {
       },
     );
 
+    test('DT4 onNavigate: maps mix and single modes to study flows', () {
+      expect(
+        studyFlowForModes(StudyType.newStudy, const <StudyMode>[
+          StudyMode.review,
+          StudyMode.match,
+          StudyMode.guess,
+          StudyMode.recall,
+          StudyMode.fill,
+        ]),
+        StudyFlow.newFullCycle,
+      );
+      expect(
+        studyFlowForModes(StudyType.newStudy, const <StudyMode>[
+          StudyMode.review,
+        ]),
+        StudyFlow.newReviewOnly,
+      );
+      expect(
+        studyFlowForModes(StudyType.newStudy, const <StudyMode>[
+          StudyMode.match,
+        ]),
+        StudyFlow.newMatchOnly,
+      );
+      expect(
+        studyFlowForModes(StudyType.newStudy, const <StudyMode>[
+          StudyMode.guess,
+        ]),
+        StudyFlow.newGuessOnly,
+      );
+      expect(
+        studyFlowForModes(StudyType.newStudy, const <StudyMode>[
+          StudyMode.recall,
+        ]),
+        StudyFlow.newRecallOnly,
+      );
+      expect(
+        studyFlowForModes(StudyType.newStudy, const <StudyMode>[
+          StudyMode.fill,
+        ]),
+        StudyFlow.newFillOnly,
+      );
+      expect(
+        studyFlowForModes(StudyType.srsReview, const <StudyMode>[
+          StudyMode.fill,
+        ]),
+        StudyFlow.srsFillReview,
+      );
+      expect(studyModesForFlow(StudyFlow.newMatchOnly), const <StudyMode>[
+        StudyMode.match,
+      ]);
+    });
+
     test('DT1 selectStrategy: throws on duplicate strategy registration', () {
       expect(
         () => StudyStrategyFactory(const <StudyStrategy>[
