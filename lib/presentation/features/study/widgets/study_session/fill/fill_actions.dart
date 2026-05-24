@@ -3,6 +3,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
@@ -30,6 +31,7 @@ class FillInputActions extends StatelessWidget {
           child: MxSecondaryButton(
             key: const ValueKey<String>('fill-help-action'),
             label: l10n.studyHintAction,
+            size: MxButtonSize.compact,
             fullWidth: true,
             onPressed: isSubmitting ? null : onHelp,
           ),
@@ -39,6 +41,7 @@ class FillInputActions extends StatelessWidget {
           child: MxPrimaryButton(
             key: const ValueKey<String>('fill-check-action'),
             label: l10n.studyCheckAnswerAction,
+            size: MxButtonSize.compact,
             shape: MxPrimaryButtonShape.pill,
             fullWidth: true,
             onPressed: canCheck ? onCheck : null,
@@ -71,6 +74,7 @@ class FillResultActions extends StatelessWidget {
           child: MxSecondaryButton(
             key: const ValueKey<String>('fill-mark-correct-action'),
             label: l10n.studyMarkCorrectAction,
+            size: MxButtonSize.compact,
             fullWidth: true,
             onPressed: isSubmitting ? null : onMarkCorrect,
           ),
@@ -80,6 +84,7 @@ class FillResultActions extends StatelessWidget {
           child: MxPrimaryButton(
             key: const ValueKey<String>('fill-try-again-action'),
             label: l10n.studyTryAgainAction,
+            size: MxButtonSize.compact,
             shape: MxPrimaryButtonShape.pill,
             fullWidth: true,
             onPressed: isSubmitting ? null : onTryAgain,

@@ -149,8 +149,32 @@ class MxPrimaryButton extends StatelessWidget {
     TextTheme textTheme,
   ) {
     return switch (size) {
+      MxButtonSize.xsmall => ButtonStyle(
+        minimumSize: const WidgetStatePropertyAll(Size(0, 32)),
+        padding: WidgetStatePropertyAll(
+          EdgeInsets.symmetric(
+            horizontal: AppLayout.buttonHorizontalPadding(
+              context,
+              regular: AppSpacing.md,
+            ),
+          ),
+        ),
+        textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelSmall),
+      ),
       MxButtonSize.small => ButtonStyle(
         minimumSize: const WidgetStatePropertyAll(Size(0, 36)),
+        padding: WidgetStatePropertyAll(
+          EdgeInsets.symmetric(
+            horizontal: AppLayout.buttonHorizontalPadding(
+              context,
+              regular: AppSpacing.lg,
+            ),
+          ),
+        ),
+        textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelMedium),
+      ),
+      MxButtonSize.compact => ButtonStyle(
+        minimumSize: const WidgetStatePropertyAll(Size(0, 40)),
         padding: WidgetStatePropertyAll(
           EdgeInsets.symmetric(
             horizontal: AppLayout.buttonHorizontalPadding(

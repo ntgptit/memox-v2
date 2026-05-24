@@ -10,6 +10,7 @@ import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/motion/mx_motion.dart';
 import 'package:memox/core/utils/string_utils.dart';
+import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_divider.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
@@ -397,6 +398,7 @@ class _ReviewBottomBar extends StatelessWidget {
         MxPrimaryButton(
           label: l10n.studyNextAction,
           trailingIcon: Icons.arrow_forward_rounded,
+          size: MxButtonSize.compact,
           shape: MxPrimaryButtonShape.pill,
           isLoading: isBusy,
           onPressed: isAtLast || isBusy ? null : onNext,

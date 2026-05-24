@@ -8,6 +8,7 @@ import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
@@ -318,6 +319,7 @@ class _RecallTimerAction extends StatelessWidget {
         return Center(
           child: MxPrimaryButton(
             label: l10n.studyShowAnswerCountdownAction(remainingSeconds),
+            size: MxButtonSize.compact,
             shape: MxPrimaryButtonShape.pill,
             onPressed: isSubmitting ? null : onPressed,
           ),
@@ -464,6 +466,7 @@ class _RecallRevealedActions extends StatelessWidget {
           child: MxPrimaryButton(
             key: const ValueKey<String>('recall-forgot-action'),
             label: l10n.studyForgotAction,
+            size: MxButtonSize.compact,
             shape: MxPrimaryButtonShape.pill,
             tone: MxPrimaryButtonTone.danger,
             fullWidth: true,
@@ -475,6 +478,7 @@ class _RecallRevealedActions extends StatelessWidget {
           child: MxPrimaryButton(
             key: const ValueKey<String>('recall-remembered-action'),
             label: l10n.studyGotItAction,
+            size: MxButtonSize.compact,
             shape: MxPrimaryButtonShape.pill,
             fullWidth: true,
             onPressed: isSubmitting ? null : onRemembered,
@@ -504,6 +508,7 @@ class _RecallTimedOutAction extends StatelessWidget {
         key: const ValueKey<String>('recall-next-action'),
         label: l10n.studyNextAction,
         trailingIcon: Icons.arrow_forward_rounded,
+        size: MxButtonSize.compact,
         variant: MxSecondaryVariant.tonal,
         onPressed: isSubmitting ? null : onNext,
       ),
