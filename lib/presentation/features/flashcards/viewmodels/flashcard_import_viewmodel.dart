@@ -46,29 +46,30 @@ class FlashcardImportDraftState {
     bool clearSourceBytes = false,
     bool clearLoadedFileName = false,
   }) => FlashcardImportDraftState(
-      format: format ?? this.format,
-      structuredTextSeparator:
-          structuredTextSeparator ?? this.structuredTextSeparator,
-      duplicatePolicy: duplicatePolicy ?? this.duplicatePolicy,
-      rawContent: rawContent ?? this.rawContent,
-      excelHasHeader: excelHasHeader ?? this.excelHasHeader,
-      sourceBytes: clearSourceBytes ? null : (sourceBytes ?? this.sourceBytes),
-      loadedFileName: clearLoadedFileName
-          ? null
-          : (loadedFileName ?? this.loadedFileName),
-      preparation: clearPreparation ? null : (preparation ?? this.preparation),
-    );
+    format: format ?? this.format,
+    structuredTextSeparator:
+        structuredTextSeparator ?? this.structuredTextSeparator,
+    duplicatePolicy: duplicatePolicy ?? this.duplicatePolicy,
+    rawContent: rawContent ?? this.rawContent,
+    excelHasHeader: excelHasHeader ?? this.excelHasHeader,
+    sourceBytes: clearSourceBytes ? null : (sourceBytes ?? this.sourceBytes),
+    loadedFileName: clearLoadedFileName
+        ? null
+        : (loadedFileName ?? this.loadedFileName),
+    preparation: clearPreparation ? null : (preparation ?? this.preparation),
+  );
 }
 
 @riverpod
 class FlashcardImportDraft extends _$FlashcardImportDraft {
   @override
-  FlashcardImportDraftState build(String deckId) => const FlashcardImportDraftState(
-      format: ImportSourceFormat.excel,
-      structuredTextSeparator: ImportStructuredTextSeparator.auto,
-      duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
-      rawContent: '',
-    );
+  FlashcardImportDraftState build(String deckId) =>
+      const FlashcardImportDraftState(
+        format: ImportSourceFormat.excel,
+        structuredTextSeparator: ImportStructuredTextSeparator.auto,
+        duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
+        rawContent: '',
+      );
 
   void setFormat(ImportSourceFormat format) {
     if (state.format == format) {
@@ -170,7 +171,6 @@ class FlashcardImportController extends _$FlashcardImportController {
   FutureOr<void> build(String deckId) {}
 
   Future<FlashcardImportPreparation?> preparePreview() async {
-    // guard:retry-reviewed
     final draft = ref.read(flashcardImportDraftProvider(deckId));
     return _actionRunner.runResultValue(
       () => ref
@@ -214,14 +214,13 @@ class FlashcardImportController extends _$FlashcardImportController {
   }
 
   MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(
-      isMounted: () => ref.mounted,
-      setState: (nextState) => state = nextState,
-    );
+    isMounted: () => ref.mounted,
+    setState: (nextState) => state = nextState,
+  );
 }
 
-AppFailure? flashcardImportError(AsyncValue<void> actionState) => actionState.whenOrNull(
-    error: (error, _) => error is AppFailure ? error : null,
-  );
+AppFailure? flashcardImportError(AsyncValue<void> actionState) => actionState
+    .whenOrNull(error: (error, _) => error is AppFailure ? error : null);
 
 String flashcardImportErrorMessage(AppFailure? failure) {
   if (failure == null) {

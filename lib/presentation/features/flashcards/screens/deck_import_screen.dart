@@ -16,12 +16,12 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_section.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_button_size.dart';
 import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_inline_toggle.dart';
 import '../../../shared/widgets/mx_list_tile.dart';
-import '../../../shared/widgets/mx_button_size.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
@@ -29,8 +29,9 @@ import '../../../shared/widgets/mx_text.dart';
 import '../../../shared/widgets/mx_text_field.dart';
 import '../viewmodels/flashcard_import_viewmodel.dart';
 import '../widgets/deck_import_preview_section.dart';
-part '../widgets/deck_import_screen_source_widgets.dart';
+
 part '../widgets/deck_import_screen_options_widgets.dart';
+part '../widgets/deck_import_screen_source_widgets.dart';
 
 class DeckImportScreen extends ConsumerStatefulWidget {
   const DeckImportScreen({required this.deckId, super.key});
@@ -102,8 +103,7 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     required bool hasImportSource,
     required FlashcardImportPreparation? preparation,
     required bool canCommit,
-  }) {
-    return MxScaffold(
+  }) => MxScaffold(
       title: l10n.flashcardsImportTitle,
       automaticallyImplyLeading: false,
       leading: MxIconButton.toolbar(
@@ -191,7 +191,6 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
         ),
       ),
     );
-  }
 
   Future<void> _preparePreview() async {
     setState(() => _pendingAction = _ImportPendingAction.preview);
@@ -229,8 +228,7 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     required FlashcardImportDraftState draft,
     required bool enabled,
     required AppLocalizations l10n,
-  }) {
-    return switch (draft.format) {
+  }) => switch (draft.format) {
       ImportSourceFormat.excel => _ImportExcelSource(
         fileName: draft.loadedFileName,
         fileSummary: _fileSummary(l10n, draft.preparation),
@@ -252,7 +250,6 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
             .setRawContent(value),
       ),
     };
-  }
 
   Future<void> _pickFile(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
@@ -262,9 +259,8 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
       allowedExtensions: _allowedImportFileExtensions(draft.format),
       withData: true,
     );
-    if (!context.mounted || result == null || result.files.isEmpty) {
-      return;
-    }
+    if (!context.mounted) return;
+    if (result == null || result.files.isEmpty) return;
 
     final file = result.files.single;
     if (draft.format == ImportSourceFormat.excel) {
@@ -309,9 +305,8 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
         selectedValue: _duplicatePolicyChoice(current),
       ),
     );
-    if (!mounted || selected == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (selected == null) return;
     ref
         .read(flashcardImportDraftProvider(widget.deckId).notifier)
         .setDuplicatePolicy(FlashcardImportDuplicatePolicy.skipExactDuplicates);
@@ -329,9 +324,8 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
         selectedValue: current,
       ),
     );
-    if (!mounted || selected == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (selected == null) return;
     ref
         .read(flashcardImportDraftProvider(widget.deckId).notifier)
         .setStructuredTextSeparator(selected);

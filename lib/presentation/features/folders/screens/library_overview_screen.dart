@@ -5,23 +5,23 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../core/utils/string_utils.dart';
-import '../../../shared/layouts/mx_gap.dart';
-import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
+import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_animated_switcher.dart';
 import '../../../shared/widgets/mx_fab.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../actions/folder_quick_actions.dart';
 import '../models/library_folder.dart';
+import '../viewmodels/folder_detail_viewmodel.dart';
+import '../viewmodels/library_overview_viewmodel.dart';
 import '../widgets/library_app_bar.dart';
 import '../widgets/library_empty_state_section.dart';
 import '../widgets/library_folder_list.dart';
-import '../viewmodels/folder_detail_viewmodel.dart';
-import '../viewmodels/library_overview_viewmodel.dart';
 
 Widget buildLibraryOverviewFab(BuildContext context, WidgetRef ref) {
   final l10n = AppLocalizations.of(context);
@@ -87,8 +87,7 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
           isLoading: queryState.isLoading,
           error: queryState.hasError ? queryState.error : null,
           stackTrace: queryState.hasError ? queryState.stackTrace : null,
-          dataBuilder: (context, state) {
-            return CustomScrollView(
+          dataBuilder: (context, state) => CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
                   child: LibraryAppBar(
@@ -121,8 +120,7 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
                 const MxSliverGap(MxSpace.md),
                 ..._buildFolderListSlivers(context, ref, state),
               ],
-            );
-          },
+            ),
         ),
       ),
     );
@@ -176,8 +174,7 @@ class _LibrarySectionHeader extends StatelessWidget {
   final bool showSubtitle;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MxText(title, role: MxTextRole.sectionTitle),
@@ -187,7 +184,6 @@ class _LibrarySectionHeader extends StatelessWidget {
         ],
       ],
     );
-  }
 }
 
 void _openFolder(BuildContext context, WidgetRef ref, String folderId) {
@@ -204,9 +200,8 @@ Future<void> _handleCreateFolder(BuildContext context, WidgetRef ref) async {
     hintText: l10n.foldersFolderNameHint,
     confirmLabel: l10n.commonCreate,
   );
-  if (!context.mounted || name == null) {
-    return;
-  }
+  if (!context.mounted) return;
+  if (name == null) return;
 
   final success = await ref
       .read(libraryOverviewActionControllerProvider.notifier)

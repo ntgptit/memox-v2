@@ -9,10 +9,10 @@ import '../../../../domain/entities/drive_sync_models.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_list_tile.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
@@ -86,9 +86,8 @@ Future<void> _showDirectionSheet(
     title: l10n.settingsDriveSyncDirectionTitle,
     child: _DriveSyncDirectionSheet(state: state),
   );
-  if (!context.mounted || direction == null) {
-    return;
-  }
+  if (!context.mounted) return;
+  if (direction == null) return;
 
   final confirmed = await MxBottomSheet.show<bool>(
     context: context,
@@ -100,9 +99,8 @@ Future<void> _showDirectionSheet(
     },
     child: _DriveSyncConfirmationSheet(direction: direction),
   );
-  if (!context.mounted || confirmed != true) {
-    return;
-  }
+  if (!context.mounted) return;
+  if (confirmed != true) return;
 
   final controller = ref.read(driveSyncSettingsControllerProvider.notifier);
   switch (direction) {
@@ -154,8 +152,7 @@ class _DriveSyncContent extends ConsumerWidget {
     );
   }
 
-  IconData get _statusIcon {
-    return switch (state.kind) {
+  IconData get _statusIcon => switch (state.kind) {
       DriveSyncStatusKind.synced => Icons.cloud_done_outlined,
       DriveSyncStatusKind.failure ||
       DriveSyncStatusKind.unsupportedSchema ||
@@ -163,7 +160,6 @@ class _DriveSyncContent extends ConsumerWidget {
       DriveSyncStatusKind.needsDriveAuthorization => Icons.cloud_sync_outlined,
       _ => Icons.cloud_queue_outlined,
     };
-  }
 
   Widget? _syncAction(AppLocalizations l10n, {required VoidCallback onSync}) {
     if (!state.canSync) {
@@ -176,8 +172,7 @@ class _DriveSyncContent extends ConsumerWidget {
     );
   }
 
-  String _statusText(AppLocalizations l10n) {
-    return switch (state.kind) {
+  String _statusText(AppLocalizations l10n) => switch (state.kind) {
       DriveSyncStatusKind.signedOut => l10n.settingsDriveSyncSignedOut,
       DriveSyncStatusKind.unconfigured => l10n.settingsDriveSyncUnconfigured,
       DriveSyncStatusKind.needsDriveAuthorization =>
@@ -192,10 +187,8 @@ class _DriveSyncContent extends ConsumerWidget {
         l10n.settingsDriveSyncUnsupportedSchema,
       DriveSyncStatusKind.failure => l10n.settingsDriveSyncFailed,
     };
-  }
 
-  String? _messageText(AppLocalizations l10n) {
-    return switch (state.message) {
+  String? _messageText(AppLocalizations l10n) => switch (state.message) {
       DriveSyncSettingsMessage.none =>
         state.kind == DriveSyncStatusKind.failure
             ? _technicalMessage(l10n)
@@ -210,7 +203,6 @@ class _DriveSyncContent extends ConsumerWidget {
             ? _technicalMessage(l10n)
             : null,
     };
-  }
 
   String? _technicalMessage(AppLocalizations l10n) {
     final message = state.technicalMessage;

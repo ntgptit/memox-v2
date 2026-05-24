@@ -1,0 +1,52 @@
+warning - 'avoid_returning_null_for_future' was removed in Dart '3.3.0' - analysis_options.yaml:74:5 - removed_lint
+   info - 'Future'-returning calls in a non-'async' function - lib\app\router\app_navigation.dart:49:5 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\app\router\app_navigation.dart:56:5 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\app\router\app_navigation.dart:65:5 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\app\router\app_navigation.dart:75:5 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\app\router\app_navigation.dart:85:5 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\app\router\app_navigation.dart:96:5 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\app\router\app_navigation.dart:111:5 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\app\router\app_navigation.dart:115:5 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\core\network\connectivity_service.dart:63:17 - discarded_futures
+   info - The type 'TypeError' should not be caught because it is a subclass of 'Error' - lib\data\settings\cloud_account_store.dart:31:7 - avoid_catching_errors
+   info - The type 'ArgumentError' should not be caught because it is a subclass of 'Error' - lib\data\settings\cloud_account_store.dart:33:7 - avoid_catching_errors
+   info - The type 'TypeError' should not be caught because it is a subclass of 'Error' - lib\data\sync\drive_sync_json.dart:82:7 - avoid_catching_errors
+   info - The type 'TypeError' should not be caught because it is a subclass of 'Error' - lib\data\sync\drive_sync_metadata_store.dart:34:7 - avoid_catching_errors
+   info - Unnecessary use of a block function body - lib\presentation\features\decks\viewmodels\deck_action_viewmodel.dart:59:40 - prefer_expression_function_bodies
+   info - Unnecessary use of a block function body - lib\presentation\features\flashcards\viewmodels\flashcard_list_viewmodel.dart:184:60 - prefer_expression_function_bodies
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\flashcards\widgets\flashcard_preview_section.dart:83:25 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\folders\screens\folder_detail_screen.dart:123:25 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\folders\screens\folder_detail_screen.dart:127:25 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\folders\screens\folder_detail_screen.dart:130:23 - discarded_futures
+   info - Unnecessary use of a block function body - lib\presentation\features\folders\viewmodels\folder_detail_viewmodel.dart:154:45 - prefer_expression_function_bodies
+   info - Unnecessary use of a block function body - lib\presentation\features\folders\viewmodels\library_overview_viewmodel.dart:104:42 - prefer_expression_function_bodies
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\study\widgets\study_session\fill\fill_mode_session_view.dart:198:7 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\study\widgets\study_session\guess\guess_option_tile.dart:50:24 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\study\widgets\study_session\guess\guess_option_tile.dart:59:24 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\study\widgets\study_session\match\match_mode_tile.dart:43:24 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\study\widgets\study_session\match\match_mode_tile.dart:52:24 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\features\study\widgets\study_session\recall\recall_mode_session_view.dart:179:22 - discarded_futures
+   info - Unnecessary use of a block function body - lib\presentation\features\tts\providers\tts_settings_notifier.dart:16:40 - prefer_expression_function_bodies
+   info - Unnecessary use of a block function body - lib\presentation\features\tts\providers\tts_settings_notifier.dart:21:55 - prefer_expression_function_bodies
+   info - Unnecessary use of a block function body - lib\presentation\features\tts\providers\tts_settings_notifier.dart:29:38 - prefer_expression_function_bodies
+   info - Unnecessary use of a block function body - lib\presentation\features\tts\providers\tts_settings_notifier.dart:36:53 - prefer_expression_function_bodies
+   info - 'Future'-returning calls in a non-'async' function - lib\presentation\shared\widgets\mx_speak_button.dart:77:19 - discarded_futures
+   info - Dependencies not sorted alphabetically - pubspec.yaml:36:3 - sort_pub_dependencies
+   info - Dependencies not sorted alphabetically - pubspec.yaml:78:3 - sort_pub_dependencies
+  error - The argument type 'dynamic' can't be assigned to the parameter type 'List<Override>'.  - test\presentation\deck_import_screen_test.dart:810:18 - argument_type_not_assignable
+   info - Don't throw instances of classes that don't extend either 'Exception' or 'Error' - test\presentation\drive_sync_viewmodel_test.dart:446:13 - only_throw_errors
+   info - Don't throw instances of classes that don't extend either 'Exception' or 'Error' - test\presentation\drive_sync_viewmodel_test.dart:459:13 - only_throw_errors
+   info - Don't throw instances of classes that don't extend either 'Exception' or 'Error' - test\presentation\drive_sync_viewmodel_test.dart:484:13 - only_throw_errors
+   info - 'Future'-returning calls in a non-'async' function - test\presentation\library_overview_screen_test.dart:304:30 - discarded_futures
+   info - Don't throw instances of classes that don't extend either 'Exception' or 'Error' - test\presentation\settings_screen_test.dart:1513:13 - only_throw_errors
+   info - 'Future'-returning calls in a non-'async' function - test\presentation\shared\dialog_typography_test.dart:19:30 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test\presentation\shared\dialog_typography_test.dart:58:30 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test\presentation\shared\mx_dialog_test.dart:78:28 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test\presentation\shared\mx_name_dialog_test.dart:132:32 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test\presentation\shared\mx_name_dialog_test.dart:167:30 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test_support\presentation\shared\shared_widget_contract.dart:1976:24 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test_support\presentation\shared\shared_widget_contract.dart:2044:28 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test_support\presentation\shared\shared_widget_contract.dart:2066:28 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test_support\presentation\shared\shared_widget_contract.dart:2113:29 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test_support\presentation\shared\shared_widget_contract.dart:2197:33 - discarded_futures
+   info - 'Future'-returning calls in a non-'async' function - test_support\presentation\shared\shared_widget_contract.dart:2218:33 - discarded_futures

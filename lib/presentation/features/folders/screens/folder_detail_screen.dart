@@ -1,37 +1,39 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
-import '../../../shared/layouts/mx_gap.dart';
-import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/options/content_sort_options.dart';
-import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_animated_switcher.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_search_sort_toolbar.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../decks/actions/deck_quick_actions.dart';
 import '../../decks/viewmodels/deck_action_viewmodel.dart';
 import '../actions/folder_quick_actions.dart';
+import '../viewmodels/folder_detail_viewmodel.dart';
 import '../widgets/folder_detail_skeleton.dart';
 import '../widgets/folder_empty_state_section.dart';
 import '../widgets/folder_header_section.dart';
 import '../widgets/folder_reorder_section.dart';
 import '../widgets/folder_stat_strip.dart';
 import '../widgets/folder_tree_section.dart';
-import '../viewmodels/folder_detail_viewmodel.dart';
 
 enum _FolderBodyMode { empty, reorder, tree }
 
@@ -111,8 +113,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     required FolderDetailState? queryData,
     required bool showFab,
     required ContentQuery toolbarState,
-  }) {
-    return MxScaffold(
+  }) => MxScaffold(
       floatingActionButton: showFab
           ? MxFab(
               icon: Icons.add,
@@ -121,14 +122,14 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                   ? null
                   : () {
                       if (queryData.isUnlocked) {
-                        _chooseCreateContent();
+                        unawaited(_chooseCreateContent());
                         return;
                       }
                       if (queryData.isSubfolderMode) {
-                        _createSubfolder();
+                        unawaited(_createSubfolder());
                         return;
                       }
-                      _createDeck();
+                      unawaited(_createDeck());
                     },
             )
           : null,
@@ -144,8 +145,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
           skeletonBuilder: (_) => const FolderDetailSkeleton(),
           onRetry: () =>
               ref.invalidate(folderDetailQueryProvider(widget.folderId)),
-          dataBuilder: (context, state) {
-            return CustomScrollView(
+          dataBuilder: (context, state) => CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
                   child: FolderHeaderSection(
@@ -221,12 +221,10 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                 const MxSliverGap(MxSpace.sm),
                 ..._buildBodySlivers(state),
               ],
-            );
-          },
+            ),
         ),
       ),
     );
-  }
 
   List<Widget> _buildBodySlivers(FolderDetailState state) {
     final mode = _resolveBodyMode(state);
@@ -297,9 +295,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     return FolderEmptyStateMode.unlocked;
   }
 
-  bool _shouldShowFab(FolderDetailState state) {
-    return !_isReorderMode && !_isSearchNoResult(state);
-  }
+  bool _shouldShowFab(FolderDetailState state) => !_isReorderMode && !_isSearchNoResult(state);
 
   String _resolveFabTooltip(AppLocalizations l10n, FolderDetailState state) {
     if (state.isUnlocked) {
@@ -311,11 +307,9 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     return l10n.foldersNewDeckTooltip;
   }
 
-  bool _isSearchNoResult(FolderDetailState state) {
-    return !state.isUnlocked &&
+  bool _isSearchNoResult(FolderDetailState state) => !state.isUnlocked &&
         state.searchTerm.isNotEmpty &&
         !_hasActiveItems(state);
-  }
 
   bool _hasActiveItems(FolderDetailState state) {
     if (state.isSubfolderMode) {
@@ -353,9 +347,8 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
         ],
       ),
     );
-    if (!mounted || choice == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (choice == null) return;
 
     switch (choice) {
       case _FolderCreateChoice.subfolder:
@@ -374,15 +367,13 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       hintText: l10n.foldersFolderNameHint,
       confirmLabel: l10n.commonCreate,
     );
-    if (!mounted || name == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (name == null) return;
     final success = await ref
         .read(folderActionControllerProvider(widget.folderId).notifier)
         .createSubfolder(name);
-    if (!mounted || !success) {
-      return;
-    }
+    if (!mounted) return;
+    if (!success) return;
     MxSnackbar.success(context, l10n.foldersSubfolderCreatedMessage);
   }
 
@@ -395,15 +386,13 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       hintText: l10n.decksNameHint,
       confirmLabel: l10n.commonCreate,
     );
-    if (!mounted || name == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (name == null) return;
     final deckId = await ref
         .read(folderActionControllerProvider(widget.folderId).notifier)
         .createDeck(name);
-    if (!mounted || deckId == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (deckId == null) return;
     MxSnackbar.success(context, l10n.decksCreatedMessage);
   }
 
@@ -444,18 +433,15 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     context.pushFolderDetail(folderId);
   }
 
-  Future<void> _openSubfolderActions(FolderSubfolderItem item) {
-    return showFolderActions(
+  Future<void> _openSubfolderActions(FolderSubfolderItem item) => showFolderActions(
       context: context,
       ref: ref,
       folderId: item.id,
       folderName: item.name,
       canImportFlashcards: item.canImportFlashcards,
     );
-  }
 
-  Future<void> _openDeckActions(FolderDetailState state, FolderDeckItem item) {
-    return showDeckActions(
+  Future<void> _openDeckActions(FolderDetailState state, FolderDeckItem item) => showDeckActions(
       context: context,
       ref: ref,
       deckId: item.id,
@@ -470,7 +456,6 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
         ],
       ),
     );
-  }
 
   Future<void> _saveReorder(FolderDetailState state) async {
     final controller = ref.read(
@@ -480,9 +465,8 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     final success = state.isSubfolderMode
         ? await controller.reorderSubfolders(_orderedIds)
         : await controller.reorderDecks(_orderedIds);
-    if (!mounted || !success) {
-      return;
-    }
+    if (!mounted) return;
+    if (!success) return;
 
     setState(() {
       _isReorderMode = false;

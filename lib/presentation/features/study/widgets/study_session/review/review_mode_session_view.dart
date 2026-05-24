@@ -2,21 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:memox/l10n/generated/app_localizations.dart';
-
+import 'package:memox/core/utils/string_utils.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/motion/mx_motion.dart';
-import 'package:memox/core/utils/string_utils.dart';
 import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_divider.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
+
 import '../study_mode_session_scaffold.dart';
 import '../study_speak_button.dart';
 import 'review_page_scroll_behavior.dart';
@@ -115,9 +115,7 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
                       scrollDirection: Axis.horizontal,
                       itemCount: cards.length,
                       onPageChanged: _handlePageChanged,
-                      itemBuilder: (context, index) {
-                        return _ReviewSplitCard(card: cards[index]);
-                      },
+                      itemBuilder: (context, index) => _ReviewSplitCard(card: cards[index]),
                     ),
                   ),
                   if (cards.isNotEmpty)
@@ -213,12 +211,10 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
   bool _shouldResetPages(
     StudySessionSnapshot oldSnapshot,
     StudySessionSnapshot newSnapshot,
-  ) {
-    return oldSnapshot.session.id != newSnapshot.session.id ||
+  ) => oldSnapshot.session.id != newSnapshot.session.id ||
         oldSnapshot.currentItem?.id != newSnapshot.currentItem?.id ||
         oldSnapshot.sessionFlashcards.length !=
             newSnapshot.sessionFlashcards.length;
-  }
 
   void _handlePageChanged(int index) {
     setState(() {
@@ -240,9 +236,8 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
   }
 
   Future<void> _submitBatch() async {
-    if (!mounted || widget.isSubmitting || _hasSubmitted) {
-      return;
-    }
+    if (!mounted) return;
+    if (widget.isSubmitting || _hasSubmitted) return;
     _hasSubmitted = true;
     _autoSubmitTimer?.cancel();
     _autoSubmitTimer = null;
@@ -315,8 +310,7 @@ class _ReviewSplitFace extends StatelessWidget {
   final String? editTooltip;
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
+  Widget build(BuildContext context) => Stack(
       children: [
         Align(
           alignment: Alignment.topLeft,
@@ -353,7 +347,6 @@ class _ReviewSplitFace extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 class _ReviewBottomBar extends StatelessWidget {

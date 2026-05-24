@@ -13,28 +13,24 @@ class TtsSettingsNotifier extends _$TtsSettingsNotifier {
     return store.load();
   }
 
-  // guard:retry-reviewed
   Future<void> setAutoPlay(bool value) =>
       _update((settings) => settings.copyWith(autoPlay: value));
 
-  // guard:retry-reviewed
   Future<void> setFrontLanguage(TtsLanguage language) => _update(
-        (settings) =>
-            settings.copyWith(frontLanguage: language, clearFrontVoice: true),
-      );
+    (settings) =>
+        settings.copyWith(frontLanguage: language, clearFrontVoice: true),
+  );
 
-  // guard:retry-reviewed
   Future<void> setRate(double value) => _update(
-        (settings) => settings.copyWith(rate: TtsSettings.normalizeRate(value)),
-      );
+    (settings) => settings.copyWith(rate: TtsSettings.normalizeRate(value)),
+  );
 
-  // guard:retry-reviewed
   Future<void> setFrontVoiceName(String? voiceName) => _update(
-        (settings) => settings.copyWith(
-          frontVoiceName: voiceName,
-          clearFrontVoice: voiceName == null,
-        ),
-      );
+    (settings) => settings.copyWith(
+      frontVoiceName: voiceName,
+      clearFrontVoice: voiceName == null,
+    ),
+  );
 
   Future<void> _update(
     TtsSettings Function(TtsSettings settings) transform,

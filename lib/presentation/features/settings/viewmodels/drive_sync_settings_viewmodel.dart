@@ -58,16 +58,16 @@ final class DriveSyncSettingsState {
     String? technicalMessage,
     bool clearTechnicalMessage = false,
   }) => DriveSyncSettingsState(
-      status: status ?? this.status,
-      pendingConflict: clearPendingConflict
-          ? null
-          : pendingConflict ?? this.pendingConflict,
-      message: message ?? this.message,
-      isBusy: isBusy ?? this.isBusy,
-      technicalMessage: clearTechnicalMessage
-          ? null
-          : technicalMessage ?? this.technicalMessage,
-    );
+    status: status ?? this.status,
+    pendingConflict: clearPendingConflict
+        ? null
+        : pendingConflict ?? this.pendingConflict,
+    message: message ?? this.message,
+    isBusy: isBusy ?? this.isBusy,
+    technicalMessage: clearTechnicalMessage
+        ? null
+        : technicalMessage ?? this.technicalMessage,
+  );
 }
 
 @riverpod
@@ -86,7 +86,6 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
   }
 
   Future<void> refresh() async {
-    // guard:retry-reviewed
     try {
       final useCase = await ref.read(loadDriveSyncStatusUseCaseProvider.future);
       final status = await useCase.execute();
@@ -103,7 +102,6 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
   }
 
   Future<void> syncNow() async {
-    // guard:retry-reviewed
     final current = state.value;
     if (current == null || !current.canSync) {
       return;
@@ -129,7 +127,6 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
   }
 
   Future<void> uploadLocalToDrive() async {
-    // guard:retry-reviewed
     await _runDirectedSync(
       canRun: (state) => state.canUploadLocal,
       action: () async {
@@ -142,7 +139,6 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
   }
 
   Future<void> restoreDriveToLocal() async {
-    // guard:retry-reviewed
     await _runDirectedSync(
       canRun: (state) => state.canRestoreDrive,
       action: () async {
@@ -180,7 +176,6 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
   }
 
   Future<void> resolveConflict(DriveSyncConflictChoice choice) async {
-    // guard:retry-reviewed
     final current = state.value;
     final conflict = current?.pendingConflict;
     if (current == null || conflict == null || current.isBusy) {
@@ -218,26 +213,26 @@ class DriveSyncSettingsController extends _$DriveSyncSettingsController {
     state = AsyncData(_stateFromResult(result));
   }
 
-  DriveSyncSettingsState _stateFromResult(DriveSyncRunResult result) => DriveSyncSettingsState(
-      status: result.status,
-      pendingConflict: result.conflict,
-      message: switch (result.kind) {
-        DriveSyncActionKind.uploadedLocal => DriveSyncSettingsMessage.uploaded,
-        DriveSyncActionKind.restoredRemote => DriveSyncSettingsMessage.restored,
-        DriveSyncActionKind.noChanges => DriveSyncSettingsMessage.noChanges,
-        DriveSyncActionKind.canceled => DriveSyncSettingsMessage.canceled,
-        DriveSyncActionKind.failed => DriveSyncSettingsMessage.failed,
-        DriveSyncActionKind.needsConflictResolution =>
-          DriveSyncSettingsMessage.none,
-        DriveSyncActionKind.none => DriveSyncSettingsMessage.none,
-      },
-      technicalMessage: result.message ?? result.status.message,
-    );
+  DriveSyncSettingsState _stateFromResult(
+    DriveSyncRunResult result,
+  ) => DriveSyncSettingsState(
+    status: result.status,
+    pendingConflict: result.conflict,
+    message: switch (result.kind) {
+      DriveSyncActionKind.uploadedLocal => DriveSyncSettingsMessage.uploaded,
+      DriveSyncActionKind.restoredRemote => DriveSyncSettingsMessage.restored,
+      DriveSyncActionKind.noChanges => DriveSyncSettingsMessage.noChanges,
+      DriveSyncActionKind.canceled => DriveSyncSettingsMessage.canceled,
+      DriveSyncActionKind.failed => DriveSyncSettingsMessage.failed,
+      DriveSyncActionKind.needsConflictResolution =>
+        DriveSyncSettingsMessage.none,
+      DriveSyncActionKind.none => DriveSyncSettingsMessage.none,
+    },
+    technicalMessage: result.message ?? result.status.message,
+  );
 
-  DriveSyncSettingsState _stateFromStatus(DriveSyncStatus status) => DriveSyncSettingsState(
-      status: status,
-      technicalMessage: status.message,
-    );
+  DriveSyncSettingsState _stateFromStatus(DriveSyncStatus status) =>
+      DriveSyncSettingsState(status: status, technicalMessage: status.message);
 
   DriveSyncSettingsState _stateFromUnexpectedError(
     Object error, {

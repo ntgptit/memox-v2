@@ -2,19 +2,19 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:memox/l10n/generated/app_localizations.dart';
-
-import 'package:memox/domain/services/tts_service.dart';
-import 'package:memox/domain/enums/study_enums.dart';
-import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/core/utils/string_utils.dart';
+import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/services/tts_service.dart';
+import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/study_session_round.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_indicator.dart';
-import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
-import 'package:memox/domain/study/study_session_round.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
+
 import '../study_mode_session_scaffold.dart';
 import '../study_speak_button.dart';
 import 'guess_motion.dart';
@@ -233,9 +233,8 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
       _hasSubmitted = true;
     });
     final success = await widget.onSubmit(nextGrades);
-    if (!mounted || success) {
-      return;
-    }
+    if (!mounted) return;
+    if (success) return;
     setState(() {
       _isLocalSubmitting = false;
       _hasSubmitted = false;
@@ -243,9 +242,7 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     });
   }
 
-  List<StudySessionItem> get _roundItems {
-    return pendingModeRoundItems(widget.snapshot);
-  }
+  List<StudySessionItem> get _roundItems => pendingModeRoundItems(widget.snapshot);
 
   StudySessionItem? get _currentItem {
     final items = _roundItems;
@@ -426,12 +423,10 @@ class _GuessAutoAdvanceFooter extends StatelessWidget {
             tween: Tween<double>(begin: 0, end: 1),
             duration: guessFeedbackDelay,
             curve: Curves.linear,
-            builder: (context, value, _) {
-              return MxLinearProgress(
+            builder: (context, value, _) => MxLinearProgress(
                 value: value,
                 size: MxProgressSize.small,
-              );
-            },
+              ),
           ),
         ],
       ),

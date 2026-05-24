@@ -194,6 +194,8 @@ For Dart or Flutter code changes, run the strongest relevant checks in this orde
 3. `flutter analyze`
 4. Targeted `flutter test` commands for the affected area
 
+If `dart analyze` or `flutter analyze` reports errors, first run Dart's automated fix workflow (`dart fix --apply`) for applicable analyzer diagnostics, then rerun analyze and manually fix any remaining issues.
+
 Examples:
 
 - Database changes: run the build step, guard, analyze, and the relevant test under `test/data/**`

@@ -5,6 +5,8 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/value_objects/content_actions.dart';
+import '../../../shared/dialogs/mx_action_sheet_list.dart';
+import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/dialogs/mx_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
@@ -15,8 +17,6 @@ import '../../../shared/widgets/mx_breadcrumb_bar.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
-import '../../../shared/dialogs/mx_action_sheet_list.dart';
-import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../viewmodels/flashcard_editor_destinations_provider.dart';
 import '../viewmodels/flashcard_editor_viewmodel.dart';
 import '../widgets/flashcard_editor_form.dart';
@@ -221,7 +221,8 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     final destinations = await ref.read(
       flashcardEditorDestinationsProvider.future,
     );
-    if (!mounted || destinations.isEmpty) return;
+    if (!mounted) return;
+    if (destinations.isEmpty) return;
 
     final picked = await MxBottomSheet.show<String>(
       context: context,
@@ -243,7 +244,8 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
         ],
       ),
     );
-    if (!mounted || picked == null || picked == currentDeckId) return;
+    if (!mounted) return;
+    if (picked == null || picked == currentDeckId) return;
 
     final target = destinations.firstWhere((d) => d.id == picked);
     draftNotifier.setDestinationDeck(
@@ -262,9 +264,8 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     required AppLocalizations l10n,
   }) async {
     final success = await actionController.save(keepCreating: true);
-    if (!mounted || !success) {
-      return;
-    }
+    if (!mounted) return;
+    if (!success) return;
     _didSeedControllers = false;
     _resetControllers();
     MxSnackbar.success(context, l10n.flashcardsSavedMessage);
@@ -279,14 +280,12 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
       draft: draft,
       l10n: l10n,
     );
-    if (!mounted || progressPolicy == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (progressPolicy == null) return;
 
     final success = await actionController.save(progressPolicy: progressPolicy);
-    if (!mounted || !success) {
-      return;
-    }
+    if (!mounted) return;
+    if (!success) return;
     final showSavedMessage = MxSnackbar.deferredSuccess(
       context,
       draft.isEditing

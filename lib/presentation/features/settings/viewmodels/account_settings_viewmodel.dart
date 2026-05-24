@@ -59,15 +59,15 @@ class AccountSettingsState {
     bool? requiresPlatformSignInButton,
     bool? requiresRuntimeReconnect,
   }) => AccountSettingsState(
-      status: status ?? this.status,
-      link: clearLink ? null : link ?? this.link,
-      message: message ?? this.message,
-      isBusy: isBusy ?? this.isBusy,
-      requiresPlatformSignInButton:
-          requiresPlatformSignInButton ?? this.requiresPlatformSignInButton,
-      requiresRuntimeReconnect:
-          requiresRuntimeReconnect ?? this.requiresRuntimeReconnect,
-    );
+    status: status ?? this.status,
+    link: clearLink ? null : link ?? this.link,
+    message: message ?? this.message,
+    isBusy: isBusy ?? this.isBusy,
+    requiresPlatformSignInButton:
+        requiresPlatformSignInButton ?? this.requiresPlatformSignInButton,
+    requiresRuntimeReconnect:
+        requiresRuntimeReconnect ?? this.requiresRuntimeReconnect,
+  );
 }
 
 @riverpod
@@ -114,7 +114,6 @@ class AccountSettingsController extends _$AccountSettingsController {
   }
 
   Future<void> signIn() async {
-    // guard:retry-reviewed
     await _runAction(() async {
       final useCase = await ref.read(signInGoogleAccountUseCaseProvider.future);
       return useCase.execute();
@@ -122,7 +121,6 @@ class AccountSettingsController extends _$AccountSettingsController {
   }
 
   Future<void> reconnectDrive() async {
-    // guard:retry-reviewed
     final current = state.value;
     final link = current?.link;
     if (link == null) {
@@ -146,7 +144,6 @@ class AccountSettingsController extends _$AccountSettingsController {
   }
 
   Future<void> signOut() async {
-    // guard:retry-reviewed
     final current = state.value;
     if (current == null) {
       return;

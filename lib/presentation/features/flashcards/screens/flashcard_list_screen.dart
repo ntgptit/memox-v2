@@ -12,20 +12,21 @@ import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/services/tts_service.dart';
 import '../../../../domain/value_objects/content_queries.dart';
-import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
+import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_fab.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../decks/actions/deck_quick_actions.dart';
 import '../../decks/viewmodels/deck_action_viewmodel.dart';
 import '../../tts/providers/tts_controller_notifier.dart';
+import '../viewmodels/flashcard_list_viewmodel.dart';
 import '../widgets/flashcard_breadcrumb_section.dart';
 import '../widgets/flashcard_bulk_action_section.dart';
 import '../widgets/flashcard_deck_summary_section.dart';
@@ -37,7 +38,6 @@ import '../widgets/flashcard_progress_section.dart';
 import '../widgets/flashcard_reorder_list.dart';
 import '../widgets/flashcard_study_modes_section.dart';
 import '../widgets/flashcard_toolbar_section.dart';
-import '../viewmodels/flashcard_list_viewmodel.dart';
 
 enum _FlashcardRowAction { edit, move, export, select, delete }
 
@@ -106,8 +106,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     required FlashcardToolbarState toolbarNotifier,
     required Set<String> selection,
     required FlashcardSelection selectionNotifier,
-  }) {
-    return MxScaffold(
+  }) => MxScaffold(
       floatingActionButton: _isReorderMode
           ? null
           : MxFab(
@@ -127,8 +126,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
           skeletonBuilder: (_) => const FlashcardListSkeleton(),
           onRetry: () =>
               ref.invalidate(flashcardListQueryProvider(widget.deckId)),
-          dataBuilder: (context, state) {
-            return CustomScrollView(
+          dataBuilder: (context, state) => CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
                   child: FlashcardHeaderSection(
@@ -232,12 +230,10 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                 if (!_isReorderMode)
                   const MxSliverGap(kMinInteractiveDimension + MxSpace.xxl),
               ],
-            );
-          },
+            ),
         ),
       ),
     );
-  }
 
   void _enterReorderMode(FlashcardListState state) {
     setState(() {
@@ -267,9 +263,8 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     final success = await ref
         .read(flashcardActionControllerProvider(widget.deckId).notifier)
         .reorderFlashcards(_orderedIds);
-    if (!mounted || !success) {
-      return;
-    }
+    if (!mounted) return;
+    if (!success) return;
     setState(() {
       _isReorderMode = false;
       _orderedIds = <String>[];
@@ -305,16 +300,14 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
       ],
       emptyLabel: l10n.commonNoValidDestinationFound,
     );
-    if (!mounted || targetDeckId == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (targetDeckId == null) return;
 
     final success = await ref
         .read(flashcardActionControllerProvider(widget.deckId).notifier)
         .moveFlashcards(flashcardIds: flashcardIds, targetDeckId: targetDeckId);
-    if (!mounted || !success) {
-      return;
-    }
+    if (!mounted) return;
+    if (!success) return;
     MxSnackbar.success(context, l10n.flashcardsMovedMessage);
   }
 
@@ -322,9 +315,8 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     final export = await ref
         .read(flashcardActionControllerProvider(widget.deckId).notifier)
         .exportFlashcards(flashcardIds);
-    if (!mounted || export == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (export == null) return;
 
     final bytes = Uint8List.fromList(utf8.encode(export.content));
     await SharePlus.instance.share(
@@ -340,9 +332,8 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     final export = await ref
         .read(deckActionControllerProvider(widget.deckId).notifier)
         .exportDeck();
-    if (!mounted || export == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (export == null) return;
 
     final bytes = Uint8List.fromList(utf8.encode(export.content));
     await SharePlus.instance.share(
@@ -364,16 +355,14 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
       tone: MxConfirmationTone.danger,
       icon: Icons.delete_outline,
     );
-    if (!mounted || !confirmed) {
-      return;
-    }
+    if (!mounted) return;
+    if (!confirmed) return;
 
     final success = await ref
         .read(flashcardActionControllerProvider(widget.deckId).notifier)
         .deleteFlashcards(flashcardIds);
-    if (!mounted || !success) {
-      return;
-    }
+    if (!mounted) return;
+    if (!success) return;
     MxSnackbar.success(context, l10n.flashcardsDeletedMessage);
   }
 
@@ -413,9 +402,8 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
         ],
       ),
     );
-    if (!mounted || action == null) {
-      return;
-    }
+    if (!mounted) return;
+    if (action == null) return;
 
     switch (action) {
       case _FlashcardRowAction.edit:

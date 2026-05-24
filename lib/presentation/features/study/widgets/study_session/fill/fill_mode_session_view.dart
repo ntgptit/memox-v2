@@ -1,13 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:memox/l10n/generated/app_localizations.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:memox/core/utils/string_utils.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/study_session_round.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
-import 'package:memox/domain/study/study_session_round.dart';
+
 import '../study_mode_session_scaffold.dart';
 import 'fill_actions.dart';
 import 'fill_answer_cards.dart';
@@ -146,16 +148,14 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
                   duration: fillStateTransitionDuration,
                   switchInCurve: fillStateTransitionCurve,
                   switchOutCurve: fillStateExitCurve,
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
+                  transitionBuilder: (child, animation) => FadeTransition(
                       opacity: animation,
                       child: SizeTransition(
                         sizeFactor: animation,
                         axisAlignment: -1,
                         child: child,
                       ),
-                    );
-                  },
+                    ),
                   child: _answerState == _FillAnswerState.input
                       ? FillInputActions(
                           key: const ValueKey<String>('fill-input-actions'),
@@ -181,9 +181,8 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
   bool get _canCheck => !_isBusy && StringUtils.isNotBlank(_controller.text);
 
   void _handleInputChanged() {
-    if (!mounted || _answerState != _FillAnswerState.input) {
-      return;
-    }
+    if (!mounted) return;
+    if (_answerState != _FillAnswerState.input) return;
     setState(() {});
   }
 
@@ -198,7 +197,7 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
     }
     if (StringUtils.equalsNormalized(answer, current.flashcard.front)) {
       _focusNode.unfocus();
-      _submit(AttemptGrade.correct);
+      unawaited(_submit(AttemptGrade.correct));
       return;
     }
     _focusNode.unfocus();
@@ -262,17 +261,14 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
       _isLocalSubmitting = true;
     });
     final success = await widget.onSubmit(nextGrades);
-    if (!mounted || success) {
-      return;
-    }
+    if (!mounted) return;
+    if (success) return;
     setState(() {
       _isLocalSubmitting = false;
     });
   }
 
-  List<StudySessionItem> get _roundItems {
-    return pendingModeRoundItems(widget.snapshot);
-  }
+  List<StudySessionItem> get _roundItems => pendingModeRoundItems(widget.snapshot);
 
   StudySessionItem? get _currentItem {
     final items = _roundItems;
@@ -303,9 +299,8 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
 
   void _focusAnswerInput() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _answerState != _FillAnswerState.input) {
-        return;
-      }
+      if (!mounted) return;
+      if (_answerState != _FillAnswerState.input) return;
       _focusNode.requestFocus();
     });
   }

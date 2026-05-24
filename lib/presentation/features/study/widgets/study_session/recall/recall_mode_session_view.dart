@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:memox/l10n/generated/app_localizations.dart';
-
-import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/study_session_round.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
@@ -13,9 +14,9 @@ import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
-import 'package:memox/domain/study/study_session_round.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
+
 import '../study_mode_session_scaffold.dart';
 import '../study_speak_button.dart';
 import 'recall_motion.dart';
@@ -135,16 +136,14 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
                   duration: recallRevealTransitionDuration,
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(
+                  transitionBuilder: (child, animation) => FadeTransition(
                       opacity: animation,
                       child: SizeTransition(
                         sizeFactor: animation,
                         axisAlignment: -1,
                         child: child,
                       ),
-                    );
-                  },
+                    ),
                   child: _RecallActionArea(
                     answerState: _answerState,
                     timer: _timerController,
@@ -164,11 +163,9 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
   bool get _isBusy => widget.isSubmitting || _isLocalSubmitting;
 
   void _handleTimerStatus(AnimationStatus status) {
-    if (status != AnimationStatus.completed ||
-        !mounted ||
-        _answerState != _RecallAnswerState.hidden) {
-      return;
-    }
+    if (status != AnimationStatus.completed) return;
+    if (!mounted) return;
+    if (_answerState != _RecallAnswerState.hidden) return;
     setState(() {
       _answerState = _RecallAnswerState.timedOut;
     });
@@ -180,7 +177,7 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
     if (_currentItem == null) {
       return;
     }
-    _timerController.forward();
+    unawaited(_timerController.forward());
   }
 
   void _revealAnswer() {
@@ -216,17 +213,14 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
       _isLocalSubmitting = true;
     });
     final success = await widget.onSubmit(nextGrades);
-    if (!mounted || success) {
-      return;
-    }
+    if (!mounted) return;
+    if (success) return;
     setState(() {
       _isLocalSubmitting = false;
     });
   }
 
-  List<StudySessionItem> get _roundItems {
-    return pendingModeRoundItems(widget.snapshot);
-  }
+  List<StudySessionItem> get _roundItems => pendingModeRoundItems(widget.snapshot);
 
   StudySessionItem? get _currentItem {
     final items = _roundItems;
@@ -270,8 +264,7 @@ class _RecallActionArea extends StatelessWidget {
   final VoidCallback onNextAfterTimeout;
 
   @override
-  Widget build(BuildContext context) {
-    return switch (answerState) {
+  Widget build(BuildContext context) => switch (answerState) {
       _RecallAnswerState.hidden => _RecallTimerAction(
         key: const ValueKey<String>('recall-hidden-action'),
         timer: timer,
@@ -290,7 +283,6 @@ class _RecallActionArea extends StatelessWidget {
         onNext: onNextAfterTimeout,
       ),
     };
-  }
 }
 
 class _RecallTimerAction extends StatelessWidget {
@@ -384,8 +376,7 @@ class _RecallAnswerCard extends StatelessWidget {
   final bool isRevealed;
 
   @override
-  Widget build(BuildContext context) {
-    return MxCard(
+  Widget build(BuildContext context) => MxCard(
       key: const ValueKey<String>('recall-answer-card'),
       variant: MxCardVariant.outlined,
       padding: const EdgeInsets.all(MxSpace.sm),
@@ -421,7 +412,6 @@ class _RecallAnswerCard extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 class _RecallAnswerContent extends StatelessWidget {
@@ -430,8 +420,7 @@ class _RecallAnswerContent extends StatelessWidget {
   final String answer;
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
+  Widget build(BuildContext context) => Center(
       child: SingleChildScrollView(
         child: MxText(
           answer,
@@ -441,7 +430,6 @@ class _RecallAnswerContent extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 class _RecallRevealedActions extends StatelessWidget {

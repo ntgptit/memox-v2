@@ -65,9 +65,8 @@ class PersonalizationSettingsGroup extends ConsumerWidget {
       title: l10n.settingsAppearanceTitle,
       child: _ThemeOptions(current: current),
     );
-    if (!context.mounted || nextMode == null) {
-      return;
-    }
+    if (!context.mounted) return;
+    if (nextMode == null) return;
     ref.read(themeModeProvider.notifier).set(nextMode);
     MxSnackbar.success(context, l10n.settingsUpdatedMessage);
   }
@@ -83,9 +82,8 @@ class PersonalizationSettingsGroup extends ConsumerWidget {
       title: l10n.settingsLanguageTitle,
       child: _LanguageOptions(current: current),
     );
-    if (!context.mounted || nextChoice == null) {
-      return;
-    }
+    if (!context.mounted) return;
+    if (nextChoice == null) return;
     final notifier = ref.read(localeProvider.notifier);
     switch (nextChoice) {
       case _LocaleChoice.system:
@@ -114,9 +112,7 @@ class _PersonalizationRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
-  }
+  Widget build(BuildContext context) => SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
 }
 
 class _ThemeOptions extends StatelessWidget {
@@ -214,26 +210,20 @@ class _OptionTile<T> extends StatelessWidget {
   }
 }
 
-String _themeLabel(AppLocalizations l10n, ThemeMode themeMode) {
-  return switch (themeMode) {
+String _themeLabel(AppLocalizations l10n, ThemeMode themeMode) => switch (themeMode) {
     ThemeMode.system => l10n.settingsThemeSystem,
     ThemeMode.light => l10n.settingsThemeLight,
     ThemeMode.dark => l10n.settingsThemeDark,
   };
-}
 
-String _localeLabel(AppLocalizations l10n, _LocaleChoice locale) {
-  return switch (locale) {
+String _localeLabel(AppLocalizations l10n, _LocaleChoice locale) => switch (locale) {
     _LocaleChoice.system => l10n.settingsLocaleSystem,
     _LocaleChoice.english => l10n.settingsLocaleEnglish,
     _LocaleChoice.vietnamese => l10n.settingsLocaleVietnamese,
   };
-}
 
-_LocaleChoice _localeChoiceOf(Locale? locale) {
-  return switch (locale?.languageCode) {
+_LocaleChoice _localeChoiceOf(Locale? locale) => switch (locale?.languageCode) {
     'en' => _LocaleChoice.english,
     'vi' => _LocaleChoice.vietnamese,
     _ => _LocaleChoice.system,
   };
-}

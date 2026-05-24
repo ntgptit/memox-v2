@@ -29,42 +29,40 @@ class StudyDefaultsSettings extends _$StudyDefaultsSettings {
   @override
   Future<StudyDefaultsSettingsState> build() async => _load();
 
-  // guard:retry-reviewed
   Future<void> setNewStudyBatchSize(int value) => _update(
-      (current) => StudyDefaultsSettingsState(
-        newStudyDefaults: _copySettings(
-          current.newStudyDefaults,
-          batchSize: StudySettingsPolicy.clampBatchSize(
-            value,
-            StudyType.newStudy,
-          ),
+    (current) => StudyDefaultsSettingsState(
+      newStudyDefaults: _copySettings(
+        current.newStudyDefaults,
+        batchSize: StudySettingsPolicy.clampBatchSize(
+          value,
+          StudyType.newStudy,
         ),
-        reviewDefaults: current.reviewDefaults,
       ),
-    );
+      reviewDefaults: current.reviewDefaults,
+    ),
+  );
 
-  // guard:retry-reviewed
   Future<void> setReviewBatchSize(int value) => _update(
-      (current) => StudyDefaultsSettingsState(
-        newStudyDefaults: current.newStudyDefaults,
-        reviewDefaults: _copySettings(
-          current.reviewDefaults,
-          batchSize: StudySettingsPolicy.clampBatchSize(
-            value,
-            StudyType.srsReview,
-          ),
+    (current) => StudyDefaultsSettingsState(
+      newStudyDefaults: current.newStudyDefaults,
+      reviewDefaults: _copySettings(
+        current.reviewDefaults,
+        batchSize: StudySettingsPolicy.clampBatchSize(
+          value,
+          StudyType.srsReview,
         ),
       ),
-    );
+    ),
+  );
 
-  // guard:retry-reviewed
-  Future<void> setShuffleFlashcards(bool value) => _updateShared(shuffleFlashcards: value);
+  Future<void> setShuffleFlashcards(bool value) =>
+      _updateShared(shuffleFlashcards: value);
 
-  // guard:retry-reviewed
-  Future<void> setShuffleAnswers(bool value) => _updateShared(shuffleAnswers: value);
+  Future<void> setShuffleAnswers(bool value) =>
+      _updateShared(shuffleAnswers: value);
 
-  // guard:retry-reviewed
-  Future<void> setPrioritizeOverdue(bool value) => _updateShared(prioritizeOverdue: value);
+  Future<void> setPrioritizeOverdue(bool value) =>
+      _updateShared(prioritizeOverdue: value);
 
   Future<StudyDefaultsSettingsState> _load() async {
     final store = await ref.watch(studySettingsStoreProvider.future);
@@ -109,28 +107,27 @@ class StudyDefaultsSettings extends _$StudyDefaultsSettings {
     bool? shuffleAnswers,
     bool? prioritizeOverdue,
   }) => _update((current) {
-      final nextNewStudy = _copySettings(
-        current.newStudyDefaults,
-        shuffleFlashcards:
-            shuffleFlashcards ?? current.newStudyDefaults.shuffleFlashcards,
-        shuffleAnswers:
-            shuffleAnswers ?? current.newStudyDefaults.shuffleAnswers,
-        prioritizeOverdue:
-            prioritizeOverdue ?? current.newStudyDefaults.prioritizeOverdue,
-      );
-      final nextReview = _copySettings(
-        current.reviewDefaults,
-        shuffleFlashcards:
-            shuffleFlashcards ?? current.reviewDefaults.shuffleFlashcards,
-        shuffleAnswers: shuffleAnswers ?? current.reviewDefaults.shuffleAnswers,
-        prioritizeOverdue:
-            prioritizeOverdue ?? current.reviewDefaults.prioritizeOverdue,
-      );
-      return StudyDefaultsSettingsState(
-        newStudyDefaults: nextNewStudy,
-        reviewDefaults: nextReview,
-      );
-    });
+    final nextNewStudy = _copySettings(
+      current.newStudyDefaults,
+      shuffleFlashcards:
+          shuffleFlashcards ?? current.newStudyDefaults.shuffleFlashcards,
+      shuffleAnswers: shuffleAnswers ?? current.newStudyDefaults.shuffleAnswers,
+      prioritizeOverdue:
+          prioritizeOverdue ?? current.newStudyDefaults.prioritizeOverdue,
+    );
+    final nextReview = _copySettings(
+      current.reviewDefaults,
+      shuffleFlashcards:
+          shuffleFlashcards ?? current.reviewDefaults.shuffleFlashcards,
+      shuffleAnswers: shuffleAnswers ?? current.reviewDefaults.shuffleAnswers,
+      prioritizeOverdue:
+          prioritizeOverdue ?? current.reviewDefaults.prioritizeOverdue,
+    );
+    return StudyDefaultsSettingsState(
+      newStudyDefaults: nextNewStudy,
+      reviewDefaults: nextReview,
+    );
+  });
 }
 
 StudySettingsSnapshot _copySettings(
@@ -140,8 +137,8 @@ StudySettingsSnapshot _copySettings(
   bool? shuffleAnswers,
   bool? prioritizeOverdue,
 }) => StudySettingsSnapshot(
-    batchSize: batchSize ?? settings.batchSize,
-    shuffleFlashcards: shuffleFlashcards ?? settings.shuffleFlashcards,
-    shuffleAnswers: shuffleAnswers ?? settings.shuffleAnswers,
-    prioritizeOverdue: prioritizeOverdue ?? settings.prioritizeOverdue,
-  );
+  batchSize: batchSize ?? settings.batchSize,
+  shuffleFlashcards: shuffleFlashcards ?? settings.shuffleFlashcards,
+  shuffleAnswers: shuffleAnswers ?? settings.shuffleAnswers,
+  prioritizeOverdue: prioritizeOverdue ?? settings.prioritizeOverdue,
+);

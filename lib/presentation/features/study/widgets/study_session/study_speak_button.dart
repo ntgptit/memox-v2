@@ -2,12 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:memox/l10n/generated/app_localizations.dart';
-
 import 'package:memox/core/utils/string_utils.dart';
 import 'package:memox/domain/services/tts_service.dart';
-import 'package:memox/presentation/shared/widgets/mx_speak_button.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/tts/providers/tts_controller_notifier.dart';
+import 'package:memox/presentation/shared/widgets/mx_speak_button.dart';
 
 class StudySpeakButton extends ConsumerWidget {
   const StudySpeakButton({
@@ -72,9 +71,8 @@ class _StudyAutoSpeakEffectState extends ConsumerState<StudyAutoSpeakEffect> {
     super.initState();
     _lastTriggerKey = widget.triggerKey;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !widget.enabled) {
-        return;
-      }
+      if (!mounted) return;
+      if (!widget.enabled) return;
       _speakCurrentText();
     });
   }
@@ -98,7 +96,5 @@ class _StudyAutoSpeakEffectState extends ConsumerState<StudyAutoSpeakEffect> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return const SizedBox.shrink();
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }

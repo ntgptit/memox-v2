@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:memox/l10n/generated/app_localizations.dart';
-
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/study_session_round.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
-import 'package:memox/domain/study/study_session_round.dart';
+
 import '../study_mode_session_scaffold.dart';
 import 'match_batching.dart';
 import 'match_board.dart';
@@ -171,12 +171,10 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     return items;
   }
 
-  double get _localCorrectMatchCount {
-    return _matchedItemIds
+  double get _localCorrectMatchCount => _matchedItemIds
         .where((itemId) => !_failedItemIds.contains(itemId))
         .length
         .toDouble();
-  }
 
   List<StudySessionItem> _rightItems(List<StudySessionItem> roundItems) {
     final itemById = <String, StudySessionItem>{
@@ -330,9 +328,8 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
 
   Future<void> _settleMatchedPair(String itemId) async {
     await Future<void>.delayed(matchSuccessHoldDuration);
-    if (!mounted || !_successItemIds.contains(itemId)) {
-      return;
-    }
+    if (!mounted) return;
+    if (!_successItemIds.contains(itemId)) return;
     setState(() {
       _successItemIds = <String>{..._successItemIds}..remove(itemId);
     });
