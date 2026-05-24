@@ -532,6 +532,66 @@ void main() {
   });
 
   testWidgets(
+    'DT4 onNavigate: starts deck study from the study-flow Mix card',
+    (WidgetTester tester) async {
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final router = GoRouter(
+        initialLocation: '/deck/$deckId/flashcards',
+        routes: [
+          GoRoute(
+            path: '/${RoutePaths.flashcardListSegment}',
+            name: RouteNames.flashcardList,
+            builder: (context, state) => FlashcardListScreen(
+              deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+            ),
+          ),
+          GoRoute(
+            path: '/${RoutePaths.studyEntrySegment}',
+            name: RouteNames.studyEntry,
+            builder: (context, state) => const SizedBox.shrink(),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final mixCard = find.byKey(const ValueKey('study_mode_mix'));
+      await tester.scrollUntilVisible(
+        mixCard,
+        300,
+        scrollable: _verticalScrollable(),
+      );
+      await tester.tap(mixCard);
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/study/deck/$deckId',
+      );
+    },
+  );
+
+  testWidgets(
     'DT2 onNavigate: header more opens deck actions from flashcard management',
     (WidgetTester tester) async {
       const deckId = 'deck-001';

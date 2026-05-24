@@ -28,6 +28,7 @@ Test file: `test/presentation/flashcard_list_screen_test.dart`
 | DT1 | flashcard management owns the deck study entry point for non-empty decks | loaded deck has two flashcards and is routed at `/deck/deck-001/flashcards` | user scrolls to and taps `Study this deck` | route path becomes `/study/deck/deck-001` | C0+C1 |
 | DT2 | flashcard management header exposes deck-level actions without a separate deck screen | loaded deck has two flashcards and header more action is present | user taps tooltip `More actions` | `Deck actions`, `Edit`, `Move`, `Duplicate`, `Import flashcards`, `Export CSV`, and `Delete` are visible | C0+C1 |
 | DT3 | deck action import should route to the deck-scoped import screen | loaded deck `deck-001` is managed from the flashcard list route and deck import route is registered | user opens `Deck actions` and taps `Import flashcards` | deck import destination renders with path parameter `deck-001` | C0+C1 |
+| DT4 | study-flow cards share the same deck study entry point as the primary study CTA | loaded deck has two flashcards and is routed at `/deck/deck-001/flashcards` | user scrolls to the study-flow section and taps the `Mix` card | route path becomes `/study/deck/deck-001` | C0+C1 |
 
 ## Decision table: onDelete
 

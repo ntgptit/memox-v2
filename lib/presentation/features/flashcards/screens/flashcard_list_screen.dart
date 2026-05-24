@@ -178,6 +178,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
                 SliverToBoxAdapter(
                   child: FlashcardStudyModesSection(
                     enabled: state.items.isNotEmpty,
+                    onStartStudy: () => _goStudyEntry(state),
                   ),
                 ),
                 const MxSliverGap(MxSpace.xl),

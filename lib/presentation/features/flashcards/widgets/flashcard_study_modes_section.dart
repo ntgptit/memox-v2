@@ -11,9 +11,14 @@ import '../../../shared/widgets/mx_section_header.dart';
 import '../../../shared/widgets/mx_text.dart';
 
 class FlashcardStudyModesSection extends StatelessWidget {
-  const FlashcardStudyModesSection({required this.enabled, super.key});
+  const FlashcardStudyModesSection({
+    required this.enabled,
+    required this.onStartStudy,
+    super.key,
+  });
 
   final bool enabled;
+  final VoidCallback onStartStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +66,7 @@ class FlashcardStudyModesSection extends StatelessWidget {
         const MxGap(MxSpace.md),
         if (enabled) ...[
           MxModeMixCard(
+            key: const ValueKey('study_mode_mix'),
             title: l10n.studyModeMixTitle,
             subtitle: l10n.studyModeMixSubtitle,
             badgeLabel: l10n.studyModeMixBadge,
@@ -72,10 +78,15 @@ class FlashcardStudyModesSection extends StatelessWidget {
               Icons.edit_note_rounded,
             ],
             modesSummary: l10n.studyModeMixSummary,
+            onTap: onStartStudy,
           ),
           const MxGap(MxSpace.sm),
         ],
-        _StudyModeListCard(modes: modes, enabled: enabled),
+        _StudyModeListCard(
+          modes: modes,
+          enabled: enabled,
+          onStartStudy: onStartStudy,
+        ),
         if (!enabled) ...[
           const MxGap(MxSpace.sm),
           _StudyUnavailableCard(message: l10n.decksStudyUnavailableNoCards),
@@ -100,10 +111,15 @@ class _ModeTileData {
 }
 
 class _StudyModeListCard extends StatelessWidget {
-  const _StudyModeListCard({required this.modes, required this.enabled});
+  const _StudyModeListCard({
+    required this.modes,
+    required this.enabled,
+    required this.onStartStudy,
+  });
 
   final List<_ModeTileData> modes;
   final bool enabled;
+  final VoidCallback onStartStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +129,11 @@ class _StudyModeListCard extends StatelessWidget {
             constraints.hasBoundedWidth && context.gridColumns(base: 2) > 1;
         final tiles = [
           for (final mode in modes)
-            _StudyModeTile(mode: mode, enabled: enabled),
+            _StudyModeTile(
+              mode: mode,
+              enabled: enabled,
+              onStartStudy: onStartStudy,
+            ),
         ];
         if (!twoColumn) {
           return Column(children: tiles);
@@ -135,10 +155,15 @@ class _StudyModeListCard extends StatelessWidget {
 }
 
 class _StudyModeTile extends StatelessWidget {
-  const _StudyModeTile({required this.mode, required this.enabled});
+  const _StudyModeTile({
+    required this.mode,
+    required this.enabled,
+    required this.onStartStudy,
+  });
 
   final _ModeTileData mode;
   final bool enabled;
+  final VoidCallback onStartStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -151,6 +176,7 @@ class _StudyModeTile extends StatelessWidget {
       backgroundColor: enabled
           ? scheme.surfaceContainerLowest
           : scheme.surfaceContainerHighest,
+      onTap: enabled ? onStartStudy : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

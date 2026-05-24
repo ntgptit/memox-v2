@@ -89,7 +89,7 @@ extension AppNavigation on BuildContext {
   }
 
   void goStudyEntry({required String entryType, required String entryRefId}) {
-    goNamed(
+    pushNamed(
       RouteNames.studyEntry,
       pathParameters: {
         RoutePaths.studyEntryTypeParam: entryType,
