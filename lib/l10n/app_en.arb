@@ -899,6 +899,39 @@
     }
   },
   "studyMarkCorrectAction": "Mark correct",
+  "studyTryAgainAction": "Try again",
+  "studyHintAction": "Hint",
+  "studyGotItAction": "Got it",
+  "studyReviewSwipeHint": "Swipe or tap Next",
+  "studyReviewMeaningLabel": "Meaning",
+  "studyGuessPromptLabel": "What is this?",
+  "studyGuessAutoAdvanceLabel": "Next card in {seconds}s",
+  "@studyGuessAutoAdvanceLabel": {
+    "placeholders": {
+      "seconds": {"type": "String"}
+    }
+  },
+  "studyMatchBoardStatus": "Board {board} of {totalBoards} · {pairsLeft, plural, =1{1 pair left} other{{pairsLeft} pairs left}}",
+  "@studyMatchBoardStatus": {
+    "placeholders": {
+      "board": {"type": "int"},
+      "totalBoards": {"type": "int"},
+      "pairsLeft": {"type": "num"}
+    }
+  },
+  "studyMatchMistakesLabel": "{mistakes, plural, =0{No mistakes} =1{1 mistake} other{{mistakes} mistakes}}",
+  "@studyMatchMistakesLabel": {
+    "placeholders": {
+      "mistakes": {"type": "num"}
+    }
+  },
+  "studyCounterFormat": "{current} / {total}",
+  "@studyCounterFormat": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
   "studyContinueAction": "Continue",
   "studyEmptyAnswerMessage": "Enter an answer before submitting.",
   "studyCancelConfirmTitle": "Cancel this session?",

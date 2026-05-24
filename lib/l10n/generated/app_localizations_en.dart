@@ -1844,6 +1844,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyMarkCorrectAction => 'Mark correct';
 
   @override
+  String get studyTryAgainAction => 'Try again';
+
+  @override
+  String get studyHintAction => 'Hint';
+
+  @override
+  String get studyGotItAction => 'Got it';
+
+  @override
+  String get studyReviewSwipeHint => 'Swipe or tap Next';
+
+  @override
+  String get studyReviewMeaningLabel => 'Meaning';
+
+  @override
+  String get studyGuessPromptLabel => 'What is this?';
+
+  @override
+  String studyGuessAutoAdvanceLabel(String seconds) {
+    return 'Next card in ${seconds}s';
+  }
+
+  @override
+  String studyMatchBoardStatus(int board, int totalBoards, num pairsLeft) {
+    String _temp0 = intl.Intl.pluralLogic(
+      pairsLeft,
+      locale: localeName,
+      other: '$pairsLeft pairs left',
+      one: '1 pair left',
+    );
+    return 'Board $board of $totalBoards · $_temp0';
+  }
+
+  @override
+  String studyMatchMistakesLabel(num mistakes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      mistakes,
+      locale: localeName,
+      other: '$mistakes mistakes',
+      one: '1 mistake',
+      zero: 'No mistakes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String studyCounterFormat(int current, int total) {
+    return '$current / $total';
+  }
+
+  @override
   String get studyContinueAction => 'Continue';
 
   @override

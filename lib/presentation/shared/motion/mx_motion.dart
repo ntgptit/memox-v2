@@ -14,4 +14,5 @@ abstract final class MxDurations {
   static const snackbar = AppDurations.snackbar;
   static const reviewAutoSubmit = AppDurations.reviewAutoSubmit;
   static const recallAnswerTimeout = AppDurations.recallAnswerTimeout;
+  static const matchTimerTick = AppDurations.matchTimerTick;
 }

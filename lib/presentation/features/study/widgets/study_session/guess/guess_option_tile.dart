@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_shake_transition.dart';
@@ -9,12 +10,17 @@ import 'guess_motion.dart';
 import 'guess_option_models.dart';
 
 const _guessOptionTextMaxLines = 2;
+// guard:raw-size-reviewed letter-circle diameter per design mock (28 px)
+const _guessLetterCircleDiameter = 28.0;
+// guard:raw-size-reviewed letter-circle border thickness per design mock
+const _guessLetterCircleBorderWidth = 1.5;
 
 class GuessOptionTile extends StatefulWidget {
   const GuessOptionTile({
     required this.option,
     required this.state,
     required this.enabled,
+    required this.letter,
     required this.onTap,
     super.key,
   });
@@ -22,6 +28,7 @@ class GuessOptionTile extends StatefulWidget {
   final StudyFlashcardRef option;
   final GuessOptionState state;
   final bool enabled;
+  final String letter;
   final VoidCallback onTap;
 
   @override
@@ -79,22 +86,72 @@ class _GuessOptionTileState extends State<GuessOptionTile>
             variant: MxCardVariant.outlined,
             backgroundColor: backgroundColor,
             borderColor: visual.borderColor,
-            padding: const EdgeInsets.all(MxSpace.md),
+            padding: const EdgeInsets.symmetric(
+              horizontal: MxSpace.md,
+              vertical: MxSpace.md,
+            ),
             onTap: canTap ? widget.onTap : null,
-            child: Center(
-              child: MxText(
-                widget.option.back,
-                role: MxTextRole.contentBody,
-                color: visual.foregroundColor,
-                maxLines: _guessOptionTextMaxLines,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                softWrap: true,
-              ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _GuessLetterCircle(
+                  letter: widget.letter,
+                  color: visual.foregroundColor,
+                ),
+                const MxGap(MxSpace.md),
+                Expanded(
+                  child: MxText(
+                    widget.option.back,
+                    role: MxTextRole.contentBody,
+                    color: visual.foregroundColor,
+                    maxLines: _guessOptionTextMaxLines,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                  ),
+                ),
+                if (widget.state == GuessOptionState.success) ...[
+                  const MxGap(MxSpace.sm),
+                  Icon(
+                    Icons.check_rounded,
+                    color: visual.foregroundColor,
+                  ),
+                ],
+                if (widget.state == GuessOptionState.error) ...[
+                  const MxGap(MxSpace.sm),
+                  Icon(
+                    Icons.close_rounded,
+                    color: visual.foregroundColor,
+                  ),
+                ],
+              ],
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _GuessLetterCircle extends StatelessWidget {
+  const _GuessLetterCircle({required this.letter, required this.color});
+
+  final String letter;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: _guessLetterCircleDiameter,
+      height: _guessLetterCircleDiameter,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: color,
+          width: _guessLetterCircleBorderWidth,
+        ),
+      ),
+      child: MxText(letter, role: MxTextRole.badge, color: color),
     );
   }
 }

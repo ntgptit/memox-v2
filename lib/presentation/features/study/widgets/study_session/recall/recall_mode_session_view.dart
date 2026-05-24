@@ -10,12 +10,11 @@ import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
+import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
 import 'package:memox/domain/study/study_session_round.dart';
-import '../study_mode_progress_row.dart';
 import '../study_mode_session_scaffold.dart';
 import '../study_speak_button.dart';
 import 'recall_motion.dart';
@@ -92,8 +91,15 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
       localGrades: _stagedGrades,
     );
 
+    final totalItems = _roundItems.length;
+    final currentOneBased = totalItems == 0
+        ? 0
+        : (_itemIndex + 1).clamp(0, totalItems);
     return StudyModeSessionScaffold(
-      title: l10n.studyModeRecall,
+      modeLabel: l10n.studyModeRecall,
+      accent: MxStudyTopBarAccent.mastery,
+      progressValue: progress.value,
+      counterLabel: l10n.studyCounterFormat(currentOneBased, totalItems),
       canCancel: widget.canCancel,
       isActionBusy: widget.isSubmitting,
       onCancel: widget.onCancel,
@@ -108,11 +114,6 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
                   text: item.flashcard.front,
                   side: TtsTextSide.front,
                 ),
-                StudyModeProgressRow(
-                  value: progress.value,
-                  label: l10n.commonPercentValue(progress.percent),
-                ),
-                const MxGap(MxSpace.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -317,8 +318,7 @@ class _RecallTimerAction extends StatelessWidget {
         return Center(
           child: MxPrimaryButton(
             label: l10n.studyShowAnswerCountdownAction(remainingSeconds),
-            size: MxButtonSize.large,
-            fullWidth: true,
+            shape: MxPrimaryButtonShape.pill,
             onPressed: isSubmitting ? null : onPressed,
           ),
         );
@@ -458,14 +458,14 @@ class _RecallRevealedActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
-          child: MxSecondaryButton(
+          child: MxPrimaryButton(
             key: const ValueKey<String>('recall-forgot-action'),
             label: l10n.studyForgotAction,
-            leadingIcon: Icons.close_rounded,
-            size: MxButtonSize.large,
-            tone: MxSecondaryButtonTone.danger,
+            shape: MxPrimaryButtonShape.pill,
+            tone: MxPrimaryButtonTone.danger,
             fullWidth: true,
             onPressed: isSubmitting ? null : onForgot,
           ),
@@ -474,10 +474,8 @@ class _RecallRevealedActions extends StatelessWidget {
         Expanded(
           child: MxPrimaryButton(
             key: const ValueKey<String>('recall-remembered-action'),
-            label: l10n.studyRememberedAction,
-            leadingIcon: Icons.check_rounded,
-            size: MxButtonSize.large,
-            tone: MxPrimaryButtonTone.success,
+            label: l10n.studyGotItAction,
+            shape: MxPrimaryButtonShape.pill,
             fullWidth: true,
             onPressed: isSubmitting ? null : onRemembered,
           ),
@@ -506,7 +504,6 @@ class _RecallTimedOutAction extends StatelessWidget {
         key: const ValueKey<String>('recall-next-action'),
         label: l10n.studyNextAction,
         trailingIcon: Icons.arrow_forward_rounded,
-        size: MxButtonSize.large,
         variant: MxSecondaryVariant.tonal,
         onPressed: isSubmitting ? null : onNext,
       ),

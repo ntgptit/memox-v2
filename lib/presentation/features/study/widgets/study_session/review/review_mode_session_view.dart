@@ -9,12 +9,15 @@ import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/motion/mx_motion.dart';
+import 'package:memox/core/utils/string_utils.dart';
+import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_divider.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
-import 'package:memox/domain/study/study_session_round.dart';
-import '../study_mode_progress_row.dart';
+import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
 import '../study_mode_session_scaffold.dart';
 import '../study_speak_button.dart';
-import 'review_mode_card.dart';
 import 'review_page_scroll_behavior.dart';
 
 const _reviewPointerScrollThreshold = 20.0;
@@ -81,13 +84,17 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final cards = _reviewCards;
-    final progress = studyModeProgress(
-      snapshot: widget.snapshot,
-      localCorrectCount: _reviewLocalCorrectCount(cards.length),
-    );
+    final totalCards = cards.length;
+    final currentOneBased = totalCards == 0 ? 0 : _pageIndex + 1;
+    final progressValue = totalCards <= 1
+        ? 1.0
+        : currentOneBased / totalCards;
 
     return StudyModeSessionScaffold(
-      title: l10n.studyModeReview,
+      modeLabel: l10n.studyModeReview,
+      accent: MxStudyTopBarAccent.primary,
+      progressValue: progressValue,
+      counterLabel: l10n.studyCounterFormat(currentOneBased, totalCards),
       canCancel: widget.canCancel,
       isActionBusy: widget.isSubmitting,
       onCancel: widget.onCancel,
@@ -95,11 +102,6 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          StudyModeProgressRow(
-            value: progress.value,
-            label: l10n.studyReviewProgressPercent(progress.percent),
-          ),
-          const MxGap(MxSpace.md),
           Expanded(
             child: Listener(
               onPointerSignal: _handlePointerSignal,
@@ -113,37 +115,7 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
                       itemCount: cards.length,
                       onPageChanged: _handlePageChanged,
                       itemBuilder: (context, index) {
-                        final card = cards[index];
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: ReviewModeCard(
-                                tooltip: l10n.studyReviewEditCardTooltip,
-                                actionIcon: Icons.mode_edit_outline,
-                                text: card.front,
-                                role: MxTextRole.reviewFront,
-                                secondaryAction: StudySpeakButton(
-                                  key: ValueKey<String>(
-                                    'review-front-speak-${card.id}',
-                                  ),
-                                  text: card.front,
-                                  side: TtsTextSide.front,
-                                  tooltip: l10n.studyReviewCardAudioTooltip,
-                                ),
-                              ),
-                            ),
-                            const MxGap(MxSpace.md),
-                            Expanded(
-                              flex: 1,
-                              child: ReviewModeCard(
-                                text: card.back,
-                                role: MxTextRole.reviewBack,
-                              ),
-                            ),
-                          ],
-                        );
+                        return _ReviewSplitCard(card: cards[index]);
                       },
                     ),
                   ),
@@ -156,6 +128,12 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
                 ],
               ),
             ),
+          ),
+          const MxGap(MxSpace.md),
+          _ReviewBottomBar(
+            isAtLast: _isAtLastPage,
+            isBusy: widget.isSubmitting,
+            onNext: _isAtLastPage ? null : _advancePage,
           ),
         ],
       ),
@@ -183,6 +161,10 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
       return delta.dx;
     }
     return delta.dy;
+  }
+
+  Future<void> _advancePage() async {
+    await _turnPage(_pageIndex + 1);
   }
 
   Future<void> _turnPage(int targetIndex) async {
@@ -237,18 +219,6 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
             newSnapshot.sessionFlashcards.length;
   }
 
-  double _reviewProgress(int cardCount) {
-    final lastPage = cardCount - 1;
-    if (lastPage <= 0) {
-      return 0;
-    }
-    return _pageIndex / lastPage;
-  }
-
-  double _reviewLocalCorrectCount(int cardCount) {
-    return _reviewProgress(cardCount) * cardCount;
-  }
-
   void _handlePageChanged(int index) {
     setState(() {
       _pageIndex = index;
@@ -276,5 +246,162 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
     _autoSubmitTimer?.cancel();
     _autoSubmitTimer = null;
     await widget.onSubmit();
+  }
+}
+
+/// Single split card: term up top, divider, meaning bottom.
+class _ReviewSplitCard extends StatelessWidget {
+  const _ReviewSplitCard({required this.card});
+
+  final StudyFlashcardRef card;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MxCard(
+      variant: MxCardVariant.outlined,
+      padding: const EdgeInsets.symmetric(
+        horizontal: MxSpace.lg,
+        vertical: MxSpace.lg,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _ReviewSplitFace(
+              overline: StringUtils.uppercased(l10n.studyModeReview),
+              text: card.front,
+              role: MxTextRole.reviewFront,
+              trailing: StudySpeakButton(
+                key: ValueKey<String>('review-front-speak-${card.id}'),
+                text: card.front,
+                side: TtsTextSide.front,
+                tooltip: l10n.studyReviewCardAudioTooltip,
+              ),
+              editTooltip: l10n.studyReviewEditCardTooltip,
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: MxSpace.xs),
+            child: MxDivider(),
+          ),
+          Expanded(
+            child: _ReviewSplitFace(
+              overline: StringUtils.uppercased(l10n.studyReviewMeaningLabel),
+              text: card.back,
+              role: MxTextRole.reviewBack,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewSplitFace extends StatelessWidget {
+  const _ReviewSplitFace({
+    required this.overline,
+    required this.text,
+    required this.role,
+    this.trailing,
+    this.editTooltip,
+  });
+
+  final String overline;
+  final String text;
+  final MxTextRole role;
+  final Widget? trailing;
+  final String? editTooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Align(
+          alignment: Alignment.topLeft,
+          child: MxText(overline, role: MxTextRole.overline),
+        ),
+        if (editTooltip != null)
+          Align(
+            alignment: Alignment.topRight,
+            child: MxIconButton(
+              tooltip: editTooltip,
+              icon: Icons.mode_edit_outline,
+              onPressed: null,
+            ),
+          ),
+        if (trailing != null)
+          Align(
+            alignment: Alignment.bottomRight,
+            child: trailing,
+          ),
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: MxSpace.lg),
+            child: Center(
+              child: SingleChildScrollView(
+                child: MxText(
+                  text,
+                  role: role,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ReviewBottomBar extends StatelessWidget {
+  const _ReviewBottomBar({
+    required this.isAtLast,
+    required this.isBusy,
+    required this.onNext,
+  });
+
+  final bool isAtLast;
+  final bool isBusy;
+  final VoidCallback? onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        Expanded(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.chevron_right_rounded,
+                color: scheme.onSurfaceVariant,
+              ),
+              const MxGap(MxSpace.xs),
+              Flexible(
+                child: MxText(
+                  l10n.studyReviewSwipeHint,
+                  role: MxTextRole.overline,
+                  color: scheme.onSurfaceVariant,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const MxGap(MxSpace.sm),
+        MxPrimaryButton(
+          label: l10n.studyNextAction,
+          trailingIcon: Icons.arrow_forward_rounded,
+          shape: MxPrimaryButtonShape.pill,
+          isLoading: isBusy,
+          onPressed: isAtLast || isBusy ? null : onNext,
+        ),
+      ],
+    );
   }
 }

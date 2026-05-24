@@ -74,6 +74,7 @@ bool _shouldHideShellNavigation(GoRouterState state) {
     RouteNames.settingsAccount,
     RouteNames.settingsLearning,
     RouteNames.settingsAudioSpeech,
+    RouteNames.studySession,
   };
   return hiddenRoutes.contains(state.topRoute?.name) ||
       hiddenRoutes.contains(state.name);

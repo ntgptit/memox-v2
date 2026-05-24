@@ -1735,6 +1735,50 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyMarkCorrectAction => 'Đánh dấu đúng';
 
   @override
+  String get studyTryAgainAction => 'Thử lại';
+
+  @override
+  String get studyHintAction => 'Gợi ý';
+
+  @override
+  String get studyGotItAction => 'Đã nhớ';
+
+  @override
+  String get studyReviewSwipeHint => 'Vuốt hoặc bấm Tiếp';
+
+  @override
+  String get studyReviewMeaningLabel => 'Ý nghĩa';
+
+  @override
+  String get studyGuessPromptLabel => 'Đây là gì?';
+
+  @override
+  String studyGuessAutoAdvanceLabel(String seconds) {
+    return 'Thẻ tiếp theo sau ${seconds}s';
+  }
+
+  @override
+  String studyMatchBoardStatus(int board, int totalBoards, num pairsLeft) {
+    return 'Bảng $board/$totalBoards · còn $pairsLeft cặp';
+  }
+
+  @override
+  String studyMatchMistakesLabel(num mistakes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      mistakes,
+      locale: localeName,
+      other: '$mistakes lỗi',
+      zero: 'Không lỗi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String studyCounterFormat(int current, int total) {
+    return '$current / $total';
+  }
+
+  @override
   String get studyContinueAction => 'Tiếp tục';
 
   @override

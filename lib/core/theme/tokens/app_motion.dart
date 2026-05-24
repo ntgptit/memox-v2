@@ -27,6 +27,7 @@ abstract final class AppDurations {
   static const Duration snackbar = Duration(seconds: 4);
   static const Duration reviewAutoSubmit = Duration(seconds: 2);
   static const Duration recallAnswerTimeout = Duration(seconds: 20);
+  static const Duration matchTimerTick = Duration(seconds: 1);
 }
 
 /// Easing curves aligned with Material 3 motion.

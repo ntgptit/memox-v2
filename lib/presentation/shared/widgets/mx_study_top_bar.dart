@@ -1,135 +1,132 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/utils/string_utils.dart';
 import '../../../core/theme/extensions/theme_extensions.dart';
-import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
+import '../../../core/utils/string_utils.dart';
 import '../layouts/mx_gap.dart';
+import '../layouts/mx_space.dart';
+import 'mx_icon_button.dart';
+import 'mx_text.dart';
 
-/// Accent palette for [MxStudyTopBar] driven by the active study mode.
-enum MxStudyTopBarTone { primary, mastery, accent }
-
-/// Top bar used by Match / Guess / Recall / Fill study screens.
+/// Visual accent role for the [MxStudyTopBar] mode badge + progress bar.
 ///
-/// Layout per Design System UI kit (`StudyTopBar`):
-/// `[close] [MODE-pill] [progress] [n/total]`.
-class MxStudyTopBar extends StatelessWidget implements PreferredSizeWidget {
+/// Mirrors the mock's two-tone scheme: indigo primary for Review/Match/Guess,
+/// mastery-green for Recall/Fill (study modes that exercise recall).
+enum MxStudyTopBarAccent { primary, mastery }
+
+const _studyTopBarBadgeRadius = AppRadius.borderFull;
+const _studyTopBarProgressHeight = AppSpacing.xs;
+const _studyTopBarBadgeFillAlpha = AppOpacity.disabledSurface;
+
+/// Slim study-mode top bar.
+///
+/// Mock 06–10: a close (X) button, an uppercase mode badge pill, a thin
+/// progress track filling the remaining width, and a "current / total"
+/// counter on the right. Replaces the standard `AppBar` title+actions for
+/// the study session shell so the experience reads as immersive practice.
+class MxStudyTopBar extends StatelessWidget {
   const MxStudyTopBar({
-    required this.mode,
-    required this.current,
-    required this.total,
-    this.tone = MxStudyTopBarTone.primary,
-    this.onClose,
+    required this.modeLabel,
+    required this.accent,
+    required this.progressValue,
+    required this.counterLabel,
+    required this.onClose,
+    this.closeTooltip,
     super.key,
   });
 
-  /// Short uppercase label, e.g. `MATCH`, `RECALL`.
-  final String mode;
-  final int current;
-  final int total;
-  final MxStudyTopBarTone tone;
+  final String modeLabel;
+  final MxStudyTopBarAccent accent;
+  final double progressValue;
+  final String counterLabel;
   final VoidCallback? onClose;
-
-  /// guard:raw-size-reviewed Top bar height matches Material AppBar tonal
-  /// behaviour while keeping the lighter feel from the Design System.
-  static const double _height = 48;
-
-  /// guard:raw-size-reviewed Progress track height per Design System spec.
-  static const double _progressHeight = 4;
-
-  @override
-  Size get preferredSize => const Size.fromHeight(_height);
-
-  Color _accent(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final mx = context.mxColors;
-    return switch (tone) {
-      MxStudyTopBarTone.primary => scheme.primary,
-      MxStudyTopBarTone.mastery => mx.mastery,
-      MxStudyTopBarTone.accent => mx.streak,
-    };
-  }
+  final String? closeTooltip;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final accent = _accent(context);
-    final progress = total <= 0 ? 0.0 : (current / total).clamp(0.0, 1.0);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final accentColor = switch (accent) {
+      MxStudyTopBarAccent.primary => scheme.primary,
+      MxStudyTopBarAccent.mastery => context.mxColors.mastery,
+    };
+    final accentFill = accentColor.withValues(alpha: _studyTopBarBadgeFillAlpha);
+    final trackColor = scheme.surfaceContainer;
 
-    return SafeArea(
-      bottom: false,
-      child: SizedBox(
-        height: _height,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.close_rounded),
-                iconSize: AppIconSizes.md,
-                onPressed: onClose,
-                color: scheme.onSurface,
-                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              ),
-              const MxGap(AppSpacing.xs),
-              _ModePill(label: mode, accent: accent),
-              const MxGap(AppSpacing.sm),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: AppRadius.borderFull,
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    color: accent,
-                    backgroundColor: scheme.surfaceContainer,
-                    minHeight: _progressHeight,
-                  ),
-                ),
-              ),
-              const MxGap(AppSpacing.sm),
-              Text(
-                '$current / $total',
-                style: textTheme.labelMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MxSpace.md,
+        vertical: MxSpace.xs,
+      ),
+      child: Row(
+        children: [
+          MxIconButton.toolbar(
+            icon: Icons.close_rounded,
+            tooltip: closeTooltip,
+            onPressed: onClose,
           ),
-        ),
+          const MxGap(MxSpace.xs),
+          _MxStudyModeBadge(
+            label: modeLabel,
+            accentColor: accentColor,
+            background: accentFill,
+          ),
+          const MxGap(MxSpace.sm),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: _studyTopBarBadgeRadius,
+              child: LinearProgressIndicator(
+                value: progressValue.clamp(0.0, 1.0),
+                minHeight: _studyTopBarProgressHeight,
+                color: accentColor,
+                backgroundColor: trackColor,
+              ),
+            ),
+          ),
+          const MxGap(MxSpace.sm),
+          MxText(
+            counterLabel,
+            role: MxTextRole.studyProgress,
+            color: scheme.onSurfaceVariant,
+          ),
+        ],
       ),
     );
   }
 }
 
-class _ModePill extends StatelessWidget {
-  const _ModePill({required this.label, required this.accent});
+class _MxStudyModeBadge extends StatelessWidget {
+  const _MxStudyModeBadge({
+    required this.label,
+    required this.accentColor,
+    required this.background,
+  });
 
   final String label;
-  final Color accent;
+  final Color accentColor;
+  final Color background;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: AppOpacity.disabledSurface),
-        borderRadius: AppRadius.chip,
+        color: background,
+        borderRadius: _studyTopBarBadgeRadius,
+        border: Border.all(
+          color: accentColor.withValues(alpha: AppOpacity.ghostBorder),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.sm,
           vertical: AppSpacing.xxs,
         ),
-        child: Text(
-          StringUtils.upperCaseToEmpty(label),
-          style: textTheme.labelSmall?.copyWith(
-            color: accent,
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.w700,
-          ),
+        child: MxText(
+          StringUtils.uppercased(label),
+          role: MxTextRole.overline,
+          color: accentColor,
         ),
       ),
     );

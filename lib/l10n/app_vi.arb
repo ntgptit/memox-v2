@@ -899,6 +899,39 @@
     }
   },
   "studyMarkCorrectAction": "Đánh dấu đúng",
+  "studyTryAgainAction": "Thử lại",
+  "studyHintAction": "Gợi ý",
+  "studyGotItAction": "Đã nhớ",
+  "studyReviewSwipeHint": "Vuốt hoặc bấm Tiếp",
+  "studyReviewMeaningLabel": "Ý nghĩa",
+  "studyGuessPromptLabel": "Đây là gì?",
+  "studyGuessAutoAdvanceLabel": "Thẻ tiếp theo sau {seconds}s",
+  "@studyGuessAutoAdvanceLabel": {
+    "placeholders": {
+      "seconds": {"type": "String"}
+    }
+  },
+  "studyMatchBoardStatus": "Bảng {board}/{totalBoards} · còn {pairsLeft} cặp",
+  "@studyMatchBoardStatus": {
+    "placeholders": {
+      "board": {"type": "int"},
+      "totalBoards": {"type": "int"},
+      "pairsLeft": {"type": "num"}
+    }
+  },
+  "studyMatchMistakesLabel": "{mistakes, plural, =0{Không lỗi} other{{mistakes} lỗi}}",
+  "@studyMatchMistakesLabel": {
+    "placeholders": {
+      "mistakes": {"type": "num"}
+    }
+  },
+  "studyCounterFormat": "{current} / {total}",
+  "@studyCounterFormat": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
   "studyContinueAction": "Tiếp tục",
   "studyEmptyAnswerMessage": "Hãy nhập đáp án trước khi gửi.",
   "studyCancelConfirmTitle": "Hủy phiên học này?",

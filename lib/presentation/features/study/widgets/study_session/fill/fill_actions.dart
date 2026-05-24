@@ -3,7 +3,6 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
-import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
@@ -25,13 +24,12 @@ class FillInputActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Expanded(
           child: MxSecondaryButton(
             key: const ValueKey<String>('fill-help-action'),
-            label: l10n.studyHelpAction,
-            leadingIcon: Icons.lightbulb_outline,
-            size: MxButtonSize.large,
+            label: l10n.studyHintAction,
             fullWidth: true,
             onPressed: isSubmitting ? null : onHelp,
           ),
@@ -41,8 +39,7 @@ class FillInputActions extends StatelessWidget {
           child: MxPrimaryButton(
             key: const ValueKey<String>('fill-check-action'),
             label: l10n.studyCheckAnswerAction,
-            leadingIcon: Icons.check_rounded,
-            size: MxButtonSize.large,
+            shape: MxPrimaryButtonShape.pill,
             fullWidth: true,
             onPressed: canCheck ? onCheck : null,
           ),
@@ -55,25 +52,40 @@ class FillInputActions extends StatelessWidget {
 class FillResultActions extends StatelessWidget {
   const FillResultActions({
     required this.isSubmitting,
-    required this.onNext,
+    required this.onMarkCorrect,
+    required this.onTryAgain,
     super.key,
   });
 
   final bool isSubmitting;
-  final VoidCallback onNext;
+  final VoidCallback onMarkCorrect;
+  final VoidCallback onTryAgain;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final nextButton = MxPrimaryButton(
-      key: const ValueKey<String>('fill-next-action'),
-      label: l10n.studyNextAction,
-      trailingIcon: Icons.arrow_forward_rounded,
-      size: MxButtonSize.large,
-      tone: MxPrimaryButtonTone.danger,
-      onPressed: isSubmitting ? null : onNext,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+          child: MxSecondaryButton(
+            key: const ValueKey<String>('fill-mark-correct-action'),
+            label: l10n.studyMarkCorrectAction,
+            fullWidth: true,
+            onPressed: isSubmitting ? null : onMarkCorrect,
+          ),
+        ),
+        const MxGap(MxSpace.sm),
+        Expanded(
+          child: MxPrimaryButton(
+            key: const ValueKey<String>('fill-try-again-action'),
+            label: l10n.studyTryAgainAction,
+            shape: MxPrimaryButtonShape.pill,
+            fullWidth: true,
+            onPressed: isSubmitting ? null : onTryAgain,
+          ),
+        ),
+      ],
     );
-
-    return Align(alignment: Alignment.centerRight, child: nextButton);
   }
 }

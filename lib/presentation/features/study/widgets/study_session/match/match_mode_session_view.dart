@@ -8,7 +8,8 @@ import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
-import '../study_mode_progress_row.dart';
+import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
+import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/domain/study/study_session_round.dart';
 import '../study_mode_session_scaffold.dart';
 import 'match_batching.dart';
@@ -52,11 +53,15 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
   int _visibleBatchStartIndex = 0;
   bool _isResolving = false;
   bool _hasSubmitted = false;
+  DateTime? _boardStartedAt;
+  Timer? _elapsedTicker;
+  Duration _elapsed = Duration.zero;
 
   @override
   void initState() {
     super.initState();
     _resetBoard(_roundItems);
+    _startElapsedTicker();
   }
 
   @override
@@ -66,7 +71,32 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     final nextBoardKey = _computeBoardKey(items);
     if (_boardKey != nextBoardKey) {
       _resetBoard(items);
+      _startElapsedTicker();
     }
+  }
+
+  @override
+  void dispose() {
+    _elapsedTicker?.cancel();
+    super.dispose();
+  }
+
+  void _startElapsedTicker() {
+    _elapsedTicker?.cancel();
+    _boardStartedAt = DateTime.now();
+    _elapsed = Duration.zero;
+    _elapsedTicker = Timer.periodic(matchTimerTickDuration, (_) {
+      if (!mounted) {
+        return;
+      }
+      final startedAt = _boardStartedAt;
+      if (startedAt == null) {
+        return;
+      }
+      setState(() {
+        _elapsed = DateTime.now().difference(startedAt);
+      });
+    });
   }
 
   @override
@@ -78,9 +108,23 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
       snapshot: widget.snapshot,
       localCorrectCount: _localCorrectMatchCount,
     );
+    final totalPairs = roundItems.length;
+    final pairsMatched = _matchedItemIds.length;
+    final pairsLeftInBatch = visibleItems
+        .where((item) => !_matchedItemIds.contains(item.id))
+        .length;
+    final totalBoards = totalPairs == 0
+        ? 1
+        : ((totalPairs + matchVisiblePairLimit - 1) ~/ matchVisiblePairLimit);
+    final boardNumber =
+        (_visibleBatchStartIndex ~/ matchVisiblePairLimit) + 1;
+    final mistakes = _failedItemIds.length;
 
     return StudyModeSessionScaffold(
-      title: l10n.studyModeMatch,
+      modeLabel: l10n.studyModeMatch,
+      accent: MxStudyTopBarAccent.primary,
+      progressValue: progress.value,
+      counterLabel: l10n.studyCounterFormat(pairsMatched, totalPairs),
       canCancel: widget.canCancel,
       isActionBusy: widget.isSubmitting,
       onCancel: widget.onCancel,
@@ -88,11 +132,12 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          StudyModeProgressRow(
-            value: progress.value,
-            label: l10n.commonPercentValue(progress.percent),
+          _MatchBoardStatusHeader(
+            boardNumber: boardNumber,
+            totalBoards: totalBoards,
+            pairsLeft: pairsLeftInBatch,
           ),
-          const MxGap(MxSpace.md),
+          const MxGap(MxSpace.sm),
           Expanded(
             child: MatchBoard(
               leftItems: visibleItems,
@@ -102,6 +147,8 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
               onTileTap: _handleTileTap,
             ),
           ),
+          const MxGap(MxSpace.sm),
+          _MatchFooter(elapsed: _elapsed, mistakes: mistakes),
         ],
       ),
     );
@@ -322,5 +369,71 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
       return;
     }
     await widget.onSubmit(itemGrades);
+  }
+}
+
+class _MatchBoardStatusHeader extends StatelessWidget {
+  const _MatchBoardStatusHeader({
+    required this.boardNumber,
+    required this.totalBoards,
+    required this.pairsLeft,
+  });
+
+  final int boardNumber;
+  final int totalBoards;
+  final int pairsLeft;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Center(
+      child: MxText(
+        l10n.studyMatchBoardStatus(boardNumber, totalBoards, pairsLeft),
+        role: MxTextRole.overline,
+        color: scheme.onSurfaceVariant,
+      ),
+    );
+  }
+}
+
+class _MatchFooter extends StatelessWidget {
+  const _MatchFooter({required this.elapsed, required this.mistakes});
+
+  final Duration elapsed;
+  final int mistakes;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final minutes = elapsed.inMinutes;
+    final seconds = elapsed.inSeconds.remainder(60).toString().padLeft(2, '0');
+    final timerLabel = '$minutes:$seconds';
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.timer_outlined,
+              color: scheme.onSurfaceVariant,
+            ),
+            const MxGap(MxSpace.xs),
+            MxText(
+              timerLabel,
+              role: MxTextRole.studyProgress,
+              color: scheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+        MxText(
+          l10n.studyMatchMistakesLabel(mistakes),
+          role: MxTextRole.studyProgress,
+          color: scheme.onSurfaceVariant,
+        ),
+      ],
+    );
   }
 }

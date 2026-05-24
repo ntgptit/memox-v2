@@ -3084,6 +3084,66 @@ abstract class AppLocalizations {
   /// **'Mark correct'**
   String get studyMarkCorrectAction;
 
+  /// No description provided for @studyTryAgainAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get studyTryAgainAction;
+
+  /// No description provided for @studyHintAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Hint'**
+  String get studyHintAction;
+
+  /// No description provided for @studyGotItAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get studyGotItAction;
+
+  /// No description provided for @studyReviewSwipeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe or tap Next'**
+  String get studyReviewSwipeHint;
+
+  /// No description provided for @studyReviewMeaningLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Meaning'**
+  String get studyReviewMeaningLabel;
+
+  /// No description provided for @studyGuessPromptLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'What is this?'**
+  String get studyGuessPromptLabel;
+
+  /// No description provided for @studyGuessAutoAdvanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Next card in {seconds}s'**
+  String studyGuessAutoAdvanceLabel(String seconds);
+
+  /// No description provided for @studyMatchBoardStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Board {board} of {totalBoards} · {pairsLeft, plural, =1{1 pair left} other{{pairsLeft} pairs left}}'**
+  String studyMatchBoardStatus(int board, int totalBoards, num pairsLeft);
+
+  /// No description provided for @studyMatchMistakesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{mistakes, plural, =0{No mistakes} =1{1 mistake} other{{mistakes} mistakes}}'**
+  String studyMatchMistakesLabel(num mistakes);
+
+  /// No description provided for @studyCounterFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {total}'**
+  String studyCounterFormat(int current, int total);
+
   /// No description provided for @studyContinueAction.
   ///
   /// In en, this message translates to:

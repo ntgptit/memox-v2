@@ -6,8 +6,8 @@ import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
 import 'package:memox/domain/study/study_session_round.dart';
-import '../study_mode_progress_row.dart';
 import '../study_mode_session_scaffold.dart';
 import 'fill_actions.dart';
 import 'fill_answer_cards.dart';
@@ -86,8 +86,15 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
       localGrades: _stagedGrades,
     );
 
+    final totalItems = _roundItems.length;
+    final currentOneBased = totalItems == 0
+        ? 0
+        : (_itemIndex + 1).clamp(0, totalItems);
     return StudyModeSessionScaffold(
-      title: l10n.studyModeFill,
+      modeLabel: l10n.studyModeFill,
+      accent: MxStudyTopBarAccent.mastery,
+      progressValue: progress.value,
+      counterLabel: l10n.studyCounterFormat(currentOneBased, totalItems),
       resizeToAvoidBottomInset: true,
       canCancel: widget.canCancel,
       isActionBusy: widget.isSubmitting,
@@ -98,11 +105,6 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                StudyModeProgressRow(
-                  value: progress.value,
-                  label: l10n.commonPercentValue(progress.percent),
-                ),
-                const MxGap(MxSpace.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -165,7 +167,8 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
                       : FillResultActions(
                           key: const ValueKey<String>('fill-result-actions'),
                           isSubmitting: _isBusy,
-                          onNext: () => _submit(AttemptGrade.incorrect),
+                          onMarkCorrect: () => _submit(AttemptGrade.correct),
+                          onTryAgain: _tryAgain,
                         ),
                 ),
               ],
@@ -203,6 +206,18 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
       _submittedAnswer = answer;
       _answerState = _FillAnswerState.incorrect;
     });
+  }
+
+  void _tryAgain() {
+    if (_isBusy) {
+      return;
+    }
+    setState(() {
+      _submittedAnswer = null;
+      _answerState = _FillAnswerState.input;
+      _controller.clear();
+    });
+    _focusAnswerInput();
   }
 
   void _showHelp() {
