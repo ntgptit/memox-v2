@@ -2340,6 +2340,12 @@ abstract class AppLocalizations {
   /// **'Saving to'**
   String get flashcardsDeckPickerLabel;
 
+  /// No description provided for @flashcardsDeckPickerSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save card to'**
+  String get flashcardsDeckPickerSheetTitle;
+
   /// No description provided for @flashcardsSaveAndAddNextTooltip.
   ///
   /// In en, this message translates to:

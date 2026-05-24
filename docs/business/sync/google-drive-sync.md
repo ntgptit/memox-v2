@@ -19,8 +19,8 @@ Google Drive Sync V1 cho phép user tự bấm `Sync now` trong Settings, chọn
 | `memox.sync.snapshot.zip` | `manifest.json`, `memox.sqlite`, `settings.json` | bản sao dữ liệu local để upload/restore |
 
 ## Settings được sync
-- Theme mode.
-- Locale override.
+- Theme mode nếu key đã có trong SharedPreferences.
+- Locale override nếu key đã có trong SharedPreferences.
 - Study defaults: new/review batch size, shuffle flashcards, shuffle answers, prioritize overdue.
 - TTS settings được user chọn.
 

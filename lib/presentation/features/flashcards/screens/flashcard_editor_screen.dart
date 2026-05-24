@@ -15,6 +15,9 @@ import '../../../shared/widgets/mx_breadcrumb_bar.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
+import '../../../shared/dialogs/mx_action_sheet_list.dart';
+import '../../../shared/dialogs/mx_bottom_sheet.dart';
+import '../viewmodels/flashcard_editor_destinations_provider.dart';
 import '../viewmodels/flashcard_editor_viewmodel.dart';
 import '../widgets/flashcard_editor_form.dart';
 import '../widgets/flashcard_editor_header_section.dart';
@@ -195,8 +198,62 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
           onAddTag: draftNotifier.addTag,
           onRemoveTag: draftNotifier.removeTag,
           onStartingStatusChanged: draftNotifier.setStartingStatus,
+          // Edit mode keeps the deck destination read-only; moving an existing
+          // card belongs to the separate "Move flashcards" action on the list
+          // screen, so we suppress the picker chevron there.
+          onPickDestination: draft.isEditing
+              ? null
+              : () => _pickDestination(
+                  currentDeckId: draft.deckId,
+                  draftNotifier: draftNotifier,
+                  l10n: l10n,
+                ),
         ),
       ],
+    );
+  }
+
+  Future<void> _pickDestination({
+    required String currentDeckId,
+    required FlashcardEditorDraft draftNotifier,
+    required AppLocalizations l10n,
+  }) async {
+    final destinations = await ref.read(
+      flashcardEditorDestinationsProvider.future,
+    );
+    if (!mounted || destinations.isEmpty) return;
+
+    final picked = await MxBottomSheet.show<String>(
+      context: context,
+      title: l10n.flashcardsDeckPickerSheetTitle,
+      child: MxActionSheetList<String>(
+        selectedValue: currentDeckId,
+        items: [
+          for (final target in destinations)
+            MxActionSheetItem<String>(
+              value: target.id,
+              label: target.name,
+              subtitle: target.breadcrumb
+                  .take(target.breadcrumb.length - 1)
+                  .join(' / '),
+              icon: target.id == currentDeckId
+                  ? Icons.check_rounded
+                  : Icons.layers_outlined,
+            ),
+        ],
+      ),
+    );
+    if (!mounted || picked == null || picked == currentDeckId) return;
+
+    final target = destinations.firstWhere((d) => d.id == picked);
+    draftNotifier.setDestinationDeck(
+      deckId: target.id,
+      deckName: target.name,
+      // breadcrumb in DeckMoveTarget includes the deck name as last segment;
+      // FlashcardEditorDraftState only carries the folder trail, so drop it.
+      breadcrumb: target.breadcrumb.length > 1
+          ? target.breadcrumb.sublist(0, target.breadcrumb.length - 1)
+          : const <String>[],
     );
   }
 

@@ -1442,6 +1442,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsDeckPickerLabel => 'Saving to';
 
   @override
+  String get flashcardsDeckPickerSheetTitle => 'Save card to';
+
+  @override
   String get flashcardsSaveAndAddNextTooltip => 'Save and add another';
 
   @override

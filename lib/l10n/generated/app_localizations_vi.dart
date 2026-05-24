@@ -1333,6 +1333,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flashcardsDeckPickerLabel => 'Lưu vào';
 
   @override
+  String get flashcardsDeckPickerSheetTitle => 'Lưu thẻ vào';
+
+  @override
   String get flashcardsSaveAndAddNextTooltip => 'Lưu và thêm thẻ khác';
 
   @override

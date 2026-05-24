@@ -19,6 +19,12 @@ abstract interface class DeckRepository {
     String? excludingFolderId,
   });
 
+  /// All decks the user can save a flashcard into, each with a full folder
+  /// breadcrumb. Used by the create-card destination picker to switch the
+  /// draft's target deck before save (per Design System "05 · Create card"
+  /// deck pill chevron-down affordance).
+  Future<List<DeckMoveTarget>> getDeckDestinations();
+
   Future<Result<DeckEntity>> createDeck({
     required String folderId,
     required String name,

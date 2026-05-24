@@ -12,6 +12,10 @@
 
 - [Google Drive Sync](./sync/google-drive-sync.md)
 
+## Settings
+
+- [Settings Screen Business Inventory](./settings/settings-screen.md)
+
 ## Folder
 
 - [Folder Overview](./folder/folder-overview.md)

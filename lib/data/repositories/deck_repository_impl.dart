@@ -124,6 +124,22 @@ final class DeckRepositoryImpl implements DeckRepository {
   }
 
   @override
+  Future<List<DeckMoveTarget>> getDeckDestinations() async {
+    final targets = <DeckMoveTarget>[];
+    for (final deck in await _deckDao.listAllDecks()) {
+      final breadcrumb = await _folderDao.getBreadcrumbNames(deck.folderId);
+      targets.add(
+        DeckMoveTarget(
+          id: deck.id,
+          name: deck.name,
+          breadcrumb: [...breadcrumb, deck.name],
+        ),
+      );
+    }
+    return targets;
+  }
+
+  @override
   Future<List<DeckMoveTarget>> getDeckMoveTargets({
     required String deckId,
     String? excludingFolderId,

@@ -42,6 +42,7 @@ class FlashcardEditorForm extends StatefulWidget {
     required this.onAddTag,
     required this.onRemoveTag,
     required this.onStartingStatusChanged,
+    this.onPickDestination,
     super.key,
   });
 
@@ -62,6 +63,10 @@ class FlashcardEditorForm extends StatefulWidget {
   final ValueChanged<String> onRemoveTag;
   final ValueChanged<FlashcardStartingStatus> onStartingStatusChanged;
 
+  /// Opens the destination-deck picker. Null disables the pill chevron
+  /// (e.g., in edit mode where moving the card belongs to a separate flow).
+  final VoidCallback? onPickDestination;
+
   @override
   State<FlashcardEditorForm> createState() => _FlashcardEditorFormState();
 }
@@ -81,7 +86,10 @@ class _FlashcardEditorFormState extends State<FlashcardEditorForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        MxDeckPill(deckName: widget.draft.deckName),
+        MxDeckPill(
+          deckName: widget.draft.deckName,
+          onTap: widget.onPickDestination,
+        ),
         const MxGap(MxSpace.lg),
         MxFieldLabel(
           label: l10n.flashcardsFieldFrontLabel,

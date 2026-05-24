@@ -45,6 +45,16 @@ final class GetDeckMoveTargetsUseCase {
   }
 }
 
+final class ListDeckDestinationsUseCase {
+  const ListDeckDestinationsUseCase(this._repository);
+
+  final DeckRepository _repository;
+
+  Future<List<DeckMoveTarget>> execute() {
+    return _repository.getDeckDestinations();
+  }
+}
+
 final class DeleteDeckUseCase {
   const DeleteDeckUseCase(this._repository);
 

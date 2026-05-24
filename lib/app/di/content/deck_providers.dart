@@ -43,6 +43,11 @@ GetDeckMoveTargetsUseCase getDeckMoveTargetsUseCase(Ref ref) {
 }
 
 @riverpod
+ListDeckDestinationsUseCase listDeckDestinationsUseCase(Ref ref) {
+  return ListDeckDestinationsUseCase(ref.watch(deckRepositoryProvider));
+}
+
+@riverpod
 UpdateDeckUseCase updateDeckUseCase(Ref ref) {
   return UpdateDeckUseCase(ref.watch(deckRepositoryProvider));
 }

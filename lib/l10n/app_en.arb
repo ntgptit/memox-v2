@@ -693,6 +693,7 @@
   "flashcardsShowAdvanced": "Show advanced fields",
   "flashcardsHideAdvanced": "Hide advanced",
   "flashcardsDeckPickerLabel": "Saving to",
+  "flashcardsDeckPickerSheetTitle": "Save card to",
   "flashcardsSaveAndAddNextTooltip": "Save and add another",
   "flashcardsLongContentHelper": "Supports multiple lines. Keep the full answer readable during study.",
   "flashcardsNoteHelper": "Optional context, examples, or memory hints.",

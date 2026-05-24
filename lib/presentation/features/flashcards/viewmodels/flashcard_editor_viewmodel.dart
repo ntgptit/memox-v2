@@ -99,6 +99,9 @@ class FlashcardEditorDraftState {
   }
 
   FlashcardEditorDraftState copyWith({
+    String? deckId,
+    String? deckName,
+    List<String>? breadcrumb,
     String? front,
     String? back,
     String? note,
@@ -109,9 +112,9 @@ class FlashcardEditorDraftState {
     FlashcardStartingStatus? startingStatus,
   }) {
     return FlashcardEditorDraftState(
-      deckId: deckId,
-      deckName: deckName,
-      breadcrumb: breadcrumb,
+      deckId: deckId ?? this.deckId,
+      deckName: deckName ?? this.deckName,
+      breadcrumb: breadcrumb ?? this.breadcrumb,
       flashcardId: flashcardId,
       front: front ?? this.front,
       back: back ?? this.back,
@@ -198,6 +201,23 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
 
   void setStartingStatus(FlashcardStartingStatus value) =>
       _patch((draft) => draft.copyWith(startingStatus: value));
+
+  /// Re-targets the draft to a different deck. Per Design System "05 · Create
+  /// card", the deck pill is a picker that lets the author swap destination
+  /// before saving.
+  void setDestinationDeck({
+    required String deckId,
+    required String deckName,
+    required List<String> breadcrumb,
+  }) {
+    _patch(
+      (draft) => draft.copyWith(
+        deckId: deckId,
+        deckName: deckName,
+        breadcrumb: breadcrumb,
+      ),
+    );
+  }
 
   void addTag(String tag) {
     final trimmed = StringUtils.trimmed(tag);
@@ -286,9 +306,11 @@ class FlashcardEditorController extends _$FlashcardEditorController {
     }
 
     return _actionRunner.runResult(
+      // Use the live draft.deckId, not args.deckId — the destination picker
+      // can re-target the draft to a different deck before save.
       () => ref
           .read(createFlashcardUseCaseProvider)
-          .execute(deckId: args.deckId, draft: draftState.toDraft()),
+          .execute(deckId: draftState.deckId, draft: draftState.toDraft()),
       onSuccess: (_) {
         if (keepCreating) {
           ref.read(flashcardEditorDraftProvider(args).notifier).clearForNext();

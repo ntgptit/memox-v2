@@ -33,6 +33,7 @@ MemoX là hệ thống học tập cá nhân dùng flashcard và spaced repetiti
 - Hỗ trợ học từ deck, folder hoặc danh sách hôm nay
 - Dashboard định hướng học hằng ngày theo Today Review, New Study, Resume, Library health và gợi ý deck gần đây
 - Liên kết Google account trong Settings và đồng bộ thủ công DB local với Google Drive `appDataFolder`
+- Quản lý Settings cấp app gồm account, Drive sync, personalization, learning defaults và Audio & Speech
 - Điều phối phiên học
 - Lập lịch ôn theo SRS 8 box
 - Nhắc học
@@ -45,5 +46,6 @@ MemoX là hệ thống học tập cá nhân dùng flashcard và spaced repetiti
 - [Study Index](../study/study-index.md)
 - [Study Entry](../study/study-entry.md)
 - [SRS Overview](../srs/srs-overview.md)
+- [Settings Screen Business Inventory](../settings/settings-screen.md)
 - [Google Account And Drive Sync Foundation](../account/google-account.md)
 - [Google Drive Sync](../sync/google-drive-sync.md)
