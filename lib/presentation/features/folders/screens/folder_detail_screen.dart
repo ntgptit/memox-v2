@@ -4,6 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/value_objects/content_queries.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
@@ -93,11 +94,29 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     final toolbarState = ref.watch(
       folderChildrenToolbarStateProvider(widget.folderId),
     );
+    return _buildScaffold(
+      l10n: l10n,
+      sortOptions: sortOptions,
+      queryState: queryState,
+      queryData: queryData,
+      showFab: showFab,
+      toolbarState: toolbarState,
+    );
+  }
+
+  Widget _buildScaffold({
+    required AppLocalizations l10n,
+    required List<MxSortOption<ContentSortMode>> sortOptions,
+    required AsyncValue<FolderDetailState> queryState,
+    required FolderDetailState? queryData,
+    required bool showFab,
+    required ContentQuery toolbarState,
+  }) {
     return MxScaffold(
       floatingActionButton: showFab
           ? MxFab(
               icon: Icons.add,
-              tooltip: _resolveFabTooltip(l10n, queryData),
+              tooltip: _resolveFabTooltip(l10n, queryData!),
               onPressed: _isReorderMode
                   ? null
                   : () {

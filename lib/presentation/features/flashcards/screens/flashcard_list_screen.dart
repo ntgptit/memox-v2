@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/services/tts_service.dart';
+import '../../../../domain/value_objects/content_queries.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
@@ -87,6 +88,24 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
       flashcardSelectionProvider(widget.deckId).notifier,
     );
 
+    return _buildScaffold(
+      l10n: l10n,
+      queryState: queryState,
+      toolbarState: toolbarState,
+      toolbarNotifier: toolbarNotifier,
+      selection: selection,
+      selectionNotifier: selectionNotifier,
+    );
+  }
+
+  Widget _buildScaffold({
+    required AppLocalizations l10n,
+    required AsyncValue<FlashcardListState> queryState,
+    required ContentQuery toolbarState,
+    required FlashcardToolbarState toolbarNotifier,
+    required Set<String> selection,
+    required FlashcardSelection selectionNotifier,
+  }) {
     return MxScaffold(
       floatingActionButton: _isReorderMode
           ? null
