@@ -1455,6 +1455,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyPrioritizeOverdue => 'Ưu tiên thẻ quá hạn';
 
   @override
+  String get studyBatchSizeShortLabel => 'Số thẻ mỗi phiên';
+
+  @override
+  String studyStartWithCountAction(int count) {
+    return 'Bắt đầu · $count thẻ';
+  }
+
+  @override
+  String studyStartNewWithCountAction(int count) {
+    return 'Tạo phiên mới · $count thẻ';
+  }
+
+  @override
   String get studySessionTitle => 'Phiên học';
 
   @override

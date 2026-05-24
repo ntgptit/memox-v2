@@ -747,6 +747,19 @@
   "studyShuffleCards": "Shuffle flashcards",
   "studyShuffleAnswers": "Shuffle answers",
   "studyPrioritizeOverdue": "Prioritize overdue cards",
+  "studyBatchSizeShortLabel": "Batch size",
+  "studyStartWithCountAction": "Start · {count} cards",
+  "@studyStartWithCountAction": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "studyStartNewWithCountAction": "Start new · {count} cards",
+  "@studyStartNewWithCountAction": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "studySessionTitle": "Study session",
   "studyCancelAction": "Cancel",
   "studyFinalizeAction": "Finalize",

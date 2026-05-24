@@ -4,6 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/study/study_settings_policy.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../../domain/enums/study_enums.dart';
@@ -13,12 +14,14 @@ import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
-import '../../../shared/widgets/mx_error_state.dart';
-import '../../../shared/widgets/mx_loading_state.dart';
-import '../../../shared/widgets/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_button_size.dart';
 import '../../../shared/widgets/mx_card.dart';
+import '../../../shared/widgets/mx_divider.dart';
+import '../../../shared/widgets/mx_error_state.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
+import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
 import '../../../shared/widgets/mx_text.dart';
@@ -85,64 +88,35 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
               studyEntryStateProvider(widget.entryType, widget.entryRefId),
             ),
           ),
-          dataBuilder: (context, state) => ListView(
-            children: [
-              MxText(l10n.studyEntryHeading, role: MxTextRole.pageTitle),
-              if (context.showsSupportingCopy) ...[
-                const MxGap(MxSpace.sm),
-                MxText(l10n.studyEntrySubtitle, role: MxTextRole.contentBody),
-              ],
-              const MxGap(MxSpace.xl),
-              if (state.resumeCandidate != null) ...[
-                _ResumeCard(candidate: state.resumeCandidate!),
-                const MxGap(MxSpace.xl),
-              ],
-              _FlowCard(
-                state: state,
-                selectedType: _effectiveType(state),
-                onTypeChanged: (type) {
-                  setState(() {
-                    _selectedType = type;
-                    _batchSize = null;
-                    _shuffleFlashcards = null;
-                    _shuffleAnswers = null;
-                    _prioritizeOverdue = null;
-                  });
-                },
-              ),
-              const MxGap(MxSpace.xl),
-              _SettingsCard(
-                settings: _effectiveSettings(state),
-                minBatchSize: _minBatchSize(_effectiveType(state)),
-                maxBatchSize: _maxBatchSize(_effectiveType(state)),
-                onBatchSizeChanged: (value) => setState(() {
-                  _batchSize = value;
-                }),
-                onShuffleFlashcardsChanged: (value) => setState(() {
-                  _shuffleFlashcards = value;
-                }),
-                onShuffleAnswersChanged: (value) => setState(() {
-                  _shuffleAnswers = value;
-                }),
-                onPrioritizeOverdueChanged: (value) => setState(() {
-                  _prioritizeOverdue = value;
-                }),
-              ),
-              const MxGap(MxSpace.xl),
-              MxPrimaryButton(
-                label: state.resumeCandidate == null
-                    ? l10n.studyStartAction
-                    : l10n.studyStartNewSessionAction,
-                leadingIcon: Icons.play_arrow_rounded,
-                isLoading: actionState.isLoading,
-                fullWidth: true,
-                onPressed: () => _start(state),
-              ),
-            ],
+          dataBuilder: (context, state) => _StudyEntryBody(
+            state: state,
+            effectiveType: _effectiveType(state),
+            effectiveSettings: _effectiveSettings(state),
+            isStartLoading: actionState.isLoading,
+            onTypeChanged: _handleTypeChanged,
+            onBatchSizeChanged: (value) =>
+                setState(() => _batchSize = value),
+            onShuffleFlashcardsChanged: (value) =>
+                setState(() => _shuffleFlashcards = value),
+            onShuffleAnswersChanged: (value) =>
+                setState(() => _shuffleAnswers = value),
+            onPrioritizeOverdueChanged: (value) =>
+                setState(() => _prioritizeOverdue = value),
+            onStart: () => _start(state),
           ),
         ),
       ),
     );
+  }
+
+  void _handleTypeChanged(StudyType type) {
+    setState(() {
+      _selectedType = type;
+      _batchSize = null;
+      _shuffleFlashcards = null;
+      _shuffleAnswers = null;
+      _prioritizeOverdue = null;
+    });
   }
 
   StudyType _effectiveType(StudyEntryState state) {
@@ -233,6 +207,92 @@ int _maxBatchSize(StudyType studyType) {
   return StudySettingsPolicy.maxBatchSize(studyType);
 }
 
+class _StudyEntryBody extends StatelessWidget {
+  const _StudyEntryBody({
+    required this.state,
+    required this.effectiveType,
+    required this.effectiveSettings,
+    required this.isStartLoading,
+    required this.onTypeChanged,
+    required this.onBatchSizeChanged,
+    required this.onShuffleFlashcardsChanged,
+    required this.onShuffleAnswersChanged,
+    required this.onPrioritizeOverdueChanged,
+    required this.onStart,
+  });
+
+  final StudyEntryState state;
+  final StudyType effectiveType;
+  final StudySettingsSnapshot effectiveSettings;
+  final bool isStartLoading;
+  final ValueChanged<StudyType> onTypeChanged;
+  final ValueChanged<int> onBatchSizeChanged;
+  final ValueChanged<bool> onShuffleFlashcardsChanged;
+  final ValueChanged<bool> onShuffleAnswersChanged;
+  final ValueChanged<bool> onPrioritizeOverdueChanged;
+  final VoidCallback onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final hasResume = state.resumeCandidate != null;
+    final ctaLabel = hasResume
+        ? l10n.studyStartNewWithCountAction(effectiveSettings.batchSize)
+        : l10n.studyStartWithCountAction(effectiveSettings.batchSize);
+    return ListView(
+      children: [
+        if (hasResume) ...[
+          _ResumeCard(candidate: state.resumeCandidate!),
+          const MxGap(MxSpace.xl),
+        ],
+        _SectionOverline(label: l10n.studyFlowTitle),
+        const MxGap(MxSpace.sm),
+        _FlowSection(
+          state: state,
+          selectedType: effectiveType,
+          onTypeChanged: onTypeChanged,
+        ),
+        const MxGap(MxSpace.xl),
+        _SectionOverline(label: l10n.studySettingsTitle),
+        const MxGap(MxSpace.sm),
+        _SettingsCard(
+          settings: effectiveSettings,
+          minBatchSize: _minBatchSize(effectiveType),
+          maxBatchSize: _maxBatchSize(effectiveType),
+          onBatchSizeChanged: onBatchSizeChanged,
+          onShuffleFlashcardsChanged: onShuffleFlashcardsChanged,
+          onShuffleAnswersChanged: onShuffleAnswersChanged,
+          onPrioritizeOverdueChanged: onPrioritizeOverdueChanged,
+        ),
+        const MxGap(MxSpace.xxl),
+        MxPrimaryButton(
+          label: ctaLabel,
+          leadingIcon: Icons.play_arrow_rounded,
+          size: MxButtonSize.compact,
+          shape: MxPrimaryButtonShape.pill,
+          isLoading: isStartLoading,
+          fullWidth: true,
+          onPressed: onStart,
+        ),
+      ],
+    );
+  }
+}
+
+class _SectionOverline extends StatelessWidget {
+  const _SectionOverline({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return MxText(
+      StringUtils.uppercased(label),
+      role: MxTextRole.overline,
+    );
+  }
+}
+
 class _ResumeCard extends StatelessWidget {
   const _ResumeCard({required this.candidate});
 
@@ -242,21 +302,25 @@ class _ResumeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return MxCard(
-      variant: MxCardVariant.outlined,
+      accent: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           MxText(l10n.studyResumeTitle, role: MxTextRole.sectionTitle),
-          const MxGap(MxSpace.sm),
+          const MxGap(MxSpace.xs),
           MxText(
             studyProgressLabel(l10n, candidate),
             role: MxTextRole.contentBody,
           ),
           const MxGap(MxSpace.md),
-          MxSecondaryButton(
-            label: l10n.studyContinueSessionAction,
-            leadingIcon: Icons.history_rounded,
-            onPressed: () => context.goStudySession(candidate.session.id),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: MxSecondaryButton(
+              label: l10n.studyContinueSessionAction,
+              leadingIcon: Icons.history_rounded,
+              size: MxButtonSize.compact,
+              onPressed: () => context.goStudySession(candidate.session.id),
+            ),
           ),
         ],
       ),
@@ -264,8 +328,8 @@ class _ResumeCard extends StatelessWidget {
   }
 }
 
-class _FlowCard extends StatelessWidget {
-  const _FlowCard({
+class _FlowSection extends StatelessWidget {
+  const _FlowSection({
     required this.state,
     required this.selectedType,
     required this.onTypeChanged,
@@ -279,35 +343,31 @@ class _FlowCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isToday = state.entryType == StudyEntryType.today;
-    return MxCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          MxText(l10n.studyFlowTitle, role: MxTextRole.sectionTitle),
-          const MxGap(MxSpace.md),
-          MxSegmentedControl<StudyType>(
-            segments: [
-              if (!isToday)
-                MxSegment(
-                  value: StudyType.newStudy,
-                  label: l10n.studyTypeNew,
-                  icon: Icons.auto_stories_outlined,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        MxSegmentedControl<StudyType>(
+          segments: [
+            if (!isToday)
               MxSegment(
-                value: StudyType.srsReview,
-                label: l10n.studyTypeReview,
-                icon: Icons.event_available_outlined,
+                value: StudyType.newStudy,
+                label: l10n.studyTypeNew,
+                icon: Icons.auto_stories_outlined,
               ),
-            ],
-            selected: {selectedType},
-            onChanged: (selection) => onTypeChanged(selection.first),
-          ),
-          if (isToday) ...[
-            const MxGap(MxSpace.sm),
-            MxText(l10n.studyTodayReviewOnly, role: MxTextRole.contentBody),
+            MxSegment(
+              value: StudyType.srsReview,
+              label: l10n.studyTypeReview,
+              icon: Icons.event_available_outlined,
+            ),
           ],
+          selected: {selectedType},
+          onChanged: (selection) => onTypeChanged(selection.first),
+        ),
+        if (isToday) ...[
+          const MxGap(MxSpace.sm),
+          MxText(l10n.studyTodayReviewOnly, role: MxTextRole.formHelper),
         ],
-      ),
+      ],
     );
   }
 }
@@ -335,57 +395,136 @@ class _SettingsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return MxCard(
+      variant: MxCardVariant.outlined,
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MxText(l10n.studySettingsTitle, role: MxTextRole.sectionTitle),
-          const MxGap(MxSpace.md),
-          Row(
-            children: [
-              Expanded(
-                child: MxText(
-                  l10n.studyBatchSizeLabel(settings.batchSize),
-                  role: MxTextRole.contentBody,
-                ),
-              ),
-              MxIconButton(
-                tooltip: l10n.studyDecreaseBatch,
-                onPressed: settings.batchSize <= minBatchSize
-                    ? null
-                    : () => onBatchSizeChanged(settings.batchSize - 1),
-                icon: Icons.remove_rounded,
-              ),
-              MxIconButton(
-                tooltip: l10n.studyIncreaseBatch,
-                onPressed: settings.batchSize >= maxBatchSize
-                    ? null
-                    : () => onBatchSizeChanged(settings.batchSize + 1),
-                icon: Icons.add_rounded,
-              ),
-            ],
+          _BatchSizeRow(
+            value: settings.batchSize,
+            minValue: minBatchSize,
+            maxValue: maxBatchSize,
+            label: l10n.studyBatchSizeShortLabel,
+            rangeHelper: l10n.studyBatchSizeRangeLabel(
+              minBatchSize,
+              maxBatchSize,
+            ),
+            onChanged: onBatchSizeChanged,
           ),
-          MxText(
-            l10n.studyBatchSizeRangeLabel(minBatchSize, maxBatchSize),
-            role: MxTextRole.formHelper,
-          ),
-          const MxGap(MxSpace.sm),
+          const MxDivider(),
           MxToggle(
+            label: l10n.studyShuffleCards,
             value: settings.shuffleFlashcards,
             onChanged: onShuffleFlashcardsChanged,
-            label: l10n.studyShuffleCards,
           ),
+          const MxDivider(),
           MxToggle(
+            label: l10n.studyShuffleAnswers,
             value: settings.shuffleAnswers,
             onChanged: onShuffleAnswersChanged,
-            label: l10n.studyShuffleAnswers,
           ),
+          const MxDivider(),
           MxToggle(
+            label: l10n.studyPrioritizeOverdue,
             value: settings.prioritizeOverdue,
             onChanged: onPrioritizeOverdueChanged,
-            label: l10n.studyPrioritizeOverdue,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _BatchSizeRow extends StatelessWidget {
+  const _BatchSizeRow({
+    required this.value,
+    required this.minValue,
+    required this.maxValue,
+    required this.label,
+    required this.rangeHelper,
+    required this.onChanged,
+  });
+
+  final int value;
+  final int minValue;
+  final int maxValue;
+  final String label;
+  final String rangeHelper;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MxSpace.lg,
+        vertical: MxSpace.md,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                MxText(label, role: MxTextRole.listTitle),
+                const MxGap(MxSpace.xxs),
+                MxText(rangeHelper, role: MxTextRole.formHelper),
+              ],
+            ),
+          ),
+          const MxGap(MxSpace.md),
+          _Stepper(
+            value: value,
+            onDecrement: value <= minValue ? null : () => onChanged(value - 1),
+            onIncrement: value >= maxValue ? null : () => onChanged(value + 1),
+            decrementTooltip: l10n.studyDecreaseBatch,
+            incrementTooltip: l10n.studyIncreaseBatch,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Stepper extends StatelessWidget {
+  const _Stepper({
+    required this.value,
+    required this.onDecrement,
+    required this.onIncrement,
+    required this.decrementTooltip,
+    required this.incrementTooltip,
+  });
+
+  final int value;
+  final VoidCallback? onDecrement;
+  final VoidCallback? onIncrement;
+  final String decrementTooltip;
+  final String incrementTooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final valueLabel = value.toString();
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        MxIconButton.compact(
+          tooltip: decrementTooltip,
+          icon: Icons.remove_rounded,
+          onPressed: onDecrement,
+        ),
+        SizedBox(
+          width: MxSpace.xxl + MxSpace.md,
+          child: Center(
+            child: MxText(valueLabel, role: MxTextRole.tileTitle),
+          ),
+        ),
+        MxIconButton.compact(
+          tooltip: incrementTooltip,
+          icon: Icons.add_rounded,
+          onPressed: onIncrement,
+        ),
+      ],
     );
   }
 }

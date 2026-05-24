@@ -102,15 +102,19 @@ extension AppNavigation on BuildContext {
     goNamed(RouteNames.studyToday);
   }
 
+  void pushStudyToday() {
+    pushNamed(RouteNames.studyToday);
+  }
+
   void goStudySession(String sessionId) {
-    goNamed(
+    pushNamed(
       RouteNames.studySession,
       pathParameters: {RoutePaths.studySessionIdParam: sessionId},
     );
   }
 
   void goStudyResult(String sessionId) {
-    goNamed(
+    replaceNamed(
       RouteNames.studyResult,
       pathParameters: {RoutePaths.studySessionIdParam: sessionId},
     );

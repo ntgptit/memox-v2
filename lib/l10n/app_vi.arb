@@ -747,6 +747,19 @@
   "studyShuffleCards": "Trộn flashcard",
   "studyShuffleAnswers": "Trộn đáp án",
   "studyPrioritizeOverdue": "Ưu tiên thẻ quá hạn",
+  "studyBatchSizeShortLabel": "Số thẻ mỗi phiên",
+  "studyStartWithCountAction": "Bắt đầu · {count} thẻ",
+  "@studyStartWithCountAction": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "studyStartNewWithCountAction": "Tạo phiên mới · {count} thẻ",
+  "@studyStartNewWithCountAction": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "studySessionTitle": "Phiên học",
   "studyCancelAction": "Hủy",
   "studyFinalizeAction": "Finalize",

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/responsive/app_breakpoints.dart';
 import '../../../core/theme/responsive/app_layout.dart';
+import '../widgets/mx_bottom_nav.dart';
 import '../widgets/mx_icon_button.dart';
 import 'mx_content_shell.dart';
 
@@ -18,8 +19,8 @@ class MxAdaptiveDestination {
     required this.label,
   });
 
-  final Widget icon;
-  final Widget selectedIcon;
+  final IconData icon;
+  final IconData selectedIcon;
   final String label;
 }
 
@@ -84,13 +85,12 @@ class MxAdaptiveScaffold extends StatelessWidget {
         body: SafeArea(child: wrappedBody),
         floatingActionButton: floatingActionButton,
         floatingActionButtonLocation: floatingActionButtonLocation,
-        bottomNavigationBar: NavigationBar(
-          height: AppLayout.navigationBarHeight(context),
+        bottomNavigationBar: MxBottomNav(
           selectedIndex: selectedIndex,
           onDestinationSelected: onDestinationSelected,
           destinations: [
             for (final d in destinations)
-              NavigationDestination(
+              MxBottomNavDestination(
                 icon: d.icon,
                 selectedIcon: d.selectedIcon,
                 label: d.label,
@@ -112,8 +112,8 @@ class MxAdaptiveScaffold extends StatelessWidget {
                 destinations: [
                   for (final d in destinations)
                     NavigationRailDestination(
-                      icon: d.icon,
-                      selectedIcon: d.selectedIcon,
+                      icon: Icon(d.icon),
+                      selectedIcon: Icon(d.selectedIcon),
                       label: Text(d.label),
                     ),
                 ],
@@ -141,8 +141,8 @@ class MxAdaptiveScaffold extends StatelessWidget {
                   destinations: [
                     for (final d in destinations)
                       NavigationRailDestination(
-                        icon: d.icon,
-                        selectedIcon: d.selectedIcon,
+                        icon: Icon(d.icon),
+                        selectedIcon: Icon(d.selectedIcon),
                         label: Text(d.label),
                       ),
                   ],

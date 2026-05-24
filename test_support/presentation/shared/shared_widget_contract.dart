@@ -3454,23 +3454,23 @@ void registerSharedWidgetContractTests() {
             ),
             destinations: const [
               MxAdaptiveDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
+                icon: Icons.home_outlined,
+                selectedIcon: Icons.home,
                 label: 'Home',
               ),
               MxAdaptiveDestination(
-                icon: Icon(Icons.folder_outlined),
-                selectedIcon: Icon(Icons.folder),
+                icon: Icons.folder_outlined,
+                selectedIcon: Icons.folder,
                 label: 'Library',
               ),
               MxAdaptiveDestination(
-                icon: Icon(Icons.show_chart_outlined),
-                selectedIcon: Icon(Icons.show_chart),
+                icon: Icons.show_chart_outlined,
+                selectedIcon: Icons.show_chart,
                 label: 'Progress',
               ),
               MxAdaptiveDestination(
-                icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings),
+                icon: Icons.settings_outlined,
+                selectedIcon: Icons.settings,
                 label: 'Settings',
               ),
             ],
@@ -4976,13 +4976,13 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       key: key,
       destinations: const [
         MxAdaptiveDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home),
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
           label: 'Home',
         ),
         MxAdaptiveDestination(
-          icon: Icon(Icons.style_outlined),
-          selectedIcon: Icon(Icons.style),
+          icon: Icons.style_outlined,
+          selectedIcon: Icons.style,
           label: 'Decks',
         ),
       ],
@@ -5000,13 +5000,13 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       ),
       destinations: const [
         MxAdaptiveDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home),
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
           label: 'Home',
         ),
         MxAdaptiveDestination(
-          icon: Icon(Icons.person_outline),
-          selectedIcon: Icon(Icons.person),
+          icon: Icons.person_outline,
+          selectedIcon: Icons.person,
           label: 'Profile',
         ),
       ],

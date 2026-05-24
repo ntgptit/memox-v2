@@ -32,23 +32,23 @@ class AppShell extends StatelessWidget {
     return MxAdaptiveScaffold(
       destinations: [
         MxAdaptiveDestination(
-          icon: const Icon(Icons.home_outlined),
-          selectedIcon: const Icon(Icons.home),
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
           label: l10n.homeTitle,
         ),
         MxAdaptiveDestination(
-          icon: const Icon(Icons.folder_outlined),
-          selectedIcon: const Icon(Icons.folder),
+          icon: Icons.folder_outlined,
+          selectedIcon: Icons.folder,
           label: l10n.libraryTitle,
         ),
         MxAdaptiveDestination(
-          icon: const Icon(Icons.show_chart_outlined),
-          selectedIcon: const Icon(Icons.show_chart),
+          icon: Icons.show_chart_outlined,
+          selectedIcon: Icons.show_chart,
           label: l10n.progressTitle,
         ),
         MxAdaptiveDestination(
-          icon: const Icon(Icons.settings_outlined),
-          selectedIcon: const Icon(Icons.settings),
+          icon: Icons.settings_outlined,
+          selectedIcon: Icons.settings,
           label: l10n.settingsTitle,
         ),
       ],

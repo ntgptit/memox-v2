@@ -2562,6 +2562,24 @@ abstract class AppLocalizations {
   /// **'Prioritize overdue cards'**
   String get studyPrioritizeOverdue;
 
+  /// No description provided for @studyBatchSizeShortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch size'**
+  String get studyBatchSizeShortLabel;
+
+  /// No description provided for @studyStartWithCountAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start · {count} cards'**
+  String studyStartWithCountAction(int count);
+
+  /// No description provided for @studyStartNewWithCountAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start new · {count} cards'**
+  String studyStartNewWithCountAction(int count);
+
   /// No description provided for @studySessionTitle.
   ///
   /// In en, this message translates to:

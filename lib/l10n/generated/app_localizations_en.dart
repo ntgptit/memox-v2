@@ -1564,6 +1564,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyPrioritizeOverdue => 'Prioritize overdue cards';
 
   @override
+  String get studyBatchSizeShortLabel => 'Batch size';
+
+  @override
+  String studyStartWithCountAction(int count) {
+    return 'Start · $count cards';
+  }
+
+  @override
+  String studyStartNewWithCountAction(int count) {
+    return 'Start new · $count cards';
+  }
+
+  @override
   String get studySessionTitle => 'Study session';
 
   @override

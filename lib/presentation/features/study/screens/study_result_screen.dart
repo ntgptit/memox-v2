@@ -221,7 +221,7 @@ class _ResultActions extends StatelessWidget {
         MxPrimaryButton(
           label: l10n.studyResultReviewMoreAction,
           leadingIcon: Icons.school_rounded,
-          onPressed: context.goStudyToday,
+          onPressed: context.pushStudyToday,
         ),
         if (canStudyEntry) ...[
           const MxGap(MxSpace.sm),
@@ -238,7 +238,7 @@ class _ResultActions extends StatelessWidget {
         MxSecondaryButton(
           label: l10n.commonBack,
           leadingIcon: Icons.arrow_back_rounded,
-          onPressed: context.goLibrary,
+          onPressed: () => context.popRoute(fallback: context.goLibrary),
         ),
       ],
     );
