@@ -12,10 +12,11 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_badge.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
+import '../../../shared/widgets/mx_icon_tile.dart';
 import '../../../shared/widgets/mx_inline_toggle.dart';
-import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/study_settings_defaults_viewmodel.dart';
 import 'settings_group.dart';
@@ -78,6 +79,8 @@ class _StudySettingsContent extends ConsumerWidget {
       title: l10n.settingsLearningExperienceTitle,
       child: Column(
         children: [
+          _StudyDefaultsSummary(state: state),
+          const MxDivider(),
           _StudySettingRow(
             key: _newStudyBatchRowKey,
             icon: Icons.edit_calendar_outlined,
@@ -163,29 +166,79 @@ class _StudySettingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    return SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
+  }
+}
 
-    return MxListTile(
-      leading: Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
-      title: title,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
+class _StudyDefaultsSummary extends StatelessWidget {
+  const _StudyDefaultsSummary({required this.state});
+
+  final StudyDefaultsSettingsState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        MxSpace.lg,
+        MxSpace.sm,
+        MxSpace.lg,
+        MxSpace.lg,
+      ),
+      child: Row(
         children: [
-          MxText(
-            value,
-            role: MxTextRole.tileMeta,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          Expanded(
+            child: _StudyMetric(
+              icon: Icons.edit_calendar_outlined,
+              label: l10n.settingsNewStudyBatchSizeLabel,
+              value: l10n.settingsCardsCountValue(
+                state.newStudyDefaults.batchSize,
+              ),
+            ),
           ),
-          const MxGap(MxSpace.sm),
-          Icon(
-            Icons.chevron_right_rounded,
-            size: MxSpace.xxl,
-            color: scheme.onSurfaceVariant,
+          const MxGap(MxSpace.md),
+          Expanded(
+            child: _StudyMetric(
+              icon: Icons.history_rounded,
+              label: l10n.settingsReviewBatchSizeLabel,
+              value: l10n.settingsCardsCountValue(
+                state.reviewDefaults.batchSize,
+              ),
+            ),
           ),
         ],
       ),
-      onTap: onTap,
+    );
+  }
+}
+
+class _StudyMetric extends StatelessWidget {
+  const _StudyMetric({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxIconTile(icon: icon),
+        const MxGap(MxSpace.sm),
+        MxText(
+          label,
+          role: MxTextRole.tileMeta,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const MxGap(MxSpace.xs),
+        MxBadge(label: value, tone: MxBadgeTone.primary),
+      ],
     );
   }
 }
@@ -268,17 +321,23 @@ class _BatchSizeStepper extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        MxText(label, role: MxTextRole.formLabel),
+        const MxGap(MxSpace.md),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(child: MxText(label, role: MxTextRole.formLabel)),
-            MxText(value.toString(), role: MxTextRole.tileMeta),
-            const MxGap(MxSpace.sm),
             MxIconButton(
               key: decreaseKey,
               tooltip: l10n.studyDecreaseBatch,
               onPressed: value <= min ? null : () => onChanged(value - 1),
               icon: Icons.remove_rounded,
             ),
+            const MxGap(MxSpace.lg),
+            MxBadge(
+              label: l10n.settingsCardsCountValue(value),
+              tone: MxBadgeTone.primary,
+            ),
+            const MxGap(MxSpace.lg),
             MxIconButton(
               key: increaseKey,
               tooltip: l10n.studyIncreaseBatch,
@@ -287,6 +346,7 @@ class _BatchSizeStepper extends StatelessWidget {
             ),
           ],
         ),
+        const MxGap(MxSpace.sm),
         MxText(
           l10n.studyBatchSizeRangeLabel(min, max),
           role: MxTextRole.formHelper,

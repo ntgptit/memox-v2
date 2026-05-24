@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
@@ -46,31 +48,40 @@ class MxBottomNav extends StatelessWidget {
           MxSpace.sm,
           MxSpace.xs,
         ),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: scheme.surfaceContainer,
-            borderRadius: AppRadius.borderXl,
-            border: Border.all(
-              color: scheme.outlineVariant.withValues(
-                alpha: AppOpacity.ghostBorder,
-              ),
+        child: ClipRRect(
+          borderRadius: AppRadius.borderXl,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: _mxBottomNavBlurSigma,
+              sigmaY: _mxBottomNavBlurSigma,
             ),
-          ),
-          child: ClipRRect(
-            borderRadius: AppRadius.borderXl,
-            child: SizedBox(
-              height: _mxBottomNavBarHeight,
-              child: Row(
-                children: [
-                  for (var i = 0; i < destinations.length; i++)
-                    Expanded(
-                      child: _MxBottomNavItem(
-                        destination: destinations[i],
-                        isSelected: i == selectedIndex,
-                        onTap: () => onDestinationSelected(i),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: scheme.surface.withValues(
+                  alpha: AppOpacity.surfaceGlass,
+                ),
+                borderRadius: AppRadius.borderXl,
+                border: Border.all(
+                  color: scheme.outlineVariant.withValues(
+                    alpha: AppOpacity.ghostBorder,
+                  ),
+                ),
+              ),
+              child: SizedBox(
+                key: const ValueKey('mx-bottom-nav-bar'),
+                height: _mxBottomNavBarHeight,
+                child: Row(
+                  children: [
+                    for (var i = 0; i < destinations.length; i++)
+                      Expanded(
+                        child: _MxBottomNavItem(
+                          destination: destinations[i],
+                          isSelected: i == selectedIndex,
+                          onTap: () => onDestinationSelected(i),
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -96,6 +107,9 @@ class MxBottomNavDestination {
 
 // guard:raw-size-reviewed bar height matches Design System mock (64 dp)
 const double _mxBottomNavBarHeight = 64;
+
+// guard:raw-size-reviewed glass chrome blur mirrors the Design System preview.
+const double _mxBottomNavBlurSigma = 18;
 
 class _MxBottomNavItem extends StatelessWidget {
   const _MxBottomNavItem({
@@ -126,11 +140,7 @@ class _MxBottomNavItem extends StatelessWidget {
             color: foreground,
           ),
           const MxGap(MxSpace.xxs),
-          MxText(
-            destination.label,
-            role: MxTextRole.badge,
-            color: foreground,
-          ),
+          MxText(destination.label, role: MxTextRole.badge, color: foreground),
         ],
       ),
     );
@@ -152,7 +162,11 @@ class _MxBottomNavIconPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final pillColor = isActive
-        ? scheme.primary.withValues(alpha: AppOpacity.ghostBorder)
+        ? scheme.primary.withValues(
+            alpha: Theme.of(context).brightness == Brightness.dark
+                ? AppOpacity.navigationSelectedPillDark
+                : AppOpacity.navigationSelectedPillLight,
+          )
         : null;
     return AnimatedContainer(
       duration: MxDurations.stateChange,

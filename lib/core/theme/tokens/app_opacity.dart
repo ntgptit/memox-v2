@@ -20,6 +20,15 @@ abstract final class AppOpacity {
   /// MemoX ghost border opacity for quiet card outlines.
   static const double ghostBorder = 0.15;
 
+  /// Glass chrome opacity for app bars, bottom nav, and sticky chrome.
+  static const double surfaceGlass = 0.84;
+
+  /// Selected bottom-nav icon pill opacity on Tokyo Pure Light.
+  static const double navigationSelectedPillLight = 0.14;
+
+  /// Selected bottom-nav icon pill opacity on Tokyo Nebula.
+  static const double navigationSelectedPillDark = 0.20;
+
   /// Drag handle / scrim.
   static const double handle = 0.4;
 

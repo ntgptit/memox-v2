@@ -16,7 +16,6 @@ import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_divider.dart';
 import '../../../shared/widgets/mx_inline_toggle.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
-import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_select_field.dart';
 import '../../../shared/widgets/mx_segmented_control.dart';
 import '../../../shared/widgets/mx_slider.dart';
@@ -144,30 +143,7 @@ class _SpeechSettingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return MxListTile(
-      leading: Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
-      title: title,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          MxText(
-            value,
-            role: MxTextRole.tileMeta,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const MxGap(MxSpace.sm),
-          Icon(
-            Icons.chevron_right_rounded,
-            size: MxSpace.xxl,
-            color: scheme.onSurfaceVariant,
-          ),
-        ],
-      ),
-      onTap: onTap,
-    );
+    return SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
   }
 }
 

@@ -9,8 +9,10 @@ import '../../../../core/widgets/app_async_builder.dart';
 import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_badge.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
+import '../../../shared/widgets/mx_icon_tile.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/account_settings_viewmodel.dart';
@@ -193,11 +195,15 @@ class _LinkedAccountRow extends StatelessWidget {
                 ),
                 if (statusLabel.isNotEmpty) ...[
                   const MxGap(MxSpace.xs),
-                  MxText(
-                    statusLabel,
-                    role: MxTextRole.listSubtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  MxBadge(
+                    label: statusLabel,
+                    tone:
+                        statusLabel ==
+                            AppLocalizations.of(
+                              context,
+                            ).settingsAccountDriveReconnectRequired
+                        ? MxBadgeTone.warning
+                        : MxBadgeTone.success,
                   ),
                 ],
                 const MxGap(MxSpace.xs),
@@ -243,7 +249,12 @@ class _AccountStatusText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MxText(text, role: MxTextRole.formHelper);
+    return SettingsRow(
+      icon: Icons.account_circle_outlined,
+      title: text,
+      showChevron: false,
+      iconTone: MxIconTileTone.neutral,
+    );
   }
 }
 

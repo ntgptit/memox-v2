@@ -34,6 +34,7 @@ import 'package:memox/presentation/shared/widgets/mx_animated_switcher.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
 import 'package:memox/presentation/shared/widgets/mx_badge.dart';
+import 'package:memox/presentation/shared/widgets/mx_bottom_nav.dart';
 import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
@@ -3484,17 +3485,25 @@ void registerSharedWidgetContractTests() {
       await tester.pump();
 
       expect(tester.takeException(), isNull);
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(MxBottomNav), findsOneWidget);
 
-      final navigationBar = tester.widget<NavigationBar>(
-        find.byType(NavigationBar),
-      );
       final bodyBottom = tester.getBottomLeft(find.byKey(bodyKey)).dy;
-      final navTop = tester.getTopLeft(find.byType(NavigationBar)).dy;
-      final navContext = tester.element(find.byType(NavigationBar));
+      final navTop = tester.getTopLeft(find.byType(MxBottomNav)).dy;
+      final navBarHeight = tester
+          .getSize(find.byKey(const ValueKey('mx-bottom-nav-bar')))
+          .height;
 
-      expect(navigationBar.height, AppLayout.navigationBarHeight(navContext));
+      expect(navBarHeight, 64);
       expect(bodyBottom, lessThanOrEqualTo(navTop));
+      expect(
+        find.descendant(
+          of: find.byType(MxBottomNav),
+          matching: find.text('Home'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.byIcon(Icons.home), findsOneWidget);
+      expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
     },
   );
 
@@ -4967,6 +4976,54 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       primaryActionLabel: 'Retry',
       primaryAction: () {},
       onDismiss: () {},
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxBottomNav',
+    scrollableHost: false,
+    minimal: (key) => MxBottomNav(
+      key: key,
+      selectedIndex: 0,
+      onDestinationSelected: (_) {},
+      destinations: const [
+        MxBottomNavDestination(
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
+          label: 'Home',
+        ),
+        MxBottomNavDestination(
+          icon: Icons.folder_outlined,
+          selectedIcon: Icons.folder,
+          label: 'Library',
+        ),
+      ],
+    ),
+    full: (key) => MxBottomNav(
+      key: key,
+      selectedIndex: 1,
+      onDestinationSelected: (_) {},
+      destinations: const [
+        MxBottomNavDestination(
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
+          label: 'Home',
+        ),
+        MxBottomNavDestination(
+          icon: Icons.folder_outlined,
+          selectedIcon: Icons.folder,
+          label: 'Library',
+        ),
+        MxBottomNavDestination(
+          icon: Icons.show_chart_outlined,
+          selectedIcon: Icons.show_chart,
+          label: 'Progress',
+        ),
+        MxBottomNavDestination(
+          icon: Icons.settings_outlined,
+          selectedIcon: Icons.settings,
+          label: 'Settings',
+        ),
+      ],
     ),
   ),
   _SharedWidgetCase(

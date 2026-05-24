@@ -9,6 +9,7 @@ import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../../domain/services/tts_service.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_badge.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_text.dart';
@@ -84,7 +85,7 @@ class LearningSettingsOverviewGroup extends ConsumerWidget {
       dataBuilder: (_, state) => SettingsGroup(
         title: l10n.settingsLearningExperienceTitle,
         onTap: context.pushSettingsLearning,
-        child: _OverviewFocusContent(
+        child: SettingsRow(
           key: _learningOverviewRowKey,
           icon: Icons.edit_calendar_outlined,
           title: l10n.settingsStudyDefaultsTitle,
@@ -123,7 +124,7 @@ class AudioSpeechSettingsOverviewGroup extends ConsumerWidget {
       dataBuilder: (_, state) => SettingsGroup(
         title: l10n.settingsAudioSpeechTitle,
         onTap: context.pushSettingsAudioSpeech,
-        child: _OverviewFocusContent(
+        child: SettingsRow(
           key: _audioSpeechOverviewRowKey,
           icon: Icons.record_voice_over_outlined,
           title: l10n.settingsSpeechTextToSpeechLabel,
@@ -133,6 +134,10 @@ class AudioSpeechSettingsOverviewGroup extends ConsumerWidget {
                 : l10n.settingsAudioSpeechDisabled,
             _voiceSelectionValue(l10n, state),
           ),
+          value: state.autoPlay
+              ? l10n.settingsAudioSpeechEnabled
+              : l10n.settingsAudioSpeechDisabled,
+          valueTone: state.autoPlay ? MxBadgeTone.success : MxBadgeTone.neutral,
         ),
       ),
     );
@@ -158,7 +163,7 @@ class _AccountOverviewRow extends StatelessWidget {
       );
     }
 
-    return _OverviewFocusContent(
+    return SettingsRow(
       key: _accountOverviewRowKey,
       icon: Icons.account_circle_outlined,
       title: _accountStatusText(l10n, state),
@@ -182,11 +187,8 @@ class _LinkedAccountOverviewRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final displayName = link.displayName ?? link.email;
     final scheme = Theme.of(context).colorScheme;
-    final subtitle = context.showsSupportingCopy
-        ? l10n.settingsAccountOverviewSubtitle(statusLabel, link.email)
-        : (statusLabel == l10n.settingsAccountDriveReconnectRequired
-              ? statusLabel
-              : link.email);
+    final showStatusBadge =
+        statusLabel.isNotEmpty && context.showsSupportingCopy;
 
     return Row(
       key: _accountOverviewRowKey,
@@ -214,11 +216,21 @@ class _LinkedAccountOverviewRow extends StatelessWidget {
               ),
               const MxGap(MxSpace.xxs),
               MxText(
-                subtitle,
+                link.email,
                 role: MxTextRole.listSubtitle,
-                maxLines: context.showsSupportingCopy ? 2 : 1,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+              if (showStatusBadge) ...[
+                const MxGap(MxSpace.xs),
+                MxBadge(
+                  label: statusLabel,
+                  tone:
+                      statusLabel == l10n.settingsAccountDriveReconnectRequired
+                      ? MxBadgeTone.warning
+                      : MxBadgeTone.success,
+                ),
+              ],
             ],
           ),
         ),
@@ -243,70 +255,6 @@ class _LinkedAccountOverviewRow extends StatelessWidget {
       return parts.first.substring(0, 1);
     }
     return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}';
-  }
-}
-
-class _OverviewFocusContent extends StatelessWidget {
-  const _OverviewFocusContent({
-    required this.icon,
-    required this.title,
-    this.subtitle,
-    this.preserveSubtitleOnCompact = false,
-    super.key,
-  });
-
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final bool preserveSubtitleOnCompact;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final showSubtitle =
-        subtitle != null &&
-        (context.showsSupportingCopy || preserveSubtitleOnCompact);
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minHeight: MxSpace.xxl + MxSpace.xxl + MxSpace.lg,
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: scheme.onSurfaceVariant, size: MxSpace.xxl),
-          const MxGap(MxSpace.lg),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MxText(
-                  title,
-                  role: MxTextRole.listTitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (showSubtitle) ...[
-                  const MxGap(MxSpace.xxs),
-                  MxText(
-                    subtitle!,
-                    role: MxTextRole.listSubtitle,
-                    maxLines: context.showsSupportingCopy ? 2 : 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const MxGap(MxSpace.sm),
-          Icon(
-            Icons.chevron_right_rounded,
-            size: MxSpace.xxl,
-            color: scheme.onSurfaceVariant,
-          ),
-        ],
-      ),
-    );
   }
 }
 

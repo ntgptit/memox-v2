@@ -133,23 +133,36 @@ class _DriveSyncContent extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MxText(statusText, role: MxTextRole.formHelper),
-          if (state.lastSyncedAt case final lastSyncedAt?) ...[
+          SettingsRow(
+            icon: _statusIcon,
+            title: statusText,
+            subtitle: state.lastSyncedAt == null
+                ? messageText
+                : l10n.settingsDriveSyncLastSynced(
+                    _formattedSyncTime(context, state.lastSyncedAt!),
+                  ),
+            showChevron: false,
+            preserveSubtitleOnCompact: true,
+          ),
+          if (state.lastSyncedAt != null) ...[
             const MxGap(MxSpace.xs),
-            MxText(
-              l10n.settingsDriveSyncLastSynced(
-                _formattedSyncTime(context, lastSyncedAt),
-              ),
-              role: MxTextRole.formHelper,
-            ),
-          ],
-          if (messageText != null) ...[
-            const MxGap(MxSpace.xs),
-            MxText(messageText, role: MxTextRole.formHelper),
+            if (messageText != null)
+              MxText(messageText, role: MxTextRole.formHelper),
           ],
         ],
       ),
     );
+  }
+
+  IconData get _statusIcon {
+    return switch (state.kind) {
+      DriveSyncStatusKind.synced => Icons.cloud_done_outlined,
+      DriveSyncStatusKind.failure ||
+      DriveSyncStatusKind.unsupportedSchema ||
+      DriveSyncStatusKind.conflict => Icons.cloud_off_outlined,
+      DriveSyncStatusKind.needsDriveAuthorization => Icons.cloud_sync_outlined,
+      _ => Icons.cloud_queue_outlined,
+    };
   }
 
   Widget? _syncAction(AppLocalizations l10n, {required VoidCallback onSync}) {

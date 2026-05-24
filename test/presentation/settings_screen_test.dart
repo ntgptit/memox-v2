@@ -33,7 +33,9 @@ import 'package:memox/presentation/features/settings/viewmodels/study_settings_d
 import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_badge.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
@@ -132,7 +134,7 @@ void main() {
     },
   );
 
-  testWidgets('DT1 onDisplay: uses soft minimal tonal settings islands', (
+  testWidgets('DT1 onDisplay: uses tokenized settings status islands', (
     tester,
   ) async {
     await _pumpSettings(tester);
@@ -153,6 +155,13 @@ void main() {
     expect(
       _overviewCardForKey(tester, 'settings-overview-account-row').onTap,
       isNotNull,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey<String>('settings-overview-account-row')),
+        matching: find.byType(MxIconTile),
+      ),
+      findsOneWidget,
     );
     expect(
       tester
@@ -186,6 +195,24 @@ void main() {
           )
           .showOverlay,
       isFalse,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(
+          const ValueKey<String>('settings-personalization-theme-row'),
+        ),
+        matching: find.byType(MxIconTile),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(
+          const ValueKey<String>('settings-personalization-theme-row'),
+        ),
+        matching: find.byType(MxBadge),
+      ),
+      findsOneWidget,
     );
     expect(
       find.descendant(
@@ -241,6 +268,15 @@ void main() {
     expect(
       _overviewCardForKey(tester, 'settings-overview-audio-speech-row').onTap,
       isNotNull,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(
+          const ValueKey<String>('settings-overview-audio-speech-row'),
+        ),
+        matching: find.byType(MxIconTile),
+      ),
+      findsOneWidget,
     );
   });
 
@@ -557,6 +593,15 @@ void main() {
     expect(find.text('Audio & Speech'), findsOneWidget);
     expect(find.text('Text-to-Speech'), findsOneWidget);
     expect(find.text('Off · System voice'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(
+          const ValueKey<String>('settings-overview-audio-speech-row'),
+        ),
+        matching: find.byType(MxBadge),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Voice selection'), findsNothing);
     expect(find.text('Front language'), findsNothing);
     expect(find.text('Back language'), findsNothing);
@@ -873,6 +918,8 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
       await tester.pumpAndSettle();
+      expect(find.byType(MxIconTile), findsWidgets);
+      expect(find.byType(MxBadge), findsWidgets);
       await tester.tap(
         find.byKey(const ValueKey<String>('settings-study-new-batch-row')),
       );

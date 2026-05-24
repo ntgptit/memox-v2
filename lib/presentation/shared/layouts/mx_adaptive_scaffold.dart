@@ -8,7 +8,7 @@ import 'mx_content_shell.dart';
 
 /// Destination descriptor used by [MxAdaptiveScaffold] to render the right
 /// navigation surface at each [WindowSize]:
-/// - compact: [NavigationBar]
+/// - compact: [MxBottomNav]
 /// - medium / expanded: [NavigationRail]
 /// - large / extraLarge: extended rail (drawer-style)
 @immutable
