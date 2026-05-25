@@ -911,8 +911,10 @@ void main() {
       expect(find.text('Front voice'), findsOneWidget);
       await tester.tap(find.byType(DropdownButtonFormField<String>).last);
       await tester.pumpAndSettle();
-      expect(find.text('korean system voice · Male'), findsOneWidget);
-      await tester.tap(find.text('korean system voice · Male'));
+      expect(find.text('Korean voice 1 · Device · Male'), findsOneWidget);
+      expect(find.text('Korean voice 1 · Online'), findsOneWidget);
+      expect(find.text('ko-kr-x-ism-local'), findsNothing);
+      await tester.tap(find.text('Korean voice 1 · Device · Male'));
       await tester.pumpAndSettle();
       expect(find.text('Back voice'), findsNothing);
       expect(harness.tts.availableVoiceRequests, [TtsLanguage.korean]);
@@ -1743,9 +1745,13 @@ final class _FakeTtsService implements TtsService {
     availableVoiceRequests.add(language);
     return [
       TtsVoice(
-        name: '${language.name} system voice',
+        name: '${language.localeTag.toLowerCase()}-x-ism-local',
         language: language,
         gender: 'male',
+      ),
+      TtsVoice(
+        name: '${language.localeTag.toLowerCase()}-x-ism-network',
+        language: language,
       ),
     ];
   }

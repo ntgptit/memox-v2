@@ -889,6 +889,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSpeechSystemVoice => 'System voice';
 
   @override
+  String settingsSpeechKoreanVoiceLabel(Object index) {
+    return 'Korean voice $index';
+  }
+
+  @override
+  String settingsSpeechEnglishVoiceLabel(Object index) {
+    return 'English voice $index';
+  }
+
+  @override
+  String get settingsSpeechVoiceDeviceSource => 'Device';
+
+  @override
+  String get settingsSpeechVoiceOnlineSource => 'Online';
+
+  @override
   String get settingsSpeechVoiceMale => 'Male';
 
   @override

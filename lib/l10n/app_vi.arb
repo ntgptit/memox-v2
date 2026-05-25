@@ -448,6 +448,20 @@
   },
   "settingsSpeechFrontVoiceLabel": "Giọng mặt trước",
   "settingsSpeechSystemVoice": "Giọng hệ thống",
+  "settingsSpeechKoreanVoiceLabel": "Giọng tiếng Hàn {index}",
+  "@settingsSpeechKoreanVoiceLabel": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "settingsSpeechEnglishVoiceLabel": "Giọng tiếng Anh {index}",
+  "@settingsSpeechEnglishVoiceLabel": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "settingsSpeechVoiceDeviceSource": "Thiết bị",
+  "settingsSpeechVoiceOnlineSource": "Trực tuyến",
   "settingsSpeechVoiceMale": "Nam",
   "settingsSpeechVoiceFemale": "Nữ",
   "settingsSpeechLoadingVoices": "Đang tải danh sách giọng...",

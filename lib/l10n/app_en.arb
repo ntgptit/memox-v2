@@ -448,6 +448,20 @@
   },
   "settingsSpeechFrontVoiceLabel": "Front voice",
   "settingsSpeechSystemVoice": "System voice",
+  "settingsSpeechKoreanVoiceLabel": "Korean voice {index}",
+  "@settingsSpeechKoreanVoiceLabel": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "settingsSpeechEnglishVoiceLabel": "English voice {index}",
+  "@settingsSpeechEnglishVoiceLabel": {
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "settingsSpeechVoiceDeviceSource": "Device",
+  "settingsSpeechVoiceOnlineSource": "Online",
   "settingsSpeechVoiceMale": "Male",
   "settingsSpeechVoiceFemale": "Female",
   "settingsSpeechLoadingVoices": "Loading voices...",

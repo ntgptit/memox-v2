@@ -1404,6 +1404,30 @@ abstract class AppLocalizations {
   /// **'System voice'**
   String get settingsSpeechSystemVoice;
 
+  /// No description provided for @settingsSpeechKoreanVoiceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Korean voice {index}'**
+  String settingsSpeechKoreanVoiceLabel(Object index);
+
+  /// No description provided for @settingsSpeechEnglishVoiceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'English voice {index}'**
+  String settingsSpeechEnglishVoiceLabel(Object index);
+
+  /// No description provided for @settingsSpeechVoiceDeviceSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Device'**
+  String get settingsSpeechVoiceDeviceSource;
+
+  /// No description provided for @settingsSpeechVoiceOnlineSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get settingsSpeechVoiceOnlineSource;
+
   /// No description provided for @settingsSpeechVoiceMale.
   ///
   /// In en, this message translates to:

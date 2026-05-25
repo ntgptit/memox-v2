@@ -25,6 +25,7 @@ import '../../tts/providers/tts_controller_notifier.dart';
 import '../../tts/providers/tts_settings_notifier.dart';
 import 'settings_group.dart';
 import 'speech_audio_sliders.dart';
+import 'speech_voice_labeler.dart';
 
 const _speechPreviewButtonKey = ValueKey<String>(
   'settings-speech-preview-button',
@@ -494,6 +495,7 @@ class _VoiceSelect extends StatelessWidget {
       voices: voices,
       voiceItems: voiceItems,
     );
+    final voiceLabeler = SpeechVoiceLabeler(voiceItems);
     return MxSelectField<String>(
       label: label,
       value: selectedValue,
@@ -506,20 +508,13 @@ class _VoiceSelect extends StatelessWidget {
         for (final voice in voiceItems)
           MxSelectOption<String>(
             value: voice.name,
-            label: _voiceLabel(l10n, voice),
+            label: voiceLabeler.labelFor(l10n, voice),
           ),
       ],
       onChanged: onChanged,
     );
   }
 }
-
-String _voiceLabel(AppLocalizations l10n, TtsVoice voice) =>
-    switch (voice.gender) {
-      'male' => '${voice.name} · ${l10n.settingsSpeechVoiceMale}',
-      'female' => '${voice.name} · ${l10n.settingsSpeechVoiceFemale}',
-      _ => voice.name,
-    };
 
 String? _voiceSelectHelperText({
   required AppLocalizations l10n,
