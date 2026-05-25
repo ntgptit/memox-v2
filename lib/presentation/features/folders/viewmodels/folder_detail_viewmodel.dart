@@ -6,7 +6,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../app/di/content/content_revision_providers.dart';
 import '../../../../app/di/content/deck_providers.dart';
 import '../../../../app/di/content/folder_providers.dart';
-import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
@@ -14,6 +13,7 @@ import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
+import '../../../shared/viewmodels/mx_action_errors.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'folder_detail_viewmodel.g.dart';
@@ -264,15 +264,8 @@ FolderDetailMode _toDetailMode(FolderContentMode mode) => switch (mode) {
   FolderContentMode.decks => FolderDetailMode.decks,
 };
 
-AppFailure? folderActionError(AsyncValue<void> actionState) => actionState
-    .whenOrNull(error: (error, _) => error is AppFailure ? error : null);
+AppFailure? folderActionError(AsyncValue<void> actionState) =>
+    MxActionErrors.failureOf(actionState);
 
-String folderActionErrorMessage(AppFailure? failure) {
-  if (failure == null) {
-    return '';
-  }
-  if (failure.cause case final ValidationException cause) {
-    return cause.message;
-  }
-  return failure.message;
-}
+String folderActionErrorMessage(AppFailure? failure) =>
+    MxActionErrors.messageOf(failure);

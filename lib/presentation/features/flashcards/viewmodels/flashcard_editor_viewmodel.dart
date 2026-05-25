@@ -5,12 +5,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/di/content/deck_providers.dart';
 import '../../../../app/di/content/flashcard_providers.dart';
-import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/flashcard_starting_status.dart';
 import '../../../../domain/value_objects/content_actions.dart';
+import '../../../shared/viewmodels/mx_action_errors.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
+import '../../../shared/viewmodels/mx_async_draft.dart';
 
 part 'flashcard_editor_viewmodel.g.dart';
 
@@ -298,7 +299,7 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
   }
 
   void clearForNext() {
-    final current = _currentDraft(state);
+    final current = state.currentValue;
     if (current == null) {
       return;
     }
@@ -325,11 +326,7 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
 
   void _patch(
     FlashcardEditorDraftState Function(FlashcardEditorDraftState draft) update,
-  ) {
-    final current = _currentDraft(state);
-    if (current == null) return;
-    state = AsyncData(update(current));
-  }
+  ) => state = mxPatchDraft(state, update);
 }
 
 @riverpod
@@ -346,9 +343,9 @@ class FlashcardEditorController extends _$FlashcardEditorController {
       return false;
     }
 
-    final draftState = _currentDraft(
-      ref.read(flashcardEditorDraftProvider(args)),
-    );
+    final draftState = ref
+        .read(flashcardEditorDraftProvider(args))
+        .currentValue;
     if (draftState == null) {
       return false;
     }
@@ -385,22 +382,8 @@ class FlashcardEditorController extends _$FlashcardEditorController {
   );
 }
 
-AppFailure? flashcardEditorError(AsyncValue<void> actionState) => actionState
-    .whenOrNull(error: (error, _) => error is AppFailure ? error : null);
+AppFailure? flashcardEditorError(AsyncValue<void> actionState) =>
+    MxActionErrors.failureOf(actionState);
 
-String flashcardEditorErrorMessage(AppFailure? failure) {
-  if (failure == null) {
-    return '';
-  }
-  if (failure.cause case final ValidationException cause) {
-    return cause.message;
-  }
-  return failure.message;
-}
-
-FlashcardEditorDraftState? _currentDraft(
-  AsyncValue<FlashcardEditorDraftState> state,
-) => switch (state) {
-  AsyncData(:final value) => value,
-  _ => null,
-};
+String flashcardEditorErrorMessage(AppFailure? failure) =>
+    MxActionErrors.messageOf(failure);

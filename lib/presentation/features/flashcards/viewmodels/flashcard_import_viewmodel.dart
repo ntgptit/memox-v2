@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/di/content/flashcard_providers.dart';
-import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../domain/value_objects/content_actions.dart';
+import '../../../shared/viewmodels/mx_action_errors.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'flashcard_import_viewmodel.g.dart';
@@ -260,15 +260,8 @@ class FlashcardImportController extends _$FlashcardImportController {
   );
 }
 
-AppFailure? flashcardImportError(AsyncValue<void> actionState) => actionState
-    .whenOrNull(error: (error, _) => error is AppFailure ? error : null);
+AppFailure? flashcardImportError(AsyncValue<void> actionState) =>
+    MxActionErrors.failureOf(actionState);
 
-String flashcardImportErrorMessage(AppFailure? failure) {
-  if (failure == null) {
-    return '';
-  }
-  if (failure.cause case final ValidationException cause) {
-    return cause.message;
-  }
-  return failure.message;
-}
+String flashcardImportErrorMessage(AppFailure? failure) =>
+    MxActionErrors.messageOf(failure);

@@ -5,14 +5,15 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/di/content/content_revision_providers.dart';
 import '../../../../app/di/content/flashcard_providers.dart';
-import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
+import '../../../shared/viewmodels/mx_action_errors.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
+import '../../../shared/viewmodels/mx_selection_ops.dart';
 
 part 'flashcard_list_viewmodel.g.dart';
 
@@ -174,25 +175,19 @@ Future<FlashcardListState> flashcardListQuery(Ref ref, String deckId) async {
 @riverpod
 class FlashcardSelection extends _$FlashcardSelection {
   @override
-  Set<String> build(String deckId) => <String>{};
+  Set<String> build(String deckId) => const <String>{};
 
-  void toggle(String flashcardId) {
-    if (state.contains(flashcardId)) {
-      state = {...state}..remove(flashcardId);
-      return;
-    }
-    state = {...state, flashcardId};
-  }
+  void toggle(String flashcardId) =>
+      state = MxSelectionOps.toggle(state, flashcardId);
 
-  void setAll(Iterable<String> flashcardIds) {
-    state = flashcardIds.toSet();
-  }
+  void setAll(Iterable<String> flashcardIds) =>
+      state = MxSelectionOps.setAll(flashcardIds);
 
   void clear() {
     if (state.isEmpty) {
       return;
     }
-    state = <String>{};
+    state = MxSelectionOps.clear<String>();
   }
 }
 
@@ -256,15 +251,8 @@ class FlashcardActionController extends _$FlashcardActionController {
   );
 }
 
-AppFailure? flashcardActionError(AsyncValue<void> actionState) => actionState
-    .whenOrNull(error: (error, _) => error is AppFailure ? error : null);
+AppFailure? flashcardActionError(AsyncValue<void> actionState) =>
+    MxActionErrors.failureOf(actionState);
 
-String flashcardActionErrorMessage(AppFailure? failure) {
-  if (failure == null) {
-    return '';
-  }
-  if (failure.cause case final ValidationException cause) {
-    return cause.message;
-  }
-  return failure.message;
-}
+String flashcardActionErrorMessage(AppFailure? failure) =>
+    MxActionErrors.messageOf(failure);

@@ -331,6 +331,25 @@ If you find yourself writing the same `context.responsive(...)` call on three sc
 - Widget `build()` must not trigger navigation directly, run multi-step async chains, do collection processing (sort/group/filter/fold across many lines), or accumulate try/catch blocks. Push that work into providers, notifiers, use cases, or presenters.
 - Widgets must not import DAO / Drift / repository implementation files or watch repository providers directly. Go through a domain-facing provider.
 - After `await` in UI code, guard `BuildContext` use with `if (!mounted) return;` (see UI async guard contract below).
+- **Do not create abstract base notifiers** (`extends ConsumerNotifier`, `extends AsyncNotifier<T>`). `@riverpod` codegen extends `_$Class` and inheritance breaks it. Compose via the shared helpers in `lib/presentation/shared/viewmodels/` instead.
+
+### Shared viewmodel helpers (`lib/presentation/shared/viewmodels/`)
+
+| Helper | When to use | Guard |
+| --- | --- | --- |
+| `MxAsyncActionRunner` | Mandatory for action controllers (`*ActionController extends _$...` with `FutureOr<void> build(...)`). Provides `run` / `runResult` / `runResultValue` with `ref.mounted` guard. | `memox.presentation_async_action_controllers_use_runner` |
+| `MxActionErrors.failureOf` / `MxActionErrors.messageOf` | Canonical extraction of `AppFailure` from action `AsyncValue<void>` and validation-aware mapping to a user-facing string. Feature-level `xxxError` / `xxxErrorMessage` should forward to these — do not re-implement the body. | `memox.action_error_extraction_via_helper`, `memox.action_error_message_via_helper` |
+| `MxSelectionOps.{toggle, setAll, clear, addAll, removeAll, isAllSelected}` | Pure operations for `Set<TId>` multi-selection notifiers. The notifier still owns the `Set<TId>` state; helpers produce the next set. | _(no regex guard — hand-rolled selection patterns are too varied to detect reliably; reviewer enforced)_ |
+| `MxAsyncDraft` extension (`asyncValue.currentValue`) + `mxPatchDraft(state, update)` | For form notifiers holding `AsyncValue<DraftState>`. Replace ad-hoc `_currentDraft` / `_patch` helpers with these. | `memox.async_draft_current_value_via_helper` |
+
+### Provider taxonomy (4 roles — do not add new ones)
+
+| Role | Lives in | Pattern |
+| --- | --- | --- |
+| **DI / infrastructure** | `lib/app/di/**/*_providers.dart` | `@Riverpod(keepAlive: true)` wrapping a repository / use case factory. Enforced by `memox.infrastructure_provider_keep_alive_required`. |
+| **Query viewmodel** (read state) | `lib/presentation/features/<feature>/viewmodels/*_viewmodel.dart` | `@riverpod Future<TState> foo(Ref ref, ...)` or `@riverpod class FooState extends _$FooState` returning the read model. |
+| **Action controller** (commands) | Same `*_viewmodel.dart` file or sibling | `@riverpod class XActionController extends _$XActionController` with `FutureOr<void> build(...) {}`, command methods routed through `MxAsyncActionRunner`. |
+| **UI-state notifier** (long-lived UI state, no use case calls) | `lib/presentation/features/<feature>/providers/*_notifier.dart` | `@riverpod class FooNotifier extends _$FooNotifier` returning the UI state. Example: `app_shell_notifier`, `theme_mode_notifier`. |
 
 ---
 

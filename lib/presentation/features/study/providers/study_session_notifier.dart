@@ -8,6 +8,7 @@ import '../../../../core/errors/failures.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
 import '../../../shared/providers/study_revision_providers.dart';
+import '../../../shared/viewmodels/mx_action_errors.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'study_session_notifier.g.dart';
@@ -146,15 +147,12 @@ List<StudyFlashcardRef> _studyAnswerOptions(
   return options;
 }
 
-AppFailure? studyActionError(AsyncValue<void> actionState) => actionState
-    .whenOrNull(error: (error, _) => error is AppFailure ? error : null);
+AppFailure? studyActionError(AsyncValue<void> actionState) =>
+    MxActionErrors.failureOf(actionState);
 
 String studyErrorMessage(Object? error) {
   if (error is AppFailure) {
-    if (error.cause case final ValidationException cause) {
-      return cause.message;
-    }
-    return error.message;
+    return MxActionErrors.messageOf(error);
   }
   if (error is ValidationException) {
     return error.message;

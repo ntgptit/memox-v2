@@ -5,10 +5,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/di/content/content_revision_providers.dart';
 import '../../../../app/di/content/deck_providers.dart';
-import '../../../../core/errors/app_exception.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
+import '../../../shared/viewmodels/mx_action_errors.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
 part 'deck_action_viewmodel.g.dart';
@@ -90,15 +90,8 @@ class DeckActionController extends _$DeckActionController {
   );
 }
 
-AppFailure? deckActionError(AsyncValue<void> actionState) => actionState
-    .whenOrNull(error: (error, _) => error is AppFailure ? error : null);
+AppFailure? deckActionError(AsyncValue<void> actionState) =>
+    MxActionErrors.failureOf(actionState);
 
-String deckActionErrorMessage(AppFailure? failure) {
-  if (failure == null) {
-    return '';
-  }
-  if (failure.cause case final ValidationException cause) {
-    return cause.message;
-  }
-  return failure.message;
-}
+String deckActionErrorMessage(AppFailure? failure) =>
+    MxActionErrors.messageOf(failure);

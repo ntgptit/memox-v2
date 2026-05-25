@@ -12,6 +12,7 @@ import '../../../../core/utils/string_utils.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
 import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_queries.dart';
+import '../../../shared/viewmodels/mx_action_errors.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
 import '../models/library_folder.dart';
 
@@ -123,6 +124,4 @@ LibraryOverviewGreeting _buildGreeting(Clock clock) {
 }
 
 AppFailure? libraryOverviewActionError(AsyncValue<void> actionState) =>
-    actionState.whenOrNull(
-      error: (error, _) => error is AppFailure ? error : null,
-    );
+    MxActionErrors.failureOf(actionState);
