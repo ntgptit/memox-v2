@@ -33,6 +33,8 @@ Test file: `test/data/sync/google_drive_sync_repository_test.dart`
 | ID | Branch / condition | Given | When | Then | Coverage |
 | --- | --- | --- | --- | --- | --- |
 | DT17 | user explicitly chooses local data as latest while local and Drive diverged | account is Drive-authorized, a baseline exists, local DB bytes changed, and Drive snapshot also changed | repository runs `uploadLocalSnapshot` | local snapshot overwrites Drive files, result is `uploadedLocal`, status becomes `synced`, and metadata is saved | C0+C1 |
+| DT20 | Drive fails while replacing an existing backup | account is Drive-authorized, Drive already has a previous backup, local DB bytes changed, and Drive returns a service failure before upload completes | repository runs `uploadLocalSnapshot` | result is `failed` and previous manifest and snapshot bytes remain unchanged | C0+C1 |
+| DT21 | first backup writes owner and version metadata | account is Drive-authorized and Drive has no previous backup | repository runs `uploadLocalSnapshot` | Drive manifest records Google subject id, app version, and DB schema version, and local sync metadata is saved for the same account | C0+C1 |
 
 ## Decision table: restoreDriveSnapshot
 
@@ -40,6 +42,7 @@ Test file: `test/data/sync/google_drive_sync_repository_test.dart`
 | --- | --- | --- | --- | --- | --- |
 | DT18 | user explicitly chooses Drive data as latest while local and Drive diverged | account is Drive-authorized, a baseline exists, local DB bytes changed, and Drive has a valid newer snapshot | repository runs `restoreDriveSnapshot` | settings and DB bytes are restored from Drive and the required runtime restore effect is returned | C0+C1 |
 | DT19 | user chooses Drive data but no remote snapshot exists | account is Drive-authorized and Drive has no manifest or snapshot file | repository runs `restoreDriveSnapshot` | result is `noChanges` with `noRemoteSnapshot` and local DB restore is not called | C0+C1 |
+| DT20 | Drive backup belongs to a different Google account | account is Drive-authorized as account A and remote manifest contains account B's subject id | repository runs `restoreDriveSnapshot` | result is `failed` with wrong-account message and local DB restore is not called | C0+C1 |
 
 ## Decision table: resolveConflict
 

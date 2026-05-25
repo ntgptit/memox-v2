@@ -2128,6 +2128,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bulkAddSeparatorLabel => 'SEPARATOR';
 
   @override
+  String get bulkAddSourceTabText => 'Text';
+
+  @override
+  String get bulkAddSourceTabFile => 'File';
+
+  @override
+  String get bulkAddFileEmptyTitle => 'No file loaded';
+
+  @override
+  String get bulkAddFileEmptyDescription =>
+      'Choose a CSV (.csv) or Excel (.xlsx) file up to 10 MB. Only the first sheet is read for Excel.';
+
+  @override
+  String get bulkAddFileChooseAction => 'Choose file';
+
+  @override
+  String get bulkAddFileSizeError =>
+      'File exceeds 10 MB. Please choose a smaller file.';
+
+  @override
+  String get bulkAddFileFormatHint => 'CSV · XLSX · 10 MB max';
+
+  @override
+  String bulkAddFileLoadedTitle(String name) {
+    return '$name';
+  }
+
+  @override
+  String bulkAddFileSizeLabel(String size) {
+    return '$size KB';
+  }
+
+  @override
   String bulkAddFooterTrailing(String deckName) {
     return 'cards · $deckName';
   }

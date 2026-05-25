@@ -83,6 +83,7 @@ class AccountSettingsController extends _$AccountSettingsController {
   StreamSubscription<GoogleAccountAuthResult>? _authSubscription;
   GoogleAccountAuthService? _subscribedAuthService;
   bool _registeredDispose = false;
+  bool _isRunningAction = false;
 
   @override
   Future<AccountSettingsState> build() async {
@@ -154,6 +155,9 @@ class AccountSettingsController extends _$AccountSettingsController {
   Future<void> signOut() async {
     final current = state.value;
     if (current == null) {
+      return;
+    }
+    if (current.isBusy) {
       return;
     }
     state = AsyncData(current.copyWith(isBusy: true));
@@ -284,19 +288,27 @@ class AccountSettingsController extends _$AccountSettingsController {
     if (current == null) {
       return;
     }
-    state = AsyncData(current.copyWith(isBusy: true));
-    final result = await action();
-    if (!ref.mounted) {
+    if (_isRunningAction || current.isBusy) {
       return;
     }
-    state = AsyncData(
-      _stateFromActionResult(
-        result,
-        fallbackLink: current.link,
-        requiresPlatformSignInButton: current.requiresPlatformSignInButton,
-      ),
-    );
-    _refreshDriveSyncStatus();
+    _isRunningAction = true;
+    state = AsyncData(current.copyWith(isBusy: true));
+    try {
+      final result = await action();
+      if (!ref.mounted) {
+        return;
+      }
+      state = AsyncData(
+        _stateFromActionResult(
+          result,
+          fallbackLink: current.link,
+          requiresPlatformSignInButton: current.requiresPlatformSignInButton,
+        ),
+      );
+      _refreshDriveSyncStatus();
+    } finally {
+      _isRunningAction = false;
+    }
   }
 
   void _refreshDriveSyncStatus() {

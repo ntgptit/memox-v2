@@ -113,7 +113,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
     }
 
     try {
-      final local = await _createLocalSnapshot();
+      final local = await _createLocalSnapshot(context.link!.subjectId);
       final remote = await _loadRemoteSnapshot(context.accessToken);
       if (remote != null && local.fingerprint == remote.fingerprint) {
         await _saveMetadata(
@@ -159,7 +159,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
         );
       }
 
-      final local = await _createLocalSnapshot();
+      final local = await _createLocalSnapshot(context.link!.subjectId);
       if (local.fingerprint == remote.fingerprint) {
         await _saveMetadata(
           accountSubjectId: context.link!.subjectId,

@@ -2012,6 +2012,39 @@ class AppLocalizationsVi extends AppLocalizations {
   String get bulkAddSeparatorLabel => 'DẤU TÁCH';
 
   @override
+  String get bulkAddSourceTabText => 'Văn bản';
+
+  @override
+  String get bulkAddSourceTabFile => 'Tệp';
+
+  @override
+  String get bulkAddFileEmptyTitle => 'Chưa có tệp';
+
+  @override
+  String get bulkAddFileEmptyDescription =>
+      'Chọn tệp CSV (.csv) hoặc Excel (.xlsx) tối đa 10 MB. Excel chỉ đọc sheet đầu tiên.';
+
+  @override
+  String get bulkAddFileChooseAction => 'Chọn tệp';
+
+  @override
+  String get bulkAddFileSizeError =>
+      'Tệp vượt quá 10 MB. Hãy chọn tệp nhỏ hơn.';
+
+  @override
+  String get bulkAddFileFormatHint => 'CSV · XLSX · tối đa 10 MB';
+
+  @override
+  String bulkAddFileLoadedTitle(String name) {
+    return '$name';
+  }
+
+  @override
+  String bulkAddFileSizeLabel(String size) {
+    return '$size KB';
+  }
+
+  @override
   String bulkAddFooterTrailing(String deckName) {
     return 'thẻ · $deckName';
   }

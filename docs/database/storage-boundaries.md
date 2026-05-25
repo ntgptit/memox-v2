@@ -11,6 +11,14 @@ SQLite là source of truth cho:
 - `study_attempts`
 - `tts_settings`
 
+### Account database context
+MemoX dùng local DB làm source of truth, nhưng DB context phải tách theo chủ sở hữu dữ liệu:
+- Khi chưa login, app dùng guest database context `memox_guest`.
+- Khi login Google, app dùng database context theo Google subject id, ví dụ `memox_<google_subject_id>`.
+- Logout chỉ clear account link cục bộ, không xóa DB guest hoặc DB của Google account.
+- Login account B sau account A không được mở DB của account A. Nếu account B chưa có DB thì app hiển thị trạng thái trống hoặc cho restore từ Drive của account B.
+- Nếu user login Google khi đang có guest DB, app phải hỏi rõ: attach guest DB vào Google account hoặc tạo DB mới cho account đó.
+
 ## 2. SharedPreferences
 `SharedPreferences` chỉ nên giữ app settings nhỏ, không phải dữ liệu học.
 

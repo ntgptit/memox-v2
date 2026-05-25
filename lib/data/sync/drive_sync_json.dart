@@ -20,6 +20,8 @@ abstract final class DriveSyncJson {
         'databaseSha256': manifest.databaseSha256,
         'settingsSha256': manifest.settingsSha256,
         'snapshotSizeBytes': manifest.snapshotSizeBytes,
+        if (manifest.accountSubjectId != null)
+          'accountSubjectId': manifest.accountSubjectId,
         if (manifest.appVersion != null) 'appVersion': manifest.appVersion,
         if (manifest.snapshotFileId != null)
           'snapshotFileId': manifest.snapshotFileId,
@@ -68,6 +70,7 @@ abstract final class DriveSyncJson {
       databaseSha256: databaseSha256,
       settingsSha256: settingsSha256,
       snapshotSizeBytes: snapshotSizeBytes,
+      accountSubjectId: value['accountSubjectId'] as String?,
       appVersion: value['appVersion'] as String?,
       snapshotFileId: value['snapshotFileId'] as String?,
       snapshotFileVersion: value['snapshotFileVersion'] as String?,

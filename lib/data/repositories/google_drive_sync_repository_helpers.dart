@@ -83,7 +83,9 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
     }
   }
 
-  Future<DriveSyncSnapshot> _createLocalSnapshot() async {
+  Future<DriveSyncSnapshot> _createLocalSnapshot(
+    String accountSubjectId,
+  ) async {
     final databaseBytes = await _databaseSnapshotGateway.exportDatabase();
     final settings = _settingsSnapshotStore.load();
     final deviceId = await _metadataStore.loadOrCreateDeviceId(_idGenerator);
@@ -94,6 +96,7 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
       createdAt: _clock.nowEpochMillis(),
       deviceId: deviceId,
       deviceLabel: 'MemoX device',
+      accountSubjectId: accountSubjectId,
       appVersion: _appVersion,
     );
   }
@@ -244,6 +247,20 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
       return DriveSyncRunResult.failed(
         status,
         'Drive snapshot was created by a newer database schema.',
+      );
+    }
+    final remoteAccountSubjectId = remote.manifest.accountSubjectId;
+    if (remoteAccountSubjectId != null &&
+        remoteAccountSubjectId != accountSubjectId) {
+      final status = DriveSyncStatus(
+        kind: DriveSyncStatusKind.failure,
+        remote: remote,
+        localDeviceId: localDeviceId,
+        message: 'Drive snapshot belongs to another Google account.',
+      );
+      return DriveSyncRunResult.failed(
+        status,
+        'Drive snapshot belongs to another Google account.',
       );
     }
 

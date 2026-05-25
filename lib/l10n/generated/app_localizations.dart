@@ -3462,6 +3462,60 @@ abstract class AppLocalizations {
   /// **'SEPARATOR'**
   String get bulkAddSeparatorLabel;
 
+  /// No description provided for @bulkAddSourceTabText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get bulkAddSourceTabText;
+
+  /// No description provided for @bulkAddSourceTabFile.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get bulkAddSourceTabFile;
+
+  /// No description provided for @bulkAddFileEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No file loaded'**
+  String get bulkAddFileEmptyTitle;
+
+  /// No description provided for @bulkAddFileEmptyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a CSV (.csv) or Excel (.xlsx) file up to 10 MB. Only the first sheet is read for Excel.'**
+  String get bulkAddFileEmptyDescription;
+
+  /// No description provided for @bulkAddFileChooseAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose file'**
+  String get bulkAddFileChooseAction;
+
+  /// No description provided for @bulkAddFileSizeError.
+  ///
+  /// In en, this message translates to:
+  /// **'File exceeds 10 MB. Please choose a smaller file.'**
+  String get bulkAddFileSizeError;
+
+  /// No description provided for @bulkAddFileFormatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV · XLSX · 10 MB max'**
+  String get bulkAddFileFormatHint;
+
+  /// No description provided for @bulkAddFileLoadedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}'**
+  String bulkAddFileLoadedTitle(String name);
+
+  /// No description provided for @bulkAddFileSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} KB'**
+  String bulkAddFileSizeLabel(String size);
+
   /// No description provided for @bulkAddFooterTrailing.
   ///
   /// In en, this message translates to:

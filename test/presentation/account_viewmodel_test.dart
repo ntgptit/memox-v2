@@ -572,6 +572,101 @@ void main() {
       );
     },
   );
+
+  test(
+    'DT14 onUpdate: sign-in failure exposes technical message without storing account',
+    () async {
+      final container = _createContainer(
+        auth: _FakeGoogleAccountAuthService(
+          signInResult: const GoogleAccountAuthResult.failure(
+            'network unavailable',
+          ),
+        ),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(accountSettingsControllerProvider.future);
+      await container.read(accountSettingsControllerProvider.notifier).signIn();
+      final state = container
+          .read(accountSettingsControllerProvider)
+          .requireValue;
+      final repository = await container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+
+      expect(state.status, AccountLinkStatus.error);
+      expect(state.message, AccountSettingsMessage.signInFailed);
+      expect(state.technicalMessage, 'network unavailable');
+      expect(await repository.load(), isNull);
+    },
+  );
+
+  test(
+    'DT15 onUpdate: duplicate sign-in taps run only one Google auth flow',
+    () async {
+      final auth = _FakeGoogleAccountAuthService(
+        signInResult: GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+        pauseSignIn: true,
+      );
+      final container = _createContainer(auth: auth);
+      addTearDown(container.dispose);
+
+      await container.read(accountSettingsControllerProvider.future);
+      final firstSignIn = container
+          .read(accountSettingsControllerProvider.notifier)
+          .signIn();
+      await auth.signInStarted.future;
+      final secondSignIn = container
+          .read(accountSettingsControllerProvider.notifier)
+          .signIn();
+      auth.allowSignIn();
+      await Future.wait(<Future<void>>[firstSignIn, secondSignIn]);
+
+      final state = container
+          .read(accountSettingsControllerProvider)
+          .requireValue;
+      expect(auth.signInCount, 1);
+      expect(state.status, AccountLinkStatus.signedIn);
+    },
+  );
+
+  test(
+    'DT16 onUpdate: explicit sign-out clears account link and preserves local settings',
+    () async {
+      final preferences = await SharedPreferences.getInstance();
+      await CloudAccountStore(preferences).save(_driveReadyLink);
+      await preferences.setInt(
+        AppConstants.sharedPrefsDefaultNewBatchSizeKey,
+        12,
+      );
+      final container = _createContainer(auth: _FakeGoogleAccountAuthService());
+      addTearDown(container.dispose);
+
+      await container.read(accountSettingsControllerProvider.future);
+      await container
+          .read(accountSettingsControllerProvider.notifier)
+          .signOut();
+      final state = container
+          .read(accountSettingsControllerProvider)
+          .requireValue;
+      final repository = await container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+
+      expect(state.status, AccountLinkStatus.signedOut);
+      expect(state.message, AccountSettingsMessage.signedOut);
+      expect(await repository.load(), isNull);
+      expect(
+        preferences.getInt(AppConstants.sharedPrefsDefaultNewBatchSizeKey),
+        12,
+      );
+    },
+  );
 }
 
 ProviderContainer _createContainer({
@@ -647,6 +742,7 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
     this.accessTokenResult =
         const DriveAccessTokenResult.reauthorizationRequired(),
     this.requiresPlatformSignInButton = false,
+    this.pauseSignIn = false,
   }) {
     _events = StreamController<GoogleAccountAuthResult>.broadcast(
       onListen: () {
@@ -665,8 +761,12 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   GoogleAccountAuthResult signInResult;
   GoogleAccountAuthResult? authorizeResult;
   DriveAccessTokenResult accessTokenResult;
+  final bool pauseSignIn;
+  int signInCount = 0;
   int listenCount = 0;
   int cancelCount = 0;
+  final Completer<void> signInStarted = Completer<void>();
+  final Completer<void> _allowSignIn = Completer<void>();
   @override
   final bool requiresPlatformSignInButton;
 
@@ -687,7 +787,16 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   Future<GoogleAccountAuthResult> signInAndAuthorizeDriveAppData(
     GoogleOAuthConfig config,
-  ) async => signInResult;
+  ) async {
+    signInCount += 1;
+    if (!signInStarted.isCompleted) {
+      signInStarted.complete();
+    }
+    if (pauseSignIn) {
+      await _allowSignIn.future;
+    }
+    return signInResult;
+  }
 
   @override
   Future<GoogleAccountAuthResult> authorizeDriveAppData(
@@ -709,6 +818,12 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   void emit(GoogleAccountAuthResult result) {
     _events.add(result);
+  }
+
+  void allowSignIn() {
+    if (!_allowSignIn.isCompleted) {
+      _allowSignIn.complete();
+    }
   }
 }
 

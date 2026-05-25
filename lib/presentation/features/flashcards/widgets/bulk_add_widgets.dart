@@ -168,12 +168,12 @@ class BulkAddPreviewSection extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return _PreparedPreview(preparation: preparation);
+    return BulkAddPreparedPreview(preparation: preparation);
   }
 }
 
-class _PreparedPreview extends StatelessWidget {
-  const _PreparedPreview({required this.preparation});
+class BulkAddPreparedPreview extends StatelessWidget {
+  const BulkAddPreparedPreview({required this.preparation, super.key});
 
   final FlashcardImportPreparation preparation;
 

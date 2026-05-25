@@ -36,6 +36,7 @@ final class DriveSyncManifest {
     required this.databaseSha256,
     required this.settingsSha256,
     required this.snapshotSizeBytes,
+    this.accountSubjectId,
     this.appVersion,
     this.snapshotFileId,
     this.snapshotFileVersion,
@@ -55,6 +56,7 @@ final class DriveSyncManifest {
   final String databaseSha256;
   final String settingsSha256;
   final int snapshotSizeBytes;
+  final String? accountSubjectId;
 
   /// Human-readable app version string at backup time (e.g. `1.0.0+1`).
   /// Nullable for legacy backups created before this field was introduced.
@@ -64,7 +66,7 @@ final class DriveSyncManifest {
 
   String get fingerprint =>
       '$appId:$snapshotFormatVersion:$appDatabaseSchemaVersion:'
-      '$databaseSha256:$settingsSha256';
+      '${accountSubjectId ?? 'legacy'}:$databaseSha256:$settingsSha256';
 
   DriveSyncManifest copyWith({
     int? createdAt,
@@ -82,6 +84,7 @@ final class DriveSyncManifest {
     databaseSha256: databaseSha256,
     settingsSha256: settingsSha256,
     snapshotSizeBytes: snapshotSizeBytes ?? this.snapshotSizeBytes,
+    accountSubjectId: accountSubjectId,
     appVersion: appVersion,
     snapshotFileId: snapshotFileId ?? this.snapshotFileId,
     snapshotFileVersion: snapshotFileVersion ?? this.snapshotFileVersion,

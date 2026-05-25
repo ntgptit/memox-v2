@@ -33,17 +33,31 @@ void main() {
   });
 
   group('backup (uploadLocalSnapshot)', () {
-    test('success: first upload creates manifest + snapshot', () async {
-      final harness = await _RepositoryHarness.create();
+    test(
+      'DT21 uploadLocalSnapshot: first upload stores owner and version metadata',
+      () async {
+        final harness = await _RepositoryHarness.create();
 
-      final result = await harness.repository.uploadLocalSnapshot();
+        final result = await harness.repository.uploadLocalSnapshot();
+        final manifest = DriveSyncJson.decodeManifest(
+          DriveSyncJson.decodeJsonObject(
+            utf8.decode(harness.drive.manifestBytes!),
+          ),
+        );
 
-      expect(result.kind, DriveSyncActionKind.uploadedLocal);
-      expect(result.status.kind, DriveSyncStatusKind.synced);
-      expect(harness.drive.createCount, 2);
-      expect(harness.drive.snapshotBytes, isNotNull);
-      expect(harness.metadata.loadForAccount(_account.subjectId), isNotNull);
-    });
+        expect(result.kind, DriveSyncActionKind.uploadedLocal);
+        expect(result.status.kind, DriveSyncStatusKind.synced);
+        expect(harness.drive.createCount, 2);
+        expect(harness.drive.snapshotBytes, isNotNull);
+        expect(harness.metadata.loadForAccount(_account.subjectId), isNotNull);
+        expect(manifest?.accountSubjectId, _account.subjectId);
+        expect(manifest?.appVersion, '0.0.0-test');
+        expect(
+          manifest?.appDatabaseSchemaVersion,
+          harness.database.currentSchemaVersion,
+        );
+      },
+    );
 
     test('success: subsequent identical upload is a no-op', () async {
       final harness = await _RepositoryHarness.create();
@@ -113,6 +127,31 @@ void main() {
       expect(result.kind, DriveSyncActionKind.failed);
       expect(result.status.kind, DriveSyncStatusKind.needsDriveAuthorization);
     });
+
+    test(
+      'DT20 uploadLocalSnapshot: Drive failure preserves previous remote backup',
+      () async {
+        final harness = await _RepositoryHarness.create();
+        await harness.repository.uploadLocalSnapshot();
+        final previousManifestBytes = Uint8List.fromList(
+          harness.drive.manifestBytes!,
+        );
+        final previousSnapshotBytes = Uint8List.fromList(
+          harness.drive.snapshotBytes!,
+        );
+        harness.database.databaseBytes = Uint8List.fromList(<int>[7, 7, 7]);
+        harness.drive.failure = const GoogleDriveAppDataException(
+          'service unavailable',
+          statusCode: 503,
+        );
+
+        final result = await harness.repository.uploadLocalSnapshot();
+
+        expect(result.kind, DriveSyncActionKind.failed);
+        expect(harness.drive.manifestBytes, previousManifestBytes);
+        expect(harness.drive.snapshotBytes, previousSnapshotBytes);
+      },
+    );
   });
 
   group('restore (restoreDriveSnapshot)', () {
@@ -222,6 +261,29 @@ void main() {
       expect(result.status.kind, DriveSyncStatusKind.failure);
       expect(harness.database.restoredBytes, isNull);
     });
+
+    test(
+      'DT20 restoreDriveSnapshot: wrong account backup is blocked before DB restore',
+      () async {
+        final harness = await _RepositoryHarness.create();
+        await harness.repository.uploadLocalSnapshot();
+        final remote = _snapshotFor(
+          databaseBytes: Uint8List.fromList(<int>[8, 8, 8]),
+          settings: const <String, Object?>{},
+          accountSubjectId: 'another-google-user',
+        );
+        harness.drive.replaceRemoteSnapshot(remote);
+
+        final result = await harness.repository.restoreDriveSnapshot();
+
+        expect(result.kind, DriveSyncActionKind.failed);
+        expect(
+          result.message,
+          'Drive snapshot belongs to another Google account.',
+        );
+        expect(harness.database.restoredBytes, isNull);
+      },
+    );
   });
 
   group('loadStatus', () {
@@ -399,6 +461,7 @@ DriveSyncSnapshot _snapshotFor({
   required Uint8List databaseBytes,
   required Map<String, Object?> settings,
   int appDatabaseSchemaVersion = 6,
+  String? accountSubjectId,
 }) => const DriveSyncSnapshotCodec().encode(
   databaseBytes: databaseBytes,
   settings: settings,
@@ -406,12 +469,13 @@ DriveSyncSnapshot _snapshotFor({
   createdAt: 100,
   deviceId: 'remote-device',
   deviceLabel: 'Remote device',
+  accountSubjectId: accountSubjectId,
 );
 
 final class _FakeDriveAppDataClient implements DriveAppDataClient {
   _FakeDriveAppDataClient({this.failure});
 
-  final GoogleDriveAppDataException? failure;
+  GoogleDriveAppDataException? failure;
 
   DriveAppDataFile? manifestFile;
   DriveAppDataFile? snapshotFile;

@@ -8,6 +8,7 @@ Google Drive Sync V1 cho phép user tự bấm `Sync now` trong Settings, chọn
 - Dùng Google account đã liên kết và scope `https://www.googleapis.com/auth/drive.appdata`.
 - Remote artifact nằm trong Drive `appDataFolder`, không hiển thị như file user quản lý trong My Drive.
 - Payload gồm SQLite snapshot và app settings được phép sync.
+- Snapshot/manifest ghi Google subject id của account tạo backup để app chặn restore nhầm account.
 - Không lưu access token, id token, refresh token hoặc server auth code.
 - Không đổi Drift schema và không merge từng flashcard/entity.
 - Không mã hóa snapshot trong V1.
@@ -46,6 +47,8 @@ Google Drive Sync V1 cho phép user tự bấm `Sync now` trong Settings, chọn
 | User chọn `Cancel` | Không mutate local hoặc Drive. |
 
 ## Restore safety
+- Restore snapshot có `accountSubjectId` khác account đang liên kết phải bị chặn trước khi ghi DB.
+- Backup/restore thất bại không được làm hỏng SQLite local hoặc remote snapshot cũ đã tồn tại.
 - Snapshot phải pass hash DB/settings và schema version check trước khi restore.
 - Nếu Drive snapshot được tạo bởi DB schema mới hơn app hiện tại, restore bị chặn.
 - Web restore yêu cầu reload app sau khi ghi DB.

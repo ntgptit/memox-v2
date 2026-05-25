@@ -1056,6 +1056,21 @@
   "bulkAddEmptyPaste": "Paste your list to see a preview.",
   "bulkAddHelpTooltip": "Format help",
   "bulkAddSeparatorLabel": "SEPARATOR",
+  "bulkAddSourceTabText": "Text",
+  "bulkAddSourceTabFile": "File",
+  "bulkAddFileEmptyTitle": "No file loaded",
+  "bulkAddFileEmptyDescription": "Choose a CSV (.csv) or Excel (.xlsx) file up to 10 MB. Only the first sheet is read for Excel.",
+  "bulkAddFileChooseAction": "Choose file",
+  "bulkAddFileSizeError": "File exceeds 10 MB. Please choose a smaller file.",
+  "bulkAddFileFormatHint": "CSV · XLSX · 10 MB max",
+  "bulkAddFileLoadedTitle": "{name}",
+  "@bulkAddFileLoadedTitle": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "bulkAddFileSizeLabel": "{size} KB",
+  "@bulkAddFileSizeLabel": {
+    "placeholders": { "size": { "type": "String" } }
+  },
   "bulkAddFooterTrailing": "cards · {deckName}",
   "@bulkAddFooterTrailing": {
     "placeholders": { "deckName": { "type": "String" } }
