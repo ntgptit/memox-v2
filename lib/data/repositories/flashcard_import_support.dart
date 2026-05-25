@@ -221,6 +221,7 @@ final class FlashcardImportSupport {
 
   static const _autoDetectSeparators = <ImportStructuredTextSeparator>[
     ImportStructuredTextSeparator.tab,
+    ImportStructuredTextSeparator.comma,
     ImportStructuredTextSeparator.slash,
     ImportStructuredTextSeparator.pipe,
     ImportStructuredTextSeparator.semicolon,
@@ -295,6 +296,8 @@ final class FlashcardImportSupport {
   }) => switch (separator) {
     ImportStructuredTextSeparator.auto => null,
     ImportStructuredTextSeparator.tab => _firstIndex(line, '\t'),
+    ImportStructuredTextSeparator.comma =>
+      clearOnly ? _spacedTokenIndex(line, ',') : _firstIndex(line, ','),
     ImportStructuredTextSeparator.colon =>
       clearOnly ? _clearColonIndex(line) : _firstIndex(line, ':'),
     ImportStructuredTextSeparator.slash =>

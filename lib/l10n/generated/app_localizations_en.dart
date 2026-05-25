@@ -2036,6 +2036,103 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsImportTitle => 'Import flashcards';
 
   @override
+  String get bulkAddTitle => 'Bulk add';
+
+  @override
+  String get bulkAddBreadcrumbLeaf => 'Bulk add';
+
+  @override
+  String get bulkAddTabPaste => 'Paste';
+
+  @override
+  String get bulkAddTabPreview => 'Preview';
+
+  @override
+  String bulkAddTabPreviewWithCount(int count) {
+    return 'Preview ($count)';
+  }
+
+  @override
+  String get bulkAddPasteHint =>
+      '연구자\tresearcher\n공부하다\tto study\n도서관\tlibrary';
+
+  @override
+  String get bulkAddHelper =>
+      'One card per line. Separate the term and meaning with a tab or two spaces. Paste straight from a spreadsheet — it just works.';
+
+  @override
+  String bulkAddCardsReady(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards ready',
+      one: '1 card ready',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkAddNoDuplicates => 'No duplicates';
+
+  @override
+  String bulkAddDuplicatesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duplicates skipped',
+      one: '1 duplicate skipped',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bulkAddIssuesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count issues',
+      one: '1 issue',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bulkAddCommit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Add $count cards',
+      one: 'Add 1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bulkAddFooterSummary(int count, String deckName) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards · $deckName',
+      one: '1 card · $deckName',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkAddEmptyPaste => 'Paste your list to see a preview.';
+
+  @override
+  String get bulkAddHelpTooltip => 'Format help';
+
+  @override
+  String get bulkAddSeparatorLabel => 'SEPARATOR';
+
+  @override
+  String bulkAddFooterTrailing(String deckName) {
+    return 'cards · $deckName';
+  }
+
+  @override
   String get importSourceTitle => 'Import from';
 
   @override
@@ -2132,6 +2229,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importSeparatorTab => 'Tab';
 
   @override
+  String get importSeparatorComma => 'Comma';
+
+  @override
   String get importSeparatorColon => 'Colon';
 
   @override
@@ -2149,6 +2249,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importSeparatorTabDescription => 'term<Tab>definition';
+
+  @override
+  String get importSeparatorCommaDescription => 'term, definition';
 
   @override
   String get importSeparatorColonDescription => 'term: definition';

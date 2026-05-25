@@ -1019,6 +1019,47 @@
   "studyCancelConfirmMessage": "Your current study session will stop and you will be taken to the result screen.",
   "studyCancelConfirmAction": "Cancel",
   "flashcardsImportTitle": "Import flashcards",
+  "bulkAddTitle": "Bulk add",
+  "bulkAddBreadcrumbLeaf": "Bulk add",
+  "bulkAddTabPaste": "Paste",
+  "bulkAddTabPreview": "Preview",
+  "bulkAddTabPreviewWithCount": "Preview ({count})",
+  "@bulkAddTabPreviewWithCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddPasteHint": "연구자\tresearcher\n공부하다\tto study\n도서관\tlibrary",
+  "bulkAddHelper": "One card per line. Separate the term and meaning with a tab or two spaces. Paste straight from a spreadsheet — it just works.",
+  "bulkAddCardsReady": "{count, plural, =1{1 card ready} other{{count} cards ready}}",
+  "@bulkAddCardsReady": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddNoDuplicates": "No duplicates",
+  "bulkAddDuplicatesSkipped": "{count, plural, =1{1 duplicate skipped} other{{count} duplicates skipped}}",
+  "@bulkAddDuplicatesSkipped": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddIssuesCount": "{count, plural, =1{1 issue} other{{count} issues}}",
+  "@bulkAddIssuesCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddCommit": "{count, plural, =1{Add 1 card} other{Add {count} cards}}",
+  "@bulkAddCommit": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddFooterSummary": "{count, plural, =1{1 card · {deckName}} other{{count} cards · {deckName}}}",
+  "@bulkAddFooterSummary": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "deckName": { "type": "String" }
+    }
+  },
+  "bulkAddEmptyPaste": "Paste your list to see a preview.",
+  "bulkAddHelpTooltip": "Format help",
+  "bulkAddSeparatorLabel": "SEPARATOR",
+  "bulkAddFooterTrailing": "cards · {deckName}",
+  "@bulkAddFooterTrailing": {
+    "placeholders": { "deckName": { "type": "String" } }
+  },
   "importSourceTitle": "Import from",
   "importSourceSubtitle": "Import is preview-first and atomic. Any invalid line blocks the entire write.",
   "importCsvLabel": "CSV",
@@ -1053,12 +1094,14 @@
   "importSeparatorLabel": "Separator",
   "importSeparatorAuto": "Auto",
   "importSeparatorTab": "Tab",
+  "importSeparatorComma": "Comma",
   "importSeparatorColon": "Colon",
   "importSeparatorSlash": "Slash",
   "importSeparatorSemicolon": "Semicolon",
   "importSeparatorPipe": "Pipe",
   "importSeparatorAutoDescription": "Detects clear line separators before preview.",
   "importSeparatorTabDescription": "term<Tab>definition",
+  "importSeparatorCommaDescription": "term, definition",
   "importSeparatorColonDescription": "term: definition",
   "importSeparatorSlashDescription": "term / definition",
   "importSeparatorSemicolonDescription": "term; definition",

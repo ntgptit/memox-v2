@@ -40,7 +40,15 @@ final class ExportData {
 
 enum ImportSourceFormat { csv, excel, structuredText }
 
-enum ImportStructuredTextSeparator { auto, tab, colon, slash, semicolon, pipe }
+enum ImportStructuredTextSeparator {
+  auto,
+  tab,
+  comma,
+  colon,
+  slash,
+  semicolon,
+  pipe,
+}
 
 enum FlashcardImportDuplicatePolicy { skipExactDuplicates }
 

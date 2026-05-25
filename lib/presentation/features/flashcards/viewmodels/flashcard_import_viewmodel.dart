@@ -106,8 +106,8 @@ class FlashcardImportSource {
 class FlashcardImportDraft extends _$FlashcardImportDraft {
   @override
   FlashcardImportDraftState build(String deckId) => FlashcardImportDraftState(
-    format: ImportSourceFormat.excel,
-    structuredTextSeparator: ImportStructuredTextSeparator.auto,
+    format: ImportSourceFormat.structuredText,
+    structuredTextSeparator: ImportStructuredTextSeparator.tab,
     duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
     rawContent: '',
   );
@@ -198,8 +198,8 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
 
   void reset() {
     state = FlashcardImportDraftState(
-      format: ImportSourceFormat.excel,
-      structuredTextSeparator: ImportStructuredTextSeparator.auto,
+      format: ImportSourceFormat.structuredText,
+      structuredTextSeparator: ImportStructuredTextSeparator.tab,
       duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
       rawContent: '',
     );

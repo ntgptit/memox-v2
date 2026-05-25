@@ -1019,6 +1019,47 @@
   "studyCancelConfirmMessage": "Phiên học hiện tại sẽ dừng lại và bạn sẽ được đưa đến màn hình kết quả.",
   "studyCancelConfirmAction": "Hủy",
   "flashcardsImportTitle": "Nhập flashcard",
+  "bulkAddTitle": "Thêm hàng loạt",
+  "bulkAddBreadcrumbLeaf": "Thêm hàng loạt",
+  "bulkAddTabPaste": "Dán",
+  "bulkAddTabPreview": "Xem trước",
+  "bulkAddTabPreviewWithCount": "Xem trước ({count})",
+  "@bulkAddTabPreviewWithCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddPasteHint": "연구자\tnhà nghiên cứu\n공부하다\thọc\n도서관\tthư viện",
+  "bulkAddHelper": "Mỗi dòng một thẻ. Ngăn cách thuật ngữ và nghĩa bằng tab hoặc hai khoảng trắng. Dán thẳng từ bảng tính — vẫn chạy ngon.",
+  "bulkAddCardsReady": "{count, plural, =1{Sẵn sàng 1 thẻ} other{Sẵn sàng {count} thẻ}}",
+  "@bulkAddCardsReady": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddNoDuplicates": "Không trùng lặp",
+  "bulkAddDuplicatesSkipped": "{count, plural, =1{Bỏ qua 1 trùng} other{Bỏ qua {count} trùng}}",
+  "@bulkAddDuplicatesSkipped": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddIssuesCount": "{count, plural, =1{1 lỗi} other{{count} lỗi}}",
+  "@bulkAddIssuesCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddCommit": "{count, plural, =1{Thêm 1 thẻ} other{Thêm {count} thẻ}}",
+  "@bulkAddCommit": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "bulkAddFooterSummary": "{count, plural, =1{1 thẻ · {deckName}} other{{count} thẻ · {deckName}}}",
+  "@bulkAddFooterSummary": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "deckName": { "type": "String" }
+    }
+  },
+  "bulkAddEmptyPaste": "Dán danh sách để xem trước.",
+  "bulkAddHelpTooltip": "Hướng dẫn định dạng",
+  "bulkAddSeparatorLabel": "DẤU TÁCH",
+  "bulkAddFooterTrailing": "thẻ · {deckName}",
+  "@bulkAddFooterTrailing": {
+    "placeholders": { "deckName": { "type": "String" } }
+  },
   "importSourceTitle": "Nhập từ",
   "importSourceSubtitle": "Luồng import luôn preview trước và ghi atomically. Chỉ cần một dòng lỗi là chặn toàn bộ lần ghi.",
   "importCsvLabel": "CSV",
@@ -1053,12 +1094,14 @@
   "importSeparatorLabel": "Dấu tách",
   "importSeparatorAuto": "Tự động",
   "importSeparatorTab": "Tab",
+  "importSeparatorComma": "Phẩy",
   "importSeparatorColon": "Dấu hai chấm",
   "importSeparatorSlash": "Dấu gạch chéo",
   "importSeparatorSemicolon": "Dấu chấm phẩy",
   "importSeparatorPipe": "Dấu gạch đứng",
   "importSeparatorAutoDescription": "Tự nhận diện dấu tách rõ trước khi xem trước.",
   "importSeparatorTabDescription": "thuật ngữ<Tab>định nghĩa",
+  "importSeparatorCommaDescription": "thuật ngữ, định nghĩa",
   "importSeparatorColonDescription": "thuật ngữ: định nghĩa",
   "importSeparatorSlashDescription": "thuật ngữ / định nghĩa",
   "importSeparatorSemicolonDescription": "thuật ngữ; định nghĩa",

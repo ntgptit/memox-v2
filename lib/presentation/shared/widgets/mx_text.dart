@@ -41,6 +41,10 @@ enum MxTextRole {
   /// Uppercase, tracked label per Design System overline style (`MASTERY`,
   /// `STUDY MODES`, `CARD BREAKDOWN`). 11/700 with 1.2 letter-spacing.
   overline,
+
+  /// Monospace body for code blocks, paste areas, and structured-text
+  /// editing surfaces (e.g. Bulk add).
+  monoBody,
 }
 
 abstract final class MxTextStyles {
@@ -166,6 +170,11 @@ abstract final class MxTextStyles {
         color: scheme.onSurfaceVariant,
         letterSpacing: 1.2,
         fontWeight: FontWeight.w700,
+      ),
+      MxTextRole.monoBody => textTheme.bodyMedium!.copyWith(
+        color: scheme.onSurface,
+        fontFamily: 'monospace',
+        height: 1.6,
       ),
     };
   }

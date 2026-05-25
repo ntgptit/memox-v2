@@ -119,6 +119,7 @@ class MxTextField extends StatelessWidget {
             ? Icon(prefixIcon, size: AppIconSizes.md)
             : null,
         suffixIcon: suffixIcon,
+        filled: false,
         border: InputBorder.none,
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,

@@ -1920,6 +1920,103 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flashcardsImportTitle => 'Nhập flashcard';
 
   @override
+  String get bulkAddTitle => 'Thêm hàng loạt';
+
+  @override
+  String get bulkAddBreadcrumbLeaf => 'Thêm hàng loạt';
+
+  @override
+  String get bulkAddTabPaste => 'Dán';
+
+  @override
+  String get bulkAddTabPreview => 'Xem trước';
+
+  @override
+  String bulkAddTabPreviewWithCount(int count) {
+    return 'Xem trước ($count)';
+  }
+
+  @override
+  String get bulkAddPasteHint =>
+      '연구자\tnhà nghiên cứu\n공부하다\thọc\n도서관\tthư viện';
+
+  @override
+  String get bulkAddHelper =>
+      'Mỗi dòng một thẻ. Ngăn cách thuật ngữ và nghĩa bằng tab hoặc hai khoảng trắng. Dán thẳng từ bảng tính — vẫn chạy ngon.';
+
+  @override
+  String bulkAddCardsReady(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sẵn sàng $count thẻ',
+      one: 'Sẵn sàng 1 thẻ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkAddNoDuplicates => 'Không trùng lặp';
+
+  @override
+  String bulkAddDuplicatesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Bỏ qua $count trùng',
+      one: 'Bỏ qua 1 trùng',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bulkAddIssuesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count lỗi',
+      one: '1 lỗi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bulkAddCommit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Thêm $count thẻ',
+      one: 'Thêm 1 thẻ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bulkAddFooterSummary(int count, String deckName) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ · $deckName',
+      one: '1 thẻ · $deckName',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get bulkAddEmptyPaste => 'Dán danh sách để xem trước.';
+
+  @override
+  String get bulkAddHelpTooltip => 'Hướng dẫn định dạng';
+
+  @override
+  String get bulkAddSeparatorLabel => 'DẤU TÁCH';
+
+  @override
+  String bulkAddFooterTrailing(String deckName) {
+    return 'thẻ · $deckName';
+  }
+
+  @override
   String get importSourceTitle => 'Nhập từ';
 
   @override
@@ -2015,6 +2112,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get importSeparatorTab => 'Tab';
 
   @override
+  String get importSeparatorComma => 'Phẩy';
+
+  @override
   String get importSeparatorColon => 'Dấu hai chấm';
 
   @override
@@ -2032,6 +2132,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get importSeparatorTabDescription => 'thuật ngữ<Tab>định nghĩa';
+
+  @override
+  String get importSeparatorCommaDescription => 'thuật ngữ, định nghĩa';
 
   @override
   String get importSeparatorColonDescription => 'thuật ngữ: định nghĩa';

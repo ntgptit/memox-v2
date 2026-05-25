@@ -3366,6 +3366,108 @@ abstract class AppLocalizations {
   /// **'Import flashcards'**
   String get flashcardsImportTitle;
 
+  /// No description provided for @bulkAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bulk add'**
+  String get bulkAddTitle;
+
+  /// No description provided for @bulkAddBreadcrumbLeaf.
+  ///
+  /// In en, this message translates to:
+  /// **'Bulk add'**
+  String get bulkAddBreadcrumbLeaf;
+
+  /// No description provided for @bulkAddTabPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get bulkAddTabPaste;
+
+  /// No description provided for @bulkAddTabPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get bulkAddTabPreview;
+
+  /// No description provided for @bulkAddTabPreviewWithCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview ({count})'**
+  String bulkAddTabPreviewWithCount(int count);
+
+  /// No description provided for @bulkAddPasteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'연구자\tresearcher\n공부하다\tto study\n도서관\tlibrary'**
+  String get bulkAddPasteHint;
+
+  /// No description provided for @bulkAddHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'One card per line. Separate the term and meaning with a tab or two spaces. Paste straight from a spreadsheet — it just works.'**
+  String get bulkAddHelper;
+
+  /// No description provided for @bulkAddCardsReady.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card ready} other{{count} cards ready}}'**
+  String bulkAddCardsReady(int count);
+
+  /// No description provided for @bulkAddNoDuplicates.
+  ///
+  /// In en, this message translates to:
+  /// **'No duplicates'**
+  String get bulkAddNoDuplicates;
+
+  /// No description provided for @bulkAddDuplicatesSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 duplicate skipped} other{{count} duplicates skipped}}'**
+  String bulkAddDuplicatesSkipped(int count);
+
+  /// No description provided for @bulkAddIssuesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 issue} other{{count} issues}}'**
+  String bulkAddIssuesCount(int count);
+
+  /// No description provided for @bulkAddCommit.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Add 1 card} other{Add {count} cards}}'**
+  String bulkAddCommit(int count);
+
+  /// No description provided for @bulkAddFooterSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card · {deckName}} other{{count} cards · {deckName}}}'**
+  String bulkAddFooterSummary(int count, String deckName);
+
+  /// No description provided for @bulkAddEmptyPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste your list to see a preview.'**
+  String get bulkAddEmptyPaste;
+
+  /// No description provided for @bulkAddHelpTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Format help'**
+  String get bulkAddHelpTooltip;
+
+  /// No description provided for @bulkAddSeparatorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SEPARATOR'**
+  String get bulkAddSeparatorLabel;
+
+  /// No description provided for @bulkAddFooterTrailing.
+  ///
+  /// In en, this message translates to:
+  /// **'cards · {deckName}'**
+  String bulkAddFooterTrailing(String deckName);
+
   /// No description provided for @importSourceTitle.
   ///
   /// In en, this message translates to:
@@ -3528,6 +3630,12 @@ abstract class AppLocalizations {
   /// **'Tab'**
   String get importSeparatorTab;
 
+  /// No description provided for @importSeparatorComma.
+  ///
+  /// In en, this message translates to:
+  /// **'Comma'**
+  String get importSeparatorComma;
+
   /// No description provided for @importSeparatorColon.
   ///
   /// In en, this message translates to:
@@ -3563,6 +3671,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'term<Tab>definition'**
   String get importSeparatorTabDescription;
+
+  /// No description provided for @importSeparatorCommaDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'term, definition'**
+  String get importSeparatorCommaDescription;
 
   /// No description provided for @importSeparatorColonDescription.
   ///
