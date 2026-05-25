@@ -6,22 +6,22 @@ import '../tokens/app_spacing.dart';
 
 abstract final class ListTileThemeBuilder {
   static ListTileThemeData build(ColorScheme scheme) => ListTileThemeData(
-      iconColor: scheme.onSurfaceVariant,
-      textColor: scheme.onSurface,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.xs,
-      ),
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
-      selectedColor: scheme.primary,
-      selectedTileColor: scheme.primaryContainer.withValues(
-        alpha: AppOpacity.half,
-      ),
-      tileColor: scheme.surface.withValues(alpha: AppOpacity.transparent),
-      horizontalTitleGap: AppSpacing.md,
-      minVerticalPadding: AppSpacing.xs,
-      visualDensity: VisualDensity.standard,
-      style: ListTileStyle.list,
-      enableFeedback: true,
-    );
+    iconColor: scheme.onSurfaceVariant,
+    textColor: scheme.onSurface,
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: AppSpacing.lg,
+      vertical: AppSpacing.xs,
+    ),
+    shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
+    selectedColor: scheme.primary,
+    selectedTileColor: scheme.primaryContainer.withValues(
+      alpha: AppOpacity.half,
+    ),
+    tileColor: scheme.surface.withValues(alpha: AppOpacity.transparent),
+    horizontalTitleGap: AppSpacing.md,
+    minVerticalPadding: AppSpacing.xs,
+    visualDensity: VisualDensity.standard,
+    style: ListTileStyle.list,
+    enableFeedback: true,
+  );
 }

@@ -159,7 +159,9 @@ void main() {
 
 Widget _buildCreateApp() {
   final container = _editorContainer(
-    _EditorFlashcardRepository(flashcard: _flashcard(hasLearningProgress: false)),
+    _EditorFlashcardRepository(
+      flashcard: _flashcard(hasLearningProgress: false),
+    ),
   );
   return UncontrolledProviderScope(
     container: container,
@@ -171,54 +173,57 @@ Widget _buildCreateApp() {
   );
 }
 
-ProviderContainer _editorContainer(_EditorFlashcardRepository repository) => ProviderContainer(
-    overrides: [
-      getFlashcardUseCaseProvider.overrideWithValue(
-        GetFlashcardUseCase(repository),
-      ),
-      updateFlashcardUseCaseProvider.overrideWithValue(
-        UpdateFlashcardUseCase(repository),
-      ),
-      createFlashcardUseCaseProvider.overrideWithValue(
-        CreateFlashcardUseCase(repository),
-      ),
-      getDeckActionContextUseCaseProvider.overrideWithValue(
-        GetDeckActionContextUseCase(_StubDeckRepository()),
-      ),
-    ],
-  );
-
-GoRouter _editorRouter({required String deckId, required String flashcardId}) => GoRouter(
-    initialLocation: '/deck/$deckId/flashcards/$flashcardId/edit',
-    routes: [
-      GoRoute(
-        path: '/${RoutePaths.flashcardEditSegment}',
-        name: RouteNames.flashcardEdit,
-        builder: (context, state) => FlashcardEditorScreen(
-          deckId: state.pathParameters[RoutePaths.deckIdParam]!,
-          flashcardId: state.pathParameters[RoutePaths.flashcardIdParam],
+ProviderContainer _editorContainer(_EditorFlashcardRepository repository) =>
+    ProviderContainer(
+      overrides: [
+        getFlashcardUseCaseProvider.overrideWithValue(
+          GetFlashcardUseCase(repository),
         ),
-      ),
-      GoRoute(
-        path: '/${RoutePaths.flashcardListSegment}',
-        name: RouteNames.flashcardList,
-        builder: (context, state) =>
-            const SizedBox(key: ValueKey('flashcard_list_destination')),
-      ),
-    ],
-  );
+        updateFlashcardUseCaseProvider.overrideWithValue(
+          UpdateFlashcardUseCase(repository),
+        ),
+        createFlashcardUseCaseProvider.overrideWithValue(
+          CreateFlashcardUseCase(repository),
+        ),
+        getDeckActionContextUseCaseProvider.overrideWithValue(
+          GetDeckActionContextUseCase(_StubDeckRepository()),
+        ),
+      ],
+    );
 
-FlashcardEntity _flashcard({required bool hasLearningProgress}) => FlashcardEntity(
-    id: 'card-001',
-    deckId: 'deck-001',
-    front: 'Original front',
-    back: 'Original back',
-    note: 'Original note',
-    sortOrder: 0,
-    createdAt: 1,
-    updatedAt: 1,
-    hasLearningProgress: hasLearningProgress,
-  );
+GoRouter _editorRouter({required String deckId, required String flashcardId}) =>
+    GoRouter(
+      initialLocation: '/deck/$deckId/flashcards/$flashcardId/edit',
+      routes: [
+        GoRoute(
+          path: '/${RoutePaths.flashcardEditSegment}',
+          name: RouteNames.flashcardEdit,
+          builder: (context, state) => FlashcardEditorScreen(
+            deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+            flashcardId: state.pathParameters[RoutePaths.flashcardIdParam],
+          ),
+        ),
+        GoRoute(
+          path: '/${RoutePaths.flashcardListSegment}',
+          name: RouteNames.flashcardList,
+          builder: (context, state) =>
+              const SizedBox(key: ValueKey('flashcard_list_destination')),
+        ),
+      ],
+    );
+
+FlashcardEntity _flashcard({required bool hasLearningProgress}) =>
+    FlashcardEntity(
+      id: 'card-001',
+      deckId: 'deck-001',
+      front: 'Original front',
+      back: 'Original back',
+      note: 'Original note',
+      sortOrder: 0,
+      createdAt: 1,
+      updatedAt: 1,
+      hasLearningProgress: hasLearningProgress,
+    );
 
 final class _EditorFlashcardRepository implements FlashcardRepository {
   _EditorFlashcardRepository({required FlashcardEntity flashcard})
@@ -282,20 +287,22 @@ final class _EditorFlashcardRepository implements FlashcardRepository {
 
 final class _StubDeckRepository implements DeckRepository {
   @override
-  Future<DeckActionContextReadModel> getDeckActionContext(String deckId) async => DeckActionContextReadModel(
-      deck: DeckEntity(
-        id: deckId,
-        folderId: 'folder-001',
-        name: 'Sample deck',
-        sortOrder: 0,
-        createdAt: 1,
-        updatedAt: 1,
-      ),
-      breadcrumb: const <BreadcrumbSegmentReadModel>[
-        BreadcrumbSegmentReadModel(label: 'Sample folder'),
-        BreadcrumbSegmentReadModel(label: 'Sample deck'),
-      ],
-    );
+  Future<DeckActionContextReadModel> getDeckActionContext(
+    String deckId,
+  ) async => DeckActionContextReadModel(
+    deck: DeckEntity(
+      id: deckId,
+      folderId: 'folder-001',
+      name: 'Sample deck',
+      sortOrder: 0,
+      createdAt: 1,
+      updatedAt: 1,
+    ),
+    breadcrumb: const <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'Sample folder'),
+      BreadcrumbSegmentReadModel(label: 'Sample deck'),
+    ],
+  );
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

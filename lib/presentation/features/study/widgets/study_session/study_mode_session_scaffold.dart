@@ -40,9 +40,7 @@ class StudyModeSessionScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final closeHandler = isActionBusy
-        ? null
-        : (canCancel ? onCancel : onBack);
+    final closeHandler = isActionBusy ? null : (canCancel ? onCancel : onBack);
     return MxScaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       bodyInsets: false,

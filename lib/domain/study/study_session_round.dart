@@ -77,11 +77,11 @@ StudyProgressValue studyModeProgressFromGrades({
   required StudySessionSnapshot snapshot,
   required Map<String, AttemptGrade> localGrades,
 }) => studyModeProgress(
-    snapshot: snapshot,
-    localCorrectCount: localCorrectGradeCount(localGrades),
-  );
+  snapshot: snapshot,
+  localCorrectCount: localCorrectGradeCount(localGrades),
+);
 
 double localCorrectGradeCount(Map<String, AttemptGrade> grades) => grades.values
-      .where((grade) => grade == AttemptGrade.correct)
-      .length
-      .toDouble();
+    .where((grade) => grade == AttemptGrade.correct)
+    .length
+    .toDouble();

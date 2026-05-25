@@ -9,19 +9,15 @@ enum DriveSyncStatusKind {
   synced,
   localChanges,
   remoteChanges,
-  conflict,
   unsupportedSchema,
   failure,
 }
-
-enum DriveSyncConflictChoice { keepLocal, useDriveCopy, cancel }
 
 enum DriveSyncActionKind {
   none,
   uploadedLocal,
   restoredRemote,
   noChanges,
-  needsConflictResolution,
   canceled,
   failed,
 }
@@ -71,19 +67,19 @@ final class DriveSyncManifest {
     String? snapshotFileId,
     String? snapshotFileVersion,
   }) => DriveSyncManifest(
-      manifestVersion: manifestVersion,
-      snapshotFormatVersion: snapshotFormatVersion,
-      appId: appId,
-      appDatabaseSchemaVersion: appDatabaseSchemaVersion,
-      createdAt: createdAt ?? this.createdAt,
-      deviceId: deviceId,
-      deviceLabel: deviceLabel,
-      databaseSha256: databaseSha256,
-      settingsSha256: settingsSha256,
-      snapshotSizeBytes: snapshotSizeBytes ?? this.snapshotSizeBytes,
-      snapshotFileId: snapshotFileId ?? this.snapshotFileId,
-      snapshotFileVersion: snapshotFileVersion ?? this.snapshotFileVersion,
-    );
+    manifestVersion: manifestVersion,
+    snapshotFormatVersion: snapshotFormatVersion,
+    appId: appId,
+    appDatabaseSchemaVersion: appDatabaseSchemaVersion,
+    createdAt: createdAt ?? this.createdAt,
+    deviceId: deviceId,
+    deviceLabel: deviceLabel,
+    databaseSha256: databaseSha256,
+    settingsSha256: settingsSha256,
+    snapshotSizeBytes: snapshotSizeBytes ?? this.snapshotSizeBytes,
+    snapshotFileId: snapshotFileId ?? this.snapshotFileId,
+    snapshotFileVersion: snapshotFileVersion ?? this.snapshotFileVersion,
+  );
 }
 
 final class DriveSyncSnapshot {
@@ -146,24 +142,11 @@ final class DriveSyncMetadata {
   bool matchesAccount(String subjectId) => accountSubjectId == subjectId;
 }
 
-final class DriveSyncConflict {
-  const DriveSyncConflict({
-    required this.localFingerprint,
-    required this.remote,
-    required this.reason,
-  });
-
-  final String localFingerprint;
-  final DriveSyncRemoteSnapshot remote;
-  final String reason;
-}
-
 final class DriveSyncStatus {
   const DriveSyncStatus({
     required this.kind,
     this.lastSyncedAt,
     this.remote,
-    this.conflict,
     this.message,
   });
 
@@ -186,7 +169,6 @@ final class DriveSyncStatus {
   final DriveSyncStatusKind kind;
   final int? lastSyncedAt;
   final DriveSyncRemoteSnapshot? remote;
-  final DriveSyncConflict? conflict;
   final String? message;
 }
 
@@ -194,7 +176,6 @@ final class DriveSyncRunResult {
   const DriveSyncRunResult({
     required this.kind,
     required this.status,
-    this.conflict,
     this.restoreEffect = DriveSyncRestoreEffect.none,
     this.message,
   });
@@ -214,15 +195,6 @@ final class DriveSyncRunResult {
         restoreEffect: effect,
       );
 
-  const DriveSyncRunResult.conflict(
-    DriveSyncStatus status,
-    DriveSyncConflict conflict,
-  ) : this(
-        kind: DriveSyncActionKind.needsConflictResolution,
-        status: status,
-        conflict: conflict,
-      );
-
   const DriveSyncRunResult.canceled(DriveSyncStatus status)
     : this(kind: DriveSyncActionKind.canceled, status: status);
 
@@ -231,7 +203,6 @@ final class DriveSyncRunResult {
 
   final DriveSyncActionKind kind;
   final DriveSyncStatus status;
-  final DriveSyncConflict? conflict;
   final DriveSyncRestoreEffect restoreEffect;
   final String? message;
 }

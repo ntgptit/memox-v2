@@ -55,16 +55,16 @@ class CloudAccountLink {
     DriveAuthorizationState? driveAuthorizationState,
     int? lastSignedInAt,
   }) => CloudAccountLink(
-      provider: provider,
-      subjectId: subjectId,
-      email: email,
-      displayName: displayName,
-      photoUrl: photoUrl,
-      grantedScopes: grantedScopes ?? this.grantedScopes,
-      driveAuthorizationState:
-          driveAuthorizationState ?? this.driveAuthorizationState,
-      linkedAt: linkedAt,
-      lastSignedInAt: lastSignedInAt ?? this.lastSignedInAt,
-      schemaVersion: schemaVersion,
-    );
+    provider: provider,
+    subjectId: subjectId,
+    email: email,
+    displayName: displayName,
+    photoUrl: photoUrl,
+    grantedScopes: grantedScopes ?? this.grantedScopes,
+    driveAuthorizationState:
+        driveAuthorizationState ?? this.driveAuthorizationState,
+    linkedAt: linkedAt,
+    lastSignedInAt: lastSignedInAt ?? this.lastSignedInAt,
+    schemaVersion: schemaVersion,
+  );
 }

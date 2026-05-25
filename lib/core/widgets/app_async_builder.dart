@@ -21,8 +21,8 @@ class AppAsyncBuilder<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => value.when(
-      loading: () => loading(context),
-      error: (error, stackTrace) => this.error(context, error, stackTrace),
-      data: (value) => data(context, value),
-    );
+    loading: () => loading(context),
+    error: (error, stackTrace) => this.error(context, error, stackTrace),
+    data: (value) => data(context, value),
+  );
 }

@@ -172,32 +172,21 @@ final class DeckRepositoryImpl implements DeckRepository {
     required String folderId,
     required String name,
   }) => runRepositoryAction(() async {
-      final trimmedName = _normalizeName(name);
-      final parentFolder = await _requireFolder(folderId);
-      final targetMode = _structureService.resolveModeAfterAddingDeck(
-        DatabaseEnumCodecs.folderContentModeFromStorage(
-          parentFolder.contentMode,
-        ),
+    final trimmedName = _normalizeName(name);
+    final parentFolder = await _requireFolder(folderId);
+    final targetMode = _structureService.resolveModeAfterAddingDeck(
+      DatabaseEnumCodecs.folderContentModeFromStorage(parentFolder.contentMode),
+    );
+    final now = _clock.nowEpochMillis();
+    final id = _idGenerator.nextId();
+    final sortOrder = await _deckDao.nextSortOrder(folderId);
+    await _transactionRunner.write((_) async {
+      await _folderDao.updateFolderMode(
+        folderId: folderId,
+        contentMode: targetMode,
+        updatedAt: now,
       );
-      final now = _clock.nowEpochMillis();
-      final id = _idGenerator.nextId();
-      final sortOrder = await _deckDao.nextSortOrder(folderId);
-      await _transactionRunner.write((_) async {
-        await _folderDao.updateFolderMode(
-          folderId: folderId,
-          contentMode: targetMode,
-          updatedAt: now,
-        );
-        await _deckDao.insertDeck(
-          id: id,
-          folderId: folderId,
-          name: trimmedName,
-          sortOrder: sortOrder,
-          createdAt: now,
-          updatedAt: now,
-        );
-      });
-      return DeckEntity(
+      await _deckDao.insertDeck(
         id: id,
         folderId: folderId,
         name: trimmedName,
@@ -206,133 +195,116 @@ final class DeckRepositoryImpl implements DeckRepository {
         updatedAt: now,
       );
     });
+    return DeckEntity(
+      id: id,
+      folderId: folderId,
+      name: trimmedName,
+      sortOrder: sortOrder,
+      createdAt: now,
+      updatedAt: now,
+    );
+  });
 
   @override
   Future<Result<DeckEntity>> updateDeck({
     required String deckId,
     required String name,
   }) => runRepositoryAction(() async {
-      final deck = await _requireDeck(deckId);
-      final trimmedName = _normalizeName(name);
-      final now = _clock.nowEpochMillis();
-      await _deckDao.updateDeckName(
-        deckId: deckId,
-        name: trimmedName,
-        updatedAt: now,
-      );
-      return DeckEntity(
-        id: deck.id,
-        folderId: deck.folderId,
-        name: trimmedName,
-        sortOrder: deck.sortOrder,
-        createdAt: deck.createdAt,
-        updatedAt: now,
-      );
-    });
+    final deck = await _requireDeck(deckId);
+    final trimmedName = _normalizeName(name);
+    final now = _clock.nowEpochMillis();
+    await _deckDao.updateDeckName(
+      deckId: deckId,
+      name: trimmedName,
+      updatedAt: now,
+    );
+    return DeckEntity(
+      id: deck.id,
+      folderId: deck.folderId,
+      name: trimmedName,
+      sortOrder: deck.sortOrder,
+      createdAt: deck.createdAt,
+      updatedAt: now,
+    );
+  });
 
   @override
-  Future<Result<void>> deleteDeck(String deckId) => runRepositoryAction(() async {
-      final deck = await _requireDeck(deckId);
-      final now = _clock.nowEpochMillis();
-      await _transactionRunner.write((_) async {
-        await _deckDao.deleteDeck(deckId);
-        await _syncFolderMode(deck.folderId, updatedAt: now);
+  Future<Result<void>> deleteDeck(String deckId) =>
+      runRepositoryAction(() async {
+        final deck = await _requireDeck(deckId);
+        final now = _clock.nowEpochMillis();
+        await _transactionRunner.write((_) async {
+          await _deckDao.deleteDeck(deckId);
+          await _syncFolderMode(deck.folderId, updatedAt: now);
+        });
       });
-    });
 
   @override
   Future<Result<void>> moveDeck({
     required String deckId,
     required String targetFolderId,
   }) => runRepositoryAction(() async {
-      final deck = await _requireDeck(deckId);
-      final targetFolder = await _requireFolder(targetFolderId);
-      final targetMode = DatabaseEnumCodecs.folderContentModeFromStorage(
-        targetFolder.contentMode,
+    final deck = await _requireDeck(deckId);
+    final targetFolder = await _requireFolder(targetFolderId);
+    final targetMode = DatabaseEnumCodecs.folderContentModeFromStorage(
+      targetFolder.contentMode,
+    );
+    _structureService.validateDeckMove(targetMode);
+    final now = _clock.nowEpochMillis();
+    final targetSortOrder = await _deckDao.nextSortOrder(targetFolderId);
+    await _transactionRunner.write((_) async {
+      final nextMode = _structureService.resolveModeAfterAddingDeck(targetMode);
+      await _folderDao.updateFolderMode(
+        folderId: targetFolderId,
+        contentMode: nextMode,
+        updatedAt: now,
       );
-      _structureService.validateDeckMove(targetMode);
-      final now = _clock.nowEpochMillis();
-      final targetSortOrder = await _deckDao.nextSortOrder(targetFolderId);
-      await _transactionRunner.write((_) async {
-        final nextMode = _structureService.resolveModeAfterAddingDeck(
-          targetMode,
-        );
-        await _folderDao.updateFolderMode(
-          folderId: targetFolderId,
-          contentMode: nextMode,
-          updatedAt: now,
-        );
-        await _deckDao.updateDeckFolder(
-          deckId: deckId,
-          folderId: targetFolderId,
-          sortOrder: targetSortOrder,
-          updatedAt: now,
-        );
-        await _syncFolderMode(deck.folderId, updatedAt: now);
-      });
+      await _deckDao.updateDeckFolder(
+        deckId: deckId,
+        folderId: targetFolderId,
+        sortOrder: targetSortOrder,
+        updatedAt: now,
+      );
+      await _syncFolderMode(deck.folderId, updatedAt: now);
     });
+  });
 
   @override
   Future<Result<void>> reorderDecks({
     required String folderId,
     required List<String> orderedDeckIds,
   }) => runRepositoryAction(() async {
-      await _deckDao.reorderDecks(
-        folderId: folderId,
-        orderedDeckIds: orderedDeckIds,
-        updatedAt: _clock.nowEpochMillis(),
-      );
-    });
+    await _deckDao.reorderDecks(
+      folderId: folderId,
+      orderedDeckIds: orderedDeckIds,
+      updatedAt: _clock.nowEpochMillis(),
+    );
+  });
 
   @override
   Future<Result<DeckEntity>> duplicateDeck({
     required String deckId,
     required String targetFolderId,
   }) => runRepositoryAction(() async {
-      final sourceDeck = await _requireDeck(deckId);
-      final targetFolder = await _requireFolder(targetFolderId);
-      final targetMode = DatabaseEnumCodecs.folderContentModeFromStorage(
-        targetFolder.contentMode,
+    final sourceDeck = await _requireDeck(deckId);
+    final targetFolder = await _requireFolder(targetFolderId);
+    final targetMode = DatabaseEnumCodecs.folderContentModeFromStorage(
+      targetFolder.contentMode,
+    );
+    _structureService.validateDeckMove(targetMode);
+    final now = _clock.nowEpochMillis();
+    final newDeckId = _idGenerator.nextId();
+    final newDeckName = '${sourceDeck.name} Copy';
+    final sortOrder = await _deckDao.nextSortOrder(targetFolderId);
+    final sourceFlashcards = await _deckDao.listDeckFlashcards(deckId);
+    await _transactionRunner.write((_) async {
+      final nextMode = _structureService.resolveModeAfterAddingDeck(targetMode);
+      await _folderDao.updateFolderMode(
+        folderId: targetFolderId,
+        contentMode: nextMode,
+        updatedAt: now,
       );
-      _structureService.validateDeckMove(targetMode);
-      final now = _clock.nowEpochMillis();
-      final newDeckId = _idGenerator.nextId();
-      final newDeckName = '${sourceDeck.name} Copy';
-      final sortOrder = await _deckDao.nextSortOrder(targetFolderId);
-      final sourceFlashcards = await _deckDao.listDeckFlashcards(deckId);
-      await _transactionRunner.write((_) async {
-        final nextMode = _structureService.resolveModeAfterAddingDeck(
-          targetMode,
-        );
-        await _folderDao.updateFolderMode(
-          folderId: targetFolderId,
-          contentMode: nextMode,
-          updatedAt: now,
-        );
-        await _deckDao.insertDeck(
-          id: newDeckId,
-          folderId: targetFolderId,
-          name: newDeckName,
-          sortOrder: sortOrder,
-          createdAt: now,
-          updatedAt: now,
-        );
-        for (var index = 0; index < sourceFlashcards.length; index++) {
-          await _flashcardDao.insertFlashcard(
-            id: _idGenerator.nextId(),
-            deckId: newDeckId,
-            draft: FlashcardDraft(
-              front: sourceFlashcards[index].front,
-              back: sourceFlashcards[index].back,
-              note: sourceFlashcards[index].note,
-            ),
-            sortOrder: index,
-            createdAt: now,
-            updatedAt: now,
-          );
-        }
-      });
-      return DeckEntity(
+      await _deckDao.insertDeck(
         id: newDeckId,
         folderId: targetFolderId,
         name: newDeckName,
@@ -340,27 +312,51 @@ final class DeckRepositoryImpl implements DeckRepository {
         createdAt: now,
         updatedAt: now,
       );
+      for (var index = 0; index < sourceFlashcards.length; index++) {
+        await _flashcardDao.insertFlashcard(
+          id: _idGenerator.nextId(),
+          deckId: newDeckId,
+          draft: FlashcardDraft(
+            front: sourceFlashcards[index].front,
+            back: sourceFlashcards[index].back,
+            note: sourceFlashcards[index].note,
+          ),
+          sortOrder: index,
+          createdAt: now,
+          updatedAt: now,
+        );
+      }
     });
+    return DeckEntity(
+      id: newDeckId,
+      folderId: targetFolderId,
+      name: newDeckName,
+      sortOrder: sortOrder,
+      createdAt: now,
+      updatedAt: now,
+    );
+  });
 
   @override
-  Future<Result<ExportData>> exportDeck(String deckId) => runRepositoryAction(() async {
-      final deck = await _requireDeck(deckId);
-      final flashcards = await _deckDao.listDeckFlashcards(deckId);
-      final lines = <String>[
-        'front,back,note',
-        for (final flashcard in flashcards)
-          [
-            escapeCsvCell(flashcard.front),
-            escapeCsvCell(flashcard.back),
-            escapeCsvCell(flashcard.note),
-          ].join(','),
-      ];
-      return ExportData(
-        fileName: '${sanitizeFileName(deck.name)}.csv',
-        mimeType: 'text/csv',
-        content: lines.join('\n'),
-      );
-    });
+  Future<Result<ExportData>> exportDeck(String deckId) =>
+      runRepositoryAction(() async {
+        final deck = await _requireDeck(deckId);
+        final flashcards = await _deckDao.listDeckFlashcards(deckId);
+        final lines = <String>[
+          'front,back,note',
+          for (final flashcard in flashcards)
+            [
+              escapeCsvCell(flashcard.front),
+              escapeCsvCell(flashcard.back),
+              escapeCsvCell(flashcard.note),
+            ].join(','),
+        ];
+        return ExportData(
+          fileName: '${sanitizeFileName(deck.name)}.csv',
+          mimeType: 'text/csv',
+          content: lines.join('\n'),
+        );
+      });
 
   Future<Deck> _requireDeck(String deckId) async {
     final deck = await _deckDao.findById(deckId);

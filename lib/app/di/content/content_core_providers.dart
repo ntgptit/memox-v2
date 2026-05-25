@@ -14,4 +14,5 @@ Clock clock(Ref ref) => const SystemClock();
 IdGenerator idGenerator(Ref ref) => RandomIdGenerator();
 
 @riverpod
-LocalTransactionRunner localTransactionRunner(Ref ref) => LocalTransactionRunner(ref.watch(appDatabaseProvider));
+LocalTransactionRunner localTransactionRunner(Ref ref) =>
+    LocalTransactionRunner(ref.watch(appDatabaseProvider));

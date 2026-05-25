@@ -245,7 +245,10 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
     final snapshot = _snapshotCodec.decode(archiveBytes);
     if (snapshot == null || snapshot.fingerprint != remote.fingerprint) {
       const status = DriveSyncStatus.failure('Drive snapshot is invalid.');
-      return const DriveSyncRunResult.failed(status, 'Drive snapshot is invalid.');
+      return const DriveSyncRunResult.failed(
+        status,
+        'Drive snapshot is invalid.',
+      );
     }
 
     await _settingsSnapshotStore.restore(snapshot.settings);
@@ -273,23 +276,24 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
     required String localFingerprint,
     required DriveSyncRemoteSnapshot remote,
   }) => _metadataStore.save(
-      DriveSyncMetadata(
-        accountSubjectId: accountSubjectId,
-        manifestFileId: remote.manifestFileId,
-        snapshotFileId: remote.snapshotFileId,
-        remoteFingerprint: remote.fingerprint,
-        localFingerprint: localFingerprint,
-        remoteManifestVersion: remote.manifestFileVersion,
-        remoteSnapshotVersion: remote.snapshotFileVersion,
-        lastSyncedAt: _clock.nowEpochMillis(),
-      ),
-    );
-
-  DriveSyncStatus _syncedStatus(DriveSyncRemoteSnapshot remote) => DriveSyncStatus(
-      kind: DriveSyncStatusKind.synced,
+    DriveSyncMetadata(
+      accountSubjectId: accountSubjectId,
+      manifestFileId: remote.manifestFileId,
+      snapshotFileId: remote.snapshotFileId,
+      remoteFingerprint: remote.fingerprint,
+      localFingerprint: localFingerprint,
+      remoteManifestVersion: remote.manifestFileVersion,
+      remoteSnapshotVersion: remote.snapshotFileVersion,
       lastSyncedAt: _clock.nowEpochMillis(),
-      remote: remote,
-    );
+    ),
+  );
+
+  DriveSyncStatus _syncedStatus(DriveSyncRemoteSnapshot remote) =>
+      DriveSyncStatus(
+        kind: DriveSyncStatusKind.synced,
+        lastSyncedAt: _clock.nowEpochMillis(),
+        remote: remote,
+      );
 }
 
 final class _DriveSyncContext {

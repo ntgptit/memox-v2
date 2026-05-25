@@ -70,7 +70,8 @@ class _MxSpeakButtonState extends State<MxSpeakButton>
     return AnimatedBuilder(
       animation: _scale,
       child: iconButton,
-      builder: (context, child) => Transform.scale(scale: _scale.value, child: child),
+      builder: (context, child) =>
+          Transform.scale(scale: _scale.value, child: child),
     );
   }
 

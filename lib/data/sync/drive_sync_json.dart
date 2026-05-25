@@ -5,24 +5,26 @@ import '../../domain/entities/drive_sync_models.dart';
 abstract final class DriveSyncJson {
   const DriveSyncJson._();
 
-  static String encodeCanonicalJson(Object? value) => jsonEncode(_canonicalize(value));
+  static String encodeCanonicalJson(Object? value) =>
+      jsonEncode(_canonicalize(value));
 
-  static Map<String, Object?> encodeManifest(DriveSyncManifest manifest) => <String, Object?>{
-      'manifestVersion': manifest.manifestVersion,
-      'snapshotFormatVersion': manifest.snapshotFormatVersion,
-      'appId': manifest.appId,
-      'appDatabaseSchemaVersion': manifest.appDatabaseSchemaVersion,
-      'createdAt': manifest.createdAt,
-      'deviceId': manifest.deviceId,
-      'deviceLabel': manifest.deviceLabel,
-      'databaseSha256': manifest.databaseSha256,
-      'settingsSha256': manifest.settingsSha256,
-      'snapshotSizeBytes': manifest.snapshotSizeBytes,
-      if (manifest.snapshotFileId != null)
-        'snapshotFileId': manifest.snapshotFileId,
-      if (manifest.snapshotFileVersion != null)
-        'snapshotFileVersion': manifest.snapshotFileVersion,
-    };
+  static Map<String, Object?> encodeManifest(DriveSyncManifest manifest) =>
+      <String, Object?>{
+        'manifestVersion': manifest.manifestVersion,
+        'snapshotFormatVersion': manifest.snapshotFormatVersion,
+        'appId': manifest.appId,
+        'appDatabaseSchemaVersion': manifest.appDatabaseSchemaVersion,
+        'createdAt': manifest.createdAt,
+        'deviceId': manifest.deviceId,
+        'deviceLabel': manifest.deviceLabel,
+        'databaseSha256': manifest.databaseSha256,
+        'settingsSha256': manifest.settingsSha256,
+        'snapshotSizeBytes': manifest.snapshotSizeBytes,
+        if (manifest.snapshotFileId != null)
+          'snapshotFileId': manifest.snapshotFileId,
+        if (manifest.snapshotFileVersion != null)
+          'snapshotFileVersion': manifest.snapshotFileVersion,
+      };
 
   static DriveSyncManifest? decodeManifest(Object? value) {
     if (value is! Map<String, Object?>) {

@@ -75,24 +75,24 @@ class MxDestinationPickerSheet<T> extends StatefulWidget {
     bool enableDrag = true,
     bool useRootNavigator = false,
   }) => MxBottomSheet.show<T>(
-      context: context,
-      title: title,
-      isDismissible: isDismissible,
-      enableDrag: enableDrag,
-      useRootNavigator: useRootNavigator,
-      child: MxDestinationPickerSheet<T>(
-        destinations: destinations,
-        selectedValue: selectedValue,
-        supportingText: supportingText,
-        searchHintText: searchHintText,
-        emptyLabel: emptyLabel,
-        showSearch: showSearch,
-        maxListHeight: maxListHeight,
-        onSelected: onSelected,
-        popOnSelect: popOnSelect,
-        initialQuery: initialQuery,
-      ),
-    );
+    context: context,
+    title: title,
+    isDismissible: isDismissible,
+    enableDrag: enableDrag,
+    useRootNavigator: useRootNavigator,
+    child: MxDestinationPickerSheet<T>(
+      destinations: destinations,
+      selectedValue: selectedValue,
+      supportingText: supportingText,
+      searchHintText: searchHintText,
+      emptyLabel: emptyLabel,
+      showSearch: showSearch,
+      maxListHeight: maxListHeight,
+      onSelected: onSelected,
+      popOnSelect: popOnSelect,
+      initialQuery: initialQuery,
+    ),
+  );
 
   @override
   State<MxDestinationPickerSheet<T>> createState() =>

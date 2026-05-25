@@ -19,24 +19,24 @@ class FlashcardReorderList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-      height: MxFeatureSizes.flashcardReorderPanelHeightFor(context),
-      child: MxReorderableList.builder(
-        itemCount: orderedIds.length,
-        buildDefaultDragHandles: true,
-        onReorder: onReorder,
-        itemBuilder: (context, index) {
-          final item = state.items.firstWhere(
-            (flashcard) => flashcard.id == orderedIds[index],
-          );
-          return KeyedSubtree(
-            key: ValueKey(item.id),
-            child: MxTermRow(
-              term: item.front,
-              definition: item.back,
-              caption: item.note,
-            ),
-          );
-        },
-      ),
-    );
+    height: MxFeatureSizes.flashcardReorderPanelHeightFor(context),
+    child: MxReorderableList.builder(
+      itemCount: orderedIds.length,
+      buildDefaultDragHandles: true,
+      onReorder: onReorder,
+      itemBuilder: (context, index) {
+        final item = state.items.firstWhere(
+          (flashcard) => flashcard.id == orderedIds[index],
+        );
+        return KeyedSubtree(
+          key: ValueKey(item.id),
+          child: MxTermRow(
+            term: item.front,
+            definition: item.back,
+            caption: item.note,
+          ),
+        );
+      },
+    ),
+  );
 }

@@ -143,4 +143,5 @@ class TtsController extends _$TtsController {
 }
 
 @riverpod
-Future<List<TtsVoice>> ttsVoices(Ref ref, TtsLanguage language) => ref.watch(ttsServiceProvider).availableVoices(language);
+Future<List<TtsVoice>> ttsVoices(Ref ref, TtsLanguage language) =>
+    ref.watch(ttsServiceProvider).availableVoices(language);

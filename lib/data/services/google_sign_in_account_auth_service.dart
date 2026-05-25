@@ -32,7 +32,8 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
   bool get requiresPlatformSignInButton => !supportsInteractiveSignIn;
 
   @override
-  Future<void> initialize(GoogleOAuthConfig config) => _initializeFuture ??= _initialize(config);
+  Future<void> initialize(GoogleOAuthConfig config) =>
+      _initializeFuture ??= _initialize(config);
 
   Future<void> _initialize(GoogleOAuthConfig config) async {
     await _signIn.initialize(
@@ -285,28 +286,28 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
     required Set<String> grantedScopes,
     required DriveAuthorizationState driveAuthorizationState,
   }) => GoogleAccountAuthSession(
-      profile: GoogleAccountProfile(
-        subjectId: account.id,
-        email: account.email,
-        displayName: account.displayName,
-        photoUrl: account.photoUrl,
-      ),
-      grantedScopes: grantedScopes,
-      driveAuthorizationState: driveAuthorizationState,
-    );
+    profile: GoogleAccountProfile(
+      subjectId: account.id,
+      email: account.email,
+      displayName: account.displayName,
+      photoUrl: account.photoUrl,
+    ),
+    grantedScopes: grantedScopes,
+    driveAuthorizationState: driveAuthorizationState,
+  );
 
-  GoogleAccountAuthResult _mapGoogleException(GoogleSignInException error) => switch (error.code) {
-      GoogleSignInExceptionCode.canceled ||
-      GoogleSignInExceptionCode.interrupted =>
-        const GoogleAccountAuthResult.canceled(),
-      GoogleSignInExceptionCode.uiUnavailable =>
-        const GoogleAccountAuthResult.unsupported(),
-      GoogleSignInExceptionCode.clientConfigurationError ||
-      GoogleSignInExceptionCode.providerConfigurationError =>
-        GoogleAccountAuthResult.failure(error.description),
-      GoogleSignInExceptionCode.unknownError ||
-      GoogleSignInExceptionCode.userMismatch => GoogleAccountAuthResult.failure(
-        error.description,
-      ),
-    };
+  GoogleAccountAuthResult _mapGoogleException(GoogleSignInException error) =>
+      switch (error.code) {
+        GoogleSignInExceptionCode.canceled ||
+        GoogleSignInExceptionCode.interrupted =>
+          const GoogleAccountAuthResult.canceled(),
+        GoogleSignInExceptionCode.uiUnavailable =>
+          const GoogleAccountAuthResult.unsupported(),
+        GoogleSignInExceptionCode.clientConfigurationError ||
+        GoogleSignInExceptionCode.providerConfigurationError =>
+          GoogleAccountAuthResult.failure(error.description),
+        GoogleSignInExceptionCode.unknownError ||
+        GoogleSignInExceptionCode.userMismatch =>
+          GoogleAccountAuthResult.failure(error.description),
+      };
 }

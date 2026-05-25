@@ -131,33 +131,33 @@ class _StudyModeListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-      builder: (context, constraints) {
-        final twoColumn =
-            constraints.hasBoundedWidth && context.gridColumns(base: 2) > 1;
-        final tiles = [
-          for (final mode in modes)
-            _StudyModeTile(
-              mode: mode,
-              enabled: enabled,
-              onStartStudy: onStartStudy,
+    builder: (context, constraints) {
+      final twoColumn =
+          constraints.hasBoundedWidth && context.gridColumns(base: 2) > 1;
+      final tiles = [
+        for (final mode in modes)
+          _StudyModeTile(
+            mode: mode,
+            enabled: enabled,
+            onStartStudy: onStartStudy,
+          ),
+      ];
+      if (!twoColumn) {
+        return Column(children: tiles);
+      }
+      return Wrap(
+        spacing: MxSpace.sm,
+        runSpacing: MxSpace.sm,
+        children: [
+          for (final tile in tiles)
+            SizedBox(
+              width: (constraints.maxWidth - MxSpace.sm) / 2,
+              child: tile,
             ),
-        ];
-        if (!twoColumn) {
-          return Column(children: tiles);
-        }
-        return Wrap(
-          spacing: MxSpace.sm,
-          runSpacing: MxSpace.sm,
-          children: [
-            for (final tile in tiles)
-              SizedBox(
-                width: (constraints.maxWidth - MxSpace.sm) / 2,
-                child: tile,
-              ),
-          ],
-        );
-      },
-    );
+        ],
+      );
+    },
+  );
 }
 
 class _StudyModeTile extends StatelessWidget {

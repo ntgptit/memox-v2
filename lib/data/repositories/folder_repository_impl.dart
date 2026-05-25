@@ -231,12 +231,24 @@ final class FolderRepositoryImpl implements FolderRepository {
   }
 
   @override
-  Future<Result<FolderEntity>> createRootFolder(String name) => runRepositoryAction(() async {
-      final trimmedName = _normalizeName(name);
-      final now = _clock.nowEpochMillis();
-      final id = _idGenerator.nextId();
-      final sortOrder = await _folderDao.nextSortOrder(null);
-      await _transactionRunner.write((_) => _folderDao.insertFolder(
+  Future<Result<FolderEntity>> createRootFolder(String name) =>
+      runRepositoryAction(() async {
+        final trimmedName = _normalizeName(name);
+        final now = _clock.nowEpochMillis();
+        final id = _idGenerator.nextId();
+        final sortOrder = await _folderDao.nextSortOrder(null);
+        await _transactionRunner.write(
+          (_) => _folderDao.insertFolder(
+            id: id,
+            parentId: null,
+            name: trimmedName,
+            contentMode: FolderContentMode.unlocked,
+            sortOrder: sortOrder,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+        return FolderEntity(
           id: id,
           parentId: null,
           name: trimmedName,
@@ -244,48 +256,29 @@ final class FolderRepositoryImpl implements FolderRepository {
           sortOrder: sortOrder,
           createdAt: now,
           updatedAt: now,
-        ));
-      return FolderEntity(
-        id: id,
-        parentId: null,
-        name: trimmedName,
-        contentMode: FolderContentMode.unlocked,
-        sortOrder: sortOrder,
-        createdAt: now,
-        updatedAt: now,
-      );
-    });
+        );
+      });
 
   @override
   Future<Result<FolderEntity>> createSubfolder({
     required String parentFolderId,
     required String name,
   }) => runRepositoryAction(() async {
-      final trimmedName = _normalizeName(name);
-      final parent = await _requireFolder(parentFolderId);
-      final nextMode = _structureService.resolveModeAfterAddingSubfolder(
-        DatabaseEnumCodecs.folderContentModeFromStorage(parent.contentMode),
+    final trimmedName = _normalizeName(name);
+    final parent = await _requireFolder(parentFolderId);
+    final nextMode = _structureService.resolveModeAfterAddingSubfolder(
+      DatabaseEnumCodecs.folderContentModeFromStorage(parent.contentMode),
+    );
+    final now = _clock.nowEpochMillis();
+    final id = _idGenerator.nextId();
+    final sortOrder = await _folderDao.nextSortOrder(parentFolderId);
+    await _transactionRunner.write((_) async {
+      await _folderDao.updateFolderMode(
+        folderId: parentFolderId,
+        contentMode: nextMode,
+        updatedAt: now,
       );
-      final now = _clock.nowEpochMillis();
-      final id = _idGenerator.nextId();
-      final sortOrder = await _folderDao.nextSortOrder(parentFolderId);
-      await _transactionRunner.write((_) async {
-        await _folderDao.updateFolderMode(
-          folderId: parentFolderId,
-          contentMode: nextMode,
-          updatedAt: now,
-        );
-        await _folderDao.insertFolder(
-          id: id,
-          parentId: parentFolderId,
-          name: trimmedName,
-          contentMode: FolderContentMode.unlocked,
-          sortOrder: sortOrder,
-          createdAt: now,
-          updatedAt: now,
-        );
-      });
-      return FolderEntity(
+      await _folderDao.insertFolder(
         id: id,
         parentId: parentFolderId,
         name: trimmedName,
@@ -295,102 +288,113 @@ final class FolderRepositoryImpl implements FolderRepository {
         updatedAt: now,
       );
     });
+    return FolderEntity(
+      id: id,
+      parentId: parentFolderId,
+      name: trimmedName,
+      contentMode: FolderContentMode.unlocked,
+      sortOrder: sortOrder,
+      createdAt: now,
+      updatedAt: now,
+    );
+  });
 
   @override
   Future<Result<FolderEntity>> updateFolder({
     required String folderId,
     required String name,
   }) => runRepositoryAction(() async {
-      final existing = await _requireFolder(folderId);
-      final trimmedName = _normalizeName(name);
-      final now = _clock.nowEpochMillis();
-      await _folderDao.updateFolderName(
-        folderId: folderId,
-        name: trimmedName,
-        updatedAt: now,
-      );
-      return FolderEntity(
-        id: existing.id,
-        parentId: existing.parentId,
-        name: trimmedName,
-        contentMode: DatabaseEnumCodecs.folderContentModeFromStorage(
-          existing.contentMode,
-        ),
-        sortOrder: existing.sortOrder,
-        createdAt: existing.createdAt,
-        updatedAt: now,
-      );
-    });
+    final existing = await _requireFolder(folderId);
+    final trimmedName = _normalizeName(name);
+    final now = _clock.nowEpochMillis();
+    await _folderDao.updateFolderName(
+      folderId: folderId,
+      name: trimmedName,
+      updatedAt: now,
+    );
+    return FolderEntity(
+      id: existing.id,
+      parentId: existing.parentId,
+      name: trimmedName,
+      contentMode: DatabaseEnumCodecs.folderContentModeFromStorage(
+        existing.contentMode,
+      ),
+      sortOrder: existing.sortOrder,
+      createdAt: existing.createdAt,
+      updatedAt: now,
+    );
+  });
 
   @override
-  Future<Result<void>> deleteFolder(String folderId) => runRepositoryAction(() async {
-      final folder = await _requireFolder(folderId);
-      final now = _clock.nowEpochMillis();
-      await _transactionRunner.write((_) async {
-        await _folderDao.deleteFolder(folderId);
-        if (folder.parentId != null) {
-          await _syncFolderMode(folder.parentId!, updatedAt: now);
-        }
+  Future<Result<void>> deleteFolder(String folderId) =>
+      runRepositoryAction(() async {
+        final folder = await _requireFolder(folderId);
+        final now = _clock.nowEpochMillis();
+        await _transactionRunner.write((_) async {
+          await _folderDao.deleteFolder(folderId);
+          if (folder.parentId != null) {
+            await _syncFolderMode(folder.parentId!, updatedAt: now);
+          }
+        });
       });
-    });
 
   @override
   Future<Result<void>> moveFolder({
     required String folderId,
     required String? targetParentId,
   }) => runRepositoryAction(() async {
-      final folder = await _requireFolder(folderId);
-      final descendants = await _folderDao.getDescendantIds(folderId);
-      final now = _clock.nowEpochMillis();
-      FolderContentMode targetMode = FolderContentMode.unlocked;
-      if (targetParentId != null) {
-        final targetFolder = await _requireFolder(targetParentId);
-        targetMode = DatabaseEnumCodecs.folderContentModeFromStorage(
-          targetFolder.contentMode,
-        );
-      }
-      _structureService.validateFolderMove(
-        folderId: folderId,
-        targetParentId: targetParentId,
-        descendantIds: descendants,
-        targetParentMode: targetMode,
+    final folder = await _requireFolder(folderId);
+    final descendants = await _folderDao.getDescendantIds(folderId);
+    final now = _clock.nowEpochMillis();
+    FolderContentMode targetMode = FolderContentMode.unlocked;
+    if (targetParentId != null) {
+      final targetFolder = await _requireFolder(targetParentId);
+      targetMode = DatabaseEnumCodecs.folderContentModeFromStorage(
+        targetFolder.contentMode,
       );
-      final targetSortOrder = await _folderDao.nextSortOrder(targetParentId);
-      await _transactionRunner.write((_) async {
-        if (targetParentId != null) {
-          final nextMode = _structureService.resolveModeAfterAddingSubfolder(
-            targetMode,
-          );
-          await _folderDao.updateFolderMode(
-            folderId: targetParentId,
-            contentMode: nextMode,
-            updatedAt: now,
-          );
-        }
-        await _folderDao.updateFolderParent(
-          folderId: folderId,
-          parentId: targetParentId,
-          sortOrder: targetSortOrder,
+    }
+    _structureService.validateFolderMove(
+      folderId: folderId,
+      targetParentId: targetParentId,
+      descendantIds: descendants,
+      targetParentMode: targetMode,
+    );
+    final targetSortOrder = await _folderDao.nextSortOrder(targetParentId);
+    await _transactionRunner.write((_) async {
+      if (targetParentId != null) {
+        final nextMode = _structureService.resolveModeAfterAddingSubfolder(
+          targetMode,
+        );
+        await _folderDao.updateFolderMode(
+          folderId: targetParentId,
+          contentMode: nextMode,
           updatedAt: now,
         );
-        if (folder.parentId != null) {
-          await _syncFolderMode(folder.parentId!, updatedAt: now);
-        }
-      });
+      }
+      await _folderDao.updateFolderParent(
+        folderId: folderId,
+        parentId: targetParentId,
+        sortOrder: targetSortOrder,
+        updatedAt: now,
+      );
+      if (folder.parentId != null) {
+        await _syncFolderMode(folder.parentId!, updatedAt: now);
+      }
     });
+  });
 
   @override
   Future<Result<void>> reorderFolders({
     required String? parentFolderId,
     required List<String> orderedFolderIds,
   }) => runRepositoryAction(() async {
-      final now = _clock.nowEpochMillis();
-      await _folderDao.reorderFolders(
-        parentFolderId: parentFolderId,
-        orderedFolderIds: orderedFolderIds,
-        updatedAt: now,
-      );
-    });
+    final now = _clock.nowEpochMillis();
+    await _folderDao.reorderFolders(
+      parentFolderId: parentFolderId,
+      orderedFolderIds: orderedFolderIds,
+      updatedAt: now,
+    );
+  });
 
   Future<void> _syncFolderMode(
     String folderId, {
@@ -415,18 +419,19 @@ final class FolderRepositoryImpl implements FolderRepository {
     return folder;
   }
 
-  Future<FolderDeckReadModel> _buildFolderDeckReadModel(Deck deck) async => FolderDeckReadModel(
-      deck: deck.toDomain(),
-      cardCount: await _deckDao.countFlashcardsInDeck(deck.id),
-      dueTodayCount: await _deckDao.countDueTodayInDeck(
-        deckId: deck.id,
-        endOfTodayEpochMillis: endOfTodayEpochMillis(_clock),
-      ),
-      masteryPercent: computeMasteryPercent(
-        await _deckDao.getCurrentBoxesInDeck(deck.id),
-      ),
-      lastStudiedAt: await _deckDao.getLastStudiedAtInDeck(deck.id),
-    );
+  Future<FolderDeckReadModel> _buildFolderDeckReadModel(Deck deck) async =>
+      FolderDeckReadModel(
+        deck: deck.toDomain(),
+        cardCount: await _deckDao.countFlashcardsInDeck(deck.id),
+        dueTodayCount: await _deckDao.countDueTodayInDeck(
+          deckId: deck.id,
+          endOfTodayEpochMillis: endOfTodayEpochMillis(_clock),
+        ),
+        masteryPercent: computeMasteryPercent(
+          await _deckDao.getCurrentBoxesInDeck(deck.id),
+        ),
+        lastStudiedAt: await _deckDao.getLastStudiedAtInDeck(deck.id),
+      );
 
   String _normalizeName(String name) {
     final trimmed = StringUtils.trimmed(name);

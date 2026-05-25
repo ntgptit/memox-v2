@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../tokens/app_opacity.dart';
 
 abstract final class TextSelectionThemeBuilder {
-  static TextSelectionThemeData build(ColorScheme scheme) => TextSelectionThemeData(
-      cursorColor: scheme.primary,
-      selectionColor: scheme.primary.withValues(alpha: AppOpacity.handle),
-      selectionHandleColor: scheme.primary,
-    );
+  static TextSelectionThemeData build(ColorScheme scheme) =>
+      TextSelectionThemeData(
+        cursorColor: scheme.primary,
+        selectionColor: scheme.primary.withValues(alpha: AppOpacity.handle),
+        selectionHandleColor: scheme.primary,
+      );
 }

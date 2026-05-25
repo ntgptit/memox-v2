@@ -242,7 +242,8 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     });
   }
 
-  List<StudySessionItem> get _roundItems => pendingModeRoundItems(widget.snapshot);
+  List<StudySessionItem> get _roundItems =>
+      pendingModeRoundItems(widget.snapshot);
 
   StudySessionItem? get _currentItem {
     final items = _roundItems;
@@ -403,7 +404,9 @@ class _GuessAutoAdvanceFooter extends StatelessWidget {
     }
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final seconds = (guessFeedbackDelay.inMilliseconds / 1000).toStringAsFixed(1);
+    final seconds = (guessFeedbackDelay.inMilliseconds / 1000).toStringAsFixed(
+      1,
+    );
     return Padding(
       padding: const EdgeInsets.only(top: MxSpace.md),
       child: Column(
@@ -423,10 +426,8 @@ class _GuessAutoAdvanceFooter extends StatelessWidget {
             tween: Tween<double>(begin: 0, end: 1),
             duration: guessFeedbackDelay,
             curve: Curves.linear,
-            builder: (context, value, _) => MxLinearProgress(
-                value: value,
-                size: MxProgressSize.small,
-              ),
+            builder: (context, value, _) =>
+                MxLinearProgress(value: value, size: MxProgressSize.small),
           ),
         ],
       ),

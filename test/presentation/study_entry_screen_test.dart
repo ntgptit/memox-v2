@@ -248,10 +248,14 @@ class _CapturingStudyRepo implements StudyRepo {
   List<StudyMode>? startedModes;
 
   @override
-  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => [_card()];
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => [
+    _card(),
+  ];
 
   @override
-  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async => [_card(sourcePool: SessionItemSourcePool.due)];
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async => [
+    _card(sourcePool: SessionItemSourcePool.due),
+  ];
 
   @override
   Future<StudySessionSnapshot> startSession({
@@ -278,7 +282,8 @@ class _CapturingStudyRepo implements StudyRepo {
   ) async => null;
 
   @override
-  Future<List<StudySessionSnapshot>> listActiveSessions() async => const <StudySessionSnapshot>[];
+  Future<List<StudySessionSnapshot>> listActiveSessions() async =>
+      const <StudySessionSnapshot>[];
 
   @override
   Future<StudySessionSnapshot> loadSession(String sessionId) {
@@ -334,10 +339,12 @@ class _CapturingStudyRepo implements StudyRepo {
 
 final class _EmptyStudyRepo extends _CapturingStudyRepo {
   @override
-  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => const <StudyFlashcardRef>[];
+  Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async =>
+      const <StudyFlashcardRef>[];
 
   @override
-  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async => const <StudyFlashcardRef>[];
+  Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async =>
+      const <StudyFlashcardRef>[];
 }
 
 StudySessionSnapshot _snapshot({
@@ -347,49 +354,49 @@ StudySessionSnapshot _snapshot({
   required StudyMode mode,
   required StudyFlashcardRef flashcard,
 }) => StudySessionSnapshot(
-    session: StudySession(
-      id: 'session-001',
-      entryType: StudyEntryType.deck,
-      entryRefId: 'deck-001',
-      studyType: studyType,
-      studyFlow: studyFlow,
-      settings: settings,
-      status: SessionStatus.inProgress,
-      startedAt: 0,
-      endedAt: null,
-      restartedFromSessionId: null,
-    ),
-    currentItem: StudySessionItem(
-      id: 'item-001',
-      sessionId: 'session-001',
-      flashcard: flashcard,
-      studyMode: mode,
-      modeOrder: 1,
-      roundIndex: 1,
-      queuePosition: 1,
-      sourcePool: flashcard.sourcePool,
-      status: SessionItemStatus.pending,
-      completedAt: null,
-    ),
-    sessionFlashcards: [flashcard],
-    summary: const StudySummary(
-      totalCards: 1,
-      completedAttempts: 0,
-      correctAttempts: 0,
-      incorrectAttempts: 0,
-      increasedBoxCount: 0,
-      decreasedBoxCount: 0,
-      remainingCount: 1,
-    ),
-    canFinalize: false,
-  );
+  session: StudySession(
+    id: 'session-001',
+    entryType: StudyEntryType.deck,
+    entryRefId: 'deck-001',
+    studyType: studyType,
+    studyFlow: studyFlow,
+    settings: settings,
+    status: SessionStatus.inProgress,
+    startedAt: 0,
+    endedAt: null,
+    restartedFromSessionId: null,
+  ),
+  currentItem: StudySessionItem(
+    id: 'item-001',
+    sessionId: 'session-001',
+    flashcard: flashcard,
+    studyMode: mode,
+    modeOrder: 1,
+    roundIndex: 1,
+    queuePosition: 1,
+    sourcePool: flashcard.sourcePool,
+    status: SessionItemStatus.pending,
+    completedAt: null,
+  ),
+  sessionFlashcards: [flashcard],
+  summary: const StudySummary(
+    totalCards: 1,
+    completedAttempts: 0,
+    correctAttempts: 0,
+    incorrectAttempts: 0,
+    increasedBoxCount: 0,
+    decreasedBoxCount: 0,
+    remainingCount: 1,
+  ),
+  canFinalize: false,
+);
 
 StudyFlashcardRef _card({
   SessionItemSourcePool sourcePool = SessionItemSourcePool.newCards,
 }) => StudyFlashcardRef(
-    id: 'card-${sourcePool.storageValue}',
-    deckId: 'deck-001',
-    front: 'Front',
-    back: 'Back',
-    sourcePool: sourcePool,
-  );
+  id: 'card-${sourcePool.storageValue}',
+  deckId: 'deck-001',
+  front: 'Front',
+  back: 'Back',
+  sourcePool: sourcePool,
+);

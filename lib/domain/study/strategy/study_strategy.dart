@@ -121,8 +121,8 @@ final class NewStudyStrategy extends AbstractStudyFlowStrategy {
   StudyFinalizePolicy buildFinalizePolicy() => StudyFinalizePolicy.newStudy;
 
   @override
-  bool supportsEntry(StudyEntryType entryType) => entryType == StudyEntryType.deck ||
-        entryType == StudyEntryType.folder;
+  bool supportsEntry(StudyEntryType entryType) =>
+      entryType == StudyEntryType.deck || entryType == StudyEntryType.folder;
 
   @override
   Future<List<StudyFlashcardRef>> loadBatch(
@@ -147,9 +147,10 @@ final class SrsReviewStrategy extends AbstractStudyFlowStrategy {
   StudyFinalizePolicy buildFinalizePolicy() => StudyFinalizePolicy.srsReview;
 
   @override
-  bool supportsEntry(StudyEntryType entryType) => entryType == StudyEntryType.deck ||
-        entryType == StudyEntryType.folder ||
-        entryType == StudyEntryType.today;
+  bool supportsEntry(StudyEntryType entryType) =>
+      entryType == StudyEntryType.deck ||
+      entryType == StudyEntryType.folder ||
+      entryType == StudyEntryType.today;
 
   @override
   Future<List<StudyFlashcardRef>> loadBatch(
@@ -190,20 +191,20 @@ StudyFlow studyFlowForModes(StudyType studyType, List<StudyMode> modes) {
 }
 
 List<StudyMode> studyModesForFlow(StudyFlow flow) => switch (flow) {
-    StudyFlow.newFullCycle => const <StudyMode>[
-      StudyMode.review,
-      StudyMode.match,
-      StudyMode.guess,
-      StudyMode.recall,
-      StudyMode.fill,
-    ],
-    StudyFlow.newReviewOnly => const <StudyMode>[StudyMode.review],
-    StudyFlow.newMatchOnly => const <StudyMode>[StudyMode.match],
-    StudyFlow.newGuessOnly => const <StudyMode>[StudyMode.guess],
-    StudyFlow.newRecallOnly => const <StudyMode>[StudyMode.recall],
-    StudyFlow.newFillOnly => const <StudyMode>[StudyMode.fill],
-    StudyFlow.srsFillReview => const <StudyMode>[StudyMode.fill],
-  };
+  StudyFlow.newFullCycle => const <StudyMode>[
+    StudyMode.review,
+    StudyMode.match,
+    StudyMode.guess,
+    StudyMode.recall,
+    StudyMode.fill,
+  ],
+  StudyFlow.newReviewOnly => const <StudyMode>[StudyMode.review],
+  StudyFlow.newMatchOnly => const <StudyMode>[StudyMode.match],
+  StudyFlow.newGuessOnly => const <StudyMode>[StudyMode.guess],
+  StudyFlow.newRecallOnly => const <StudyMode>[StudyMode.recall],
+  StudyFlow.newFillOnly => const <StudyMode>[StudyMode.fill],
+  StudyFlow.srsFillReview => const <StudyMode>[StudyMode.fill],
+};
 
 bool _sameModes(List<StudyMode> left, List<StudyMode> right) {
   if (left.length != right.length) {

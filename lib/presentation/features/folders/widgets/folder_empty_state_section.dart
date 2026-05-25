@@ -48,52 +48,52 @@ class FolderEmptyStateSection extends StatelessWidget {
   }
 
   _FolderEmptyContent _resolveContent(AppLocalizations l10n) => switch (mode) {
-      FolderEmptyStateMode.unlocked => _FolderEmptyContent(
-        title: l10n.foldersEmptyTitle,
-        message: l10n.foldersEmptyMessage,
-        icon: Icons.folder_open_outlined,
-      ),
-      FolderEmptyStateMode.subfolders => _FolderEmptyContent(
-        title: l10n.foldersEmptySubfoldersTitle,
-        message: l10n.foldersEmptySubfoldersMessage,
-        icon: Icons.create_new_folder_outlined,
-      ),
-      FolderEmptyStateMode.decks => _FolderEmptyContent(
-        title: l10n.foldersEmptyDecksTitle,
-        message: l10n.foldersEmptyDecksMessage,
-        icon: Icons.style_outlined,
-      ),
-      FolderEmptyStateMode.noResults => _FolderEmptyContent(
-        title: l10n.foldersNoResultsTitle,
-        message: l10n.foldersNoResultsMessage,
-        icon: Icons.search_off_outlined,
-      ),
-    };
+    FolderEmptyStateMode.unlocked => _FolderEmptyContent(
+      title: l10n.foldersEmptyTitle,
+      message: l10n.foldersEmptyMessage,
+      icon: Icons.folder_open_outlined,
+    ),
+    FolderEmptyStateMode.subfolders => _FolderEmptyContent(
+      title: l10n.foldersEmptySubfoldersTitle,
+      message: l10n.foldersEmptySubfoldersMessage,
+      icon: Icons.create_new_folder_outlined,
+    ),
+    FolderEmptyStateMode.decks => _FolderEmptyContent(
+      title: l10n.foldersEmptyDecksTitle,
+      message: l10n.foldersEmptyDecksMessage,
+      icon: Icons.style_outlined,
+    ),
+    FolderEmptyStateMode.noResults => _FolderEmptyContent(
+      title: l10n.foldersNoResultsTitle,
+      message: l10n.foldersNoResultsMessage,
+      icon: Icons.search_off_outlined,
+    ),
+  };
 
   List<Widget> _buildActions(AppLocalizations l10n) => switch (mode) {
-      FolderEmptyStateMode.unlocked => const <Widget>[],
-      FolderEmptyStateMode.subfolders => [
-        MxPrimaryButton(
-          label: l10n.foldersNewSubfolderTooltip,
-          leadingIcon: Icons.create_new_folder_outlined,
-          onPressed: onCreateSubfolder,
-        ),
-      ],
-      FolderEmptyStateMode.decks => [
-        MxPrimaryButton(
-          label: l10n.foldersNewDeckTooltip,
-          leadingIcon: Icons.style_outlined,
-          onPressed: onCreateDeck,
-        ),
-      ],
-      FolderEmptyStateMode.noResults => [
-        MxPrimaryButton(
-          label: l10n.foldersClearSearchAction,
-          leadingIcon: Icons.search_off_outlined,
-          onPressed: onClearSearch,
-        ),
-      ],
-    };
+    FolderEmptyStateMode.unlocked => const <Widget>[],
+    FolderEmptyStateMode.subfolders => [
+      MxPrimaryButton(
+        label: l10n.foldersNewSubfolderTooltip,
+        leadingIcon: Icons.create_new_folder_outlined,
+        onPressed: onCreateSubfolder,
+      ),
+    ],
+    FolderEmptyStateMode.decks => [
+      MxPrimaryButton(
+        label: l10n.foldersNewDeckTooltip,
+        leadingIcon: Icons.style_outlined,
+        onPressed: onCreateDeck,
+      ),
+    ],
+    FolderEmptyStateMode.noResults => [
+      MxPrimaryButton(
+        label: l10n.foldersClearSearchAction,
+        leadingIcon: Icons.search_off_outlined,
+        onPressed: onClearSearch,
+      ),
+    ],
+  };
 }
 
 class _FolderEmptyContent {

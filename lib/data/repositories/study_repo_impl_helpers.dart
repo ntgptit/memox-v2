@@ -33,17 +33,20 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
     return rows;
   }
 
-  Future<_SqlScope> _scopeSql(StudyContext context) async => switch (context.entryType) {
-      StudyEntryType.deck => _SqlScope(
-        whereClause: 'f.deck_id = ?',
-        variables: [Variable<String>(_requireEntryRef(context))],
-      ),
-      StudyEntryType.folder => await _folderScopeSql(_requireEntryRef(context)),
-      StudyEntryType.today => const _SqlScope(
-        whereClause: '1 = 1',
-        variables: <Variable>[],
-      ),
-    };
+  Future<_SqlScope> _scopeSql(StudyContext context) async =>
+      switch (context.entryType) {
+        StudyEntryType.deck => _SqlScope(
+          whereClause: 'f.deck_id = ?',
+          variables: [Variable<String>(_requireEntryRef(context))],
+        ),
+        StudyEntryType.folder => await _folderScopeSql(
+          _requireEntryRef(context),
+        ),
+        StudyEntryType.today => const _SqlScope(
+          whereClause: '1 = 1',
+          variables: <Variable>[],
+        ),
+      };
 
   Future<_SqlScope> _folderScopeSql(String folderId) async {
     final subtreeIds = await _folderDao.getSubtreeIds(folderId);
@@ -208,9 +211,10 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
     );
   }
 
-  Future<local.FlashcardProgressData?> _findProgress(String flashcardId) => (_database.select(_database.flashcardProgress)
-          ..where((table) => table.flashcardId.equals(flashcardId)))
-        .getSingleOrNull();
+  Future<local.FlashcardProgressData?> _findProgress(String flashcardId) =>
+      (_database.select(_database.flashcardProgress)
+            ..where((table) => table.flashcardId.equals(flashcardId)))
+          .getSingleOrNull();
 
   Future<void> _upsertProgress({
     required String flashcardId,

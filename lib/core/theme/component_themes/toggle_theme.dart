@@ -11,59 +11,59 @@ import 'focus_theme.dart';
 /// [AppOpacity.disabled]).
 abstract final class ToggleThemeBuilder {
   static SwitchThemeData switchTheme(ColorScheme scheme) => SwitchThemeData(
-      thumbColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.disabled)) {
-          return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
-        }
-        if (states.contains(WidgetState.selected)) return scheme.onPrimary;
-        return scheme.outline;
-      }),
-      trackColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.disabled)) {
-          return scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface);
-        }
-        if (states.contains(WidgetState.selected)) return scheme.primary;
-        return scheme.surfaceContainerHighest;
-      }),
-      trackOutlineColor: WidgetStatePropertyAll(scheme.outline),
-      overlayColor: AppFocus.overlayProperty(scheme.primary),
-    );
+    thumbColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.disabled)) {
+        return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
+      }
+      if (states.contains(WidgetState.selected)) return scheme.onPrimary;
+      return scheme.outline;
+    }),
+    trackColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.disabled)) {
+        return scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface);
+      }
+      if (states.contains(WidgetState.selected)) return scheme.primary;
+      return scheme.surfaceContainerHighest;
+    }),
+    trackOutlineColor: WidgetStatePropertyAll(scheme.outline),
+    overlayColor: AppFocus.overlayProperty(scheme.primary),
+  );
 
   static CheckboxThemeData checkbox(ColorScheme scheme) => CheckboxThemeData(
-      fillColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.disabled)) {
-          return scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface);
-        }
-        if (states.contains(WidgetState.selected)) return scheme.primary;
-        return null;
-      }),
-      checkColor: WidgetStatePropertyAll(scheme.onPrimary),
-      side: BorderSide(color: scheme.outline, width: 2),
-      overlayColor: AppFocus.overlayProperty(scheme.primary),
-    );
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.disabled)) {
+        return scheme.onSurface.withValues(alpha: AppOpacity.disabledSurface);
+      }
+      if (states.contains(WidgetState.selected)) return scheme.primary;
+      return null;
+    }),
+    checkColor: WidgetStatePropertyAll(scheme.onPrimary),
+    side: BorderSide(color: scheme.outline, width: 2),
+    overlayColor: AppFocus.overlayProperty(scheme.primary),
+  );
 
   static RadioThemeData radio(ColorScheme scheme) => RadioThemeData(
-      fillColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.disabled)) {
-          return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
-        }
-        if (states.contains(WidgetState.selected)) return scheme.primary;
-        return scheme.outline;
-      }),
-      overlayColor: AppFocus.overlayProperty(scheme.primary),
-    );
+    fillColor: WidgetStateProperty.resolveWith((states) {
+      if (states.contains(WidgetState.disabled)) {
+        return scheme.onSurface.withValues(alpha: AppOpacity.disabled);
+      }
+      if (states.contains(WidgetState.selected)) return scheme.primary;
+      return scheme.outline;
+    }),
+    overlayColor: AppFocus.overlayProperty(scheme.primary),
+  );
 
   static SliderThemeData slider(ColorScheme scheme) => SliderThemeData(
-      activeTrackColor: scheme.primary,
-      inactiveTrackColor: scheme.primary.withValues(
-        alpha: AppOpacity.disabledSurface,
-      ),
-      thumbColor: scheme.primary,
-      overlayColor: scheme.primary.withValues(alpha: AppFocus.focusOpacity),
-      valueIndicatorColor: scheme.inverseSurface,
-      valueIndicatorTextStyle: AppTypography.bodySmall.copyWith(
-        color: scheme.onInverseSurface,
-      ),
-      trackHeight: 4,
-    );
+    activeTrackColor: scheme.primary,
+    inactiveTrackColor: scheme.primary.withValues(
+      alpha: AppOpacity.disabledSurface,
+    ),
+    thumbColor: scheme.primary,
+    overlayColor: scheme.primary.withValues(alpha: AppFocus.focusOpacity),
+    valueIndicatorColor: scheme.inverseSurface,
+    valueIndicatorTextStyle: AppTypography.bodySmall.copyWith(
+      color: scheme.onInverseSurface,
+    ),
+    trackHeight: 4,
+  );
 }

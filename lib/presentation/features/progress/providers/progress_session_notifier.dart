@@ -34,18 +34,16 @@ final class ProgressOverviewState {
   int get activeSessionCount => sessions.length;
 
   int get readySessionCount => sessions
-        .where(
-          (snapshot) =>
-              snapshot.session.status == SessionStatus.readyToFinalize,
-        )
-        .length;
+      .where(
+        (snapshot) => snapshot.session.status == SessionStatus.readyToFinalize,
+      )
+      .length;
 
   int get failedSessionCount => sessions
-        .where(
-          (snapshot) =>
-              snapshot.session.status == SessionStatus.failedToFinalize,
-        )
-        .length;
+      .where(
+        (snapshot) => snapshot.session.status == SessionStatus.failedToFinalize,
+      )
+      .length;
 }
 
 @Riverpod(keepAlive: true)
@@ -82,33 +80,36 @@ class ProgressSessionActionController
   FutureOr<void> build() {}
 
   Future<bool> cancel(String sessionId) async => _executeMutation(
-      () => ref.read(cancelStudySessionUseCaseProvider).execute(sessionId),
-    );
+    () => ref.read(cancelStudySessionUseCaseProvider).execute(sessionId),
+  );
 
-  Future<bool> finalize(StudySessionSnapshot snapshot) async => _executeMutation(
-      () => ref
-          .read(finalizeStudySessionUseCaseProvider)
-          .execute(
-            sessionId: snapshot.session.id,
-            studyType: snapshot.session.studyType,
-          ),
-    );
+  Future<bool> finalize(StudySessionSnapshot snapshot) async =>
+      _executeMutation(
+        () => ref
+            .read(finalizeStudySessionUseCaseProvider)
+            .execute(
+              sessionId: snapshot.session.id,
+              studyType: snapshot.session.studyType,
+            ),
+      );
 
-  Future<bool> retryFinalize(StudySessionSnapshot snapshot) async => _executeMutation(
-      () => ref
-          .read(retryFinalizeUseCaseProvider)
-          .execute(
-            sessionId: snapshot.session.id,
-            studyType: snapshot.session.studyType,
-          ),
-    );
+  Future<bool> retryFinalize(StudySessionSnapshot snapshot) async =>
+      _executeMutation(
+        () => ref
+            .read(retryFinalizeUseCaseProvider)
+            .execute(
+              sessionId: snapshot.session.id,
+              studyType: snapshot.session.studyType,
+            ),
+      );
 
-  Future<bool> _executeMutation(Future<void> Function() action) async => _actionRunner.run(action, onSuccess: _refresh);
+  Future<bool> _executeMutation(Future<void> Function() action) async =>
+      _actionRunner.run(action, onSuccess: _refresh);
 
   MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(
-      isMounted: () => ref.mounted,
-      setState: (nextState) => state = nextState,
-    );
+    isMounted: () => ref.mounted,
+    setState: (nextState) => state = nextState,
+  );
 
   void _refresh() {
     ref.read(studySessionDataRevisionProvider.notifier).bump();

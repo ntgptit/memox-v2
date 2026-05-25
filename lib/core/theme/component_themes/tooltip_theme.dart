@@ -6,20 +6,18 @@ import '../tokens/app_typography.dart';
 
 abstract final class TooltipThemeBuilder {
   static TooltipThemeData build(ColorScheme scheme) => TooltipThemeData(
-      decoration: BoxDecoration(
-        color: scheme.inverseSurface.withValues(alpha: 0.92),
-        borderRadius: AppRadius.borderMd,
-      ),
-      textStyle: AppTypography.bodySmall.copyWith(
-        color: scheme.onInverseSurface,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xxs,
-      ),
-      margin: const EdgeInsets.all(AppSpacing.xs),
-      waitDuration: const Duration(milliseconds: 500),
-      showDuration: const Duration(milliseconds: 1500),
-      preferBelow: true,
-    );
+    decoration: BoxDecoration(
+      color: scheme.inverseSurface.withValues(alpha: 0.92),
+      borderRadius: AppRadius.borderMd,
+    ),
+    textStyle: AppTypography.bodySmall.copyWith(color: scheme.onInverseSurface),
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSpacing.sm,
+      vertical: AppSpacing.xxs,
+    ),
+    margin: const EdgeInsets.all(AppSpacing.xs),
+    waitDuration: const Duration(milliseconds: 500),
+    showDuration: const Duration(milliseconds: 1500),
+    preferBelow: true,
+  );
 }

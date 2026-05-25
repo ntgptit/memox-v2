@@ -103,34 +103,33 @@ class _AccountSettingsContent extends ConsumerWidget {
   }
 
   String? _subtitle(AppLocalizations l10n) => switch (state.status) {
-      AccountLinkStatus.signedIn => null,
-      AccountLinkStatus.needsDriveAuthorization =>
-        l10n.settingsAccountSubtitleReconnect,
-      AccountLinkStatus.unconfigured => l10n.settingsAccountSubtitleConfig,
-      AccountLinkStatus.unsupported => l10n.settingsAccountSubtitleUnsupported,
-      AccountLinkStatus.error => l10n.settingsAccountSubtitleError,
-      AccountLinkStatus.signedOut => l10n.settingsAccountSubtitleSignedOut,
-    };
+    AccountLinkStatus.signedIn => null,
+    AccountLinkStatus.needsDriveAuthorization =>
+      l10n.settingsAccountSubtitleReconnect,
+    AccountLinkStatus.unconfigured => l10n.settingsAccountSubtitleConfig,
+    AccountLinkStatus.unsupported => l10n.settingsAccountSubtitleUnsupported,
+    AccountLinkStatus.error => l10n.settingsAccountSubtitleError,
+    AccountLinkStatus.signedOut => l10n.settingsAccountSubtitleSignedOut,
+  };
 
   String _statusLabel(AppLocalizations l10n) => switch (state.status) {
-      AccountLinkStatus.signedIn => l10n.settingsAccountDriveReady,
-      AccountLinkStatus.needsDriveAuthorization =>
-        l10n.settingsAccountDriveReconnectRequired,
-      AccountLinkStatus.unconfigured ||
-      AccountLinkStatus.unsupported ||
-      AccountLinkStatus.error ||
-      AccountLinkStatus.signedOut => '',
-    };
+    AccountLinkStatus.signedIn => l10n.settingsAccountDriveReady,
+    AccountLinkStatus.needsDriveAuthorization =>
+      l10n.settingsAccountDriveReconnectRequired,
+    AccountLinkStatus.unconfigured ||
+    AccountLinkStatus.unsupported ||
+    AccountLinkStatus.error ||
+    AccountLinkStatus.signedOut => '',
+  };
 
   String? _message(AppLocalizations l10n) => switch (state.message) {
-      AccountSettingsMessage.none => null,
-      AccountSettingsMessage.signInCanceled =>
-        l10n.settingsAccountSignInCanceled,
-      AccountSettingsMessage.signInFailed => l10n.settingsAccountSignInFailed,
-      AccountSettingsMessage.driveAuthorizationRequired =>
-        l10n.settingsAccountDriveAuthorizationRequired,
-      AccountSettingsMessage.signedOut => l10n.settingsAccountSignedOutMessage,
-    };
+    AccountSettingsMessage.none => null,
+    AccountSettingsMessage.signInCanceled => l10n.settingsAccountSignInCanceled,
+    AccountSettingsMessage.signInFailed => l10n.settingsAccountSignInFailed,
+    AccountSettingsMessage.driveAuthorizationRequired =>
+      l10n.settingsAccountDriveAuthorizationRequired,
+    AccountSettingsMessage.signedOut => l10n.settingsAccountSignedOutMessage,
+  };
 
   Widget? _headerAction(
     AppLocalizations l10n, {
@@ -243,11 +242,11 @@ class _AccountStatusText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SettingsRow(
-      icon: Icons.account_circle_outlined,
-      title: text,
-      showChevron: false,
-      iconTone: MxIconTileTone.neutral,
-    );
+    icon: Icons.account_circle_outlined,
+    title: text,
+    showChevron: false,
+    iconTone: MxIconTileTone.neutral,
+  );
 }
 
 class _AccountActions extends StatelessWidget {

@@ -123,35 +123,37 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     required String deckId,
     required FlashcardDraft draft,
   }) => runRepositoryAction(() async {
-      await _requireDeck(deckId);
-      final now = _clock.nowEpochMillis();
-      final sortOrder = await _flashcardDao.nextSortOrder(deckId);
-      final id = _idGenerator.nextId();
-      await _transactionRunner.write((_) => _flashcardDao.insertFlashcard(
-          id: id,
-          deckId: deckId,
-          draft: _normalizeDraft(draft),
-          sortOrder: sortOrder,
-          createdAt: now,
-          updatedAt: now,
-        ));
-      final normalized = _normalizeDraft(draft);
-      return FlashcardEntity(
+    await _requireDeck(deckId);
+    final now = _clock.nowEpochMillis();
+    final sortOrder = await _flashcardDao.nextSortOrder(deckId);
+    final id = _idGenerator.nextId();
+    await _transactionRunner.write(
+      (_) => _flashcardDao.insertFlashcard(
         id: id,
         deckId: deckId,
-        front: normalized.front,
-        back: normalized.back,
-        note: normalized.note,
+        draft: _normalizeDraft(draft),
         sortOrder: sortOrder,
-        example: normalized.example,
-        pronunciation: normalized.pronunciation,
-        hint: normalized.hint,
-        tags: normalized.tags,
-        startingStatus: normalized.startingStatus,
         createdAt: now,
         updatedAt: now,
-      );
-    });
+      ),
+    );
+    final normalized = _normalizeDraft(draft);
+    return FlashcardEntity(
+      id: id,
+      deckId: deckId,
+      front: normalized.front,
+      back: normalized.back,
+      note: normalized.note,
+      sortOrder: sortOrder,
+      example: normalized.example,
+      pronunciation: normalized.pronunciation,
+      hint: normalized.hint,
+      tags: normalized.tags,
+      startingStatus: normalized.startingStatus,
+      createdAt: now,
+      updatedAt: now,
+    );
+  });
 
   @override
   Future<Result<FlashcardEntity>> updateFlashcard({
@@ -160,80 +162,83 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     FlashcardProgressEditPolicy progressPolicy =
         FlashcardProgressEditPolicy.keepProgress,
   }) => runRepositoryAction(() async {
-      final flashcard = await _requireFlashcard(flashcardId);
-      final normalized = _normalizeDraft(draft);
-      final now = _clock.nowEpochMillis();
-      await _transactionRunner.write((_) async {
-        await _flashcardDao.updateFlashcard(
+    final flashcard = await _requireFlashcard(flashcardId);
+    final normalized = _normalizeDraft(draft);
+    final now = _clock.nowEpochMillis();
+    await _transactionRunner.write((_) async {
+      await _flashcardDao.updateFlashcard(
+        flashcardId: flashcardId,
+        draft: normalized,
+        updatedAt: now,
+      );
+      if (progressPolicy == FlashcardProgressEditPolicy.resetProgress) {
+        await _flashcardDao.resetFlashcardProgress(
           flashcardId: flashcardId,
-          draft: normalized,
           updatedAt: now,
         );
-        if (progressPolicy == FlashcardProgressEditPolicy.resetProgress) {
-          await _flashcardDao.resetFlashcardProgress(
-            flashcardId: flashcardId,
-            updatedAt: now,
-          );
-        }
-      });
-      final progress = await _flashcardDao.findProgressByFlashcardId(
-        flashcardId,
-      );
-      return FlashcardEntity(
-        id: flashcard.id,
-        deckId: flashcard.deckId,
-        front: normalized.front,
-        back: normalized.back,
-        note: normalized.note,
-        sortOrder: flashcard.sortOrder,
-        example: normalized.example,
-        pronunciation: normalized.pronunciation,
-        hint: normalized.hint,
-        tags: normalized.tags,
-        startingStatus: normalized.startingStatus,
-        createdAt: flashcard.createdAt,
-        updatedAt: now,
-        hasLearningProgress: _hasLearningProgress(progress),
-      );
+      }
     });
+    final progress = await _flashcardDao.findProgressByFlashcardId(flashcardId);
+    return FlashcardEntity(
+      id: flashcard.id,
+      deckId: flashcard.deckId,
+      front: normalized.front,
+      back: normalized.back,
+      note: normalized.note,
+      sortOrder: flashcard.sortOrder,
+      example: normalized.example,
+      pronunciation: normalized.pronunciation,
+      hint: normalized.hint,
+      tags: normalized.tags,
+      startingStatus: normalized.startingStatus,
+      createdAt: flashcard.createdAt,
+      updatedAt: now,
+      hasLearningProgress: _hasLearningProgress(progress),
+    );
+  });
 
   @override
-  Future<Result<void>> deleteFlashcards(List<String> flashcardIds) => runRepositoryAction(() async {
-      if (flashcardIds.isEmpty) {
-        return;
-      }
-      await _transactionRunner.write((_) => _flashcardDao.deleteFlashcards(flashcardIds));
-    });
+  Future<Result<void>> deleteFlashcards(List<String> flashcardIds) =>
+      runRepositoryAction(() async {
+        if (flashcardIds.isEmpty) {
+          return;
+        }
+        await _transactionRunner.write(
+          (_) => _flashcardDao.deleteFlashcards(flashcardIds),
+        );
+      });
 
   @override
   Future<Result<void>> moveFlashcards({
     required List<String> flashcardIds,
     required String targetDeckId,
   }) => runRepositoryAction(() async {
-      if (flashcardIds.isEmpty) {
-        return;
-      }
-      await _requireDeck(targetDeckId);
-      final nextSortOrder = await _flashcardDao.nextSortOrder(targetDeckId);
-      await _transactionRunner.write((_) => _flashcardDao.moveFlashcards(
-          flashcardIds: flashcardIds,
-          targetDeckId: targetDeckId,
-          startingSortOrder: nextSortOrder,
-          updatedAt: _clock.nowEpochMillis(),
-        ));
-    });
+    if (flashcardIds.isEmpty) {
+      return;
+    }
+    await _requireDeck(targetDeckId);
+    final nextSortOrder = await _flashcardDao.nextSortOrder(targetDeckId);
+    await _transactionRunner.write(
+      (_) => _flashcardDao.moveFlashcards(
+        flashcardIds: flashcardIds,
+        targetDeckId: targetDeckId,
+        startingSortOrder: nextSortOrder,
+        updatedAt: _clock.nowEpochMillis(),
+      ),
+    );
+  });
 
   @override
   Future<Result<void>> reorderFlashcards({
     required String deckId,
     required List<String> orderedFlashcardIds,
   }) => runRepositoryAction(() async {
-      await _flashcardDao.reorderFlashcards(
-        deckId: deckId,
-        orderedFlashcardIds: orderedFlashcardIds,
-        updatedAt: _clock.nowEpochMillis(),
-      );
-    });
+    await _flashcardDao.reorderFlashcards(
+      deckId: deckId,
+      orderedFlashcardIds: orderedFlashcardIds,
+      updatedAt: _clock.nowEpochMillis(),
+    );
+  });
 
   @override
   Future<Result<FlashcardImportPreparation>> prepareImport({
@@ -247,73 +252,76 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
   }) => runRepositoryAction(() async {
-      await _requireDeck(deckId);
-      final preparation = FlashcardImportSupport.parse(
-        format: format,
-        rawContent: rawContent,
-        sourceBytes: sourceBytes,
-        excelHasHeader: excelHasHeader,
-        structuredTextSeparator: structuredTextSeparator,
-      );
-      return _applyImportDuplicatePolicy(
-        deckId: deckId,
-        preparation: preparation,
-        duplicatePolicy: duplicatePolicy,
-      );
-    });
+    await _requireDeck(deckId);
+    final preparation = FlashcardImportSupport.parse(
+      format: format,
+      rawContent: rawContent,
+      sourceBytes: sourceBytes,
+      excelHasHeader: excelHasHeader,
+      structuredTextSeparator: structuredTextSeparator,
+    );
+    return _applyImportDuplicatePolicy(
+      deckId: deckId,
+      preparation: preparation,
+      duplicatePolicy: duplicatePolicy,
+    );
+  });
 
   @override
   Future<Result<int>> commitImport({
     required String deckId,
     required FlashcardImportPreparation preparation,
   }) => runRepositoryAction(() async {
-      final importablePreparation = await _applyImportDuplicatePolicy(
-        deckId: deckId,
-        preparation: preparation,
-        duplicatePolicy: preparation.duplicatePolicy,
+    final importablePreparation = await _applyImportDuplicatePolicy(
+      deckId: deckId,
+      preparation: preparation,
+      duplicatePolicy: preparation.duplicatePolicy,
+    );
+    if (!importablePreparation.canCommit) {
+      throw const ValidationException(
+        message: 'Import preparation contains validation issues.',
       );
-      if (!importablePreparation.canCommit) {
-        throw const ValidationException(
-          message: 'Import preparation contains validation issues.',
+    }
+    await _requireDeck(deckId);
+    final now = _clock.nowEpochMillis();
+    await _transactionRunner.write((_) async {
+      var nextSortOrder = await _flashcardDao.nextSortOrder(deckId);
+      for (final item in importablePreparation.previewItems) {
+        await _flashcardDao.insertFlashcard(
+          id: _idGenerator.nextId(),
+          deckId: deckId,
+          draft: item.draft,
+          sortOrder: nextSortOrder,
+          createdAt: now,
+          updatedAt: now,
         );
+        nextSortOrder += 1;
       }
-      await _requireDeck(deckId);
-      final now = _clock.nowEpochMillis();
-      await _transactionRunner.write((_) async {
-        var nextSortOrder = await _flashcardDao.nextSortOrder(deckId);
-        for (final item in importablePreparation.previewItems) {
-          await _flashcardDao.insertFlashcard(
-            id: _idGenerator.nextId(),
-            deckId: deckId,
-            draft: item.draft,
-            sortOrder: nextSortOrder,
-            createdAt: now,
-            updatedAt: now,
-          );
-          nextSortOrder += 1;
-        }
-      });
-      return importablePreparation.previewItems.length;
     });
+    return importablePreparation.previewItems.length;
+  });
 
   @override
-  Future<Result<ExportData>> exportFlashcards(List<String> flashcardIds) => runRepositoryAction(() async {
-      final flashcards = await _flashcardDao.listFlashcardsByIds(flashcardIds);
-      final lines = <String>[
-        'front,back,note',
-        for (final flashcard in flashcards)
-          [
-            escapeCsvCell(flashcard.front),
-            escapeCsvCell(flashcard.back),
-            escapeCsvCell(flashcard.note),
-          ].join(','),
-      ];
-      return ExportData(
-        fileName: 'flashcards_export.csv',
-        mimeType: 'text/csv',
-        content: lines.join('\n'),
-      );
-    });
+  Future<Result<ExportData>> exportFlashcards(List<String> flashcardIds) =>
+      runRepositoryAction(() async {
+        final flashcards = await _flashcardDao.listFlashcardsByIds(
+          flashcardIds,
+        );
+        final lines = <String>[
+          'front,back,note',
+          for (final flashcard in flashcards)
+            [
+              escapeCsvCell(flashcard.front),
+              escapeCsvCell(flashcard.back),
+              escapeCsvCell(flashcard.note),
+            ].join(','),
+        ];
+        return ExportData(
+          fileName: 'flashcards_export.csv',
+          mimeType: 'text/csv',
+          content: lines.join('\n'),
+        );
+      });
 
   Future<Deck> _requireDeck(String deckId) async {
     final deck = await _deckDao.findById(deckId);
@@ -348,9 +356,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     required FlashcardImportPreparation preparation,
     required FlashcardImportDuplicatePolicy duplicatePolicy,
   }) async => switch (duplicatePolicy) {
-      FlashcardImportDuplicatePolicy.skipExactDuplicates =>
-        _skipExactImportDuplicates(deckId, preparation),
-    };
+    FlashcardImportDuplicatePolicy.skipExactDuplicates =>
+      _skipExactImportDuplicates(deckId, preparation),
+  };
 
   Future<FlashcardImportPreparation> _skipExactImportDuplicates(
     String deckId,
@@ -401,8 +409,9 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     );
   }
 
-  String _duplicateKey({required String front, required String back}) => '${StringUtils.normalizedForComparison(front)}\u0001'
-        '${StringUtils.normalizedForComparison(back)}';
+  String _duplicateKey({required String front, required String back}) =>
+      '${StringUtils.normalizedForComparison(front)}\u0001'
+      '${StringUtils.normalizedForComparison(back)}';
 
   FlashcardDraft _normalizeDraft(FlashcardDraft draft) {
     final front = StringUtils.trimmed(draft.front);

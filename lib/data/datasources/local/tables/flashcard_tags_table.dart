@@ -16,7 +16,8 @@ class FlashcardTags extends Table {
       .named('flashcard_id')
       .references(Flashcards, #id, onDelete: KeyAction.cascade)();
 
-  TextColumn get tag => text().check(tag.trim().length.isBiggerOrEqualValue(1))();
+  TextColumn get tag =>
+      text().check(tag.trim().length.isBiggerOrEqualValue(1))();
 
   @override
   Set<Column> get primaryKey => <Column>{flashcardId, tag};

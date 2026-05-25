@@ -219,7 +219,9 @@ final class GoogleDriveAppDataClient implements DriveAppDataClient {
     return _decodeFile(decoded);
   }
 
-  Map<String, String> _headers(String accessToken) => <String, String>{'Authorization': 'Bearer $accessToken'};
+  Map<String, String> _headers(String accessToken) => <String, String>{
+    'Authorization': 'Bearer $accessToken',
+  };
 
   void _throwIfUnsuccessful(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {

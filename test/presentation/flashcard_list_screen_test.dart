@@ -1018,65 +1018,63 @@ const _emptyFlashcardState = FlashcardListState(
 );
 
 FlashcardListState _largeFlashcardState() => FlashcardListState(
-    deckId: 'deck-001',
-    folderId: 'folder-001',
-    deckName: 'Korean deck',
-    breadcrumb: const <BreadcrumbSegmentReadModel>[
-      BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
-      BreadcrumbSegmentReadModel(label: 'Korean deck', folderId: null),
-    ],
-    sortMode: ContentSortMode.manual,
-    searchTerm: '',
-    progress: const FlashcardDeckProgressState(
-      newCount: 80,
-      learningCount: 0,
-      masteredCount: 0,
-      masteryPercent: 0,
+  deckId: 'deck-001',
+  folderId: 'folder-001',
+  deckName: 'Korean deck',
+  breadcrumb: const <BreadcrumbSegmentReadModel>[
+    BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
+    BreadcrumbSegmentReadModel(label: 'Korean deck', folderId: null),
+  ],
+  sortMode: ContentSortMode.manual,
+  searchTerm: '',
+  progress: const FlashcardDeckProgressState(
+    newCount: 80,
+    learningCount: 0,
+    masteredCount: 0,
+    masteryPercent: 0,
+  ),
+  items: List<FlashcardListItemState>.generate(
+    80,
+    (index) => FlashcardListItemState(
+      id: 'card-$index',
+      front: 'Front $index',
+      back: 'Back $index',
+      note: null,
+      lastStudiedAt: null,
     ),
-    items: List<FlashcardListItemState>.generate(
-      80,
-      (index) => FlashcardListItemState(
-        id: 'card-$index',
-        front: 'Front $index',
-        back: 'Back $index',
-        note: null,
-        lastStudiedAt: null,
-      ),
-    ),
-  );
+  ),
+);
 
 Finder _rowText(String text) => find.descendant(
-    of: find.byType(FlashcardDetailCardRow),
-    matching: find.text(text),
-  );
+  of: find.byType(FlashcardDetailCardRow),
+  matching: find.text(text),
+);
 
 Finder _rowForText(String text) => find
-      .ancestor(
-        of: _rowText(text),
-        matching: find.byType(FlashcardDetailCardRow),
-      )
-      .first;
+    .ancestor(of: _rowText(text), matching: find.byType(FlashcardDetailCardRow))
+    .first;
 
-Finder _rowIcon(String rowText, IconData icon) => find.descendant(of: _rowForText(rowText), matching: find.byIcon(icon));
+Finder _rowIcon(String rowText, IconData icon) =>
+    find.descendant(of: _rowForText(rowText), matching: find.byIcon(icon));
 
 Finder _studyModeSection() => find.byType(FlashcardStudyModesSection);
 
 Finder _studyModeTiles() => find.descendant(
-    of: _studyModeSection(),
-    matching: find.byWidgetPredicate(
-      (widget) =>
-          widget is MxCard &&
-          widget.key is ValueKey<String> &&
-          (widget.key! as ValueKey<String>).value.startsWith('study_mode_'),
-    ),
-  );
+  of: _studyModeSection(),
+  matching: find.byWidgetPredicate(
+    (widget) =>
+        widget is MxCard &&
+        widget.key is ValueKey<String> &&
+        (widget.key! as ValueKey<String>).value.startsWith('study_mode_'),
+  ),
+);
 
 Finder _verticalScrollable() => find
-      .byWidgetPredicate(
-        (widget) =>
-            widget is Scrollable && widget.axisDirection == AxisDirection.down,
-      )
-      .first;
+    .byWidgetPredicate(
+      (widget) =>
+          widget is Scrollable && widget.axisDirection == AxisDirection.down,
+    )
+    .first;
 
 Future<void> _scrollToText(WidgetTester tester, String text) async {
   await _scrollUntilAny(tester, find.text(text));
@@ -1107,10 +1105,10 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: child,
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: child,
+  );
 }
 
 final class _MoveTargetsFlashcardRepository implements FlashcardRepository {

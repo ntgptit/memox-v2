@@ -9,16 +9,15 @@ abstract final class StudySettingsPolicy {
   static const int reviewMaxBatchSize = 50;
 
   static int minBatchSize(StudyType studyType) => switch (studyType) {
-      StudyType.newStudy => newStudyMinBatchSize,
-      StudyType.srsReview => reviewMinBatchSize,
-    };
+    StudyType.newStudy => newStudyMinBatchSize,
+    StudyType.srsReview => reviewMinBatchSize,
+  };
 
   static int maxBatchSize(StudyType studyType) => switch (studyType) {
-      StudyType.newStudy => newStudyMaxBatchSize,
-      StudyType.srsReview => reviewMaxBatchSize,
-    };
+    StudyType.newStudy => newStudyMaxBatchSize,
+    StudyType.srsReview => reviewMaxBatchSize,
+  };
 
-  static int clampBatchSize(int value, StudyType studyType) => value
-        .clamp(minBatchSize(studyType), maxBatchSize(studyType))
-        .toInt();
+  static int clampBatchSize(int value, StudyType studyType) =>
+      value.clamp(minBatchSize(studyType), maxBatchSize(studyType)).toInt();
 }

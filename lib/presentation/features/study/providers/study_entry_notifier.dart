@@ -118,6 +118,6 @@ class StudyEntryActionController extends _$StudyEntryActionController {
 }
 
 StudyEntryType _parseEntryType(String raw) => StudyEntryType.values.firstWhere(
-    (value) => value.storageValue == raw,
-    orElse: () => throw ArgumentError.value(raw, 'entryType'),
-  );
+  (value) => value.storageValue == raw,
+  orElse: () => throw ArgumentError.value(raw, 'entryType'),
+);

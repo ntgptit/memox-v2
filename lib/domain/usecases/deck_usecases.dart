@@ -34,9 +34,9 @@ final class GetDeckMoveTargetsUseCase {
     required String deckId,
     String? excludingFolderId,
   }) => _repository.getDeckMoveTargets(
-      deckId: deckId,
-      excludingFolderId: excludingFolderId,
-    );
+    deckId: deckId,
+    excludingFolderId: excludingFolderId,
+  );
 }
 
 final class ListDeckDestinationsUseCase {
@@ -75,9 +75,9 @@ final class ReorderDecksUseCase {
     required String folderId,
     required List<String> orderedDeckIds,
   }) => _repository.reorderDecks(
-      folderId: folderId,
-      orderedDeckIds: orderedDeckIds,
-    );
+    folderId: folderId,
+    orderedDeckIds: orderedDeckIds,
+  );
 }
 
 final class DuplicateDeckUseCase {
@@ -88,10 +88,8 @@ final class DuplicateDeckUseCase {
   Future<Result<DeckEntity>> execute({
     required String deckId,
     required String targetFolderId,
-  }) => _repository.duplicateDeck(
-      deckId: deckId,
-      targetFolderId: targetFolderId,
-    );
+  }) =>
+      _repository.duplicateDeck(deckId: deckId, targetFolderId: targetFolderId);
 }
 
 final class ExportDeckUseCase {
@@ -99,5 +97,6 @@ final class ExportDeckUseCase {
 
   final DeckRepository _repository;
 
-  Future<Result<ExportData>> execute(String deckId) => _repository.exportDeck(deckId);
+  Future<Result<ExportData>> execute(String deckId) =>
+      _repository.exportDeck(deckId);
 }

@@ -49,9 +49,11 @@ final class LibraryOverviewReadModel {
   final int totalFolderCount;
   final List<LibraryFolderReadModel> folders;
 
-  int get deckCount => folders.fold<int>(0, (sum, folder) => sum + folder.deckCount);
+  int get deckCount =>
+      folders.fold<int>(0, (sum, folder) => sum + folder.deckCount);
 
-  int get cardCount => folders.fold<int>(0, (sum, folder) => sum + folder.itemCount);
+  int get cardCount =>
+      folders.fold<int>(0, (sum, folder) => sum + folder.itemCount);
 
   int get masteryPercent {
     final totalCardCount = cardCount;

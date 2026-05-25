@@ -29,17 +29,6 @@ class DriveSyncSettingsGroup extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final sync = ref.watch(driveSyncSettingsControllerProvider);
 
-    ref.listen<AsyncValue<DriveSyncSettingsState>>(
-      driveSyncSettingsControllerProvider,
-      (previous, next) {
-        final conflict = next.value?.pendingConflict;
-        final previousConflict = previous?.value?.pendingConflict;
-        if (conflict != null && !identical(conflict, previousConflict)) {
-          unawaited(_showConflictSheet(context, ref, conflict));
-        }
-      },
-    );
-
     return AppAsyncBuilder<DriveSyncSettingsState>(
       value: sync,
       loading: (context) => SettingsGroup(
@@ -53,25 +42,6 @@ class DriveSyncSettingsGroup extends ConsumerWidget {
       ),
       data: (context, state) => _DriveSyncContent(state: state),
     );
-  }
-
-  Future<void> _showConflictSheet(
-    BuildContext context,
-    WidgetRef ref,
-    DriveSyncConflict conflict,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final choice = await MxBottomSheet.show<DriveSyncConflictChoice>(
-      context: context,
-      title: l10n.settingsDriveSyncConflictTitle,
-      child: _DriveSyncConflictSheet(conflict: conflict),
-    );
-    if (!context.mounted) {
-      return;
-    }
-    await ref
-        .read(driveSyncSettingsControllerProvider.notifier)
-        .resolveConflict(choice ?? DriveSyncConflictChoice.cancel);
   }
 }
 
@@ -153,13 +123,12 @@ class _DriveSyncContent extends ConsumerWidget {
   }
 
   IconData get _statusIcon => switch (state.kind) {
-      DriveSyncStatusKind.synced => Icons.cloud_done_outlined,
-      DriveSyncStatusKind.failure ||
-      DriveSyncStatusKind.unsupportedSchema ||
-      DriveSyncStatusKind.conflict => Icons.cloud_off_outlined,
-      DriveSyncStatusKind.needsDriveAuthorization => Icons.cloud_sync_outlined,
-      _ => Icons.cloud_queue_outlined,
-    };
+    DriveSyncStatusKind.synced => Icons.cloud_done_outlined,
+    DriveSyncStatusKind.failure ||
+    DriveSyncStatusKind.unsupportedSchema => Icons.cloud_off_outlined,
+    DriveSyncStatusKind.needsDriveAuthorization => Icons.cloud_sync_outlined,
+    _ => Icons.cloud_queue_outlined,
+  };
 
   Widget? _syncAction(AppLocalizations l10n, {required VoidCallback onSync}) {
     if (!state.canSync) {
@@ -173,36 +142,35 @@ class _DriveSyncContent extends ConsumerWidget {
   }
 
   String _statusText(AppLocalizations l10n) => switch (state.kind) {
-      DriveSyncStatusKind.signedOut => l10n.settingsDriveSyncSignedOut,
-      DriveSyncStatusKind.unconfigured => l10n.settingsDriveSyncUnconfigured,
-      DriveSyncStatusKind.needsDriveAuthorization =>
-        l10n.settingsDriveSyncReconnectRequired,
-      DriveSyncStatusKind.noRemoteSnapshot => l10n.settingsDriveSyncNoRemote,
-      DriveSyncStatusKind.synced => l10n.settingsDriveSyncSynced,
-      DriveSyncStatusKind.ready ||
-      DriveSyncStatusKind.localChanges ||
-      DriveSyncStatusKind.remoteChanges => l10n.settingsDriveSyncReady,
-      DriveSyncStatusKind.conflict => l10n.settingsDriveSyncConflictStatus,
-      DriveSyncStatusKind.unsupportedSchema =>
-        l10n.settingsDriveSyncUnsupportedSchema,
-      DriveSyncStatusKind.failure => l10n.settingsDriveSyncFailed,
-    };
+    DriveSyncStatusKind.signedOut => l10n.settingsDriveSyncSignedOut,
+    DriveSyncStatusKind.unconfigured => l10n.settingsDriveSyncUnconfigured,
+    DriveSyncStatusKind.needsDriveAuthorization =>
+      l10n.settingsDriveSyncReconnectRequired,
+    DriveSyncStatusKind.noRemoteSnapshot => l10n.settingsDriveSyncNoRemote,
+    DriveSyncStatusKind.synced => l10n.settingsDriveSyncSynced,
+    DriveSyncStatusKind.ready ||
+    DriveSyncStatusKind.localChanges ||
+    DriveSyncStatusKind.remoteChanges => l10n.settingsDriveSyncReady,
+    DriveSyncStatusKind.unsupportedSchema =>
+      l10n.settingsDriveSyncUnsupportedSchema,
+    DriveSyncStatusKind.failure => l10n.settingsDriveSyncFailed,
+  };
 
   String? _messageText(AppLocalizations l10n) => switch (state.message) {
-      DriveSyncSettingsMessage.none =>
-        state.kind == DriveSyncStatusKind.failure
-            ? _technicalMessage(l10n)
-            : null,
-      DriveSyncSettingsMessage.uploaded ||
-      DriveSyncSettingsMessage.restored ||
-      DriveSyncSettingsMessage.noChanges ||
-      DriveSyncSettingsMessage.canceled => null,
-      DriveSyncSettingsMessage.failed =>
-        state.kind == DriveSyncStatusKind.failure ||
-                state.kind == DriveSyncStatusKind.unsupportedSchema
-            ? _technicalMessage(l10n)
-            : null,
-    };
+    DriveSyncSettingsMessage.none =>
+      state.kind == DriveSyncStatusKind.failure
+          ? _technicalMessage(l10n)
+          : null,
+    DriveSyncSettingsMessage.uploaded ||
+    DriveSyncSettingsMessage.restored ||
+    DriveSyncSettingsMessage.noChanges ||
+    DriveSyncSettingsMessage.canceled => null,
+    DriveSyncSettingsMessage.failed =>
+      state.kind == DriveSyncStatusKind.failure ||
+              state.kind == DriveSyncStatusKind.unsupportedSchema
+          ? _technicalMessage(l10n)
+          : null,
+  };
 
   String? _technicalMessage(AppLocalizations l10n) {
     final message = state.technicalMessage;
@@ -309,53 +277,6 @@ class _DriveSyncConfirmationSheet extends StatelessWidget {
         MxSecondaryButton(
           label: l10n.commonCancel,
           onPressed: () => Navigator.of(context).pop(false),
-          variant: MxSecondaryVariant.text,
-          fullWidth: true,
-        ),
-      ],
-    );
-  }
-}
-
-class _DriveSyncConflictSheet extends StatelessWidget {
-  const _DriveSyncConflictSheet({required this.conflict});
-
-  final DriveSyncConflict conflict;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        MxText(
-          l10n.settingsDriveSyncConflictMessage,
-          role: MxTextRole.formHelper,
-        ),
-        const MxGap(MxSpace.md),
-        MxListTile(
-          title: l10n.settingsDriveSyncKeepLocal,
-          subtitle: l10n.settingsDriveSyncKeepLocalSubtitle,
-          showChevron: true,
-          dense: true,
-          onTap: () =>
-              Navigator.of(context).pop(DriveSyncConflictChoice.keepLocal),
-        ),
-        const MxDivider(),
-        MxListTile(
-          title: l10n.settingsDriveSyncUseDrive,
-          subtitle: l10n.settingsDriveSyncUseDriveSubtitle,
-          showChevron: true,
-          dense: true,
-          onTap: () =>
-              Navigator.of(context).pop(DriveSyncConflictChoice.useDriveCopy),
-        ),
-        const MxGap(MxSpace.md),
-        MxSecondaryButton(
-          label: l10n.commonCancel,
-          onPressed: () =>
-              Navigator.of(context).pop(DriveSyncConflictChoice.cancel),
           variant: MxSecondaryVariant.text,
           fullWidth: true,
         ),

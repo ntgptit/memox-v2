@@ -33,11 +33,11 @@ class MxDialog extends StatelessWidget {
     List<Widget> actions = const [],
     bool barrierDismissible = true,
   }) => showDialog<T>(
-      context: context,
-      barrierDismissible: barrierDismissible,
-      builder: (_) =>
-          MxDialog(title: title, icon: icon, actions: actions, child: child),
-    );
+    context: context,
+    barrierDismissible: barrierDismissible,
+    builder: (_) =>
+        MxDialog(title: title, icon: icon, actions: actions, child: child),
+  );
 
   @override
   Widget build(BuildContext context) {

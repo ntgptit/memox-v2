@@ -33,7 +33,8 @@ class FlashcardBreadcrumbSection extends StatelessWidget {
         for (var index = 0; index < breadcrumb.length; index++)
           MxBreadcrumb(
             label: breadcrumb[index].label,
-            onTap: index == breadcrumb.length - 1 ||
+            onTap:
+                index == breadcrumb.length - 1 ||
                     breadcrumb[index].folderId == null
                 ? null
                 : () => onOpenBreadcrumb(breadcrumb[index].folderId!),

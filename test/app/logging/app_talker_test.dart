@@ -53,13 +53,13 @@ AppConfig _testConfig({
   required AppEnv env,
   required bool enableRiverpodDiagnostics,
 }) => AppConfig(
-    env: env,
-    initialLocation: RouteDefaults.initialLocation,
-    showDebugBanner: false,
-    enableRouterDiagnostics: false,
-    enableTalkerConsoleLogs: false,
-    enableTalkerRouteLogging: false,
-    enableRiverpodDiagnostics: enableRiverpodDiagnostics,
-    exposeInternalErrorDetails: false,
-    googleOAuthConfig: GoogleOAuthConfig.fromValues(),
-  );
+  env: env,
+  initialLocation: RouteDefaults.initialLocation,
+  showDebugBanner: false,
+  enableRouterDiagnostics: false,
+  enableTalkerConsoleLogs: false,
+  enableTalkerRouteLogging: false,
+  enableRiverpodDiagnostics: enableRiverpodDiagnostics,
+  exposeInternalErrorDetails: false,
+  googleOAuthConfig: GoogleOAuthConfig.fromValues(),
+);

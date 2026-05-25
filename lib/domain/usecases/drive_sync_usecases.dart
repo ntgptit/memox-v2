@@ -9,14 +9,6 @@ final class LoadDriveSyncStatusUseCase {
   Future<DriveSyncStatus> execute() => _repository.loadStatus();
 }
 
-final class SyncGoogleDriveSnapshotUseCase {
-  const SyncGoogleDriveSnapshotUseCase(this._repository);
-
-  final DriveSyncRepository _repository;
-
-  Future<DriveSyncRunResult> execute() => _repository.syncNow();
-}
-
 final class UploadLocalDriveSnapshotUseCase {
   const UploadLocalDriveSnapshotUseCase(this._repository);
 
@@ -31,15 +23,4 @@ final class RestoreDriveSnapshotUseCase {
   final DriveSyncRepository _repository;
 
   Future<DriveSyncRunResult> execute() => _repository.restoreDriveSnapshot();
-}
-
-final class ResolveDriveSyncConflictUseCase {
-  const ResolveDriveSyncConflictUseCase(this._repository);
-
-  final DriveSyncRepository _repository;
-
-  Future<DriveSyncRunResult> execute(
-    DriveSyncConflict conflict,
-    DriveSyncConflictChoice choice,
-  ) => _repository.resolveConflict(conflict, choice);
 }

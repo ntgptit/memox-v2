@@ -55,10 +55,12 @@ class MxProgressRing extends StatelessWidget {
     // Design System: deck mastery ring sits over a `surfaceContainerHigh`
     // track, not the lower-contrast `outlineVariant` used for borders.
     final resolvedTrack = trackColor ?? scheme.surfaceContainerHigh;
-    final resolvedDimension = dimension ?? switch (size) {
-      MxProgressRingSize.compact => _compactDimension,
-      MxProgressRingSize.hero => _heroDimension,
-    };
+    final resolvedDimension =
+        dimension ??
+        switch (size) {
+          MxProgressRingSize.compact => _compactDimension,
+          MxProgressRingSize.hero => _heroDimension,
+        };
     final resolvedStroke = strokeWidth ?? _defaultStroke;
 
     final ring = SizedBox.square(

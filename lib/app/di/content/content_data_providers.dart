@@ -15,7 +15,9 @@ FolderDao folderDao(Ref ref) => FolderDao(ref.watch(appDatabaseProvider));
 DeckDao deckDao(Ref ref) => DeckDao(ref.watch(appDatabaseProvider));
 
 @riverpod
-FlashcardDao flashcardDao(Ref ref) => FlashcardDao(ref.watch(appDatabaseProvider));
+FlashcardDao flashcardDao(Ref ref) =>
+    FlashcardDao(ref.watch(appDatabaseProvider));
 
 @riverpod
-FolderStructureService folderStructureService(Ref ref) => const FolderStructureService();
+FolderStructureService folderStructureService(Ref ref) =>
+    const FolderStructureService();

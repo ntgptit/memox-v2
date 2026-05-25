@@ -8,7 +8,8 @@ import '../config/app_config.dart';
 const int _maxTalkerHistoryItems = 500;
 const String _unhandledErrorMessage = 'Unhandled MemoX app error';
 
-Talker createAppTalker([AppConfig? config]) => TalkerFlutter.init(settings: _talkerSettings(config));
+Talker createAppTalker([AppConfig? config]) =>
+    TalkerFlutter.init(settings: _talkerSettings(config));
 
 void configureAppTalker(Talker talker, AppConfig config) {
   talker.configure(settings: _talkerSettings(config));
@@ -61,7 +62,7 @@ final class TalkerAppLogger implements AppLogger {
 }
 
 TalkerSettings _talkerSettings(AppConfig? config) => TalkerSettings(
-    useHistory: true,
-    useConsoleLogs: config?.enableTalkerConsoleLogs ?? true,
-    maxHistoryItems: _maxTalkerHistoryItems,
-  );
+  useHistory: true,
+  useConsoleLogs: config?.enableTalkerConsoleLogs ?? true,
+  maxHistoryItems: _maxTalkerHistoryItems,
+);

@@ -65,41 +65,43 @@ class _TestRouterApp extends StatelessWidget {
         GoRoute(
           path: '/previous',
           builder: (context, state) => Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('Previous route'),
-                    TextButton(
-                      onPressed: () => context.goStudySession('session-001'),
-                      child: const Text('Open session'),
-                    ),
-                  ],
-                ),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Previous route'),
+                  TextButton(
+                    onPressed: () => context.goStudySession('session-001'),
+                    child: const Text('Open session'),
+                  ),
+                ],
               ),
             ),
+          ),
         ),
         GoRoute(
           path: '/${RoutePaths.studyResultSegment}',
           name: RouteNames.studyResult,
           builder: (context, state) => Scaffold(
-              body: Center(
-                child: TextButton(
-                  onPressed: () =>
-                      context.popRoute(fallback: () => context.go('/library')),
-                  child: const Text('Result back'),
-                ),
+            body: Center(
+              child: TextButton(
+                onPressed: () =>
+                    context.popRoute(fallback: () => context.go('/library')),
+                child: const Text('Result back'),
               ),
             ),
+          ),
         ),
         GoRoute(
           path: '/${RoutePaths.studySessionSegment}',
           name: RouteNames.studySession,
-          builder: (context, state) => const StudySessionScreen(sessionId: 'session-001'),
+          builder: (context, state) =>
+              const StudySessionScreen(sessionId: 'session-001'),
         ),
         GoRoute(
           path: '/library',
-          builder: (context, state) => const Scaffold(body: Center(child: Text('Library'))),
+          builder: (context, state) =>
+              const Scaffold(body: Center(child: Text('Library'))),
         ),
       ],
     );
@@ -146,7 +148,8 @@ final class _CancelDialogStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) => Future.value(_activeFillSnapshot);
+  Future<StudySessionSnapshot> loadSession(String sessionId) =>
+      Future.value(_activeFillSnapshot);
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({

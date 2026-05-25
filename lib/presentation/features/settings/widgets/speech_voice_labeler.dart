@@ -11,9 +11,7 @@ final class SpeechVoiceLabeler {
 
   String labelFor(AppLocalizations l10n, TtsVoice voice) {
     final familyIndex = _voiceFamilyIndex[_voiceFamilyKey(voice.name)] ?? 1;
-    final parts = <String>[
-      _voiceBaseLabel(l10n, voice.language, familyIndex),
-    ];
+    final parts = <String>[_voiceBaseLabel(l10n, voice.language, familyIndex)];
     final source = _voiceSourceLabel(l10n, voice.name);
     if (source != null) {
       parts.add(source);
@@ -39,11 +37,10 @@ String _voiceBaseLabel(
   AppLocalizations l10n,
   TtsLanguage language,
   int index,
-) =>
-    switch (language) {
-      TtsLanguage.korean => l10n.settingsSpeechKoreanVoiceLabel(index),
-      TtsLanguage.english => l10n.settingsSpeechEnglishVoiceLabel(index),
-    };
+) => switch (language) {
+  TtsLanguage.korean => l10n.settingsSpeechKoreanVoiceLabel(index),
+  TtsLanguage.english => l10n.settingsSpeechEnglishVoiceLabel(index),
+};
 
 String? _voiceSourceLabel(AppLocalizations l10n, String voiceName) =>
     switch (_voiceSource(voiceName)) {
@@ -85,8 +82,8 @@ String _voiceFamilyKey(String voiceName) {
   return familyTokens.join('-');
 }
 
-List<String> _voiceNameTokens(String voiceName) => StringUtils
-    .normalizedForComparison(voiceName)
-    .split(RegExp(r'[-_\s]+'))
-    .where(StringUtils.isNotBlank)
-    .toList(growable: false);
+List<String> _voiceNameTokens(String voiceName) =>
+    StringUtils.normalizedForComparison(voiceName)
+        .split(RegExp(r'[-_\s]+'))
+        .where(StringUtils.isNotBlank)
+        .toList(growable: false);

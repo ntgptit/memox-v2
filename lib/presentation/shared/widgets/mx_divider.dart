@@ -10,5 +10,6 @@ class MxDivider extends StatelessWidget {
   final double endIndent;
 
   @override
-  Widget build(BuildContext context) => Divider(indent: indent, endIndent: endIndent);
+  Widget build(BuildContext context) =>
+      Divider(indent: indent, endIndent: endIndent);
 }

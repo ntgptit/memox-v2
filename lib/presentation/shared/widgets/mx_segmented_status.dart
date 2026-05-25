@@ -42,19 +42,19 @@ class MxSegmentedStatus<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-      children: [
-        for (var index = 0; index < options.length; index++) ...[
-          if (index > 0) const SizedBox(width: AppSpacing.xs),
-          Expanded(
-            child: _Segment<T>(
-              option: options[index],
-              isSelected: options[index].value == selected,
-              onTap: () => onSelected(options[index].value),
-            ),
+    children: [
+      for (var index = 0; index < options.length; index++) ...[
+        if (index > 0) const SizedBox(width: AppSpacing.xs),
+        Expanded(
+          child: _Segment<T>(
+            option: options[index],
+            isSelected: options[index].value == selected,
+            onTap: () => onSelected(options[index].value),
           ),
-        ],
+        ),
       ],
-    );
+    ],
+  );
 }
 
 class _Segment<T> extends StatelessWidget {
@@ -122,8 +122,8 @@ class _StatusDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-      width: AppSpacing.sm,
-      height: AppSpacing.sm,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
+    width: AppSpacing.sm,
+    height: AppSpacing.sm,
+    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  );
 }

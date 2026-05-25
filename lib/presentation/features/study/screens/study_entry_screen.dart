@@ -140,9 +140,9 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
 }
 
 StudyType _defaultStudyType(StudyEntryType entryType) => switch (entryType) {
-    StudyEntryType.today => StudyType.srsReview,
-    StudyEntryType.deck || StudyEntryType.folder => StudyType.newStudy,
-  };
+  StudyEntryType.today => StudyType.srsReview,
+  StudyEntryType.deck || StudyEntryType.folder => StudyType.newStudy,
+};
 
 List<StudyMode>? _selectedModes(String? raw) {
   if (raw == null) {

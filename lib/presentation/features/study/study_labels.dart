@@ -18,9 +18,9 @@ String studyProgressLabel(
 }
 
 String studyModeLabel(AppLocalizations l10n, StudyMode mode) => switch (mode) {
-    StudyMode.review => l10n.studyModeReview,
-    StudyMode.match => l10n.studyModeMatch,
-    StudyMode.guess => l10n.studyModeGuess,
-    StudyMode.recall => l10n.studyModeRecall,
-    StudyMode.fill => l10n.studyModeFill,
-  };
+  StudyMode.review => l10n.studyModeReview,
+  StudyMode.match => l10n.studyModeMatch,
+  StudyMode.guess => l10n.studyModeGuess,
+  StudyMode.recall => l10n.studyModeRecall,
+  StudyMode.fill => l10n.studyModeFill,
+};

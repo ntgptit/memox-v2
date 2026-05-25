@@ -183,7 +183,8 @@ final class StudyRepoImpl implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) => _loadSnapshot(sessionId);
+  Future<StudySessionSnapshot> loadSession(String sessionId) =>
+      _loadSnapshot(sessionId);
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({
@@ -376,7 +377,8 @@ final class StudyRepoImpl implements StudyRepo {
     return _loadSnapshot(sessionId);
   }
 
-  String _acceptedBatchGradeLabel(Set<AttemptGrade> grades) => grades.map((grade) => grade.storageValue).join(' or ');
+  String _acceptedBatchGradeLabel(Set<AttemptGrade> grades) =>
+      grades.map((grade) => grade.storageValue).join(' or ');
 
   @override
   Future<StudySessionSnapshot> skipCurrentItem(String sessionId) async {
@@ -452,8 +454,8 @@ final class StudyRepoImpl implements StudyRepo {
     required StudyType studyType,
     required StudyFinalizePolicy finalizePolicy,
   }) => finalizeSession(
-      sessionId: sessionId,
-      studyType: studyType,
-      finalizePolicy: finalizePolicy,
-    );
+    sessionId: sessionId,
+    studyType: studyType,
+    finalizePolicy: finalizePolicy,
+  );
 }

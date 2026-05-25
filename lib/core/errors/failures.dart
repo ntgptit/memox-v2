@@ -41,14 +41,14 @@ class AppFailure {
     StackTrace? stackTrace,
     String? technicalDetails,
   }) => AppFailure(
-      type: FailureType.unknown,
-      message: message,
-      code: code,
-      cause: cause,
-      stackTrace: stackTrace,
-      technicalDetails: technicalDetails,
-      severity: FailureSeverity.critical,
-    );
+    type: FailureType.unknown,
+    message: message,
+    code: code,
+    cause: cause,
+    stackTrace: stackTrace,
+    technicalDetails: technicalDetails,
+    severity: FailureSeverity.critical,
+  );
 
   final FailureType type;
   final String message;

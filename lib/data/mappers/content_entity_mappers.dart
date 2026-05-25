@@ -7,25 +7,25 @@ import 'database_enum_codecs.dart';
 
 extension FolderDataMapper on Folder {
   FolderEntity toDomain() => FolderEntity(
-      id: id,
-      parentId: parentId,
-      name: name,
-      contentMode: DatabaseEnumCodecs.folderContentModeFromStorage(contentMode),
-      sortOrder: sortOrder,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-    );
+    id: id,
+    parentId: parentId,
+    name: name,
+    contentMode: DatabaseEnumCodecs.folderContentModeFromStorage(contentMode),
+    sortOrder: sortOrder,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
 }
 
 extension DeckDataMapper on Deck {
   DeckEntity toDomain() => DeckEntity(
-      id: id,
-      folderId: folderId,
-      name: name,
-      sortOrder: sortOrder,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-    );
+    id: id,
+    folderId: folderId,
+    name: name,
+    sortOrder: sortOrder,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+  );
 }
 
 extension FlashcardDataMapper on Flashcard {
@@ -33,20 +33,20 @@ extension FlashcardDataMapper on Flashcard {
     bool hasLearningProgress = false,
     List<String> tags = const <String>[],
   }) => FlashcardEntity(
-      id: id,
-      deckId: deckId,
-      front: front,
-      back: back,
-      note: note,
-      sortOrder: sortOrder,
-      example: example,
-      pronunciation: pronunciation,
-      hint: hint,
-      tags: tags,
-      createdAt: createdAt,
-      updatedAt: updatedAt,
-      hasLearningProgress: hasLearningProgress,
-    );
+    id: id,
+    deckId: deckId,
+    front: front,
+    back: back,
+    note: note,
+    sortOrder: sortOrder,
+    example: example,
+    pronunciation: pronunciation,
+    hint: hint,
+    tags: tags,
+    createdAt: createdAt,
+    updatedAt: updatedAt,
+    hasLearningProgress: hasLearningProgress,
+  );
 }
 
 final class FolderDeckAggregateData {
@@ -65,12 +65,12 @@ final class FolderDeckAggregateData {
   final int? lastStudiedAt;
 
   FolderDeckReadModel toReadModel() => FolderDeckReadModel(
-      deck: deck.toDomain(),
-      cardCount: cardCount,
-      dueTodayCount: dueTodayCount,
-      masteryPercent: masteryPercent,
-      lastStudiedAt: lastStudiedAt,
-    );
+    deck: deck.toDomain(),
+    cardCount: cardCount,
+    dueTodayCount: dueTodayCount,
+    masteryPercent: masteryPercent,
+    lastStudiedAt: lastStudiedAt,
+  );
 }
 
 final class FlashcardListAggregateData {
@@ -83,7 +83,7 @@ final class FlashcardListAggregateData {
   final int? lastStudiedAt;
 
   FlashcardListItemReadModel toReadModel() => FlashcardListItemReadModel(
-      flashcard: flashcard.toDomain(),
-      lastStudiedAt: lastStudiedAt,
-    );
+    flashcard: flashcard.toDomain(),
+    lastStudiedAt: lastStudiedAt,
+  );
 }

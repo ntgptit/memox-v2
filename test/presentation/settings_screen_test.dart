@@ -1196,7 +1196,6 @@ void main() {
 
     expect(find.text('Google Drive is up to date.'), findsOneWidget);
     expect(find.text('Local data backed up to Google Drive.'), findsNothing);
-    expect(repository.syncNowCount, 0);
     expect(repository.uploadLocalCount, 1);
   });
 
@@ -1516,34 +1515,23 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   _FakeDriveSyncRepository({
     DriveSyncStatus? loadStatusResult,
     List<DriveSyncStatus>? loadStatusResults,
-    DriveSyncRunResult? syncResult,
     DriveSyncRunResult? uploadResult,
     DriveSyncRunResult? restoreResult,
-    DriveSyncRunResult? resolveResult,
     this.loadStatusError,
   }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
        _loadStatusResults = loadStatusResults?.toList() ?? <DriveSyncStatus>[],
-       syncResult =
-           syncResult ??
-           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        uploadResult =
            uploadResult ??
            const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        restoreResult =
            restoreResult ??
-           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
-       resolveResult =
-           resolveResult ??
-           const DriveSyncRunResult.canceled(DriveSyncStatus.ready());
+           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
 
   DriveSyncStatus loadStatusResult;
   final List<DriveSyncStatus> _loadStatusResults;
-  final DriveSyncRunResult syncResult;
   final DriveSyncRunResult uploadResult;
   final DriveSyncRunResult restoreResult;
-  final DriveSyncRunResult resolveResult;
   final Object? loadStatusError;
-  int syncNowCount = 0;
   int uploadLocalCount = 0;
   int restoreDriveCount = 0;
 
@@ -1560,12 +1548,6 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   }
 
   @override
-  Future<DriveSyncRunResult> syncNow() async {
-    syncNowCount += 1;
-    return syncResult;
-  }
-
-  @override
   Future<DriveSyncRunResult> uploadLocalSnapshot() async {
     uploadLocalCount += 1;
     return uploadResult;
@@ -1576,12 +1558,6 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
     restoreDriveCount += 1;
     return restoreResult;
   }
-
-  @override
-  Future<DriveSyncRunResult> resolveConflict(
-    DriveSyncConflict conflict,
-    DriveSyncConflictChoice choice,
-  ) async => resolveResult;
 }
 
 final class _FakeDriveSyncRuntimeEffects implements DriveSyncRuntimeEffects {

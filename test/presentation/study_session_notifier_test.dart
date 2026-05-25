@@ -530,11 +530,11 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
 
   @override
   Future<StudySessionSnapshot> loadSession(String sessionId) async => _snapshot(
-      mode: StudyMode.fill,
-      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
-      shuffleAnswers: false,
-    );
+    mode: StudyMode.fill,
+    currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+    cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+    shuffleAnswers: false,
+  );
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({
@@ -595,7 +595,8 @@ final class _ResumeCandidateStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) async => _activeSnapshot();
+  Future<StudySessionSnapshot> loadSession(String sessionId) async =>
+      _activeSnapshot();
 
   @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
@@ -677,12 +678,12 @@ final class _ResumeCandidateStudyRepo implements StudyRepo {
   }
 
   StudySessionSnapshot _activeSnapshot() => _snapshot(
-      mode: StudyMode.fill,
-      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
-      shuffleAnswers: false,
-      status: SessionStatus.inProgress,
-    );
+    mode: StudyMode.fill,
+    currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+    cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+    shuffleAnswers: false,
+    status: SessionStatus.inProgress,
+  );
 }
 
 final class _ReviewBatchStudyRepo implements StudyRepo {
@@ -693,12 +694,12 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
 
   @override
   Future<StudySessionSnapshot> loadSession(String sessionId) async => _snapshot(
-      mode: StudyMode.review,
-      currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-      cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
-      shuffleAnswers: false,
-      studyType: StudyType.newStudy,
-    );
+    mode: StudyMode.review,
+    currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
+    cards: [_card(id: 'card-1', front: 'front 1', back: 'back 1')],
+    shuffleAnswers: false,
+    studyType: StudyType.newStudy,
+  );
 
   @override
   Future<StudySessionSnapshot> answerCurrentModeItemGradesBatch({
@@ -937,20 +938,20 @@ class _StudyModeHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(
-        body: StudyModePanel(
-          snapshot: snapshot,
-          answerOptions: studyAnswerOptions(snapshot),
-          isSubmitting: isSubmitting,
-          feedback: feedback,
-          onAnswer: onAnswer ?? (_) {},
-          onContinue: onContinue,
-          onMarkCorrect: onMarkCorrect,
-        ),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: Scaffold(
+      body: StudyModePanel(
+        snapshot: snapshot,
+        answerOptions: studyAnswerOptions(snapshot),
+        isSubmitting: isSubmitting,
+        feedback: feedback,
+        onAnswer: onAnswer ?? (_) {},
+        onContinue: onContinue,
+        onMarkCorrect: onMarkCorrect,
       ),
-    );
+    ),
+  );
 }
 
 class _InteractiveStudyModeHost extends StatefulWidget {
@@ -993,7 +994,8 @@ class _InteractiveStudyModeHostState extends State<_InteractiveStudyModeHost> {
   }
 }
 
-EditableText _editableText(WidgetTester tester) => tester.widget<EditableText>(find.byType(EditableText));
+EditableText _editableText(WidgetTester tester) =>
+    tester.widget<EditableText>(find.byType(EditableText));
 
 StudySessionSnapshot _snapshot({
   required StudyMode mode,
@@ -1005,50 +1007,50 @@ StudySessionSnapshot _snapshot({
   StudyType studyType = StudyType.srsReview,
   SessionStatus status = SessionStatus.inProgress,
 }) => StudySessionSnapshot(
-    session: StudySession(
-      id: 'session-1',
-      entryType: StudyEntryType.deck,
-      entryRefId: 'deck-1',
-      studyType: studyType,
-      studyFlow: studyType == StudyType.newStudy
-          ? StudyFlow.newFullCycle
-          : StudyFlow.srsFillReview,
-      settings: StudySettingsSnapshot(
-        batchSize: cards.length,
-        shuffleFlashcards: false,
-        shuffleAnswers: shuffleAnswers,
-        prioritizeOverdue: true,
-      ),
-      status: status,
-      startedAt: 0,
-      endedAt: null,
-      restartedFromSessionId: null,
+  session: StudySession(
+    id: 'session-1',
+    entryType: StudyEntryType.deck,
+    entryRefId: 'deck-1',
+    studyType: studyType,
+    studyFlow: studyType == StudyType.newStudy
+        ? StudyFlow.newFullCycle
+        : StudyFlow.srsFillReview,
+    settings: StudySettingsSnapshot(
+      batchSize: cards.length,
+      shuffleFlashcards: false,
+      shuffleAnswers: shuffleAnswers,
+      prioritizeOverdue: true,
     ),
-    currentItem: StudySessionItem(
-      id: itemId,
-      sessionId: 'session-1',
-      flashcard: currentCard,
-      studyMode: mode,
-      modeOrder: 1,
-      roundIndex: 1,
-      queuePosition: 1,
-      sourcePool: SessionItemSourcePool.due,
-      status: SessionItemStatus.pending,
-      completedAt: null,
-    ),
-    currentRoundItems: currentRoundItems,
-    sessionFlashcards: cards,
-    summary: const StudySummary(
-      totalCards: 0,
-      completedAttempts: 0,
-      correctAttempts: 0,
-      incorrectAttempts: 0,
-      increasedBoxCount: 0,
-      decreasedBoxCount: 0,
-      remainingCount: 0,
-    ),
-    canFinalize: false,
-  );
+    status: status,
+    startedAt: 0,
+    endedAt: null,
+    restartedFromSessionId: null,
+  ),
+  currentItem: StudySessionItem(
+    id: itemId,
+    sessionId: 'session-1',
+    flashcard: currentCard,
+    studyMode: mode,
+    modeOrder: 1,
+    roundIndex: 1,
+    queuePosition: 1,
+    sourcePool: SessionItemSourcePool.due,
+    status: SessionItemStatus.pending,
+    completedAt: null,
+  ),
+  currentRoundItems: currentRoundItems,
+  sessionFlashcards: cards,
+  summary: const StudySummary(
+    totalCards: 0,
+    completedAttempts: 0,
+    correctAttempts: 0,
+    incorrectAttempts: 0,
+    increasedBoxCount: 0,
+    decreasedBoxCount: 0,
+    remainingCount: 0,
+  ),
+  canFinalize: false,
+);
 
 StudySessionItem _sessionItem({
   required String id,
@@ -1056,26 +1058,26 @@ StudySessionItem _sessionItem({
   required StudyFlashcardRef card,
   required int queuePosition,
 }) => StudySessionItem(
-    id: id,
-    sessionId: 'session-1',
-    flashcard: card,
-    studyMode: mode,
-    modeOrder: 1,
-    roundIndex: 1,
-    queuePosition: queuePosition,
-    sourcePool: SessionItemSourcePool.due,
-    status: SessionItemStatus.pending,
-    completedAt: null,
-  );
+  id: id,
+  sessionId: 'session-1',
+  flashcard: card,
+  studyMode: mode,
+  modeOrder: 1,
+  roundIndex: 1,
+  queuePosition: queuePosition,
+  sourcePool: SessionItemSourcePool.due,
+  status: SessionItemStatus.pending,
+  completedAt: null,
+);
 
 StudyFlashcardRef _card({
   required String id,
   required String front,
   required String back,
 }) => StudyFlashcardRef(
-    id: id,
-    deckId: 'deck-1',
-    front: front,
-    back: back,
-    sourcePool: SessionItemSourcePool.due,
-  );
+  id: id,
+  deckId: 'deck-1',
+  front: front,
+  back: back,
+  sourcePool: SessionItemSourcePool.due,
+);

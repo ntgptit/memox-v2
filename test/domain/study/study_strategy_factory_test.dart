@@ -252,10 +252,11 @@ void main() {
   });
 }
 
-StudyModeStrategyFactory _modeStrategyFactory() => StudyModeStrategyFactory(const <StudyModeStrategy>[
-    ReviewModeStrategy(),
-    MatchModeStrategy(),
-    GuessModeStrategy(),
-    RecallModeStrategy(),
-    FillModeStrategy(),
-  ]);
+StudyModeStrategyFactory _modeStrategyFactory() =>
+    StudyModeStrategyFactory(const <StudyModeStrategy>[
+      ReviewModeStrategy(),
+      MatchModeStrategy(),
+      GuessModeStrategy(),
+      RecallModeStrategy(),
+      FillModeStrategy(),
+    ]);

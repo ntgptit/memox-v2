@@ -28,19 +28,19 @@ class FlashcardListSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-      key: const ValueKey('flashcard_list_skeleton'),
-      children: const [
-        _FlashcardHeaderSkeleton(),
-        MxGap(MxSpace.xl),
-        _FlashcardToolbarSkeleton(),
-        MxGap(MxSpace.xl),
-        _TermRowSkeleton(),
-        MxGap(MxSpace.sm),
-        _TermRowSkeleton(),
-        MxGap(MxSpace.sm),
-        _TermRowSkeleton(),
-      ],
-    );
+    key: const ValueKey('flashcard_list_skeleton'),
+    children: const [
+      _FlashcardHeaderSkeleton(),
+      MxGap(MxSpace.xl),
+      _FlashcardToolbarSkeleton(),
+      MxGap(MxSpace.xl),
+      _TermRowSkeleton(),
+      MxGap(MxSpace.sm),
+      _TermRowSkeleton(),
+      MxGap(MxSpace.sm),
+      _TermRowSkeleton(),
+    ],
+  );
 }
 
 class _FlashcardHeaderSkeleton extends StatelessWidget {
@@ -48,31 +48,31 @@ class _FlashcardHeaderSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            MxSkeleton(
-              width: _flashcardHeaderActionSize,
-              height: _flashcardHeaderActionSize,
-              borderRadius: MxFeatureRadii.md,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          MxSkeleton(
+            width: _flashcardHeaderActionSize,
+            height: _flashcardHeaderActionSize,
+            borderRadius: MxFeatureRadii.md,
+          ),
+          MxGap(MxSpace.sm),
+          Expanded(
+            child: MxSkeleton(
+              height: _flashcardHeaderTitleHeight,
+              width: _flashcardHeaderTitleWidth,
             ),
-            MxGap(MxSpace.sm),
-            Expanded(
-              child: MxSkeleton(
-                height: _flashcardHeaderTitleHeight,
-                width: _flashcardHeaderTitleWidth,
-              ),
-            ),
-          ],
-        ),
-        MxGap(MxSpace.sm),
-        MxSkeleton(
-          height: _flashcardBreadcrumbHeight,
-          width: _flashcardBreadcrumbWidth,
-        ),
-      ],
-    );
+          ),
+        ],
+      ),
+      MxGap(MxSpace.sm),
+      MxSkeleton(
+        height: _flashcardBreadcrumbHeight,
+        width: _flashcardBreadcrumbWidth,
+      ),
+    ],
+  );
 }
 
 class _FlashcardToolbarSkeleton extends StatelessWidget {
@@ -80,36 +80,36 @@ class _FlashcardToolbarSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxSkeleton(
-          height: _flashcardToolbarHeight,
-          borderRadius: MxFeatureRadii.full,
-        ),
-        MxGap(MxSpace.sm),
-        Wrap(
-          spacing: MxSpace.sm,
-          runSpacing: MxSpace.sm,
-          children: [
-            MxSkeleton(
-              height: _flashcardSortChipHeight,
-              width: _flashcardSortChipWidth,
-              borderRadius: MxFeatureRadii.full,
-            ),
-            MxSkeleton(
-              height: _flashcardActionHeight,
-              width: _flashcardActionPrimaryWidth,
-              borderRadius: MxFeatureRadii.full,
-            ),
-            MxSkeleton(
-              height: _flashcardActionHeight,
-              width: _flashcardActionTertiaryWidth,
-              borderRadius: MxFeatureRadii.full,
-            ),
-          ],
-        ),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxSkeleton(
+        height: _flashcardToolbarHeight,
+        borderRadius: MxFeatureRadii.full,
+      ),
+      MxGap(MxSpace.sm),
+      Wrap(
+        spacing: MxSpace.sm,
+        runSpacing: MxSpace.sm,
+        children: [
+          MxSkeleton(
+            height: _flashcardSortChipHeight,
+            width: _flashcardSortChipWidth,
+            borderRadius: MxFeatureRadii.full,
+          ),
+          MxSkeleton(
+            height: _flashcardActionHeight,
+            width: _flashcardActionPrimaryWidth,
+            borderRadius: MxFeatureRadii.full,
+          ),
+          MxSkeleton(
+            height: _flashcardActionHeight,
+            width: _flashcardActionTertiaryWidth,
+            borderRadius: MxFeatureRadii.full,
+          ),
+        ],
+      ),
+    ],
+  );
 }
 
 class _TermRowSkeleton extends StatelessWidget {
@@ -117,25 +117,25 @@ class _TermRowSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Padding(
-      padding: EdgeInsets.all(MxSpace.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MxSkeleton(
-            height: _flashcardTermTitleHeight,
-            width: _flashcardTermTitleWidth,
-          ),
-          MxGap(MxSpace.xs),
-          MxSkeleton(
-            height: _flashcardTermBodyHeight,
-            width: _flashcardTermBodyWidth,
-          ),
-          MxGap(MxSpace.sm),
-          MxSkeleton(
-            height: _flashcardTermCaptionHeight,
-            width: _flashcardTermCaptionWidth,
-          ),
-        ],
-      ),
-    );
+    padding: EdgeInsets.all(MxSpace.md),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MxSkeleton(
+          height: _flashcardTermTitleHeight,
+          width: _flashcardTermTitleWidth,
+        ),
+        MxGap(MxSpace.xs),
+        MxSkeleton(
+          height: _flashcardTermBodyHeight,
+          width: _flashcardTermBodyWidth,
+        ),
+        MxGap(MxSpace.sm),
+        MxSkeleton(
+          height: _flashcardTermCaptionHeight,
+          width: _flashcardTermCaptionWidth,
+        ),
+      ],
+    ),
+  );
 }

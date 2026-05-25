@@ -217,8 +217,8 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      home: Scaffold(body: Center(child: child)),
-    );
+    home: Scaffold(body: Center(child: child)),
+  );
 }
 
 void _noop() {}

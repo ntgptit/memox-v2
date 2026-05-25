@@ -33,10 +33,7 @@ class FolderHeaderSection extends StatelessWidget {
 
     final folderCrumbs = state.header.breadcrumb;
     final breadcrumbItems = <MxBreadcrumb>[
-      MxBreadcrumb(
-        label: l10n.libraryTitle,
-        onTap: () => context.goLibrary(),
-      ),
+      MxBreadcrumb(label: l10n.libraryTitle, onTap: () => context.goLibrary()),
       for (var index = 0; index < folderCrumbs.length; index++)
         MxBreadcrumb(
           label: folderCrumbs[index].label,
@@ -72,15 +69,15 @@ class FolderHeaderSection extends StatelessWidget {
   }
 
   String _resolveSummary(AppLocalizations l10n) => switch (state.mode) {
-      FolderDetailMode.unlocked => l10n.foldersSummaryUnlocked,
-      FolderDetailMode.subfolders => l10n.foldersStatusSubfolders(
-        state.subfolders.length,
-      ),
-      FolderDetailMode.decks => l10n.foldersStatusDecks(
-        state.decks.length,
-        state.decks.fold<int>(0, (sum, item) => sum + item.cardCount),
-      ),
-    };
+    FolderDetailMode.unlocked => l10n.foldersSummaryUnlocked,
+    FolderDetailMode.subfolders => l10n.foldersStatusSubfolders(
+      state.subfolders.length,
+    ),
+    FolderDetailMode.decks => l10n.foldersStatusDecks(
+      state.decks.length,
+      state.decks.fold<int>(0, (sum, item) => sum + item.cardCount),
+    ),
+  };
 }
 
 class _FolderHeaderTitleRow extends StatelessWidget {

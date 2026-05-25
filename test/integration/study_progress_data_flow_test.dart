@@ -1523,14 +1523,15 @@ class _IntegrationHarness {
         );
   }
 
-  Future<void> setSessionStatus(String sessionId, SessionStatus status) => (database.update(
-      database.studySessions,
-    )..where((table) => table.id.equals(sessionId))).write(
-      StudySessionsCompanion(
-        status: Value(status.storageValue),
-        endedAt: Value(clock.nowEpochMillis()),
-      ),
-    );
+  Future<void> setSessionStatus(String sessionId, SessionStatus status) =>
+      (database.update(
+        database.studySessions,
+      )..where((table) => table.id.equals(sessionId))).write(
+        StudySessionsCompanion(
+          status: Value(status.storageValue),
+          endedAt: Value(clock.nowEpochMillis()),
+        ),
+      );
 
   Future<String> sessionStatus(String sessionId) async {
     final session = await (database.select(
@@ -1546,15 +1547,16 @@ class _IntegrationHarness {
     return progress.currentBox;
   }
 
-  Future<int> activeSessionCount() => (database.select(database.studySessions)..where(
-          (table) => table.status.isIn(const <String>[
-            'in_progress',
-            'ready_to_finalize',
-            'failed_to_finalize',
-          ]),
-        ))
-        .get()
-        .then((sessions) => sessions.length);
+  Future<int> activeSessionCount() =>
+      (database.select(database.studySessions)..where(
+            (table) => table.status.isIn(const <String>[
+              'in_progress',
+              'ready_to_finalize',
+              'failed_to_finalize',
+            ]),
+          ))
+          .get()
+          .then((sessions) => sessions.length);
 
   Future<String> singleActiveSessionId() async {
     final sessions =
@@ -1692,18 +1694,18 @@ class _StudyDriver {
     StudyEntryType entryType = StudyEntryType.deck,
     int batchSize = 2,
   }) => _start.execute(
-      StudyContext(
-        entryType: entryType,
-        entryRefId: _entryRefId(entryType),
-        studyType: StudyType.newStudy,
-        settings: StudySettingsSnapshot(
-          batchSize: batchSize,
-          shuffleFlashcards: false,
-          shuffleAnswers: false,
-          prioritizeOverdue: true,
-        ),
+    StudyContext(
+      entryType: entryType,
+      entryRefId: _entryRefId(entryType),
+      studyType: StudyType.newStudy,
+      settings: StudySettingsSnapshot(
+        batchSize: batchSize,
+        shuffleFlashcards: false,
+        shuffleAnswers: false,
+        prioritizeOverdue: true,
       ),
-    );
+    ),
+  );
 
   Future<StudySessionSnapshot> startReadySrsReview() async {
     final session = await _start.execute(
@@ -1726,10 +1728,11 @@ class _StudyDriver {
     );
   }
 
-  Future<StudySessionSnapshot> finalize(StudySessionSnapshot snapshot) => _finalize.execute(
-      sessionId: snapshot.session.id,
-      studyType: snapshot.session.studyType,
-    );
+  Future<StudySessionSnapshot> finalize(StudySessionSnapshot snapshot) =>
+      _finalize.execute(
+        sessionId: snapshot.session.id,
+        studyType: snapshot.session.studyType,
+      );
 
   StartStudySessionUseCase get _start => StartStudySessionUseCase(
     repository: _repo,
@@ -1772,14 +1775,14 @@ class _IntegrationApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.light,
-      debugShowCheckedModeBanner: false,
-      routerConfig: ref.watch(appRouterProvider),
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    theme: AppTheme.light(),
+    darkTheme: AppTheme.dark(),
+    themeMode: ThemeMode.light,
+    debugShowCheckedModeBanner: false,
+    routerConfig: ref.watch(appRouterProvider),
+  );
 }
 
 const _surfaceSize = Size(900, 1200);
@@ -1790,16 +1793,19 @@ const _alphaBack = 'Alpha answer';
 const _betaFront = 'Beta prompt';
 const _betaBack = 'Beta answer';
 
-String _flashcardListLocation(String deckId) => '${RoutePaths.library}/deck/$deckId/flashcards';
+String _flashcardListLocation(String deckId) =>
+    '${RoutePaths.library}/deck/$deckId/flashcards';
 
 String _studyEntryLocation(StudyEntryType entryType) {
   final entryRefId = _entryRefId(entryType);
   return '${RoutePaths.library}/study/${entryType.storageValue}/$entryRefId';
 }
 
-String _studyResultLocation(String sessionId) => '${RoutePaths.library}/study/session/$sessionId/result';
+String _studyResultLocation(String sessionId) =>
+    '${RoutePaths.library}/study/session/$sessionId/result';
 
-String _studySessionLocation(String sessionId) => '${RoutePaths.library}/study/session/$sessionId';
+String _studySessionLocation(String sessionId) =>
+    '${RoutePaths.library}/study/session/$sessionId';
 
 String _entryRefId(StudyEntryType entryType) {
   if (entryType == StudyEntryType.folder) {
@@ -1809,13 +1815,13 @@ String _entryRefId(StudyEntryType entryType) {
 }
 
 AppConfig _testConfig({required String initialLocation}) => AppConfig(
-    env: AppEnv.local,
-    initialLocation: initialLocation,
-    showDebugBanner: false,
-    enableRouterDiagnostics: false,
-    enableTalkerConsoleLogs: false,
-    enableTalkerRouteLogging: false,
-    enableRiverpodDiagnostics: false,
-    exposeInternalErrorDetails: true,
-    googleOAuthConfig: GoogleOAuthConfig.fromValues(),
-  );
+  env: AppEnv.local,
+  initialLocation: initialLocation,
+  showDebugBanner: false,
+  enableRouterDiagnostics: false,
+  enableTalkerConsoleLogs: false,
+  enableTalkerRouteLogging: false,
+  enableRiverpodDiagnostics: false,
+  exposeInternalErrorDetails: true,
+  googleOAuthConfig: GoogleOAuthConfig.fromValues(),
+);

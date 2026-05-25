@@ -27,30 +27,27 @@ final class AppBootstrap {
     final errorReporter = reportError ?? _reportUnhandledError;
     final originalFlutterOnError = FlutterError.onError;
 
-    await runZonedGuarded(
-      () async {
-        WidgetsFlutterBinding.ensureInitialized();
+    await runZonedGuarded(() async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-        FlutterError.onError = (details) {
-          originalFlutterOnError?.call(details);
-          final stackTrace = details.stack ?? StackTrace.current;
-          errorReporter(details.exception, stackTrace);
-        };
+      FlutterError.onError = (details) {
+        originalFlutterOnError?.call(details);
+        final stackTrace = details.stack ?? StackTrace.current;
+        errorReporter(details.exception, stackTrace);
+      };
 
-        PlatformDispatcher.instance.onError = (error, stackTrace) {
-          errorReporter(error, stackTrace);
-          return true;
-        };
+      PlatformDispatcher.instance.onError = (error, stackTrace) {
+        errorReporter(error, stackTrace);
+        return true;
+      };
 
-        if (beforeRun != null) {
-          await beforeRun();
-        }
+      if (beforeRun != null) {
+        await beforeRun();
+      }
 
-        final app = await builder();
-        runApp(app);
-      },
-      errorReporter,
-    );
+      final app = await builder();
+      runApp(app);
+    }, errorReporter);
   }
 
   static void _reportUnhandledError(Object error, StackTrace stackTrace) {

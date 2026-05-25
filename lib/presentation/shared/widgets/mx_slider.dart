@@ -26,24 +26,24 @@ class MxSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            Expanded(child: MxText(label, role: MxTextRole.formLabel)),
-            if (valueLabel != null)
-              MxText(valueLabel!, role: MxTextRole.tileMeta),
-          ],
-        ),
-        const MxGap(MxSpace.xs),
-        Slider(
-          value: value.clamp(min, max).toDouble(),
-          min: min,
-          max: max,
-          divisions: divisions,
-          label: valueLabel,
-          onChanged: onChanged,
-        ),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Row(
+        children: [
+          Expanded(child: MxText(label, role: MxTextRole.formLabel)),
+          if (valueLabel != null)
+            MxText(valueLabel!, role: MxTextRole.tileMeta),
+        ],
+      ),
+      const MxGap(MxSpace.xs),
+      Slider(
+        value: value.clamp(min, max).toDouble(),
+        min: min,
+        max: max,
+        divisions: divisions,
+        label: valueLabel,
+        onChanged: onChanged,
+      ),
+    ],
+  );
 }

@@ -32,16 +32,16 @@ class MxNameDialog extends StatefulWidget {
     required String confirmLabel,
     String? initialValue,
   }) => showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => MxNameDialog(
-        title: title,
-        label: label,
-        hintText: hintText,
-        confirmLabel: confirmLabel,
-        initialValue: initialValue,
-      ),
-    );
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => MxNameDialog(
+      title: title,
+      label: label,
+      hintText: hintText,
+      confirmLabel: confirmLabel,
+      initialValue: initialValue,
+    ),
+  );
 
   @override
   State<MxNameDialog> createState() => _MxNameDialogState();

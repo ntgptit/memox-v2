@@ -10,12 +10,12 @@ final class DeckDao {
   final AppDatabase _database;
 
   Future<Deck?> findById(String deckId) => (_database.select(
-      _database.decks,
-    )..where((table) => table.id.equals(deckId))).getSingleOrNull();
+    _database.decks,
+  )..where((table) => table.id.equals(deckId))).getSingleOrNull();
 
   Future<List<Deck>> listAllDecks() => (_database.select(
-      _database.decks,
-    )..orderBy([(table) => OrderingTerm.asc(table.createdAt)])).get();
+    _database.decks,
+  )..orderBy([(table) => OrderingTerm.asc(table.createdAt)])).get();
 
   Future<List<Deck>> listDecksInFolder({
     required String folderId,
@@ -57,44 +57,48 @@ final class DeckDao {
     required int createdAt,
     required int updatedAt,
   }) => _database
-        .into(_database.decks)
-        .insert(
-          DecksCompanion.insert(
-            id: id,
-            folderId: folderId,
-            name: name,
-            sortOrder: sortOrder,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-          ),
-        );
+      .into(_database.decks)
+      .insert(
+        DecksCompanion.insert(
+          id: id,
+          folderId: folderId,
+          name: name,
+          sortOrder: sortOrder,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+        ),
+      );
 
   Future<void> updateDeckName({
     required String deckId,
     required String name,
     required int updatedAt,
-  }) => (_database.update(_database.decks)
-          ..where((table) => table.id.equals(deckId)))
-        .write(DecksCompanion(name: Value(name), updatedAt: Value(updatedAt)));
+  }) =>
+      (_database.update(
+        _database.decks,
+      )..where((table) => table.id.equals(deckId))).write(
+        DecksCompanion(name: Value(name), updatedAt: Value(updatedAt)),
+      );
 
   Future<void> updateDeckFolder({
     required String deckId,
     required String folderId,
     required int sortOrder,
     required int updatedAt,
-  }) => (_database.update(
-      _database.decks,
-    )..where((table) => table.id.equals(deckId))).write(
-      DecksCompanion(
-        folderId: Value(folderId),
-        sortOrder: Value(sortOrder),
-        updatedAt: Value(updatedAt),
-      ),
-    );
+  }) =>
+      (_database.update(
+        _database.decks,
+      )..where((table) => table.id.equals(deckId))).write(
+        DecksCompanion(
+          folderId: Value(folderId),
+          sortOrder: Value(sortOrder),
+          updatedAt: Value(updatedAt),
+        ),
+      );
 
   Future<void> deleteDeck(String deckId) => (_database.delete(
-      _database.decks,
-    )..where((table) => table.id.equals(deckId))).go();
+    _database.decks,
+  )..where((table) => table.id.equals(deckId))).go();
 
   Future<void> reorderDecks({
     required String folderId,
@@ -181,8 +185,9 @@ final class DeckDao {
         .toList(growable: false);
   }
 
-  Future<List<Flashcard>> listDeckFlashcards(String deckId) => (_database.select(_database.flashcards)
-          ..where((table) => table.deckId.equals(deckId))
-          ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
-        .get();
+  Future<List<Flashcard>> listDeckFlashcards(String deckId) =>
+      (_database.select(_database.flashcards)
+            ..where((table) => table.deckId.equals(deckId))
+            ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+          .get();
 }

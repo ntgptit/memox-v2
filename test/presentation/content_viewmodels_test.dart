@@ -481,13 +481,14 @@ void main() {
   });
 }
 
-ProviderContainer _createContainer(ContentRepositoryHarness harness) => ProviderContainer(
-    overrides: [
-      appDatabaseProvider.overrideWithValue(harness.database),
-      clockProvider.overrideWithValue(harness.clock),
-      idGeneratorProvider.overrideWithValue(harness.idGenerator),
-    ],
-  );
+ProviderContainer _createContainer(ContentRepositoryHarness harness) =>
+    ProviderContainer(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(harness.database),
+        clockProvider.overrideWithValue(harness.clock),
+        idGeneratorProvider.overrideWithValue(harness.idGenerator),
+      ],
+    );
 
 final class _PendingCreateFlashcardRepository implements FlashcardRepository {
   final Completer<void> _createCompleter = Completer<void>();

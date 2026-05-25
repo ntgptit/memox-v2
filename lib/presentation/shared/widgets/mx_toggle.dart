@@ -19,11 +19,11 @@ class MxToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SwitchListTile(
-      value: value,
-      onChanged: onChanged,
-      title: MxText(label, role: MxTextRole.listTitle),
-      subtitle: subtitle == null
-          ? null
-          : MxText(subtitle!, role: MxTextRole.listSubtitle),
-    );
+    value: value,
+    onChanged: onChanged,
+    title: MxText(label, role: MxTextRole.listTitle),
+    subtitle: subtitle == null
+        ? null
+        : MxText(subtitle!, role: MxTextRole.listSubtitle),
+  );
 }

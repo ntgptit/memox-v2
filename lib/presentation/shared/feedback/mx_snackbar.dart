@@ -22,17 +22,17 @@ abstract final class MxSnackbar {
     Duration duration = MxDurations.snackbar,
     IconData? icon,
   }) => _show(
-      ScaffoldMessenger.of(context),
-      _snackBar(
-        context,
-        message: message,
-        tone: tone,
-        actionLabel: actionLabel,
-        onAction: onAction,
-        duration: duration,
-        icon: icon,
-      ),
-    );
+    ScaffoldMessenger.of(context),
+    _snackBar(
+      context,
+      message: message,
+      tone: tone,
+      actionLabel: actionLabel,
+      onAction: onAction,
+      duration: duration,
+      icon: icon,
+    ),
+  );
 
   static MxDeferredSnackbar deferredSuccess(BuildContext c, String message) {
     final messenger = ScaffoldMessenger.of(c);

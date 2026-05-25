@@ -64,12 +64,14 @@ class MxDeckCard extends StatelessWidget {
     final hasMastery = masteryPercent != null;
     final mastery = (masteryPercent ?? 0).clamp(0, 100);
     final progressValue = mastery / 100;
-    final trailingContent = trailing ?? _buildDefaultTrailing(
-      context,
-      hasMastery: hasMastery,
-      mastery: mastery,
-      progressValue: progressValue,
-    );
+    final trailingContent =
+        trailing ??
+        _buildDefaultTrailing(
+          context,
+          hasMastery: hasMastery,
+          mastery: mastery,
+          progressValue: progressValue,
+        );
 
     return MxCard(
       variant: MxCardVariant.filled,

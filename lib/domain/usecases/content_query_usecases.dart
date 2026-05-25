@@ -9,7 +9,8 @@ final class WatchLibraryOverviewUseCase {
 
   final FolderRepository _repository;
 
-  Future<LibraryOverviewReadModel> execute(ContentQuery query) => _repository.getLibraryOverview(query);
+  Future<LibraryOverviewReadModel> execute(ContentQuery query) =>
+      _repository.getLibraryOverview(query);
 }
 
 final class WatchFolderDetailUseCase {
@@ -17,7 +18,8 @@ final class WatchFolderDetailUseCase {
 
   final FolderRepository _repository;
 
-  Future<FolderDetailReadModel> execute(String folderId, ContentQuery query) => _repository.getFolderDetail(folderId, query);
+  Future<FolderDetailReadModel> execute(String folderId, ContentQuery query) =>
+      _repository.getFolderDetail(folderId, query);
 }
 
 final class GetDeckActionContextUseCase {
@@ -25,7 +27,8 @@ final class GetDeckActionContextUseCase {
 
   final DeckRepository _repository;
 
-  Future<DeckActionContextReadModel> execute(String deckId) => _repository.getDeckActionContext(deckId);
+  Future<DeckActionContextReadModel> execute(String deckId) =>
+      _repository.getDeckActionContext(deckId);
 }
 
 final class GetDeckHighlightsUseCase {
@@ -33,7 +36,8 @@ final class GetDeckHighlightsUseCase {
 
   final DeckRepository _repository;
 
-  Future<List<DeckHighlightReadModel>> execute({required int limit}) => _repository.getDeckHighlights(limit: limit);
+  Future<List<DeckHighlightReadModel>> execute({required int limit}) =>
+      _repository.getDeckHighlights(limit: limit);
 }
 
 final class WatchFlashcardListUseCase {
@@ -41,5 +45,6 @@ final class WatchFlashcardListUseCase {
 
   final FlashcardRepository _repository;
 
-  Future<FlashcardListReadModel> execute(String deckId, ContentQuery query) => _repository.getFlashcards(deckId, query);
+  Future<FlashcardListReadModel> execute(String deckId, ContentQuery query) =>
+      _repository.getFlashcards(deckId, query);
 }

@@ -26,29 +26,29 @@ class MatchBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          child: _MatchBoardColumn(
-            side: MatchTileSide.left,
-            items: leftItems,
-            isLocked: isLocked,
-            tileStateFor: tileStateFor,
-            onTileTap: onTileTap,
-          ),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Expanded(
+        child: _MatchBoardColumn(
+          side: MatchTileSide.left,
+          items: leftItems,
+          isLocked: isLocked,
+          tileStateFor: tileStateFor,
+          onTileTap: onTileTap,
         ),
-        const MxGap(MxSpace.sm),
-        Expanded(
-          child: _MatchBoardColumn(
-            side: MatchTileSide.right,
-            items: rightItems,
-            isLocked: isLocked,
-            tileStateFor: tileStateFor,
-            onTileTap: onTileTap,
-          ),
+      ),
+      const MxGap(MxSpace.sm),
+      Expanded(
+        child: _MatchBoardColumn(
+          side: MatchTileSide.right,
+          items: rightItems,
+          isLocked: isLocked,
+          tileStateFor: tileStateFor,
+          onTileTap: onTileTap,
         ),
-      ],
-    );
+      ),
+    ],
+  );
 }
 
 class _MatchBoardColumn extends StatelessWidget {

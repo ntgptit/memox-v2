@@ -107,133 +107,133 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     required Set<String> selection,
     required FlashcardSelection selectionNotifier,
   }) => MxScaffold(
-      floatingActionButton: _isReorderMode
-          ? null
-          : MxFab(
-              icon: Icons.add,
-              tooltip: l10n.flashcardsAddTooltip,
-              onPressed: () => context.pushFlashcardCreate(widget.deckId),
-            ),
-      body: MxContentShell(
-        width: MxContentWidth.wide,
-        applyVerticalPadding: true,
-        hasFab: !_isReorderMode,
-        child: MxRetainedAsyncState<FlashcardListState>(
-          data: queryState.value,
-          isLoading: queryState.isLoading,
-          error: queryState.hasError ? queryState.error : null,
-          stackTrace: queryState.hasError ? queryState.stackTrace : null,
-          skeletonBuilder: (_) => const FlashcardListSkeleton(),
-          onRetry: () =>
-              ref.invalidate(flashcardListQueryProvider(widget.deckId)),
-          dataBuilder: (context, state) => CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: FlashcardHeaderSection(
-                    title: state.deckName,
-                    onBack: () => context.popRoute(
-                      fallback: () => _goToDeckParent(context, state),
-                    ),
-                    onShare: _exportDeck,
-                    onOpenActions: () => showDeckActions(
-                      context: context,
-                      ref: ref,
-                      deckId: state.deckId,
-                      deckName: state.deckName,
-                      actionContext: DeckActionContext(
-                        deckId: state.deckId,
-                        deckName: state.deckName,
-                        folderId: state.folderId,
-                        breadcrumb: state.breadcrumb,
-                      ),
-                      onDeleted: () async {
-                        await context.popRoute(
-                          fallback: () => _goToDeckParent(context, state),
-                        );
-                      },
-                    ),
-                  ),
+    floatingActionButton: _isReorderMode
+        ? null
+        : MxFab(
+            icon: Icons.add,
+            tooltip: l10n.flashcardsAddTooltip,
+            onPressed: () => context.pushFlashcardCreate(widget.deckId),
+          ),
+    body: MxContentShell(
+      width: MxContentWidth.wide,
+      applyVerticalPadding: true,
+      hasFab: !_isReorderMode,
+      child: MxRetainedAsyncState<FlashcardListState>(
+        data: queryState.value,
+        isLoading: queryState.isLoading,
+        error: queryState.hasError ? queryState.error : null,
+        stackTrace: queryState.hasError ? queryState.stackTrace : null,
+        skeletonBuilder: (_) => const FlashcardListSkeleton(),
+        onRetry: () =>
+            ref.invalidate(flashcardListQueryProvider(widget.deckId)),
+        dataBuilder: (context, state) => CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: FlashcardHeaderSection(
+                title: state.deckName,
+                onBack: () => context.popRoute(
+                  fallback: () => _goToDeckParent(context, state),
                 ),
-                const MxSliverGap(MxSpace.sm),
-                // DS Deck Detail order: appbar → breadcrumb → hero summary →
-                // study modes (primary CTA) → card breakdown → preview → items.
-                SliverToBoxAdapter(
-                  child: FlashcardBreadcrumbSection(
+                onShare: _exportDeck,
+                onOpenActions: () => showDeckActions(
+                  context: context,
+                  ref: ref,
+                  deckId: state.deckId,
+                  deckName: state.deckName,
+                  actionContext: DeckActionContext(
+                    deckId: state.deckId,
+                    deckName: state.deckName,
+                    folderId: state.folderId,
                     breadcrumb: state.breadcrumb,
-                    onOpenBreadcrumb: (folderId) =>
-                        context.goFolderDetail(folderId),
-                    onOpenLibrary: context.goLibrary,
                   ),
+                  onDeleted: () async {
+                    await context.popRoute(
+                      fallback: () => _goToDeckParent(context, state),
+                    );
+                  },
                 ),
-                const MxSliverGap(MxSpace.md),
-                SliverToBoxAdapter(
-                  child: FlashcardDeckSummarySection(
-                    state: state,
-                    studyEnabled: state.items.isNotEmpty,
-                    onStartStudy: () => _goStudyEntry(state, null),
-                  ),
-                ),
-                const MxSliverGap(MxSpace.xl),
-                SliverToBoxAdapter(
-                  child: FlashcardStudyModesSection(
-                    enabled: state.items.isNotEmpty,
-                    onStartStudy: (mode) => _goStudyEntry(state, mode),
-                  ),
-                ),
-                const MxSliverGap(MxSpace.xl),
-                SliverToBoxAdapter(
-                  child: FlashcardProgressSection(progress: state.progress),
-                ),
-                const MxSliverGap(MxSpace.xl),
-                SliverToBoxAdapter(
-                  child: FlashcardToolbarSection(
-                    selectedSort: toolbarState.sortMode,
-                    isReorderMode: _isReorderMode,
-                    canManualReorder: state.canManualReorder,
-                    searchTerm: toolbarState.searchTerm,
-                    onSearchChanged: toolbarNotifier.setSearchTerm,
-                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                    onSortSelected: toolbarNotifier.setSortMode,
-                    onCancelReorder: _cancelReorder,
-                    onSaveReorder: _saveReorder,
-                    onImport: () => context.pushDeckImport(widget.deckId),
-                    onStartReorder: () => _enterReorderMode(state),
-                  ),
-                ),
-                if (selection.isNotEmpty) ...[
-                  const MxSliverGap(MxSpace.lg),
-                  SliverToBoxAdapter(
-                    child: FlashcardBulkActionSection(
-                      selectionCount: selection.length,
-                      totalItemCount: state.items.length,
-                      onToggleSelectionMode: () {
-                        if (selection.length == state.items.length) {
-                          selectionNotifier.clear();
-                          return;
-                        }
-                        selectionNotifier.setAll(
-                          state.items.map((item) => item.id),
-                        );
-                      },
-                      onMove: () => _moveSelected(selection.toList()),
-                      onExport: () => _exportSelected(selection.toList()),
-                      onDelete: () => _deleteSelected(selection.toList()),
-                    ),
-                  ),
-                ],
-                const MxSliverGap(MxSpace.lg),
-                ..._buildBodySlivers(
-                  state: state,
-                  selection: selection,
-                  onToggleSelection: selectionNotifier.toggle,
-                ),
-                if (!_isReorderMode)
-                  const MxSliverGap(kMinInteractiveDimension + MxSpace.xxl),
-              ],
+              ),
             ),
+            const MxSliverGap(MxSpace.sm),
+            // DS Deck Detail order: appbar → breadcrumb → hero summary →
+            // study modes (primary CTA) → card breakdown → preview → items.
+            SliverToBoxAdapter(
+              child: FlashcardBreadcrumbSection(
+                breadcrumb: state.breadcrumb,
+                onOpenBreadcrumb: (folderId) =>
+                    context.goFolderDetail(folderId),
+                onOpenLibrary: context.goLibrary,
+              ),
+            ),
+            const MxSliverGap(MxSpace.md),
+            SliverToBoxAdapter(
+              child: FlashcardDeckSummarySection(
+                state: state,
+                studyEnabled: state.items.isNotEmpty,
+                onStartStudy: () => _goStudyEntry(state, null),
+              ),
+            ),
+            const MxSliverGap(MxSpace.xl),
+            SliverToBoxAdapter(
+              child: FlashcardStudyModesSection(
+                enabled: state.items.isNotEmpty,
+                onStartStudy: (mode) => _goStudyEntry(state, mode),
+              ),
+            ),
+            const MxSliverGap(MxSpace.xl),
+            SliverToBoxAdapter(
+              child: FlashcardProgressSection(progress: state.progress),
+            ),
+            const MxSliverGap(MxSpace.xl),
+            SliverToBoxAdapter(
+              child: FlashcardToolbarSection(
+                selectedSort: toolbarState.sortMode,
+                isReorderMode: _isReorderMode,
+                canManualReorder: state.canManualReorder,
+                searchTerm: toolbarState.searchTerm,
+                onSearchChanged: toolbarNotifier.setSearchTerm,
+                onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                onSortSelected: toolbarNotifier.setSortMode,
+                onCancelReorder: _cancelReorder,
+                onSaveReorder: _saveReorder,
+                onImport: () => context.pushDeckImport(widget.deckId),
+                onStartReorder: () => _enterReorderMode(state),
+              ),
+            ),
+            if (selection.isNotEmpty) ...[
+              const MxSliverGap(MxSpace.lg),
+              SliverToBoxAdapter(
+                child: FlashcardBulkActionSection(
+                  selectionCount: selection.length,
+                  totalItemCount: state.items.length,
+                  onToggleSelectionMode: () {
+                    if (selection.length == state.items.length) {
+                      selectionNotifier.clear();
+                      return;
+                    }
+                    selectionNotifier.setAll(
+                      state.items.map((item) => item.id),
+                    );
+                  },
+                  onMove: () => _moveSelected(selection.toList()),
+                  onExport: () => _exportSelected(selection.toList()),
+                  onDelete: () => _deleteSelected(selection.toList()),
+                ),
+              ),
+            ],
+            const MxSliverGap(MxSpace.lg),
+            ..._buildBodySlivers(
+              state: state,
+              selection: selection,
+              onToggleSelection: selectionNotifier.toggle,
+            ),
+            if (!_isReorderMode)
+              const MxSliverGap(kMinInteractiveDimension + MxSpace.xxl),
+          ],
         ),
       ),
-    );
+    ),
+  );
 
   void _enterReorderMode(FlashcardListState state) {
     setState(() {

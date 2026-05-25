@@ -27,9 +27,11 @@ abstract final class StringUtils {
 
   static String upperCaseToEmpty(String? value) => upperCase(value) ?? '';
 
-  static String normalizedForComparison(String? value) => lowerCaseToEmpty(trimToEmpty(value));
+  static String normalizedForComparison(String? value) =>
+      lowerCaseToEmpty(trimToEmpty(value));
 
-  static String normalizedForSearch(String? value) => normalizedForComparison(value);
+  static String normalizedForSearch(String? value) =>
+      normalizedForComparison(value);
 
   static String uppercased(String? value) => upperCaseToEmpty(value);
 
@@ -41,9 +43,11 @@ abstract final class StringUtils {
     return result.replaceAll(_whitespacePattern, ' ');
   }
 
-  static String normalizeSpaceToEmpty(String? value) => normalizeSpace(value) ?? '';
+  static String normalizeSpaceToEmpty(String? value) =>
+      normalizeSpace(value) ?? '';
 
-  static String normalizedWhitespace(String? value) => normalizeSpaceToEmpty(value);
+  static String normalizedWhitespace(String? value) =>
+      normalizeSpaceToEmpty(value);
 
   static bool equalsNormalized(String? left, String? right) {
     if (left == null || right == null) {

@@ -138,7 +138,9 @@ class MxFolderTile extends StatelessWidget {
                         MxLinearProgress(
                           value: progressValue,
                           size: MxProgressSize.small,
-                          color: context.mxColors.masteryProgress(progressValue),
+                          color: context.mxColors.masteryProgress(
+                            progressValue,
+                          ),
                           minHeight: _progressBarHeight,
                         ),
                       ],

@@ -15,7 +15,8 @@ import '../logging/app_talker.dart';
 part 'providers.g.dart';
 
 @Riverpod(keepAlive: true)
-Future<SharedPreferences> sharedPreferences(Ref ref) => SharedPreferences.getInstance();
+Future<SharedPreferences> sharedPreferences(Ref ref) =>
+    SharedPreferences.getInstance();
 
 @Riverpod(keepAlive: true)
 AppEnv appEnv(Ref ref) => AppEnv.fromEnvironment();

@@ -40,10 +40,7 @@ class MxTagInput extends StatelessWidget {
     final tag = await MxBottomSheet.show<String>(
       context: context,
       title: sheetTitle,
-      child: _TagInputSheetBody(
-        hintText: hintText,
-        confirmLabel: confirmLabel,
-      ),
+      child: _TagInputSheetBody(hintText: hintText, confirmLabel: confirmLabel),
     );
     if (tag == null) return;
     final trimmed = StringUtils.trimmed(tag);
@@ -53,22 +50,19 @@ class MxTagInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-      spacing: AppSpacing.xs,
-      runSpacing: AppSpacing.xs,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        for (final tag in tags)
-          MxChip(
-            label: tag,
-            tone: MxChipTone.primary,
-            onDeleted: () => onRemove(tag),
-          ),
-        _AddTagTrigger(
-          label: addLabel,
-          onTap: () => _openSheet(context),
+    spacing: AppSpacing.xs,
+    runSpacing: AppSpacing.xs,
+    crossAxisAlignment: WrapCrossAlignment.center,
+    children: [
+      for (final tag in tags)
+        MxChip(
+          label: tag,
+          tone: MxChipTone.primary,
+          onDeleted: () => onRemove(tag),
         ),
-      ],
-    );
+      _AddTagTrigger(label: addLabel, onTap: () => _openSheet(context)),
+    ],
+  );
 }
 
 class _AddTagTrigger extends StatelessWidget {
@@ -159,10 +153,11 @@ class _DashedStadiumPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _DashedStadiumPainter old) => old.color != color ||
-        old.strokeWidth != strokeWidth ||
-        old.dashLength != dashLength ||
-        old.gapLength != gapLength;
+  bool shouldRepaint(covariant _DashedStadiumPainter old) =>
+      old.color != color ||
+      old.strokeWidth != strokeWidth ||
+      old.dashLength != dashLength ||
+      old.gapLength != gapLength;
 }
 
 class _TagInputSheetBody extends StatefulWidget {
@@ -198,24 +193,23 @@ class _TagInputSheetBodyState extends State<_TagInputSheetBody> {
 
   @override
   Widget build(BuildContext context) => Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        MxTextField(
-          controller: _controller,
-          hintText: widget.hintText,
-          autofocus: true,
-          textInputAction: TextInputAction.done,
-          textCapitalization: TextCapitalization.none,
-          onSubmitted: (_) => _submit(),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        MxPrimaryButton(
-          label: widget.confirmLabel,
-          fullWidth: true,
-          onPressed: _submit,
-        ),
-      ],
-    );
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      MxTextField(
+        controller: _controller,
+        hintText: widget.hintText,
+        autofocus: true,
+        textInputAction: TextInputAction.done,
+        textCapitalization: TextCapitalization.none,
+        onSubmitted: (_) => _submit(),
+      ),
+      const SizedBox(height: AppSpacing.md),
+      MxPrimaryButton(
+        label: widget.confirmLabel,
+        fullWidth: true,
+        onPressed: _submit,
+      ),
+    ],
+  );
 }
-

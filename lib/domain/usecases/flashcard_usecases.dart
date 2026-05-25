@@ -21,7 +21,8 @@ final class GetFlashcardUseCase {
 
   final FlashcardRepository _repository;
 
-  Future<FlashcardEntity> execute(String flashcardId) => _repository.getFlashcard(flashcardId);
+  Future<FlashcardEntity> execute(String flashcardId) =>
+      _repository.getFlashcard(flashcardId);
 }
 
 final class GetFlashcardMoveTargetsUseCase {
@@ -33,9 +34,9 @@ final class GetFlashcardMoveTargetsUseCase {
     required String deckId,
     required List<String> flashcardIds,
   }) => _repository.getFlashcardMoveTargets(
-      deckId: deckId,
-      flashcardIds: flashcardIds,
-    );
+    deckId: deckId,
+    flashcardIds: flashcardIds,
+  );
 }
 
 final class UpdateFlashcardUseCase {
@@ -49,10 +50,10 @@ final class UpdateFlashcardUseCase {
     FlashcardProgressEditPolicy progressPolicy =
         FlashcardProgressEditPolicy.keepProgress,
   }) => _repository.updateFlashcard(
-      flashcardId: flashcardId,
-      draft: draft,
-      progressPolicy: progressPolicy,
-    );
+    flashcardId: flashcardId,
+    draft: draft,
+    progressPolicy: progressPolicy,
+  );
 }
 
 final class DeleteFlashcardsUseCase {
@@ -60,7 +61,8 @@ final class DeleteFlashcardsUseCase {
 
   final FlashcardRepository _repository;
 
-  Future<Result<void>> execute(List<String> flashcardIds) => _repository.deleteFlashcards(flashcardIds);
+  Future<Result<void>> execute(List<String> flashcardIds) =>
+      _repository.deleteFlashcards(flashcardIds);
 }
 
 final class MoveFlashcardsUseCase {
@@ -72,9 +74,9 @@ final class MoveFlashcardsUseCase {
     required List<String> flashcardIds,
     required String targetDeckId,
   }) => _repository.moveFlashcards(
-      flashcardIds: flashcardIds,
-      targetDeckId: targetDeckId,
-    );
+    flashcardIds: flashcardIds,
+    targetDeckId: targetDeckId,
+  );
 }
 
 final class ReorderFlashcardsUseCase {
@@ -86,9 +88,9 @@ final class ReorderFlashcardsUseCase {
     required String deckId,
     required List<String> orderedFlashcardIds,
   }) => _repository.reorderFlashcards(
-      deckId: deckId,
-      orderedFlashcardIds: orderedFlashcardIds,
-    );
+    deckId: deckId,
+    orderedFlashcardIds: orderedFlashcardIds,
+  );
 }
 
 final class PrepareFlashcardImportUseCase {
@@ -107,14 +109,14 @@ final class PrepareFlashcardImportUseCase {
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
   }) => _repository.prepareImport(
-      deckId: deckId,
-      format: format,
-      rawContent: rawContent,
-      sourceBytes: sourceBytes,
-      excelHasHeader: excelHasHeader,
-      duplicatePolicy: duplicatePolicy,
-      structuredTextSeparator: structuredTextSeparator,
-    );
+    deckId: deckId,
+    format: format,
+    rawContent: rawContent,
+    sourceBytes: sourceBytes,
+    excelHasHeader: excelHasHeader,
+    duplicatePolicy: duplicatePolicy,
+    structuredTextSeparator: structuredTextSeparator,
+  );
 }
 
 final class CommitFlashcardImportUseCase {
@@ -133,5 +135,6 @@ final class ExportFlashcardsUseCase {
 
   final FlashcardRepository _repository;
 
-  Future<Result<ExportData>> execute(List<String> flashcardIds) => _repository.exportFlashcards(flashcardIds);
+  Future<Result<ExportData>> execute(List<String> flashcardIds) =>
+      _repository.exportFlashcards(flashcardIds);
 }

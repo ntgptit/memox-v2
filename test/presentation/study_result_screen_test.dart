@@ -152,38 +152,38 @@ void main() {
 }
 
 StudySessionSnapshot _snapshot(SessionStatus status) => StudySessionSnapshot(
-    session: StudySession(
-      id: 'session-001',
-      entryType: StudyEntryType.deck,
-      entryRefId: 'deck-001',
-      studyType: StudyType.srsReview,
-      studyFlow: StudyFlow.srsFillReview,
-      settings: const StudySettingsSnapshot(
-        batchSize: 4,
-        shuffleFlashcards: false,
-        shuffleAnswers: false,
-        prioritizeOverdue: true,
-      ),
-      status: status,
-      startedAt: 0,
-      endedAt: 1,
-      restartedFromSessionId: null,
+  session: StudySession(
+    id: 'session-001',
+    entryType: StudyEntryType.deck,
+    entryRefId: 'deck-001',
+    studyType: StudyType.srsReview,
+    studyFlow: StudyFlow.srsFillReview,
+    settings: const StudySettingsSnapshot(
+      batchSize: 4,
+      shuffleFlashcards: false,
+      shuffleAnswers: false,
+      prioritizeOverdue: true,
     ),
-    currentItem: null,
-    sessionFlashcards: const <StudyFlashcardRef>[],
-    summary: const StudySummary(
-      totalCards: 4,
-      masteredCardCount: 4,
-      retryCardCount: 2,
-      completedAttempts: 6,
-      correctAttempts: 5,
-      incorrectAttempts: 1,
-      increasedBoxCount: 1,
-      decreasedBoxCount: 0,
-      remainingCount: 0,
-    ),
-    canFinalize: false,
-  );
+    status: status,
+    startedAt: 0,
+    endedAt: 1,
+    restartedFromSessionId: null,
+  ),
+  currentItem: null,
+  sessionFlashcards: const <StudyFlashcardRef>[],
+  summary: const StudySummary(
+    totalCards: 4,
+    masteredCardCount: 4,
+    retryCardCount: 2,
+    completedAttempts: 6,
+    correctAttempts: 5,
+    incorrectAttempts: 1,
+    increasedBoxCount: 1,
+    decreasedBoxCount: 0,
+    remainingCount: 0,
+  ),
+  canFinalize: false,
+);
 
 class _TestApp extends StatelessWidget {
   const _TestApp({required this.child});
@@ -192,10 +192,10 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: child,
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: child,
+  );
 }
 
 class _TestRouterApp extends StatelessWidget {
@@ -209,42 +209,44 @@ class _TestRouterApp extends StatelessWidget {
         GoRoute(
           path: '/previous',
           builder: (context, state) => Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('Previous route'),
-                    TextButton(
-                      onPressed: () =>
-                          context.push('/study/session/session-001/result'),
-                      child: const Text('Open result'),
-                    ),
-                  ],
-                ),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Previous route'),
+                  TextButton(
+                    onPressed: () =>
+                        context.push('/study/session/session-001/result'),
+                    child: const Text('Open result'),
+                  ),
+                ],
               ),
             ),
+          ),
         ),
         GoRoute(
           path: '/${RoutePaths.studyResultSegment}',
           name: RouteNames.studyResult,
-          builder: (context, state) => const StudyResultScreen(sessionId: 'session-001'),
+          builder: (context, state) =>
+              const StudyResultScreen(sessionId: 'session-001'),
         ),
         GoRoute(
           path: '/${RoutePaths.studyTodaySegment}',
           name: RouteNames.studyToday,
           builder: (context, state) => Scaffold(
-              body: Center(
-                child: TextButton(
-                  onPressed: () =>
-                      context.popRoute(fallback: () => context.go('/library')),
-                  child: const Text('Today back'),
-                ),
+            body: Center(
+              child: TextButton(
+                onPressed: () =>
+                    context.popRoute(fallback: () => context.go('/library')),
+                child: const Text('Today back'),
               ),
             ),
+          ),
         ),
         GoRoute(
           path: '/library',
-          builder: (context, state) => const Scaffold(body: Center(child: Text('Library'))),
+          builder: (context, state) =>
+              const Scaffold(body: Center(child: Text('Library'))),
         ),
       ],
     );

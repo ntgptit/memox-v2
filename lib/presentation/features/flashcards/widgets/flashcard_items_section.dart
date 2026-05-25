@@ -26,18 +26,18 @@ class FlashcardItemsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SliverList.separated(
-      key: const ValueKey('flashcard_lazy_items'),
-      itemCount: state.items.length,
-      itemBuilder: (context, index) => _FlashcardItemRow(
-        item: state.items[index],
-        deckId: deckId,
-        selection: selection,
-        onToggleSelection: onToggleSelection,
-        onOpenActions: onOpenActions,
-        onSpeak: onSpeak,
-      ),
-      separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
-    );
+    key: const ValueKey('flashcard_lazy_items'),
+    itemCount: state.items.length,
+    itemBuilder: (context, index) => _FlashcardItemRow(
+      item: state.items[index],
+      deckId: deckId,
+      selection: selection,
+      onToggleSelection: onToggleSelection,
+      onOpenActions: onOpenActions,
+      onSpeak: onSpeak,
+    ),
+    separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
+  );
 }
 
 class _FlashcardItemRow extends StatelessWidget {
@@ -59,23 +59,23 @@ class _FlashcardItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => FlashcardDetailCardRow(
-      item: item,
-      selected: selection.contains(item.id),
-      onTap: () {
-        if (selection.isNotEmpty) {
-          onToggleSelection(item.id);
-          return;
-        }
-        context.pushFlashcardEdit(deckId: deckId, flashcardId: item.id);
-      },
-      onLongPress: () {
-        if (selection.isNotEmpty) {
-          onToggleSelection(item.id);
-          return;
-        }
-        onOpenActions(item);
-      },
-      onSpeak: () => onSpeak(item),
-      onSelect: () => onToggleSelection(item.id),
-    );
+    item: item,
+    selected: selection.contains(item.id),
+    onTap: () {
+      if (selection.isNotEmpty) {
+        onToggleSelection(item.id);
+        return;
+      }
+      context.pushFlashcardEdit(deckId: deckId, flashcardId: item.id);
+    },
+    onLongPress: () {
+      if (selection.isNotEmpty) {
+        onToggleSelection(item.id);
+        return;
+      }
+      onOpenActions(item);
+    },
+    onSpeak: () => onSpeak(item),
+    onSelect: () => onToggleSelection(item.id),
+  );
 }

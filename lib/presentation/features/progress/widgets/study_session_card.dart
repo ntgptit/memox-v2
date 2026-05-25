@@ -268,10 +268,11 @@ int _completedStudySteps(StudySessionSnapshot snapshot) {
   return snapshot.summary.completedAttempts.clamp(0, total).toInt();
 }
 
-String _sessionTitle(AppLocalizations l10n, StudySession session) => l10n.progressSessionTitle(
-    _studyTypeLabel(l10n, session.studyType),
-    _entryTypeLabel(l10n, session.entryType),
-  );
+String _sessionTitle(AppLocalizations l10n, StudySession session) =>
+    l10n.progressSessionTitle(
+      _studyTypeLabel(l10n, session.studyType),
+      _entryTypeLabel(l10n, session.entryType),
+    );
 
 String _sessionSubtitle(AppLocalizations l10n, StudySessionSnapshot snapshot) {
   final item = snapshot.currentItem;
@@ -284,39 +285,42 @@ String _sessionSubtitle(AppLocalizations l10n, StudySessionSnapshot snapshot) {
   );
 }
 
-String _studyTypeLabel(AppLocalizations l10n, StudyType studyType) => switch (studyType) {
-    StudyType.newStudy => l10n.studyTypeNew,
-    StudyType.srsReview => l10n.studyTypeReview,
-  };
+String _studyTypeLabel(AppLocalizations l10n, StudyType studyType) =>
+    switch (studyType) {
+      StudyType.newStudy => l10n.studyTypeNew,
+      StudyType.srsReview => l10n.studyTypeReview,
+    };
 
-String _entryTypeLabel(AppLocalizations l10n, StudyEntryType entryType) => switch (entryType) {
-    StudyEntryType.deck => l10n.progressEntryDeck,
-    StudyEntryType.folder => l10n.progressEntryFolder,
-    StudyEntryType.today => l10n.progressEntryToday,
-  };
+String _entryTypeLabel(AppLocalizations l10n, StudyEntryType entryType) =>
+    switch (entryType) {
+      StudyEntryType.deck => l10n.progressEntryDeck,
+      StudyEntryType.folder => l10n.progressEntryFolder,
+      StudyEntryType.today => l10n.progressEntryToday,
+    };
 
 String _studyModeLabel(AppLocalizations l10n, StudyMode mode) => switch (mode) {
-    StudyMode.review => l10n.studyModeReview,
-    StudyMode.match => l10n.studyModeMatch,
-    StudyMode.guess => l10n.studyModeGuess,
-    StudyMode.recall => l10n.studyModeRecall,
-    StudyMode.fill => l10n.studyModeFill,
-  };
+  StudyMode.review => l10n.studyModeReview,
+  StudyMode.match => l10n.studyModeMatch,
+  StudyMode.guess => l10n.studyModeGuess,
+  StudyMode.recall => l10n.studyModeRecall,
+  StudyMode.fill => l10n.studyModeFill,
+};
 
-String _statusLabel(AppLocalizations l10n, SessionStatus status) => switch (status) {
-    SessionStatus.draft => l10n.studyResultDraft,
-    SessionStatus.inProgress => l10n.progressSessionStatusInProgress,
-    SessionStatus.readyToFinalize => l10n.progressSessionStatusReady,
-    SessionStatus.completed => l10n.studyResultCompleted,
-    SessionStatus.failedToFinalize => l10n.progressSessionStatusFailed,
-    SessionStatus.cancelled => l10n.studyResultCancelled,
-  };
+String _statusLabel(AppLocalizations l10n, SessionStatus status) =>
+    switch (status) {
+      SessionStatus.draft => l10n.studyResultDraft,
+      SessionStatus.inProgress => l10n.progressSessionStatusInProgress,
+      SessionStatus.readyToFinalize => l10n.progressSessionStatusReady,
+      SessionStatus.completed => l10n.studyResultCompleted,
+      SessionStatus.failedToFinalize => l10n.progressSessionStatusFailed,
+      SessionStatus.cancelled => l10n.studyResultCancelled,
+    };
 
 MxBadgeTone _statusTone(SessionStatus status) => switch (status) {
-    SessionStatus.inProgress => MxBadgeTone.info,
-    SessionStatus.readyToFinalize => MxBadgeTone.success,
-    SessionStatus.failedToFinalize => MxBadgeTone.error,
-    SessionStatus.draft => MxBadgeTone.neutral,
-    SessionStatus.completed => MxBadgeTone.success,
-    SessionStatus.cancelled => MxBadgeTone.neutral,
-  };
+  SessionStatus.inProgress => MxBadgeTone.info,
+  SessionStatus.readyToFinalize => MxBadgeTone.success,
+  SessionStatus.failedToFinalize => MxBadgeTone.error,
+  SessionStatus.draft => MxBadgeTone.neutral,
+  SessionStatus.completed => MxBadgeTone.success,
+  SessionStatus.cancelled => MxBadgeTone.neutral,
+};

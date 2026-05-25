@@ -36,9 +36,9 @@ GoRouter appRouter(Ref ref) {
       GoRoute(path: '/', redirect: guards.rootRedirect),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => AppShell(
-            navigationShell: navigationShell,
-            hideNavigation: _shouldHideShellNavigation(state),
-          ),
+          navigationShell: navigationShell,
+          hideNavigation: _shouldHideShellNavigation(state),
+        ),
         branches: [
           StatefulShellBranch(routes: dashboardBranchRoutes()),
           StatefulShellBranch(
@@ -103,18 +103,18 @@ class _RouterErrorView extends StatelessWidget {
   }
 
   String _localizedMessage(AppLocalizations l10n) => switch (failure.code) {
-      FailureCodes.invalidAppEnvironment => l10n.errorConfiguration,
-      FailureCodes.requestTimedOut => l10n.errorRequestTimedOut,
-      FailureCodes.invalidData => l10n.errorInvalidData,
-      FailureCodes.unsupportedAction => l10n.errorUnsupportedAction,
-      FailureCodes.unknown => l10n.errorUnexpected,
-      _ => switch (failure.type) {
-        FailureType.configuration => l10n.errorConfiguration,
-        FailureType.validation => l10n.errorInvalidData,
-        FailureType.network => l10n.errorNetwork,
-        FailureType.storage => l10n.errorStorage,
-        FailureType.notFound => l10n.errorNotFound,
-        FailureType.unknown => l10n.errorUnexpected,
-      },
-    };
+    FailureCodes.invalidAppEnvironment => l10n.errorConfiguration,
+    FailureCodes.requestTimedOut => l10n.errorRequestTimedOut,
+    FailureCodes.invalidData => l10n.errorInvalidData,
+    FailureCodes.unsupportedAction => l10n.errorUnsupportedAction,
+    FailureCodes.unknown => l10n.errorUnexpected,
+    _ => switch (failure.type) {
+      FailureType.configuration => l10n.errorConfiguration,
+      FailureType.validation => l10n.errorInvalidData,
+      FailureType.network => l10n.errorNetwork,
+      FailureType.storage => l10n.errorStorage,
+      FailureType.notFound => l10n.errorNotFound,
+      FailureType.unknown => l10n.errorUnexpected,
+    },
+  };
 }

@@ -13,17 +13,17 @@ void main() {
       _TestApp(
         child: Builder(
           builder: (context) => TextButton(
-              onPressed: () async {
-                result = await MxNameDialog.show(
-                  context: context,
-                  title: 'Create folder',
-                  label: 'Folder name',
-                  hintText: 'e.g. Listening practice',
-                  confirmLabel: 'Create',
-                );
-              },
-              child: const Text('Open dialog'),
-            ),
+            onPressed: () async {
+              result = await MxNameDialog.show(
+                context: context,
+                title: 'Create folder',
+                label: 'Folder name',
+                hintText: 'e.g. Listening practice',
+                confirmLabel: 'Create',
+              );
+            },
+            child: const Text('Open dialog'),
+          ),
         ),
       ),
     );
@@ -56,17 +56,17 @@ void main() {
       _TestApp(
         child: Builder(
           builder: (context) => TextButton(
-              onPressed: () async {
-                result = await MxNameDialog.show(
-                  context: context,
-                  title: 'Create folder',
-                  label: 'Folder name',
-                  hintText: 'e.g. Listening practice',
-                  confirmLabel: 'Create',
-                );
-              },
-              child: const Text('Open dialog'),
-            ),
+            onPressed: () async {
+              result = await MxNameDialog.show(
+                context: context,
+                title: 'Create folder',
+                label: 'Folder name',
+                hintText: 'e.g. Listening practice',
+                confirmLabel: 'Create',
+              );
+            },
+            child: const Text('Open dialog'),
+          ),
         ),
       ),
     );
@@ -93,17 +93,17 @@ void main() {
         _TestApp(
           child: Builder(
             builder: (context) => TextButton(
-                onPressed: () async {
-                  result = await MxNameDialog.show(
-                    context: context,
-                    title: 'Rename deck',
-                    label: 'Deck name',
-                    hintText: 'e.g. Core vocabulary',
-                    confirmLabel: 'Save',
-                  );
-                },
-                child: const Text('Open dialog'),
-              ),
+              onPressed: () async {
+                result = await MxNameDialog.show(
+                  context: context,
+                  title: 'Rename deck',
+                  label: 'Deck name',
+                  hintText: 'e.g. Core vocabulary',
+                  confirmLabel: 'Save',
+                );
+              },
+              child: const Text('Open dialog'),
+            ),
           ),
         ),
       );
@@ -128,18 +128,18 @@ void main() {
         _TestApp(
           child: Builder(
             builder: (context) => TextButton(
-                onPressed: () {
-                  MxNameDialog.show(
-                    context: context,
-                    title: 'Rename folder',
-                    label: 'Folder name',
-                    hintText: 'e.g. Listening practice',
-                    confirmLabel: 'Save',
-                    initialValue: 'Existing folder',
-                  );
-                },
-                child: const Text('Open dialog'),
-              ),
+              onPressed: () {
+                MxNameDialog.show(
+                  context: context,
+                  title: 'Rename folder',
+                  label: 'Folder name',
+                  hintText: 'e.g. Listening practice',
+                  confirmLabel: 'Save',
+                  initialValue: 'Existing folder',
+                );
+              },
+              child: const Text('Open dialog'),
+            ),
           ),
         ),
       );
@@ -163,17 +163,17 @@ void main() {
       _TestApp(
         child: Builder(
           builder: (context) => TextButton(
-              onPressed: () {
-                MxNameDialog.show(
-                  context: context,
-                  title: 'Create folder',
-                  label: 'Folder name',
-                  hintText: 'e.g. Listening practice',
-                  confirmLabel: 'Create',
-                );
-              },
-              child: const Text('Open dialog'),
-            ),
+            onPressed: () {
+              MxNameDialog.show(
+                context: context,
+                title: 'Create folder',
+                label: 'Folder name',
+                hintText: 'e.g. Listening practice',
+                confirmLabel: 'Create',
+              );
+            },
+            child: const Text('Open dialog'),
+          ),
         ),
       ),
     );
@@ -196,8 +196,8 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      home: Scaffold(
-        body: Padding(padding: const EdgeInsets.all(24), child: child),
-      ),
-    );
+    home: Scaffold(
+      body: Padding(padding: const EdgeInsets.all(24), child: child),
+    ),
+  );
 }

@@ -258,41 +258,47 @@ class _LinkedAccountOverviewRow extends StatelessWidget {
   }
 }
 
-bool _preservesAccountSubtitle(AccountSettingsState state) => switch (state.status) {
-    AccountLinkStatus.needsDriveAuthorization ||
-    AccountLinkStatus.unconfigured ||
-    AccountLinkStatus.unsupported ||
-    AccountLinkStatus.error => true,
-    AccountLinkStatus.signedIn || AccountLinkStatus.signedOut => false,
-  };
+bool _preservesAccountSubtitle(AccountSettingsState state) =>
+    switch (state.status) {
+      AccountLinkStatus.needsDriveAuthorization ||
+      AccountLinkStatus.unconfigured ||
+      AccountLinkStatus.unsupported ||
+      AccountLinkStatus.error => true,
+      AccountLinkStatus.signedIn || AccountLinkStatus.signedOut => false,
+    };
 
-String _accountStatusLabel(AppLocalizations l10n, AccountSettingsState state) => switch (state.status) {
-    AccountLinkStatus.signedIn => l10n.settingsAccountDriveReady,
-    AccountLinkStatus.needsDriveAuthorization =>
-      l10n.settingsAccountDriveReconnectRequired,
-    AccountLinkStatus.unconfigured ||
-    AccountLinkStatus.unsupported ||
-    AccountLinkStatus.error ||
-    AccountLinkStatus.signedOut => '',
-  };
+String _accountStatusLabel(AppLocalizations l10n, AccountSettingsState state) =>
+    switch (state.status) {
+      AccountLinkStatus.signedIn => l10n.settingsAccountDriveReady,
+      AccountLinkStatus.needsDriveAuthorization =>
+        l10n.settingsAccountDriveReconnectRequired,
+      AccountLinkStatus.unconfigured ||
+      AccountLinkStatus.unsupported ||
+      AccountLinkStatus.error ||
+      AccountLinkStatus.signedOut => '',
+    };
 
-String _accountStatusText(AppLocalizations l10n, AccountSettingsState state) => switch (state.status) {
-    AccountLinkStatus.signedIn || AccountLinkStatus.needsDriveAuthorization =>
-      state.link?.displayName ?? state.link?.email ?? l10n.settingsAccountTitle,
-    AccountLinkStatus.unconfigured => l10n.settingsAccountMissingConfig,
-    AccountLinkStatus.unsupported => l10n.settingsAccountUnsupported,
-    AccountLinkStatus.error => l10n.settingsAccountSignInFailed,
-    AccountLinkStatus.signedOut => l10n.settingsAccountSignedOut,
-  };
+String _accountStatusText(AppLocalizations l10n, AccountSettingsState state) =>
+    switch (state.status) {
+      AccountLinkStatus.signedIn || AccountLinkStatus.needsDriveAuthorization =>
+        state.link?.displayName ??
+            state.link?.email ??
+            l10n.settingsAccountTitle,
+      AccountLinkStatus.unconfigured => l10n.settingsAccountMissingConfig,
+      AccountLinkStatus.unsupported => l10n.settingsAccountUnsupported,
+      AccountLinkStatus.error => l10n.settingsAccountSignInFailed,
+      AccountLinkStatus.signedOut => l10n.settingsAccountSignedOut,
+    };
 
-String? _accountSubtitle(AppLocalizations l10n, AccountSettingsState state) => switch (state.status) {
-    AccountLinkStatus.signedIn ||
-    AccountLinkStatus.needsDriveAuthorization => state.link?.email,
-    AccountLinkStatus.unconfigured => l10n.settingsAccountSubtitleConfig,
-    AccountLinkStatus.unsupported => l10n.settingsAccountSubtitleUnsupported,
-    AccountLinkStatus.error => l10n.settingsAccountSubtitleError,
-    AccountLinkStatus.signedOut => l10n.settingsAccountSubtitleSignedOut,
-  };
+String? _accountSubtitle(AppLocalizations l10n, AccountSettingsState state) =>
+    switch (state.status) {
+      AccountLinkStatus.signedIn ||
+      AccountLinkStatus.needsDriveAuthorization => state.link?.email,
+      AccountLinkStatus.unconfigured => l10n.settingsAccountSubtitleConfig,
+      AccountLinkStatus.unsupported => l10n.settingsAccountSubtitleUnsupported,
+      AccountLinkStatus.error => l10n.settingsAccountSubtitleError,
+      AccountLinkStatus.signedOut => l10n.settingsAccountSubtitleSignedOut,
+    };
 
 String _voiceSelectionValue(AppLocalizations l10n, TtsSettings settings) {
   final voiceName = settings.frontVoiceName;

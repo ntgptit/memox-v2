@@ -68,12 +68,14 @@ final class ResumeStudySessionUseCase {
     return snapshot == null ? null : _withRegisteredFlowPlan(snapshot);
   }
 
-  Future<StudySessionSnapshot> execute(String sessionId) async => _withRegisteredFlowPlan(await _repository.loadSession(sessionId));
+  Future<StudySessionSnapshot> execute(String sessionId) async =>
+      _withRegisteredFlowPlan(await _repository.loadSession(sessionId));
 
-  StudySessionSnapshot _withRegisteredFlowPlan(StudySessionSnapshot snapshot) => _withFlowPlan(
-      snapshot,
-      _flowPlan(snapshot.session.studyType, snapshot.session.studyFlow),
-    );
+  StudySessionSnapshot _withRegisteredFlowPlan(StudySessionSnapshot snapshot) =>
+      _withFlowPlan(
+        snapshot,
+        _flowPlan(snapshot.session.studyType, snapshot.session.studyFlow),
+      );
 }
 
 final class RestartStudySessionUseCase {
@@ -321,7 +323,8 @@ final class SkipFlashcardUseCase {
 
   final StudyRepo _repository;
 
-  Future<StudySessionSnapshot> execute(String sessionId) => _repository.skipCurrentItem(sessionId);
+  Future<StudySessionSnapshot> execute(String sessionId) =>
+      _repository.skipCurrentItem(sessionId);
 }
 
 final class CancelStudySessionUseCase {
@@ -329,7 +332,8 @@ final class CancelStudySessionUseCase {
 
   final StudyRepo _repository;
 
-  Future<StudySessionSnapshot> execute(String sessionId) => _repository.cancelSession(sessionId);
+  Future<StudySessionSnapshot> execute(String sessionId) =>
+      _repository.cancelSession(sessionId);
 }
 
 final class FinalizeStudySessionUseCase {
@@ -384,8 +388,8 @@ StudySessionSnapshot _withFlowPlan(
   StudySessionSnapshot snapshot,
   StudyFlowPlan flowPlan,
 ) => snapshot.copyWith(
-    summary: snapshot.summary.copyWith(totalModeCount: flowPlan.totalModeCount),
-  );
+  summary: snapshot.summary.copyWith(totalModeCount: flowPlan.totalModeCount),
+);
 
 StudyFlow _flowForModes(StudyType studyType, List<StudyMode> modes) {
   try {
@@ -396,10 +400,10 @@ StudyFlow _flowForModes(StudyType studyType, List<StudyMode> modes) {
 }
 
 StudyFlowPlan _flowPlan(StudyType studyType, StudyFlow flow) => StudyFlowPlan(
-    studyType: studyType,
-    flow: flow,
-    modes: studyModesForFlow(flow),
-  );
+  studyType: studyType,
+  flow: flow,
+  modes: studyModesForFlow(flow),
+);
 
 List<String> _pendingItemIds(StudySessionSnapshot snapshot) {
   final currentItem = snapshot.currentItem;

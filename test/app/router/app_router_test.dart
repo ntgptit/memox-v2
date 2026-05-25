@@ -139,10 +139,10 @@ class _RouterApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: ref.watch(appRouterProvider),
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    routerConfig: ref.watch(appRouterProvider),
+  );
 }
 
 final _activeSnapshot = StudySessionSnapshot(
@@ -188,29 +188,29 @@ const _settings = StudySettingsSnapshot(
 );
 
 StudySession _session(SessionStatus status) => StudySession(
-    id: 'session-001',
-    entryType: StudyEntryType.deck,
-    entryRefId: 'deck-001',
-    studyType: StudyType.srsReview,
-    studyFlow: StudyFlow.srsFillReview,
-    settings: _settings,
-    status: status,
-    startedAt: 0,
-    endedAt: null,
-    restartedFromSessionId: null,
-  );
+  id: 'session-001',
+  entryType: StudyEntryType.deck,
+  entryRefId: 'deck-001',
+  studyType: StudyType.srsReview,
+  studyFlow: StudyFlow.srsFillReview,
+  settings: _settings,
+  status: status,
+  startedAt: 0,
+  endedAt: null,
+  restartedFromSessionId: null,
+);
 
 StudyFlashcardRef _card({
   required String id,
   required String front,
   required String back,
 }) => StudyFlashcardRef(
-    id: id,
-    deckId: 'deck-001',
-    front: front,
-    back: back,
-    sourcePool: SessionItemSourcePool.due,
-  );
+  id: id,
+  deckId: 'deck-001',
+  front: front,
+  back: back,
+  sourcePool: SessionItemSourcePool.due,
+);
 
 final _configuredGoogle = GoogleOAuthConfig.fromValues(
   webClientId: 'web-client-id.apps.googleusercontent.com',
@@ -259,20 +259,14 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   @override
-  Future<DriveSyncStatus> loadStatus() async => const DriveSyncStatus.signedOut();
+  Future<DriveSyncStatus> loadStatus() async =>
+      const DriveSyncStatus.signedOut();
 
   @override
-  Future<DriveSyncRunResult> syncNow() async => const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async =>
+      const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
 
   @override
-  Future<DriveSyncRunResult> uploadLocalSnapshot() async => const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
-
-  @override
-  Future<DriveSyncRunResult> restoreDriveSnapshot() async => const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
-
-  @override
-  Future<DriveSyncRunResult> resolveConflict(
-    DriveSyncConflict conflict,
-    DriveSyncConflictChoice choice,
-  ) async => const DriveSyncRunResult.canceled(DriveSyncStatus.signedOut());
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async =>
+      const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
 }

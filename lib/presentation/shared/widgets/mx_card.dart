@@ -108,11 +108,13 @@ class MxCard extends StatelessWidget {
     );
   }
 
-  Color _backgroundColor(CardThemeData cardTheme, ColorScheme scheme) => switch (variant) {
-      MxCardVariant.filled => cardTheme.color ?? scheme.surfaceContainerLowest,
-      MxCardVariant.elevated => scheme.surfaceContainerLow,
-      MxCardVariant.outlined => scheme.surfaceContainerLowest,
-    };
+  Color _backgroundColor(CardThemeData cardTheme, ColorScheme scheme) =>
+      switch (variant) {
+        MxCardVariant.filled =>
+          cardTheme.color ?? scheme.surfaceContainerLowest,
+        MxCardVariant.elevated => scheme.surfaceContainerLow,
+        MxCardVariant.outlined => scheme.surfaceContainerLowest,
+      };
 
   double _elevation(CardThemeData cardTheme) {
     final baseElevation = cardTheme.elevation ?? AppElevation.card;

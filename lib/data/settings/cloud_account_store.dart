@@ -41,12 +41,13 @@ final class CloudAccountStore implements CloudAccountRepository {
 
   @override
   Future<void> save(CloudAccountLink link) => _preferences.setString(
-      AppConstants.sharedPrefsCloudAccountLinkKey,
-      jsonEncode(_encodeLink(link)),
-    );
+    AppConstants.sharedPrefsCloudAccountLinkKey,
+    jsonEncode(_encodeLink(link)),
+  );
 
   @override
-  Future<void> clear() => _preferences.remove(AppConstants.sharedPrefsCloudAccountLinkKey);
+  Future<void> clear() =>
+      _preferences.remove(AppConstants.sharedPrefsCloudAccountLinkKey);
 
   CloudAccountLink? _decodeLink(Map<String, Object?> data) {
     final schemaVersion = data['schemaVersion'];
@@ -89,15 +90,15 @@ final class CloudAccountStore implements CloudAccountRepository {
   }
 
   Map<String, Object?> _encodeLink(CloudAccountLink link) => <String, Object?>{
-      'schemaVersion': link.schemaVersion,
-      'provider': link.provider.name,
-      'subjectId': link.subjectId,
-      'email': link.email,
-      'displayName': link.displayName,
-      'photoUrl': link.photoUrl,
-      'grantedScopes': link.grantedScopes.toList(growable: false)..sort(),
-      'driveAuthorizationState': link.driveAuthorizationState.name,
-      'linkedAt': link.linkedAt,
-      'lastSignedInAt': link.lastSignedInAt,
-    };
+    'schemaVersion': link.schemaVersion,
+    'provider': link.provider.name,
+    'subjectId': link.subjectId,
+    'email': link.email,
+    'displayName': link.displayName,
+    'photoUrl': link.photoUrl,
+    'grantedScopes': link.grantedScopes.toList(growable: false)..sort(),
+    'driveAuthorizationState': link.driveAuthorizationState.name,
+    'linkedAt': link.linkedAt,
+    'lastSignedInAt': link.lastSignedInAt,
+  };
 }

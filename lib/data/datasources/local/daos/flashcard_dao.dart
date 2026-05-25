@@ -31,14 +31,14 @@ final class FlashcardDao {
   static const int _masteredSrsBox = 8;
 
   static int initialBoxFor(FlashcardStartingStatus status) => switch (status) {
-      FlashcardStartingStatus.newCard => _initialSrsBox,
-      FlashcardStartingStatus.learning => _learningStartingSrsBox,
-      FlashcardStartingStatus.reviewing => _reviewingStartingSrsBox,
-    };
+    FlashcardStartingStatus.newCard => _initialSrsBox,
+    FlashcardStartingStatus.learning => _learningStartingSrsBox,
+    FlashcardStartingStatus.reviewing => _reviewingStartingSrsBox,
+  };
 
   Future<Flashcard?> findById(String flashcardId) => (_database.select(
-      _database.flashcards,
-    )..where((table) => table.id.equals(flashcardId))).getSingleOrNull();
+    _database.flashcards,
+  )..where((table) => table.id.equals(flashcardId))).getSingleOrNull();
 
   Future<List<Flashcard>> listFlashcardsInDeck({
     required String deckId,
@@ -123,9 +123,11 @@ final class FlashcardDao {
     };
   }
 
-  Future<FlashcardProgressData?> findProgressByFlashcardId(String flashcardId) => (_database.select(_database.flashcardProgress)
-          ..where((table) => table.flashcardId.equals(flashcardId)))
-        .getSingleOrNull();
+  Future<FlashcardProgressData?> findProgressByFlashcardId(
+    String flashcardId,
+  ) => (_database.select(
+    _database.flashcardProgress,
+  )..where((table) => table.flashcardId.equals(flashcardId))).getSingleOrNull();
 
   Future<int> nextSortOrder(String deckId) async {
     final row =
@@ -199,10 +201,11 @@ final class FlashcardDao {
   }
 
   Future<List<String>> findTagsForFlashcard(String flashcardId) async {
-    final rows = await (_database.select(_database.flashcardTags)
-          ..where((table) => table.flashcardId.equals(flashcardId))
-          ..orderBy([(table) => OrderingTerm.asc(table.tag)]))
-        .get();
+    final rows =
+        await (_database.select(_database.flashcardTags)
+              ..where((table) => table.flashcardId.equals(flashcardId))
+              ..orderBy([(table) => OrderingTerm.asc(table.tag)]))
+            .get();
     return rows.map((row) => row.tag).toList(growable: false);
   }
 
@@ -212,10 +215,11 @@ final class FlashcardDao {
     if (flashcardIds.isEmpty) {
       return const <String, List<String>>{};
     }
-    final rows = await (_database.select(_database.flashcardTags)
-          ..where((table) => table.flashcardId.isIn(flashcardIds))
-          ..orderBy([(table) => OrderingTerm.asc(table.tag)]))
-        .get();
+    final rows =
+        await (_database.select(_database.flashcardTags)
+              ..where((table) => table.flashcardId.isIn(flashcardIds))
+              ..orderBy([(table) => OrderingTerm.asc(table.tag)]))
+            .get();
     final result = <String, List<String>>{};
     for (final row in rows) {
       result.putIfAbsent(row.flashcardId, () => <String>[]).add(row.tag);
@@ -241,36 +245,34 @@ final class FlashcardDao {
       return;
     }
     await _database.batch((batch) {
-      batch.insertAll(
-        _database.flashcardTags,
-        [
-          for (final tag in cleaned)
-            FlashcardTagsCompanion.insert(flashcardId: flashcardId, tag: tag),
-        ],
-      );
+      batch.insertAll(_database.flashcardTags, [
+        for (final tag in cleaned)
+          FlashcardTagsCompanion.insert(flashcardId: flashcardId, tag: tag),
+      ]);
     });
   }
 
   Future<void> resetFlashcardProgress({
     required String flashcardId,
     required int updatedAt,
-  }) => (_database.update(
-      _database.flashcardProgress,
-    )..where((table) => table.flashcardId.equals(flashcardId))).write(
-      FlashcardProgressCompanion(
-        currentBox: const Value(1),
-        reviewCount: const Value(0),
-        lapseCount: const Value(0),
-        lastResult: const Value<String?>(null),
-        lastStudiedAt: const Value<int?>(null),
-        dueAt: const Value<int?>(null),
-        updatedAt: Value(updatedAt),
-      ),
-    );
+  }) =>
+      (_database.update(
+        _database.flashcardProgress,
+      )..where((table) => table.flashcardId.equals(flashcardId))).write(
+        FlashcardProgressCompanion(
+          currentBox: const Value(1),
+          reviewCount: const Value(0),
+          lapseCount: const Value(0),
+          lastResult: const Value<String?>(null),
+          lastStudiedAt: const Value<int?>(null),
+          dueAt: const Value<int?>(null),
+          updatedAt: Value(updatedAt),
+        ),
+      );
 
   Future<void> deleteFlashcards(List<String> flashcardIds) => (_database.delete(
-      _database.flashcards,
-    )..where((table) => table.id.isIn(flashcardIds))).go();
+    _database.flashcards,
+  )..where((table) => table.id.isIn(flashcardIds))).go();
 
   Future<void> moveFlashcards({
     required List<String> flashcardIds,
@@ -311,8 +313,9 @@ final class FlashcardDao {
     }
   }
 
-  Future<List<Flashcard>> listFlashcardsByIds(List<String> flashcardIds) => (_database.select(_database.flashcards)
-          ..where((table) => table.id.isIn(flashcardIds))
-          ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
-        .get();
+  Future<List<Flashcard>> listFlashcardsByIds(List<String> flashcardIds) =>
+      (_database.select(_database.flashcards)
+            ..where((table) => table.id.isIn(flashcardIds))
+            ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+          .get();
 }

@@ -54,19 +54,20 @@ class MxIconTile extends StatelessWidget {
     );
   }
 
-  (Color, Color) _toneColors(BuildContext context, ColorScheme scheme) => switch (tone) {
-      MxIconTileTone.neutral => (
-        scheme.surfaceContainerHighest,
-        scheme.onSurfaceVariant,
-      ),
-      MxIconTileTone.primary => (scheme.primary, scheme.onPrimary),
-      MxIconTileTone.primarySoft => (
-        scheme.primary.withValues(alpha: AppOpacity.disabledSurface),
-        scheme.primary,
-      ),
-      MxIconTileTone.disabled => (
-        scheme.surfaceContainerHighest,
-        context.mxOnSurfaceDisabled,
-      ),
-    };
+  (Color, Color) _toneColors(BuildContext context, ColorScheme scheme) =>
+      switch (tone) {
+        MxIconTileTone.neutral => (
+          scheme.surfaceContainerHighest,
+          scheme.onSurfaceVariant,
+        ),
+        MxIconTileTone.primary => (scheme.primary, scheme.onPrimary),
+        MxIconTileTone.primarySoft => (
+          scheme.primary.withValues(alpha: AppOpacity.disabledSurface),
+          scheme.primary,
+        ),
+        MxIconTileTone.disabled => (
+          scheme.surfaceContainerHighest,
+          context.mxOnSurfaceDisabled,
+        ),
+      };
 }

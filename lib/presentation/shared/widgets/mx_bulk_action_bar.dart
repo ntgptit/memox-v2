@@ -21,55 +21,52 @@ class MxBulkActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MxCard(
-      variant: MxCardVariant.elevated,
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isStacked = constraints.maxWidth < 520;
-          final info = _InfoBlock(
-            label: label,
-            subtitle: subtitle,
-            leading: leading,
-          );
-          final actionWrap = actions.isEmpty
-              ? null
-              : Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
-                  alignment: WrapAlignment.end,
-                  children: actions,
-                );
+    variant: MxCardVariant.elevated,
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final isStacked = constraints.maxWidth < 520;
+        final info = _InfoBlock(
+          label: label,
+          subtitle: subtitle,
+          leading: leading,
+        );
+        final actionWrap = actions.isEmpty
+            ? null
+            : Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                alignment: WrapAlignment.end,
+                children: actions,
+              );
 
-          if (isStacked) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                info,
-                if (actionWrap != null) ...[
-                  const MxGap(AppSpacing.md),
-                  actionWrap,
-                ],
-              ],
-            );
-          }
-
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        if (isStacked) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(child: info),
+              info,
               if (actionWrap != null) ...[
                 const MxGap(AppSpacing.md),
-                Flexible(
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: actionWrap,
-                  ),
-                ),
+                actionWrap,
               ],
             ],
           );
-        },
-      ),
-    );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: info),
+            if (actionWrap != null) ...[
+              const MxGap(AppSpacing.md),
+              Flexible(
+                child: Align(alignment: Alignment.topRight, child: actionWrap),
+              ),
+            ],
+          ],
+        );
+      },
+    ),
+  );
 }
 
 class _InfoBlock extends StatelessWidget {

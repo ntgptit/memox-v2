@@ -148,52 +148,52 @@ class MxStudySetTile extends StatelessWidget {
   }
 
   Widget _buildTextColumn({required bool stackTrailing}) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxText(
+        title,
+        role: MxTextRole.tileTitle,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      if (metaLine != null) ...[
+        const MxGap(AppSpacing.xxs),
         MxText(
-          title,
-          role: MxTextRole.tileTitle,
-          maxLines: 2,
+          metaLine!,
+          role: MxTextRole.tileMeta,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        if (metaLine != null) ...[
-          const MxGap(AppSpacing.xxs),
-          MxText(
-            metaLine!,
-            role: MxTextRole.tileMeta,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-        if (ownerLabel != null) ...[
-          const MxGap(AppSpacing.sm),
-          Row(
-            children: [
-              MxAvatar(
-                initials: ownerInitials,
-                size: MxAvatarSize.sm,
-                badgeLabel: ownerBadge,
-              ),
-              if (ownerBadge == null) ...[
-                const MxGap(AppSpacing.sm),
-                Expanded(
-                  child: MxText(
-                    ownerLabel!,
-                    role: MxTextRole.tileMeta,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-        if (trailing != null && stackTrailing) ...[
-          const MxGap(AppSpacing.sm),
-          Align(alignment: Alignment.centerRight, child: trailing),
-        ],
       ],
-    );
+      if (ownerLabel != null) ...[
+        const MxGap(AppSpacing.sm),
+        Row(
+          children: [
+            MxAvatar(
+              initials: ownerInitials,
+              size: MxAvatarSize.sm,
+              badgeLabel: ownerBadge,
+            ),
+            if (ownerBadge == null) ...[
+              const MxGap(AppSpacing.sm),
+              Expanded(
+                child: MxText(
+                  ownerLabel!,
+                  role: MxTextRole.tileMeta,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+      if (trailing != null && stackTrailing) ...[
+        const MxGap(AppSpacing.sm),
+        Align(alignment: Alignment.centerRight, child: trailing),
+      ],
+    ],
+  );
 }
 
 class _IconTilePalette {

@@ -412,7 +412,8 @@ void _expectPrimaryButtonSurface(Key key) {
   );
 }
 
-Size _dashboardActionButtonSize(WidgetTester tester, Key key) => tester.getSize(find.byKey(key));
+Size _dashboardActionButtonSize(WidgetTester tester, Key key) =>
+    tester.getSize(find.byKey(key));
 
 void _expectDashboardActionLabel(Key key, String label) {
   expect(
@@ -422,49 +423,49 @@ void _expectDashboardActionLabel(Key key, String label) {
 }
 
 GoRouter _dashboardRouter() => GoRouter(
-    initialLocation: RoutePaths.home,
-    routes: [
-      GoRoute(
-        path: RoutePaths.home,
-        name: RouteNames.home,
-        builder: (context, state) => const DashboardScreen(),
-      ),
-      GoRoute(
-        path: RoutePaths.library,
-        name: RouteNames.library,
-        builder: (context, state) => const SizedBox.shrink(),
-        routes: [
-          GoRoute(
-            path: RoutePaths.flashcardListSegment,
-            name: RouteNames.flashcardList,
-            builder: (context, state) =>
-                const SizedBox(key: ValueKey('flashcard_list_destination')),
-          ),
-          GoRoute(
-            path: RoutePaths.studyTodaySegment,
-            name: RouteNames.studyToday,
-            builder: (context, state) => const SizedBox.shrink(),
-          ),
-          GoRoute(
-            path: RoutePaths.studySessionSegment,
-            name: RouteNames.studySession,
-            builder: (context, state) => const SizedBox.shrink(),
-          ),
-          GoRoute(
-            path: RoutePaths.studyEntrySegment,
-            name: RouteNames.studyEntry,
-            builder: (context, state) =>
-                const SizedBox(key: ValueKey('study_entry_destination')),
-          ),
-        ],
-      ),
-      GoRoute(
-        path: RoutePaths.progress,
-        name: RouteNames.progress,
-        builder: (context, state) => const SizedBox.shrink(),
-      ),
-    ],
-  );
+  initialLocation: RoutePaths.home,
+  routes: [
+    GoRoute(
+      path: RoutePaths.home,
+      name: RouteNames.home,
+      builder: (context, state) => const DashboardScreen(),
+    ),
+    GoRoute(
+      path: RoutePaths.library,
+      name: RouteNames.library,
+      builder: (context, state) => const SizedBox.shrink(),
+      routes: [
+        GoRoute(
+          path: RoutePaths.flashcardListSegment,
+          name: RouteNames.flashcardList,
+          builder: (context, state) =>
+              const SizedBox(key: ValueKey('flashcard_list_destination')),
+        ),
+        GoRoute(
+          path: RoutePaths.studyTodaySegment,
+          name: RouteNames.studyToday,
+          builder: (context, state) => const SizedBox.shrink(),
+        ),
+        GoRoute(
+          path: RoutePaths.studySessionSegment,
+          name: RouteNames.studySession,
+          builder: (context, state) => const SizedBox.shrink(),
+        ),
+        GoRoute(
+          path: RoutePaths.studyEntrySegment,
+          name: RouteNames.studyEntry,
+          builder: (context, state) =>
+              const SizedBox(key: ValueKey('study_entry_destination')),
+        ),
+      ],
+    ),
+    GoRoute(
+      path: RoutePaths.progress,
+      name: RouteNames.progress,
+      builder: (context, state) => const SizedBox.shrink(),
+    ),
+  ],
+);
 
 class _TestApp extends StatelessWidget {
   const _TestApp({required this.child});
@@ -473,11 +474,11 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
-      home: child,
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
+    home: child,
+  );
 }
 
 const _studyReadyDashboardState = DashboardOverviewState(

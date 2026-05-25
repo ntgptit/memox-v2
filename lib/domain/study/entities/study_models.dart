@@ -154,17 +154,17 @@ final class StudySummary {
     int? retryCardCount,
     int? totalModeCount,
   }) => StudySummary(
-      totalCards: totalCards,
-      masteredCardCount: masteredCardCount ?? this.masteredCardCount,
-      retryCardCount: retryCardCount ?? this.retryCardCount,
-      completedAttempts: completedAttempts,
-      correctAttempts: correctAttempts,
-      incorrectAttempts: incorrectAttempts,
-      increasedBoxCount: increasedBoxCount,
-      decreasedBoxCount: decreasedBoxCount,
-      remainingCount: remainingCount,
-      totalModeCount: totalModeCount ?? this.totalModeCount,
-    );
+    totalCards: totalCards,
+    masteredCardCount: masteredCardCount ?? this.masteredCardCount,
+    retryCardCount: retryCardCount ?? this.retryCardCount,
+    completedAttempts: completedAttempts,
+    correctAttempts: correctAttempts,
+    incorrectAttempts: incorrectAttempts,
+    increasedBoxCount: increasedBoxCount,
+    decreasedBoxCount: decreasedBoxCount,
+    remainingCount: remainingCount,
+    totalModeCount: totalModeCount ?? this.totalModeCount,
+  );
 }
 
 final class StudySessionSnapshot {
@@ -184,12 +184,13 @@ final class StudySessionSnapshot {
   final StudySummary summary;
   final bool canFinalize;
 
-  StudySessionSnapshot copyWith({StudySummary? summary}) => StudySessionSnapshot(
-      session: session,
-      currentItem: currentItem,
-      currentRoundItems: currentRoundItems,
-      sessionFlashcards: sessionFlashcards,
-      summary: summary ?? this.summary,
-      canFinalize: canFinalize,
-    );
+  StudySessionSnapshot copyWith({StudySummary? summary}) =>
+      StudySessionSnapshot(
+        session: session,
+        currentItem: currentItem,
+        currentRoundItems: currentRoundItems,
+        sessionFlashcards: sessionFlashcards,
+        summary: summary ?? this.summary,
+        canFinalize: canFinalize,
+      );
 }

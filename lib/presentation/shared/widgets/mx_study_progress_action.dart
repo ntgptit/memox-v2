@@ -199,8 +199,9 @@ class _PillProgressPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _PillProgressPainter oldDelegate) => oldDelegate.value != value ||
-        oldDelegate.color != color ||
-        oldDelegate.trackColor != trackColor ||
-        oldDelegate.strokeWidth != strokeWidth;
+  bool shouldRepaint(covariant _PillProgressPainter oldDelegate) =>
+      oldDelegate.value != value ||
+      oldDelegate.color != color ||
+      oldDelegate.trackColor != trackColor ||
+      oldDelegate.strokeWidth != strokeWidth;
 }

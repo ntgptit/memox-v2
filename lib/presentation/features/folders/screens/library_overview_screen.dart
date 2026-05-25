@@ -88,39 +88,39 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
           error: queryState.hasError ? queryState.error : null,
           stackTrace: queryState.hasError ? queryState.stackTrace : null,
           dataBuilder: (context, state) => CustomScrollView(
-              slivers: [
+            slivers: [
+              SliverToBoxAdapter(
+                child: LibraryAppBar(
+                  title: l10n.libraryTitle,
+                  isSearchOpen: isSearchVisible,
+                  onToggleSearch: () =>
+                      setState(() => _searchOpen = !_searchOpen),
+                  searchTerm: toolbarState.searchTerm,
+                  onSearchChanged: toolbarNotifier.setSearchTerm,
+                  onSearchClear: () => toolbarNotifier.setSearchTerm(''),
+                  chips: [
+                    LibraryFilterChip(
+                      label: l10n.libraryFilterAll,
+                      selected: true,
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ),
+              if (StringUtils.isNotBlank(toolbarState.searchTerm)) ...[
+                const MxSliverGap(MxSpace.md),
                 SliverToBoxAdapter(
-                  child: LibraryAppBar(
-                    title: l10n.libraryTitle,
-                    isSearchOpen: isSearchVisible,
-                    onToggleSearch: () =>
-                        setState(() => _searchOpen = !_searchOpen),
-                    searchTerm: toolbarState.searchTerm,
-                    onSearchChanged: toolbarNotifier.setSearchTerm,
-                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                    chips: [
-                      LibraryFilterChip(
-                        label: l10n.libraryFilterAll,
-                        selected: true,
-                        onTap: () {},
-                      ),
-                    ],
+                  child: _LibrarySectionHeader(
+                    title: l10n.libraryFoldersSectionTitle,
+                    subtitle: l10n.librarySearchResultsSubtitle,
+                    showSubtitle: true,
                   ),
                 ),
-                if (StringUtils.isNotBlank(toolbarState.searchTerm)) ...[
-                  const MxSliverGap(MxSpace.md),
-                  SliverToBoxAdapter(
-                    child: _LibrarySectionHeader(
-                      title: l10n.libraryFoldersSectionTitle,
-                      subtitle: l10n.librarySearchResultsSubtitle,
-                      showSubtitle: true,
-                    ),
-                  ),
-                ],
-                const MxSliverGap(MxSpace.md),
-                ..._buildFolderListSlivers(context, ref, state),
               ],
-            ),
+              const MxSliverGap(MxSpace.md),
+              ..._buildFolderListSlivers(context, ref, state),
+            ],
+          ),
         ),
       ),
     );
@@ -175,15 +175,15 @@ class _LibrarySectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxText(title, role: MxTextRole.sectionTitle),
-        if (showSubtitle) ...[
-          const MxGap(MxSpace.xxs),
-          MxText(subtitle, role: MxTextRole.sectionSubtitle),
-        ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxText(title, role: MxTextRole.sectionTitle),
+      if (showSubtitle) ...[
+        const MxGap(MxSpace.xxs),
+        MxText(subtitle, role: MxTextRole.sectionSubtitle),
       ],
-    );
+    ],
+  );
 }
 
 void _openFolder(BuildContext context, WidgetRef ref, String folderId) {

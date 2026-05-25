@@ -69,29 +69,29 @@ class MxSegmentedControl<T> extends StatelessWidget {
   }
 
   Widget _buildSegmentedButton(BuildContext context) => SegmentedButton<T>(
-      style: _style(context),
-      segments: segments
-          .map(
-            (s) => ButtonSegment<T>(
-              value: s.value,
-              label: Text(s.label),
-              icon: s.icon != null
-                  ? Icon(
-                      s.icon,
-                      size: density == MxSegmentedControlDensity.compact
-                          ? AppIconSizes.sm
-                          : null,
-                    )
-                  : null,
-            ),
-          )
-          .toList(growable: false),
-      selected: selected,
-      onSelectionChanged: onChanged,
-      multiSelectionEnabled: multiSelectionEnabled,
-      emptySelectionAllowed: emptySelectionAllowed,
-      showSelectedIcon: showSelectedIcon,
-    );
+    style: _style(context),
+    segments: segments
+        .map(
+          (s) => ButtonSegment<T>(
+            value: s.value,
+            label: Text(s.label),
+            icon: s.icon != null
+                ? Icon(
+                    s.icon,
+                    size: density == MxSegmentedControlDensity.compact
+                        ? AppIconSizes.sm
+                        : null,
+                  )
+                : null,
+          ),
+        )
+        .toList(growable: false),
+    selected: selected,
+    onSelectionChanged: onChanged,
+    multiSelectionEnabled: multiSelectionEnabled,
+    emptySelectionAllowed: emptySelectionAllowed,
+    showSelectedIcon: showSelectedIcon,
+  );
 
   ButtonStyle? _style(BuildContext context) {
     if (density != MxSegmentedControlDensity.compact) {
@@ -178,43 +178,43 @@ class _AdaptiveSegmentList<T> extends StatelessWidget {
   }
 
   Widget _buildRadioTile(MxSegment<T> segment) => RadioListTile<T>(
-      value: segment.value,
-      toggleable: emptySelectionAllowed,
-      title: Text(segment.label),
-      secondary: segment.icon != null
-          ? Icon(
-              segment.icon,
-              size: density == MxSegmentedControlDensity.compact
-                  ? AppIconSizes.sm
-                  : null,
-            )
-          : null,
-      selected: selected.contains(segment.value),
-      dense: density == MxSegmentedControlDensity.compact,
-    );
+    value: segment.value,
+    toggleable: emptySelectionAllowed,
+    title: Text(segment.label),
+    secondary: segment.icon != null
+        ? Icon(
+            segment.icon,
+            size: density == MxSegmentedControlDensity.compact
+                ? AppIconSizes.sm
+                : null,
+          )
+        : null,
+    selected: selected.contains(segment.value),
+    dense: density == MxSegmentedControlDensity.compact,
+  );
 
   Widget _buildCheckboxTile(MxSegment<T> segment) => CheckboxListTile(
-      value: selected.contains(segment.value),
-      title: Text(segment.label),
-      secondary: segment.icon != null
-          ? Icon(
-              segment.icon,
-              size: density == MxSegmentedControlDensity.compact
-                  ? AppIconSizes.sm
-                  : null,
-            )
-          : null,
-      dense: density == MxSegmentedControlDensity.compact,
-      onChanged: (checked) {
-        final next = Set<T>.of(selected);
-        if (checked ?? false) {
-          next.add(segment.value);
-          onChanged(next);
-          return;
-        }
-        next.remove(segment.value);
-        if (next.isEmpty && !emptySelectionAllowed) return;
+    value: selected.contains(segment.value),
+    title: Text(segment.label),
+    secondary: segment.icon != null
+        ? Icon(
+            segment.icon,
+            size: density == MxSegmentedControlDensity.compact
+                ? AppIconSizes.sm
+                : null,
+          )
+        : null,
+    dense: density == MxSegmentedControlDensity.compact,
+    onChanged: (checked) {
+      final next = Set<T>.of(selected);
+      if (checked ?? false) {
+        next.add(segment.value);
         onChanged(next);
-      },
-    );
+        return;
+      }
+      next.remove(segment.value);
+      if (next.isEmpty && !emptySelectionAllowed) return;
+      onChanged(next);
+    },
+  );
 }

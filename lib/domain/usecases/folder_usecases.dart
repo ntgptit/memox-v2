@@ -8,15 +8,13 @@ final class CreateFolderUseCase {
 
   final FolderRepository _repository;
 
-  Future<Result<FolderEntity>> createRoot(String name) => _repository.createRootFolder(name);
+  Future<Result<FolderEntity>> createRoot(String name) =>
+      _repository.createRootFolder(name);
 
   Future<Result<FolderEntity>> createSubfolder({
     required String parentFolderId,
     required String name,
-  }) => _repository.createSubfolder(
-      parentFolderId: parentFolderId,
-      name: name,
-    );
+  }) => _repository.createSubfolder(parentFolderId: parentFolderId, name: name);
 }
 
 final class UpdateFolderUseCase {
@@ -35,7 +33,8 @@ final class GetFolderMoveTargetsUseCase {
 
   final FolderRepository _repository;
 
-  Future<List<FolderMoveTarget>> execute(String folderId) => _repository.getFolderMoveTargets(folderId);
+  Future<List<FolderMoveTarget>> execute(String folderId) =>
+      _repository.getFolderMoveTargets(folderId);
 }
 
 final class DeleteFolderUseCase {
@@ -43,7 +42,8 @@ final class DeleteFolderUseCase {
 
   final FolderRepository _repository;
 
-  Future<Result<void>> execute(String folderId) => _repository.deleteFolder(folderId);
+  Future<Result<void>> execute(String folderId) =>
+      _repository.deleteFolder(folderId);
 }
 
 final class MoveFolderUseCase {
@@ -55,9 +55,9 @@ final class MoveFolderUseCase {
     required String folderId,
     required String? targetParentId,
   }) => _repository.moveFolder(
-      folderId: folderId,
-      targetParentId: targetParentId,
-    );
+    folderId: folderId,
+    targetParentId: targetParentId,
+  );
 }
 
 final class ReorderFoldersUseCase {
@@ -69,7 +69,7 @@ final class ReorderFoldersUseCase {
     required String? parentFolderId,
     required List<String> orderedFolderIds,
   }) => _repository.reorderFolders(
-      parentFolderId: parentFolderId,
-      orderedFolderIds: orderedFolderIds,
-    );
+    parentFolderId: parentFolderId,
+    orderedFolderIds: orderedFolderIds,
+  );
 }

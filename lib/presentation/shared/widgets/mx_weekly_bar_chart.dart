@@ -105,10 +105,7 @@ class _Bar extends StatelessWidget {
             widthFactor: 1,
             alignment: Alignment.bottomCenter,
             child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: barRadius,
-              ),
+              decoration: BoxDecoration(color: color, borderRadius: barRadius),
             ),
           ),
         ),

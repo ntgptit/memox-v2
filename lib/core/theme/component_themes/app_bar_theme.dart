@@ -14,24 +14,22 @@ import '../tokens/app_typography.dart';
 /// we opt out of that here too so the page stays flat end-to-end.
 abstract final class AppBarThemeBuilder {
   static AppBarTheme build(ColorScheme scheme) => AppBarTheme(
-      backgroundColor: scheme.surface,
-      foregroundColor: scheme.onSurface,
-      surfaceTintColor: scheme.surfaceTint.withValues(
-        alpha: AppOpacity.transparent,
-      ),
-      shadowColor: scheme.shadow,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      centerTitle: false,
-      titleSpacing: AppSpacing.lg,
-      iconTheme: IconThemeData(color: scheme.onSurface, size: 24),
-      actionsIconTheme: IconThemeData(color: scheme.onSurfaceVariant, size: 24),
-      titleTextStyle: AppTypography.titleLarge.copyWith(
-        color: scheme.onSurface,
-      ),
-      toolbarTextStyle: AppTypography.bodyMedium.copyWith(
-        color: scheme.onSurface,
-      ),
-      systemOverlayStyle: null,
-    );
+    backgroundColor: scheme.surface,
+    foregroundColor: scheme.onSurface,
+    surfaceTintColor: scheme.surfaceTint.withValues(
+      alpha: AppOpacity.transparent,
+    ),
+    shadowColor: scheme.shadow,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    centerTitle: false,
+    titleSpacing: AppSpacing.lg,
+    iconTheme: IconThemeData(color: scheme.onSurface, size: 24),
+    actionsIconTheme: IconThemeData(color: scheme.onSurfaceVariant, size: 24),
+    titleTextStyle: AppTypography.titleLarge.copyWith(color: scheme.onSurface),
+    toolbarTextStyle: AppTypography.bodyMedium.copyWith(
+      color: scheme.onSurface,
+    ),
+    systemOverlayStyle: null,
+  );
 }

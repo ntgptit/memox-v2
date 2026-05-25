@@ -27,7 +27,7 @@ abstract final class AppConstants {
   static const String sharedPrefsDriveSyncDeviceIdKey =
       'settings.sync.google_drive.device_id';
   static const String driveSyncManifestFileName = 'memox.sync.manifest.json';
-  static const String driveSyncSnapshotFileName = 'memox.sync.snapshot.zip';
+  static const String driveSyncSnapshotFileName = 'memox_latest_backup.zip';
   static const String driveSyncManifestEntryName = 'manifest.json';
   static const String driveSyncDatabaseEntryName = 'memox.sqlite';
   static const String driveSyncSettingsEntryName = 'settings.json';

@@ -26,7 +26,8 @@ class GoogleOAuthConfig {
   bool get hasAnyClientId =>
       webClientId != null || iosClientId != null || serverClientId != null;
 
-  bool get isConfiguredForCurrentPlatform => isConfiguredFor(platform: defaultTargetPlatform, isWeb: kIsWeb);
+  bool get isConfiguredForCurrentPlatform =>
+      isConfiguredFor(platform: defaultTargetPlatform, isWeb: kIsWeb);
 
   bool isConfiguredFor({
     required TargetPlatform platform,
@@ -46,18 +47,18 @@ class GoogleOAuthConfig {
   }
 
   static GoogleOAuthConfig fromEnvironment() => fromValues(
-      webClientId: const String.fromEnvironment(webClientIdKey),
-      iosClientId: const String.fromEnvironment(iosClientIdKey),
-      serverClientId: const String.fromEnvironment(serverClientIdKey),
-    );
+    webClientId: const String.fromEnvironment(webClientIdKey),
+    iosClientId: const String.fromEnvironment(iosClientIdKey),
+    serverClientId: const String.fromEnvironment(serverClientIdKey),
+  );
 
   static GoogleOAuthConfig fromValues({
     String? webClientId,
     String? iosClientId,
     String? serverClientId,
   }) => GoogleOAuthConfig(
-      webClientId: StringUtils.trimToNull(webClientId),
-      iosClientId: StringUtils.trimToNull(iosClientId),
-      serverClientId: StringUtils.trimToNull(serverClientId),
-    );
+    webClientId: StringUtils.trimToNull(webClientId),
+    iosClientId: StringUtils.trimToNull(iosClientId),
+    serverClientId: StringUtils.trimToNull(serverClientId),
+  );
 }

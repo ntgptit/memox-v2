@@ -104,93 +104,93 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     required FlashcardImportPreparation? preparation,
     required bool canCommit,
   }) => MxScaffold(
-      title: l10n.flashcardsImportTitle,
-      automaticallyImplyLeading: false,
-      leading: MxIconButton.toolbar(
-        icon: Icons.arrow_back,
-        tooltip: l10n.commonBack,
-        onPressed: () => context.popRoute(
-          fallback: () => context.goFlashcardList(widget.deckId),
-        ),
+    title: l10n.flashcardsImportTitle,
+    automaticallyImplyLeading: false,
+    leading: MxIconButton.toolbar(
+      icon: Icons.arrow_back,
+      tooltip: l10n.commonBack,
+      onPressed: () => context.popRoute(
+        fallback: () => context.goFlashcardList(widget.deckId),
       ),
-      body: MxContentShell(
-        width: MxContentWidth.wide,
-        applyVerticalPadding: true,
-        child: CustomScrollView(
-          key: const ValueKey('deck_import_content'),
-          slivers: [
-            SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _ImportSourceSection(
-                    format: draft.format,
-                    enabled: !isImportBusy,
-                    onChanged: (format) => ref
-                        .read(
-                          flashcardImportDraftProvider(widget.deckId).notifier,
-                        )
-                        .setFormat(format),
+    ),
+    body: MxContentShell(
+      width: MxContentWidth.wide,
+      applyVerticalPadding: true,
+      child: CustomScrollView(
+        key: const ValueKey('deck_import_content'),
+        slivers: [
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _ImportSourceSection(
+                  format: draft.format,
+                  enabled: !isImportBusy,
+                  onChanged: (format) => ref
+                      .read(
+                        flashcardImportDraftProvider(widget.deckId).notifier,
+                      )
+                      .setFormat(format),
+                ),
+                const MxGap(MxSpace.lg),
+                _buildImportSourceInput(
+                  draft: draft,
+                  enabled: !isImportBusy,
+                  l10n: l10n,
+                ),
+                const MxGap(MxSpace.lg),
+                _ImportOptionsSection(
+                  format: draft.format,
+                  duplicatePolicy: draft.duplicatePolicy,
+                  excelHasHeader: draft.excelHasHeader,
+                  structuredTextSeparator: draft.structuredTextSeparator,
+                  enabled: !isImportBusy,
+                  onDuplicateTap: () =>
+                      _chooseDuplicatePolicy(draft.duplicatePolicy),
+                  onSeparatorTap: () => _chooseStructuredTextSeparator(
+                    draft.structuredTextSeparator,
                   ),
+                  onHeaderChanged: (value) => ref
+                      .read(
+                        flashcardImportDraftProvider(widget.deckId).notifier,
+                      )
+                      .setExcelHasHeader(value),
+                ),
+                const MxGap(MxSpace.sm),
+                MxText(
+                  _rulesText(l10n, draft.format),
+                  role: MxTextRole.formHelper,
+                ),
+                if (hasImportSource) ...[
                   const MxGap(MxSpace.lg),
-                  _buildImportSourceInput(
-                    draft: draft,
-                    enabled: !isImportBusy,
-                    l10n: l10n,
+                  _ImportActionButton(
+                    previewLabel: l10n.importPreviewAction,
+                    importLabel: canCommit
+                        ? l10n.importCommitCardsAction(
+                            preparation!.previewItems.length,
+                          )
+                        : null,
+                    canCommit: canCommit,
+                    isBusy: isImportBusy,
+                    pendingAction: _pendingAction,
+                    onPreview: _preparePreview,
+                    onCommit: () => _commitImport(context),
                   ),
-                  const MxGap(MxSpace.lg),
-                  _ImportOptionsSection(
-                    format: draft.format,
-                    duplicatePolicy: draft.duplicatePolicy,
-                    excelHasHeader: draft.excelHasHeader,
-                    structuredTextSeparator: draft.structuredTextSeparator,
-                    enabled: !isImportBusy,
-                    onDuplicateTap: () =>
-                        _chooseDuplicatePolicy(draft.duplicatePolicy),
-                    onSeparatorTap: () => _chooseStructuredTextSeparator(
-                      draft.structuredTextSeparator,
-                    ),
-                    onHeaderChanged: (value) => ref
-                        .read(
-                          flashcardImportDraftProvider(widget.deckId).notifier,
-                        )
-                        .setExcelHasHeader(value),
-                  ),
-                  const MxGap(MxSpace.sm),
-                  MxText(
-                    _rulesText(l10n, draft.format),
-                    role: MxTextRole.formHelper,
-                  ),
-                  if (hasImportSource) ...[
-                    const MxGap(MxSpace.lg),
-                    _ImportActionButton(
-                      previewLabel: l10n.importPreviewAction,
-                      importLabel: canCommit
-                          ? l10n.importCommitCardsAction(
-                              preparation!.previewItems.length,
-                            )
-                          : null,
-                      canCommit: canCommit,
-                      isBusy: isImportBusy,
-                      pendingAction: _pendingAction,
-                      onPreview: _preparePreview,
-                      onCommit: () => _commitImport(context),
-                    ),
-                  ],
                 ],
-              ),
+              ],
             ),
-            if (preparation != null) ...[
-              const MxSliverGap(MxSpace.lg),
-              ...buildDeckImportPreviewSlivers(
-                context: context,
-                preparation: preparation,
-              ),
-            ],
+          ),
+          if (preparation != null) ...[
+            const MxSliverGap(MxSpace.lg),
+            ...buildDeckImportPreviewSlivers(
+              context: context,
+              preparation: preparation,
+            ),
           ],
-        ),
+        ],
       ),
-    );
+    ),
+  );
 
   Future<void> _preparePreview() async {
     setState(() => _pendingAction = _ImportPendingAction.preview);
@@ -229,27 +229,27 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     required bool enabled,
     required AppLocalizations l10n,
   }) => switch (draft.format) {
-      ImportSourceFormat.excel => _ImportExcelSource(
-        fileName: draft.loadedFileName,
-        fileSummary: _fileSummary(l10n, draft.preparation),
-        enabled: enabled,
-        onSelect: () => _pickFile(context),
-        onChange: () => _pickFile(context),
-        onRemove: () => ref
-            .read(flashcardImportDraftProvider(widget.deckId).notifier)
-            .clearSourceFile(),
-      ),
-      ImportSourceFormat.csv ||
-      ImportSourceFormat.structuredText => _ImportTextSource(
-        controller: _rawContentController,
-        format: draft.format,
-        enabled: enabled,
-        onLoadFile: () => _pickFile(context),
-        onChanged: (value) => ref
-            .read(flashcardImportDraftProvider(widget.deckId).notifier)
-            .setRawContent(value),
-      ),
-    };
+    ImportSourceFormat.excel => _ImportExcelSource(
+      fileName: draft.loadedFileName,
+      fileSummary: _fileSummary(l10n, draft.preparation),
+      enabled: enabled,
+      onSelect: () => _pickFile(context),
+      onChange: () => _pickFile(context),
+      onRemove: () => ref
+          .read(flashcardImportDraftProvider(widget.deckId).notifier)
+          .clearSourceFile(),
+    ),
+    ImportSourceFormat.csv ||
+    ImportSourceFormat.structuredText => _ImportTextSource(
+      controller: _rawContentController,
+      format: draft.format,
+      enabled: enabled,
+      onLoadFile: () => _pickFile(context),
+      onChanged: (value) => ref
+          .read(flashcardImportDraftProvider(widget.deckId).notifier)
+          .setRawContent(value),
+    ),
+  };
 
   Future<void> _pickFile(BuildContext context) async {
     final l10n = AppLocalizations.of(context);

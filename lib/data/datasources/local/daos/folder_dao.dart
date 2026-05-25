@@ -12,12 +12,12 @@ final class FolderDao {
   final AppDatabase _database;
 
   Future<Folder?> findById(String folderId) => (_database.select(
-      _database.folders,
-    )..where((table) => table.id.equals(folderId))).getSingleOrNull();
+    _database.folders,
+  )..where((table) => table.id.equals(folderId))).getSingleOrNull();
 
   Future<List<Folder>> listAllFolders() => (_database.select(
-      _database.folders,
-    )..orderBy([(table) => OrderingTerm.asc(table.createdAt)])).get();
+    _database.folders,
+  )..orderBy([(table) => OrderingTerm.asc(table.createdAt)])).get();
 
   Future<List<Folder>> listRootFolders(ContentQuery query) {
     final statement = _database.select(_database.folders)
@@ -70,60 +70,63 @@ final class FolderDao {
     required int createdAt,
     required int updatedAt,
   }) => _database
-        .into(_database.folders)
-        .insert(
-          FoldersCompanion.insert(
-            id: id,
-            parentId: Value(parentId),
-            name: name,
-            contentMode: contentMode.storageValue,
-            sortOrder: sortOrder,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-          ),
-        );
+      .into(_database.folders)
+      .insert(
+        FoldersCompanion.insert(
+          id: id,
+          parentId: Value(parentId),
+          name: name,
+          contentMode: contentMode.storageValue,
+          sortOrder: sortOrder,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+        ),
+      );
 
   Future<void> updateFolderName({
     required String folderId,
     required String name,
     required int updatedAt,
-  }) => (_database.update(
-      _database.folders,
-    )..where((table) => table.id.equals(folderId))).write(
-      FoldersCompanion(name: Value(name), updatedAt: Value(updatedAt)),
-    );
+  }) =>
+      (_database.update(
+        _database.folders,
+      )..where((table) => table.id.equals(folderId))).write(
+        FoldersCompanion(name: Value(name), updatedAt: Value(updatedAt)),
+      );
 
   Future<void> updateFolderParent({
     required String folderId,
     required String? parentId,
     required int sortOrder,
     required int updatedAt,
-  }) => (_database.update(
-      _database.folders,
-    )..where((table) => table.id.equals(folderId))).write(
-      FoldersCompanion(
-        parentId: Value(parentId),
-        sortOrder: Value(sortOrder),
-        updatedAt: Value(updatedAt),
-      ),
-    );
+  }) =>
+      (_database.update(
+        _database.folders,
+      )..where((table) => table.id.equals(folderId))).write(
+        FoldersCompanion(
+          parentId: Value(parentId),
+          sortOrder: Value(sortOrder),
+          updatedAt: Value(updatedAt),
+        ),
+      );
 
   Future<void> updateFolderMode({
     required String folderId,
     required FolderContentMode contentMode,
     required int updatedAt,
-  }) => (_database.update(
-      _database.folders,
-    )..where((table) => table.id.equals(folderId))).write(
-      FoldersCompanion(
-        contentMode: Value(contentMode.storageValue),
-        updatedAt: Value(updatedAt),
-      ),
-    );
+  }) =>
+      (_database.update(
+        _database.folders,
+      )..where((table) => table.id.equals(folderId))).write(
+        FoldersCompanion(
+          contentMode: Value(contentMode.storageValue),
+          updatedAt: Value(updatedAt),
+        ),
+      );
 
   Future<void> deleteFolder(String folderId) => (_database.delete(
-      _database.folders,
-    )..where((table) => table.id.equals(folderId))).go();
+    _database.folders,
+  )..where((table) => table.id.equals(folderId))).go();
 
   Future<void> reorderFolders({
     required String? parentFolderId,
@@ -451,5 +454,6 @@ final class FolderDao {
     }
   }
 
-  static String _placeholders(int count) => List<String>.generate(count, (index) => '?${index + 1}').join(', ');
+  static String _placeholders(int count) =>
+      List<String>.generate(count, (index) => '?${index + 1}').join(', ');
 }

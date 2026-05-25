@@ -126,20 +126,20 @@ class _ImportPreviewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxText(title, role: MxTextRole.sectionTitle),
-        const MxGap(MxSpace.xs),
-        MxText(subtitle, role: MxTextRole.sectionSubtitle),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxText(title, role: MxTextRole.sectionTitle),
+      const MxGap(MxSpace.xs),
+      MxText(subtitle, role: MxTextRole.sectionSubtitle),
+    ],
+  );
 }
 
 String _skippedDuplicateReason(
   AppLocalizations l10n,
   FlashcardImportDuplicateSource source,
 ) => switch (source) {
-    FlashcardImportDuplicateSource.importFile =>
-      l10n.importSkippedDuplicateInFile,
-    FlashcardImportDuplicateSource.deck => l10n.importSkippedDuplicateInDeck,
-  };
+  FlashcardImportDuplicateSource.importFile =>
+    l10n.importSkippedDuplicateInFile,
+  FlashcardImportDuplicateSource.deck => l10n.importSkippedDuplicateInDeck,
+};

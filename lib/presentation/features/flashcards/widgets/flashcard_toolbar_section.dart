@@ -85,14 +85,13 @@ class _FlashcardToolbarSectionState extends State<FlashcardToolbarSection> {
         Row(
           children: [
             Expanded(
-              child: MxSectionHeader(
-                title: l10n.flashcardsCardsSectionTitle,
-              ),
+              child: MxSectionHeader(title: l10n.flashcardsCardsSectionTitle),
             ),
             const MxGap(MxSpace.xs),
             MxIconButton(
-              icon:
-                  _isSearchVisible ? Icons.close_rounded : Icons.search_rounded,
+              icon: _isSearchVisible
+                  ? Icons.close_rounded
+                  : Icons.search_rounded,
               tooltip: l10n.commonSearch,
               onPressed: _toggleSearch,
             ),
@@ -114,8 +113,7 @@ class _FlashcardToolbarSectionState extends State<FlashcardToolbarSection> {
             MxIconButton(
               icon: Icons.reorder_rounded,
               tooltip: l10n.commonReorder,
-              onPressed:
-                  widget.canManualReorder ? widget.onStartReorder : null,
+              onPressed: widget.canManualReorder ? widget.onStartReorder : null,
             ),
           ],
         ),
@@ -171,10 +169,10 @@ class _SortIconMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MxIconButton(
-      icon: Icons.sort_rounded,
-      tooltip: tooltip,
-      onPressed: () => _openSheet(context),
-    );
+    icon: Icons.sort_rounded,
+    tooltip: tooltip,
+    onPressed: () => _openSheet(context),
+  );
 }
 
 class _ReorderActionGroup extends StatelessWidget {
@@ -192,39 +190,39 @@ class _ReorderActionGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 600) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              MxPrimaryButton(
-                label: saveLabel,
-                size: MxButtonSize.large,
-                fullWidth: true,
-                onPressed: onSave,
-              ),
-              const MxGap(MxSpace.xs),
-              MxSecondaryButton(
-                label: cancelLabel,
-                variant: MxSecondaryVariant.text,
-                fullWidth: true,
-                onPressed: onCancel,
-              ),
-            ],
-          );
-        }
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+    builder: (context, constraints) {
+      if (constraints.maxWidth < 600) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            MxPrimaryButton(
+              label: saveLabel,
+              size: MxButtonSize.large,
+              fullWidth: true,
+              onPressed: onSave,
+            ),
+            const MxGap(MxSpace.xs),
             MxSecondaryButton(
               label: cancelLabel,
               variant: MxSecondaryVariant.text,
+              fullWidth: true,
               onPressed: onCancel,
             ),
-            const MxGap(MxSpace.sm),
-            MxPrimaryButton(label: saveLabel, onPressed: onSave),
           ],
         );
-      },
-    );
+      }
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          MxSecondaryButton(
+            label: cancelLabel,
+            variant: MxSecondaryVariant.text,
+            onPressed: onCancel,
+          ),
+          const MxGap(MxSpace.sm),
+          MxPrimaryButton(label: saveLabel, onPressed: onSave),
+        ],
+      );
+    },
+  );
 }

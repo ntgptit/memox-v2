@@ -19,14 +19,14 @@ class MxShakeTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-      animation: animation,
-      child: child,
-      builder: (context, child) {
-        final dx =
-            math.sin(animation.value * math.pi * cycles * 2) *
-            distance *
-            (1 - animation.value);
-        return Transform.translate(offset: Offset(dx, 0), child: child);
-      },
-    );
+    animation: animation,
+    child: child,
+    builder: (context, child) {
+      final dx =
+          math.sin(animation.value * math.pi * cycles * 2) *
+          distance *
+          (1 - animation.value);
+      return Transform.translate(offset: Offset(dx, 0), child: child);
+    },
+  );
 }

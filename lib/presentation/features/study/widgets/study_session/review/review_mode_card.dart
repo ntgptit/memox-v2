@@ -25,38 +25,38 @@ class ReviewModeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MxCard(
-      variant: MxCardVariant.outlined,
-      child: Stack(
-        children: [
-          if (action != null || actionIcon != null)
-            Align(
-              alignment: Alignment.topRight,
-              child:
-                  action ??
-                  MxIconButton(
-                    tooltip: tooltip ?? '',
-                    icon: actionIcon!,
-                    onPressed: null,
-                  ),
-            ),
-          if (secondaryAction != null)
-            Align(alignment: Alignment.bottomRight, child: secondaryAction),
-          Positioned.fill(
-            child: Padding(
-              padding: const EdgeInsets.only(top: MxSpace.xxl),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: MxText(
-                    text,
-                    role: role,
-                    textAlign: TextAlign.center,
-                    softWrap: true,
-                  ),
+    variant: MxCardVariant.outlined,
+    child: Stack(
+      children: [
+        if (action != null || actionIcon != null)
+          Align(
+            alignment: Alignment.topRight,
+            child:
+                action ??
+                MxIconButton(
+                  tooltip: tooltip ?? '',
+                  icon: actionIcon!,
+                  onPressed: null,
+                ),
+          ),
+        if (secondaryAction != null)
+          Align(alignment: Alignment.bottomRight, child: secondaryAction),
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.only(top: MxSpace.xxl),
+            child: Center(
+              child: SingleChildScrollView(
+                child: MxText(
+                  text,
+                  role: role,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
                 ),
               ),
             ),
           ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
 }

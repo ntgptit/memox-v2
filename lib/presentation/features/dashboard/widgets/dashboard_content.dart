@@ -17,20 +17,20 @@ class DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-      key: const ValueKey('dashboard_content'),
-      padding: const EdgeInsets.only(bottom: MxSpace.xxl),
-      children: [
-        const DashboardGreetingHeader(),
-        const MxGap(MxSpace.lg),
-        DashboardActionList(state: state),
-        const MxGap(MxSpace.lg),
-        DashboardHomeStatsSection(state: state),
-        const MxGap(MxSpace.lg),
-        if (state.deckHighlights.isNotEmpty)
-          DashboardDeckHighlightsSection(items: state.deckHighlights),
-        if (state.deckHighlights.isEmpty) const _DashboardDeckEmptyState(),
-      ],
-    );
+    key: const ValueKey('dashboard_content'),
+    padding: const EdgeInsets.only(bottom: MxSpace.xxl),
+    children: [
+      const DashboardGreetingHeader(),
+      const MxGap(MxSpace.lg),
+      DashboardActionList(state: state),
+      const MxGap(MxSpace.lg),
+      DashboardHomeStatsSection(state: state),
+      const MxGap(MxSpace.lg),
+      if (state.deckHighlights.isNotEmpty)
+        DashboardDeckHighlightsSection(items: state.deckHighlights),
+      if (state.deckHighlights.isEmpty) const _DashboardDeckEmptyState(),
+    ],
+  );
 }
 
 class _DashboardDeckEmptyState extends StatelessWidget {

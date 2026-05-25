@@ -149,13 +149,13 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
                   switchInCurve: fillStateTransitionCurve,
                   switchOutCurve: fillStateExitCurve,
                   transitionBuilder: (child, animation) => FadeTransition(
-                      opacity: animation,
-                      child: SizeTransition(
-                        sizeFactor: animation,
-                        axisAlignment: -1,
-                        child: child,
-                      ),
+                    opacity: animation,
+                    child: SizeTransition(
+                      sizeFactor: animation,
+                      axisAlignment: -1,
+                      child: child,
                     ),
+                  ),
                   child: _answerState == _FillAnswerState.input
                       ? FillInputActions(
                           key: const ValueKey<String>('fill-input-actions'),
@@ -268,7 +268,8 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
     });
   }
 
-  List<StudySessionItem> get _roundItems => pendingModeRoundItems(widget.snapshot);
+  List<StudySessionItem> get _roundItems =>
+      pendingModeRoundItems(widget.snapshot);
 
   StudySessionItem? get _currentItem {
     final items = _roundItems;

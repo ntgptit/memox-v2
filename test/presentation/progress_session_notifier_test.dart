@@ -171,15 +171,15 @@ final class _ProgressFolderRepo implements FolderRepository {
   Future<LibraryOverviewReadModel> getLibraryOverview(
     ContentQuery query,
   ) async => LibraryOverviewReadModel(
-      overdueCount: 2,
-      dueTodayCount: 3,
-      newCardCount: 4,
-      totalFolderCount: 2,
-      folders: [
-        _folderReadModel(id: 'folder-1', itemCount: 4, masteryPercent: 25),
-        _folderReadModel(id: 'folder-2', itemCount: 6, masteryPercent: 67),
-      ],
-    );
+    overdueCount: 2,
+    dueTodayCount: 3,
+    newCardCount: 4,
+    totalFolderCount: 2,
+    folders: [
+      _folderReadModel(id: 'folder-1', itemCount: 4, masteryPercent: 25),
+      _folderReadModel(id: 'folder-2', itemCount: 6, masteryPercent: 67),
+    ],
+  );
 
   @override
   Future<Result<FolderEntity>> createRootFolder(String name) {
@@ -242,24 +242,24 @@ LibraryFolderReadModel _folderReadModel({
   required int itemCount,
   required int masteryPercent,
 }) => LibraryFolderReadModel(
-    folder: FolderEntity(
-      id: id,
-      parentId: null,
-      name: id,
-      contentMode: FolderContentMode.decks,
-      sortOrder: 0,
-      createdAt: 0,
-      updatedAt: 0,
-    ),
-    breadcrumb: const [],
-    subfolderCount: 0,
-    deckCount: 1,
-    itemCount: itemCount,
-    dueCardCount: 0,
-    newCardCount: 0,
-    masteryPercent: masteryPercent,
-    lastStudiedAt: null,
-  );
+  folder: FolderEntity(
+    id: id,
+    parentId: null,
+    name: id,
+    contentMode: FolderContentMode.decks,
+    sortOrder: 0,
+    createdAt: 0,
+    updatedAt: 0,
+  ),
+  breadcrumb: const [],
+  subfolderCount: 0,
+  deckCount: 1,
+  itemCount: itemCount,
+  dueCardCount: 0,
+  newCardCount: 0,
+  masteryPercent: masteryPercent,
+  lastStudiedAt: null,
+);
 
 final class _ProgressStudyRepo implements StudyRepo {
   _ProgressStudyRepo({required this.activeSessions});
@@ -274,7 +274,8 @@ final class _ProgressStudyRepo implements StudyRepo {
   StudyType? lastRetriedStudyType;
 
   @override
-  Future<List<StudySessionSnapshot>> listActiveSessions() async => activeSessions;
+  Future<List<StudySessionSnapshot>> listActiveSessions() async =>
+      activeSessions;
 
   @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
@@ -421,9 +422,9 @@ StudySessionSnapshot _snapshot({
 }
 
 StudyFlashcardRef _card() => const StudyFlashcardRef(
-    id: 'card-1',
-    deckId: 'deck-1',
-    front: 'front 1',
-    back: 'back 1',
-    sourcePool: SessionItemSourcePool.due,
-  );
+  id: 'card-1',
+  deckId: 'deck-1',
+  front: 'front 1',
+  back: 'back 1',
+  sourcePool: SessionItemSourcePool.due,
+);

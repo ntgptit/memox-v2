@@ -38,24 +38,24 @@ class MxReorderableList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ReorderableListView.builder(
-      itemCount: itemCount,
-      itemBuilder: (context, index) {
-        final child = itemBuilder(context, index);
-        assert(child.key != null, 'MxReorderableList items must have keys.');
-        return child;
-      },
-      onReorder: onReorder,
-      padding: padding,
-      header: header,
-      footer: footer,
-      shrinkWrap: shrinkWrap,
-      physics: physics,
-      buildDefaultDragHandles: buildDefaultDragHandles,
-      proxyDecorator:
-          proxyDecorator ??
-          (child, _, animation) =>
-              _MxDefaultReorderProxy(animation: animation, child: child),
-    );
+    itemCount: itemCount,
+    itemBuilder: (context, index) {
+      final child = itemBuilder(context, index);
+      assert(child.key != null, 'MxReorderableList items must have keys.');
+      return child;
+    },
+    onReorder: onReorder,
+    padding: padding,
+    header: header,
+    footer: footer,
+    shrinkWrap: shrinkWrap,
+    physics: physics,
+    buildDefaultDragHandles: buildDefaultDragHandles,
+    proxyDecorator:
+        proxyDecorator ??
+        (child, _, animation) =>
+            _MxDefaultReorderProxy(animation: animation, child: child),
+  );
 }
 
 class _MxDefaultReorderProxy extends StatelessWidget {
@@ -66,27 +66,23 @@ class _MxDefaultReorderProxy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-      animation: animation,
-      child: child,
-      builder: (context, child) {
-        final t = Curves.easeOutCubic.transform(animation.value);
+    animation: animation,
+    child: child,
+    builder: (context, child) {
+      final t = Curves.easeOutCubic.transform(animation.value);
 
-        return Transform.scale(
-          scale: lerpDouble(1, 1.01, t),
-          child: Material(
-            color: Theme.of(
-              context,
-            ).colorScheme.surface.withValues(alpha: AppOpacity.transparent),
-            elevation: lerpDouble(
-              AppElevation.card,
-              AppElevation.cardRaised,
-              t,
-            )!,
-            shadowColor: Theme.of(context).shadowColor,
-            borderRadius: AppRadius.card,
-            child: child,
-          ),
-        );
-      },
-    );
+      return Transform.scale(
+        scale: lerpDouble(1, 1.01, t),
+        child: Material(
+          color: Theme.of(
+            context,
+          ).colorScheme.surface.withValues(alpha: AppOpacity.transparent),
+          elevation: lerpDouble(AppElevation.card, AppElevation.cardRaised, t)!,
+          shadowColor: Theme.of(context).shadowColor,
+          borderRadius: AppRadius.card,
+          child: child,
+        ),
+      );
+    },
+  );
 }

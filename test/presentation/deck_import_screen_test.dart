@@ -733,16 +733,16 @@ const _preparationWithSkippedDuplicates = FlashcardImportPreparation(
 );
 
 FlashcardImportPreparation _largePreparation() => FlashcardImportPreparation(
-    format: ImportSourceFormat.csv,
-    previewItems: List<FlashcardImportPreviewItem>.generate(
-      80,
-      (index) => FlashcardImportPreviewItem(
-        sourceLabel: 'Line ${index + 2}',
-        draft: FlashcardDraft(front: 'Front $index', back: 'Back $index'),
-      ),
+  format: ImportSourceFormat.csv,
+  previewItems: List<FlashcardImportPreviewItem>.generate(
+    80,
+    (index) => FlashcardImportPreviewItem(
+      sourceLabel: 'Line ${index + 2}',
+      draft: FlashcardDraft(front: 'Front $index', back: 'Back $index'),
     ),
-    issues: const [],
-  );
+  ),
+  issues: const [],
+);
 
 final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
   const _ImportOnlyFlashcardRepository({
@@ -778,23 +778,25 @@ final class _ImportOnlyFlashcardRepository implements FlashcardRepository {
         FlashcardImportDuplicatePolicy.skipExactDuplicates,
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
-  }) => prepareHandler?.call(
-          deckId: deckId,
-          format: format,
-          rawContent: rawContent,
-          sourceBytes: sourceBytes,
-          excelHasHeader: excelHasHeader,
-          duplicatePolicy: duplicatePolicy,
-          structuredTextSeparator: structuredTextSeparator,
-        ) ??
-        Future.value(const Success(_validPreparation));
+  }) =>
+      prepareHandler?.call(
+        deckId: deckId,
+        format: format,
+        rawContent: rawContent,
+        sourceBytes: sourceBytes,
+        excelHasHeader: excelHasHeader,
+        duplicatePolicy: duplicatePolicy,
+        structuredTextSeparator: structuredTextSeparator,
+      ) ??
+      Future.value(const Success(_validPreparation));
 
   @override
   Future<Result<int>> commitImport({
     required String deckId,
     required FlashcardImportPreparation preparation,
-  }) => commitHandler?.call(deckId: deckId, preparation: preparation) ??
-        Future.value(const Success(1));
+  }) =>
+      commitHandler?.call(deckId: deckId, preparation: preparation) ??
+      Future.value(const Success(1));
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -810,15 +812,16 @@ final class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ProviderScope(
-      overrides: overrides,
-      child: MaterialApp(
-        theme: AppTheme.light(),
-        darkTheme: AppTheme.dark(),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: child,
-      ),
-    );
+    overrides: overrides,
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: child,
+    ),
+  );
 }
 
-ElevatedButton _primaryButton(WidgetTester tester) => tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+ElevatedButton _primaryButton(WidgetTester tester) =>
+    tester.widget<ElevatedButton>(find.byType(ElevatedButton));

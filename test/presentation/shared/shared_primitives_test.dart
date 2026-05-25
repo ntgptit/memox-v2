@@ -145,28 +145,28 @@ void main() {
       _TestApp(
         child: Builder(
           builder: (context) => ElevatedButton(
-              onPressed: () async {
-                selectedAction = await MxBottomSheet.show<String>(
-                  context: context,
-                  child: const MxActionSheetList<String>(
-                    items: [
-                      MxActionSheetItem<String>(
-                        value: 'edit',
-                        label: 'Edit',
-                        icon: Icons.edit_outlined,
-                      ),
-                      MxActionSheetItem<String>(
-                        value: 'delete',
-                        label: 'Delete',
-                        icon: Icons.delete_outline,
-                        tone: MxActionSheetItemTone.destructive,
-                      ),
-                    ],
-                  ),
-                );
-              },
-              child: const Text('Open'),
-            ),
+            onPressed: () async {
+              selectedAction = await MxBottomSheet.show<String>(
+                context: context,
+                child: const MxActionSheetList<String>(
+                  items: [
+                    MxActionSheetItem<String>(
+                      value: 'edit',
+                      label: 'Edit',
+                      icon: Icons.edit_outlined,
+                    ),
+                    MxActionSheetItem<String>(
+                      value: 'delete',
+                      label: 'Delete',
+                      icon: Icons.delete_outline,
+                      tone: MxActionSheetItemTone.destructive,
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: const Text('Open'),
+          ),
         ),
       ),
     );
@@ -189,29 +189,29 @@ void main() {
         _TestApp(
           child: Builder(
             builder: (context) => ElevatedButton(
-                onPressed: () async {
-                  selectedDestination =
-                      await MxDestinationPickerSheet.show<String>(
-                        context: context,
-                        title: 'Move to',
-                        searchHintText: 'Search destinations',
-                        emptyLabel: 'No destinations',
-                        destinations: const [
-                          MxDestinationOption<String>(
-                            value: 'folder-a',
-                            title: 'Algebra',
-                            subtitle: 'Folder',
-                          ),
-                          MxDestinationOption<String>(
-                            value: 'folder-b',
-                            title: 'Biology',
-                            subtitle: 'Folder',
-                          ),
-                        ],
-                      );
-                },
-                child: const Text('Pick destination'),
-              ),
+              onPressed: () async {
+                selectedDestination =
+                    await MxDestinationPickerSheet.show<String>(
+                      context: context,
+                      title: 'Move to',
+                      searchHintText: 'Search destinations',
+                      emptyLabel: 'No destinations',
+                      destinations: const [
+                        MxDestinationOption<String>(
+                          value: 'folder-a',
+                          title: 'Algebra',
+                          subtitle: 'Folder',
+                        ),
+                        MxDestinationOption<String>(
+                          value: 'folder-b',
+                          title: 'Biology',
+                          subtitle: 'Folder',
+                        ),
+                      ],
+                    );
+              },
+              child: const Text('Pick destination'),
+            ),
           ),
         ),
       );
@@ -518,18 +518,18 @@ void main() {
         _TestApp(
           child: StatefulBuilder(
             builder: (context, setState) => SizedBox(
-                width: 180,
-                child: MxSegmentedControl<int>(
-                  adaptive: true,
-                  segments: const [
-                    MxSegment(value: 1, label: 'One'),
-                    MxSegment(value: 2, label: 'Two'),
-                    MxSegment(value: 3, label: 'Three'),
-                  ],
-                  selected: selected,
-                  onChanged: (value) => setState(() => selected = value),
-                ),
+              width: 180,
+              child: MxSegmentedControl<int>(
+                adaptive: true,
+                segments: const [
+                  MxSegment(value: 1, label: 'One'),
+                  MxSegment(value: 2, label: 'Two'),
+                  MxSegment(value: 3, label: 'Three'),
+                ],
+                selected: selected,
+                onChanged: (value) => setState(() => selected = value),
               ),
+            ),
           ),
         ),
       );
@@ -555,23 +555,19 @@ void main() {
             data: AppTheme.light(),
             child: StatefulBuilder(
               builder: (context, setState) => SizedBox(
-                  width: 320,
-                  child: MxSegmentedControl<int>(
-                    adaptive: true,
-                    density: MxSegmentedControlDensity.compact,
-                    segments: const [
-                      MxSegment(
-                        value: 1,
-                        label: 'CSV',
-                        icon: Icons.table_chart,
-                      ),
-                      MxSegment(value: 2, label: 'Excel', icon: Icons.grid_on),
-                      MxSegment(value: 3, label: 'Text', icon: Icons.notes),
-                    ],
-                    selected: selected,
-                    onChanged: (value) => setState(() => selected = value),
-                  ),
+                width: 320,
+                child: MxSegmentedControl<int>(
+                  adaptive: true,
+                  density: MxSegmentedControlDensity.compact,
+                  segments: const [
+                    MxSegment(value: 1, label: 'CSV', icon: Icons.table_chart),
+                    MxSegment(value: 2, label: 'Excel', icon: Icons.grid_on),
+                    MxSegment(value: 3, label: 'Text', icon: Icons.notes),
+                  ],
+                  selected: selected,
+                  onChanged: (value) => setState(() => selected = value),
                 ),
+              ),
             ),
           ),
         ),
@@ -751,9 +747,9 @@ void main() {
           child: MxReorderableList.builder(
             itemCount: items.length,
             itemBuilder: (context, index) => ListTile(
-                key: ValueKey(items[index]),
-                title: Text(items[index]),
-              ),
+              key: ValueKey(items[index]),
+              title: Text(items[index]),
+            ),
             onReorder: (oldIndex, newIndex) {},
           ),
         ),
@@ -773,10 +769,10 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(
-        body: Padding(padding: const EdgeInsets.all(24), child: child),
-      ),
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: Scaffold(
+      body: Padding(padding: const EdgeInsets.all(24), child: child),
+    ),
+  );
 }

@@ -94,21 +94,21 @@ class _MatchModeTileState extends State<MatchModeTile>
               onTap: canTap ? widget.onTap : null,
               child: LayoutBuilder(
                 builder: (context, constraints) => Center(
-                    child: SizedBox(
-                      width: constraints.maxWidth,
-                      child: MxText(
-                        text,
-                        role: isTerm
-                            ? MxTextRole.tileTitle
-                            : MxTextRole.contentBody,
-                        color: visual.foregroundColor,
-                        maxLines: isTerm ? 3 : 4,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                      ),
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: MxText(
+                      text,
+                      role: isTerm
+                          ? MxTextRole.tileTitle
+                          : MxTextRole.contentBody,
+                      color: visual.foregroundColor,
+                      maxLines: isTerm ? 3 : 4,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      softWrap: true,
                     ),
                   ),
+                ),
               ),
             ),
           ),

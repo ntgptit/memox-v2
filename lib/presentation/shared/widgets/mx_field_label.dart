@@ -10,12 +10,7 @@ import 'mx_text.dart';
 /// and turns warning-toned once the soft cap is exceeded (per Design System
 /// "05 · Create card", soft limit, never blocks input).
 class MxFieldLabel extends StatelessWidget {
-  const MxFieldLabel({
-    required this.label,
-    this.used,
-    this.max,
-    super.key,
-  });
+  const MxFieldLabel({required this.label, this.used, this.max, super.key});
 
   /// Label text — converted to uppercase per the overline role.
   final String label;

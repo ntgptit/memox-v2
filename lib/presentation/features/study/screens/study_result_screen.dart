@@ -119,14 +119,15 @@ class StudyResultScreen extends ConsumerWidget {
     );
   }
 
-  String _statusLabel(AppLocalizations l10n, SessionStatus status) => switch (status) {
-      SessionStatus.completed => l10n.studyResultCompleted,
-      SessionStatus.cancelled => l10n.studyResultCancelled,
-      SessionStatus.failedToFinalize => l10n.studyResultFailedFinalize,
-      SessionStatus.readyToFinalize => l10n.studyResultReadyFinalize,
-      SessionStatus.inProgress => l10n.studyResultInProgress,
-      SessionStatus.draft => l10n.studyResultDraft,
-    };
+  String _statusLabel(AppLocalizations l10n, SessionStatus status) =>
+      switch (status) {
+        SessionStatus.completed => l10n.studyResultCompleted,
+        SessionStatus.cancelled => l10n.studyResultCancelled,
+        SessionStatus.failedToFinalize => l10n.studyResultFailedFinalize,
+        SessionStatus.readyToFinalize => l10n.studyResultReadyFinalize,
+        SessionStatus.inProgress => l10n.studyResultInProgress,
+        SessionStatus.draft => l10n.studyResultDraft,
+      };
 }
 
 class _ResultProgressSummary extends StatelessWidget {
@@ -258,12 +259,12 @@ class _MetricRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: MxSpace.xs),
-      child: Row(
-        children: [
-          Expanded(child: MxText(label, role: MxTextRole.contentBody)),
-          MxText(value, role: MxTextRole.tileTrailing),
-        ],
-      ),
-    );
+    padding: const EdgeInsets.symmetric(vertical: MxSpace.xs),
+    child: Row(
+      children: [
+        Expanded(child: MxText(label, role: MxTextRole.contentBody)),
+        MxText(value, role: MxTextRole.tileTrailing),
+      ],
+    ),
+  );
 }

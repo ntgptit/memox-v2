@@ -47,5 +47,6 @@ class AppConfig {
   final bool exposeInternalErrorDetails;
   final GoogleOAuthConfig? _googleOAuthConfig;
 
-  GoogleOAuthConfig get googleOAuthConfig => _googleOAuthConfig ?? GoogleOAuthConfig.empty;
+  GoogleOAuthConfig get googleOAuthConfig =>
+      _googleOAuthConfig ?? GoogleOAuthConfig.empty;
 }

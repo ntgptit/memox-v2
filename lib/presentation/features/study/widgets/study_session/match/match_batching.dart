@@ -20,8 +20,9 @@ List<StudySessionItem> visibleMatchBatch(
 bool isVisibleMatchBatchComplete({
   required List<StudySessionItem> visibleItems,
   required Set<String> matchedItemIds,
-}) => visibleItems.isNotEmpty &&
-      visibleItems.every((item) => matchedItemIds.contains(item.id));
+}) =>
+    visibleItems.isNotEmpty &&
+    visibleItems.every((item) => matchedItemIds.contains(item.id));
 
 int nextVisibleMatchBatchStart({
   required List<StudySessionItem> items,

@@ -49,33 +49,33 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
       children: [
         LayoutBuilder(
           builder: (context, constraints) => SizedBox(
-              height: constraints.maxWidth / _previewAspectRatio,
-              child: PageView.builder(
-                controller: _controller,
-                itemCount: widget.items.length,
-                onPageChanged: (index) {
-                  setState(() {
-                    _activeIndex = index;
-                    _showBack = false;
-                  });
-                },
-                itemBuilder: (context, index) {
-                  final item = widget.items[index];
-                  return AnimatedSwitcher(
-                    duration: MxDurations.quickTransition,
-                    child: _PreviewFlashcard(
-                      key: ValueKey('${item.id}:$_showBack'),
-                      item: item,
-                      showBack: _showBack,
-                      aspectRatio: _previewAspectRatio,
-                      onTap: _toggleFace,
-                      onFullscreen: () =>
-                          _showFullscreen(context, item, _showBack),
-                    ),
-                  );
-                },
-              ),
+            height: constraints.maxWidth / _previewAspectRatio,
+            child: PageView.builder(
+              controller: _controller,
+              itemCount: widget.items.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _activeIndex = index;
+                  _showBack = false;
+                });
+              },
+              itemBuilder: (context, index) {
+                final item = widget.items[index];
+                return AnimatedSwitcher(
+                  duration: MxDurations.quickTransition,
+                  child: _PreviewFlashcard(
+                    key: ValueKey('${item.id}:$_showBack'),
+                    item: item,
+                    showBack: _showBack,
+                    aspectRatio: _previewAspectRatio,
+                    onTap: _toggleFace,
+                    onFullscreen: () =>
+                        _showFullscreen(context, item, _showBack),
+                  ),
+                );
+              },
             ),
+          ),
         ),
         const MxGap(MxSpace.sm),
         MxPageDots(
@@ -113,15 +113,15 @@ class _FlashcardPreviewSectionState extends State<FlashcardPreviewSection> {
       title: l10n.flashcardsPreviewDialogTitle,
       child: StatefulBuilder(
         builder: (context, setDialogState) => _PreviewFlashcard(
-            item: item,
-            showBack: showBack,
-            aspectRatio: _fullscreenAspectRatio,
-            onTap: () {
-              setDialogState(() {
-                showBack = !showBack;
-              });
-            },
-          ),
+          item: item,
+          showBack: showBack,
+          aspectRatio: _fullscreenAspectRatio,
+          onTap: () {
+            setDialogState(() {
+              showBack = !showBack;
+            });
+          },
+        ),
       ),
     );
   }

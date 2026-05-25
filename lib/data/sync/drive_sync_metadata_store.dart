@@ -40,11 +40,12 @@ final class DriveSyncMetadataStore {
   }
 
   Future<void> save(DriveSyncMetadata metadata) => _preferences.setString(
-      AppConstants.sharedPrefsDriveSyncMetadataKey,
-      jsonEncode(_encode(metadata)),
-    );
+    AppConstants.sharedPrefsDriveSyncMetadataKey,
+    jsonEncode(_encode(metadata)),
+  );
 
-  Future<void> clear() => _preferences.remove(AppConstants.sharedPrefsDriveSyncMetadataKey);
+  Future<void> clear() =>
+      _preferences.remove(AppConstants.sharedPrefsDriveSyncMetadataKey);
 
   Future<String> loadOrCreateDeviceId(IdGenerator idGenerator) async {
     final existing = _preferences.getString(
@@ -100,13 +101,13 @@ final class DriveSyncMetadataStore {
   }
 
   Map<String, Object?> _encode(DriveSyncMetadata metadata) => <String, Object?>{
-      'accountSubjectId': metadata.accountSubjectId,
-      'manifestFileId': metadata.manifestFileId,
-      'snapshotFileId': metadata.snapshotFileId,
-      'remoteFingerprint': metadata.remoteFingerprint,
-      'localFingerprint': metadata.localFingerprint,
-      'remoteManifestVersion': metadata.remoteManifestVersion,
-      'remoteSnapshotVersion': metadata.remoteSnapshotVersion,
-      'lastSyncedAt': metadata.lastSyncedAt,
-    };
+    'accountSubjectId': metadata.accountSubjectId,
+    'manifestFileId': metadata.manifestFileId,
+    'snapshotFileId': metadata.snapshotFileId,
+    'remoteFingerprint': metadata.remoteFingerprint,
+    'localFingerprint': metadata.localFingerprint,
+    'remoteManifestVersion': metadata.remoteManifestVersion,
+    'remoteSnapshotVersion': metadata.remoteSnapshotVersion,
+    'lastSyncedAt': metadata.lastSyncedAt,
+  };
 }

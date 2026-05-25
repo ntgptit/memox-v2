@@ -31,15 +31,15 @@ class MxBottomSheet extends StatelessWidget {
     bool useRootNavigator = false,
     bool isScrollControlled = true,
   }) => showModalBottomSheet<T>(
-      context: context,
-      isDismissible: isDismissible,
-      enableDrag: enableDrag,
-      useRootNavigator: useRootNavigator,
-      isScrollControlled: isScrollControlled,
-      useSafeArea: true,
-      builder: (_) =>
-          MxBottomSheet(title: title, trailing: trailing, child: child),
-    );
+    context: context,
+    isDismissible: isDismissible,
+    enableDrag: enableDrag,
+    useRootNavigator: useRootNavigator,
+    isScrollControlled: isScrollControlled,
+    useSafeArea: true,
+    builder: (_) =>
+        MxBottomSheet(title: title, trailing: trailing, child: child),
+  );
 
   @override
   Widget build(BuildContext context) {

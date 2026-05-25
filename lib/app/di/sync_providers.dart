@@ -27,77 +27,69 @@ http.Client driveSyncHttpClient(Ref ref) {
 }
 
 @riverpod
-DriveAppDataClient googleDriveAppDataClient(Ref ref) => GoogleDriveAppDataClient(ref.watch(driveSyncHttpClientProvider));
+DriveAppDataClient googleDriveAppDataClient(Ref ref) =>
+    GoogleDriveAppDataClient(ref.watch(driveSyncHttpClientProvider));
 
 @riverpod
-DriveSyncSnapshotCodec driveSyncSnapshotCodec(Ref ref) => const DriveSyncSnapshotCodec();
+DriveSyncSnapshotCodec driveSyncSnapshotCodec(Ref ref) =>
+    const DriveSyncSnapshotCodec();
 
 @riverpod
-LocalDatabaseSnapshotGateway localDatabaseSnapshotGateway(Ref ref) => createLocalDatabaseSnapshotGateway(ref.watch(appDatabaseProvider));
+LocalDatabaseSnapshotGateway localDatabaseSnapshotGateway(Ref ref) =>
+    createLocalDatabaseSnapshotGateway(ref.watch(appDatabaseProvider));
 
 @riverpod
-Future<AppSettingsSnapshotStore> appSettingsSnapshotStore(Ref ref) async => AppSettingsSnapshotStore(
-    await ref.watch(sharedPreferencesProvider.future),
-  );
+Future<AppSettingsSnapshotStore> appSettingsSnapshotStore(Ref ref) async =>
+    AppSettingsSnapshotStore(await ref.watch(sharedPreferencesProvider.future));
 
 @riverpod
-Future<DriveSyncMetadataStore> driveSyncMetadataStore(Ref ref) async => DriveSyncMetadataStore(
-    await ref.watch(sharedPreferencesProvider.future),
-  );
+Future<DriveSyncMetadataStore> driveSyncMetadataStore(Ref ref) async =>
+    DriveSyncMetadataStore(await ref.watch(sharedPreferencesProvider.future));
 
 @riverpod
-Future<DriveSyncRepository> driveSyncRepository(Ref ref) async => GoogleDriveSyncRepository(
-    accountRepository: await ref.watch(cloudAccountRepositoryProvider.future),
-    authService: ref.watch(googleAccountAuthServiceProvider),
-    googleOAuthConfig: ref.watch(googleOAuthConfigProvider),
-    driveClient: ref.watch(googleDriveAppDataClientProvider),
-    databaseSnapshotGateway: ref.watch(localDatabaseSnapshotGatewayProvider),
-    settingsSnapshotStore: await ref.watch(
-      appSettingsSnapshotStoreProvider.future,
-    ),
-    metadataStore: await ref.watch(driveSyncMetadataStoreProvider.future),
-    snapshotCodec: ref.watch(driveSyncSnapshotCodecProvider),
-    clock: ref.watch(clockProvider),
-    idGenerator: ref.watch(idGeneratorProvider),
-    logger: TalkerAppLogger(ref.watch(talkerProvider)),
-  );
+Future<DriveSyncRepository> driveSyncRepository(Ref ref) async =>
+    GoogleDriveSyncRepository(
+      accountRepository: await ref.watch(cloudAccountRepositoryProvider.future),
+      authService: ref.watch(googleAccountAuthServiceProvider),
+      googleOAuthConfig: ref.watch(googleOAuthConfigProvider),
+      driveClient: ref.watch(googleDriveAppDataClientProvider),
+      databaseSnapshotGateway: ref.watch(localDatabaseSnapshotGatewayProvider),
+      settingsSnapshotStore: await ref.watch(
+        appSettingsSnapshotStoreProvider.future,
+      ),
+      metadataStore: await ref.watch(driveSyncMetadataStoreProvider.future),
+      snapshotCodec: ref.watch(driveSyncSnapshotCodecProvider),
+      clock: ref.watch(clockProvider),
+      idGenerator: ref.watch(idGeneratorProvider),
+      logger: TalkerAppLogger(ref.watch(talkerProvider)),
+    );
 
 @riverpod
-Future<LoadDriveSyncStatusUseCase> loadDriveSyncStatusUseCase(Ref ref) async => LoadDriveSyncStatusUseCase(
-    await ref.watch(driveSyncRepositoryProvider.future),
-  );
-
-@riverpod
-Future<SyncGoogleDriveSnapshotUseCase> syncGoogleDriveSnapshotUseCase(
-  Ref ref,
-) async => SyncGoogleDriveSnapshotUseCase(
-    await ref.watch(driveSyncRepositoryProvider.future),
-  );
+Future<LoadDriveSyncStatusUseCase> loadDriveSyncStatusUseCase(Ref ref) async =>
+    LoadDriveSyncStatusUseCase(
+      await ref.watch(driveSyncRepositoryProvider.future),
+    );
 
 @riverpod
 Future<UploadLocalDriveSnapshotUseCase> uploadLocalDriveSnapshotUseCase(
   Ref ref,
 ) async => UploadLocalDriveSnapshotUseCase(
-    await ref.watch(driveSyncRepositoryProvider.future),
-  );
+  await ref.watch(driveSyncRepositoryProvider.future),
+);
 
 @riverpod
-Future<RestoreDriveSnapshotUseCase> restoreDriveSnapshotUseCase(Ref ref) async => RestoreDriveSnapshotUseCase(
-    await ref.watch(driveSyncRepositoryProvider.future),
-  );
-
-@riverpod
-Future<ResolveDriveSyncConflictUseCase> resolveDriveSyncConflictUseCase(
+Future<RestoreDriveSnapshotUseCase> restoreDriveSnapshotUseCase(
   Ref ref,
-) async => ResolveDriveSyncConflictUseCase(
-    await ref.watch(driveSyncRepositoryProvider.future),
-  );
+) async => RestoreDriveSnapshotUseCase(
+  await ref.watch(driveSyncRepositoryProvider.future),
+);
 
 @riverpod
 AppReloadService appReloadService(Ref ref) => createAppReloadService();
 
 @riverpod
-DriveSyncRuntimeEffects driveSyncRuntimeEffects(Ref ref) => RiverpodDriveSyncRuntimeEffects(
-    ref: ref,
-    appReloadService: ref.watch(appReloadServiceProvider),
-  );
+DriveSyncRuntimeEffects driveSyncRuntimeEffects(Ref ref) =>
+    RiverpodDriveSyncRuntimeEffects(
+      ref: ref,
+      appReloadService: ref.watch(appReloadServiceProvider),
+    );

@@ -88,33 +88,33 @@ class MxPrimaryButton extends StatelessWidget {
   }
 
   Widget _buildLabel() => LayoutBuilder(
-      builder: (context, constraints) {
-        final canShowIcons = AppLayout.showsButtonIcons(
-          hasBoundedWidth: constraints.hasBoundedWidth,
-          maxWidth: constraints.maxWidth,
-        );
-        final labelText = Text(
-          label,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-        );
-        return Row(
-          mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (leadingIcon != null && canShowIcons) ...[
-              Icon(leadingIcon, size: AppIconSizes.md),
-              const MxGap(AppSpacing.sm),
-            ],
-            Flexible(child: labelText),
-            if (trailingIcon != null && canShowIcons) ...[
-              const MxGap(AppSpacing.sm),
-              Icon(trailingIcon, size: AppIconSizes.md),
-            ],
+    builder: (context, constraints) {
+      final canShowIcons = AppLayout.showsButtonIcons(
+        hasBoundedWidth: constraints.hasBoundedWidth,
+        maxWidth: constraints.maxWidth,
+      );
+      final labelText = Text(
+        label,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      );
+      return Row(
+        mainAxisSize: fullWidth ? MainAxisSize.max : MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (leadingIcon != null && canShowIcons) ...[
+            Icon(leadingIcon, size: AppIconSizes.md),
+            const MxGap(AppSpacing.sm),
           ],
-        );
-      },
-    );
+          Flexible(child: labelText),
+          if (trailingIcon != null && canShowIcons) ...[
+            const MxGap(AppSpacing.sm),
+            Icon(trailingIcon, size: AppIconSizes.md),
+          ],
+        ],
+      );
+    },
+  );
 
   ButtonStyle? _resolvedStyle(
     BuildContext context,
@@ -122,15 +122,15 @@ class MxPrimaryButton extends StatelessWidget {
     TextTheme textTheme,
     MxColorsExtension mxColors,
   ) => _mergeButtonStyles(
+    _mergeButtonStyles(
       _mergeButtonStyles(
-        _mergeButtonStyles(
-          theme.elevatedButtonTheme.style,
-          _sizeStyle(context, size, textTheme),
-        ),
-        _toneStyle(theme, mxColors),
+        theme.elevatedButtonTheme.style,
+        _sizeStyle(context, size, textTheme),
       ),
-      _shapeStyle(),
-    );
+      _toneStyle(theme, mxColors),
+    ),
+    _shapeStyle(),
+  );
 
   ButtonStyle? _shapeStyle() {
     if (shape != MxPrimaryButtonShape.pill) return null;
@@ -144,69 +144,69 @@ class MxPrimaryButton extends StatelessWidget {
     MxButtonSize size,
     TextTheme textTheme,
   ) => switch (size) {
-      MxButtonSize.xsmall => ButtonStyle(
-        minimumSize: const WidgetStatePropertyAll(Size(0, 32)),
-        padding: WidgetStatePropertyAll(
-          EdgeInsets.symmetric(
-            horizontal: AppLayout.buttonHorizontalPadding(
-              context,
-              regular: AppSpacing.md,
-            ),
+    MxButtonSize.xsmall => ButtonStyle(
+      minimumSize: const WidgetStatePropertyAll(Size(0, 32)),
+      padding: WidgetStatePropertyAll(
+        EdgeInsets.symmetric(
+          horizontal: AppLayout.buttonHorizontalPadding(
+            context,
+            regular: AppSpacing.md,
           ),
         ),
-        textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelSmall),
       ),
-      MxButtonSize.small => ButtonStyle(
-        minimumSize: const WidgetStatePropertyAll(Size(0, 36)),
-        padding: WidgetStatePropertyAll(
-          EdgeInsets.symmetric(
-            horizontal: AppLayout.buttonHorizontalPadding(
-              context,
-              regular: AppSpacing.lg,
-            ),
+      textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelSmall),
+    ),
+    MxButtonSize.small => ButtonStyle(
+      minimumSize: const WidgetStatePropertyAll(Size(0, 36)),
+      padding: WidgetStatePropertyAll(
+        EdgeInsets.symmetric(
+          horizontal: AppLayout.buttonHorizontalPadding(
+            context,
+            regular: AppSpacing.lg,
           ),
         ),
-        textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelMedium),
       ),
-      MxButtonSize.compact => ButtonStyle(
-        minimumSize: const WidgetStatePropertyAll(Size(0, 40)),
-        padding: WidgetStatePropertyAll(
-          EdgeInsets.symmetric(
-            horizontal: AppLayout.buttonHorizontalPadding(
-              context,
-              regular: AppSpacing.lg,
-            ),
+      textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelMedium),
+    ),
+    MxButtonSize.compact => ButtonStyle(
+      minimumSize: const WidgetStatePropertyAll(Size(0, 40)),
+      padding: WidgetStatePropertyAll(
+        EdgeInsets.symmetric(
+          horizontal: AppLayout.buttonHorizontalPadding(
+            context,
+            regular: AppSpacing.lg,
           ),
         ),
-        textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelMedium),
       ),
-      MxButtonSize.medium =>
-        context.isCompactMobile
-            ? const ButtonStyle(
-                minimumSize: WidgetStatePropertyAll(Size(0, 48)),
-                padding: WidgetStatePropertyAll(
-                  EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.md,
-                  ),
+      textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelMedium),
+    ),
+    MxButtonSize.medium =>
+      context.isCompactMobile
+          ? const ButtonStyle(
+              minimumSize: WidgetStatePropertyAll(Size(0, 48)),
+              padding: WidgetStatePropertyAll(
+                EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.md,
                 ),
-              )
-            : null,
-      MxButtonSize.large => ButtonStyle(
-        minimumSize: WidgetStatePropertyAll(
-          Size(0, context.isCompactMobile ? 56 : 52),
-        ),
-        padding: WidgetStatePropertyAll(
-          EdgeInsets.symmetric(
-            horizontal: AppLayout.buttonHorizontalPadding(
-              context,
-              regular: AppSpacing.xxl,
-            ),
+              ),
+            )
+          : null,
+    MxButtonSize.large => ButtonStyle(
+      minimumSize: WidgetStatePropertyAll(
+        Size(0, context.isCompactMobile ? 56 : 52),
+      ),
+      padding: WidgetStatePropertyAll(
+        EdgeInsets.symmetric(
+          horizontal: AppLayout.buttonHorizontalPadding(
+            context,
+            regular: AppSpacing.xxl,
           ),
         ),
-        textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
       ),
-    };
+      textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+    ),
+  };
 
   ButtonStyle? _toneStyle(ThemeData theme, MxColorsExtension mxColors) {
     final scheme = theme.colorScheme;

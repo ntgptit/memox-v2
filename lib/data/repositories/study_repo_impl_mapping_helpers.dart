@@ -102,48 +102,50 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
     }).length;
   }
 
-  int _requiredModeCount(local.StudySession session) => switch (DatabaseEnumCodecs.studyFlowFromStorage(session.studyFlow)) {
-      StudyFlow.newFullCycle => 5,
-      StudyFlow.newReviewOnly ||
-      StudyFlow.newMatchOnly ||
-      StudyFlow.newGuessOnly ||
-      StudyFlow.newRecallOnly ||
-      StudyFlow.newFillOnly => 1,
-      StudyFlow.srsFillReview => 1,
-    };
+  int _requiredModeCount(local.StudySession session) =>
+      switch (DatabaseEnumCodecs.studyFlowFromStorage(session.studyFlow)) {
+        StudyFlow.newFullCycle => 5,
+        StudyFlow.newReviewOnly ||
+        StudyFlow.newMatchOnly ||
+        StudyFlow.newGuessOnly ||
+        StudyFlow.newRecallOnly ||
+        StudyFlow.newFillOnly => 1,
+        StudyFlow.srsFillReview => 1,
+      };
 
   StudySession _mapSession(local.StudySession row) => StudySession(
-      id: row.id,
-      entryType: DatabaseEnumCodecs.studyEntryTypeFromStorage(row.entryType),
-      entryRefId: row.entryRefId,
-      studyType: DatabaseEnumCodecs.studyTypeFromStorage(row.studyType),
-      studyFlow: DatabaseEnumCodecs.studyFlowFromStorage(row.studyFlow),
-      settings: StudySettingsSnapshot(
-        batchSize: row.batchSize,
-        shuffleFlashcards: row.shuffleFlashcards == 1,
-        shuffleAnswers: row.shuffleAnswers == 1,
-        prioritizeOverdue: row.prioritizeOverdue == 1,
-      ),
-      status: DatabaseEnumCodecs.sessionStatusFromStorage(row.status),
-      startedAt: row.startedAt,
-      endedAt: row.endedAt,
-      restartedFromSessionId: row.restartedFromSessionId,
-    );
+    id: row.id,
+    entryType: DatabaseEnumCodecs.studyEntryTypeFromStorage(row.entryType),
+    entryRefId: row.entryRefId,
+    studyType: DatabaseEnumCodecs.studyTypeFromStorage(row.studyType),
+    studyFlow: DatabaseEnumCodecs.studyFlowFromStorage(row.studyFlow),
+    settings: StudySettingsSnapshot(
+      batchSize: row.batchSize,
+      shuffleFlashcards: row.shuffleFlashcards == 1,
+      shuffleAnswers: row.shuffleAnswers == 1,
+      prioritizeOverdue: row.prioritizeOverdue == 1,
+    ),
+    status: DatabaseEnumCodecs.sessionStatusFromStorage(row.status),
+    startedAt: row.startedAt,
+    endedAt: row.endedAt,
+    restartedFromSessionId: row.restartedFromSessionId,
+  );
 
-  Future<StudySessionItem> _mapItem(local.StudySessionItem row) async => StudySessionItem(
-      id: row.id,
-      sessionId: row.sessionId,
-      flashcard: await _flashcardRefForItem(row),
-      studyMode: DatabaseEnumCodecs.studyModeFromStorage(row.studyMode),
-      modeOrder: row.modeOrder,
-      roundIndex: row.roundIndex,
-      queuePosition: row.queuePosition,
-      sourcePool: DatabaseEnumCodecs.sessionItemSourcePoolFromStorage(
-        row.sourcePool,
-      ),
-      status: DatabaseEnumCodecs.sessionItemStatusFromStorage(row.status),
-      completedAt: row.completedAt,
-    );
+  Future<StudySessionItem> _mapItem(local.StudySessionItem row) async =>
+      StudySessionItem(
+        id: row.id,
+        sessionId: row.sessionId,
+        flashcard: await _flashcardRefForItem(row),
+        studyMode: DatabaseEnumCodecs.studyModeFromStorage(row.studyMode),
+        modeOrder: row.modeOrder,
+        roundIndex: row.roundIndex,
+        queuePosition: row.queuePosition,
+        sourcePool: DatabaseEnumCodecs.sessionItemSourcePoolFromStorage(
+          row.sourcePool,
+        ),
+        status: DatabaseEnumCodecs.sessionItemStatusFromStorage(row.status),
+        completedAt: row.completedAt,
+      );
 
   Future<List<StudySessionItem>> _mapItems(
     List<local.StudySessionItem> rows,
@@ -176,12 +178,12 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
     QueryRow row, {
     required SessionItemSourcePool sourcePool,
   }) => StudyFlashcardRef(
-      id: row.read<String>('id'),
-      deckId: row.read<String>('deck_id'),
-      front: row.read<String>('front'),
-      back: row.read<String>('back'),
-      sourcePool: sourcePool,
-    );
+    id: row.read<String>('id'),
+    deckId: row.read<String>('deck_id'),
+    front: row.read<String>('front'),
+    back: row.read<String>('back'),
+    sourcePool: sourcePool,
+  );
 
   Future<local.StudySession> _requireSession(String sessionId) async {
     final session = await _studySessionDao.findById(sessionId);
@@ -308,16 +310,16 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
   }
 
   Duration _intervalForBox(int box) => switch (box) {
-      1 => Duration.zero,
-      2 => const Duration(days: 1),
-      3 => const Duration(days: 3),
-      4 => const Duration(days: 7),
-      5 => const Duration(days: 14),
-      6 => const Duration(days: 30),
-      7 => const Duration(days: 60),
-      8 => const Duration(days: 120),
-      _ => throw ValidationException(message: 'Unsupported SRS box: $box.'),
-    };
+    1 => Duration.zero,
+    2 => const Duration(days: 1),
+    3 => const Duration(days: 3),
+    4 => const Duration(days: 7),
+    5 => const Duration(days: 14),
+    6 => const Duration(days: 30),
+    7 => const Duration(days: 60),
+    8 => const Duration(days: 120),
+    _ => throw ValidationException(message: 'Unsupported SRS box: $box.'),
+  };
 
   String _requireEntryRef(StudyContext context) {
     final refId = context.entryRefId;
@@ -330,4 +332,5 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
   }
 }
 
-String _studyRepoPlaceholders(int count) => List<String>.filled(count, '?').join(', ');
+String _studyRepoPlaceholders(int count) =>
+    List<String>.filled(count, '?').join(', ');

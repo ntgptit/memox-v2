@@ -19,97 +19,103 @@ abstract final class ButtonThemeBuilder {
     vertical: AppSpacing.sm,
   );
 
-  static ElevatedButtonThemeData filled(ColorScheme scheme) => ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: scheme.primary,
-        foregroundColor: scheme.onPrimary,
-        disabledBackgroundColor: scheme.onSurface.withValues(
-          alpha: AppOpacity.disabledSurface,
-        ),
-        disabledForegroundColor: scheme.onSurface.withValues(
-          alpha: AppOpacity.disabled,
-        ),
-        elevation: AppElevation.button,
-        shadowColor: scheme.shadow,
-        minimumSize: const Size(0, _minHeight),
-        padding: _padding,
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
-        textStyle: AppTypography.labelLarge,
-        animationDuration: const Duration(milliseconds: 150),
-        side: BorderSide.none,
-      ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onPrimary)),
-    );
-
-  static FilledButtonThemeData tonal(ColorScheme scheme) => FilledButtonThemeData(
-      style:
-          FilledButton.styleFrom(
-            backgroundColor: scheme.primaryContainer,
-            foregroundColor: scheme.onPrimaryContainer,
-            disabledBackgroundColor: scheme.onSurface.withValues(
-              alpha: AppOpacity.disabledSurface,
-            ),
-            disabledForegroundColor: scheme.onSurface.withValues(
-              alpha: AppOpacity.disabled,
-            ),
-            minimumSize: const Size(0, _minHeight),
-            padding: _padding,
-            shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
-            textStyle: AppTypography.labelLarge,
-            side: BorderSide.none,
-          ).copyWith(
-            overlayColor: AppFocus.overlayProperty(scheme.onPrimaryContainer),
+  static ElevatedButtonThemeData filled(ColorScheme scheme) =>
+      ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          disabledBackgroundColor: scheme.onSurface.withValues(
+            alpha: AppOpacity.disabledSurface,
           ),
-    );
+          disabledForegroundColor: scheme.onSurface.withValues(
+            alpha: AppOpacity.disabled,
+          ),
+          elevation: AppElevation.button,
+          shadowColor: scheme.shadow,
+          minimumSize: const Size(0, _minHeight),
+          padding: _padding,
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
+          textStyle: AppTypography.labelLarge,
+          animationDuration: const Duration(milliseconds: 150),
+          side: BorderSide.none,
+        ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onPrimary)),
+      );
 
-  static OutlinedButtonThemeData outlined(ColorScheme scheme) => OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: scheme.primary,
-        disabledForegroundColor: scheme.onSurface.withValues(
-          alpha: AppOpacity.disabled,
-        ),
-        minimumSize: const Size(0, _minHeight),
-        padding: _padding,
-        side: BorderSide(color: scheme.outline),
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
-        textStyle: AppTypography.labelLarge,
-      ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.primary)),
-    );
+  static FilledButtonThemeData tonal(ColorScheme scheme) =>
+      FilledButtonThemeData(
+        style:
+            FilledButton.styleFrom(
+              backgroundColor: scheme.primaryContainer,
+              foregroundColor: scheme.onPrimaryContainer,
+              disabledBackgroundColor: scheme.onSurface.withValues(
+                alpha: AppOpacity.disabledSurface,
+              ),
+              disabledForegroundColor: scheme.onSurface.withValues(
+                alpha: AppOpacity.disabled,
+              ),
+              minimumSize: const Size(0, _minHeight),
+              padding: _padding,
+              shape: const RoundedRectangleBorder(
+                borderRadius: AppRadius.button,
+              ),
+              textStyle: AppTypography.labelLarge,
+              side: BorderSide.none,
+            ).copyWith(
+              overlayColor: AppFocus.overlayProperty(scheme.onPrimaryContainer),
+            ),
+      );
+
+  static OutlinedButtonThemeData outlined(ColorScheme scheme) =>
+      OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.primary,
+          disabledForegroundColor: scheme.onSurface.withValues(
+            alpha: AppOpacity.disabled,
+          ),
+          minimumSize: const Size(0, _minHeight),
+          padding: _padding,
+          side: BorderSide(color: scheme.outline),
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
+          textStyle: AppTypography.labelLarge,
+        ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.primary)),
+      );
 
   static TextButtonThemeData text(ColorScheme scheme) => TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: scheme.primary,
-        disabledForegroundColor: scheme.onSurface.withValues(
-          alpha: AppOpacity.disabled,
-        ),
-        minimumSize: const Size(0, _minHeight),
-        padding: _textPadding,
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
-        textStyle: AppTypography.labelLarge,
-        side: BorderSide.none,
-      ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.primary)),
-    );
+    style: TextButton.styleFrom(
+      foregroundColor: scheme.primary,
+      disabledForegroundColor: scheme.onSurface.withValues(
+        alpha: AppOpacity.disabled,
+      ),
+      minimumSize: const Size(0, _minHeight),
+      padding: _textPadding,
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
+      textStyle: AppTypography.labelLarge,
+      side: BorderSide.none,
+    ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.primary)),
+  );
 
   static IconButtonThemeData icon(ColorScheme scheme) => IconButtonThemeData(
-      style: IconButton.styleFrom(
-        foregroundColor: scheme.onSurfaceVariant,
-        disabledForegroundColor: scheme.onSurface.withValues(
-          alpha: AppOpacity.disabled,
-        ),
-        minimumSize: const Size.square(_minHeight),
-        fixedSize: const Size.square(_minHeight),
-        iconSize: AppIconSizes.md,
-        backgroundColor: scheme.surfaceContainerLow,
-        shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
-      ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onSurface)),
-    );
+    style: IconButton.styleFrom(
+      foregroundColor: scheme.onSurfaceVariant,
+      disabledForegroundColor: scheme.onSurface.withValues(
+        alpha: AppOpacity.disabled,
+      ),
+      minimumSize: const Size.square(_minHeight),
+      fixedSize: const Size.square(_minHeight),
+      iconSize: AppIconSizes.md,
+      backgroundColor: scheme.surfaceContainerLow,
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
+    ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onSurface)),
+  );
 
-  static FloatingActionButtonThemeData fab(ColorScheme scheme) => FloatingActionButtonThemeData(
-      backgroundColor: scheme.primaryContainer,
-      foregroundColor: scheme.onPrimaryContainer,
-      elevation: AppElevation.fab,
-      focusElevation: AppElevation.fabFocus,
-      hoverElevation: AppElevation.fabHover,
-      highlightElevation: AppElevation.fabPressed,
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.cardLarge),
-    );
+  static FloatingActionButtonThemeData fab(ColorScheme scheme) =>
+      FloatingActionButtonThemeData(
+        backgroundColor: scheme.primaryContainer,
+        foregroundColor: scheme.onPrimaryContainer,
+        elevation: AppElevation.fab,
+        focusElevation: AppElevation.fabFocus,
+        hoverElevation: AppElevation.fabHover,
+        highlightElevation: AppElevation.fabPressed,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.cardLarge),
+      );
 }

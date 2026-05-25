@@ -26,21 +26,21 @@ class DashboardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-      key: const ValueKey('dashboard_skeleton'),
-      children: const [
-        _GreetingSkeleton(),
-        MxGap(MxSpace.lg),
-        _HeadingSkeleton(),
-        MxGap(MxSpace.lg),
-        _ActionRowSkeleton(),
-        MxGap(MxSpace.md),
-        _ActionRowSkeleton(),
-        MxGap(MxSpace.md),
-        _ActionRowSkeleton(),
-        MxGap(MxSpace.lg),
-        _ProgressSkeleton(),
-      ],
-    );
+    key: const ValueKey('dashboard_skeleton'),
+    children: const [
+      _GreetingSkeleton(),
+      MxGap(MxSpace.lg),
+      _HeadingSkeleton(),
+      MxGap(MxSpace.lg),
+      _ActionRowSkeleton(),
+      MxGap(MxSpace.md),
+      _ActionRowSkeleton(),
+      MxGap(MxSpace.md),
+      _ActionRowSkeleton(),
+      MxGap(MxSpace.lg),
+      _ProgressSkeleton(),
+    ],
+  );
 }
 
 class _GreetingSkeleton extends StatelessWidget {
@@ -48,19 +48,19 @@ class _GreetingSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxSkeleton(
-          height: _dashboardGreetingHeight,
-          width: _dashboardGreetingWidth,
-        ),
-        MxGap(MxSpace.xs),
-        MxSkeleton(
-          height: _dashboardActionBodyHeight,
-          width: _dashboardProgressBodyWidth,
-        ),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxSkeleton(
+        height: _dashboardGreetingHeight,
+        width: _dashboardGreetingWidth,
+      ),
+      MxGap(MxSpace.xs),
+      MxSkeleton(
+        height: _dashboardActionBodyHeight,
+        width: _dashboardProgressBodyWidth,
+      ),
+    ],
+  );
 }
 
 class _HeadingSkeleton extends StatelessWidget {
@@ -68,9 +68,9 @@ class _HeadingSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const MxSkeleton(
-      height: _dashboardHeadingHeight,
-      width: _dashboardHeadingWidth,
-    );
+    height: _dashboardHeadingHeight,
+    width: _dashboardHeadingWidth,
+  );
 }
 
 class _ActionRowSkeleton extends StatelessWidget {
@@ -78,37 +78,37 @@ class _ActionRowSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            MxSkeleton(
-              height: _dashboardActionTitleHeight,
-              width: _dashboardActionTitleHeight,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          MxSkeleton(
+            height: _dashboardActionTitleHeight,
+            width: _dashboardActionTitleHeight,
+          ),
+          MxGap(MxSpace.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MxSkeleton(
+                  height: _dashboardActionTitleHeight,
+                  width: _dashboardActionTitleWidth,
+                ),
+                MxGap(MxSpace.xs),
+                MxSkeleton(
+                  height: _dashboardActionBodyHeight,
+                  width: _dashboardActionBodyWidth,
+                ),
+              ],
             ),
-            MxGap(MxSpace.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MxSkeleton(
-                    height: _dashboardActionTitleHeight,
-                    width: _dashboardActionTitleWidth,
-                  ),
-                  MxGap(MxSpace.xs),
-                  MxSkeleton(
-                    height: _dashboardActionBodyHeight,
-                    width: _dashboardActionBodyWidth,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        MxGap(MxSpace.sm),
-        MxSkeleton(height: _dashboardActionButtonHeight),
-      ],
-    );
+          ),
+        ],
+      ),
+      MxGap(MxSpace.sm),
+      MxSkeleton(height: _dashboardActionButtonHeight),
+    ],
+  );
 }
 
 class _ProgressSkeleton extends StatelessWidget {
@@ -116,49 +116,49 @@ class _ProgressSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        MxSkeleton(
-          height: _dashboardProgressChartSize,
-          width: _dashboardProgressChartSize,
-          borderRadius: AppRadius.borderFull,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      MxSkeleton(
+        height: _dashboardProgressChartSize,
+        width: _dashboardProgressChartSize,
+        borderRadius: AppRadius.borderFull,
+      ),
+      MxGap(MxSpace.xl),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                MxSkeleton(
+                  height: _dashboardActionTitleHeight,
+                  width: _dashboardActionTitleHeight,
+                ),
+                MxGap(MxSpace.md),
+                MxSkeleton(
+                  height: _dashboardProgressTitleHeight,
+                  width: _dashboardProgressTitleWidth,
+                ),
+              ],
+            ),
+            MxGap(MxSpace.xs),
+            MxSkeleton(
+              height: _dashboardProgressBodyHeight,
+              width: _dashboardProgressBodyWidth,
+            ),
+            MxGap(MxSpace.xs),
+            MxSkeleton(
+              height: _dashboardDeckMetaHeight,
+              width: _dashboardProgressBodyWidth,
+            ),
+            MxGap(MxSpace.md),
+            MxSkeleton(
+              height: _dashboardActionBodyHeight,
+              width: _dashboardActionTitleWidth,
+            ),
+          ],
         ),
-        MxGap(MxSpace.xl),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  MxSkeleton(
-                    height: _dashboardActionTitleHeight,
-                    width: _dashboardActionTitleHeight,
-                  ),
-                  MxGap(MxSpace.md),
-                  MxSkeleton(
-                    height: _dashboardProgressTitleHeight,
-                    width: _dashboardProgressTitleWidth,
-                  ),
-                ],
-              ),
-              MxGap(MxSpace.xs),
-              MxSkeleton(
-                height: _dashboardProgressBodyHeight,
-                width: _dashboardProgressBodyWidth,
-              ),
-              MxGap(MxSpace.xs),
-              MxSkeleton(
-                height: _dashboardDeckMetaHeight,
-                width: _dashboardProgressBodyWidth,
-              ),
-              MxGap(MxSpace.md),
-              MxSkeleton(
-                height: _dashboardActionBodyHeight,
-                width: _dashboardActionTitleWidth,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+      ),
+    ],
+  );
 }

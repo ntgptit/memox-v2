@@ -630,15 +630,15 @@ GoogleAccountAuthSession _session({
   required Set<String> grantedScopes,
   required DriveAuthorizationState driveAuthorizationState,
 }) => GoogleAccountAuthSession(
-    profile: const GoogleAccountProfile(
-      subjectId: 'google-user-001',
-      email: 'user@example.com',
-      displayName: 'MemoX User',
-      photoUrl: null,
-    ),
-    grantedScopes: grantedScopes,
-    driveAuthorizationState: driveAuthorizationState,
-  );
+  profile: const GoogleAccountProfile(
+    subjectId: 'google-user-001',
+    email: 'user@example.com',
+    displayName: 'MemoX User',
+    photoUrl: null,
+  ),
+  grantedScopes: grantedScopes,
+  driveAuthorizationState: driveAuthorizationState,
+);
 
 final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   _FakeGoogleAccountAuthService({
@@ -767,25 +767,14 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   }
 
   @override
-  Future<DriveSyncRunResult> resolveConflict(
-    DriveSyncConflict conflict,
-    DriveSyncConflictChoice choice,
-  ) async => const DriveSyncRunResult.canceled(
-      DriveSyncStatus.needsDriveAuthorization(),
-    );
+  Future<DriveSyncRunResult> uploadLocalSnapshot() async =>
+      const DriveSyncRunResult.noChanges(
+        DriveSyncStatus.needsDriveAuthorization(),
+      );
 
   @override
-  Future<DriveSyncRunResult> syncNow() async => const DriveSyncRunResult.noChanges(
-      DriveSyncStatus.needsDriveAuthorization(),
-    );
-
-  @override
-  Future<DriveSyncRunResult> uploadLocalSnapshot() async => const DriveSyncRunResult.noChanges(
-      DriveSyncStatus.needsDriveAuthorization(),
-    );
-
-  @override
-  Future<DriveSyncRunResult> restoreDriveSnapshot() async => const DriveSyncRunResult.noChanges(
-      DriveSyncStatus.needsDriveAuthorization(),
-    );
+  Future<DriveSyncRunResult> restoreDriveSnapshot() async =>
+      const DriveSyncRunResult.noChanges(
+        DriveSyncStatus.needsDriveAuthorization(),
+      );
 }

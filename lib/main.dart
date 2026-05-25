@@ -106,10 +106,7 @@ class MemoxApp extends ConsumerWidget {
         );
         final listTileTheme = isCompactMobile
             ? theme.listTileTheme.copyWith(
-                visualDensity: const VisualDensity(
-                  horizontal: 0,
-                  vertical: -1,
-                ),
+                visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
                 minVerticalPadding: AppSpacing.xs,
               )
             : theme.listTileTheme;

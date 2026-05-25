@@ -15,15 +15,15 @@ void main() {
           home: Scaffold(
             body: Builder(
               builder: (context) => TextButton(
-                  onPressed: () {
-                    MxDialog.show<void>(
-                      context: context,
-                      title: 'Create folder',
-                      child: const Text('Dialog body'),
-                    );
-                  },
-                  child: const Text('Open dialog'),
-                ),
+                onPressed: () {
+                  MxDialog.show<void>(
+                    context: context,
+                    title: 'Create folder',
+                    child: const Text('Dialog body'),
+                  );
+                },
+                child: const Text('Open dialog'),
+              ),
             ),
           ),
         ),
@@ -54,16 +54,16 @@ void main() {
           home: Scaffold(
             body: Builder(
               builder: (context) => TextButton(
-                  onPressed: () {
-                    MxDialog.show<void>(
-                      context: context,
-                      title: 'Delete folder',
-                      icon: Icons.delete_outline,
-                      child: const Text('Dialog body'),
-                    );
-                  },
-                  child: const Text('Open dialog'),
-                ),
+                onPressed: () {
+                  MxDialog.show<void>(
+                    context: context,
+                    title: 'Delete folder',
+                    icon: Icons.delete_outline,
+                    child: const Text('Dialog body'),
+                  );
+                },
+                child: const Text('Open dialog'),
+              ),
             ),
           ),
         ),

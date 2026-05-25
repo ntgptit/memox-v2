@@ -52,7 +52,9 @@ class MxStudyTopBar extends StatelessWidget {
       MxStudyTopBarAccent.primary => scheme.primary,
       MxStudyTopBarAccent.mastery => context.mxColors.mastery,
     };
-    final accentFill = accentColor.withValues(alpha: _studyTopBarBadgeFillAlpha);
+    final accentFill = accentColor.withValues(
+      alpha: _studyTopBarBadgeFillAlpha,
+    );
     final trackColor = scheme.surfaceContainer;
 
     return Padding(
@@ -110,23 +112,23 @@ class _MxStudyModeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: _studyTopBarBadgeRadius,
-        border: Border.all(
-          color: accentColor.withValues(alpha: AppOpacity.ghostBorder),
-        ),
+    decoration: BoxDecoration(
+      color: background,
+      borderRadius: _studyTopBarBadgeRadius,
+      border: Border.all(
+        color: accentColor.withValues(alpha: AppOpacity.ghostBorder),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xxs,
-        ),
-        child: MxText(
-          StringUtils.uppercased(label),
-          role: MxTextRole.overline,
-          color: accentColor,
-        ),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xxs,
       ),
-    );
+      child: MxText(
+        StringUtils.uppercased(label),
+        role: MxTextRole.overline,
+        color: accentColor,
+      ),
+    ),
+  );
 }

@@ -137,13 +137,13 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeInCubic,
                   transitionBuilder: (child, animation) => FadeTransition(
-                      opacity: animation,
-                      child: SizeTransition(
-                        sizeFactor: animation,
-                        axisAlignment: -1,
-                        child: child,
-                      ),
+                    opacity: animation,
+                    child: SizeTransition(
+                      sizeFactor: animation,
+                      axisAlignment: -1,
+                      child: child,
                     ),
+                  ),
                   child: _RecallActionArea(
                     answerState: _answerState,
                     timer: _timerController,
@@ -220,7 +220,8 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
     });
   }
 
-  List<StudySessionItem> get _roundItems => pendingModeRoundItems(widget.snapshot);
+  List<StudySessionItem> get _roundItems =>
+      pendingModeRoundItems(widget.snapshot);
 
   StudySessionItem? get _currentItem {
     final items = _roundItems;
@@ -265,24 +266,24 @@ class _RecallActionArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => switch (answerState) {
-      _RecallAnswerState.hidden => _RecallTimerAction(
-        key: const ValueKey<String>('recall-hidden-action'),
-        timer: timer,
-        isSubmitting: isSubmitting,
-        onPressed: onShowAnswer,
-      ),
-      _RecallAnswerState.revealed => _RecallRevealedActions(
-        key: const ValueKey<String>('recall-revealed-actions'),
-        isSubmitting: isSubmitting,
-        onForgot: onForgot,
-        onRemembered: onRemembered,
-      ),
-      _RecallAnswerState.timedOut => _RecallTimedOutAction(
-        key: const ValueKey<String>('recall-timeout-action'),
-        isSubmitting: isSubmitting,
-        onNext: onNextAfterTimeout,
-      ),
-    };
+    _RecallAnswerState.hidden => _RecallTimerAction(
+      key: const ValueKey<String>('recall-hidden-action'),
+      timer: timer,
+      isSubmitting: isSubmitting,
+      onPressed: onShowAnswer,
+    ),
+    _RecallAnswerState.revealed => _RecallRevealedActions(
+      key: const ValueKey<String>('recall-revealed-actions'),
+      isSubmitting: isSubmitting,
+      onForgot: onForgot,
+      onRemembered: onRemembered,
+    ),
+    _RecallAnswerState.timedOut => _RecallTimedOutAction(
+      key: const ValueKey<String>('recall-timeout-action'),
+      isSubmitting: isSubmitting,
+      onNext: onNextAfterTimeout,
+    ),
+  };
 }
 
 class _RecallTimerAction extends StatelessWidget {
@@ -377,41 +378,41 @@ class _RecallAnswerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MxCard(
-      key: const ValueKey<String>('recall-answer-card'),
-      variant: MxCardVariant.outlined,
-      padding: const EdgeInsets.all(MxSpace.sm),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: AnimatedSwitcher(
-              duration: recallRevealTransitionDuration,
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              child: isRevealed
-                  ? KeyedSubtree(
-                      key: ValueKey<String>(
-                        'recall-answer-revealed-switch-$answer',
-                      ),
-                      child: _RecallAnswerContent(
-                        key: const ValueKey<String>('recall-answer-revealed'),
-                        answer: answer,
-                      ),
-                    )
-                  : KeyedSubtree(
-                      key: ValueKey<String>(
-                        'recall-answer-hidden-switch-$answer',
-                      ),
-                      child: ImageFiltered(
-                        key: const ValueKey<String>('recall-answer-hidden'),
-                        imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                        child: _RecallAnswerContent(answer: answer),
-                      ),
+    key: const ValueKey<String>('recall-answer-card'),
+    variant: MxCardVariant.outlined,
+    padding: const EdgeInsets.all(MxSpace.sm),
+    child: Stack(
+      children: [
+        Positioned.fill(
+          child: AnimatedSwitcher(
+            duration: recallRevealTransitionDuration,
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            child: isRevealed
+                ? KeyedSubtree(
+                    key: ValueKey<String>(
+                      'recall-answer-revealed-switch-$answer',
                     ),
-            ),
+                    child: _RecallAnswerContent(
+                      key: const ValueKey<String>('recall-answer-revealed'),
+                      answer: answer,
+                    ),
+                  )
+                : KeyedSubtree(
+                    key: ValueKey<String>(
+                      'recall-answer-hidden-switch-$answer',
+                    ),
+                    child: ImageFiltered(
+                      key: const ValueKey<String>('recall-answer-hidden'),
+                      imageFilter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      child: _RecallAnswerContent(answer: answer),
+                    ),
+                  ),
           ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
 }
 
 class _RecallAnswerContent extends StatelessWidget {
@@ -421,15 +422,15 @@ class _RecallAnswerContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-      child: SingleChildScrollView(
-        child: MxText(
-          answer,
-          role: MxTextRole.recallBack,
-          textAlign: TextAlign.center,
-          softWrap: true,
-        ),
+    child: SingleChildScrollView(
+      child: MxText(
+        answer,
+        role: MxTextRole.recallBack,
+        textAlign: TextAlign.center,
+        softWrap: true,
       ),
-    );
+    ),
+  );
 }
 
 class _RecallRevealedActions extends StatelessWidget {

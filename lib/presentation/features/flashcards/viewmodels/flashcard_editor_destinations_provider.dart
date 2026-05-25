@@ -11,4 +11,5 @@ part 'flashcard_editor_destinations_provider.g.dart';
 /// reads from this provider and selecting a row updates the editor draft via
 /// `FlashcardEditorDraft.setDestinationDeck`.
 @riverpod
-Future<List<DeckMoveTarget>> flashcardEditorDestinations(Ref ref) => ref.read(listDeckDestinationsUseCaseProvider).execute();
+Future<List<DeckMoveTarget>> flashcardEditorDestinations(Ref ref) =>
+    ref.read(listDeckDestinationsUseCaseProvider).execute();

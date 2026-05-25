@@ -87,9 +87,7 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
     final cards = _reviewCards;
     final totalCards = cards.length;
     final currentOneBased = totalCards == 0 ? 0 : _pageIndex + 1;
-    final progressValue = totalCards <= 1
-        ? 1.0
-        : currentOneBased / totalCards;
+    final progressValue = totalCards <= 1 ? 1.0 : currentOneBased / totalCards;
 
     return StudyModeSessionScaffold(
       modeLabel: l10n.studyModeReview,
@@ -115,7 +113,8 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
                       scrollDirection: Axis.horizontal,
                       itemCount: cards.length,
                       onPageChanged: _handlePageChanged,
-                      itemBuilder: (context, index) => _ReviewSplitCard(card: cards[index]),
+                      itemBuilder: (context, index) =>
+                          _ReviewSplitCard(card: cards[index]),
                     ),
                   ),
                   if (cards.isNotEmpty)
@@ -211,10 +210,11 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
   bool _shouldResetPages(
     StudySessionSnapshot oldSnapshot,
     StudySessionSnapshot newSnapshot,
-  ) => oldSnapshot.session.id != newSnapshot.session.id ||
-        oldSnapshot.currentItem?.id != newSnapshot.currentItem?.id ||
-        oldSnapshot.sessionFlashcards.length !=
-            newSnapshot.sessionFlashcards.length;
+  ) =>
+      oldSnapshot.session.id != newSnapshot.session.id ||
+      oldSnapshot.currentItem?.id != newSnapshot.currentItem?.id ||
+      oldSnapshot.sessionFlashcards.length !=
+          newSnapshot.sessionFlashcards.length;
 
   void _handlePageChanged(int index) {
     setState(() {
@@ -311,42 +311,39 @@ class _ReviewSplitFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Stack(
-      children: [
+    children: [
+      Align(
+        alignment: Alignment.topLeft,
+        child: MxText(overline, role: MxTextRole.overline),
+      ),
+      if (editTooltip != null)
         Align(
-          alignment: Alignment.topLeft,
-          child: MxText(overline, role: MxTextRole.overline),
+          alignment: Alignment.topRight,
+          child: MxIconButton(
+            tooltip: editTooltip,
+            icon: Icons.mode_edit_outline,
+            onPressed: null,
+          ),
         ),
-        if (editTooltip != null)
-          Align(
-            alignment: Alignment.topRight,
-            child: MxIconButton(
-              tooltip: editTooltip,
-              icon: Icons.mode_edit_outline,
-              onPressed: null,
-            ),
-          ),
-        if (trailing != null)
-          Align(
-            alignment: Alignment.bottomRight,
-            child: trailing,
-          ),
-        Positioned.fill(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: MxSpace.lg),
-            child: Center(
-              child: SingleChildScrollView(
-                child: MxText(
-                  text,
-                  role: role,
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                ),
+      if (trailing != null)
+        Align(alignment: Alignment.bottomRight, child: trailing),
+      Positioned.fill(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: MxSpace.lg),
+          child: Center(
+            child: SingleChildScrollView(
+              child: MxText(
+                text,
+                role: role,
+                textAlign: TextAlign.center,
+                softWrap: true,
               ),
             ),
           ),
         ),
-      ],
-    );
+      ),
+    ],
+  );
 }
 
 class _ReviewBottomBar extends StatelessWidget {
@@ -370,10 +367,7 @@ class _ReviewBottomBar extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.chevron_right_rounded,
-                color: scheme.onSurfaceVariant,
-              ),
+              Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
               const MxGap(MxSpace.xs),
               Flexible(
                 child: MxText(

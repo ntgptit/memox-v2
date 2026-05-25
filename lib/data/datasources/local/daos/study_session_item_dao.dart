@@ -13,71 +13,79 @@ final class StudySessionItemDao {
     });
   }
 
-  Future<StudySessionItem?> findCurrentPending(String sessionId) => (_database.select(_database.studySessionItems)
-          ..where(
-            (table) =>
-                table.sessionId.equals(sessionId) &
-                table.status.equals('pending'),
-          )
-          ..orderBy([
-            (table) => OrderingTerm.asc(table.modeOrder),
-            (table) => OrderingTerm.asc(table.roundIndex),
-            (table) => OrderingTerm.asc(table.queuePosition),
-          ])
-          ..limit(1))
-        .getSingleOrNull();
+  Future<StudySessionItem?> findCurrentPending(String sessionId) =>
+      (_database.select(_database.studySessionItems)
+            ..where(
+              (table) =>
+                  table.sessionId.equals(sessionId) &
+                  table.status.equals('pending'),
+            )
+            ..orderBy([
+              (table) => OrderingTerm.asc(table.modeOrder),
+              (table) => OrderingTerm.asc(table.roundIndex),
+              (table) => OrderingTerm.asc(table.queuePosition),
+            ])
+            ..limit(1))
+          .getSingleOrNull();
 
-  Future<List<StudySessionItem>> listItems(String sessionId) => (_database.select(_database.studySessionItems)
-          ..where((table) => table.sessionId.equals(sessionId))
-          ..orderBy([
-            (table) => OrderingTerm.asc(table.modeOrder),
-            (table) => OrderingTerm.asc(table.roundIndex),
-            (table) => OrderingTerm.asc(table.queuePosition),
-          ]))
-        .get();
+  Future<List<StudySessionItem>> listItems(String sessionId) =>
+      (_database.select(_database.studySessionItems)
+            ..where((table) => table.sessionId.equals(sessionId))
+            ..orderBy([
+              (table) => OrderingTerm.asc(table.modeOrder),
+              (table) => OrderingTerm.asc(table.roundIndex),
+              (table) => OrderingTerm.asc(table.queuePosition),
+            ]))
+          .get();
 
   Future<List<StudySessionItem>> listModeRoundItems({
     required String sessionId,
     required int modeOrder,
     required int roundIndex,
-  }) => (_database.select(_database.studySessionItems)
-          ..where(
-            (table) =>
-                table.sessionId.equals(sessionId) &
-                table.modeOrder.equals(modeOrder) &
-                table.roundIndex.equals(roundIndex),
-          )
-          ..orderBy([(table) => OrderingTerm.asc(table.queuePosition)]))
-        .get();
+  }) =>
+      (_database.select(_database.studySessionItems)
+            ..where(
+              (table) =>
+                  table.sessionId.equals(sessionId) &
+                  table.modeOrder.equals(modeOrder) &
+                  table.roundIndex.equals(roundIndex),
+            )
+            ..orderBy([(table) => OrderingTerm.asc(table.queuePosition)]))
+          .get();
 
-  Future<List<StudySessionItem>> listOriginalBatchItems(String sessionId) => (_database.select(_database.studySessionItems)
-          ..where(
-            (table) =>
-                table.sessionId.equals(sessionId) &
-                table.modeOrder.equals(1) &
-                table.roundIndex.equals(1),
-          )
-          ..orderBy([(table) => OrderingTerm.asc(table.queuePosition)]))
-        .get();
+  Future<List<StudySessionItem>> listOriginalBatchItems(String sessionId) =>
+      (_database.select(_database.studySessionItems)
+            ..where(
+              (table) =>
+                  table.sessionId.equals(sessionId) &
+                  table.modeOrder.equals(1) &
+                  table.roundIndex.equals(1),
+            )
+            ..orderBy([(table) => OrderingTerm.asc(table.queuePosition)]))
+          .get();
 
   Future<void> completeItem({
     required String itemId,
     required int completedAt,
-  }) => (_database.update(
-      _database.studySessionItems,
-    )..where((table) => table.id.equals(itemId))).write(
-      StudySessionItemsCompanion(
-        status: const Value('completed'),
-        completedAt: Value(completedAt),
-      ),
-    );
+  }) =>
+      (_database.update(
+        _database.studySessionItems,
+      )..where((table) => table.id.equals(itemId))).write(
+        StudySessionItemsCompanion(
+          status: const Value('completed'),
+          completedAt: Value(completedAt),
+        ),
+      );
 
   Future<void> requeuePendingItem({
     required String itemId,
     required int queuePosition,
-  }) => (_database.update(_database.studySessionItems)
-          ..where((table) => table.id.equals(itemId)))
-        .write(StudySessionItemsCompanion(queuePosition: Value(queuePosition)));
+  }) =>
+      (_database.update(
+        _database.studySessionItems,
+      )..where((table) => table.id.equals(itemId))).write(
+        StudySessionItemsCompanion(queuePosition: Value(queuePosition)),
+      );
 
   Future<int> maxQueuePosition({
     required String sessionId,
@@ -114,10 +122,11 @@ final class StudySessionItemDao {
     return (row.read(_database.studySessionItems.id.count()) ?? 0) > 0;
   }
 
-  Future<void> abandonPending(String sessionId) => (_database.update(_database.studySessionItems)..where(
-          (table) =>
-              table.sessionId.equals(sessionId) &
-              table.status.equals('pending'),
-        ))
-        .write(const StudySessionItemsCompanion(status: Value('abandoned')));
+  Future<void> abandonPending(String sessionId) =>
+      (_database.update(_database.studySessionItems)..where(
+            (table) =>
+                table.sessionId.equals(sessionId) &
+                table.status.equals('pending'),
+          ))
+          .write(const StudySessionItemsCompanion(status: Value('abandoned')));
 }

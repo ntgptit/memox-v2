@@ -300,23 +300,23 @@ void main() {
           home: Scaffold(
             body: Builder(
               builder: (context) => TextButton(
-                  onPressed: () {
-                    MxDialog.show<void>(
-                      context: context,
-                      title: 'Create folder',
-                      child: const Text('Dialog body'),
-                      actions: [
-                        Builder(
-                          builder: (dialogContext) => TextButton(
-                            onPressed: () => Navigator.of(dialogContext).pop(),
-                            child: const Text('Cancel'),
-                          ),
+                onPressed: () {
+                  MxDialog.show<void>(
+                    context: context,
+                    title: 'Create folder',
+                    child: const Text('Dialog body'),
+                    actions: [
+                      Builder(
+                        builder: (dialogContext) => TextButton(
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                          child: const Text('Cancel'),
                         ),
-                      ],
-                    );
-                  },
-                  child: const Text('Open dialog'),
-                ),
+                      ),
+                    ],
+                  );
+                },
+                child: const Text('Open dialog'),
+              ),
             ),
           ),
         ),
@@ -412,8 +412,8 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: child,
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: child,
+  );
 }

@@ -16,16 +16,16 @@ final class FlashcardImportSupport {
     ImportStructuredTextSeparator structuredTextSeparator =
         ImportStructuredTextSeparator.auto,
   }) => switch (format) {
-      ImportSourceFormat.csv => _parseCsv(rawContent),
-      ImportSourceFormat.excel => FlashcardExcelImportParser.parse(
-        sourceBytes,
-        hasHeader: excelHasHeader,
-      ),
-      ImportSourceFormat.structuredText => _parseStructuredText(
-        rawContent,
-        structuredTextSeparator,
-      ),
-    };
+    ImportSourceFormat.csv => _parseCsv(rawContent),
+    ImportSourceFormat.excel => FlashcardExcelImportParser.parse(
+      sourceBytes,
+      hasHeader: excelHasHeader,
+    ),
+    ImportSourceFormat.structuredText => _parseStructuredText(
+      rawContent,
+      structuredTextSeparator,
+    ),
+  };
 
   static FlashcardImportPreparation _parseCsv(String rawContent) {
     final lines = rawContent
@@ -293,17 +293,17 @@ final class FlashcardImportSupport {
     ImportStructuredTextSeparator separator, {
     required bool clearOnly,
   }) => switch (separator) {
-      ImportStructuredTextSeparator.auto => null,
-      ImportStructuredTextSeparator.tab => _firstIndex(line, '\t'),
-      ImportStructuredTextSeparator.colon =>
-        clearOnly ? _clearColonIndex(line) : _firstIndex(line, ':'),
-      ImportStructuredTextSeparator.slash =>
-        clearOnly ? _spacedTokenIndex(line, '/') : _firstIndex(line, '/'),
-      ImportStructuredTextSeparator.semicolon =>
-        clearOnly ? _spacedTokenIndex(line, ';') : _firstIndex(line, ';'),
-      ImportStructuredTextSeparator.pipe =>
-        clearOnly ? _spacedTokenIndex(line, '|') : _firstIndex(line, '|'),
-    };
+    ImportStructuredTextSeparator.auto => null,
+    ImportStructuredTextSeparator.tab => _firstIndex(line, '\t'),
+    ImportStructuredTextSeparator.colon =>
+      clearOnly ? _clearColonIndex(line) : _firstIndex(line, ':'),
+    ImportStructuredTextSeparator.slash =>
+      clearOnly ? _spacedTokenIndex(line, '/') : _firstIndex(line, '/'),
+    ImportStructuredTextSeparator.semicolon =>
+      clearOnly ? _spacedTokenIndex(line, ';') : _firstIndex(line, ';'),
+    ImportStructuredTextSeparator.pipe =>
+      clearOnly ? _spacedTokenIndex(line, '|') : _firstIndex(line, '|'),
+  };
 
   static int? _firstIndex(String line, String token) {
     final index = line.indexOf(token);

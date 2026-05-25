@@ -116,8 +116,7 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     final totalBoards = totalPairs == 0
         ? 1
         : ((totalPairs + matchVisiblePairLimit - 1) ~/ matchVisiblePairLimit);
-    final boardNumber =
-        (_visibleBatchStartIndex ~/ matchVisiblePairLimit) + 1;
+    final boardNumber = (_visibleBatchStartIndex ~/ matchVisiblePairLimit) + 1;
     final mistakes = _failedItemIds.length;
 
     return StudyModeSessionScaffold(
@@ -172,9 +171,9 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
   }
 
   double get _localCorrectMatchCount => _matchedItemIds
-        .where((itemId) => !_failedItemIds.contains(itemId))
-        .length
-        .toDouble();
+      .where((itemId) => !_failedItemIds.contains(itemId))
+      .length
+      .toDouble();
 
   List<StudySessionItem> _rightItems(List<StudySessionItem> roundItems) {
     final itemById = <String, StudySessionItem>{
@@ -413,10 +412,7 @@ class _MatchFooter extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.timer_outlined,
-              color: scheme.onSurfaceVariant,
-            ),
+            Icon(Icons.timer_outlined, color: scheme.onSurfaceVariant),
             const MxGap(MxSpace.xs),
             MxText(
               timerLabel,

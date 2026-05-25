@@ -84,49 +84,43 @@ class _GuessOptionTileState extends State<GuessOptionTile>
         duration: guessColorTransitionDuration,
         curve: Curves.easeOutCubic,
         builder: (context, backgroundColor, child) => MxCard(
-            variant: MxCardVariant.outlined,
-            backgroundColor: backgroundColor,
-            borderColor: visual.borderColor,
-            padding: const EdgeInsets.symmetric(
-              horizontal: MxSpace.md,
-              vertical: MxSpace.md,
-            ),
-            onTap: canTap ? widget.onTap : null,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _GuessLetterCircle(
-                  letter: widget.letter,
-                  color: visual.foregroundColor,
-                ),
-                const MxGap(MxSpace.md),
-                Expanded(
-                  child: MxText(
-                    widget.option.back,
-                    role: MxTextRole.contentBody,
-                    color: visual.foregroundColor,
-                    maxLines: _guessOptionTextMaxLines,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                  ),
-                ),
-                if (widget.state == GuessOptionState.success) ...[
-                  const MxGap(MxSpace.sm),
-                  Icon(
-                    Icons.check_rounded,
-                    color: visual.foregroundColor,
-                  ),
-                ],
-                if (widget.state == GuessOptionState.error) ...[
-                  const MxGap(MxSpace.sm),
-                  Icon(
-                    Icons.close_rounded,
-                    color: visual.foregroundColor,
-                  ),
-                ],
-              ],
-            ),
+          variant: MxCardVariant.outlined,
+          backgroundColor: backgroundColor,
+          borderColor: visual.borderColor,
+          padding: const EdgeInsets.symmetric(
+            horizontal: MxSpace.md,
+            vertical: MxSpace.md,
           ),
+          onTap: canTap ? widget.onTap : null,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _GuessLetterCircle(
+                letter: widget.letter,
+                color: visual.foregroundColor,
+              ),
+              const MxGap(MxSpace.md),
+              Expanded(
+                child: MxText(
+                  widget.option.back,
+                  role: MxTextRole.contentBody,
+                  color: visual.foregroundColor,
+                  maxLines: _guessOptionTextMaxLines,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                ),
+              ),
+              if (widget.state == GuessOptionState.success) ...[
+                const MxGap(MxSpace.sm),
+                Icon(Icons.check_rounded, color: visual.foregroundColor),
+              ],
+              if (widget.state == GuessOptionState.error) ...[
+                const MxGap(MxSpace.sm),
+                Icon(Icons.close_rounded, color: visual.foregroundColor),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -140,16 +134,13 @@ class _GuessLetterCircle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-      width: _guessLetterCircleDiameter,
-      height: _guessLetterCircleDiameter,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: color,
-          width: _guessLetterCircleBorderWidth,
-        ),
-      ),
-      child: MxText(letter, role: MxTextRole.badge, color: color),
-    );
+    width: _guessLetterCircleDiameter,
+    height: _guessLetterCircleDiameter,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      border: Border.all(color: color, width: _guessLetterCircleBorderWidth),
+    ),
+    child: MxText(letter, role: MxTextRole.badge, color: color),
+  );
 }

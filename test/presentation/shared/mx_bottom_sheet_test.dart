@@ -64,9 +64,9 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      home: MediaQuery(
-        data: MediaQueryData(viewInsets: viewInsets),
-        child: Material(child: child),
-      ),
-    );
+    home: MediaQuery(
+      data: MediaQueryData(viewInsets: viewInsets),
+      child: Material(child: child),
+    ),
+  );
 }

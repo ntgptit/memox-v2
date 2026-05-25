@@ -94,20 +94,22 @@ class _SectionHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        switch (style) {
-          MxSectionHeaderStyle.title =>
-            MxText(title, role: MxTextRole.sectionTitle),
-          MxSectionHeaderStyle.overline => MxText(
-              StringUtils.upperCaseToEmpty(title),
-              role: MxTextRole.overline,
-            ),
-        },
-        if (subtitle != null) ...[
-          const MxGap(AppSpacing.xxs),
-          MxText(subtitle!, role: MxTextRole.sectionSubtitle),
-        ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      switch (style) {
+        MxSectionHeaderStyle.title => MxText(
+          title,
+          role: MxTextRole.sectionTitle,
+        ),
+        MxSectionHeaderStyle.overline => MxText(
+          StringUtils.upperCaseToEmpty(title),
+          role: MxTextRole.overline,
+        ),
+      },
+      if (subtitle != null) ...[
+        const MxGap(AppSpacing.xxs),
+        MxText(subtitle!, role: MxTextRole.sectionSubtitle),
       ],
-    );
+    ],
+  );
 }

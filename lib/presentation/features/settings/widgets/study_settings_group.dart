@@ -165,7 +165,8 @@ class _StudySettingRow extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
+  Widget build(BuildContext context) =>
+      SettingsRow(icon: icon, title: title, value: value, onTap: onTap);
 }
 
 class _StudyDefaultsSummary extends StatelessWidget {
@@ -223,20 +224,20 @@ class _StudyMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxIconTile(icon: icon),
-        const MxGap(MxSpace.sm),
-        MxText(
-          label,
-          role: MxTextRole.tileMeta,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const MxGap(MxSpace.xs),
-        MxBadge(label: value, tone: MxBadgeTone.primary),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxIconTile(icon: icon),
+      const MxGap(MxSpace.sm),
+      MxText(
+        label,
+        role: MxTextRole.tileMeta,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      const MxGap(MxSpace.xs),
+      MxBadge(label: value, tone: MxBadgeTone.primary),
+    ],
+  );
 }
 
 class _BatchSizeSheet extends ConsumerWidget {

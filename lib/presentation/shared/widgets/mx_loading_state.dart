@@ -20,17 +20,17 @@ class MxLoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          MxCircularProgress(size: progressSize),
-          if (message != null) ...[
-            const MxGap(AppSpacing.lg),
-            MxText(message!, role: MxTextRole.stateMessage),
-          ],
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        MxCircularProgress(size: progressSize),
+        if (message != null) ...[
+          const MxGap(AppSpacing.lg),
+          MxText(message!, role: MxTextRole.stateMessage),
         ],
-      ),
-    );
+      ],
+    ),
+  );
 }
 
 /// Skeleton placeholder block with subtle pulse animation.

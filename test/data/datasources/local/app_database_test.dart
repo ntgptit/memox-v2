@@ -273,21 +273,22 @@ void main() {
   });
 }
 
-Future<void> _insertValidFolder(AppDatabase database, {required String id}) => database.customInsert(
-    '''
+Future<void> _insertValidFolder(AppDatabase database, {required String id}) =>
+    database.customInsert(
+      '''
     INSERT INTO folders
       (id, name, content_mode, sort_order, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?)
     ''',
-    variables: <Variable>[
-      Variable<String>(id),
-      const Variable<String>('Languages'),
-      const Variable<String>('unlocked'),
-      const Variable<int>(0),
-      const Variable<int>(1),
-      const Variable<int>(1),
-    ],
-  );
+      variables: <Variable>[
+        Variable<String>(id),
+        const Variable<String>('Languages'),
+        const Variable<String>('unlocked'),
+        const Variable<int>(0),
+        const Variable<int>(1),
+        const Variable<int>(1),
+      ],
+    );
 
 const List<String> _legacyV1Statements = <String>[
   '''

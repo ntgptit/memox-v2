@@ -27,25 +27,25 @@ class FolderDetailSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-      key: const ValueKey('folder_detail_skeleton'),
-      children: const [
-        _FolderHeaderSkeleton(),
-        MxGap(MxSpace.xl),
-        _ToolbarSkeleton(),
-        MxGap(MxSpace.xl),
-        _SectionSkeleton(
-          titleWidth: _folderSummaryTitleWidth,
-          subtitleWidth: _folderSummarySubtitleWidth,
-          bodyHeight: 0,
-        ),
-        MxGap(MxSpace.xl),
-        _FolderTileSkeleton(),
-        MxDivider(),
-        _FolderTileSkeleton(),
-        MxDivider(),
-        _FolderTileSkeleton(),
-      ],
-    );
+    key: const ValueKey('folder_detail_skeleton'),
+    children: const [
+      _FolderHeaderSkeleton(),
+      MxGap(MxSpace.xl),
+      _ToolbarSkeleton(),
+      MxGap(MxSpace.xl),
+      _SectionSkeleton(
+        titleWidth: _folderSummaryTitleWidth,
+        subtitleWidth: _folderSummarySubtitleWidth,
+        bodyHeight: 0,
+      ),
+      MxGap(MxSpace.xl),
+      _FolderTileSkeleton(),
+      MxDivider(),
+      _FolderTileSkeleton(),
+      MxDivider(),
+      _FolderTileSkeleton(),
+    ],
+  );
 }
 
 class _FolderHeaderSkeleton extends StatelessWidget {
@@ -53,37 +53,37 @@ class _FolderHeaderSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            MxSkeleton(
-              width: _folderHeaderActionSize,
-              height: _folderHeaderActionSize,
-              borderRadius: MxFeatureRadii.md,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          MxSkeleton(
+            width: _folderHeaderActionSize,
+            height: _folderHeaderActionSize,
+            borderRadius: MxFeatureRadii.md,
+          ),
+          MxGap(MxSpace.sm),
+          Expanded(
+            child: MxSkeleton(
+              height: _folderHeaderTitleHeight,
+              width: _folderHeaderTitleWidth,
             ),
-            MxGap(MxSpace.sm),
-            Expanded(
-              child: MxSkeleton(
-                height: _folderHeaderTitleHeight,
-                width: _folderHeaderTitleWidth,
-              ),
-            ),
-            MxGap(MxSpace.sm),
-            MxSkeleton(
-              width: _folderHeaderActionSize,
-              height: _folderHeaderActionSize,
-              borderRadius: MxFeatureRadii.md,
-            ),
-          ],
-        ),
-        MxGap(MxSpace.sm),
-        MxSkeleton(
-          height: _folderBreadcrumbHeight,
-          width: _folderBreadcrumbWidth,
-        ),
-      ],
-    );
+          ),
+          MxGap(MxSpace.sm),
+          MxSkeleton(
+            width: _folderHeaderActionSize,
+            height: _folderHeaderActionSize,
+            borderRadius: MxFeatureRadii.md,
+          ),
+        ],
+      ),
+      MxGap(MxSpace.sm),
+      MxSkeleton(
+        height: _folderBreadcrumbHeight,
+        width: _folderBreadcrumbWidth,
+      ),
+    ],
+  );
 }
 
 class _ToolbarSkeleton extends StatelessWidget {
@@ -91,24 +91,24 @@ class _ToolbarSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxSkeleton(
-          height: _folderToolbarHeight,
-          borderRadius: MxFeatureRadii.full,
-        ),
-        MxGap(MxSpace.sm),
-        Row(
-          children: [
-            MxSkeleton(
-              height: _folderToolbarChipHeight,
-              width: _folderToolbarChipWidth,
-              borderRadius: MxFeatureRadii.full,
-            ),
-          ],
-        ),
-      ],
-    );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxSkeleton(
+        height: _folderToolbarHeight,
+        borderRadius: MxFeatureRadii.full,
+      ),
+      MxGap(MxSpace.sm),
+      Row(
+        children: [
+          MxSkeleton(
+            height: _folderToolbarChipHeight,
+            width: _folderToolbarChipWidth,
+            borderRadius: MxFeatureRadii.full,
+          ),
+        ],
+      ),
+    ],
+  );
 }
 
 class _SectionSkeleton extends StatelessWidget {
@@ -124,17 +124,17 @@ class _SectionSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxSkeleton(height: _folderSectionTitleHeight, width: titleWidth),
-        const MxGap(MxSpace.xs),
-        MxSkeleton(height: _folderSectionSubtitleHeight, width: subtitleWidth),
-        if (bodyHeight > 0) ...[
-          const MxGap(MxSpace.md),
-          MxSkeleton(height: bodyHeight),
-        ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxSkeleton(height: _folderSectionTitleHeight, width: titleWidth),
+      const MxGap(MxSpace.xs),
+      MxSkeleton(height: _folderSectionSubtitleHeight, width: subtitleWidth),
+      if (bodyHeight > 0) ...[
+        const MxGap(MxSpace.md),
+        MxSkeleton(height: bodyHeight),
       ],
-    );
+    ],
+  );
 }
 
 class _FolderTileSkeleton extends StatelessWidget {
@@ -142,35 +142,32 @@ class _FolderTileSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: MxSpace.lg,
-        vertical: MxSpace.md,
-      ),
-      child: Row(
-        children: [
-          MxSkeleton(
-            width: _folderTileLeadingSize,
-            height: _folderTileLeadingSize,
-            borderRadius: MxFeatureRadii.md,
+    padding: EdgeInsets.symmetric(horizontal: MxSpace.lg, vertical: MxSpace.md),
+    child: Row(
+      children: [
+        MxSkeleton(
+          width: _folderTileLeadingSize,
+          height: _folderTileLeadingSize,
+          borderRadius: MxFeatureRadii.md,
+        ),
+        MxGap(MxSpace.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              MxSkeleton(
+                height: _folderSectionTitleHeight,
+                width: _folderTileTitleWidth,
+              ),
+              MxGap(MxSpace.xs),
+              MxSkeleton(
+                height: _folderSectionSubtitleHeight,
+                width: _folderTileMetaWidth,
+              ),
+            ],
           ),
-          MxGap(MxSpace.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MxSkeleton(
-                  height: _folderSectionTitleHeight,
-                  width: _folderTileTitleWidth,
-                ),
-                MxGap(MxSpace.xs),
-                MxSkeleton(
-                  height: _folderSectionSubtitleHeight,
-                  width: _folderTileMetaWidth,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
 }

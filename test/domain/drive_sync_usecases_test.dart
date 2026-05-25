@@ -4,7 +4,7 @@ import 'package:memox/domain/repositories/drive_sync_repository.dart';
 import 'package:memox/domain/usecases/drive_sync_usecases.dart';
 
 void main() {
-  test('DT1 if: LoadDriveSyncStatusUseCase delegates to repository', () async {
+  test('LoadDriveSyncStatusUseCase delegates to repository', () async {
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: const DriveSyncStatus.noRemoteSnapshot(),
     );
@@ -16,64 +16,21 @@ void main() {
     expect(repository.loadStatusCount, 1);
   });
 
-  test(
-    'DT2 if: SyncGoogleDriveSnapshotUseCase delegates to repository',
-    () async {
-      final repository = _FakeDriveSyncRepository(
-        syncResult: const DriveSyncRunResult.uploadedLocal(
-          DriveSyncStatus(kind: DriveSyncStatusKind.synced),
-        ),
-      );
-      final useCase = SyncGoogleDriveSnapshotUseCase(repository);
+  test('UploadLocalDriveSnapshotUseCase delegates to repository', () async {
+    final repository = _FakeDriveSyncRepository(
+      uploadResult: const DriveSyncRunResult.uploadedLocal(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced),
+      ),
+    );
+    final useCase = UploadLocalDriveSnapshotUseCase(repository);
 
-      final result = await useCase.execute();
+    final result = await useCase.execute();
 
-      expect(result.kind, DriveSyncActionKind.uploadedLocal);
-      expect(repository.syncNowCount, 1);
-    },
-  );
+    expect(result.kind, DriveSyncActionKind.uploadedLocal);
+    expect(repository.uploadLocalCount, 1);
+  });
 
-  test(
-    'DT3 if: ResolveDriveSyncConflictUseCase forwards conflict choice',
-    () async {
-      final conflict = _conflict();
-      final repository = _FakeDriveSyncRepository(
-        resolveResult: const DriveSyncRunResult.canceled(
-          DriveSyncStatus(kind: DriveSyncStatusKind.ready),
-        ),
-      );
-      final useCase = ResolveDriveSyncConflictUseCase(repository);
-
-      final result = await useCase.execute(
-        conflict,
-        DriveSyncConflictChoice.cancel,
-      );
-
-      expect(result.kind, DriveSyncActionKind.canceled);
-      expect(repository.resolveConflictCount, 1);
-      expect(repository.lastConflict, same(conflict));
-      expect(repository.lastChoice, DriveSyncConflictChoice.cancel);
-    },
-  );
-
-  test(
-    'DT4 if: UploadLocalDriveSnapshotUseCase delegates to repository',
-    () async {
-      final repository = _FakeDriveSyncRepository(
-        uploadResult: const DriveSyncRunResult.uploadedLocal(
-          DriveSyncStatus(kind: DriveSyncStatusKind.synced),
-        ),
-      );
-      final useCase = UploadLocalDriveSnapshotUseCase(repository);
-
-      final result = await useCase.execute();
-
-      expect(result.kind, DriveSyncActionKind.uploadedLocal);
-      expect(repository.uploadLocalCount, 1);
-    },
-  );
-
-  test('DT5 if: RestoreDriveSnapshotUseCase delegates to repository', () async {
+  test('RestoreDriveSnapshotUseCase delegates to repository', () async {
     final repository = _FakeDriveSyncRepository(
       restoreResult: const DriveSyncRunResult.restoredRemote(
         DriveSyncStatus(kind: DriveSyncStatusKind.synced),
@@ -92,47 +49,27 @@ void main() {
 final class _FakeDriveSyncRepository implements DriveSyncRepository {
   _FakeDriveSyncRepository({
     DriveSyncStatus? loadStatusResult,
-    DriveSyncRunResult? syncResult,
     DriveSyncRunResult? uploadResult,
     DriveSyncRunResult? restoreResult,
-    DriveSyncRunResult? resolveResult,
   }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
-       syncResult =
-           syncResult ??
-           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        uploadResult =
            uploadResult ??
            const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
        restoreResult =
            restoreResult ??
-           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut()),
-       resolveResult =
-           resolveResult ??
-           const DriveSyncRunResult.canceled(DriveSyncStatus.ready());
+           const DriveSyncRunResult.noChanges(DriveSyncStatus.signedOut());
 
   final DriveSyncStatus loadStatusResult;
-  final DriveSyncRunResult syncResult;
   final DriveSyncRunResult uploadResult;
   final DriveSyncRunResult restoreResult;
-  final DriveSyncRunResult resolveResult;
   int loadStatusCount = 0;
-  int syncNowCount = 0;
   int uploadLocalCount = 0;
   int restoreDriveCount = 0;
-  int resolveConflictCount = 0;
-  DriveSyncConflict? lastConflict;
-  DriveSyncConflictChoice? lastChoice;
 
   @override
   Future<DriveSyncStatus> loadStatus() async {
     loadStatusCount += 1;
     return loadStatusResult;
-  }
-
-  @override
-  Future<DriveSyncRunResult> syncNow() async {
-    syncNowCount += 1;
-    return syncResult;
   }
 
   @override
@@ -146,41 +83,4 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
     restoreDriveCount += 1;
     return restoreResult;
   }
-
-  @override
-  Future<DriveSyncRunResult> resolveConflict(
-    DriveSyncConflict conflict,
-    DriveSyncConflictChoice choice,
-  ) async {
-    resolveConflictCount += 1;
-    lastConflict = conflict;
-    lastChoice = choice;
-    return resolveResult;
-  }
 }
-
-DriveSyncConflict _conflict() => DriveSyncConflict(
-    localFingerprint: 'local',
-    remote: _remoteSnapshot(),
-    reason: 'test',
-  );
-
-DriveSyncRemoteSnapshot _remoteSnapshot() => const DriveSyncRemoteSnapshot(
-    manifest: DriveSyncManifest(
-      manifestVersion: DriveSyncManifest.currentManifestVersion,
-      snapshotFormatVersion: DriveSyncManifest.currentSnapshotFormatVersion,
-      appId: DriveSyncManifest.currentAppId,
-      appDatabaseSchemaVersion: 6,
-      createdAt: 1,
-      deviceId: 'remote-device',
-      deviceLabel: 'Remote device',
-      databaseSha256: 'db',
-      settingsSha256: 'settings',
-      snapshotSizeBytes: 2,
-    ),
-    manifestFileId: 'manifest-file',
-    manifestFileVersion: 'manifest-version',
-    snapshotFileId: 'snapshot-file',
-    snapshotFileVersion: 'snapshot-version',
-    modifiedAt: 1,
-  );

@@ -58,7 +58,7 @@ class LanguageSettingsGroup extends ConsumerWidget {
 }
 
 _LocaleChoice _localeChoiceOf(Locale? locale) => switch (locale?.languageCode) {
-    'en' => _LocaleChoice.english,
-    'vi' => _LocaleChoice.vietnamese,
-    _ => _LocaleChoice.system,
-  };
+  'en' => _LocaleChoice.english,
+  'vi' => _LocaleChoice.vietnamese,
+  _ => _LocaleChoice.system,
+};

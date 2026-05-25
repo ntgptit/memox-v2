@@ -27,46 +27,46 @@ class MxSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-      padding: padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final heading = _SectionHeading(title: title, subtitle: subtitle);
-              if (action == null) return heading;
+    padding: padding,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final heading = _SectionHeading(title: title, subtitle: subtitle);
+            if (action == null) return heading;
 
-              final stackAction = AppLayout.stacksSectionAction(
-                hasBoundedWidth: constraints.hasBoundedWidth,
-                maxWidth: constraints.maxWidth,
-                textScale: MediaQuery.textScalerOf(context).scale(1),
-              );
+            final stackAction = AppLayout.stacksSectionAction(
+              hasBoundedWidth: constraints.hasBoundedWidth,
+              maxWidth: constraints.maxWidth,
+              textScale: MediaQuery.textScalerOf(context).scale(1),
+            );
 
-              if (stackAction) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    heading,
-                    const MxGap(AppSpacing.xs),
-                    Align(alignment: Alignment.centerLeft, child: action),
-                  ],
-                );
-              }
-
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+            if (stackAction) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(child: heading),
-                  action!,
+                  heading,
+                  const MxGap(AppSpacing.xs),
+                  Align(alignment: Alignment.centerLeft, child: action),
                 ],
               );
-            },
-          ),
-          MxGap(spacing),
-          child,
-        ],
-      ),
-    );
+            }
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(child: heading),
+                action!,
+              ],
+            );
+          },
+        ),
+        MxGap(spacing),
+        child,
+      ],
+    ),
+  );
 }
 
 class _SectionHeading extends StatelessWidget {
@@ -77,13 +77,13 @@ class _SectionHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        MxText(title, role: MxTextRole.sectionTitle),
-        if (subtitle != null) ...[
-          const MxGap(AppSpacing.xxs),
-          MxText(subtitle!, role: MxTextRole.sectionSubtitle),
-        ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      MxText(title, role: MxTextRole.sectionTitle),
+      if (subtitle != null) ...[
+        const MxGap(AppSpacing.xxs),
+        MxText(subtitle!, role: MxTextRole.sectionSubtitle),
       ],
-    );
+    ],
+  );
 }

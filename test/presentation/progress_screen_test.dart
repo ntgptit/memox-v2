@@ -270,13 +270,13 @@ ProgressOverviewState _overview({
   int cardCount = 12,
   int masteryPercent = 48,
 }) => ProgressOverviewState(
-    sessions: sessions,
-    overdueCount: overdueCount,
-    dueTodayCount: dueTodayCount,
-    newCardCount: newCardCount,
-    cardCount: cardCount,
-    masteryPercent: masteryPercent,
-  );
+  sessions: sessions,
+  overdueCount: overdueCount,
+  dueTodayCount: dueTodayCount,
+  newCardCount: newCardCount,
+  cardCount: cardCount,
+  masteryPercent: masteryPercent,
+);
 
 class _TestApp extends StatelessWidget {
   const _TestApp({required this.child});
@@ -285,10 +285,10 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: child,
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: child,
+  );
 }
 
 final class _ProgressScreenStudyRepo implements StudyRepo {
@@ -451,9 +451,9 @@ StudySessionSnapshot _snapshot({
 }
 
 StudyFlashcardRef _card([int index = 1]) => StudyFlashcardRef(
-    id: 'card-$index',
-    deckId: 'deck-1',
-    front: 'front $index',
-    back: 'back $index',
-    sourcePool: SessionItemSourcePool.due,
-  );
+  id: 'card-$index',
+  deckId: 'deck-1',
+  front: 'front $index',
+  back: 'back $index',
+  sourcePool: SessionItemSourcePool.due,
+);

@@ -122,8 +122,8 @@ class _Host extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      home: Scaffold(
-        body: Align(alignment: Alignment.topLeft, child: child),
-      ),
-    );
+    home: Scaffold(
+      body: Align(alignment: Alignment.topLeft, child: child),
+    ),
+  );
 }
