@@ -1110,6 +1110,10 @@ void main() {
 
       await tester.tap(find.byTooltip('Sign out'));
       await tester.pumpAndSettle();
+      // New: confirmation dialog before sign-out — tap the danger primary
+      // action ("Sign out") inside the dialog to proceed.
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Sign out'));
+      await tester.pumpAndSettle();
 
       final repository = await harness.container.read(
         cloudAccountRepositoryProvider.future,
@@ -1677,6 +1681,11 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   @override
   Future<void> signOutLocal() async {
+    signOutCount += 1;
+  }
+
+  @override
+  Future<void> disconnect() async {
     signOutCount += 1;
   }
 

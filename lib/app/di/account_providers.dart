@@ -75,6 +75,14 @@ Future<SignOutGoogleAccountUseCase> signOutGoogleAccountUseCase(
 );
 
 @riverpod
+Future<DisconnectGoogleAccountUseCase> disconnectGoogleAccountUseCase(
+  Ref ref,
+) async => DisconnectGoogleAccountUseCase(
+  repository: await ref.watch(cloudAccountRepositoryProvider.future),
+  authService: ref.watch(googleAccountAuthServiceProvider),
+);
+
+@riverpod
 Future<PersistGoogleAccountAuthResultUseCase>
 persistGoogleAccountAuthResultUseCase(Ref ref) async =>
     PersistGoogleAccountAuthResultUseCase(

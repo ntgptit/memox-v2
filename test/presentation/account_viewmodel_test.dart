@@ -704,6 +704,9 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   Future<void> signOutLocal() async {}
 
+  @override
+  Future<void> disconnect() async {}
+
   void emit(GoogleAccountAuthResult result) {
     _events.add(result);
   }

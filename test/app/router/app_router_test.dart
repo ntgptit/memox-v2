@@ -255,6 +255,9 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   @override
   Future<void> signOutLocal() async {}
+
+  @override
+  Future<void> disconnect() async {}
 }
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {

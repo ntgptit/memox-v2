@@ -632,6 +632,9 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   Future<void> signOutLocal() async {}
 
   @override
+  Future<void> disconnect() async {}
+
+  @override
   Future<GoogleAccountAuthResult> signInAndAuthorizeDriveAppData(
     GoogleOAuthConfig config,
   ) async => const GoogleAccountAuthResult.signedOut();

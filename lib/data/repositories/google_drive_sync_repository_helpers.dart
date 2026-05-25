@@ -126,7 +126,8 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
       );
     }
 
-    final snapshotFile = await _driveClient.findFileByName(
+    final snapshotFile =
+        await _driveClient.findFileByName(
           accessToken: accessToken,
           name: AppConstants.driveSyncSnapshotFileName,
         ) ??

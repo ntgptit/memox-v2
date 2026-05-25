@@ -305,9 +305,22 @@
   "settingsAccountDriveAuthorizationRequired": "Grant Google Drive app data access to prepare sync.",
   "settingsAccountSignIn": "Sign in with Google",
   "settingsAccountReconnectDrive": "Reconnect Google Drive",
+  "settingsAccountSkipDrive": "Use without cloud backup",
   "settingsAccountSignOut": "Sign out",
+  "settingsAccountSignOutConfirmTitle": "Sign out of Google?",
+  "settingsAccountSignOutConfirmMessage": "Your Drive backup is kept. Sign in again later to restore it.",
+  "settingsAccountDisconnect": "Disconnect Google",
+  "settingsAccountDisconnectConfirmTitle": "Disconnect Google account?",
+  "settingsAccountDisconnectConfirmMessage": "This revokes Drive access tokens for this app. The Drive backup itself is kept. Use this on shared or lost devices.",
+  "settingsAccountDisconnectedMessage": "Google account disconnected. Drive access tokens revoked.",
   "settingsAccountSignInCanceled": "Google sign-in was canceled.",
   "settingsAccountSignInFailed": "Google sign-in failed. Try again.",
+  "settingsAccountLastSignedIn": "Last signed in {at}",
+  "@settingsAccountLastSignedIn": {
+    "placeholders": {
+      "at": {}
+    }
+  },
   "settingsAccountSignedOutMessage": "Signed out. Local flashcards stay on this device.",
   "settingsDriveSyncTitle": "Drive sync",
   "settingsDriveSyncLoading": "Loading sync state",
@@ -354,6 +367,13 @@
   "settingsDriveSyncRestoreConfirmTitle": "Restore Drive copy?",
   "settingsDriveSyncRestoreConfirmMessage": "This will replace this device's local database and settings with the Google Drive snapshot.",
   "settingsDriveSyncRestoreConfirmAction": "Restore from Drive",
+  "settingsDriveSyncBackupSource": "Backup from {device} • {when}",
+  "@settingsDriveSyncBackupSource": {
+    "placeholders": {
+      "device": {},
+      "when": {}
+    }
+  },
   "settingsDriveSyncUploadInProgressTitle": "Backing up to Google Drive",
   "settingsDriveSyncUploadInProgressMessage": "Please keep the app open. Do not close or switch accounts.",
   "settingsDriveSyncRestoreInProgressTitle": "Restoring from Google Drive",

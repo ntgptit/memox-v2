@@ -149,8 +149,7 @@ class MxSearchSortToolbar<T> extends StatelessWidget {
         ),
         backgroundColor: scheme.surfaceContainerLow,
         semanticsLabel: tooltipLabel,
-        onTap: () =>
-            controller.isOpen ? controller.close() : controller.open(),
+        onTap: () => controller.isOpen ? controller.close() : controller.open(),
         child: Tooltip(
           message: tooltipLabel,
           child: SizedBox(

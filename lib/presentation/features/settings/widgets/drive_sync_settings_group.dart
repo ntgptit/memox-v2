@@ -69,7 +69,7 @@ Future<void> _showDirectionSheet(
       _DriveSyncDirection.restoreDrive =>
         l10n.settingsDriveSyncRestoreConfirmTitle,
     },
-    child: _DriveSyncConfirmationSheet(direction: direction),
+    child: _DriveSyncConfirmationSheet(direction: direction, state: state),
   );
   if (!context.mounted) return;
   if (confirmed != true) return;
@@ -309,14 +309,20 @@ class _DriveSyncDirectionSheet extends StatelessWidget {
 }
 
 class _DriveSyncConfirmationSheet extends StatelessWidget {
-  const _DriveSyncConfirmationSheet({required this.direction});
+  const _DriveSyncConfirmationSheet({
+    required this.direction,
+    required this.state,
+  });
 
   final _DriveSyncDirection direction;
+  final DriveSyncSettingsState state;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isRestore = direction == _DriveSyncDirection.restoreDrive;
+    final remote = state.status.remote;
+    final showBackupSource = isRestore && remote != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -327,6 +333,16 @@ class _DriveSyncConfirmationSheet extends StatelessWidget {
               : l10n.settingsDriveSyncUploadConfirmMessage,
           role: MxTextRole.formHelper,
         ),
+        if (showBackupSource) ...[
+          const MxGap(MxSpace.sm),
+          MxText(
+            l10n.settingsDriveSyncBackupSource(
+              remote.manifest.deviceLabel,
+              _formatBackupTime(context, remote.manifest.createdAt),
+            ),
+            role: MxTextRole.formHelper,
+          ),
+        ],
         const MxGap(MxSpace.md),
         MxPrimaryButton(
           label: isRestore
@@ -350,5 +366,13 @@ class _DriveSyncConfirmationSheet extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _formatBackupTime(BuildContext context, int epochMillis) {
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(epochMillis).toLocal();
+    final materialL10n = MaterialLocalizations.of(context);
+    final date = materialL10n.formatShortDate(dateTime);
+    final time = materialL10n.formatTimeOfDay(TimeOfDay.fromDateTime(dateTime));
+    return '$date $time';
   }
 }

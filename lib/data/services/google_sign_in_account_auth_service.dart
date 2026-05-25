@@ -169,6 +169,18 @@ final class GoogleSignInAccountAuthService implements GoogleAccountAuthService {
     return _signIn.signOut();
   }
 
+  @override
+  Future<void> disconnect() async {
+    _currentAccount = null;
+    try {
+      await _signIn.disconnect();
+    } on GoogleSignInException {
+      // Disconnect can fail if there is no active grant; surface a clean
+      // sign-out for the caller — the local link is cleared either way.
+      await _signIn.signOut();
+    }
+  }
+
   Future<void> dispose() async {
     await _authSubscription?.cancel();
     await _events.close();

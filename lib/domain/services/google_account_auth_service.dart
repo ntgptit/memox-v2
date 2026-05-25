@@ -136,4 +136,11 @@ abstract interface class GoogleAccountAuthService {
     CloudAccountLink link,
   );
   Future<void> signOutLocal();
+
+  /// Revokes every previously granted scope and clears the local session.
+  ///
+  /// Unlike [signOutLocal], this calls `GoogleSignIn.disconnect()` so that the
+  /// access tokens we issued become invalid server-side and Google forgets the
+  /// previous consent — the next sign-in must re-prompt for Drive scope.
+  Future<void> disconnect();
 }

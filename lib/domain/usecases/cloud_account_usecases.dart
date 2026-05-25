@@ -124,6 +124,22 @@ final class SignOutGoogleAccountUseCase {
   }
 }
 
+final class DisconnectGoogleAccountUseCase {
+  const DisconnectGoogleAccountUseCase({
+    required CloudAccountRepository repository,
+    required GoogleAccountAuthService authService,
+  }) : _repository = repository,
+       _authService = authService;
+
+  final CloudAccountRepository _repository;
+  final GoogleAccountAuthService _authService;
+
+  Future<void> execute() async {
+    await _authService.disconnect();
+    await _repository.clear();
+  }
+}
+
 final class PersistGoogleAccountAuthResultUseCase {
   const PersistGoogleAccountAuthResultUseCase({
     required CloudAccountRepository repository,

@@ -485,7 +485,32 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsAccountReconnectDrive => 'Kết nối lại Google Drive';
 
   @override
+  String get settingsAccountSkipDrive => 'Dùng không cần sao lưu đám mây';
+
+  @override
   String get settingsAccountSignOut => 'Đăng xuất';
+
+  @override
+  String get settingsAccountSignOutConfirmTitle => 'Đăng xuất khỏi Google?';
+
+  @override
+  String get settingsAccountSignOutConfirmMessage =>
+      'Bản backup trên Drive vẫn được giữ. Đăng nhập lại bất cứ lúc nào để khôi phục.';
+
+  @override
+  String get settingsAccountDisconnect => 'Ngắt kết nối Google';
+
+  @override
+  String get settingsAccountDisconnectConfirmTitle =>
+      'Ngắt kết nối tài khoản Google?';
+
+  @override
+  String get settingsAccountDisconnectConfirmMessage =>
+      'Thao tác này thu hồi token Drive đã cấp cho app. Bản backup trên Drive vẫn được giữ. Dùng khi thiết bị bị mất hoặc dùng chung.';
+
+  @override
+  String get settingsAccountDisconnectedMessage =>
+      'Đã ngắt kết nối Google. Token Drive đã được thu hồi.';
 
   @override
   String get settingsAccountSignInCanceled => 'Đã hủy đăng nhập Google.';
@@ -493,6 +518,11 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get settingsAccountSignInFailed =>
       'Đăng nhập Google thất bại. Hãy thử lại.';
+
+  @override
+  String settingsAccountLastSignedIn(Object at) {
+    return 'Đăng nhập lần cuối: $at';
+  }
 
   @override
   String get settingsAccountSignedOutMessage =>
@@ -627,6 +657,11 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsDriveSyncRestoreConfirmAction => 'Khôi phục từ Drive';
+
+  @override
+  String settingsDriveSyncBackupSource(Object device, Object when) {
+    return 'Backup từ thiết bị $device • $when';
+  }
 
   @override
   String get settingsDriveSyncUploadInProgressTitle =>

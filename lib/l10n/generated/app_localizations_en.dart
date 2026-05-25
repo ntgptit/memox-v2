@@ -562,13 +562,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAccountReconnectDrive => 'Reconnect Google Drive';
 
   @override
+  String get settingsAccountSkipDrive => 'Use without cloud backup';
+
+  @override
   String get settingsAccountSignOut => 'Sign out';
+
+  @override
+  String get settingsAccountSignOutConfirmTitle => 'Sign out of Google?';
+
+  @override
+  String get settingsAccountSignOutConfirmMessage =>
+      'Your Drive backup is kept. Sign in again later to restore it.';
+
+  @override
+  String get settingsAccountDisconnect => 'Disconnect Google';
+
+  @override
+  String get settingsAccountDisconnectConfirmTitle =>
+      'Disconnect Google account?';
+
+  @override
+  String get settingsAccountDisconnectConfirmMessage =>
+      'This revokes Drive access tokens for this app. The Drive backup itself is kept. Use this on shared or lost devices.';
+
+  @override
+  String get settingsAccountDisconnectedMessage =>
+      'Google account disconnected. Drive access tokens revoked.';
 
   @override
   String get settingsAccountSignInCanceled => 'Google sign-in was canceled.';
 
   @override
   String get settingsAccountSignInFailed => 'Google sign-in failed. Try again.';
+
+  @override
+  String settingsAccountLastSignedIn(Object at) {
+    return 'Last signed in $at';
+  }
 
   @override
   String get settingsAccountSignedOutMessage =>
@@ -701,6 +731,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsDriveSyncRestoreConfirmAction => 'Restore from Drive';
+
+  @override
+  String settingsDriveSyncBackupSource(Object device, Object when) {
+    return 'Backup from $device • $when';
+  }
 
   @override
   String get settingsDriveSyncUploadInProgressTitle =>

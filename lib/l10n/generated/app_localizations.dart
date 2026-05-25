@@ -870,11 +870,53 @@ abstract class AppLocalizations {
   /// **'Reconnect Google Drive'**
   String get settingsAccountReconnectDrive;
 
+  /// No description provided for @settingsAccountSkipDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'Use without cloud backup'**
+  String get settingsAccountSkipDrive;
+
   /// No description provided for @settingsAccountSignOut.
   ///
   /// In en, this message translates to:
   /// **'Sign out'**
   String get settingsAccountSignOut;
+
+  /// No description provided for @settingsAccountSignOutConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out of Google?'**
+  String get settingsAccountSignOutConfirmTitle;
+
+  /// No description provided for @settingsAccountSignOutConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Drive backup is kept. Sign in again later to restore it.'**
+  String get settingsAccountSignOutConfirmMessage;
+
+  /// No description provided for @settingsAccountDisconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect Google'**
+  String get settingsAccountDisconnect;
+
+  /// No description provided for @settingsAccountDisconnectConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect Google account?'**
+  String get settingsAccountDisconnectConfirmTitle;
+
+  /// No description provided for @settingsAccountDisconnectConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This revokes Drive access tokens for this app. The Drive backup itself is kept. Use this on shared or lost devices.'**
+  String get settingsAccountDisconnectConfirmMessage;
+
+  /// No description provided for @settingsAccountDisconnectedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Google account disconnected. Drive access tokens revoked.'**
+  String get settingsAccountDisconnectedMessage;
 
   /// No description provided for @settingsAccountSignInCanceled.
   ///
@@ -887,6 +929,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Google sign-in failed. Try again.'**
   String get settingsAccountSignInFailed;
+
+  /// No description provided for @settingsAccountLastSignedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Last signed in {at}'**
+  String settingsAccountLastSignedIn(Object at);
 
   /// No description provided for @settingsAccountSignedOutMessage.
   ///
@@ -1103,6 +1151,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restore from Drive'**
   String get settingsDriveSyncRestoreConfirmAction;
+
+  /// No description provided for @settingsDriveSyncBackupSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup from {device} • {when}'**
+  String settingsDriveSyncBackupSource(Object device, Object when);
 
   /// No description provided for @settingsDriveSyncUploadInProgressTitle.
   ///

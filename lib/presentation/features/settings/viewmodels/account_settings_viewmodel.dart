@@ -16,6 +16,7 @@ enum AccountSettingsMessage {
   signInFailed,
   driveAuthorizationRequired,
   signedOut,
+  disconnected,
 }
 
 class AccountSettingsState {
@@ -25,6 +26,7 @@ class AccountSettingsState {
     this.link,
     this.message = AccountSettingsMessage.none,
     this.isBusy = false,
+    this.technicalMessage,
     bool? requiresRuntimeReconnect,
   }) : _requiresRuntimeReconnect = requiresRuntimeReconnect;
 
@@ -33,6 +35,7 @@ class AccountSettingsState {
   final AccountSettingsMessage message;
   final bool isBusy;
   final bool requiresPlatformSignInButton;
+  final String? technicalMessage;
   final bool? _requiresRuntimeReconnect;
 
   bool get requiresRuntimeReconnect => _requiresRuntimeReconnect ?? false;
@@ -58,6 +61,8 @@ class AccountSettingsState {
     bool? isBusy,
     bool? requiresPlatformSignInButton,
     bool? requiresRuntimeReconnect,
+    String? technicalMessage,
+    bool clearTechnicalMessage = false,
   }) => AccountSettingsState(
     status: status ?? this.status,
     link: clearLink ? null : link ?? this.link,
@@ -67,6 +72,9 @@ class AccountSettingsState {
         requiresPlatformSignInButton ?? this.requiresPlatformSignInButton,
     requiresRuntimeReconnect:
         requiresRuntimeReconnect ?? this.requiresRuntimeReconnect,
+    technicalMessage: clearTechnicalMessage
+        ? null
+        : technicalMessage ?? this.technicalMessage,
   );
 }
 
@@ -158,6 +166,29 @@ class AccountSettingsController extends _$AccountSettingsController {
       AccountSettingsState(
         status: AccountLinkStatus.signedOut,
         message: AccountSettingsMessage.signedOut,
+        requiresPlatformSignInButton: current.requiresPlatformSignInButton,
+      ),
+    );
+    _refreshDriveSyncStatus();
+  }
+
+  Future<void> disconnect() async {
+    final current = state.value;
+    if (current == null) {
+      return;
+    }
+    state = AsyncData(current.copyWith(isBusy: true));
+    final useCase = await ref.read(
+      disconnectGoogleAccountUseCaseProvider.future,
+    );
+    await useCase.execute();
+    if (!ref.mounted) {
+      return;
+    }
+    state = AsyncData(
+      AccountSettingsState(
+        status: AccountLinkStatus.signedOut,
+        message: AccountSettingsMessage.disconnected,
         requiresPlatformSignInButton: current.requiresPlatformSignInButton,
       ),
     );
@@ -324,6 +355,7 @@ class AccountSettingsController extends _$AccountSettingsController {
         link: link,
         message: AccountSettingsMessage.signInFailed,
         requiresPlatformSignInButton: requiresPlatformSignInButton,
+        technicalMessage: result.technicalMessage,
       ),
     };
   }

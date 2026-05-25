@@ -305,9 +305,22 @@
   "settingsAccountDriveAuthorizationRequired": "Cấp quyền dữ liệu ứng dụng Google Drive để chuẩn bị đồng bộ.",
   "settingsAccountSignIn": "Đăng nhập bằng Google",
   "settingsAccountReconnectDrive": "Kết nối lại Google Drive",
+  "settingsAccountSkipDrive": "Dùng không cần sao lưu đám mây",
   "settingsAccountSignOut": "Đăng xuất",
+  "settingsAccountSignOutConfirmTitle": "Đăng xuất khỏi Google?",
+  "settingsAccountSignOutConfirmMessage": "Bản backup trên Drive vẫn được giữ. Đăng nhập lại bất cứ lúc nào để khôi phục.",
+  "settingsAccountDisconnect": "Ngắt kết nối Google",
+  "settingsAccountDisconnectConfirmTitle": "Ngắt kết nối tài khoản Google?",
+  "settingsAccountDisconnectConfirmMessage": "Thao tác này thu hồi token Drive đã cấp cho app. Bản backup trên Drive vẫn được giữ. Dùng khi thiết bị bị mất hoặc dùng chung.",
+  "settingsAccountDisconnectedMessage": "Đã ngắt kết nối Google. Token Drive đã được thu hồi.",
   "settingsAccountSignInCanceled": "Đã hủy đăng nhập Google.",
   "settingsAccountSignInFailed": "Đăng nhập Google thất bại. Hãy thử lại.",
+  "settingsAccountLastSignedIn": "Đăng nhập lần cuối: {at}",
+  "@settingsAccountLastSignedIn": {
+    "placeholders": {
+      "at": {}
+    }
+  },
   "settingsAccountSignedOutMessage": "Đã đăng xuất. Flashcard cục bộ vẫn ở trên thiết bị này.",
   "settingsDriveSyncTitle": "Đồng bộ Drive",
   "settingsDriveSyncLoading": "Đang tải trạng thái đồng bộ",
@@ -354,6 +367,13 @@
   "settingsDriveSyncRestoreConfirmTitle": "Khôi phục bản Drive?",
   "settingsDriveSyncRestoreConfirmMessage": "Thao tác này sẽ thay DB và cài đặt cục bộ trên thiết bị này bằng snapshot Google Drive.",
   "settingsDriveSyncRestoreConfirmAction": "Khôi phục từ Drive",
+  "settingsDriveSyncBackupSource": "Backup từ thiết bị {device} • {when}",
+  "@settingsDriveSyncBackupSource": {
+    "placeholders": {
+      "device": {},
+      "when": {}
+    }
+  },
   "settingsDriveSyncUploadInProgressTitle": "Đang sao lưu lên Google Drive",
   "settingsDriveSyncUploadInProgressMessage": "Vui lòng giữ ứng dụng mở. Không đóng app hoặc đổi tài khoản.",
   "settingsDriveSyncRestoreInProgressTitle": "Đang khôi phục từ Google Drive",
