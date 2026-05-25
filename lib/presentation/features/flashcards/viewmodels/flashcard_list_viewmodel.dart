@@ -50,33 +50,70 @@ class FlashcardDeckProgressState {
 
 @immutable
 class FlashcardListState {
-  const FlashcardListState({
-    required this.deckId,
-    required this.folderId,
-    required this.deckName,
-    required this.breadcrumb,
-    required this.sortMode,
-    required this.searchTerm,
+  FlashcardListState({
+    required String deckId,
+    required String folderId,
+    required String deckName,
+    required List<BreadcrumbSegmentReadModel> breadcrumb,
+    required ContentSortMode sortMode,
+    required String searchTerm,
     required this.progress,
     required this.items,
-  });
+  }) : deckContext = FlashcardListDeckContext(
+         deckId: deckId,
+         folderId: folderId,
+         deckName: deckName,
+         breadcrumb: breadcrumb,
+       ),
+       query = FlashcardListQueryState(
+         sortMode: sortMode,
+         searchTerm: searchTerm,
+       );
 
   static const int previewLimit = 5;
 
-  final String deckId;
-  final String folderId;
-  final String deckName;
-  final List<BreadcrumbSegmentReadModel> breadcrumb;
-  final ContentSortMode sortMode;
-  final String searchTerm;
+  final FlashcardListDeckContext deckContext;
+  final FlashcardListQueryState query;
   final FlashcardDeckProgressState progress;
   final List<FlashcardListItemState> items;
 
+  String get deckId => deckContext.deckId;
+  String get folderId => deckContext.folderId;
+  String get deckName => deckContext.deckName;
+  List<BreadcrumbSegmentReadModel> get breadcrumb => deckContext.breadcrumb;
+  ContentSortMode get sortMode => query.sortMode;
+  String get searchTerm => query.searchTerm;
   bool get canManualReorder => sortMode.allowsManualReorder;
   int get totalCount =>
       progress.newCount + progress.learningCount + progress.masteredCount;
   List<FlashcardListItemState> get previewItems =>
       items.take(previewLimit).toList(growable: false);
+}
+
+@immutable
+class FlashcardListDeckContext {
+  const FlashcardListDeckContext({
+    required this.deckId,
+    required this.folderId,
+    required this.deckName,
+    required this.breadcrumb,
+  });
+
+  final String deckId;
+  final String folderId;
+  final String deckName;
+  final List<BreadcrumbSegmentReadModel> breadcrumb;
+}
+
+@immutable
+class FlashcardListQueryState {
+  const FlashcardListQueryState({
+    required this.sortMode,
+    required this.searchTerm,
+  });
+
+  final ContentSortMode sortMode;
+  final String searchTerm;
 }
 
 @riverpod

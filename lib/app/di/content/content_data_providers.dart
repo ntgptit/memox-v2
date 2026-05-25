@@ -8,16 +8,16 @@ import '../providers.dart';
 
 part 'content_data_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 FolderDao folderDao(Ref ref) => FolderDao(ref.watch(appDatabaseProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 DeckDao deckDao(Ref ref) => DeckDao(ref.watch(appDatabaseProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 FlashcardDao flashcardDao(Ref ref) =>
     FlashcardDao(ref.watch(appDatabaseProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 FolderStructureService folderStructureService(Ref ref) =>
     const FolderStructureService();

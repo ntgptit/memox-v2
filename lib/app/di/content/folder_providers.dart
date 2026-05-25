@@ -9,7 +9,7 @@ import 'content_data_providers.dart';
 
 part 'folder_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 FolderRepository folderRepository(Ref ref) => FolderRepositoryImpl(
   folderDao: ref.watch(folderDaoProvider),
   deckDao: ref.watch(deckDaoProvider),

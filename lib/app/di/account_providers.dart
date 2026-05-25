@@ -17,7 +17,7 @@ part 'account_providers.g.dart';
 GoogleOAuthConfig googleOAuthConfig(Ref ref) =>
     ref.watch(appConfigProvider).googleOAuthConfig;
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<CloudAccountRepository> cloudAccountRepository(Ref ref) async =>
     CloudAccountStore(await ref.watch(sharedPreferencesProvider.future));
 

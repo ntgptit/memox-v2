@@ -5,6 +5,6 @@ import '../providers.dart';
 
 part 'study_settings_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<StudySettingsStore> studySettingsStore(Ref ref) async =>
     StudySettingsStore(await ref.watch(sharedPreferencesProvider.future));

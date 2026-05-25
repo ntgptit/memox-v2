@@ -481,7 +481,7 @@ class _TestApp extends StatelessWidget {
   );
 }
 
-const _studyReadyDashboardState = DashboardOverviewState(
+final _studyReadyDashboardState = DashboardOverviewState(
   overdueCount: 3,
   dueTodayCount: 2,
   newCardCount: 7,
@@ -491,10 +491,10 @@ const _studyReadyDashboardState = DashboardOverviewState(
   cardCount: 20,
   masteryPercent: 30,
   resumeSessionId: 'session-001',
-  deckHighlights: <DashboardDeckHighlightItem>[],
+  deckHighlights: const <DashboardDeckHighlightItem>[],
 );
 
-const _idleDashboardState = DashboardOverviewState(
+final _idleDashboardState = DashboardOverviewState(
   overdueCount: 0,
   dueTodayCount: 0,
   newCardCount: 0,
@@ -504,10 +504,10 @@ const _idleDashboardState = DashboardOverviewState(
   cardCount: 0,
   masteryPercent: 0,
   resumeSessionId: null,
-  deckHighlights: <DashboardDeckHighlightItem>[],
+  deckHighlights: const <DashboardDeckHighlightItem>[],
 );
 
-const _singleItemDashboardState = DashboardOverviewState(
+final _singleItemDashboardState = DashboardOverviewState(
   overdueCount: 0,
   dueTodayCount: 0,
   newCardCount: 0,
@@ -517,10 +517,10 @@ const _singleItemDashboardState = DashboardOverviewState(
   cardCount: 1,
   masteryPercent: 1,
   resumeSessionId: null,
-  deckHighlights: <DashboardDeckHighlightItem>[],
+  deckHighlights: const <DashboardDeckHighlightItem>[],
 );
 
-const _recentDecksDashboardState = DashboardOverviewState(
+final _recentDecksDashboardState = DashboardOverviewState(
   overdueCount: 0,
   dueTodayCount: 0,
   newCardCount: 0,
@@ -530,7 +530,7 @@ const _recentDecksDashboardState = DashboardOverviewState(
   cardCount: 32,
   masteryPercent: 25,
   resumeSessionId: null,
-  deckHighlights: <DashboardDeckHighlightItem>[
+  deckHighlights: const <DashboardDeckHighlightItem>[
     DashboardDeckHighlightItem(
       id: 'deck-grammar',
       name: 'Grammar',
@@ -566,7 +566,7 @@ const _recentDecksDashboardState = DashboardOverviewState(
   ],
 );
 
-const _fallbackDecksDashboardState = DashboardOverviewState(
+final _fallbackDecksDashboardState = DashboardOverviewState(
   overdueCount: 0,
   dueTodayCount: 0,
   newCardCount: 0,
@@ -576,7 +576,7 @@ const _fallbackDecksDashboardState = DashboardOverviewState(
   cardCount: 1,
   masteryPercent: 0,
   resumeSessionId: null,
-  deckHighlights: <DashboardDeckHighlightItem>[
+  deckHighlights: const <DashboardDeckHighlightItem>[
     DashboardDeckHighlightItem(
       id: 'deck-starter',
       name: 'Starter',

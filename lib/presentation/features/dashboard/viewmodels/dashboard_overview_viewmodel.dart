@@ -15,34 +15,74 @@ const dashboardDeckHighlightLimit = 3;
 
 @immutable
 final class DashboardOverviewState {
-  const DashboardOverviewState({
+  DashboardOverviewState({
+    required int overdueCount,
+    required int dueTodayCount,
+    required int newCardCount,
+    required this.activeSessionCount,
+    required int folderCount,
+    required int deckCount,
+    required int cardCount,
+    required int masteryPercent,
+    required this.resumeSessionId,
+    required this.deckHighlights,
+  }) : reviewSummary = DashboardReviewSummary(
+         overdueCount: overdueCount,
+         dueTodayCount: dueTodayCount,
+         newCardCount: newCardCount,
+       ),
+       librarySummary = DashboardLibrarySummary(
+         folderCount: folderCount,
+         deckCount: deckCount,
+         cardCount: cardCount,
+         masteryPercent: masteryPercent,
+       );
+
+  final DashboardReviewSummary reviewSummary;
+  final int activeSessionCount;
+  final DashboardLibrarySummary librarySummary;
+  final String? resumeSessionId;
+  final List<DashboardDeckHighlightItem> deckHighlights;
+
+  int get overdueCount => reviewSummary.overdueCount;
+  int get dueTodayCount => reviewSummary.dueTodayCount;
+  int get newCardCount => reviewSummary.newCardCount;
+  int get folderCount => librarySummary.folderCount;
+  int get deckCount => librarySummary.deckCount;
+  int get cardCount => librarySummary.cardCount;
+  int get masteryPercent => librarySummary.masteryPercent;
+  int get reviewCount => overdueCount + dueTodayCount;
+  bool get hasReviewCards => reviewCount > 0;
+  bool get hasNewCards => newCardCount > 0;
+  bool get hasActiveSessions => activeSessionCount > 0;
+}
+
+@immutable
+final class DashboardReviewSummary {
+  const DashboardReviewSummary({
     required this.overdueCount,
     required this.dueTodayCount,
     required this.newCardCount,
-    required this.activeSessionCount,
-    required this.folderCount,
-    required this.deckCount,
-    required this.cardCount,
-    required this.masteryPercent,
-    required this.resumeSessionId,
-    required this.deckHighlights,
   });
 
   final int overdueCount;
   final int dueTodayCount;
   final int newCardCount;
-  final int activeSessionCount;
+}
+
+@immutable
+final class DashboardLibrarySummary {
+  const DashboardLibrarySummary({
+    required this.folderCount,
+    required this.deckCount,
+    required this.cardCount,
+    required this.masteryPercent,
+  });
+
   final int folderCount;
   final int deckCount;
   final int cardCount;
   final int masteryPercent;
-  final String? resumeSessionId;
-  final List<DashboardDeckHighlightItem> deckHighlights;
-
-  int get reviewCount => overdueCount + dueTodayCount;
-  bool get hasReviewCards => reviewCount > 0;
-  bool get hasNewCards => newCardCount > 0;
-  bool get hasActiveSessions => activeSessionCount > 0;
 }
 
 @immutable

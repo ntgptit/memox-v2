@@ -13,25 +13,39 @@ part 'flashcard_import_viewmodel.g.dart';
 
 @immutable
 class FlashcardImportDraftState {
-  const FlashcardImportDraftState({
-    required this.format,
-    required this.structuredTextSeparator,
-    required this.duplicatePolicy,
-    required this.rawContent,
-    this.excelHasHeader = true,
-    this.sourceBytes,
-    this.loadedFileName,
+  FlashcardImportDraftState({
+    required ImportSourceFormat format,
+    required ImportStructuredTextSeparator structuredTextSeparator,
+    required FlashcardImportDuplicatePolicy duplicatePolicy,
+    required String rawContent,
+    bool excelHasHeader = true,
+    Uint8List? sourceBytes,
+    String? loadedFileName,
     this.preparation,
-  });
+  }) : options = FlashcardImportOptions(
+         format: format,
+         structuredTextSeparator: structuredTextSeparator,
+         duplicatePolicy: duplicatePolicy,
+         excelHasHeader: excelHasHeader,
+       ),
+       source = FlashcardImportSource(
+         rawContent: rawContent,
+         sourceBytes: sourceBytes,
+         loadedFileName: loadedFileName,
+       );
 
-  final ImportSourceFormat format;
-  final ImportStructuredTextSeparator structuredTextSeparator;
-  final FlashcardImportDuplicatePolicy duplicatePolicy;
-  final String rawContent;
-  final bool excelHasHeader;
-  final Uint8List? sourceBytes;
-  final String? loadedFileName;
+  final FlashcardImportOptions options;
+  final FlashcardImportSource source;
   final FlashcardImportPreparation? preparation;
+
+  ImportSourceFormat get format => options.format;
+  ImportStructuredTextSeparator get structuredTextSeparator =>
+      options.structuredTextSeparator;
+  FlashcardImportDuplicatePolicy get duplicatePolicy => options.duplicatePolicy;
+  bool get excelHasHeader => options.excelHasHeader;
+  String get rawContent => source.rawContent;
+  Uint8List? get sourceBytes => source.sourceBytes;
+  String? get loadedFileName => source.loadedFileName;
 
   FlashcardImportDraftState copyWith({
     ImportSourceFormat? format,
@@ -60,16 +74,43 @@ class FlashcardImportDraftState {
   );
 }
 
+@immutable
+class FlashcardImportOptions {
+  const FlashcardImportOptions({
+    required this.format,
+    required this.structuredTextSeparator,
+    required this.duplicatePolicy,
+    required this.excelHasHeader,
+  });
+
+  final ImportSourceFormat format;
+  final ImportStructuredTextSeparator structuredTextSeparator;
+  final FlashcardImportDuplicatePolicy duplicatePolicy;
+  final bool excelHasHeader;
+}
+
+@immutable
+class FlashcardImportSource {
+  const FlashcardImportSource({
+    required this.rawContent,
+    this.sourceBytes,
+    this.loadedFileName,
+  });
+
+  final String rawContent;
+  final Uint8List? sourceBytes;
+  final String? loadedFileName;
+}
+
 @riverpod
 class FlashcardImportDraft extends _$FlashcardImportDraft {
   @override
-  FlashcardImportDraftState build(String deckId) =>
-      const FlashcardImportDraftState(
-        format: ImportSourceFormat.excel,
-        structuredTextSeparator: ImportStructuredTextSeparator.auto,
-        duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
-        rawContent: '',
-      );
+  FlashcardImportDraftState build(String deckId) => FlashcardImportDraftState(
+    format: ImportSourceFormat.excel,
+    structuredTextSeparator: ImportStructuredTextSeparator.auto,
+    duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,
+    rawContent: '',
+  );
 
   void setFormat(ImportSourceFormat format) {
     if (state.format == format) {
@@ -156,7 +197,7 @@ class FlashcardImportDraft extends _$FlashcardImportDraft {
   }
 
   void reset() {
-    state = const FlashcardImportDraftState(
+    state = FlashcardImportDraftState(
       format: ImportSourceFormat.excel,
       structuredTextSeparator: ImportStructuredTextSeparator.auto,
       duplicatePolicy: FlashcardImportDuplicatePolicy.skipExactDuplicates,

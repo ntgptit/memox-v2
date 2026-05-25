@@ -35,40 +35,61 @@ class FlashcardEditorArgs {
 
 @immutable
 class FlashcardEditorDraftState {
-  const FlashcardEditorDraftState({
-    required this.deckId,
-    required this.deckName,
-    required this.breadcrumb,
+  FlashcardEditorDraftState({
+    required String deckId,
+    required String deckName,
+    required List<String> breadcrumb,
     required this.flashcardId,
-    required this.front,
-    required this.back,
-    required this.note,
-    required this.example,
-    required this.pronunciation,
-    required this.hint,
-    required this.tags,
-    required this.startingStatus,
-    required this.originalFront,
-    required this.originalBack,
+    required String front,
+    required String back,
+    required String note,
+    required String example,
+    required String pronunciation,
+    required String hint,
+    required List<String> tags,
+    required FlashcardStartingStatus startingStatus,
+    required String originalFront,
+    required String originalBack,
     required this.hasLearningProgress,
-  });
+  }) : deckContext = FlashcardEditorDeckContext(
+         deckId: deckId,
+         deckName: deckName,
+         breadcrumb: breadcrumb,
+       ),
+       content = FlashcardEditorContentDraft(
+         front: front,
+         back: back,
+         note: note,
+         example: example,
+         pronunciation: pronunciation,
+         hint: hint,
+         tags: tags,
+         startingStatus: startingStatus,
+       ),
+       originalContent = FlashcardEditorOriginalContent(
+         front: originalFront,
+         back: originalBack,
+       );
 
-  final String deckId;
-  final String deckName;
-  final List<String> breadcrumb;
+  final FlashcardEditorDeckContext deckContext;
   final String? flashcardId;
-  final String front;
-  final String back;
-  final String note;
-  final String example;
-  final String pronunciation;
-  final String hint;
-  final List<String> tags;
-  final FlashcardStartingStatus startingStatus;
-  final String originalFront;
-  final String originalBack;
+  final FlashcardEditorContentDraft content;
+  final FlashcardEditorOriginalContent originalContent;
   final bool hasLearningProgress;
 
+  String get deckId => deckContext.deckId;
+  String get deckName => deckContext.deckName;
+  List<String> get breadcrumb => deckContext.breadcrumb;
+  String get front => content.front;
+  String get back => content.back;
+  String get note => content.note;
+  String get example => content.example;
+  String get pronunciation => content.pronunciation;
+  String get hint => content.hint;
+  List<String> get tags => content.tags;
+  FlashcardStartingStatus get startingStatus => content.startingStatus;
+  String get originalFront => originalContent.front;
+  String get originalBack => originalContent.back;
   bool get isEditing => flashcardId != null;
 
   bool get canSave =>
@@ -122,6 +143,53 @@ class FlashcardEditorDraftState {
     originalBack: originalBack,
     hasLearningProgress: hasLearningProgress,
   );
+}
+
+@immutable
+class FlashcardEditorDeckContext {
+  const FlashcardEditorDeckContext({
+    required this.deckId,
+    required this.deckName,
+    required this.breadcrumb,
+  });
+
+  final String deckId;
+  final String deckName;
+  final List<String> breadcrumb;
+}
+
+@immutable
+class FlashcardEditorContentDraft {
+  const FlashcardEditorContentDraft({
+    required this.front,
+    required this.back,
+    required this.note,
+    required this.example,
+    required this.pronunciation,
+    required this.hint,
+    required this.tags,
+    required this.startingStatus,
+  });
+
+  final String front;
+  final String back;
+  final String note;
+  final String example;
+  final String pronunciation;
+  final String hint;
+  final List<String> tags;
+  final FlashcardStartingStatus startingStatus;
+}
+
+@immutable
+class FlashcardEditorOriginalContent {
+  const FlashcardEditorOriginalContent({
+    required this.front,
+    required this.back,
+  });
+
+  final String front;
+  final String back;
 }
 
 @riverpod

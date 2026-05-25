@@ -115,9 +115,7 @@ class _MxDestinationPickerSheetState<T>
 
   @override
   Widget build(BuildContext context) {
-    final filteredDestinations = widget.destinations
-        .where((destination) => _matchesQuery(destination, _query))
-        .toList(growable: false);
+    final filteredDestinations = _filteredDestinations;
     final content = filteredDestinations.isEmpty
         ? _MxDestinationEmptyState(label: widget.emptyLabel)
         : ConstrainedBox(
@@ -163,6 +161,10 @@ class _MxDestinationPickerSheetState<T>
       ],
     );
   }
+
+  List<MxDestinationOption<T>> get _filteredDestinations => widget.destinations
+      .where((destination) => _matchesQuery(destination, _query))
+      .toList(growable: false);
 
   bool _matchesQuery(MxDestinationOption<T> destination, String query) {
     if (query.isEmpty) return true;

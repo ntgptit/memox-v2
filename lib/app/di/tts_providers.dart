@@ -16,7 +16,7 @@ part 'tts_providers.g.dart';
 @riverpod
 TtsPlaybackPolicy ttsPlaybackPolicy(Ref ref) => const TtsPlaybackPolicy();
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<TtsSettingsRepository> ttsSettingsRepository(Ref ref) async =>
     TtsSettingsRepositoryImpl(TtsSettingsDao(ref.watch(appDatabaseProvider)));
 

@@ -26,27 +26,27 @@ http.Client driveSyncHttpClient(Ref ref) {
   return client;
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 DriveAppDataClient googleDriveAppDataClient(Ref ref) =>
     GoogleDriveAppDataClient(ref.watch(driveSyncHttpClientProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 DriveSyncSnapshotCodec driveSyncSnapshotCodec(Ref ref) =>
     const DriveSyncSnapshotCodec();
 
-@riverpod
+@Riverpod(keepAlive: true)
 LocalDatabaseSnapshotGateway localDatabaseSnapshotGateway(Ref ref) =>
     createLocalDatabaseSnapshotGateway(ref.watch(appDatabaseProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<AppSettingsSnapshotStore> appSettingsSnapshotStore(Ref ref) async =>
     AppSettingsSnapshotStore(await ref.watch(sharedPreferencesProvider.future));
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<DriveSyncMetadataStore> driveSyncMetadataStore(Ref ref) async =>
     DriveSyncMetadataStore(await ref.watch(sharedPreferencesProvider.future));
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<DriveSyncRepository> driveSyncRepository(Ref ref) async =>
     GoogleDriveSyncRepository(
       accountRepository: await ref.watch(cloudAccountRepositoryProvider.future),
@@ -84,7 +84,7 @@ Future<RestoreDriveSnapshotUseCase> restoreDriveSnapshotUseCase(
   await ref.watch(driveSyncRepositoryProvider.future),
 );
 
-@riverpod
+@Riverpod(keepAlive: true)
 AppReloadService appReloadService(Ref ref) => createAppReloadService();
 
 @riverpod

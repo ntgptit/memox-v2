@@ -110,9 +110,7 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
     );
     final totalPairs = roundItems.length;
     final pairsMatched = _matchedItemIds.length;
-    final pairsLeftInBatch = visibleItems
-        .where((item) => !_matchedItemIds.contains(item.id))
-        .length;
+    final pairsLeftInBatch = _pairsLeftInBatch(visibleItems);
     final totalBoards = totalPairs == 0
         ? 1
         : ((totalPairs + matchVisiblePairLimit - 1) ~/ matchVisiblePairLimit);
@@ -174,6 +172,9 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
       .where((itemId) => !_failedItemIds.contains(itemId))
       .length
       .toDouble();
+
+  int _pairsLeftInBatch(List<StudySessionItem> visibleItems) =>
+      visibleItems.where((item) => !_matchedItemIds.contains(item.id)).length;
 
   List<StudySessionItem> _rightItems(List<StudySessionItem> roundItems) {
     final itemById = <String, StudySessionItem>{

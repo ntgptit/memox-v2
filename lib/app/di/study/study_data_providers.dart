@@ -14,22 +14,22 @@ import '../providers.dart';
 
 part 'study_data_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 StudySessionDao studySessionDao(Ref ref) =>
     StudySessionDao(ref.watch(appDatabaseProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 StudySessionItemDao studySessionItemDao(Ref ref) =>
     StudySessionItemDao(ref.watch(appDatabaseProvider));
 
-@riverpod
+@Riverpod(keepAlive: true)
 StudyAttemptDao studyAttemptDao(Ref ref) =>
     StudyAttemptDao(ref.watch(appDatabaseProvider));
 
 @riverpod
 Random studyShuffleRandom(Ref ref) => Random();
 
-@riverpod
+@Riverpod(keepAlive: true)
 StudyRepo studyRepo(Ref ref) => StudyRepoImpl(
   database: ref.watch(appDatabaseProvider),
   studySessionDao: ref.watch(studySessionDaoProvider),

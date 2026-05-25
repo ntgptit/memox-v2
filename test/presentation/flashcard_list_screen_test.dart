@@ -964,23 +964,23 @@ void main() {
   );
 }
 
-const _sampleFlashcardState = FlashcardListState(
+final _sampleFlashcardState = FlashcardListState(
   deckId: 'deck-001',
   folderId: 'folder-001',
   deckName: 'Korean deck',
-  breadcrumb: <BreadcrumbSegmentReadModel>[
+  breadcrumb: const <BreadcrumbSegmentReadModel>[
     BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
     BreadcrumbSegmentReadModel(label: 'Korean deck', folderId: null),
   ],
   sortMode: ContentSortMode.manual,
   searchTerm: '',
-  progress: FlashcardDeckProgressState(
+  progress: const FlashcardDeckProgressState(
     newCount: 1,
     learningCount: 1,
     masteredCount: 0,
     masteryPercent: 7,
   ),
-  items: <FlashcardListItemState>[
+  items: const <FlashcardListItemState>[
     FlashcardListItemState(
       id: 'card-001',
       front: 'Front 1',
@@ -998,23 +998,23 @@ const _sampleFlashcardState = FlashcardListState(
   ],
 );
 
-const _emptyFlashcardState = FlashcardListState(
+final _emptyFlashcardState = FlashcardListState(
   deckId: 'deck-001',
   folderId: 'folder-001',
   deckName: 'Korean deck',
-  breadcrumb: <BreadcrumbSegmentReadModel>[
+  breadcrumb: const <BreadcrumbSegmentReadModel>[
     BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
     BreadcrumbSegmentReadModel(label: 'Korean deck', folderId: null),
   ],
   sortMode: ContentSortMode.manual,
   searchTerm: '',
-  progress: FlashcardDeckProgressState(
+  progress: const FlashcardDeckProgressState(
     newCount: 0,
     learningCount: 0,
     masteredCount: 0,
     masteryPercent: 0,
   ),
-  items: <FlashcardListItemState>[],
+  items: const <FlashcardListItemState>[],
 );
 
 FlashcardListState _largeFlashcardState() => FlashcardListState(

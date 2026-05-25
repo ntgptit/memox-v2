@@ -9,7 +9,7 @@ import 'content_data_providers.dart';
 
 part 'flashcard_providers.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 FlashcardRepository flashcardRepository(Ref ref) => FlashcardRepositoryImpl(
   flashcardDao: ref.watch(flashcardDaoProvider),
   deckDao: ref.watch(deckDaoProvider),
