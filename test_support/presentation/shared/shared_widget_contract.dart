@@ -2672,6 +2672,12 @@ void registerSharedWidgetContractTests() {
       ),
     );
     final before = tester.getSize(find.byKey(actionKey));
+    final focusSurfaceBefore = tester.getSize(
+      find.descendant(
+        of: find.byKey(actionKey),
+        matching: find.byType(MxTappable),
+      ),
+    );
 
     updateState(() {
       masteryPercent = 100;
@@ -2679,8 +2685,17 @@ void registerSharedWidgetContractTests() {
     });
     await tester.pump();
     final after = tester.getSize(find.byKey(actionKey));
+    final focusSurfaceAfter = tester.getSize(
+      find.descendant(
+        of: find.byKey(actionKey),
+        matching: find.byType(MxTappable),
+      ),
+    );
 
     expect(after, before);
+    expect(focusSurfaceBefore, focusSurfaceAfter);
+    expect(focusSurfaceBefore.width, lessThan(before.width));
+    expect(focusSurfaceBefore.height, kMinInteractiveDimension);
     expect(find.text('100%'), findsOneWidget);
     expect(find.text('99+'), findsOneWidget);
   });
@@ -3481,10 +3496,18 @@ void registerSharedWidgetContractTests() {
 
       final bodyBottom = tester.getBottomLeft(find.byKey(bodyKey)).dy;
       final navTop = tester.getTopLeft(find.byType(MxBottomNav)).dy;
+      final navBarLeft = tester
+          .getTopLeft(find.byKey(const ValueKey('mx-bottom-nav-bar')))
+          .dx;
+      final navBarRight = tester
+          .getTopRight(find.byKey(const ValueKey('mx-bottom-nav-bar')))
+          .dx;
       final navBarHeight = tester
           .getSize(find.byKey(const ValueKey('mx-bottom-nav-bar')))
           .height;
 
+      expect(navBarLeft, AppSpacing.lg);
+      expect(navBarRight, 412 - AppSpacing.lg);
       expect(navBarHeight, 64);
       expect(bodyBottom, lessThanOrEqualTo(navTop));
       expect(

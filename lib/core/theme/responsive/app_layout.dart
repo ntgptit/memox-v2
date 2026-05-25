@@ -108,9 +108,7 @@ abstract final class AppLayout {
   static EdgeInsets pagePadding(WindowSize size, {bool compactMobile = false}) {
     switch (size) {
       case WindowSize.compact:
-        return EdgeInsets.symmetric(
-          horizontal: compactMobile ? AppSpacing.md : AppSpacing.lg,
-        );
+        return const EdgeInsets.symmetric(horizontal: AppSpacing.lg);
       case WindowSize.medium:
         return const EdgeInsets.symmetric(horizontal: AppSpacing.xl);
       case WindowSize.expanded:

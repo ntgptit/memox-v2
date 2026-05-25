@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/router/route_names.dart';
+import 'package:memox/core/theme/tokens/app_spacing.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/dashboard/screens/dashboard_screen.dart';
 import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
@@ -161,6 +162,14 @@ void main() {
           matching: find.text('4'),
         ),
         findsOneWidget,
+      );
+
+      final deckTileSize = tester.getSize(
+        find.byKey(const ValueKey('dashboard_deck_deck-grammar')),
+      );
+      expect(
+        deckTileSize.height,
+        greaterThanOrEqualTo(kMinInteractiveDimension + AppSpacing.lg * 2),
       );
     },
   );

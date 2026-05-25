@@ -15,7 +15,7 @@ import 'mx_text.dart';
 /// Floating bottom navigation bar per Design System.
 ///
 /// Mock spec:
-/// - Wrapper has small horizontal margin + bottom inset so the bar floats
+/// - Wrapper aligns to the page gutter + bottom inset so the bar floats
 ///   above the page rather than running edge-to-edge.
 /// - Bar itself: rounded surface with a ghost outline.
 /// - Active destination renders the icon inside a tonal "pill" — the label
@@ -43,9 +43,9 @@ class MxBottomNav extends StatelessWidget {
       minimum: const EdgeInsets.only(bottom: MxSpace.sm),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
-          MxSpace.sm,
+          AppSpacing.lg,
           MxSpace.xs,
-          MxSpace.sm,
+          AppSpacing.lg,
           MxSpace.xs,
         ),
         child: ClipRRect(

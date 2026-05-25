@@ -10,8 +10,6 @@ import '../../../shared/widgets/mx_study_progress_action.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
 
-const double _deckHighlightTileExtent = MxSpace.xxl + MxSpace.xxl + MxSpace.xl;
-
 class DashboardDeckHighlightsSection extends StatelessWidget {
   const DashboardDeckHighlightsSection({required this.items, super.key});
 
@@ -38,17 +36,13 @@ class DashboardDeckHighlightsSection extends StatelessWidget {
           role: MxTextRole.formLabel,
         ),
         const MxGap(MxSpace.sm),
-        SizedBox(
-          height:
-              visibleItems.length * _deckHighlightTileExtent +
-              separatorCount * MxSpace.sm,
-          child: ListView.separated(
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: visibleItems.length,
-            itemBuilder: (context, index) =>
-                _DashboardDeckHighlightTile(item: visibleItems[index]),
-            separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
-          ),
+        Column(
+          children: [
+            for (var index = 0; index < visibleItems.length; index++) ...[
+              _DashboardDeckHighlightTile(item: visibleItems[index]),
+              if (index < separatorCount) const MxGap(MxSpace.sm),
+            ],
+          ],
         ),
       ],
     );
