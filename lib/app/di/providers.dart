@@ -7,6 +7,7 @@ import 'package:talker_flutter/talker_flutter.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/network/connectivity_service.dart';
 import '../../core/network/network_info.dart';
+import '../../core/services/app_info_service.dart';
 import '../../data/datasources/local/app_database.dart';
 import '../config/app_config.dart';
 import '../config/env.dart';
@@ -44,6 +45,18 @@ ConnectivityService connectivityService(Ref ref) {
 
 @Riverpod(keepAlive: true)
 NetworkInfo networkInfo(Ref ref) => ref.watch(connectivityServiceProvider);
+
+@Riverpod(keepAlive: true)
+AppInfoService appInfoService(Ref ref) => const PackageInfoAppInfoService();
+
+/// Cached app version label such as `1.0.0+1`. Resolved once at startup via
+/// `PackageInfo.fromPlatform()` and reused for every Drive backup manifest.
+@Riverpod(keepAlive: true)
+Future<String> appVersionLabel(Ref ref) async {
+  final service = ref.watch(appInfoServiceProvider);
+  final info = await service.load();
+  return info.fullLabel;
+}
 
 @Riverpod(keepAlive: true)
 AppDatabase appDatabase(Ref ref) {

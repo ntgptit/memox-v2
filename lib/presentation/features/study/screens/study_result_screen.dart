@@ -272,7 +272,6 @@ class _MetricRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: MxSpace.xs),
-    // guard:layout-value-reviewed -- reason: metric rows use tokenized vertical rhythm inside result cards.
     child: Row(
       children: [
         Expanded(child: MxText(label, role: MxTextRole.contentBody)),

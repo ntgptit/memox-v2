@@ -171,9 +171,15 @@ All reusable UI lives in `lib/presentation/shared/`. Features MUST reach for a s
 | Widget | Use when |
 | --- | --- |
 | `MxAdaptiveScaffold` | Top-level shell with destinations. Handles bottom nav → rail → extended rail across tiers. |
-| `MxScaffold` | Leaf-screen scaffold (no destinations). |
-| `MxContentShell` | Caps reading column width at a `MxContentWidth` role. |
+| `MxScaffold` | Leaf-screen scaffold (no destinations). `bodyInsets: true` by default — applies `context.pageInsets(hasFab: ...)` automatically, do **not** wrap body in another `Padding`. Set `bodyInsets: false` only when the child handles its own gutters (e.g. `MxContentShell`, `Column` with custom slots). |
+| `MxListScaffold` | List-oriented leaf screen. Wraps body in `MxContentShell(width: contentWidth)` with tier-aware page insets; reserves bottom clearance when `floatingActionButton` is set. |
+| `MxFormScaffold` | Form / editor leaf screen. Scrollable body capped at `MxContentWidth.reading`, keyboard-dismiss-on-drag, optional `bottomAction` anchored above keyboard + SafeArea and centered to the content column on wide windows. |
+| `MxStudyScaffold` | Study-session shell. Typed top-bar slots (`modeLabel`, `accent`, `progressValue`, `counterLabel`) + body + optional `bottomAction`. Horizontal gutters are tier-aware via `context.pagePadding`; vertical insets stay tokenized. |
+| `MxContentShell` | Caps reading column width at a `MxContentWidth` role. Auto-applies `context.pagePadding` (or `pageInsets` when `applyVerticalPadding: true`). |
 | `MxSection` | Labeled content grouping inside a screen. |
+| `MxGap` / `MxSliverGap` | Axis-aware spacer. Size must come from `MxSpace.*` (features) or `AppSpacing.*` (shared widgets). |
+| `MxSpace` | Spacing tokens scoped to feature code (`xs`, `sm`, `md`, `lg`, ...). |
+| `MxFeatureLayout` | `MxFeatureSizes` (reorder panel heights with `clamp` ratio) + `MxFeatureRadii` (panel/full radii) for feature-side layout constants. |
 
 ### Widgets (`presentation/shared/widgets/`)
 
@@ -181,19 +187,34 @@ All reusable UI lives in `lib/presentation/shared/`. Features MUST reach for a s
 | --- | --- |
 | `MxPrimaryButton` / `MxSecondaryButton` | Filled / outlined / text buttons with size variants. |
 | `MxIconButton` | Themed icon-only button. |
-| `MxTextField` / `MxSearchField` | Input fields, bound to input theme. |
+| `MxFab` | Shared floating action button primitive. |
+| `MxTextField` / `MxSearchField` / `MxSelectField` / `MxFieldLabel` | Input fields + label primitives, bound to input theme. |
+| `MxSearchSortToolbar` / `MxSortMenuChip` | Search + sort toolbar pattern with menu-anchored sort chip. |
 | `MxCard` | Filled / elevated / outlined card container. |
-| `MxListTile` | List row with leading/title/subtitle/trailing. |
+| `MxDeckCard` / `MxDeckPill` | Deck-flavored card surface + compact pill. |
+| `MxDueSummaryCard` / `MxStatCard` / `MxStreakCard` | Dashboard summary surfaces. |
+| `MxCardBreakdownList` | Per-card breakdown rows for review/result surfaces. |
+| `MxListTile` / `MxIconTile` / `MxPickupTile` | List row primitives (generic, icon-led, pickup CTA). |
+| `MxStudySetTile` / `MxFolderTile` | Library rows for study sets and folders. |
+| `MxReorderableList` | Drag-to-reorder list primitive. |
+| `MxBulkActionBar` | Multi-select toolbar shown above lists/grids. |
 | `MxChip` / `MxBadge` | Filter chips, status badges. |
-| `MxProgressIndicator` | Linear + circular progress with size variants. |
-| `MxSegmentedControl` | Two/three-way toggle. |
+| `MxSegmentedControl` / `MxSegmentedStatus` | Two/three-way toggle + segmented status indicator. |
+| `MxInlineToggle` | Inline switch row primitive. |
+| `MxSlider` | Themed slider primitive. |
+| `MxProgressIndicator` / `MxProgressRing` | Linear, circular, and ring progress with size variants. |
+| `MxStudyProgressAction` | Study top-bar progress + close action composite. |
 | `MxBreadcrumbBar` | Navigation breadcrumbs. |
 | `MxAvatar` | Circular avatar + optional "Plus" pill badge. |
 | `MxPageDots` | Carousel page indicator. |
 | `MxSectionHeader` | Title + optional action link ("Xem tất cả"). |
-| `MxStudySetTile` | Library row: icon tile + title + meta + owner. |
-| `MxFlashcard` | Hero study-card surface (front/back face). |
-| `MxStreakCard` | Profile streak surface with flame + 7-day row. |
+| `MxFlashcard` / `MxAnswerOptionCard` / `MxModeMixCard` | Study surfaces: hero flashcard, answer option, mode mix tile. |
+| `MxTermRow` | Term / definition two-line row for flashcard set detail. |
+| `MxSpeakButton` | TTS playback action with state indicator. |
+| `MxDivider` | Themed divider primitive. |
+| `MxAnimatedSwitcher` / `MxShakeTransition` | Themed transitions for swap + error/shake feedback. |
+| `MxBottomNav` | Material 3 bottom navigation primitive used by `MxAdaptiveScaffold`. |
+| `MxStudyTopBar` | Top-bar surface consumed by `MxStudyScaffold`. |
 
 ### Dialogs / Feedback / States
 
@@ -202,6 +223,7 @@ All reusable UI lives in `lib/presentation/shared/`. Features MUST reach for a s
 | `MxDialog`, `MxConfirmationDialog`, `MxBottomSheet` | Modal surfaces. |
 | `MxBanner`, `MxSnackbar` | Inline + transient feedback. |
 | `MxEmptyState`, `MxErrorState`, `MxLoadingState`, `MxOfflineState` | Full-area states. |
+| `MxRetainedAsyncState<T>` | Canonical `AsyncValue` renderer for screens/sections. Keeps the last-known data on reload, supports `skeletonBuilder`, `errorBuilder`, `onRetry`. Use this instead of `AsyncValue.when` (banned by `memox.no_async_value_when`). |
 
 ### Still missing (build when the first feature needs them)
 
@@ -211,10 +233,7 @@ These patterns appear in the target design but are not in the catalogue yet. Bui
 - **`MxTabBar`** — themed `TabBar` wrapper (Học phần / Thư mục / Lớp học) with the indigo underline indicator.
 - **`MxFabCluster`** — the centered raised "+" FAB sitting inside the bottom nav notch.
 - **`MxStatChip`** — compact `icon + number + label` inline chip for stats rows.
-- **`MxTermRow`** — term/definition two-line row for flashcard set detail.
 - **`MxStudyModeTile`** — the "Thẻ ghi nhớ / Học / Kiểm tra / Ghép thẻ / Blast" tile with colored icon square and chevron.
-- **`MxProgressRing`** — circular progress-ring variant for rating completion.
-- **`MxFolderTile`** — library folder row (folder icon + name + owner).
 - **`MxClassTile`** — class card row.
 - **`MxAchievementBadge`** — profile achievement icon pill.
 

@@ -18,6 +18,7 @@ final class DriveSyncSnapshotCodec {
     required int createdAt,
     required String deviceId,
     required String deviceLabel,
+    String? appVersion,
   }) {
     final canonicalSettings = DriveSyncJson.encodeCanonicalJson(settings);
     final settingsBytes = Uint8List.fromList(utf8.encode(canonicalSettings));
@@ -35,6 +36,7 @@ final class DriveSyncSnapshotCodec {
       databaseSha256: databaseHash,
       settingsSha256: settingsHash,
       snapshotSizeBytes: databaseBytes.length,
+      appVersion: appVersion,
     );
 
     final archive = Archive()

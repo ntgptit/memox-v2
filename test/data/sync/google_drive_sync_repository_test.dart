@@ -345,6 +345,7 @@ final class _RepositoryHarness {
       snapshotCodec: const DriveSyncSnapshotCodec(),
       clock: const _FakeClock(100),
       idGenerator: const _FakeIdGenerator('device-id'),
+      appVersion: '0.0.0-test',
       logger: useNullLogger ? null : logger,
     );
 

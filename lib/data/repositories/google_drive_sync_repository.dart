@@ -32,6 +32,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
     required DriveSyncSnapshotCodec snapshotCodec,
     required Clock clock,
     required IdGenerator idGenerator,
+    required String appVersion,
     AppLogger? logger,
   }) : _accountRepository = accountRepository,
        _authService = authService,
@@ -43,6 +44,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
        _snapshotCodec = snapshotCodec,
        _clock = clock,
        _idGenerator = idGenerator,
+       _appVersion = appVersion,
        _logger = logger ?? const NoopAppLogger();
 
   final CloudAccountRepository _accountRepository;
@@ -55,6 +57,7 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
   final DriveSyncSnapshotCodec _snapshotCodec;
   final Clock _clock;
   final IdGenerator _idGenerator;
+  final String _appVersion;
   final AppLogger _logger;
 
   @override
@@ -64,10 +67,16 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
       return context.status;
     }
 
+    final localDeviceId = await _metadataStore.loadOrCreateDeviceId(
+      _idGenerator,
+    );
     try {
       final remote = await _loadRemoteSnapshot(context.accessToken);
       if (remote == null) {
-        return const DriveSyncStatus.noRemoteSnapshot();
+        return DriveSyncStatus(
+          kind: DriveSyncStatusKind.noRemoteSnapshot,
+          localDeviceId: localDeviceId,
+        );
       }
       final metadata = _metadataStore.loadForAccount(context.link!.subjectId);
       if (metadata != null &&
@@ -77,12 +86,14 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
           kind: DriveSyncStatusKind.synced,
           lastSyncedAt: metadata.lastSyncedAt,
           remote: remote,
+          localDeviceId: localDeviceId,
         );
       }
       return DriveSyncStatus(
         kind: DriveSyncStatusKind.ready,
         lastSyncedAt: metadata?.lastSyncedAt,
         remote: remote,
+        localDeviceId: localDeviceId,
       );
     } on Object catch (error, stackTrace) {
       _logger.error(
@@ -110,7 +121,9 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
           localFingerprint: local.fingerprint,
           remote: remote,
         );
-        return DriveSyncRunResult.noChanges(_syncedStatus(remote));
+        return DriveSyncRunResult.noChanges(
+          _syncedStatus(remote, localDeviceId: local.manifest.deviceId),
+        );
       }
 
       final uploaded = await _uploadLocalSnapshot(
@@ -153,13 +166,16 @@ final class GoogleDriveSyncRepository implements DriveSyncRepository {
           localFingerprint: local.fingerprint,
           remote: remote,
         );
-        return DriveSyncRunResult.noChanges(_syncedStatus(remote));
+        return DriveSyncRunResult.noChanges(
+          _syncedStatus(remote, localDeviceId: local.manifest.deviceId),
+        );
       }
 
       return _restoreRemoteSnapshot(
         accessToken: context.accessToken,
         remote: remote,
         accountSubjectId: context.link!.subjectId,
+        localDeviceId: local.manifest.deviceId,
       );
     } on Object catch (error, stackTrace) {
       _logger.error(

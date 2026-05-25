@@ -61,6 +61,25 @@ Future<void> _showDirectionSheet(
   if (!context.mounted) return;
   if (direction == null) return;
 
+  // Cross-device warning: if the user is about to upload and the existing
+  // remote backup was created by a different device, insert an extra
+  // confirmation step explicitly listing the OTHER device + its backup time.
+  if (direction == _DriveSyncDirection.uploadLocal &&
+      state.status.remoteIsFromOtherDevice) {
+    final remote = state.status.remote!;
+    final acknowledged = await MxBottomSheet.show<bool>(
+      context: context,
+      title: l10n.settingsDriveSyncCrossDeviceTitle,
+      child: _DriveSyncCrossDeviceSheet(
+        deviceLabel: remote.manifest.deviceLabel,
+        createdAt: remote.manifest.createdAt,
+        appVersion: remote.manifest.appVersion,
+      ),
+    );
+    if (!context.mounted) return;
+    if (acknowledged != true) return;
+  }
+
   final confirmed = await MxBottomSheet.show<bool>(
     context: context,
     title: switch (direction) {
@@ -342,6 +361,22 @@ class _DriveSyncConfirmationSheet extends StatelessWidget {
             ),
             role: MxTextRole.formHelper,
           ),
+          if (remote.manifest.appVersion != null) ...[
+            const MxGap(MxSpace.xxs),
+            MxText(
+              l10n.settingsDriveSyncBackupAppVersion(
+                remote.manifest.appVersion!,
+              ),
+              role: MxTextRole.formHelper,
+            ),
+          ],
+          if (state.status.remoteIsFromOtherDevice) ...[
+            const MxGap(MxSpace.xs),
+            MxText(
+              l10n.settingsDriveSyncRestoreCrossDeviceWarning,
+              role: MxTextRole.formHelper,
+            ),
+          ],
         ],
         const MxGap(MxSpace.md),
         MxPrimaryButton(
@@ -355,6 +390,71 @@ class _DriveSyncConfirmationSheet extends StatelessWidget {
           tone: isRestore
               ? MxPrimaryButtonTone.danger
               : MxPrimaryButtonTone.primary,
+          fullWidth: true,
+        ),
+        const MxGap(MxSpace.sm),
+        MxSecondaryButton(
+          label: l10n.commonCancel,
+          onPressed: () => Navigator.of(context).pop(false),
+          variant: MxSecondaryVariant.text,
+          fullWidth: true,
+        ),
+      ],
+    );
+  }
+
+  String _formatBackupTime(BuildContext context, int epochMillis) {
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(epochMillis).toLocal();
+    final materialL10n = MaterialLocalizations.of(context);
+    final date = materialL10n.formatShortDate(dateTime);
+    final time = materialL10n.formatTimeOfDay(TimeOfDay.fromDateTime(dateTime));
+    return '$date $time';
+  }
+}
+
+class _DriveSyncCrossDeviceSheet extends StatelessWidget {
+  const _DriveSyncCrossDeviceSheet({
+    required this.deviceLabel,
+    required this.createdAt,
+    required this.appVersion,
+  });
+
+  final String deviceLabel;
+  final int createdAt;
+  final String? appVersion;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        MxText(
+          l10n.settingsDriveSyncCrossDeviceMessage,
+          role: MxTextRole.formHelper,
+        ),
+        const MxGap(MxSpace.sm),
+        MxText(
+          l10n.settingsDriveSyncBackupSource(
+            deviceLabel,
+            _formatBackupTime(context, createdAt),
+          ),
+          role: MxTextRole.formHelper,
+        ),
+        if (appVersion != null) ...[
+          const MxGap(MxSpace.xxs),
+          MxText(
+            l10n.settingsDriveSyncBackupAppVersion(appVersion!),
+            role: MxTextRole.formHelper,
+          ),
+        ],
+        const MxGap(MxSpace.md),
+        MxPrimaryButton(
+          label: l10n.settingsDriveSyncCrossDeviceContinue,
+          onPressed: () => Navigator.of(context).pop(true),
+          leadingIcon: Icons.warning_amber_rounded,
+          tone: MxPrimaryButtonTone.danger,
           fullWidth: true,
         ),
         const MxGap(MxSpace.sm),

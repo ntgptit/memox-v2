@@ -664,6 +664,26 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String settingsDriveSyncBackupAppVersion(Object version) {
+    return 'Phiên bản app: $version';
+  }
+
+  @override
+  String get settingsDriveSyncCrossDeviceTitle =>
+      'Ghi đè backup từ thiết bị khác?';
+
+  @override
+  String get settingsDriveSyncCrossDeviceMessage =>
+      'Backup hiện tại trên Google Drive được tạo bởi một thiết bị KHÁC. Tải lên từ thiết bị này sẽ ghi đè backup đó. Hãy chắc chắn thiết bị kia không còn dữ liệu bạn muốn giữ.';
+
+  @override
+  String get settingsDriveSyncCrossDeviceContinue => 'Vẫn ghi đè';
+
+  @override
+  String get settingsDriveSyncRestoreCrossDeviceWarning =>
+      'Cảnh báo: backup này được tạo trên thiết bị khác. Khôi phục sẽ thay thế dữ liệu local của thiết bị này bằng dữ liệu của thiết bị kia.';
+
+  @override
   String get settingsDriveSyncUploadInProgressTitle =>
       'Đang sao lưu lên Google Drive';
 

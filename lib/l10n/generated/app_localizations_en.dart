@@ -738,6 +738,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String settingsDriveSyncBackupAppVersion(Object version) {
+    return 'App version: $version';
+  }
+
+  @override
+  String get settingsDriveSyncCrossDeviceTitle =>
+      'Overwrite backup from another device?';
+
+  @override
+  String get settingsDriveSyncCrossDeviceMessage =>
+      'The current Google Drive backup was created by a DIFFERENT device. Uploading from this device will replace it. Make sure that other device does not still hold data you want to keep.';
+
+  @override
+  String get settingsDriveSyncCrossDeviceContinue => 'Overwrite anyway';
+
+  @override
+  String get settingsDriveSyncRestoreCrossDeviceWarning =>
+      'Warning: this backup was created on a different device. Restoring replaces this device\'s local data with that device\'s data.';
+
+  @override
   String get settingsDriveSyncUploadInProgressTitle =>
       'Backing up to Google Drive';
 

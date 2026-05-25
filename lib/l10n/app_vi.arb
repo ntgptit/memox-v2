@@ -374,6 +374,16 @@
       "when": {}
     }
   },
+  "settingsDriveSyncBackupAppVersion": "Phiên bản app: {version}",
+  "@settingsDriveSyncBackupAppVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "settingsDriveSyncCrossDeviceTitle": "Ghi đè backup từ thiết bị khác?",
+  "settingsDriveSyncCrossDeviceMessage": "Backup hiện tại trên Google Drive được tạo bởi một thiết bị KHÁC. Tải lên từ thiết bị này sẽ ghi đè backup đó. Hãy chắc chắn thiết bị kia không còn dữ liệu bạn muốn giữ.",
+  "settingsDriveSyncCrossDeviceContinue": "Vẫn ghi đè",
+  "settingsDriveSyncRestoreCrossDeviceWarning": "Cảnh báo: backup này được tạo trên thiết bị khác. Khôi phục sẽ thay thế dữ liệu local của thiết bị này bằng dữ liệu của thiết bị kia.",
   "settingsDriveSyncUploadInProgressTitle": "Đang sao lưu lên Google Drive",
   "settingsDriveSyncUploadInProgressMessage": "Vui lòng giữ ứng dụng mở. Không đóng app hoặc đổi tài khoản.",
   "settingsDriveSyncRestoreInProgressTitle": "Đang khôi phục từ Google Drive",

@@ -36,6 +36,7 @@ final class DriveSyncManifest {
     required this.databaseSha256,
     required this.settingsSha256,
     required this.snapshotSizeBytes,
+    this.appVersion,
     this.snapshotFileId,
     this.snapshotFileVersion,
   });
@@ -54,6 +55,10 @@ final class DriveSyncManifest {
   final String databaseSha256;
   final String settingsSha256;
   final int snapshotSizeBytes;
+
+  /// Human-readable app version string at backup time (e.g. `1.0.0+1`).
+  /// Nullable for legacy backups created before this field was introduced.
+  final String? appVersion;
   final String? snapshotFileId;
   final String? snapshotFileVersion;
 
@@ -77,6 +82,7 @@ final class DriveSyncManifest {
     databaseSha256: databaseSha256,
     settingsSha256: settingsSha256,
     snapshotSizeBytes: snapshotSizeBytes ?? this.snapshotSizeBytes,
+    appVersion: appVersion,
     snapshotFileId: snapshotFileId ?? this.snapshotFileId,
     snapshotFileVersion: snapshotFileVersion ?? this.snapshotFileVersion,
   );
@@ -148,6 +154,7 @@ final class DriveSyncStatus {
     this.lastSyncedAt,
     this.remote,
     this.message,
+    this.localDeviceId,
   });
 
   const DriveSyncStatus.signedOut() : this(kind: DriveSyncStatusKind.signedOut);
@@ -170,6 +177,21 @@ final class DriveSyncStatus {
   final int? lastSyncedAt;
   final DriveSyncRemoteSnapshot? remote;
   final String? message;
+
+  /// Local persistent device id. UI compares against
+  /// [DriveSyncRemoteSnapshot.manifest.deviceId] to detect cross-device backups.
+  final String? localDeviceId;
+
+  /// True when a remote backup exists and was created by a different device
+  /// than this one (different `deviceId` in the manifest).
+  bool get remoteIsFromOtherDevice {
+    final remoteId = remote?.manifest.deviceId;
+    final localId = localDeviceId;
+    if (remoteId == null || localId == null || localId.isEmpty) {
+      return false;
+    }
+    return remoteId != localId;
+  }
 }
 
 final class DriveSyncRunResult {

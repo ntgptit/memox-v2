@@ -38,6 +38,7 @@ class MxStudyScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final action = bottomAction;
+    final pageHorizontal = context.pagePadding;
 
     return MxScaffold(
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
@@ -57,10 +58,10 @@ class MxStudyScaffold extends StatelessWidget {
             child: MxContentShell(
               width: MxContentWidth.reading,
               padding: EdgeInsets.fromLTRB(
-                // guard:layout-value-reviewed -- reason: study body uses asymmetric tokenized insets around the progress top bar.
-                MxSpace.md,
+                // guard:layout-value-reviewed -- reason: combines tier-aware horizontal gutters with tokenized vertical insets around the study top bar.
+                pageHorizontal.left,
                 MxSpace.xs,
-                MxSpace.md,
+                pageHorizontal.right,
                 action == null ? MxSpace.md : MxSpace.sm,
               ),
               child: body,
@@ -71,11 +72,11 @@ class MxStudyScaffold extends StatelessWidget {
               top: false,
               child: MxContentShell(
                 width: MxContentWidth.reading,
-                padding: const EdgeInsets.fromLTRB(
-                  // guard:layout-value-reviewed -- reason: fixed study bottom action inset is tokenized and SafeArea-wrapped.
-                  MxSpace.md,
+                padding: EdgeInsets.fromLTRB(
+                  // guard:layout-value-reviewed -- reason: combines tier-aware horizontal gutters with tokenized vertical action spacing, SafeArea-wrapped.
+                  pageHorizontal.left,
                   MxSpace.sm,
-                  MxSpace.md,
+                  pageHorizontal.right,
                   MxSpace.md,
                 ),
                 child: action,

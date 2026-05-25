@@ -1158,6 +1158,36 @@ abstract class AppLocalizations {
   /// **'Backup from {device} • {when}'**
   String settingsDriveSyncBackupSource(Object device, Object when);
 
+  /// No description provided for @settingsDriveSyncBackupAppVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'App version: {version}'**
+  String settingsDriveSyncBackupAppVersion(Object version);
+
+  /// No description provided for @settingsDriveSyncCrossDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite backup from another device?'**
+  String get settingsDriveSyncCrossDeviceTitle;
+
+  /// No description provided for @settingsDriveSyncCrossDeviceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The current Google Drive backup was created by a DIFFERENT device. Uploading from this device will replace it. Make sure that other device does not still hold data you want to keep.'**
+  String get settingsDriveSyncCrossDeviceMessage;
+
+  /// No description provided for @settingsDriveSyncCrossDeviceContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite anyway'**
+  String get settingsDriveSyncCrossDeviceContinue;
+
+  /// No description provided for @settingsDriveSyncRestoreCrossDeviceWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: this backup was created on a different device. Restoring replaces this device\'s local data with that device\'s data.'**
+  String get settingsDriveSyncRestoreCrossDeviceWarning;
+
   /// No description provided for @settingsDriveSyncUploadInProgressTitle.
   ///
   /// In en, this message translates to:

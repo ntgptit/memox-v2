@@ -61,6 +61,7 @@ Future<DriveSyncRepository> driveSyncRepository(Ref ref) async =>
       snapshotCodec: ref.watch(driveSyncSnapshotCodecProvider),
       clock: ref.watch(clockProvider),
       idGenerator: ref.watch(idGeneratorProvider),
+      appVersion: await ref.watch(appVersionLabelProvider.future),
       logger: TalkerAppLogger(ref.watch(talkerProvider)),
     );
 

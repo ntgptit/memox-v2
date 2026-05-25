@@ -94,6 +94,7 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
       createdAt: _clock.nowEpochMillis(),
       deviceId: deviceId,
       deviceLabel: 'MemoX device',
+      appVersion: _appVersion,
     );
   }
 
@@ -223,6 +224,7 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
       kind: DriveSyncStatusKind.synced,
       lastSyncedAt: _clock.nowEpochMillis(),
       remote: uploadedRemote,
+      localDeviceId: local.manifest.deviceId,
     );
   }
 
@@ -230,12 +232,14 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
     required String accessToken,
     required DriveSyncRemoteSnapshot remote,
     required String accountSubjectId,
+    required String localDeviceId,
   }) async {
     if (remote.manifest.appDatabaseSchemaVersion >
         _databaseSnapshotGateway.currentSchemaVersion) {
       final status = DriveSyncStatus(
         kind: DriveSyncStatusKind.unsupportedSchema,
         remote: remote,
+        localDeviceId: localDeviceId,
       );
       return DriveSyncRunResult.failed(
         status,
@@ -271,6 +275,7 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
         kind: DriveSyncStatusKind.synced,
         lastSyncedAt: _clock.nowEpochMillis(),
         remote: remote,
+        localDeviceId: localDeviceId,
       ),
       effect,
     );
@@ -293,12 +298,15 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
     ),
   );
 
-  DriveSyncStatus _syncedStatus(DriveSyncRemoteSnapshot remote) =>
-      DriveSyncStatus(
-        kind: DriveSyncStatusKind.synced,
-        lastSyncedAt: _clock.nowEpochMillis(),
-        remote: remote,
-      );
+  DriveSyncStatus _syncedStatus(
+    DriveSyncRemoteSnapshot remote, {
+    required String localDeviceId,
+  }) => DriveSyncStatus(
+    kind: DriveSyncStatusKind.synced,
+    lastSyncedAt: _clock.nowEpochMillis(),
+    remote: remote,
+    localDeviceId: localDeviceId,
+  );
 }
 
 final class _DriveSyncContext {
