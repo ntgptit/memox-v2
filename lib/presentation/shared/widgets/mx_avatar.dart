@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
@@ -8,7 +9,7 @@ import '../layouts/mx_gap.dart';
 import 'mx_tappable.dart';
 import 'mx_text.dart';
 
-enum MxAvatarSize { sm, md, lg, xl }
+enum MxAvatarSize { sm, md, lg, xl, profile }
 
 /// Circular avatar with optional image, initials fallback, and an optional
 /// "Plus"-style badge pill rendered to the right. Matches the Quizlet-style
@@ -36,6 +37,7 @@ class MxAvatar extends StatelessWidget {
     MxAvatarSize.md => AppIconSizes.xl,
     MxAvatarSize.lg => AppIconSizes.xxl,
     MxAvatarSize.xl => AppIconSizes.xxxl,
+    MxAvatarSize.profile => AppIconSizes.massive + AppSpacing.xl,
   };
 
   @override
@@ -46,10 +48,13 @@ class MxAvatar extends StatelessWidget {
       width: _diameter,
       height: _diameter,
       child: imageUrl != null
-          ? Image.network(imageUrl!, fit: BoxFit.cover)
-          : Center(
-              child: MxText(_resolvedInitials, role: MxTextRole.avatarInitials),
-            ),
+          ? CachedNetworkImage(
+              imageUrl: imageUrl!,
+              fit: BoxFit.cover,
+              errorWidget: (_, _, _) =>
+                  _InitialsFallback(initials: _resolvedInitials),
+            )
+          : _InitialsFallback(initials: _resolvedInitials),
     );
 
     final tappable = onTap == null
@@ -89,9 +94,27 @@ class MxAvatar extends StatelessWidget {
   }
 
   String get _resolvedInitials {
-    final value = StringUtils.trimToNull(initials);
-    if (value == null) return '?';
-    final resolved = value.length <= 2 ? value : value.substring(0, 2);
-    return StringUtils.uppercased(resolved);
+    final parts = StringUtils.normalizeSpaceToEmpty(
+      initials,
+    ).split(' ').where((part) => part.isNotEmpty).toList(growable: false);
+    if (parts.isEmpty) {
+      return '?';
+    }
+    if (parts.length == 1) {
+      return StringUtils.uppercased(parts.first.substring(0, 1));
+    }
+    return StringUtils.uppercased(
+      '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}',
+    );
   }
+}
+
+class _InitialsFallback extends StatelessWidget {
+  const _InitialsFallback({required this.initials});
+
+  final String initials;
+
+  @override
+  Widget build(BuildContext context) =>
+      Center(child: MxText(initials, role: MxTextRole.avatarInitials));
 }

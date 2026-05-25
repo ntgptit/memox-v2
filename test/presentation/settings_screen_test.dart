@@ -35,6 +35,7 @@ import 'package:memox/presentation/features/settings/viewmodels/drive_sync_setti
 import 'package:memox/presentation/features/settings/viewmodels/study_settings_defaults_viewmodel.dart';
 import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
 import 'package:memox/presentation/shared/widgets/mx_badge.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_tile.dart';
@@ -323,8 +324,8 @@ void main() {
     expect(find.textContaining('user@example.com'), findsOneWidget);
     expect(find.textContaining('Google Drive ready'), findsOneWidget);
     expect(
-      tester.widget<CircleAvatar>(find.byType(CircleAvatar).first).radius,
-      MxSpace.xxl + MxSpace.md,
+      tester.widget<MxAvatar>(find.byType(MxAvatar).first).size,
+      MxAvatarSize.profile,
     );
     expect(
       find.byKey(const ValueKey<String>('settings-overview-account-row')),

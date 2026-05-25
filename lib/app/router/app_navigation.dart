@@ -104,7 +104,19 @@ extension AppNavigation on BuildContext {
     required String entryType,
     required String entryRefId,
     String? studyMode,
+    bool preserveStack = true,
   }) {
+    if (!preserveStack) {
+      goNamed(
+        RouteNames.studyEntry,
+        pathParameters: {
+          RoutePaths.studyEntryTypeParam: entryType,
+          RoutePaths.studyEntryRefIdParam: entryRefId,
+        },
+        queryParameters: {'mode': ?studyMode},
+      );
+      return;
+    }
     unawaited(
       pushNamed(
         RouteNames.studyEntry,

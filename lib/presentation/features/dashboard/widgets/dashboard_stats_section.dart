@@ -10,6 +10,8 @@ import '../../../shared/widgets/mx_study_progress_action.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
 
+const double _deckHighlightTileExtent = MxSpace.xxl + MxSpace.xxl + MxSpace.xl;
+
 class DashboardDeckHighlightsSection extends StatelessWidget {
   const DashboardDeckHighlightsSection({required this.items, super.key});
 
@@ -22,6 +24,9 @@ class DashboardDeckHighlightsSection extends StatelessWidget {
         .take(dashboardDeckHighlightLimit)
         .toList(growable: false);
     final hasRecentDecks = visibleItems.any((item) => item.hasBeenStudied);
+    final separatorCount = visibleItems.length > 1
+        ? visibleItems.length - 1
+        : 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,13 +38,17 @@ class DashboardDeckHighlightsSection extends StatelessWidget {
           role: MxTextRole.formLabel,
         ),
         const MxGap(MxSpace.sm),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: visibleItems.length,
-          itemBuilder: (context, index) =>
-              _DashboardDeckHighlightTile(item: visibleItems[index]),
-          separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
+        SizedBox(
+          height:
+              visibleItems.length * _deckHighlightTileExtent +
+              separatorCount * MxSpace.sm,
+          child: ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: visibleItems.length,
+            itemBuilder: (context, index) =>
+                _DashboardDeckHighlightTile(item: visibleItems[index]),
+            separatorBuilder: (context, index) => const MxGap(MxSpace.sm),
+          ),
         ),
       ],
     );
@@ -69,8 +78,11 @@ class _DashboardDeckHighlightTile extends StatelessWidget {
         masteryPercent: item.masteryPercent,
         badgeCount: item.dueTodayCount,
         tooltip: l10n.studyStartAction,
-        onPressed: () =>
-            context.goStudyEntry(entryType: 'deck', entryRefId: item.id),
+        onPressed: () => context.goStudyEntry(
+          entryType: 'deck',
+          entryRefId: item.id,
+          preserveStack: false,
+        ),
       ),
     );
   }

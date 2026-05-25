@@ -200,6 +200,50 @@ void main() {
   );
 
   testWidgets(
+    'DT7 onNavigate: deck study entry can replace the current route',
+    (WidgetTester tester) async {
+      final router = GoRouter(
+        initialLocation: '/home',
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => Scaffold(
+              body: Center(
+                child: TextButton(
+                  onPressed: () => context.goStudyEntry(
+                    entryType: 'deck',
+                    entryRefId: 'deck-001',
+                    preserveStack: false,
+                  ),
+                  child: const Text('Study from home'),
+                ),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: '/${RoutePaths.studyEntrySegment}',
+            name: RouteNames.studyEntry,
+            builder: (context, state) =>
+                const Scaffold(body: Center(child: Text('Study entry'))),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Study from home'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/study/deck/deck-001',
+      );
+      expect(find.text('Study entry'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'DT5 onNavigate: study result replaces session while preserving entry',
     (WidgetTester tester) async {
       final router = GoRouter(

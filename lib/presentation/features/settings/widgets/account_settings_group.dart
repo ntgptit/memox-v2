@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
-import '../../../../core/utils/string_utils.dart';
 import '../../../../core/widgets/app_async_builder.dart';
 import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_avatar.dart';
 import '../../../shared/widgets/mx_badge.dart';
 import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_icon_tile.dart';
@@ -20,8 +20,6 @@ import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/account_settings_viewmodel.dart';
 import 'google_account_web_button.dart';
 import 'settings_group.dart';
-
-const double _accountAvatarRadius = MxSpace.xxl + MxSpace.md;
 
 class AccountSettingsGroup extends ConsumerWidget {
   const AccountSettingsGroup({super.key});
@@ -236,15 +234,10 @@ class _LinkedAccountRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: MxSpace.lg),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: _accountAvatarRadius,
-            backgroundColor: scheme.surfaceContainerHigh,
-            backgroundImage: link.photoUrl == null
-                ? null
-                : NetworkImage(link.photoUrl!),
-            child: link.photoUrl == null
-                ? MxText(_initials(displayName), role: MxTextRole.stateTitle)
-                : null,
+          MxAvatar(
+            imageUrl: link.photoUrl,
+            initials: displayName,
+            size: MxAvatarSize.profile,
           ),
           const MxGap(MxSpace.xxl),
           Expanded(
@@ -307,19 +300,6 @@ class _LinkedAccountRow extends StatelessWidget {
     final date = materialL10n.formatShortDate(dateTime);
     final time = materialL10n.formatTimeOfDay(TimeOfDay.fromDateTime(dateTime));
     return '$date $time';
-  }
-
-  String _initials(String value) {
-    final parts = StringUtils.normalizeSpaceToEmpty(
-      value,
-    ).split(' ').where((part) => part.isNotEmpty).toList(growable: false);
-    if (parts.isEmpty) {
-      return '?';
-    }
-    if (parts.length == 1) {
-      return parts.first.substring(0, 1);
-    }
-    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}';
   }
 }
 

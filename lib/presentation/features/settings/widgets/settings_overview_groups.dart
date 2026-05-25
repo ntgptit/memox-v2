@@ -9,6 +9,7 @@ import '../../../../domain/entities/cloud_account_link.dart';
 import '../../../../domain/services/tts_service.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_avatar.dart';
 import '../../../shared/widgets/mx_badge.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
@@ -27,8 +28,6 @@ const _learningOverviewRowKey = ValueKey<String>(
 const _audioSpeechOverviewRowKey = ValueKey<String>(
   'settings-overview-audio-speech-row',
 );
-
-const double _overviewAvatarRadius = MxSpace.xxl + MxSpace.md;
 
 class AccountSettingsOverviewGroup extends ConsumerWidget {
   const AccountSettingsOverviewGroup({super.key});
@@ -193,15 +192,10 @@ class _LinkedAccountOverviewRow extends StatelessWidget {
     return Row(
       key: _accountOverviewRowKey,
       children: [
-        CircleAvatar(
-          radius: _overviewAvatarRadius,
-          backgroundColor: scheme.surfaceContainerHigh,
-          backgroundImage: link.photoUrl == null
-              ? null
-              : NetworkImage(link.photoUrl!),
-          child: link.photoUrl == null
-              ? MxText(_initials(displayName), role: MxTextRole.stateTitle)
-              : null,
+        MxAvatar(
+          imageUrl: link.photoUrl,
+          initials: displayName,
+          size: MxAvatarSize.profile,
         ),
         const MxGap(MxSpace.lg),
         Expanded(
@@ -242,19 +236,6 @@ class _LinkedAccountOverviewRow extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _initials(String value) {
-    final parts = StringUtils.normalizeSpaceToEmpty(
-      value,
-    ).split(' ').where((part) => part.isNotEmpty).toList(growable: false);
-    if (parts.isEmpty) {
-      return '?';
-    }
-    if (parts.length == 1) {
-      return parts.first.substring(0, 1);
-    }
-    return '${parts.first.substring(0, 1)}${parts.last.substring(0, 1)}';
   }
 }
 

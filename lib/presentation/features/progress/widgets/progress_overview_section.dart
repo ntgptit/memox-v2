@@ -146,26 +146,22 @@ class _MetricCardGroup extends StatelessWidget {
     if (fourth != null) {
       return Column(
         children: [
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: first),
-                const MxGap(MxSpace.md),
-                Expanded(child: second),
-              ],
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: first),
+              const MxGap(MxSpace.md),
+              Expanded(child: second),
+            ],
           ),
           const MxGap(MxSpace.md),
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: third),
-                const MxGap(MxSpace.md),
-                Expanded(child: fourth!),
-              ],
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: third),
+              const MxGap(MxSpace.md),
+              Expanded(child: fourth!),
+            ],
           ),
         ],
       );

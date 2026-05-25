@@ -120,6 +120,14 @@ Tokens live in `lib/core/theme/` as the Flutter implementation of that Design Sy
 - Repetition colors: always via `customColors.repetitionColor(repetitionOrder.repetitionColorRole)`. Never rotate a raw palette list.
 - Do not wrap interactive widgets in `Opacity` to simulate disabled state. Use `onPressed: null` (or equivalent) and rely on `disabledForegroundColor` / `disabledBackgroundColor` from component themes.
 - On dark theme **at `expanded` tier or wider**, prefer `MxCardVariant.outlined` for busy stacked screens (Dashboard, Library listings, filter panels) — desktop layouts need the stroke to separate dense surfaces. On **compact-mobile** (phone), default to `MxCardVariant.filled` even on dark: the Quizlet-mobile silhouette relies on tonal fills + larger radius (`AppLayout.cardRadius`), not strokes. Reserve `MxCardVariant.filled` at any tier for ambient single surfaces (dialogs, sheets, hero blocks).
+- Animation / transition durations come from `AppMotion.*` in `lib/core/theme/tokens/app_motion.dart`. Raw `Duration(milliseconds: N)` / `Duration(seconds: N)` literals in presentation are blocked by `memox.no_hardcoded_animation_duration`.
+- Remote images should go through a cached image primitive — raw `Image.network(...)` / `NetworkImage(...)` re-downloads bytes on every rebuild. `memox.image_network_requires_cache` is a warning today (3 legacy callsites: `MxAvatar`, two account-settings groups) — migrate before promoting to error.
+
+**Hard rules for error handling**:
+
+- Empty `catch (...) {}` is blocked by `memox.no_empty_catch_block` — silent swallow hides bugs. Log + rethrow, map to `AppFailure`, or extract to a named helper that documents the intentional discard.
+- Generic `throw Exception(...)` is blocked by `memox.no_throw_raw_exception` — use `AppFailure` for business failures or typed `StateError` / `ArgumentError` / `UnsupportedError` for true invariant violations.
+- `AppDatabase` must run off the UI isolate — `memox.drift_database_must_run_off_main_isolate` bans raw `NativeDatabase(...)` construction. Use `driftDatabase(...)` from `drift_flutter` (already wires `shareAcrossIsolates: true`) or `NativeDatabase.createInBackground(...)`.
 
 ---
 

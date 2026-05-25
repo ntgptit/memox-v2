@@ -49,21 +49,19 @@ class MxStudyProgressAction extends StatelessWidget {
         : mx.masteryProgress(progress);
     final badgeLabel = safeBadgeCount > 99 ? '99+' : '$safeBadgeCount';
 
-    return SizedBox(
-      width: _stackWidth,
-      height: _stackHeight,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            left: 0,
-            bottom: 0,
-            child: MxTappable(
-              shape: const RoundedRectangleBorder(
-                borderRadius: AppRadius.borderFull,
-              ),
-              semanticsLabel: tooltip,
-              onTap: onPressed,
+    return MxTappable(
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderFull),
+      semanticsLabel: tooltip,
+      onTap: onPressed,
+      child: SizedBox(
+        width: _stackWidth,
+        height: _stackHeight,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              left: 0,
+              bottom: 0,
               child: CustomPaint(
                 painter: _PillProgressPainter(
                   value: progress,
@@ -98,34 +96,36 @@ class MxStudyProgressAction extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-          if (safeBadgeCount > 0)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                constraints: const BoxConstraints(minWidth: _badgeWidthFloor),
-                height: _badgeHeight,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: mx.warningContainer,
-                  borderRadius: AppRadius.borderFull,
-                  border: Border.all(color: scheme.surfaceContainerHigh),
-                ),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    badgeLabel,
-                    maxLines: 1,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: mx.onWarningContainer,
+            if (safeBadgeCount > 0)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  constraints: const BoxConstraints(minWidth: _badgeWidthFloor),
+                  height: _badgeHeight,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: mx.warningContainer,
+                    borderRadius: AppRadius.borderFull,
+                    border: Border.all(color: scheme.surfaceContainerHigh),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      badgeLabel,
+                      maxLines: 1,
+                      style: textTheme.labelSmall?.copyWith(
+                        color: mx.onWarningContainer,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
