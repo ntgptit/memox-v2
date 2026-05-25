@@ -260,7 +260,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     required FlashcardEditorController actionController,
     required AppLocalizations l10n,
   }) async {
-    final success = await actionController.save(keepCreating: true);
+    final success = await actionController.saveFlashcard(keepCreating: true);
     if (!mounted) return;
     if (!success) return;
     _didSeedControllers = false;
@@ -280,7 +280,9 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     if (!mounted) return;
     if (progressPolicy == null) return;
 
-    final success = await actionController.save(progressPolicy: progressPolicy);
+    final success = await actionController.saveFlashcard(
+      progressPolicy: progressPolicy,
+    );
     if (!mounted) return;
     if (!success) return;
     final showSavedMessage = MxSnackbar.deferredSuccess(

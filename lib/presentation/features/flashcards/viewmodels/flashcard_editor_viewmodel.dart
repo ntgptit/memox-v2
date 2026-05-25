@@ -334,7 +334,7 @@ class FlashcardEditorController extends _$FlashcardEditorController {
   @override
   FutureOr<void> build(FlashcardEditorArgs args) {}
 
-  Future<bool> save({
+  Future<bool> saveFlashcard({
     bool keepCreating = false,
     FlashcardProgressEditPolicy progressPolicy =
         FlashcardProgressEditPolicy.keepProgress,

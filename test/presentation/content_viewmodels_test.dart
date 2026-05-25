@@ -266,8 +266,8 @@ void main() {
         final controller = container.read(
           flashcardEditorControllerProvider(args).notifier,
         );
-        final firstSave = controller.save();
-        final secondSave = await controller.save();
+        final firstSave = controller.saveFlashcard();
+        final secondSave = await controller.saveFlashcard();
 
         expect(secondSave, isFalse);
         expect(repository.createCount, 1);
@@ -359,7 +359,7 @@ void main() {
 
         final success = await container
             .read(flashcardEditorControllerProvider(args).notifier)
-            .save(keepCreating: true);
+            .saveFlashcard(keepCreating: true);
 
         expect(success, isTrue);
         await _flush(container);
