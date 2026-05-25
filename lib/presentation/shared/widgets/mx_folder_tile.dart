@@ -85,13 +85,20 @@ class MxFolderTile extends StatelessWidget {
             ? AppSpacing.md
             : AppSpacing.lg;
         final trailingWidget = trailing ?? _buildDefaultTrailing(context);
+        // Library rows mirror MxDeckCard — share the same card padding so
+        // folder tiles and deck cards read as one family. Mastery bar gets
+        // extra bottom inset so the indigo fill does not touch the edge.
+        final basePadding = AppLayout.cardPadding(context);
+        final tilePadding = hasMastery
+            ? basePadding.copyWith(bottom: basePadding.bottom + AppSpacing.xs)
+            : basePadding;
 
         return ConstrainedBox(
           constraints: const BoxConstraints(
             minHeight: kMinInteractiveDimension,
           ),
           child: Padding(
-            padding: AppLayout.listTilePadding(context),
+            padding: tilePadding,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [

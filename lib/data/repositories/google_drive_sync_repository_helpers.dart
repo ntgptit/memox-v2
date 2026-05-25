@@ -127,9 +127,13 @@ extension _GoogleDriveSyncRepositoryHelpers on GoogleDriveSyncRepository {
     }
 
     final snapshotFile = await _driveClient.findFileByName(
-      accessToken: accessToken,
-      name: AppConstants.driveSyncSnapshotFileName,
-    );
+          accessToken: accessToken,
+          name: AppConstants.driveSyncSnapshotFileName,
+        ) ??
+        await _driveClient.findFileByName(
+          accessToken: accessToken,
+          name: AppConstants.driveSyncLegacySnapshotFileName,
+        );
     if (snapshotFile == null) {
       throw const GoogleDriveAppDataException(
         'Drive sync snapshot file is missing.',

@@ -703,6 +703,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDriveSyncRestoreConfirmAction => 'Restore from Drive';
 
   @override
+  String get settingsDriveSyncUploadInProgressTitle =>
+      'Backing up to Google Drive';
+
+  @override
+  String get settingsDriveSyncUploadInProgressMessage =>
+      'Please keep the app open. Do not close or switch accounts.';
+
+  @override
+  String get settingsDriveSyncRestoreInProgressTitle =>
+      'Restoring from Google Drive';
+
+  @override
+  String get settingsDriveSyncRestoreInProgressMessage =>
+      'Please keep the app open. The app will refresh when restore completes.';
+
+  @override
   String get settingsDriveSyncUploaded =>
       'Local data backed up to Google Drive.';
 

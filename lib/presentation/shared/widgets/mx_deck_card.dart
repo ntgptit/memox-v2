@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/extensions/theme_extensions.dart';
+import '../../../core/theme/responsive/app_layout.dart';
 import '../../../core/theme/tokens/app_icon_sizes.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_radius.dart';
@@ -73,8 +74,16 @@ class MxDeckCard extends StatelessWidget {
           progressValue: progressValue,
         );
 
+    final basePadding = AppLayout.cardPadding(context);
+    // Mastery bar sits at the bottom of the column — give it breathing
+    // room so the indigo fill does not visually touch the card edge.
+    final cardPadding = hasMastery
+        ? basePadding.copyWith(bottom: basePadding.bottom + AppSpacing.xs)
+        : basePadding;
+
     return MxCard(
       variant: MxCardVariant.filled,
+      padding: cardPadding,
       onTap: onTap,
       onLongPress: onLongPress,
       child: Row(

@@ -216,7 +216,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                     : const <Widget>[],
               ),
             ),
-            const MxSliverGap(MxSpace.sm),
+            const MxSliverGap(MxSpace.lg),
             ..._buildBodySlivers(state),
           ],
         ),

@@ -1104,6 +1104,30 @@ abstract class AppLocalizations {
   /// **'Restore from Drive'**
   String get settingsDriveSyncRestoreConfirmAction;
 
+  /// No description provided for @settingsDriveSyncUploadInProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing up to Google Drive'**
+  String get settingsDriveSyncUploadInProgressTitle;
+
+  /// No description provided for @settingsDriveSyncUploadInProgressMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please keep the app open. Do not close or switch accounts.'**
+  String get settingsDriveSyncUploadInProgressMessage;
+
+  /// No description provided for @settingsDriveSyncRestoreInProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring from Google Drive'**
+  String get settingsDriveSyncRestoreInProgressTitle;
+
+  /// No description provided for @settingsDriveSyncRestoreInProgressMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please keep the app open. The app will refresh when restore completes.'**
+  String get settingsDriveSyncRestoreInProgressMessage;
+
   /// No description provided for @settingsDriveSyncUploaded.
   ///
   /// In en, this message translates to:

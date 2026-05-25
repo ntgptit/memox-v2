@@ -103,8 +103,11 @@ abstract final class ButtonThemeBuilder {
       minimumSize: const Size.square(_minHeight),
       fixedSize: const Size.square(_minHeight),
       iconSize: AppIconSizes.md,
-      backgroundColor: scheme.surfaceContainerLow,
-      shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
+      // Borderless by default — circular hover/focus overlay only.
+      // Framed variants (filled / filledTonal / outlined) are opted into
+      // explicitly via MxIconButtonVariant.
+      backgroundColor: scheme.surface.withValues(alpha: AppOpacity.transparent),
+      shape: const CircleBorder(),
     ).copyWith(overlayColor: AppFocus.overlayProperty(scheme.onSurface)),
   );
 

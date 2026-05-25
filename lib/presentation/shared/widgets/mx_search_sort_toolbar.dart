@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/tokens/app_icon_sizes.dart';
+import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
 import 'mx_button_size.dart';
-import 'mx_icon_button.dart';
 import 'mx_search_field.dart';
 import 'mx_secondary_button.dart';
+import 'mx_tappable.dart';
 
 /// Sort option rendered by [MxSearchSortToolbar].
 class MxSortOption<T> {
@@ -133,16 +134,37 @@ class MxSearchSortToolbar<T> extends StatelessWidget {
   }
 
   Widget _buildSortIconTrigger(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final selectedOption = _selectedOption;
     final tooltipLabel =
         selectedOption?.label ?? sortLabel ?? sortOptions.first.label;
+    // Match the search field's pill shape (fill + outline + radius) so the
+    // sort trigger reads as part of the same toolbar instead of a floating
+    // circular icon button next to it.
     return MenuAnchor(
-      builder: (context, controller, _) => MxIconButton(
-        icon: selectedOption?.icon ?? Icons.swap_vert_rounded,
-        tooltip: tooltipLabel,
-        variant: MxIconButtonVariant.standard,
-        onPressed: () =>
+      builder: (context, controller, _) => MxTappable(
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadius.input,
+          side: BorderSide(color: scheme.outlineVariant),
+        ),
+        backgroundColor: scheme.surfaceContainerLow,
+        semanticsLabel: tooltipLabel,
+        onTap: () =>
             controller.isOpen ? controller.close() : controller.open(),
+        child: Tooltip(
+          message: tooltipLabel,
+          child: SizedBox(
+            height: kMinInteractiveDimension,
+            width: kMinInteractiveDimension,
+            child: Center(
+              child: Icon(
+                selectedOption?.icon ?? Icons.swap_vert_rounded,
+                size: AppIconSizes.lg,
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ),
       ),
       menuChildren: [
         for (final option in sortOptions)

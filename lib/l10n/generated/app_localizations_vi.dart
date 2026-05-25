@@ -629,6 +629,22 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsDriveSyncRestoreConfirmAction => 'Khôi phục từ Drive';
 
   @override
+  String get settingsDriveSyncUploadInProgressTitle =>
+      'Đang sao lưu lên Google Drive';
+
+  @override
+  String get settingsDriveSyncUploadInProgressMessage =>
+      'Vui lòng giữ ứng dụng mở. Không đóng app hoặc đổi tài khoản.';
+
+  @override
+  String get settingsDriveSyncRestoreInProgressTitle =>
+      'Đang khôi phục từ Google Drive';
+
+  @override
+  String get settingsDriveSyncRestoreInProgressMessage =>
+      'Vui lòng giữ ứng dụng mở. Ứng dụng sẽ tự làm mới khi hoàn tất.';
+
+  @override
   String get settingsDriveSyncUploaded =>
       'Đã sao lưu dữ liệu cục bộ lên Google Drive.';
 

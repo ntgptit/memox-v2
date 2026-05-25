@@ -7,6 +7,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../../core/widgets/app_async_builder.dart';
 import '../../../../domain/entities/drive_sync_models.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
+import '../../../shared/dialogs/mx_dialog.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_divider.dart';
@@ -14,6 +15,7 @@ import '../../../shared/widgets/mx_icon_button.dart';
 import '../../../shared/widgets/mx_list_tile.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
+import '../../../shared/widgets/mx_progress_indicator.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../viewmodels/drive_sync_settings_viewmodel.dart';
@@ -73,12 +75,78 @@ Future<void> _showDirectionSheet(
   if (confirmed != true) return;
 
   final controller = ref.read(driveSyncSettingsControllerProvider.notifier);
-  switch (direction) {
-    case _DriveSyncDirection.uploadLocal:
-      await controller.uploadLocalToDrive();
-    case _DriveSyncDirection.restoreDrive:
-      await controller.restoreDriveToLocal();
+  await _runWithBusyDialog(
+    context: context,
+    direction: direction,
+    action: () async {
+      switch (direction) {
+        case _DriveSyncDirection.uploadLocal:
+          await controller.uploadLocalToDrive();
+        case _DriveSyncDirection.restoreDrive:
+          await controller.restoreDriveToLocal();
+      }
+    },
+  );
+}
+
+/// Shows a non-dismissible blocking dialog while [action] runs, so the user
+/// cannot start a second sync, navigate away, or accidentally lose progress
+/// mid-flight. Closes when [action] completes (success or failure — the
+/// surrounding controller maps the failure into the next render).
+Future<void> _runWithBusyDialog({
+  required BuildContext context,
+  required _DriveSyncDirection direction,
+  required Future<void> Function() action,
+}) async {
+  final l10n = AppLocalizations.of(context);
+  final isRestore = direction == _DriveSyncDirection.restoreDrive;
+  final dialogTitle = isRestore
+      ? l10n.settingsDriveSyncRestoreInProgressTitle
+      : l10n.settingsDriveSyncUploadInProgressTitle;
+  final dialogMessage = isRestore
+      ? l10n.settingsDriveSyncRestoreInProgressMessage
+      : l10n.settingsDriveSyncUploadInProgressMessage;
+
+  final navigator = Navigator.of(context, rootNavigator: true);
+  unawaited(
+    MxDialog.show<void>(
+      context: context,
+      barrierDismissible: false,
+      title: dialogTitle,
+      icon: isRestore
+          ? Icons.cloud_download_outlined
+          : Icons.cloud_upload_outlined,
+      child: _DriveSyncBusyDialogBody(message: dialogMessage),
+    ),
+  );
+
+  try {
+    await action();
+  } finally {
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
   }
+}
+
+class _DriveSyncBusyDialogBody extends StatelessWidget {
+  const _DriveSyncBusyDialogBody({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => PopScope(
+    canPop: false,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const MxCircularProgress(size: MxProgressSize.large),
+        const MxGap(MxSpace.md),
+        MxText(message, role: MxTextRole.formHelper),
+      ],
+    ),
+  );
 }
 
 class _DriveSyncContent extends ConsumerWidget {
