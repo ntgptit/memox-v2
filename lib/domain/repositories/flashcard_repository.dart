@@ -60,5 +60,8 @@ abstract interface class FlashcardRepository {
     required FlashcardImportPreparation preparation,
   });
 
-  Future<Result<ExportData>> exportFlashcards(List<String> flashcardIds);
+  Future<Result<ExportData>> exportFlashcards(
+    List<String> flashcardIds, {
+    required ExportFormat format,
+  });
 }

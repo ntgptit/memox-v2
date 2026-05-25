@@ -17,6 +17,7 @@ import '../datasources/local/daos/folder_dao.dart';
 import '../datasources/local/local_transaction_runner.dart';
 import '../mappers/content_entity_mappers.dart';
 import '../mappers/database_enum_codecs.dart';
+import 'flashcard_export_writer.dart';
 import 'repository_support.dart';
 
 final class DeckRepositoryImpl implements DeckRepository {
@@ -338,25 +339,34 @@ final class DeckRepositoryImpl implements DeckRepository {
   });
 
   @override
-  Future<Result<ExportData>> exportDeck(String deckId) =>
-      runRepositoryAction(() async {
-        final deck = await _requireDeck(deckId);
-        final flashcards = await _deckDao.listDeckFlashcards(deckId);
-        final lines = <String>[
-          'front,back,note',
-          for (final flashcard in flashcards)
-            [
-              escapeCsvCell(flashcard.front),
-              escapeCsvCell(flashcard.back),
-              escapeCsvCell(flashcard.note),
-            ].join(','),
-        ];
-        return ExportData(
-          fileName: '${sanitizeFileName(deck.name)}.csv',
-          mimeType: 'text/csv',
-          content: lines.join('\n'),
-        );
-      });
+  Future<Result<ExportData>> exportDeck(
+    String deckId, {
+    required ExportFormat format,
+  }) => runRepositoryAction(() async {
+    final deck = await _requireDeck(deckId);
+    final flashcards = await _deckDao.listDeckFlashcards(deckId);
+    final rows = [
+      for (final flashcard in flashcards)
+        FlashcardExportRow(
+          front: flashcard.front,
+          back: flashcard.back,
+          note: flashcard.note,
+        ),
+    ];
+    final baseName = sanitizeFileName(deck.name);
+    return switch (format) {
+      ExportFormat.csv => ExportData(
+        fileName: '$baseName.csv',
+        mimeType: FlashcardExportWriter.csvMimeType,
+        bytes: FlashcardExportWriter.buildCsv(rows),
+      ),
+      ExportFormat.excel => ExportData(
+        fileName: '$baseName.xlsx',
+        mimeType: FlashcardExportWriter.excelMimeType,
+        bytes: FlashcardExportWriter.buildExcel(rows),
+      ),
+    };
+  });
 
   Future<Deck> _requireDeck(String deckId) async {
     final deck = await _deckDao.findById(deckId);

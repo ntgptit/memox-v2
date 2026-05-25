@@ -1192,7 +1192,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get decksDuplicateAction => 'Nhân bản';
 
   @override
-  String get decksExportCsvAction => 'Xuất CSV';
+  String get decksExportAction => 'Xuất bộ thẻ';
 
   @override
   String decksOverviewSubtitle(
@@ -2033,6 +2033,22 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get bulkAddFileFormatHint => 'CSV · XLSX · tối đa 10 MB';
+
+  @override
+  String get exportFormatChoiceTitle => 'Xuất ra';
+
+  @override
+  String get exportFormatCsvLabel => 'CSV';
+
+  @override
+  String get exportFormatCsvDescription =>
+      'Văn bản thuần · mở bằng mọi bảng tính';
+
+  @override
+  String get exportFormatExcelLabel => 'Excel (.xlsx)';
+
+  @override
+  String get exportFormatExcelDescription => 'Tệp Excel · một sheet';
 
   @override
   String bulkAddFileLoadedTitle(String name) {

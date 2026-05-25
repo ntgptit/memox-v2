@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
@@ -26,6 +23,7 @@ import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../decks/actions/deck_quick_actions.dart';
 import '../../decks/viewmodels/deck_action_viewmodel.dart';
 import '../../tts/providers/tts_controller_notifier.dart';
+import '../actions/flashcard_export.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
 import '../widgets/flashcard_breadcrumb_section.dart';
 import '../widgets/flashcard_bulk_action_section.dart';
@@ -312,37 +310,27 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
   }
 
   Future<void> _exportSelected(List<String> flashcardIds) async {
+    final format = await pickFlashcardExportFormat(context);
+    if (!mounted) return;
+    if (format == null) return;
     final export = await ref
         .read(flashcardActionControllerProvider(widget.deckId).notifier)
-        .exportFlashcards(flashcardIds);
+        .exportFlashcards(flashcardIds, format: format);
     if (!mounted) return;
     if (export == null) return;
-
-    final bytes = Uint8List.fromList(utf8.encode(export.content));
-    await SharePlus.instance.share(
-      ShareParams(
-        files: [XFile.fromData(bytes, mimeType: export.mimeType)],
-        fileNameOverrides: [export.fileName],
-        subject: export.fileName,
-      ),
-    );
+    await shareFlashcardExport(export);
   }
 
   Future<void> _exportDeck() async {
+    final format = await pickFlashcardExportFormat(context);
+    if (!mounted) return;
+    if (format == null) return;
     final export = await ref
         .read(deckActionControllerProvider(widget.deckId).notifier)
-        .exportDeck();
+        .exportDeck(format);
     if (!mounted) return;
     if (export == null) return;
-
-    final bytes = Uint8List.fromList(utf8.encode(export.content));
-    await SharePlus.instance.share(
-      ShareParams(
-        files: [XFile.fromData(bytes, mimeType: export.mimeType)],
-        fileNameOverrides: [export.fileName],
-        subject: export.fileName,
-      ),
-    );
+    await shareFlashcardExport(export);
   }
 
   Future<void> _deleteSelected(List<String> flashcardIds) async {

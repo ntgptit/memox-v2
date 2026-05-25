@@ -1,10 +1,6 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
@@ -13,6 +9,7 @@ import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
 import '../../../shared/dialogs/mx_name_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
+import '../../flashcards/actions/flashcard_export.dart';
 import '../viewmodels/deck_action_viewmodel.dart';
 
 enum DeckQuickAction { edit, move, duplicate, import, export, delete }
@@ -53,7 +50,7 @@ Future<void> showDeckActions({
         ),
         MxActionSheetItem(
           value: DeckQuickAction.export,
-          label: l10n.decksExportCsvAction,
+          label: l10n.decksExportAction,
           icon: Icons.file_download_outlined,
         ),
         MxActionSheetItem(
@@ -234,21 +231,17 @@ Future<void> _exportDeck(
   WidgetRef ref,
   String deckId,
 ) async {
+  final format = await pickFlashcardExportFormat(context);
+  if (!context.mounted || format == null) {
+    return;
+  }
   final export = await ref
       .read(deckActionControllerProvider(deckId).notifier)
-      .exportDeck();
+      .exportDeck(format);
   if (!context.mounted || export == null) {
     return;
   }
-
-  final bytes = Uint8List.fromList(utf8.encode(export.content));
-  await SharePlus.instance.share(
-    ShareParams(
-      files: [XFile.fromData(bytes, mimeType: export.mimeType)],
-      fileNameOverrides: [export.fileName],
-      subject: export.fileName,
-    ),
-  );
+  await shareFlashcardExport(export);
 }
 
 Future<void> _deleteDeck(

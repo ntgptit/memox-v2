@@ -640,7 +640,7 @@
   "decksMoreActionsTooltip": "Thêm thao tác",
   "decksActionsTitle": "Thao tác bộ thẻ",
   "decksDuplicateAction": "Nhân bản",
-  "decksExportCsvAction": "Xuất CSV",
+  "decksExportAction": "Xuất bộ thẻ",
   "decksOverviewSubtitle": "{cardCount} thẻ · {dueToday} thẻ đến hạn hôm nay · {masteryPercent}% thành thạo",
   "@decksOverviewSubtitle": {
     "placeholders": {
@@ -1063,6 +1063,11 @@
   "bulkAddFileChooseAction": "Chọn tệp",
   "bulkAddFileSizeError": "Tệp vượt quá 10 MB. Hãy chọn tệp nhỏ hơn.",
   "bulkAddFileFormatHint": "CSV · XLSX · tối đa 10 MB",
+  "exportFormatChoiceTitle": "Xuất ra",
+  "exportFormatCsvLabel": "CSV",
+  "exportFormatCsvDescription": "Văn bản thuần · mở bằng mọi bảng tính",
+  "exportFormatExcelLabel": "Excel (.xlsx)",
+  "exportFormatExcelDescription": "Tệp Excel · một sheet",
   "bulkAddFileLoadedTitle": "{name}",
   "@bulkAddFileLoadedTitle": {
     "placeholders": { "name": { "type": "String" } }

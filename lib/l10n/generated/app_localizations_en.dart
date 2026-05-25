@@ -1294,7 +1294,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get decksDuplicateAction => 'Duplicate';
 
   @override
-  String get decksExportCsvAction => 'Export CSV';
+  String get decksExportAction => 'Export deck';
 
   @override
   String decksOverviewSubtitle(
@@ -2149,6 +2149,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bulkAddFileFormatHint => 'CSV · XLSX · 10 MB max';
+
+  @override
+  String get exportFormatChoiceTitle => 'Export as';
+
+  @override
+  String get exportFormatCsvLabel => 'CSV';
+
+  @override
+  String get exportFormatCsvDescription =>
+      'Plain text · opens in any spreadsheet';
+
+  @override
+  String get exportFormatExcelLabel => 'Excel (.xlsx)';
+
+  @override
+  String get exportFormatExcelDescription =>
+      'Native Excel workbook · single sheet';
 
   @override
   String bulkAddFileLoadedTitle(String name) {

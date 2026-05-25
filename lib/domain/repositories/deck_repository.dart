@@ -52,5 +52,8 @@ abstract interface class DeckRepository {
     required String targetFolderId,
   });
 
-  Future<Result<ExportData>> exportDeck(String deckId);
+  Future<Result<ExportData>> exportDeck(
+    String deckId, {
+    required ExportFormat format,
+  });
 }

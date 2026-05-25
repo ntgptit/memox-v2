@@ -97,6 +97,8 @@ final class ExportDeckUseCase {
 
   final DeckRepository _repository;
 
-  Future<Result<ExportData>> execute(String deckId) =>
-      _repository.exportDeck(deckId);
+  Future<Result<ExportData>> execute(
+    String deckId, {
+    required ExportFormat format,
+  }) => _repository.exportDeck(deckId, format: format);
 }

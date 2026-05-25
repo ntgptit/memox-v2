@@ -640,7 +640,7 @@
   "decksMoreActionsTooltip": "More actions",
   "decksActionsTitle": "Deck actions",
   "decksDuplicateAction": "Duplicate",
-  "decksExportCsvAction": "Export CSV",
+  "decksExportAction": "Export deck",
   "decksOverviewSubtitle": "{cardCount} cards · {dueToday} due today · {masteryPercent}% mastery",
   "@decksOverviewSubtitle": {
     "placeholders": {
@@ -1063,6 +1063,11 @@
   "bulkAddFileChooseAction": "Choose file",
   "bulkAddFileSizeError": "File exceeds 10 MB. Please choose a smaller file.",
   "bulkAddFileFormatHint": "CSV · XLSX · 10 MB max",
+  "exportFormatChoiceTitle": "Export as",
+  "exportFormatCsvLabel": "CSV",
+  "exportFormatCsvDescription": "Plain text · opens in any spreadsheet",
+  "exportFormatExcelLabel": "Excel (.xlsx)",
+  "exportFormatExcelDescription": "Native Excel workbook · single sheet",
   "bulkAddFileLoadedTitle": "{name}",
   "@bulkAddFileLoadedTitle": {
     "placeholders": { "name": { "type": "String" } }

@@ -240,10 +240,14 @@ class FlashcardActionController extends _$FlashcardActionController {
             .execute(deckId: deckId, orderedFlashcardIds: orderedFlashcardIds),
       );
 
-  Future<ExportData?> exportFlashcards(List<String> flashcardIds) async =>
-      _actionRunner.runResultValue(
-        () => ref.read(exportFlashcardsUseCaseProvider).execute(flashcardIds),
-      );
+  Future<ExportData?> exportFlashcards(
+    List<String> flashcardIds, {
+    required ExportFormat format,
+  }) async => _actionRunner.runResultValue(
+    () => ref
+        .read(exportFlashcardsUseCaseProvider)
+        .execute(flashcardIds, format: format),
+  );
 
   MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(
     isMounted: () => ref.mounted,

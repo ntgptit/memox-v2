@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/data/datasources/local/app_database.dart';
@@ -811,16 +813,15 @@ void main() {
 
         final exported = await harness.deckRepository.exportDeck(
           deck.valueOrNull!.id,
+          format: ExportFormat.csv,
         );
 
         expect(exported.isSuccess, isTrue);
-        expect(exported.valueOrNull!.content, contains('front,back,note'));
-        expect(
-          exported.valueOrNull!.content,
-          contains('"hello","xin chao",""'),
-        );
-        expect(exported.valueOrNull!.content, isNot(contains('current_box')));
-        expect(exported.valueOrNull!.content, isNot(contains('1713945600000')));
+        final exportedText = utf8.decode(exported.valueOrNull!.bytes);
+        expect(exportedText, contains('front,back,note'));
+        expect(exportedText, contains('"hello","xin chao",""'));
+        expect(exportedText, isNot(contains('current_box')));
+        expect(exportedText, isNot(contains('1713945600000')));
       },
     );
 

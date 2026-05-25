@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../enums/flashcard_starting_status.dart';
 
 final class FolderMoveTarget {
@@ -30,13 +32,15 @@ final class ExportData {
   const ExportData({
     required this.fileName,
     required this.mimeType,
-    required this.content,
+    required this.bytes,
   });
 
   final String fileName;
   final String mimeType;
-  final String content;
+  final Uint8List bytes;
 }
+
+enum ExportFormat { csv, excel }
 
 enum ImportSourceFormat { csv, excel, structuredText }
 

@@ -1198,7 +1198,10 @@ final class _MoveTargetsFlashcardRepository implements FlashcardRepository {
   }
 
   @override
-  Future<Result<ExportData>> exportFlashcards(List<String> flashcardIds) {
+  Future<Result<ExportData>> exportFlashcards(
+    List<String> flashcardIds, {
+    required ExportFormat format,
+  }) {
     throw UnimplementedError();
   }
 }

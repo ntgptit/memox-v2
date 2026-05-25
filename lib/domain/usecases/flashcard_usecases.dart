@@ -135,6 +135,8 @@ final class ExportFlashcardsUseCase {
 
   final FlashcardRepository _repository;
 
-  Future<Result<ExportData>> execute(List<String> flashcardIds) =>
-      _repository.exportFlashcards(flashcardIds);
+  Future<Result<ExportData>> execute(
+    List<String> flashcardIds, {
+    required ExportFormat format,
+  }) => _repository.exportFlashcards(flashcardIds, format: format);
 }

@@ -2064,11 +2064,11 @@ abstract class AppLocalizations {
   /// **'Duplicate'**
   String get decksDuplicateAction;
 
-  /// No description provided for @decksExportCsvAction.
+  /// No description provided for @decksExportAction.
   ///
   /// In en, this message translates to:
-  /// **'Export CSV'**
-  String get decksExportCsvAction;
+  /// **'Export deck'**
+  String get decksExportAction;
 
   /// No description provided for @decksOverviewSubtitle.
   ///
@@ -3503,6 +3503,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'CSV · XLSX · 10 MB max'**
   String get bulkAddFileFormatHint;
+
+  /// No description provided for @exportFormatChoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as'**
+  String get exportFormatChoiceTitle;
+
+  /// No description provided for @exportFormatCsvLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV'**
+  String get exportFormatCsvLabel;
+
+  /// No description provided for @exportFormatCsvDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain text · opens in any spreadsheet'**
+  String get exportFormatCsvDescription;
+
+  /// No description provided for @exportFormatExcelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel (.xlsx)'**
+  String get exportFormatExcelLabel;
+
+  /// No description provided for @exportFormatExcelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Native Excel workbook · single sheet'**
+  String get exportFormatExcelDescription;
 
   /// No description provided for @bulkAddFileLoadedTitle.
   ///
