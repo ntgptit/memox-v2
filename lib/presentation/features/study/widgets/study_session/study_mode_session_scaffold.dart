@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/theme/responsive/app_layout.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
-import 'package:memox/presentation/shared/layouts/mx_content_shell.dart';
-import 'package:memox/presentation/shared/layouts/mx_scaffold.dart';
-import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/layouts/mx_study_scaffold.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
 
 /// Study-session shell.
@@ -41,36 +38,17 @@ class StudyModeSessionScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final closeHandler = isActionBusy ? null : (canCancel ? onCancel : onBack);
-    return MxScaffold(
+    return MxStudyScaffold(
+      modeLabel: modeLabel,
+      accent: accent,
+      progressValue: progressValue,
+      counterLabel: counterLabel,
+      onClose: closeHandler,
+      closeTooltip: canCancel
+          ? l10n.studyCancelAction
+          : MaterialLocalizations.of(context).backButtonTooltip,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-      bodyInsets: false,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          MxStudyTopBar(
-            modeLabel: modeLabel,
-            accent: accent,
-            progressValue: progressValue,
-            counterLabel: counterLabel,
-            onClose: closeHandler,
-            closeTooltip: canCancel
-                ? l10n.studyCancelAction
-                : MaterialLocalizations.of(context).backButtonTooltip,
-          ),
-          Expanded(
-            child: MxContentShell(
-              width: MxContentWidth.reading,
-              padding: const EdgeInsets.fromLTRB(
-                MxSpace.md,
-                MxSpace.xs,
-                MxSpace.md,
-                MxSpace.md,
-              ),
-              child: child,
-            ),
-          ),
-        ],
-      ),
+      body: child,
     );
   }
 }

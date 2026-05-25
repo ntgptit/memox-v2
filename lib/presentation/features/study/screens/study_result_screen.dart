@@ -21,8 +21,25 @@ import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../providers/study_session_notifier.dart';
 
-class StudyResultScreen extends ConsumerWidget {
+class StudyResultScreen extends StatelessWidget {
   const StudyResultScreen({required this.sessionId, super.key});
+
+  final String sessionId;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return MxScaffold(
+      title: l10n.studyResultTitle,
+      bodyInsets: false,
+      body: StudyResultSection(sessionId: sessionId),
+    );
+  }
+}
+
+class StudyResultSection extends ConsumerWidget {
+  const StudyResultSection({required this.sessionId, super.key});
 
   final String sessionId;
 
@@ -34,86 +51,81 @@ class StudyResultScreen extends ConsumerWidget {
       studySessionActionControllerProvider(sessionId),
     );
 
-    return MxScaffold(
-      title: l10n.studyResultTitle,
-      body: MxContentShell(
-        width: MxContentWidth.reading,
-        applyVerticalPadding: true,
-        child: MxRetainedAsyncState<StudySessionSnapshot>(
-          data: sessionState.value,
-          isLoading: sessionState.isLoading,
-          error: sessionState.hasError ? sessionState.error : null,
-          stackTrace: sessionState.hasError ? sessionState.stackTrace : null,
-          skeletonBuilder: (_) => const _StudyResultLoadingView(),
-          errorBuilder: (_, error, _) => MxErrorState(
-            title: l10n.sharedErrorTitle,
-            message: studyErrorMessage(error),
-            onRetry: () => ref.invalidate(studySessionStateProvider(sessionId)),
-          ),
-          dataBuilder: (context, snapshot) => ListView(
-            children: [
-              MxText(l10n.studyResultHeading, role: MxTextRole.pageTitle),
-              const MxGap(MxSpace.sm),
-              MxText(
-                _statusLabel(l10n, snapshot.session.status),
-                role: MxTextRole.contentBody,
+    return MxContentShell(
+      width: MxContentWidth.reading,
+      applyVerticalPadding: true,
+      child: MxRetainedAsyncState<StudySessionSnapshot>(
+        data: sessionState.value,
+        isLoading: sessionState.isLoading,
+        error: sessionState.hasError ? sessionState.error : null,
+        stackTrace: sessionState.hasError ? sessionState.stackTrace : null,
+        skeletonBuilder: (_) => const _StudyResultLoadingView(),
+        errorBuilder: (_, error, _) => MxErrorState(
+          title: l10n.sharedErrorTitle,
+          message: studyErrorMessage(error),
+          onRetry: () => ref.invalidate(studySessionStateProvider(sessionId)),
+        ),
+        dataBuilder: (context, snapshot) => ListView(
+          children: [
+            MxText(l10n.studyResultHeading, role: MxTextRole.pageTitle),
+            const MxGap(MxSpace.sm),
+            MxText(
+              _statusLabel(l10n, snapshot.session.status),
+              role: MxTextRole.contentBody,
+            ),
+            const MxGap(MxSpace.xl),
+            _ResultProgressSummary(snapshot: snapshot),
+            const MxGap(MxSpace.lg),
+            MxCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _MetricRow(
+                    label: l10n.studyResultCards,
+                    value: '${snapshot.summary.totalCards}',
+                  ),
+                  _MetricRow(
+                    label: l10n.studyResultAttempts,
+                    value: '${snapshot.summary.completedAttempts}',
+                  ),
+                  _MetricRow(
+                    label: l10n.studyResultCorrect,
+                    value: '${snapshot.summary.correctAttempts}',
+                  ),
+                  _MetricRow(
+                    label: l10n.studyResultIncorrect,
+                    value: '${snapshot.summary.incorrectAttempts}',
+                  ),
+                  _MetricRow(
+                    label: l10n.studyResultBoxUp,
+                    value: '${snapshot.summary.increasedBoxCount}',
+                  ),
+                  _MetricRow(
+                    label: l10n.studyResultBoxDown,
+                    value: '${snapshot.summary.decreasedBoxCount}',
+                  ),
+                  _MetricRow(
+                    label: l10n.studyResultRemaining,
+                    value: '${snapshot.summary.remainingCount}',
+                  ),
+                ],
               ),
-              const MxGap(MxSpace.xl),
-              _ResultProgressSummary(snapshot: snapshot),
-              const MxGap(MxSpace.lg),
-              MxCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _MetricRow(
-                      label: l10n.studyResultCards,
-                      value: '${snapshot.summary.totalCards}',
-                    ),
-                    _MetricRow(
-                      label: l10n.studyResultAttempts,
-                      value: '${snapshot.summary.completedAttempts}',
-                    ),
-                    _MetricRow(
-                      label: l10n.studyResultCorrect,
-                      value: '${snapshot.summary.correctAttempts}',
-                    ),
-                    _MetricRow(
-                      label: l10n.studyResultIncorrect,
-                      value: '${snapshot.summary.incorrectAttempts}',
-                    ),
-                    _MetricRow(
-                      label: l10n.studyResultBoxUp,
-                      value: '${snapshot.summary.increasedBoxCount}',
-                    ),
-                    _MetricRow(
-                      label: l10n.studyResultBoxDown,
-                      value: '${snapshot.summary.decreasedBoxCount}',
-                    ),
-                    _MetricRow(
-                      label: l10n.studyResultRemaining,
-                      value: '${snapshot.summary.remainingCount}',
-                    ),
-                  ],
-                ),
+            ),
+            const MxGap(MxSpace.xl),
+            if (snapshot.session.status == SessionStatus.failedToFinalize)
+              MxPrimaryButton(
+                label: l10n.studyRetryFinalizeAction,
+                leadingIcon: Icons.refresh_rounded,
+                isLoading: actionState.isLoading,
+                onPressed: () => ref
+                    .read(
+                      studySessionActionControllerProvider(sessionId).notifier,
+                    )
+                    .finalizeSession(),
               ),
-              const MxGap(MxSpace.xl),
-              if (snapshot.session.status == SessionStatus.failedToFinalize)
-                MxPrimaryButton(
-                  label: l10n.studyRetryFinalizeAction,
-                  leadingIcon: Icons.refresh_rounded,
-                  isLoading: actionState.isLoading,
-                  onPressed: () => ref
-                      .read(
-                        studySessionActionControllerProvider(
-                          sessionId,
-                        ).notifier,
-                      )
-                      .finalizeSession(),
-                ),
-              if (snapshot.session.status != SessionStatus.failedToFinalize)
-                _ResultActions(snapshot: snapshot),
-            ],
-          ),
+            if (snapshot.session.status != SessionStatus.failedToFinalize)
+              _ResultActions(snapshot: snapshot),
+          ],
         ),
       ),
     );
@@ -260,6 +272,7 @@ class _MetricRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: MxSpace.xs),
+    // guard:layout-value-reviewed -- reason: metric rows use tokenized vertical rhythm inside result cards.
     child: Row(
       children: [
         Expanded(child: MxText(label, role: MxTextRole.contentBody)),

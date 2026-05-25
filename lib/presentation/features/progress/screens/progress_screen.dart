@@ -9,27 +9,38 @@ import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../providers/progress_session_notifier.dart';
 import '../widgets/progress_content.dart';
 
-class ProgressScreen extends ConsumerWidget {
+class ProgressScreen extends StatelessWidget {
   const ProgressScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final queryState = ref.watch(progressOverviewProvider);
 
     return MxScaffold(
       title: l10n.progressTitle,
-      body: MxContentShell(
-        width: MxContentWidth.reading,
-        applyVerticalPadding: true,
-        child: MxRetainedAsyncState<ProgressOverviewState>(
-          data: queryState.value,
-          isLoading: queryState.isLoading,
-          error: queryState.hasError ? queryState.error : null,
-          stackTrace: queryState.hasError ? queryState.stackTrace : null,
-          onRetry: () => ref.invalidate(progressOverviewProvider),
-          dataBuilder: (context, state) => ProgressContent(state: state),
-        ),
+      bodyInsets: false,
+      body: const ProgressOverviewSection(),
+    );
+  }
+}
+
+class ProgressOverviewSection extends ConsumerWidget {
+  const ProgressOverviewSection({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final queryState = ref.watch(progressOverviewProvider);
+
+    return MxContentShell(
+      width: MxContentWidth.reading,
+      applyVerticalPadding: true,
+      child: MxRetainedAsyncState<ProgressOverviewState>(
+        data: queryState.value,
+        isLoading: queryState.isLoading,
+        error: queryState.hasError ? queryState.error : null,
+        stackTrace: queryState.hasError ? queryState.stackTrace : null,
+        onRetry: () => ref.invalidate(progressOverviewProvider),
+        dataBuilder: (context, state) => ProgressContent(state: state),
       ),
     );
   }

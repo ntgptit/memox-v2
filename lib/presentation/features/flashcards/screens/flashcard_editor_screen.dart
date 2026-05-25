@@ -9,9 +9,8 @@ import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/dialogs/mx_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
-import '../../../shared/layouts/mx_content_shell.dart';
+import '../../../shared/layouts/mx_form_scaffold.dart';
 import '../../../shared/layouts/mx_gap.dart';
-import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_breadcrumb_bar.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
@@ -98,8 +97,9 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     final draft = draftState.value;
     final canSave = (draft?.canSave ?? false) && !actionState.isLoading;
 
-    return MxScaffold(
-      bottomNavigationBar: draft == null
+    return MxFormScaffold(
+      contentWidth: MxContentWidth.reading,
+      bottomAction: draft == null
           ? null
           : FlashcardEditorSaveBar(
               isEditing: draft.isEditing,
@@ -114,22 +114,18 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
                 l10n: l10n,
               ),
             ),
-      body: MxContentShell(
-        width: MxContentWidth.reading,
-        applyVerticalPadding: true,
-        child: MxRetainedAsyncState<FlashcardEditorDraftState>(
-          data: draftState.value,
-          isLoading: draftState.isLoading,
-          error: draftState.hasError ? draftState.error : null,
-          stackTrace: draftState.hasError ? draftState.stackTrace : null,
-          dataBuilder: (context, draft) => _buildEditorBody(
-            context: context,
-            draft: draft,
-            canSave: canSave,
-            draftNotifier: draftNotifier,
-            actionController: actionController,
-            l10n: l10n,
-          ),
+      body: MxRetainedAsyncState<FlashcardEditorDraftState>(
+        data: draftState.value,
+        isLoading: draftState.isLoading,
+        error: draftState.hasError ? draftState.error : null,
+        stackTrace: draftState.hasError ? draftState.stackTrace : null,
+        dataBuilder: (context, draft) => _buildEditorBody(
+          context: context,
+          draft: draft,
+          canSave: canSave,
+          draftNotifier: draftNotifier,
+          actionController: actionController,
+          l10n: l10n,
         ),
       ),
     );
@@ -163,7 +159,8 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
       MxBreadcrumb(label: title),
     ];
 
-    return ListView(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         FlashcardEditorHeaderSection(
           title: title,

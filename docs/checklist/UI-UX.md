@@ -8,6 +8,9 @@
 * Màn hình có mục tiêu rõ ràng, người dùng nhìn vào biết ngay đang làm gì.
 * Nội dung chính được ưu tiên hiển thị trước, không bị chìm bởi thông tin phụ.
 * Các khu vực trên màn hình được chia rõ: header, content, action, footer.
+* Feature screen nên chọn layout template bằng composition: `MxScaffold` là primitive thấp nhất, còn list/form/study dùng template chuyên biệt khi phù hợp.
+* Screen shell chỉ nên quản lý layout; provider watch nằm trong section/widget nhỏ, view chỉ render data, command/action dùng `ref.read`.
+* Template layout không xử lý repository, service, `AsyncValue`, search/filter business state, validation, mutation hoặc navigation phức tạp.
 * Không nhồi quá nhiều thông tin vào một màn hình.
 * Khoảng cách giữa các thành phần đồng đều.
 * Các thành phần cùng loại có cùng cách căn lề, kích thước và style.
