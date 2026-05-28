@@ -1,55 +1,103 @@
-# MemoX Business Docs
+---
+last_updated: 2026-05-26
+applies_to: all business areas
+---
 
-## System
+# Business Documentation Index
 
-- [System Overview](./system/overview.md)
+This directory is the source of truth for MemoX product behavior.
 
-## Account
+## Read order
 
-- [Google Account And Drive Sync Foundation](./account/google-account.md)
+Core content lifecycle:
 
-## Sync
+1. `docs/business/glossary.md`
+2. `docs/business/system/overview.md`
+3. `docs/business/navigation/navigation-flow.md`
+4. `docs/business/folder/folder-management.md`
+5. `docs/business/deck/deck-management.md`
+6. `docs/business/flashcard/flashcard-management.md`
 
-- [Google Drive Sync](./sync/google-drive-sync.md)
+Study and progress:
 
-## Settings
+7. `docs/business/study/study-flow.md`
+8. `docs/business/srs/srs-review.md`
+9. `docs/business/study-actions/bury-suspend.md`
+10. `docs/business/resume/resume-session.md`
 
-- [Settings Screen Business Inventory](./settings/settings-screen.md)
+Organization and discovery:
 
-## Folder
+11. `docs/business/tags/tag-system.md`
+12. `docs/business/bulk/bulk-operations.md`
+13. `docs/business/search/global-search.md`
+14. `docs/business/history/card-history.md`
 
-- [Folder Overview](./folder/folder-overview.md)
-- [Folder Rules](./folder/folder-rules.md)
+Engagement and supporting features:
 
-## Deck
+15. `docs/business/engagement/dashboard-engagement.md`
+16. `docs/business/export/export.md`
+17. `docs/business/tts/tts-settings.md`
+18. `docs/business/account-sync/account-sync.md`
 
-- [Deck Overview](./deck/deck-overview.md)
-- [Deck Rules](./deck/deck-rules.md)
+Cross-cutting contracts (in `docs/` siblings):
 
-## Flashcard
+19. `docs/database/schema-contract.md`
+20. `docs/database/storage-boundaries.md`
+21. `docs/architecture/clean-architecture-contract.md`
 
-- [Flashcard Overview](./flashcard/flashcard-overview.md)
-- [Flashcard Rules](./flashcard/flashcard-rules.md)
+## Rule
 
-## Study
+When product behavior changes, update the related business doc before or in the same change.
 
-- [Study Index](./study/study-index.md)
-- [Study Concepts](./study/study-concepts.md)
-- [Study Entry](./study/study-entry.md)
-- [New Study Flow](./study/new-study-flow.md)
-- [SRS Review Flow](./study/srs-review-flow.md)
-- [Study Modes](./study/study-modes.md)
-- [Retry Loop](./study/retry-loop.md)
-- [Study Session](./study/study-session.md)
-- [Study Settings](./study/study-settings.md)
-- [Study Strategy](./study/study-strategy.md)
-- [Study Clean Architecture](./study/study-clean-architecture.md)
+When docs and code disagree, do not silently choose one. Report the mismatch or update both in the same change.
 
-## SRS
+## Main business areas
 
-- [SRS Overview](./srs/srs-overview.md)
-- [SRS Rules](./srs/srs-rules.md)
+| Area | Source of truth |
+| --- | --- |
+| Vocabulary | `docs/business/glossary.md` |
+| App scope | `docs/business/system/overview.md` |
+| Route relationship | `docs/business/navigation/navigation-flow.md` |
+| Folder rules | `docs/business/folder/folder-management.md` |
+| Deck rules | `docs/business/deck/deck-management.md` |
+| Flashcard rules + import | `docs/business/flashcard/flashcard-management.md` |
+| Study session + empty scope | `docs/business/study/study-flow.md` |
+| SRS review | `docs/business/srs/srs-review.md` |
+| Bury / suspend | `docs/business/study-actions/bury-suspend.md` |
+| Resume session | `docs/business/resume/resume-session.md` |
+| Tag system | `docs/business/tags/tag-system.md` |
+| Bulk operations | `docs/business/bulk/bulk-operations.md` |
+| Global search | `docs/business/search/global-search.md` |
+| Card history | `docs/business/history/card-history.md` |
+| Daily goal + streak + reminders | `docs/business/engagement/dashboard-engagement.md` |
+| Export (CSV/Excel) | `docs/business/export/export.md` |
+| TTS / audio | `docs/business/tts/tts-settings.md` |
+| Account + Drive sync | `docs/business/account-sync/account-sync.md` |
 
-## Shared
+## Related
 
-- [Core Rules](./shared/core-rules.md)
+**Top-level contracts:**
+- `docs/business/glossary.md` — domain terms
+- `docs/business/system/overview.md` — feature status matrix
+
+**Wireframes:**
+- `docs/wireframes/index.md` — screen index (25 wireframes + index)
+
+**Database / architecture / state / UI:**
+- `docs/database/schema-contract.md`
+- `docs/database/migration-contract.md`
+- `docs/database/storage-boundaries.md`
+- `docs/architecture/clean-architecture-contract.md`
+- `docs/state/state-management-contract.md`
+- `docs/ui-ux/ui-ux-contract.md`
+
+**Decision table:**
+- `docs/decision-tables/memox-core-decision-table.md`
+
+**Checklists:**
+- `docs/checklist/implementation-checklist.md` — per-task checklist with parity rules
+- `docs/checklist/recursive-agent-review.md` — code review checklist
+
+**Repo-level:**
+- `CLAUDE.md` — agent rules with Doc-code parity contract
+- `AGENTS.md` — agent responsibilities

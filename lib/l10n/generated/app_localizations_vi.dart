@@ -422,10 +422,35 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsPersonalizationTitle => 'Cá nhân hóa';
 
   @override
+  String get settingsStudySectionTitle => 'Học';
+
+  @override
+  String get settingsAppSectionTitle => 'Ứng dụng';
+
+  @override
+  String get settingsAboutSectionTitle => 'Thông tin';
+
+  @override
+  String get settingsOverviewFooter => 'Tạo cho việc học bình tĩnh · MemoX';
+
+  @override
   String get settingsAccountTitle => 'Tài khoản';
 
   @override
   String get settingsAccountLoading => 'Đang tải tài khoản';
+
+  @override
+  String get settingsAccountLinkedOverviewTitle => 'Tài khoản & đồng bộ';
+
+  @override
+  String get settingsAccountSignInSyncTitle => 'Đăng nhập & đồng bộ';
+
+  @override
+  String get settingsAccountSignInSyncSubtitle =>
+      'Lưu tiến độ học trên nhiều thiết bị';
+
+  @override
+  String get settingsAccountSigningIn => 'Đang đăng nhập...';
 
   @override
   String get settingsAccountSubtitleSignedOut =>
@@ -473,6 +498,24 @@ class AppLocalizationsVi extends AppLocalizations {
   String settingsAccountOverviewSubtitle(Object status, Object email) {
     return '$status\n$email';
   }
+
+  @override
+  String settingsAccountOverviewSyncedSubtitle(Object email, Object time) {
+    return '$email · đã đồng bộ $time';
+  }
+
+  @override
+  String settingsAccountOverviewSyncedMockSubtitle(Object email) {
+    return '$email · đã đồng bộ 2 phút trước';
+  }
+
+  @override
+  String settingsAccountOverviewSyncErrorSubtitle(Object email) {
+    return '$email · đồng bộ lần cuối 2 ngày trước';
+  }
+
+  @override
+  String get settingsOverviewSyncRetry => 'Thử lại';
 
   @override
   String get settingsAccountDriveAuthorizationRequired =>
@@ -749,7 +792,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsThemeDark => 'Tối';
 
   @override
+  String get settingsAppearanceOverviewSubtitle => 'Sáng, tối, hệ thống';
+
+  @override
+  String get settingsSoonChip => 'SẮP CÓ';
+
+  @override
   String get settingsLanguageTitle => 'Ngôn ngữ';
+
+  @override
+  String get settingsLanguageOverviewSubtitle => 'Tiếng Anh';
 
   @override
   String get settingsLocaleLabel => 'Ngôn ngữ app';
@@ -770,6 +822,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsLearningExperienceTitle => 'Trải nghiệm học';
 
   @override
+  String get settingsLearningOverviewTitle => 'Học';
+
+  @override
   String get settingsStudyDefaultsSubtitle =>
       'Cài đặt mặc định dùng khi tạo phiên học mới.';
 
@@ -783,21 +838,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsReviewBatchSizeLabel => 'Số thẻ Review';
 
   @override
-  String settingsLearningOverviewSummary(int newCount, int reviewCount) {
-    String _temp0 = intl.Intl.pluralLogic(
-      newCount,
-      locale: localeName,
-      other: '$newCount thẻ',
-      one: '1 thẻ',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      reviewCount,
-      locale: localeName,
-      other: '$reviewCount thẻ',
-      one: '1 thẻ',
-    );
-    return 'Học mới $_temp0 · Ôn $_temp1';
-  }
+  String get settingsLearningOverviewSummary => '20 thẻ / ngày · 5 chế độ học';
 
   @override
   String settingsCardsCountValue(int count) {
@@ -809,6 +850,19 @@ class AppLocalizationsVi extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get settingsManageTagsTitle => 'Quản lý tag';
+
+  @override
+  String get settingsManageTagsOverviewSubtitle => '14 tag';
+
+  @override
+  String get settingsManageTagsShellTitle => 'Màn quản lý tag đã có route';
+
+  @override
+  String get settingsManageTagsShellMessage =>
+      'Route đã sẵn sàng. Các thao tác đổi tên, gộp, xóa, học theo tag và xem thẻ sẽ được triển khai cùng feature quản lý tag đầy đủ.';
 
   @override
   String get settingsSpeechTitle => 'Giọng nói';
@@ -823,9 +877,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsAudioSpeechDisabled => 'Tắt';
 
   @override
-  String settingsAudioSpeechOverviewSummary(Object ttsState, Object voice) {
-    return '$ttsState · $voice';
-  }
+  String get settingsAudioSpeechOverviewSummary => 'Giọng Hàn · tốc độ 0.9×';
 
   @override
   String get settingsSpeechLabel => 'Hỗ trợ phát âm tiếng Hàn và tiếng Anh';
@@ -949,6 +1001,24 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsSpeechPreviewClearTooltip => 'Xóa văn bản thử';
+
+  @override
+  String get settingsAboutMemoXTitle => 'Thông tin MemoX';
+
+  @override
+  String settingsAboutVersion(Object version) {
+    return 'Phiên bản $version';
+  }
+
+  @override
+  String get settingsAboutVersionUnknown => 'Chưa có thông tin phiên bản';
+
+  @override
+  String get settingsAboutMessage =>
+      'MemoX giữ việc học flashcard theo hướng local-first, bình tĩnh và sẵn sàng sao lưu khi bạn chọn.';
+
+  @override
+  String get settingsAboutLegalese => 'MemoX';
 
   @override
   String get settingsUpdatedMessage => 'Đã cập nhật cài đặt.';

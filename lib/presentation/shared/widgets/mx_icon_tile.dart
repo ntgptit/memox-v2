@@ -10,7 +10,7 @@ import '../../../core/theme/tokens/app_radius.dart';
 ///
 /// Maps to a `(background, foreground)` pair from the active [ColorScheme]
 /// so feature widgets choose a *role*, not a raw color.
-enum MxIconTileTone { neutral, primary, primarySoft, disabled }
+enum MxIconTileTone { neutral, primary, primarySoft, warning, disabled }
 
 /// Rounded-square icon container used as the leading affordance on
 /// dashboard action cards, list rows, and quick-link tiles.
@@ -22,6 +22,7 @@ class MxIconTile extends StatelessWidget {
     required this.icon,
     this.tone = MxIconTileTone.neutral,
     this.size,
+    this.iconSize,
     super.key,
   });
 
@@ -32,6 +33,10 @@ class MxIconTile extends StatelessWidget {
   /// is already density-aware. Override only when a parent constrains the
   /// surface to a non-standard scale.
   final double? size;
+
+  /// Optional explicit glyph size for compact mock-aligned surfaces.
+  /// Defaults to [AppIconSizes.md].
+  final double? iconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +53,11 @@ class MxIconTile extends StatelessWidget {
           borderRadius: AppRadius.borderMd,
         ),
         child: Center(
-          child: Icon(icon, size: AppIconSizes.md, color: foreground),
+          child: Icon(
+            icon,
+            size: iconSize ?? AppIconSizes.md,
+            color: foreground,
+          ),
         ),
       ),
     );
@@ -64,6 +73,12 @@ class MxIconTile extends StatelessWidget {
         MxIconTileTone.primarySoft => (
           scheme.primary.withValues(alpha: AppOpacity.disabledSurface),
           scheme.primary,
+        ),
+        MxIconTileTone.warning => (
+          context.mxColors.warning.withValues(
+            alpha: AppOpacity.disabledSurface,
+          ),
+          context.mxColors.warning,
         ),
         MxIconTileTone.disabled => (
           scheme.surfaceContainerHighest,

@@ -14,6 +14,7 @@ abstract final class RouteNames {
   static const String settings = 'settings';
   static const String settingsAccount = 'settings-account';
   static const String settingsLearning = 'settings-learning';
+  static const String settingsLearningTags = 'settings-learning-tags';
   static const String settingsAudioSpeech = 'settings-audio-speech';
 
   // --- Nested routes under /library ---
@@ -39,6 +40,7 @@ abstract final class RoutePaths {
   static const String settings = '/settings';
   static const String settingsAccountSegment = 'account';
   static const String settingsLearningSegment = 'learning';
+  static const String settingsLearningTagsSegment = 'learning/tags';
   static const String settingsAudioSpeechSegment = 'audio-speech';
 
   /// Relative segment registered under `/library`. Keep the `:id` placeholder

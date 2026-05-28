@@ -71,6 +71,7 @@ bool _shouldHideShellNavigation(GoRouterState state) {
     RouteNames.flashcardEdit,
     RouteNames.settingsAccount,
     RouteNames.settingsLearning,
+    RouteNames.settingsLearningTags,
     RouteNames.settingsAudioSpeech,
     RouteNames.studySession,
   };

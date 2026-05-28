@@ -5,6 +5,7 @@ import '../screens/account_settings_screen.dart';
 import '../screens/audio_speech_settings_screen.dart';
 import '../screens/learning_settings_screen.dart';
 import '../screens/settings_screen.dart';
+import '../screens/tag_management_screen.dart';
 
 List<RouteBase> settingsBranchRoutes() => [
   GoRoute(
@@ -24,6 +25,12 @@ List<RouteBase> settingsBranchRoutes() => [
         name: RouteNames.settingsLearning,
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: LearningSettingsScreen()),
+      ),
+      GoRoute(
+        path: RoutePaths.settingsLearningTagsSegment,
+        name: RouteNames.settingsLearningTags,
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: SettingsTagManagementScreen()),
       ),
       GoRoute(
         path: RoutePaths.settingsAudioSpeechSegment,

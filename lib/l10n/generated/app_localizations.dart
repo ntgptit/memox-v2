@@ -768,6 +768,30 @@ abstract class AppLocalizations {
   /// **'Personalization'**
   String get settingsPersonalizationTitle;
 
+  /// No description provided for @settingsStudySectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Study'**
+  String get settingsStudySectionTitle;
+
+  /// No description provided for @settingsAppSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App'**
+  String get settingsAppSectionTitle;
+
+  /// No description provided for @settingsAboutSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAboutSectionTitle;
+
+  /// No description provided for @settingsOverviewFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Made for calm learning · MemoX'**
+  String get settingsOverviewFooter;
+
   /// No description provided for @settingsAccountTitle.
   ///
   /// In en, this message translates to:
@@ -779,6 +803,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading account'**
   String get settingsAccountLoading;
+
+  /// No description provided for @settingsAccountLinkedOverviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & sync'**
+  String get settingsAccountLinkedOverviewTitle;
+
+  /// No description provided for @settingsAccountSignInSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in & sync'**
+  String get settingsAccountSignInSyncTitle;
+
+  /// No description provided for @settingsAccountSignInSyncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your progress across devices'**
+  String get settingsAccountSignInSyncSubtitle;
+
+  /// No description provided for @settingsAccountSigningIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in...'**
+  String get settingsAccountSigningIn;
 
   /// No description provided for @settingsAccountSubtitleSignedOut.
   ///
@@ -851,6 +899,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{status}\n{email}'**
   String settingsAccountOverviewSubtitle(Object status, Object email);
+
+  /// No description provided for @settingsAccountOverviewSyncedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{email} · synced {time}'**
+  String settingsAccountOverviewSyncedSubtitle(Object email, Object time);
+
+  /// No description provided for @settingsAccountOverviewSyncedMockSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{email} · synced 2 min ago'**
+  String settingsAccountOverviewSyncedMockSubtitle(Object email);
+
+  /// No description provided for @settingsAccountOverviewSyncErrorSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{email} · last synced 2 days ago'**
+  String settingsAccountOverviewSyncErrorSubtitle(Object email);
+
+  /// No description provided for @settingsOverviewSyncRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get settingsOverviewSyncRetry;
 
   /// No description provided for @settingsAccountDriveAuthorizationRequired.
   ///
@@ -1302,11 +1374,29 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get settingsThemeDark;
 
+  /// No description provided for @settingsAppearanceOverviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Light, dark, system'**
+  String get settingsAppearanceOverviewSubtitle;
+
+  /// No description provided for @settingsSoonChip.
+  ///
+  /// In en, this message translates to:
+  /// **'SOON'**
+  String get settingsSoonChip;
+
   /// No description provided for @settingsLanguageTitle.
   ///
   /// In en, this message translates to:
   /// **'Language'**
   String get settingsLanguageTitle;
+
+  /// No description provided for @settingsLanguageOverviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get settingsLanguageOverviewSubtitle;
 
   /// No description provided for @settingsLocaleLabel.
   ///
@@ -1344,6 +1434,12 @@ abstract class AppLocalizations {
   /// **'Learning experience'**
   String get settingsLearningExperienceTitle;
 
+  /// No description provided for @settingsLearningOverviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learning'**
+  String get settingsLearningOverviewTitle;
+
   /// No description provided for @settingsStudyDefaultsSubtitle.
   ///
   /// In en, this message translates to:
@@ -1371,14 +1467,38 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLearningOverviewSummary.
   ///
   /// In en, this message translates to:
-  /// **'New {newCount, plural, =1{1 card} other{{newCount} cards}} · Review {reviewCount, plural, =1{1 card} other{{reviewCount} cards}}'**
-  String settingsLearningOverviewSummary(int newCount, int reviewCount);
+  /// **'20 cards / day · 5 study modes'**
+  String get settingsLearningOverviewSummary;
 
   /// No description provided for @settingsCardsCountValue.
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 card} other{{count} cards}}'**
   String settingsCardsCountValue(int count);
+
+  /// No description provided for @settingsManageTagsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage tags'**
+  String get settingsManageTagsTitle;
+
+  /// No description provided for @settingsManageTagsOverviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'14 tags'**
+  String get settingsManageTagsOverviewSubtitle;
+
+  /// No description provided for @settingsManageTagsShellTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag management is ready to wire'**
+  String get settingsManageTagsShellTitle;
+
+  /// No description provided for @settingsManageTagsShellMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The route is available now. Rename, merge, delete, study, and view-card actions will be implemented with the full tag-management feature.'**
+  String get settingsManageTagsShellMessage;
 
   /// No description provided for @settingsSpeechTitle.
   ///
@@ -1389,7 +1509,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAudioSpeechTitle.
   ///
   /// In en, this message translates to:
-  /// **'Audio & Speech'**
+  /// **'Audio & speech'**
   String get settingsAudioSpeechTitle;
 
   /// No description provided for @settingsAudioSpeechEnabled.
@@ -1407,8 +1527,8 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAudioSpeechOverviewSummary.
   ///
   /// In en, this message translates to:
-  /// **'{ttsState} · {voice}'**
-  String settingsAudioSpeechOverviewSummary(Object ttsState, Object voice);
+  /// **'Korean voice · 0.9× speed'**
+  String get settingsAudioSpeechOverviewSummary;
 
   /// No description provided for @settingsSpeechLabel.
   ///
@@ -1625,6 +1745,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear test text'**
   String get settingsSpeechPreviewClearTooltip;
+
+  /// No description provided for @settingsAboutMemoXTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About MemoX'**
+  String get settingsAboutMemoXTitle;
+
+  /// No description provided for @settingsAboutVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String settingsAboutVersion(Object version);
+
+  /// No description provided for @settingsAboutVersionUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Version unavailable'**
+  String get settingsAboutVersionUnknown;
+
+  /// No description provided for @settingsAboutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'MemoX keeps flashcard learning local-first, calm, and ready to back up when you choose.'**
+  String get settingsAboutMessage;
+
+  /// No description provided for @settingsAboutLegalese.
+  ///
+  /// In en, this message translates to:
+  /// **'MemoX'**
+  String get settingsAboutLegalese;
 
   /// No description provided for @settingsUpdatedMessage.
   ///

@@ -1,0 +1,221 @@
+# AGENTS.md
+
+## Scope
+
+MemoX is a Flutter full-app for flashcard learning and spaced repetition.
+Primary stack: Flutter 3.11+, Dart 3.11, Riverpod Annotation, Drift, Material 3.
+
+Use this file as the repository router for Codex work in this workspace.
+Nên viết code thật cẩn thận, tuân thủ mọi quy định đã đặt ra, code sau khi thực hiện sẽ được Claude code và ChatGPT phiên bản web review.
+
+## Skill Routing
+
+- Use `flutter-full-app` for Flutter feature, architecture, local-state, and local-data work.
+- Use `markdown-spec-to-code` when implementing from `docs/business/**` or `docs/database/**`.
+- Use `docs/system-design/MemoX Design System/SKILL.md` as the MemoX design skill for Flutter UI, visual design, brand, component composition, marketing surfaces, decks, mocks, and prototypes.
+- Use `flutter-app-development` as supporting context when a task spans app shell, routing, theme, and feature structure.
+- Only use sub-agents if the user explicitly asks for delegation or parallel agent work.
+
+## Working Convention
+
+- Use Vietnamese for discussion with the user.
+- Use English for code, comments, identifiers, and commit messages.
+- Do not rubber-stamp user proposals. If a user suggestion is technically,
+  architecturally, product-wise, or UX-wise wrong, respectfully challenge it,
+  explain the concrete risk, and propose a better alternative.
+- Agree with user suggestions only when the agreement is defensible from repo
+  context, business docs, product behavior, or implementation constraints. If
+  uncertain, state the uncertainty and verify before accepting the proposal.
+- Prefer minimal, structurally correct changes over broad refactors.
+- Do not edit generated files manually:
+  - `**/*.g.dart`
+  - `**/*.freezed.dart`
+  - `lib/l10n/generated/**`
+  - platform-generated Flutter files unless the task explicitly requires it
+
+## Nested Guard Repository Contract
+
+- `code-verification-guard/` is a separate nested Git repository, even though it is vendored inside this workspace.
+- Do not commit changes under `code-verification-guard/**` in the MemoX repository.
+- Changes inside `code-verification-guard/**` must be committed and pushed from:
+  - `D:\workspace_STS_5\memox\code-verification-guard`
+  - remote: `https://github.com/ntgptit/code-verification-guard-v2.git`
+- MemoX repository changes must be committed and pushed from:
+  - `D:\workspace_STS_5\memox`
+  - remote: `https://github.com/ntgptit/memox-v2.git`
+- MemoX may track project-level guard config files such as:
+  - `code-verification-guard.yaml`
+  - `code-verification-guard-scopes.yaml`
+- When staging MemoX changes, never use `git add .` if `code-verification-guard/` is unignored or visible as untracked content. Stage explicit paths only.
+- If `code-verification-guard/` appears as untracked content in MemoX, do not add it unless the user explicitly asks to convert it to a submodule.
+
+## MemoX Planning Contract
+
+- Any non-trivial MemoX plan must start with a `5Why` analysis before implementation details.
+- For Flutter/UI work, the `5Why` must explicitly address theme/token impact, shared widget reuse, Decision Table coverage, data source ownership, and verification gates.
+- Plans must list the docs, Decision Table files, executable tests, generated files, and verification commands that the change needs.
+- If a change intentionally does not touch schema, theme tokens, generated files, or business docs, state that directly and explain why.
+- File-level implementation maps must say whether each file is edited or created, what content changes, where the change belongs, and why it is necessary.
+
+## Repo Routing
+
+### `docs/business/**`
+
+- Source of truth for business behavior.
+- If product behavior changes, update the relevant business doc first or in the same change.
+- If a capability becomes part of the main app scope, also update `docs/business/system/overview.md`.
+
+### `docs/database/**`
+
+- Source of truth for local persistence design.
+- Any Drift schema change under `lib/data/datasources/local/**` must stay aligned with:
+  - `docs/database/schema-v1.md`
+  - `docs/database/implementation-notes.md`
+  - `docs/database/storage-boundaries.md`
+
+### `docs/system-design/**`
+
+- `docs/system-design/MemoX Design System/` is the trusted design source for MemoX brand, visual language, design tokens, UI kit references, content voice, and component intent.
+- Treat `docs/system-design/MemoX Design System/README.md` as the first document to read before changing Flutter UI, shared widgets, theme tokens, visual review checklists, presentation decks, marketing surfaces, mocks, or prototypes.
+- `docs/system-design/MemoX Design System/SKILL.md` is the portable agent skill for applying the design system.
+- `docs/system-design/v0-memox-prompts-v2.md` is legacy prompt reference only. It may inspire screen intent, but it must not override the trusted Design System, this `AGENTS.md`, repository guards, or current Flutter implementation contracts.
+- If any design doc, checklist, prompt, or agent instruction conflicts with the trusted Design System, update that document or explicitly call out the drift before implementing UI.
+
+### `lib/app/**`
+
+- App bootstrap, DI, router, global config only.
+- Do not place feature business logic here.
+- `lib/main.dart` is the canonical app shell entrypoint.
+
+### `lib/core/**`
+
+- Shared non-feature building blocks only.
+- `lib/core/theme/**` is the Flutter implementation of the trusted Design System. Token, theme, or component-theme changes must stay aligned with `docs/system-design/MemoX Design System/README.md`.
+- Do not add ad hoc feature helpers here unless they are genuinely cross-feature.
+
+### `lib/data/**`
+
+- DTOs, mappers, datasources, repository implementations.
+- Drift code stays in `lib/data/datasources/local/**`.
+- Keep transactions and persistence details in `data`, not in `presentation`.
+
+### `lib/domain/**`
+
+- Pure domain layer.
+- Must not import Flutter UI libraries, Drift, or data-layer implementations.
+
+### `lib/presentation/**`
+
+- Feature UI, providers, viewmodels, and shared UI.
+- Must not import Drift or concrete data-layer implementations.
+- Prefer `presentation/shared/**` widgets before building one-off UI patterns inside a feature.
+
+### `test/**`
+
+- Add or update targeted tests for the area touched.
+- Prefer tests near the affected layer and feature.
+
+### `tools/guard/**`
+
+- Legacy repo-local architectural guardrail.
+- Do not extend this guard for new MemoX rules unless the user explicitly asks to maintain the legacy guard.
+- Prefer `code-verification-guard/` plus root `code-verification-guard.yaml` for new guard work.
+
+### `code-verification-guard/**`
+
+- Separate nested Git repository for the new YAML-first guard engine and reusable rule registries.
+- Treat changes here as `code-verification-guard-v2` work, not MemoX app work.
+- Keep generic engine behavior project-agnostic; MemoX-specific rules belong under `registries/projects/memox/**`, scopes under `scopes/**`, or root MemoX config when the setting is project-local.
+- Commit and push this repository separately from MemoX.
+
+## Architecture Contract
+
+- Use Riverpod Annotation providers for app state and dependency wiring.
+- Widgets should `ref.watch(...)` for render state and `ref.read(...)` inside callbacks.
+- Do not put multi-step business logic, query orchestration, or persistence logic inside widgets.
+- Keep feature boundaries explicit. Do not import screens or widgets directly from another feature.
+- Promote reused UI patterns into `lib/presentation/shared/**` instead of duplicating them across features.
+
+## Decision Table Contract
+
+- Use the global `decision-table-tests` skill for any feature, logic, or test change.
+- Decision Tables are repo artifacts. Store them as markdown under `docs/decision-tables/**`; do not rely on test-file comments as the source of truth.
+- Every Decision Table markdown file must declare its executable test file with ``Test file: `test/..._test.dart` ``.
+- Any changed or added behavior must update the relevant markdown Decision Table before or with the tests.
+- Screen Decision Tables must be organized by event boundary: `onOpen`, `onDisplay`, `onInsert`, `onUpdate`, `onDelete`, `onMove`, `onSelect`, `onSearchFilterSort`, `onRefreshRetry`, `onNavigate`, `onExternalChange`, and `onDispose`.
+- Non-screen logic Decision Tables must map rows to implementation branches such as `if`, `switch`, `case`, `catch`, validation, loading, error, empty, success, disabled, cancellation, and retry.
+- Test names must map to markdown table rows with the format `DT<number> <eventName>: <expected behavior>`.
+- Every Decision Table row must include a `Coverage` cell with `C0`, `C1`, or `C0+C1`.
+- Every event table must achieve both `C0` statement/path coverage and `C1` branch/decision coverage.
+- Decision Table rows must be complete and tied to real branches: do not use filler cells such as `arranged state`, `action under test`, `expected behavior`, `branch for ...`, `test fixture creates ...`, `command under test`, `assertions verify ...`, or generic proof text.
+- Final reports for behavior changes must state which Decision Table events/cases were added or updated.
+- Do not claim verification complete unless the MemoX guard, including markdown Decision Table rules, and the targeted tests pass.
+
+## UI And Theme Contract
+
+- Design intent, brand rules, copy voice, token meaning, and UI kit references come from `docs/system-design/MemoX Design System/`.
+- Flutter code implements that design through `lib/core/theme/**` tokens/theme extensions/component themes and `lib/presentation/shared/**` widgets. Do not bypass these layers to match a mock quickly.
+- UI code should consume colors from `Theme.of(context).colorScheme` or theme extensions, not raw palette files.
+- UI code should consume typography from `Theme.of(context).textTheme`, not custom inline `TextStyle(...)` unless there is a strong repo-local reason.
+- Shared widgets should own semantic typography through internal `MxText`/`MxTextRole` usage. Only typography primitives such as `MxText` and `MxTextField` may expose `MxTextRole` as public API; other shared widgets should expose semantic variants or component-specific props instead.
+- App bar and header actions should use toolbar icon styling. Do not use filled, outlined, or card-like buttons for normal Back, Close, More, settings, or audio actions unless the action is explicitly selected/active/destructive.
+- Prefer shared layout primitives such as `MxAdaptiveScaffold`, `MxScaffold`, and `MxContentShell`.
+- Use spacing, radius, and sizing tokens from `lib/core/theme/**` instead of raw literals when a token already exists.
+- Compact mobile UI should be decision-first: use shared helpers such as `context.showsSupportingCopy`, keep titles/statuses/actions that drive the next decision, and hide repeated helper copy or duplicate metrics. Preserve error recovery copy, empty-state recovery actions, disabled/destructive reasons, account/sync warnings, and accessibility text scaling.
+
+## Database Contract
+
+- Local database is SQLite via Drift.
+- Current entrypoint: `lib/data/datasources/local/app_database.dart`.
+- Keep:
+  - `TEXT` ids for entities
+  - `TEXT` values for enums
+  - UTC epoch milliseconds for timestamps
+  - foreign keys enabled
+  - WAL mode enabled
+- Do not change schema table names, enum semantics, or lifecycle states casually. Update docs and tests in the same change.
+- Generated Drift files must come from codegen, never by manual edits.
+
+## Localization Contract
+
+- User-facing strings belong in `lib/l10n/*.arb`.
+- Keep `flutter.generate: true` and `flutter_localizations` enabled in `pubspec.yaml`.
+- `lib/main.dart` must preserve:
+  - `AppLocalizations.localizationsDelegates`
+  - `AppLocalizations.supportedLocales`
+  - `onGenerateTitle: (context) => AppLocalizations.of(context).appName`
+
+## Verification
+
+For Dart or Flutter code changes, run the strongest relevant checks in this order:
+
+1. `dart run build_runner build --delete-conflicting-outputs` when touching Drift tables, Riverpod annotations, Freezed, or JSON-serializable models
+2. `python code-verification-guard\guard\run.py check --project .`
+3. `flutter analyze`
+4. Targeted `flutter test` commands for the affected area
+
+If `dart analyze` or `flutter analyze` reports errors, first run Dart's automated fix workflow (`dart fix --apply`) for applicable analyzer diagnostics, then rerun analyze and manually fix any remaining issues.
+
+Examples:
+
+- Database changes: run the build step, guard, analyze, and the relevant test under `test/data/**`
+- UI or feature changes: run guard, analyze, and targeted tests under `test/` when present
+- Docs-only changes: manually verify consistency across `docs/business/**`, `docs/database/**`, and any code contract affected by the doc change
+
+Do not claim completion if a relevant verification step was skipped or failed. State exactly what was not run.
+
+## Generated And Review-Sensitive Files
+
+- If codegen is required, include the generated outputs in the workspace result.
+- Do not hand-edit:
+  - `lib/app/di/providers.g.dart`
+  - `lib/app/router/*.g.dart`
+  - `lib/presentation/**/providers/*.g.dart`
+  - `lib/data/datasources/local/app_database.g.dart`
+- If a generated file changes unexpectedly, inspect the source file first instead of patching the generated output.
+
+## Docs Sync Rules
+
+- If a task changes study/session/SRS semantics, sync both `docs/business/**` and `docs/database/**` when the persistence contract is affected.
+- If a task changes only implementation detail without changing business meaning, keep docs unchanged.
+- If docs and code disagree, do not silently choose one. Either sync them in the same change or call out the mismatch explicitly.

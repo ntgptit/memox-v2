@@ -499,10 +499,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPersonalizationTitle => 'Personalization';
 
   @override
+  String get settingsStudySectionTitle => 'Study';
+
+  @override
+  String get settingsAppSectionTitle => 'App';
+
+  @override
+  String get settingsAboutSectionTitle => 'About';
+
+  @override
+  String get settingsOverviewFooter => 'Made for calm learning · MemoX';
+
+  @override
   String get settingsAccountTitle => 'Account';
 
   @override
   String get settingsAccountLoading => 'Loading account';
+
+  @override
+  String get settingsAccountLinkedOverviewTitle => 'Account & sync';
+
+  @override
+  String get settingsAccountSignInSyncTitle => 'Sign in & sync';
+
+  @override
+  String get settingsAccountSignInSyncSubtitle =>
+      'Save your progress across devices';
+
+  @override
+  String get settingsAccountSigningIn => 'Signing in...';
 
   @override
   String get settingsAccountSubtitleSignedOut =>
@@ -550,6 +575,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String settingsAccountOverviewSubtitle(Object status, Object email) {
     return '$status\n$email';
   }
+
+  @override
+  String settingsAccountOverviewSyncedSubtitle(Object email, Object time) {
+    return '$email · synced $time';
+  }
+
+  @override
+  String settingsAccountOverviewSyncedMockSubtitle(Object email) {
+    return '$email · synced 2 min ago';
+  }
+
+  @override
+  String settingsAccountOverviewSyncErrorSubtitle(Object email) {
+    return '$email · last synced 2 days ago';
+  }
+
+  @override
+  String get settingsOverviewSyncRetry => 'Retry';
 
   @override
   String get settingsAccountDriveAuthorizationRequired =>
@@ -823,7 +866,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsThemeDark => 'Dark';
 
   @override
+  String get settingsAppearanceOverviewSubtitle => 'Light, dark, system';
+
+  @override
+  String get settingsSoonChip => 'SOON';
+
+  @override
   String get settingsLanguageTitle => 'Language';
+
+  @override
+  String get settingsLanguageOverviewSubtitle => 'English';
 
   @override
   String get settingsLocaleLabel => 'App language';
@@ -844,6 +896,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLearningExperienceTitle => 'Learning experience';
 
   @override
+  String get settingsLearningOverviewTitle => 'Learning';
+
+  @override
   String get settingsStudyDefaultsSubtitle =>
       'Defaults used when a new study session is created.';
 
@@ -857,21 +912,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsReviewBatchSizeLabel => 'Review batch size';
 
   @override
-  String settingsLearningOverviewSummary(int newCount, int reviewCount) {
-    String _temp0 = intl.Intl.pluralLogic(
-      newCount,
-      locale: localeName,
-      other: '$newCount cards',
-      one: '1 card',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      reviewCount,
-      locale: localeName,
-      other: '$reviewCount cards',
-      one: '1 card',
-    );
-    return 'New $_temp0 · Review $_temp1';
-  }
+  String get settingsLearningOverviewSummary =>
+      '20 cards / day · 5 study modes';
 
   @override
   String settingsCardsCountValue(int count) {
@@ -885,10 +927,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsManageTagsTitle => 'Manage tags';
+
+  @override
+  String get settingsManageTagsOverviewSubtitle => '14 tags';
+
+  @override
+  String get settingsManageTagsShellTitle => 'Tag management is ready to wire';
+
+  @override
+  String get settingsManageTagsShellMessage =>
+      'The route is available now. Rename, merge, delete, study, and view-card actions will be implemented with the full tag-management feature.';
+
+  @override
   String get settingsSpeechTitle => 'Speech';
 
   @override
-  String get settingsAudioSpeechTitle => 'Audio & Speech';
+  String get settingsAudioSpeechTitle => 'Audio & speech';
 
   @override
   String get settingsAudioSpeechEnabled => 'On';
@@ -897,9 +952,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAudioSpeechDisabled => 'Off';
 
   @override
-  String settingsAudioSpeechOverviewSummary(Object ttsState, Object voice) {
-    return '$ttsState · $voice';
-  }
+  String get settingsAudioSpeechOverviewSummary => 'Korean voice · 0.9× speed';
 
   @override
   String get settingsSpeechLabel => 'Korean and English pronunciation support';
@@ -1023,6 +1076,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSpeechPreviewClearTooltip => 'Clear test text';
+
+  @override
+  String get settingsAboutMemoXTitle => 'About MemoX';
+
+  @override
+  String settingsAboutVersion(Object version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get settingsAboutVersionUnknown => 'Version unavailable';
+
+  @override
+  String get settingsAboutMessage =>
+      'MemoX keeps flashcard learning local-first, calm, and ready to back up when you choose.';
+
+  @override
+  String get settingsAboutLegalese => 'MemoX';
 
   @override
   String get settingsUpdatedMessage => 'Settings updated.';

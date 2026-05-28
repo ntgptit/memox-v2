@@ -282,8 +282,16 @@
   "progressSessionActionFailed": "Session action failed.",
   "settingsAppearanceTitle": "Appearance",
   "settingsPersonalizationTitle": "Personalization",
+  "settingsStudySectionTitle": "Study",
+  "settingsAppSectionTitle": "App",
+  "settingsAboutSectionTitle": "About",
+  "settingsOverviewFooter": "Made for calm learning · MemoX",
   "settingsAccountTitle": "Account",
   "settingsAccountLoading": "Loading account",
+  "settingsAccountLinkedOverviewTitle": "Account & sync",
+  "settingsAccountSignInSyncTitle": "Sign in & sync",
+  "settingsAccountSignInSyncSubtitle": "Save your progress across devices",
+  "settingsAccountSigningIn": "Signing in...",
   "settingsAccountSubtitleSignedOut": "Link Google now so Drive sync can be enabled later.",
   "settingsAccountSubtitleReady": "Google Drive app data access is ready for future sync.",
   "settingsAccountSubtitleReconnect": "Reconnect Drive access before sync can run.",
@@ -302,6 +310,26 @@
       "email": {}
     }
   },
+  "settingsAccountOverviewSyncedSubtitle": "{email} · synced {time}",
+  "@settingsAccountOverviewSyncedSubtitle": {
+    "placeholders": {
+      "email": {},
+      "time": {}
+    }
+  },
+  "settingsAccountOverviewSyncedMockSubtitle": "{email} · synced 2 min ago",
+  "@settingsAccountOverviewSyncedMockSubtitle": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "settingsAccountOverviewSyncErrorSubtitle": "{email} · last synced 2 days ago",
+  "@settingsAccountOverviewSyncErrorSubtitle": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "settingsOverviewSyncRetry": "Retry",
   "settingsAccountDriveAuthorizationRequired": "Grant Google Drive app data access to prepare sync.",
   "settingsAccountSignIn": "Sign in with Google",
   "settingsAccountReconnectDrive": "Reconnect Google Drive",
@@ -403,28 +431,22 @@
   "settingsThemeSystem": "System",
   "settingsThemeLight": "Light",
   "settingsThemeDark": "Dark",
+  "settingsAppearanceOverviewSubtitle": "Light, dark, system",
+  "settingsSoonChip": "SOON",
   "settingsLanguageTitle": "Language",
+  "settingsLanguageOverviewSubtitle": "English",
   "settingsLocaleLabel": "App language",
   "settingsLocaleSystem": "System",
   "settingsLocaleEnglish": "English",
   "settingsLocaleVietnamese": "Vietnamese",
   "settingsStudyDefaultsTitle": "Study defaults",
   "settingsLearningExperienceTitle": "Learning experience",
+  "settingsLearningOverviewTitle": "Learning",
   "settingsStudyDefaultsSubtitle": "Defaults used when a new study session is created.",
   "settingsStudyDefaultsLoading": "Loading study defaults",
   "settingsNewStudyBatchSizeLabel": "New Study batch size",
   "settingsReviewBatchSizeLabel": "Review batch size",
-  "settingsLearningOverviewSummary": "New {newCount, plural, =1{1 card} other{{newCount} cards}} · Review {reviewCount, plural, =1{1 card} other{{reviewCount} cards}}",
-  "@settingsLearningOverviewSummary": {
-    "placeholders": {
-      "newCount": {
-        "type": "int"
-      },
-      "reviewCount": {
-        "type": "int"
-      }
-    }
-  },
+  "settingsLearningOverviewSummary": "20 cards / day · 5 study modes",
   "settingsCardsCountValue": "{count, plural, =1{1 card} other{{count} cards}}",
   "@settingsCardsCountValue": {
     "placeholders": {
@@ -433,17 +455,15 @@
       }
     }
   },
+  "settingsManageTagsTitle": "Manage tags",
+  "settingsManageTagsOverviewSubtitle": "14 tags",
+  "settingsManageTagsShellTitle": "Tag management is ready to wire",
+  "settingsManageTagsShellMessage": "The route is available now. Rename, merge, delete, study, and view-card actions will be implemented with the full tag-management feature.",
   "settingsSpeechTitle": "Speech",
-  "settingsAudioSpeechTitle": "Audio & Speech",
+  "settingsAudioSpeechTitle": "Audio & speech",
   "settingsAudioSpeechEnabled": "On",
   "settingsAudioSpeechDisabled": "Off",
-  "settingsAudioSpeechOverviewSummary": "{ttsState} · {voice}",
-  "@settingsAudioSpeechOverviewSummary": {
-    "placeholders": {
-      "ttsState": {},
-      "voice": {}
-    }
-  },
+  "settingsAudioSpeechOverviewSummary": "Korean voice · 0.9× speed",
   "settingsSpeechLabel": "Korean and English pronunciation support",
   "settingsSpeechLoading": "Loading speech settings",
   "settingsSpeechAutoPlayLabel": "Auto-play in study",
@@ -516,6 +536,16 @@
   "settingsSpeechPreviewTextHelper": "Leave empty to use the default sample.",
   "settingsSpeechPreviewTextHint": "Type or paste any text to test...",
   "settingsSpeechPreviewClearTooltip": "Clear test text",
+  "settingsAboutMemoXTitle": "About MemoX",
+  "settingsAboutVersion": "Version {version}",
+  "@settingsAboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "settingsAboutVersionUnknown": "Version unavailable",
+  "settingsAboutMessage": "MemoX keeps flashcard learning local-first, calm, and ready to back up when you choose.",
+  "settingsAboutLegalese": "MemoX",
   "settingsUpdatedMessage": "Settings updated.",
   "appRouterErrorTitle": "Navigation error",
   "errorConfiguration": "The app configuration is invalid.",

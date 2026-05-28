@@ -25,6 +25,7 @@ extension AppNavigation on BuildContext {
 
   void pushSettingsAccount() => pushNamed(RouteNames.settingsAccount);
   void pushSettingsLearning() => pushNamed(RouteNames.settingsLearning);
+  void pushSettingsLearningTags() => pushNamed(RouteNames.settingsLearningTags);
   void pushSettingsAudioSpeech() => pushNamed(RouteNames.settingsAudioSpeech);
 
   void goFolderDetail(String folderId) {

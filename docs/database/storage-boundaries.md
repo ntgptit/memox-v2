@@ -1,95 +1,128 @@
+---
+last_updated: 2026-05-26
+applies_to: persistence boundary, data access patterns
+---
+
 # Storage Boundaries
 
-## 1. SQLite + Drift
-SQLite là source of truth cho:
-- `folders`
-- `decks`
-- `flashcards`
-- `flashcard_progress`
-- `study_sessions`
-- `study_session_items`
-- `study_attempts`
-- `tts_settings`
+## Purpose
 
-### Account database context
-MemoX dùng local DB làm source of truth, nhưng DB context phải tách theo chủ sở hữu dữ liệu:
-- Khi chưa login, app dùng guest database context `memox_guest`.
-- Khi login Google, app dùng database context theo Google subject id, ví dụ `memox_<google_subject_id>`.
-- Logout chỉ clear account link cục bộ, không xóa DB guest hoặc DB của Google account.
-- Login account B sau account A không được mở DB của account A. Nếu account B chưa có DB thì app hiển thị trạng thái trống hoặc cho restore từ Drive của account B.
-- Nếu user login Google khi đang có guest DB, app phải hỏi rõ: attach guest DB vào Google account hoặc tạo DB mới cho account đó.
+Define where data belongs and how layers access it.
 
-## 2. SharedPreferences
-`SharedPreferences` chỉ nên giữ app settings nhỏ, không phải dữ liệu học.
+## Source of truth
 
-### Key đang có trong code
-| Key | Ý nghĩa |
+Local Drift database is the source of truth for persistent app data.
+
+Provider state is NOT persistent storage.
+
+## Correct flow
+
+```text
+Screen -> ViewModel/Notifier -> UseCase -> Repository -> DAO/Drift -> Database
+```
+
+## Forbidden flow
+
+```text
+Screen -> DAO
+Widget -> AppDatabase
+Presentation -> Drift table
+Domain -> Drift
+Provider memory -> persistent source of truth
+```
+
+## Read patterns
+
+When reading from database, choose the right pattern.
+
+| Use case | Pattern | API |
+| --- | --- | --- |
+| List screen, reactive | Stream | `watchAll`, `watchByX` |
+| Detail screen, reactive | Stream | `watchById` |
+| Form initial load (one-shot) | Future | `getById` |
+| Search results | Stream (debounced) | `watchSearch` |
+| Count badge | Stream | `watchCount` |
+| Background validation | Future | `exists`, `getById` |
+
+Rule: prefer Stream for anything user-visible. Use Future only for one-shot reads.
+
+## Write patterns
+
+| Use case | API | Wraps in transaction |
+| --- | --- | --- |
+| Single row insert | `repository.add` | No (single op) |
+| Single row update | `repository.update` | No |
+| Single row delete | `repository.delete` | If cascade cleanup needed |
+| Multi-row ops | `repository.bulkX` | Yes |
+| Cross-table ops | UseCase orchestrates | Yes |
+
+## Transaction required
+
+Use transaction for:
+
+- Creating subfolder and updating parent mode.
+- Creating deck and updating parent mode.
+- Deleting folder/deck/flashcard with cleanup.
+- Importing flashcards.
+- Creating session and session items.
+- Recording attempt plus related state changes.
+- Finalizing session and updating progress.
+
+## Refresh rule
+
+After mutation:
+
+- Repository emits via watched streams (automatic via Drift).
+- For non-streamed reads, invalidate related providers.
+- Update content revision mechanism when used.
+- Let UI reload from database.
+- Do not manually patch UI list as the only source of truth.
+
+## Revision mechanism
+
+When a feature needs to invalidate a non-Drift cache (e.g., aggregated dashboard counts), use a content revision counter:
+
+- Provider exposes `int revision`.
+- Mutation use case increments revision.
+- Dependent provider watches revision and refetches.
+
+Do not use revision as a substitute for Drift streams in normal list/detail screens.
+
+## DAO access rule
+
+| Layer | Can access DAO? |
 | --- | --- |
-| `settings.theme_mode` | theme mode của app |
-| `settings.locale` | locale override của app |
-| `settings.study.default_new_batch_size` | batch mặc định cho học mới |
-| `settings.study.default_review_batch_size` | batch mặc định cho SRS Review |
-| `settings.study.shuffle_flashcards` | mặc định có trộn thẻ hay không |
-| `settings.study.shuffle_answers` | mặc định có trộn đáp án hay không |
-| `settings.study.prioritize_overdue` | mặc định ưu tiên overdue |
-| `settings.account.cloud_link` | metadata Google account đã liên kết và trạng thái scope Drive `appDataFolder`; không chứa token |
-| `settings.sync.google_drive.metadata` | baseline fingerprint/version của lần sync Drive gần nhất; không chứa dữ liệu học hoặc token |
-| `settings.sync.google_drive.device_id` | id cục bộ để nhận diện thiết bị trong sync manifest |
+| Presentation (widget, viewmodel, notifier) | No |
+| Domain (use case, repository contract) | No |
+| Data (repository impl) | Yes |
+| Data (DAO) | Yes (it is the DAO) |
+| Data (mapper) | No (works on Drift rows passed to it) |
 
-TTS v1 không còn dùng SharedPreferences. Các key TTS cũ nếu còn tồn tại trên thiết bị được bỏ qua; Drift table `tts_settings` là source of truth hiện tại.
+## Migration
 
-## 3. Google Drive appDataFolder
-Manual Google Drive sync V1 lưu artifact trong Drive `appDataFolder` của Google account đã liên kết:
-- `memox.sync.manifest.json`: metadata nhỏ để kiểm tra version, schema và fingerprint trước khi tải DB snapshot.
-- `memox.sync.snapshot.zip`: chứa `manifest.json`, `memox.sqlite`, và `settings.json`.
+See `docs/database/migration-contract.md` for schema change procedure.
 
-Artifact Drive không hiển thị trong My Drive thông thường và không thay thế SQLite local làm source of truth khi app đang chạy. Restore phải validate manifest/hash trước, đóng DB hiện tại, ghi snapshot mới, rồi mở lại app state sạch.
+## Agent rule
 
-## 4. Không persist dài hạn
-Các state sau không cần vào SQLite ở v1:
-- import preview trước khi user xác nhận
-- lỗi validate import theo dòng
-- text import raw chưa commit
-- export file tạm
-- dialog state, search text tạm, filter UI tạm
-- Google access token, id token, refresh token hoặc server auth code
+Persistence logic belongs in data/repository/use case flow, not in widgets or notifiers.
 
-## 5. Derived data không lưu cứng
-Các field sau chỉ nên query hoặc compute khi cần:
-- breadcrumb của folder
-- số deck trong folder
-- số flashcard trong folder hoặc deck
-- `dueToday`
-- `lastStudiedAt` của folder hoặc deck
-- `masteryPercent`
-- ranking của search result
+When in doubt about whether to use Stream or Future: use Stream.
 
-Lý do:
-- tránh double source of truth
-- tránh phải backfill nhiều nơi sau mỗi write
-- giảm risk sai số khi move, duplicate, import, delete cascade
+## Related
 
-## 6. Search strategy
-### V1
-- Folder search: query theo `folders.name`
-- Deck search: query theo `decks.name`
-- Flashcard search: query theo `front`, `back`
-- Ưu tiên `LIKE` hoặc `LOWER(...) LIKE LOWER(...)` trong Drift cho bản đầu
+**Schema:**
+- `docs/database/schema-contract.md` — what belongs in Drift
 
-### V2 khi dữ liệu lớn
-- Thêm FTS5 virtual table cho flashcard text
-- Đồng bộ FTS bằng trigger hoặc write-through DAO
+**Related contracts:**
+- `docs/database/migration-contract.md`
+- `docs/state/state-management-contract.md` — provider memory is NOT a persistence boundary
 
-## 7. Session resume boundary
-- Queue hiện tại và log trả lời phải persist trong SQLite để app có thể resume sau khi đóng app
-- Study type, study flow, mode hiện tại, retry round hiện tại và các item chưa pass phải persist trong SQLite
-- Với New Study, danh sách flashcard đã pass trong mode, chưa pass trong mode và các mode đã pass có thể derive từ `study_session_items` + `study_attempts`
-- Với SRS Review, retry batch, các flashcard đã pass Fill và chưa pass Fill có thể derive từ `study_session_items` + `study_attempts`
-- Session resume được phép khi `study_sessions.status` thuộc (`in_progress`, `ready_to_finalize`, `failed_to_finalize`)
-- Session `draft` chưa bắt đầu học thì không coi là resume, chỉ là start session lần đầu
-- Session `completed` hoặc `cancelled` không resume, chỉ phục vụ history
-- Box và due date chính thức không được commit khi session ở `draft`, `in_progress`, `ready_to_finalize`, `failed_to_finalize`, hoặc `cancelled`
-- Commit SRS chỉ được chạy trong transaction chuyển `status` từ `ready_to_finalize` sang `completed`
-- Nếu transaction commit lỗi, rollback toàn bộ cập nhật SRS và chuyển session sang `failed_to_finalize`; user có thể retry finalize hoặc resume
-- Với mỗi entry point, chỉ lưu session resume-eligible gần nhất (status in `in_progress`, `ready_to_finalize`, `failed_to_finalize`) trong logic service
-- Default setting của session nằm ở `SharedPreferences`, nhưng snapshot khi session được tạo phải copy vào `study_sessions`
+**Business specs touching non-Drift storage:**
+- `docs/business/engagement/dashboard-engagement.md` → daily goal, streak, reminder time in SharedPreferences
+- `docs/business/tts/tts-settings.md` → per-language TTS settings in SharedPreferences
+- `docs/business/search/global-search.md` → recent searches in SharedPreferences
+- `docs/business/account-sync/account-sync.md` → Drive manifest (remote), account-scoped DB file path
+- `docs/business/flashcard/flashcard-management.md` → "Save and add another" toggle (session memory, NOT persisted)
+
+**Decision table:**
+- `docs/decision-tables/memox-core-decision-table.md` rows under "Storage boundaries" (account-scoped DB switching, prefs key prefixes)
