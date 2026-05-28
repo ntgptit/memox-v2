@@ -275,19 +275,23 @@ Same as Recall mode:
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/study/study-flow.md` (fill mode — plain text input, mode unavailability)
 - `docs/business/srs/srs-review.md` (perfect / recovered / forgot transitions)
 - `docs/business/tts/tts-settings.md` (front-only playback; auto-play disabled here)
 
 **Decision rows:**
+
 - Fill mode: strict matching, hint-tainting, retry budget, mode skip for trivial fronts
 
 **Schema / storage:**
+
 - INSERT `study_attempts` with `study_mode='fill'`
 
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase, `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/tts.md`
 
 **Code paths:**
+
 - `lib/presentation/features/study/widgets/fill_mode_view.dart`
 - `lib/presentation/features/study/widgets/fill_input_card.dart`
 - `lib/domain/study/strict_matcher.dart` (trim + char-equality, no normalization)
@@ -296,6 +300,7 @@ Same as Recall mode:
 - `lib/domain/usecases/study/grade_attempt_usecase.dart`
 
 **Related wireframes:**
+
 - `docs/wireframes/13-study-session-review.md` (shared shell + color family convention)
 - `docs/wireframes/14-study-session-match.md`, `docs/wireframes/15-study-session-guess.md`, `docs/wireframes/16-study-session-recall.md`
 - `docs/wireframes/08-flashcard-edit.md` (target of ✎ icon)

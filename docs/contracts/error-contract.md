@@ -58,7 +58,7 @@ enum ValidationCode {
   outOfRange,
   parentModeLocked,   // folder/deck mode mismatch
   cycleDetected,      // folder move would create cycle
-  insufficientContent, // study match requires >= 5 cards; guess requires >= 4 cards
+  insufficientContent, // study match and guess require >= 5 cards
 }
 ```
 

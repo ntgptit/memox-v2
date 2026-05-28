@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-27
+last_updated: 2026-05-28
 route: /library/study/session/:sessionId
 study_mode: guess
 source_specs:
@@ -12,7 +12,7 @@ source_specs:
 
 ## Purpose
 
-Multiple-choice recognition with **rich option cards** showing both the candidate term and its definition snippet. User sees a prompt term on top, picks the correct option among 4 (A/B/C/D), receives immediate green/red feedback, and auto-advances. Tests definition-level recognition.
+Multiple-choice recognition with **rich option cards** showing both the candidate term and its definition snippet. User sees a prompt term on top, picks the correct option among 5 (A/B/C/D/E), receives immediate green/red feedback, and auto-advances. Tests definition-level recognition.
 
 > **Direction.** The prompt shows the **front** of the current card (target-language term); options show candidate **backs** (or definition snippets). The user is identifying "what does this term mean?". This is the canonical guess direction in MemoX v1; a reversed direction (back → front) is a Future Proposal, not part of Phase 1.
 
@@ -52,11 +52,16 @@ Multiple-choice recognition with **rich option cards** showing both the candidat
 │ │ (D)  office                         │ │  ← Option D
 │ │      place of business work          │ │
 │ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ (E)  hospital                       │ │  ← Option E
+│ │      institution for medical care...│ │
+│ └─────────────────────────────────────┘ │
 └─────────────────────────────────────────┘
 ```
 
 Options list is **scrollable** when content exceeds viewport. Each option card holds:
-- A circle label `(A)` / `(B)` / `(C)` / `(D)` on the left.
+- A circle label `(A)` / `(B)` / `(C)` / `(D)` / `(E)` on the left.
 - Option **title** (the candidate back term).
 - Option **description** (a definition snippet — first ~1-2 lines of the candidate's `back` extended with `note` or `example`, truncated).
 
@@ -80,6 +85,11 @@ Options list is **scrollable** when content exceeds viewport. Each option card h
 │                                         │
 │ ┌─────────────────────────────────────┐ │
 │ │ (D)  office                         │ │  ← Dimmed
+│ │      ...                            │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ (E)  hospital                       │ │  ← Dimmed
 │ │      ...                            │ │
 │ └─────────────────────────────────────┘ │
 ├─────────────────────────────────────────┤
@@ -120,7 +130,7 @@ Options list is **scrollable** when content exceeds viewport. Each option card h
 | --- | --- | --- |
 | Current card front + back | `flashcards` | next card |
 | Per-card description snippet (e.g. `note` first line, or `example`, or `back` truncated) | `flashcards` | next card |
-| Decoy pool (3 random other cards from scope, with their back + snippet) | `flashcards` in scope, EXCLUDE current.id, random sample of 3 | next card |
+| Decoy pool (4 random other cards from scope, with their back + snippet) | `flashcards` in scope, EXCLUDE current.id, random sample of 4 | next card |
 | Decoy pool cached for session | repository in-memory cache | invalidated on session end |
 
 ## Forbidden
@@ -128,7 +138,7 @@ Options list is **scrollable** when content exceeds viewport. Each option card h
 - ❌ Show TTS button on options (could leak the correct pronunciation visually).
 - ❌ Reword the `WHAT IS THIS?` caption beyond locale translation.
 - ❌ Show only the option title without a description snippet. Both required to maintain visual rhythm.
-- ❌ Run when scope has < 4 cards.
+- ❌ Run when scope has < 5 cards.
 - ❌ Adjust the auto-advance countdown below 0.8s (correct) or below 1.5s (wrong).
 - ❌ Allow the user to tap a second option after the first is committed (single-tap per card).
 - ❌ Persist the attempt AFTER the countdown completes. Persist immediately on tap; the countdown is UI animation only.
@@ -140,7 +150,7 @@ Options list is **scrollable** when content exceeds viewport. Each option card h
 | --- | --- |
 | Top app bar | `✕` exit · `GUESS` mode pill (blue) · progress bar (blue) · "{answered} / {total}" count. |
 | Prompt card | Caption `WHAT IS THIS?`; below: front term (display-large, centered). |
-| Option card | Vertical list of 4 cards. Each card has: circle label `(A)`/`(B)`/`(C)`/`(D)` left; title (the back); description snippet (2-line clamp); state-dependent right icon (✓ / ✗). |
+| Option card | Vertical list of 5 cards. Each card has: circle label `(A)`/`(B)`/`(C)`/`(D)`/`(E)` left; title (the back); description snippet (2-line clamp); state-dependent right icon (✓ / ✗). |
 | Option — idle | Neutral surface, default text. |
 | Option — selected correct | Green border (2dp), green title text, ✓ right icon. |
 | Option — selected wrong | Red border, red title text, ✗ right icon. |
@@ -150,17 +160,17 @@ Options list is **scrollable** when content exceeds viewport. Each option card h
 
 ## Distractor selection rules
 
-- 3 decoys = 3 random other cards from the same `entry_ref` scope (deck / folder / tag).
+- 4 decoys = 4 random other cards from the same `entry_ref` scope (deck / folder / tag).
 - Decoy `back` MUST NOT match the current card's `back` (case-insensitive trim).
 - Decoy `description` is derived from the decoy card (NOT from the current card).
-- If scope has < 4 cards: mode is unavailable; flow validator skips it.
+- If scope has < 5 cards: mode is unavailable; flow validator skips it.
 - Decoy order randomized per render (seeded by `sessionId + cardId` so resume yields the same layout).
 
 ## States
 
 | State | Trigger | Behavior |
 | --- | --- | --- |
-| Awaiting selection | Card opened | 4 idle options. |
+| Awaiting selection | Card opened | 5 idle options. |
 | Selection committed (correct) | Tap correct option | Green border + ✓ on that option; others dim; countdown 0.8s; auto-advance. |
 | Selection committed (wrong) | Tap wrong option | Red border + ✗ on tapped; green border + ✓ on the true correct; others dim; countdown 1.5s; auto-advance. |
 | Skip countdown | Tap countdown bar / footer | Advance immediately. |
@@ -173,7 +183,7 @@ Options list is **scrollable** when content exceeds viewport. Each option card h
 | Tap option | Tap | Commit selection; show feedback; start countdown; persist attempt. |
 | Tap countdown footer | Tap | Skip remaining countdown, advance now. |
 | Tap ✕ | Tap | Exit confirm. |
-| Long-press option | Long-press | Open card actions sheet targeting the card the option belongs to (current card for A-D; supports bury / suspend / history on the current card). |
+| Long-press option | Long-press | Open card actions sheet targeting the card the option belongs to (current card for A-E; supports bury / suspend / history on the current card). |
 
 ## SRS handling
 
@@ -215,14 +225,14 @@ Same as Review mode.
 ## Accessibility
 
 - Prompt announces caption + front.
-- Each option labeled "Option A: {back}. {description}".
+- Each option labeled "Option A: {back}. {description}" (and similarly for B-E).
 - Feedback announced via live region: "Correct" / "Wrong. The answer was {correct back}.".
 - Countdown announced as "Next card in {n} seconds". Skip button has its own label.
 - Reduced motion: countdown does not animate; appears as a static remaining-time label.
 
 ## Rules
 
-- Mode requires ≥ 4 cards in scope.
+- Mode requires ≥ 5 cards in scope.
 - Decoys must be REAL backs from other cards.
 - Decoys MUST NOT equal the correct back (case-insensitive).
 - TTS button MUST NOT appear on options.

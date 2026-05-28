@@ -105,7 +105,7 @@ The 5 modes of card interaction.
 enum StudyMode {
   review,   // Both sides shown together on one card; swipe-to-grade (right=perfect, left=forgot)
   match,    // 5-pair board (10 cells); tap-pair to match; per-pair persistence
-  guess,    // Front shown; pick correct back from 4 rich option cards (title + description)
+  guess,    // Front shown; pick correct back from 5 rich option cards (title + description)
   recall,   // Front shown; tap Show answer to reveal; self-grade Forgot / Got it (no text input in v1)
   fill,     // Back shown as hint; type front in plain text input; strict match
 }

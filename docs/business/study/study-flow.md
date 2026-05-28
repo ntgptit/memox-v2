@@ -50,11 +50,12 @@ See `docs/business/glossary.md` for the distinction between entry type, study ty
 | --- | --- | --- |
 | `review` | both sides shown | Front and back rendered together on one card; user swipes (right = perfect, left = forgot). No reveal step. |
 | `match` | both sides shown (board) | A 5-pair board (10 cells: 5 fronts + 5 backs of the same 5 cards). User taps a cell, then taps its pair. Per-pair persistence; one board per 5 cards. |
-| `guess` | front → back | Show front; pick correct back from 4 rich option cards (title + description snippet). Auto-advance countdown on commit. |
+| `guess` | front → back | Show front; pick correct back from 5 rich option cards (title + description snippet). Auto-advance countdown on commit. |
 | `recall` | front → back | Show front, tap "Show answer" to reveal back, self-grade with Forgot / Got it. **No text input in v1**; typed-answer recall is a Future Proposal. |
 | `fill` | front production | Show back as definition / hint; type front in a plain free-text input. Strict character match; "Mark correct" override path. Optional Hint button taints result to max `recovered`. |
 
 Direction notes:
+
 - `review` and `match` cover the "both sides visible" pedagogy at different paces (1 card single-stream vs 5-pair board).
 - `guess` and `recall` cover front→back recognition at increasing effort (multiple-choice vs free recall).
 - `fill` is the only production-direction mode in v1 (user produces the front).
@@ -160,6 +161,7 @@ Do not keep active study progress only in provider memory. Every answer must per
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/12-study-entry-gate.md` — pre-session router + empty matrix
 - `docs/wireframes/13-study-session-review.md` — review mode (front→back flip)
 - `docs/wireframes/14-study-session-match.md` — match mode (front→back multiple choice)
@@ -170,15 +172,19 @@ Do not keep active study progress only in provider memory. Every answer must per
 - `docs/wireframes/25-shared-bottom-sheets.md` §scope-picker, §paused-sessions
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `study_sessions`, `study_session_items`, `study_attempts` (with `box_before` / `box_after`)
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows S1-S4i (session lifecycle, empty scope matrix, mode availability)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → `entry_type`, `study_type`, `study_flow`, `study_mode`, `entry_ref_id`
 
 **Related business specs:**
+
 - `docs/business/srs/srs-review.md` — box transitions on result
 - `docs/business/resume/resume-session.md` — paused session lifecycle
 - `docs/business/study-actions/bury-suspend.md` — bury/suspend integration into queue
@@ -188,6 +194,7 @@ Do not keep active study progress only in provider memory. Every answer must per
 - `docs/business/navigation/navigation-flow.md` — `/library/study/...` routes + `pushReplacement` rule
 
 **Source files to inspect:**
+
 - `lib/data/datasources/local/tables/study_sessions_table.dart`
 - `lib/data/datasources/local/tables/study_session_items_table.dart`
 - `lib/data/datasources/local/tables/study_attempts_table.dart`

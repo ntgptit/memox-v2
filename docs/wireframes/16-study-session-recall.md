@@ -74,6 +74,7 @@ Active-recall flip card. User sees the front (target-language term), tries to re
 ```
 
 Two cards stacked vertically:
+
 - **Top card** = front. Has `✎` (edit) icon top-right and `🔊` (TTS) icon bottom-right.
 - **Bottom card** = back / explanation area. Initially blanked (just a placeholder dash); after Show answer, displays the full back text and any rich content (note, etymology, etc.).
 
@@ -215,25 +216,30 @@ Same as other modes:
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/study/study-flow.md` (recall mode — flip-card self-grade in v1)
 - `docs/business/srs/srs-review.md` (perfect / forgot transitions)
 - `docs/business/tts/tts-settings.md` (front-only playback)
 
 **Decision rows:**
+
 - Recall mode: flip-card model, two-button grading, no input matching in v1
 
 **Schema / storage:**
+
 - INSERT `study_attempts` with `study_mode='recall'`, result ∈ (`perfect`, `forgot`)
 
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase, `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/tts.md`
 
 **Code paths:**
+
 - `lib/presentation/features/study/widgets/recall_mode_view.dart`
 - `lib/presentation/features/study/widgets/flip_card_pair.dart` (front-top, back-bottom layout)
 - `lib/domain/usecases/study/grade_attempt_usecase.dart`
 - `lib/core/tts/tts_engine.dart`
 
 **Related wireframes:**
+
 - `docs/wireframes/13-study-session-review.md` (shared shell + color family convention)
 - `docs/wireframes/14-study-session-match.md`, `docs/wireframes/15-study-session-guess.md`, `docs/wireframes/17-study-session-fill.md`
 - `docs/wireframes/08-flashcard-edit.md` (target of ✎ icon)
