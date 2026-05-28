@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-27
+last_updated: 2026-05-28
 route: /library/study/session/:sessionId
 study_mode: fill
 source_specs:
@@ -202,7 +202,7 @@ Per flow validator, fill mode requires:
 
 If unmet, the flow validator skips this mode in the current card's mode sequence silently. NO toast, NO error.
 
-This logic lives in `lib/domain/study/flow_validator.dart`.
+This logic lives under `lib/domain/study/strategy/` (see `study_strategy.dart` + `study_strategy_factory.dart`). There is no dedicated `flow_validator.dart` file in the current codebase; the skip rule is enforced inside the active study strategy when computing the per-card mode sequence.
 
 ## TTS behavior (per `docs/business/tts/tts-settings.md`)
 
@@ -290,14 +290,15 @@ Same as Recall mode:
 
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase, `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/tts.md`
 
-**Code paths:**
+**Code paths (verified 2026-05-28):**
 
-- `lib/presentation/features/study/widgets/fill_mode_view.dart`
-- `lib/presentation/features/study/widgets/fill_input_card.dart`
-- `lib/domain/study/strict_matcher.dart` (trim + char-equality, no normalization)
-- `lib/domain/study/hint_revealer.dart` (Phase 1 if implemented)
-- `lib/domain/study/flow_validator.dart` (skip rule for trivial fronts)
-- `lib/domain/usecases/study/grade_attempt_usecase.dart`
+- Mode view: `lib/presentation/features/study/widgets/study_session/fill/fill_mode_session_view.dart` + `fill_mode_panel.dart`.
+- Input + actions: `lib/presentation/features/study/widgets/study_session/fill/fill_prompt_card.dart` + `fill_answer_cards.dart` + `fill_actions.dart`.
+- Motion: `lib/presentation/features/study/widgets/study_session/fill/fill_motion.dart`.
+- Strict matcher: **no standalone `strict_matcher.dart` in `lib/domain/study/`**. Match logic currently lives in the presentation viewmodel / `fill_actions.dart`. Audit `docs/checklist/wireframe-code-parity-assessment.md` §3.10 flags this as a Clean-Architecture violation candidate — promote to domain when scope allows.
+- Hint revealer: not extracted to a domain file; hint behavior is implemented inside the fill panel.
+- Flow validator (skip rule for trivial fronts): currently lives within `lib/domain/study/strategy/` (see `study_strategy.dart`, `study_strategy_factory.dart`); no dedicated `flow_validator.dart`.
+- Grading: `lib/domain/study/usecases/study_usecases.dart` → `AnswerFlashcardUseCase`. No standalone `grade_attempt_usecase.dart`.
 
 **Related wireframes:**
 

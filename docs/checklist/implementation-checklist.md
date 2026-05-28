@@ -182,13 +182,16 @@ A report missing "Changed doc files" section or its explicit-empty justification
 ## Related
 
 **Repo-level:**
+
 - `CLAUDE.md` — Doc-code parity rule + 8-step pre-commit check
 - `AGENTS.md` — reporting format requirement
 
 **Companion checklist:**
+
 - `docs/checklist/recursive-agent-review.md` — review-time checklist
 
 **Contracts referenced by this checklist:**
+
 - `docs/business/index.md`, `docs/business/glossary.md`, `docs/business/system/overview.md`
 - `docs/database/schema-contract.md`, `docs/database/migration-contract.md`, `docs/database/storage-boundaries.md`
 - `docs/architecture/clean-architecture-contract.md`
@@ -197,4 +200,5 @@ A report missing "Changed doc files" section or its explicit-empty justification
 - `docs/decision-tables/memox-core-decision-table.md`
 
 **Wireframes:**
+
 - `docs/wireframes/index.md`

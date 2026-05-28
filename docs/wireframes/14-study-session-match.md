@@ -219,11 +219,13 @@ Same as Review mode.
 
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase, `docs/contracts/usecase-contracts/srs.md`
 
-**Code paths:**
-- `lib/presentation/features/study/widgets/match_mode_view.dart`
-- `lib/presentation/features/study/widgets/match_board.dart`
-- `lib/domain/study/match_board_composer.dart` (seeded shuffle from sessionId + board index)
-- `lib/domain/usecases/study/grade_attempt_usecase.dart`
+**Code paths (verified 2026-05-28):**
+
+- Mode view: `lib/presentation/features/study/widgets/study_session/match/match_mode_session_view.dart` + `match_mode_panel.dart`.
+- Board: `lib/presentation/features/study/widgets/study_session/match/match_board.dart` + `match_mode_tile.dart` + `match_tile_models.dart`.
+- Board size: `lib/presentation/features/study/widgets/study_session/match/match_batching.dart` → `const matchVisiblePairLimit = 5`. Take the next 5 items from session order via `visibleMatchBatch(items, startIndex)`.
+- Seeded shuffle: `lib/presentation/features/study/widgets/study_session/match/match_seed.dart` (NOT in `lib/domain/study/`). Deterministic per `sessionId + boardIndex` so resume preserves layout.
+- Grading: `lib/domain/study/usecases/study_usecases.dart` → `AnswerCurrentMatchModeBatchUseCase` for the match-specific batch grade path; no standalone `grade_attempt_usecase.dart`.
 
 **Related wireframes:**
 - `docs/wireframes/13-study-session-review.md` (shared shell + color family convention)

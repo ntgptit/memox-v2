@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 applies_to: study session lifecycle, all study modes
 ---
 
@@ -198,6 +198,6 @@ Do not keep active study progress only in provider memory. Every answer must per
 - `lib/data/datasources/local/tables/study_sessions_table.dart`
 - `lib/data/datasources/local/tables/study_session_items_table.dart`
 - `lib/data/datasources/local/tables/study_attempts_table.dart`
-- `lib/domain/usecases/study/**`
-- `lib/domain/study/flow_validator.dart`
+- `lib/domain/study/usecases/study_usecases.dart` (the entire study lifecycle: start, resume, restart, answer, skip, cancel, finalize, retry-finalize). There is **no `lib/domain/usecases/study/**` directory** — study use cases live under `lib/domain/study/usecases/`, parallel to the other feature use-case files in `lib/domain/usecases/`.
+- `lib/domain/study/strategy/` (`study_strategy.dart`, `study_mode_strategy.dart`, `study_strategy_factory.dart`) — mode skip rules and per-flow-type behavior. **There is no dedicated `flow_validator.dart`**; validation is part of the active strategy.
 - `lib/presentation/features/study/**`

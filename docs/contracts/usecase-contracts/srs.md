@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 status: contract
 ---
 
@@ -32,7 +32,8 @@ class BoxIntervals {
 - Returns Duration for a given box (1-8 inclusive).
 - Asserts box in 1..8. Out-of-range = programmer error.
 
-**Source:** `lib/domain/srs/box_intervals.dart`.
+**Source (target):** `lib/domain/srs/box_intervals.dart`.
+**Source (current):** not yet extracted into a dedicated file. Logic is inlined in `lib/domain/study/usecases/study_usecases.dart` and is a candidate for extraction. The contract above is still authoritative; implementations must satisfy it wherever they live today.
 
 ## BoxTransition
 
@@ -51,7 +52,8 @@ class BoxTransition {
 | 1..8 | recovered | current (no change) |
 | 1..8 | forgot | 1 |
 
-**Source:** `lib/domain/srs/box_transition.dart`.
+**Source (target):** `lib/domain/srs/box_transition.dart`.
+**Source (current):** not yet extracted; transition logic is inlined in `lib/domain/study/usecases/study_usecases.dart` (`Answer*UseCase` family). Same contract applies wherever the function lives.
 
 ## DueDateComputer
 

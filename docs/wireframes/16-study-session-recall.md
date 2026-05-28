@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-27
+last_updated: 2026-05-28
 route: /library/study/session/:sessionId
 study_mode: recall
 source_specs:
@@ -43,9 +43,33 @@ Active-recall flip card. User sees the front (target-language term), tries to re
 │ │                                     │ │
 │ └─────────────────────────────────────┘ │
 │                                         │
-│         [    Show answer    ]           │  ← Primary CTA, full-width
+│         [ Show answer · 14s ]           │  ← Primary CTA, full-width; trailing countdown
 └─────────────────────────────────────────┘
 ```
+
+The Show answer button label includes a **trailing countdown** ("Show answer · 14s") that ticks down from `recallAnswerTimeout` (20s). The countdown is informational; tapping at any moment still reveals the back. See §Auto-reveal on timeout for what happens if the user does NOT tap before the timer reaches 0s.
+
+## Layout — auto-reveal on timeout (user did not tap Show answer in 20s)
+
+```
+┌─────────────────────────────────────────┐
+│ ✕  [ RECALL ]  ━━━━━━━━━━━━━━━    8 / 12│
+├─────────────────────────────────────────┤
+│ ┌─────────────────────────────────────┐ │
+│ │              연구자                  │ │  ← Front (same)
+│ └─────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────┐ │
+│ │ Researcher / Nhà nghiên cứu — ...   │ │  ← Back revealed automatically
+│ └─────────────────────────────────────┘ │
+│                                         │
+│         Time's up — grade yourself      │  ← Caption above grading row
+│  ┌─────────────┐    ┌─────────────┐     │
+│  │   Forgot    │    │    Got it   │     │  ← Same grading row as manual reveal
+│  └─────────────┘    └─────────────┘     │
+└─────────────────────────────────────────┘
+```
+
+When the countdown reaches 0s and the user has not tapped Show answer, the UI auto-transitions into the **timed-out grading state**: back is revealed, the Show answer CTA is replaced by the same `Forgot / Got it` row, and a caption "Time's up — grade yourself" sits above the buttons to make the cause of the transition explicit. The countdown does NOT itself record an attempt; the user must still self-grade.
 
 ## Layout — after Show answer (back revealed)
 
@@ -98,8 +122,11 @@ Two cards stacked vertically:
 - ❌ Add a Levenshtein / fuzzy matcher. No matching logic — user self-evaluates.
 - ❌ Persist a `recovered` result in this mode. Only `perfect` and `forgot` apply in v1.
 - ❌ Use the blue progress-bar color. Recall is in the green family.
-- ❌ Auto-reveal the back without an explicit Show answer tap.
-- ❌ Auto-advance after Show answer; user MUST tap Forgot or Got it.
+- ❌ Auto-reveal the back without either an explicit Show answer tap OR the countdown reaching 0s. (The 20s timeout IS a valid auto-reveal path; see §Auto-reveal on timeout.)
+- ❌ Auto-advance after Show answer or after timeout; user MUST tap Forgot or Got it.
+- ❌ Record an attempt automatically when the timer expires. Auto-reveal does NOT imply auto-grade.
+- ❌ Hide the countdown from the Show answer label. It is a discoverability surface, not a chrome detail.
+- ❌ Reset the countdown on tap of `🔊` or `✎`. The timer pauses while editing (push of edit screen), then resumes on return.
 - ❌ Auto-play `back` via TTS. Front-only policy.
 - ❌ Show the TTS icon on the back card. TTS plays the front only.
 - ❌ Update SRS box outside `GradeAttemptUseCase`.
@@ -114,16 +141,20 @@ Two cards stacked vertically:
 | TTS icon `🔊` | Bottom-right of front card. Tap speaks `front`. Hidden when `deck.target_language = unsupported`. |
 | Back card (hidden state) | Bottom stack. Contains a centered placeholder (short horizontal dash) indicating "answer here". |
 | Back card (revealed) | Same surface; shows `back` + optional `note` rendered as body-medium. Multi-line; left-aligned within card; vertical padding generous. |
-| Show answer CTA | Full-width primary button below both cards. Visible only in the hidden state. Disappears after tap. |
-| Grading row | Visible after Show answer. Two equal-width buttons: `Forgot` (outlined) and `Got it` (filled primary). |
+| Show answer CTA | Full-width primary button below both cards. Visible only in the hidden state. Label format: `"Show answer · {n}s"` where `{n}` is the remaining whole seconds of `recallAnswerTimeout` (constant `MxDurations.recallAnswerTimeout = 20s`). Tap reveals immediately; reaching 0s auto-reveals (see Timed-out state). Disappears after either path. |
+| Timeout caption | Visible ONLY in the timed-out state (auto-reveal path). Single line above the grading row: "Time's up — grade yourself". Distinguishes timeout reveal from a deliberate Show answer tap. |
+| Grading row | Visible after Show answer OR after timeout reveal. Two equal-width buttons: `Forgot` (outlined) and `Got it` (filled primary). |
 
 ## States
 
 | State | Trigger | Behavior |
 | --- | --- | --- |
-| Hidden | Card opened | Front card shown with TTS + edit; back card shows placeholder; Show answer button visible. |
-| Revealing | Show answer tapped | Back card fades in; grading row replaces Show answer CTA. |
-| Revealed | After fade | Back text fully visible; user can tap Forgot or Got it; can also tap 🔊 to replay front. |
+| Hidden | Card opened | Front card shown with TTS + edit; back card shows placeholder; Show answer CTA visible with `"Show answer · 20s"` label. Countdown starts immediately. |
+| Counting down | Each second while hidden | Show answer label updates to `"Show answer · {n}s"`. Visual chrome unchanged. |
+| Revealing (manual) | Show answer tapped before 0s | Back card fades in; grading row replaces Show answer CTA. Countdown discarded. |
+| Revealing (timeout) | Countdown reaches 0s without tap | Back card fades in automatically; timeout caption + grading row replace Show answer CTA. No attempt recorded yet. |
+| Revealed | After fade (manual or timeout) | Back text fully visible; user can tap Forgot or Got it; can also tap 🔊 to replay front. |
+| Timer paused | ✎ tapped while hidden | Push flashcard-edit. Countdown freezes at current value. On return, resume from that value. |
 | Grading | Forgot or Got it tapped | Persist attempt + SRS update; advance to next card. |
 | Editing | ✎ tapped | Push flashcard-edit; on return, refresh current card data. |
 | TTS playing | 🔊 tapped | Icon swaps to ⏸ briefly; speak front; revert. |
@@ -135,8 +166,9 @@ Two cards stacked vertically:
 
 | Action | Trigger | Result |
 | --- | --- | --- |
-| Tap Show answer | Tap | Reveal back card; replace CTA with grading row. |
-| Tap 🔊 | Tap | Speak front. |
+| Tap Show answer | Tap (countdown > 0) | Reveal back card immediately; cancel countdown; replace CTA with grading row. |
+| Countdown elapses | Time reaches 0s without tap | Auto-reveal back; show timeout caption + grading row. NO attempt recorded. |
+| Tap 🔊 | Tap | Speak front. Countdown continues uninterrupted. |
 | Tap ✎ | Tap | Push flashcard-edit; return refreshes. |
 | Tap Forgot | Tap (revealed only) | `result = forgot`; persist; next card. |
 | Tap Got it | Tap (revealed only) | `result = perfect`; persist; next card. |
@@ -198,7 +230,9 @@ Same as other modes:
 ## Rules
 
 - Two-card stacked layout MUST be preserved (front top, back bottom).
-- Show answer MUST be the only way to reveal the back. No auto-reveal.
+- Show answer tap OR the 20s timeout are the ONLY two paths to reveal the back. No other auto-reveal trigger may be added.
+- The 20s timeout duration MUST come from `MxDurations.recallAnswerTimeout`. Do NOT hardcode in widgets.
+- Timeout reveal MUST NOT silently record an attempt. The user always self-grades after reveal, regardless of which reveal path fired.
 - Grading uses ONLY `Forgot` / `Got it`. No third button, no `recovered`, no override path in v1.
 - TTS button MUST be on the front card only.
 - `box_before` and `box_after` MUST be recorded on every attempt.
@@ -209,6 +243,8 @@ Same as other modes:
 - Do NOT introduce a text input. Recall mode in v1 is flip-card self-grade.
 - Do NOT add `recovered` result in this mode. Only `perfect` / `forgot`.
 - Do NOT collapse front and back into one card. Two cards stacked is intentional.
+- Do NOT shorten / lengthen the 20s timeout per-mode. Change `MxDurations.recallAnswerTimeout` in the token file so all callers update together.
+- Do NOT remove the countdown from the button label without parallel UX research — surfaces the cost of inaction to the user.
 - Edit icon MUST navigate to flashcard-edit; do not show inline editing.
 - Mode pill copy is exactly `RECALL`. Color: green family.
 - If a future PR adds typed recall, create a new mode (e.g., `recall_typed`) instead of modifying this one.
@@ -233,10 +269,11 @@ Same as other modes:
 
 **Code paths:**
 
-- `lib/presentation/features/study/widgets/recall_mode_view.dart`
-- `lib/presentation/features/study/widgets/flip_card_pair.dart` (front-top, back-bottom layout)
-- `lib/domain/usecases/study/grade_attempt_usecase.dart`
-- `lib/core/tts/tts_engine.dart`
+- `lib/presentation/features/study/widgets/study_session/recall/recall_mode_session_view.dart` (stateful view, owns countdown `AnimationController`, manages reveal transition)
+- `lib/presentation/features/study/widgets/study_session/recall/recall_mode_panel.dart`
+- `lib/presentation/features/study/widgets/study_session/recall/recall_motion.dart` (re-exports `MxDurations.recallAnswerTimeout` as `recallAnswerTimeoutDuration` and `MxDurations.slide` as `recallRevealTransitionDuration`)
+- `lib/core/theme/tokens/app_motion.dart` — single source of truth for `MxDurations.recallAnswerTimeout = Duration(seconds: 20)`
+- `lib/domain/study/usecases/study_usecases.dart` (`AnswerFlashcardUseCase` etc. — grading lives here, not in a `grade_attempt_usecase.dart`)
 
 **Related wireframes:**
 

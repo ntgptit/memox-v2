@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 route:
   - /library/study/:entryType/:entryRefId
   - /library/study/today
@@ -287,12 +287,10 @@ When scope is empty, this screen renders the appropriate empty state from `docs/
 
 **Code paths:**
 - `lib/presentation/features/study/screens/study_entry_gate_screen.dart`
-- `lib/presentation/features/study/notifiers/study_entry_notifier.dart`
-- `lib/domain/usecases/study/resolve_scope_usecase.dart`
-- `lib/domain/usecases/study/find_resumable_session_usecase.dart`
-- `lib/domain/usecases/study/create_session_usecase.dart`
-- `lib/domain/study/flow_validator.dart`
-- `lib/app/router/route_names.dart` → `RouteNames.studyEntry`, `RouteNames.studyToday`
+- Screen: `lib/presentation/features/study/screens/study_entry_screen.dart` + viewmodel under `lib/presentation/features/study/viewmodels/`. No standalone `study_entry_notifier.dart`.
+- Scope + session lifecycle: `lib/domain/study/usecases/study_usecases.dart` → `StartStudySessionUseCase` (resolves scope + creates session), `ResumeStudySessionUseCase` (covers `listActiveSessions` + `findCandidate(StudyContext)` + `execute(sessionId)`), `RestartStudySessionUseCase`. No separate `resolve_scope_usecase.dart` / `find_resumable_session_usecase.dart` / `create_session_usecase.dart`.
+- Mode flow rules: `lib/domain/study/strategy/study_strategy.dart` + `study_mode_strategy.dart` + `study_strategy_factory.dart`. There is no dedicated `flow_validator.dart`.
+- Route constants: `lib/app/router/route_names.dart` → `RouteNames.studyEntry`, `RouteNames.studyToday`.
 
 **Related wireframes:**
 - All 5 study mode wireframes 13-17

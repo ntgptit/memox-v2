@@ -6,6 +6,7 @@ applies_to: bury (skip card today), suspend (hide card indefinitely)
 # Bury and Suspend
 
 > **Status: Target — Migration Required.** This spec depends on the following columns from `docs/database/schema-contract.md` §Pending schema changes:
+>
 > - `flashcard_progress.buried_until INTEGER NULL`
 > - `flashcard_progress.is_suspended BOOL NOT NULL DEFAULT 0`
 >
@@ -190,28 +191,34 @@ Both bury and suspend support bulk operations from flashcard list multi-select (
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/06-flashcard-list.md` — state badges (Suspended > Buried > Due > Active)
 - `docs/wireframes/08-flashcard-edit.md` — Suspend/Unsuspend toggle action
 - `docs/wireframes/13-study-session-review.md` through `docs/wireframes/17-study-session-fill.md` — overflow ⋮ Bury / Suspend actions
 - `docs/wireframes/25-shared-bottom-sheets.md` §undo-toast (5s undo)
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `flashcard_progress.buried_until INTEGER NULL`, `flashcard_progress.is_suspended BOOL` (both in 6 pending migrations)
 - Recommended index: `flashcard_progress(is_suspended, buried_until, due_at)`
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Bury" and "Suspend"
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → `buried_until`, `is_suspended`, "bury until tomorrow", "suspend indefinitely"
 
 **Related business specs:**
+
 - `docs/business/srs/srs-review.md` — bury/suspend do NOT change current_box or due_at
 - `docs/business/study/study-flow.md` — empty-scope matrix includes `studyEmpty_allBuried` and `studyEmpty_allSuspended`
 - `docs/business/bulk/bulk-operations.md` — bulk suspend/unsuspend in selection mode
 - `docs/business/flashcard/flashcard-management.md` — state badge priority on card row
 
 **Source files to inspect:**
+
 - `lib/domain/usecases/study/bury_card_usecase.dart`
 - `lib/domain/usecases/study/suspend_card_usecase.dart`
 - `lib/data/repositories/flashcard_progress_repository.dart` (queue queries filter buried+suspended)

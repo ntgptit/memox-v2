@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 route: /library/study/session/:sessionId/result
 source_specs:
   - docs/business/study/study-flow.md
@@ -183,12 +183,13 @@ End-of-session summary. Celebrate completion, show what improved, motivate next 
 
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §FinalizeSessionUseCase, §RetryFinalizationUseCase, `docs/contracts/usecase-contracts/engagement.md` §RecordGoalProgressUseCase
 
-**Code paths:**
-- `lib/presentation/features/study/screens/study_result_screen.dart`
-- `lib/presentation/features/study/notifiers/study_result_notifier.dart`
-- `lib/domain/usecases/study/finalize_session_usecase.dart`
-- `lib/domain/usecases/engagement/record_completion_usecase.dart`
-- `lib/app/router/route_names.dart` → `RouteNames.studyResult`
+**Code paths (verified 2026-05-28):**
+
+- Screen: `lib/presentation/features/study/screens/study_result_screen.dart`.
+- Viewmodel: `lib/presentation/features/study/viewmodels/` (no standalone `study_result_notifier.dart`; the result screen consumes the same session viewmodels as `study_session_screen`).
+- Finalization: `lib/domain/study/usecases/study_usecases.dart` → `FinalizeStudySessionUseCase` (success path) + `RetryFinalizeUseCase` (failure recovery). There is no separate `lib/domain/usecases/study/finalize_session_usecase.dart` file.
+- Engagement / completion: **no `record_completion_usecase.dart` exists today**. Engagement use cases (streak, daily-goal completion) are missing from the domain layer — see audit `docs/checklist/wireframe-code-parity-assessment.md` §3.2. Streak chip on this screen is blocked on that gap.
+- Route constant: `lib/app/router/route_names.dart` → `RouteNames.studyResult`.
 
 **Related wireframes:**
 - `docs/wireframes/12-study-entry-gate.md` → `13-17` → here (full session flow)

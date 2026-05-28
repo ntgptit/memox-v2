@@ -136,13 +136,16 @@ A review that finds no issues in a non-trivial change is suspicious. Re-check be
 ## Related
 
 **Repo-level:**
+
 - `CLAUDE.md` — Doc-code parity rule
 - `AGENTS.md` — agent responsibilities
 
 **Companion checklist:**
+
 - `docs/checklist/implementation-checklist.md` — implementation-time checklist
 
 **Contracts referenced:**
+
 - `docs/business/index.md` and downstream business docs
 - `docs/database/schema-contract.md`, `docs/database/migration-contract.md`, `docs/database/storage-boundaries.md`
 - `docs/architecture/clean-architecture-contract.md`
@@ -151,4 +154,5 @@ A review that finds no issues in a non-trivial change is suspicious. Re-check be
 - `docs/decision-tables/memox-core-decision-table.md`
 
 **Wireframes:**
+
 - `docs/wireframes/index.md`

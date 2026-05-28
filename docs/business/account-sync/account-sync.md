@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 applies_to: Google account linking, Google Drive AppData sync, per-account database isolation
 ---
 
@@ -36,7 +36,10 @@ Drive sync is unavailable without a linked Google account with Drive AppData aut
 - `lib/data/repositories/google_drive_sync_repository.dart`
 - `lib/data/repositories/google_drive_sync_repository_helpers.dart`
 - `lib/data/sync/google_drive_app_data_client.dart` (Drive AppData REST client)
-- `lib/data/sync/local_database_snapshot_gateway*.dart` (DB snapshot read/write, io/web/stub)
+- `lib/data/sync/local_database_snapshot_gateway_contract.dart` (interface — `exportDatabase()`, `restoreDatabase()`, `currentSchemaVersion`)
+- `lib/data/sync/local_database_snapshot_gateway_io.dart` (mobile + desktop with file IO; uses `package:path_provider` temp directory)
+- `lib/data/sync/local_database_snapshot_gateway_web.dart` (browser; uses `WasmDatabase` + `sqlite3.wasm` + `drift_worker.dart.js`)
+- `lib/data/sync/local_database_snapshot_gateway_stub.dart` (fallback for platforms without sqlite support — throws `UnsupportedError`)
 - `lib/data/sync/app_settings_snapshot_store.dart`
 - `lib/data/sync/drive_sync_metadata_store.dart` (SharedPreferences-backed)
 - `lib/data/sync/drive_sync_snapshot_codec.dart`
@@ -144,6 +147,25 @@ Sign-out drops back to guest context. The account's database file remains on dis
 - The app MUST never write account A's data into account B's database.
 - `AccountDatabaseContext.belongsTo(link)` verifies a context matches a link before opening the database for that account.
 - Switching accounts MUST close the current `AppDatabase` and open the next account's database file.
+
+## Platform snapshot gateways
+
+Snapshot read/write is the only sync surface that requires platform-specific implementation. The contract is the same across platforms; only how bytes are read from / written to the local Drift database differs.
+
+| Platform | Implementation | How `exportDatabase()` works | How `restoreDatabase()` works | When loaded |
+| --- | --- | --- | --- | --- |
+| Mobile (Android, iOS), Desktop (macOS, Linux, Windows) | `local_database_snapshot_gateway_io.dart` | Closes the active Drift connection, copies the SQLite file from the app's documents directory into a temp file (`path_provider.getTemporaryDirectory()`), reads its bytes, deletes the temp file. | Writes incoming bytes to a temp file, swaps the active database file path with the temp file (atomic rename), re-opens Drift on the new file. | Bundled by Dart's conditional imports when `dart.library.io` is available. |
+| Web (Chrome, Edge, Safari, Firefox) | `local_database_snapshot_gateway_web.dart` | Probes the WASM-backed Drift store via `WasmDatabase.probe(databaseName, sqlite3Uri: 'sqlite3.wasm', driftWorkerUri: 'drift_worker.dart.js')`, exports the stored bytes from the chosen storage backend (IndexedDB / OPFS depending on browser support). | Writes incoming bytes back via the same WASM probe, then re-initialises the Drift store. | Bundled when `dart.library.js` (web) is available. |
+| Unsupported (rare — e.g., a runtime where neither `dart.library.io` nor `dart.library.js` resolves) | `local_database_snapshot_gateway_stub.dart` | Throws `UnsupportedError('Database snapshot export is not supported.')`. | Throws `UnsupportedError('Database snapshot restore is not supported.')`. | Compile-time fallback to satisfy linker; never expected to ship in a real build. |
+
+Selection happens at compile time via Dart's `import.dart` conditional-import shim — the binary that ships to a given platform contains exactly one gateway. `createPlatformLocalDatabaseSnapshotGateway(AppDatabase)` is the only entry point; presentation / domain layers MUST go through it and not import platform files directly.
+
+### Platform-specific rules
+
+- The web gateway depends on two static asset paths shipped under `web/`: `sqlite3.wasm` and `drift_worker.dart.js`. Build pipelines MUST keep these assets present; missing files surface as `WasmProbeFailure` during sync, not as silent zero-byte snapshots.
+- The IO gateway uses the **temporary** directory, not the documents directory, for snapshot staging. OS-driven cleanup is acceptable; sync flow re-creates the temp file on every export.
+- The stub gateway is intentionally noisy (throws on every call) to avoid silent data loss. Any new platform target without sqlite support MUST keep this behavior — do NOT replace with a no-op.
+- `currentSchemaVersion` returns `AppDatabase.schemaVersion` regardless of platform; the value flows into `DriveSyncManifest.appDatabaseSchemaVersion` and gates restore via the `unsupportedSchema` rule below.
 
 ## Drive sync model
 

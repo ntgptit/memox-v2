@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 route: /library/deck/:deckId/flashcards
 source_specs:
   - docs/business/flashcard/flashcard-management.md
@@ -156,17 +156,29 @@ Manage flashcards in one deck: browse, filter, edit, multi-select for bulk opera
 
 ## Components
 
-| Component | Spec |
-| --- | --- |
-| App bar | Title = deck name. Back. Search (in-deck). Overflow ⋮. |
-| Breadcrumb subtitle | "Library / {folderPath} / {deckName}". 2nd line "{n} cards · {targetLanguage}". |
-| Resume banner | Visible iff resumable session for this deck. |
-| Study CTAs | "Study deck" (`/library/study/deck/:deckId` new learning) and "Today (n)" (`/library/study/deck/:deckId?study_type=srs_review` deck-scoped review of due cards). "Today" hidden if 0 due. |
-| Filter row | Status filter dropdown ("All" / "Active" / "Due" / "Suspended" / "Buried") + multi-tag chip picker. Compose with AND. |
-| Card row | Front (large), Back (subtitle), tag chips (small, overflow truncated), state badge ("🔇 SUSPENDED" / "🌙 BURIED TODAY"). |
-| FAB | Plus → opens action sheet (Add card / Import). |
-| Selection app bar | Replaces normal app bar in selection mode. Shows count, X cancel, Select all. |
-| Bulk action bar | Bottom bar with 7 icons (per `docs/business/bulk/bulk-operations.md`): delete, move, tag+, tag-, suspend, unsuspend, reset. |
+Listed in **render order top-to-bottom** as they appear in `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart`. Each row maps 1-1 to a `*_section.dart` widget — keep this mapping intact when refactoring; reviewers verify by spec ↔ widget filename.
+
+| Order | Component | Code widget | Spec |
+| --- | --- | --- | --- |
+| 1 | App bar | (inline in screen scaffold) | Title = deck name. Back. Search (in-deck). Overflow ⋮. |
+| 2 | Header section | `flashcard_header_section.dart` | Renders title + overflow + search. Replaces app bar inline when needed (responsive). |
+| 3 | Breadcrumb subtitle | `flashcard_breadcrumb_section.dart` | "Library / {folderPath} / {deckName}". 2nd line "{n} cards · {targetLanguage}". |
+| 4 | Resume banner | (inline in screen, fed by resume provider) | Visible iff resumable session for this deck. |
+| 5 | Deck summary | `flashcard_deck_summary_section.dart` | Total cards · due-today badge · mastery progress chip. Single row above the study CTAs. |
+| 6 | Study modes | `flashcard_study_modes_section.dart` | "Study deck" (`/library/study/deck/:deckId` new learning) and "Today (n)" (`/library/study/deck/:deckId?study_type=srs_review` deck-scoped review of due cards). "Today" hidden if 0 due. Renders as horizontal CTA pair. |
+| 7 | Progress section | `flashcard_progress_section.dart` | Optional in-deck progress widget (e.g., box distribution or due timeline). Rendered only when `state.progress != null`. |
+| 8 | Toolbar / filter | `flashcard_toolbar_section.dart` | Status filter dropdown ("All" / "Active" / "Due" / "Suspended" / "Buried") + multi-tag chip picker + sort menu. Compose with AND. |
+| 9 | Bulk action bar | `flashcard_bulk_action_section.dart` | Sticky bottom bar with 7 icons (per `docs/business/bulk/bulk-operations.md`): delete, move, tag+, tag-, suspend, unsuspend, reset. Visible only in selection mode. |
+| 10 | List body | `flashcard_items_section.dart` + `flashcard_detail_card_row.dart` + `flashcard_card_list_header.dart` | Card rows: Front (large), Back (subtitle), tag chips (small, overflow truncated), state badge ("🔇 SUSPENDED" / "🌙 BURIED TODAY"). |
+| 10' | Reorder body | `flashcard_reorder_list.dart` | Replaces the list body when "Reorder" mode is active. Same row content with drag handles. |
+| 11 | Empty state | `flashcard_empty_state_section.dart` | Replaces list body when zero cards in deck. Renders "Add flashcard" + "Import" CTAs. |
+| 12 | Skeleton | `flashcard_list_skeleton.dart` | Shown during initial fetch before first frame of real data. |
+| 13 | Card preview | `flashcard_preview_section.dart` | Optional preview surface for editor sandbox (used by linked flashcard-edit context). May be hidden in pure list mode. |
+| — | Selection app bar | (inline) | Replaces normal app bar in selection mode. Shows count, X cancel, Select all. |
+| — | FAB | (inline) | Plus → opens action sheet (Add card / Import). |
+| — | Bulk add controls | `bulk_add_controls.dart` + `bulk_add_file_section.dart` + `bulk_add_widgets.dart` | Bulk-add UI path (paste many lines at once → preview → commit). Reached via FAB → "Bulk add"; lives on the same screen scaffold but is a sub-mode, not a separate row in the list. |
+
+Render order is enforced by reviewer checklist — see "Pre-commit parity check" in `CLAUDE.md`. When introducing a new section, place it in this table at the correct order index and update the code widget column with the file path.
 
 ## States
 
@@ -312,13 +324,13 @@ Manage flashcards in one deck: browse, filter, edit, multi-select for bulk opera
 
 **Contracts:** `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/usecase-contracts/bulk.md`, `docs/contracts/usecase-contracts/study.md` (bury/suspend), `docs/contracts/repository-contracts/flashcard-repository.md`
 
-**Code paths:**
-- `lib/presentation/features/flashcard_list/screens/flashcard_list_screen.dart`
-- `lib/presentation/features/flashcard_list/notifiers/flashcard_list_notifier.dart`
-- `lib/presentation/features/flashcard_list/notifiers/selection_controller.dart`
-- `lib/presentation/features/flashcard_list/widgets/bulk_action_bar.dart`
-- `lib/domain/usecases/bulk/**`
-- `lib/app/router/route_names.dart` → `RouteNames.flashcardList`
+**Code paths (verified 2026-05-28):**
+
+- Screen: `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart`.
+- Viewmodel: `lib/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart` (Riverpod annotation).
+- Section widgets (1-1 with §Components order above): see `lib/presentation/features/flashcards/widgets/flashcard_*_section.dart`. There is NO standalone `flashcard_list_notifier.dart` / `selection_controller.dart` file — selection state lives in the viewmodel.
+- Bulk operations: domain layer is **not yet implemented** as a dedicated `lib/domain/usecases/bulk/**` module — current actions go through `flashcard_usecases.dart` (`DeleteFlashcardsUseCase`, `MoveFlashcardsUseCase`, `ReorderFlashcardsUseCase`). Suspend / unsuspend / reset still missing (block on bury/suspend epic — see audit `docs/checklist/wireframe-code-parity-assessment.md` §3.1).
+- Route constant: `lib/app/router/route_names.dart` → `RouteNames.flashcardList`.
 
 **Related wireframes:**
 - `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/08-flashcard-edit.md`, `docs/wireframes/09-flashcard-history.md`, `docs/wireframes/10-deck-import.md`

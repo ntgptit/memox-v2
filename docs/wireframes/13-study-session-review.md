@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-27
+last_updated: 2026-05-28
 route: /library/study/session/:sessionId
 study_mode: review
 source_specs:
@@ -208,13 +208,14 @@ When `autoPlay = true` AND `deck.target_language` is supported, the engine still
 
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase, `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/tts.md`
 
-**Code paths:**
-- `lib/presentation/features/study/screens/study_session_screen.dart` (shared shell: app bar, progress bar, exit handling)
-- `lib/presentation/features/study/widgets/review_mode_view.dart`
-- `lib/presentation/features/study/widgets/swipe_to_grade.dart` (gesture handler)
-- `lib/domain/usecases/study/grade_attempt_usecase.dart`
-- `lib/domain/srs/box_transition.dart`
-- `lib/core/tts/tts_engine.dart`
+**Code paths (verified 2026-05-28):**
+
+- Shared shell: `lib/presentation/features/study/screens/study_session_screen.dart` (app bar, progress bar, exit handling).
+- Mode view: `lib/presentation/features/study/widgets/study_session/review/review_mode_session_view.dart` + `review_mode_card.dart` + `review_mode_panel.dart`.
+- Swipe gesture: `lib/presentation/features/study/widgets/study_session/review/review_page_scroll_behavior.dart` (no standalone `swipe_to_grade.dart`; behavior is embedded in the page scroll behaviour widget).
+- Grading: `lib/domain/study/usecases/study_usecases.dart` → `AnswerFlashcardUseCase` (single attempt), `AnswerCurrentModeBatchUseCase` / `AnswerCurrentModeItemGradesBatchUseCase` (batch). **No standalone `grade_attempt_usecase.dart` exists** — grading is the responsibility of these classes in the study use-case module.
+- SRS transitions: integrated into the same study use case module; the doc-implied `lib/domain/srs/box_transition.dart` is NOT present at that path. Inspect `study_usecases.dart` for the active mapping.
+- TTS: see `lib/presentation/features/study/widgets/study_session/study_speak_button.dart` for the in-mode button; engine lives behind `lib/presentation/features/tts/providers/`.
 
 **Related wireframes:**
 - `docs/wireframes/14-study-session-match.md`, `docs/wireframes/15-study-session-guess.md`, `docs/wireframes/16-study-session-recall.md`, `docs/wireframes/17-study-session-fill.md` (other modes; shared shell + progress-bar color convention)

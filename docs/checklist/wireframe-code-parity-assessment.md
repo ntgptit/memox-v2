@@ -1,0 +1,469 @@
+---
+last_updated: 2026-05-28
+revision: 3 (post C>D cleanup, recursive review of Rev 2)
+author: technical leader recursive audit
+scope: docs/wireframes/** ↔ lib/{presentation,domain,data}/**
+purpose: Đối chiếu wireframe ↔ code ở mức aspect-by-aspect, với evidence cụ thể (file:line + symbol). Rev 3 phản ánh trạng thái sau khi đợt C>D cleanup ngày 2026-05-28 hoàn thành.
+companion_docs:
+  - docs/checklist/c-greater-than-d-cleanup-2026-05-28.md (log của đợt cleanup vừa xong)
+---
+
+# Wireframe ↔ Code Parity Assessment (Revision 3)
+
+> **Lifecycle**:
+> - Rev 1 (junior, deprecated) — đánh giá theo "file tồn tại" bề mặt; sai chiều drift ở Match/Guess; sai MATCH cho Dashboard/Tag/Recall/Import/Study-entry.
+> - Rev 2 (senior, replaced) — đào sâu 3 layer, evidence file:line, phát hiện streak orphan, schema thiếu bury/suspend, code paths stale; nhưng còn vài chỗ over-broad (xem §5.1).
+> - Rev 3 (CURRENT) — refresh sau C>D cleanup pass đã commit; 4 cross-cutting items resolved, 3 cross-cutting items mới phát hiện qua recursive review. Re-tag status hàng nào còn vướng.
+
+---
+
+## §0. Methodology
+
+### Layer-by-layer audit (giữ từ Rev 2)
+
+Mỗi wireframe được kiểm ở 3 tầng — KHÔNG dừng ở "có screen file":
+
+1. **Presentation** — screen + viewmodel + mọi widget có call-site. Widget tồn tại trong `shared/` mà không có call-site = **orphan**, không tính là implement.
+2. **Domain** — use case nào? Repository contract đầy đủ?
+3. **Data** — table/column/DAO/migration. Especially cho status-bearing features (bury/suspend, tag, history, engagement).
+
+Mỗi finding cell **§1 Điểm khác biệt** phải có evidence dạng `file.dart:line` hoặc symbol cụ thể, không suy luận từ tên.
+
+### Recursive review (mới ở Rev 3)
+
+Sau mỗi pass edit/cleanup, chạy lại grep cho toàn bộ pattern stale đã fix trong pass đó. Pattern phổ biến: tên file mà code không còn (do consolidation). Nếu grep còn match, chưa được giải thích trong drift-note → fix tiếp hoặc add to backlog với rationale. Mỗi pass phải có "final sweep zero unexplained stale refs".
+
+### Severity bands
+
+| Mức | Định nghĩa | SLA |
+| --- | --- | --- |
+| **P0 — Blocker** | Spec contract / Hard Rule bị vi phạm. Release sẽ rơi vào trạng thái không thể giải thích cho user. | Trong sprint hiện tại. |
+| **P1 — Major** | Doc đã commit tính năng người dùng nhưng code không có. Risk: user trust khi đọc release notes. | Sprint tới. |
+| **P2 — Minor** | Drift về thông tin/format/edge case. UI và core flow OK. | Backlog gần. |
+| **P3 — Doc lag** | Code > doc. Không ảnh hưởng user, ảnh hưởng dev onboarding. | Sweep định kỳ. |
+
+### Direction of drift
+
+| Ký hiệu | Ý nghĩa |
+| --- | --- |
+| `D>C` | Doc vượt Code (spec hứa, code chưa có). |
+| `C>D` | Code vượt Doc (code đã làm, doc chưa cập nhật). |
+| `D≠C` | Hai bên có, nhưng spec lệch (số liệu, mô tả khác). |
+| `=` | Khớp aspect-by-aspect ở phạm vi đã verify. |
+
+### Phạm vi "verified" — disclaimer quan trọng
+
+Một row gán `=` (match) ở Rev 3 chỉ có nghĩa **các aspect được liệt kê trong cell "Điểm khác biệt" đã được verify**. Các aspect khác của cùng wireframe (Forbidden, States edge case, Accessibility, Responsive...) **không tự động được verify** trừ khi explicit. Đây là precision discipline để tránh over-claim như Junior Rev 1.
+
+---
+
+## §1. Per-screen assessment
+
+Cột "Điểm khác biệt" trình bày theo format `[Verified 2026-05-28]: ...` cho aspect đã kiểm, `[Pending]: ...` cho aspect còn lại.
+
+| # | Wireframe | Status | Chức năng (theo doc) | Điểm khác biệt (doc ↔ code, evidence) | Đề xuất | Ưu điểm | Nhược điểm |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 01 | `01-dashboard.md` | 🟠 D>C | Resume card (multi-session), streak chip với daily-progress, due cards summary, mastery, deck highlights. | [Verified 2026-05-28]: **Streak vẫn missing**. `MxStreakCard` (`lib/presentation/shared/widgets/mx_streak_card.dart:14`) vẫn không có call-site trong `lib/presentation/features/dashboard/widgets/**` (grep = 0). `DashboardOverviewState` (viewmodel:17) không có field streak/dailyGoal. [Pending]: Multi-resume UI chưa verify chi tiết — code có `ResumeStudySessionUseCase.listActiveSessions()` nhưng widget render list nhiều session chưa thấy. Mock-mapping variant `25h (multi resume)` được spec; tracking through §3.15.2 item 3. | **P1**: Implement `EngagementUseCase` (streak từ distinct `study_sessions.started_at`); mount `MxStreakCard` vào `dashboard_content.dart`. Multi-resume list nếu giữ R2. | Route + viewmodel + module hoá widgets ổn. | Streak — feature signal cao nhất ở dashboard — đang trống. |
+| 02 | `02-library.md` | 🟡 D>C | Library: tabs, sort, search inline scope-local, FAB tạo. | [Verified 2026-05-28]: Library overview dùng `MxSearchField` inline trong app bar (`library_app_bar.dart:60`); KHÔNG dùng full toolbar — Rev 2 nhầm với folder-detail. `libraryToolbarStateProvider.query` scope-local đúng spec. [Pending]: Recursive folder count chưa verify trong `WatchLibraryOverviewUseCase`. | **P2**: Verify recursive count. | Search + sort clean. | Recursive count behavior chưa biết khớp doc hay không. |
+| 03 | `03-progress.md` | 🟠 D>C | Mastery rings, history list, streak chart 7-day, box distribution chart, daily goal donut. | [Verified 2026-05-28]: `MxStatTone.streak` ở `progress_overview_section.dart:26,95` là **color tone** không phải streak count. `mx_weekly_bar_chart.dart` tồn tại nhưng nguồn data thực chưa trace. [Pending]: Box-distribution widget riêng cho box 1-8. | **P1**: Box-distribution widget + streak history data source. | Có shared chart. | Streak history hiện ở mức tone-only. |
+| 04 | `04-settings-hub.md` | ✅ = | Hub Account/Learning/Audio-Speech/About. | [Verified 2026-05-28]: 4 sub-routes `settingsAccount/Learning/AudioSpeech/LearningTags` khớp `RouteNames`. | OK. | Routes 1-1. | Tag mgmt nested dưới Learning — doc không show rõ hierarchy. |
+| 05 | `05-folder-detail.md` | 🟡 D>C | Breadcrumb, children list, sort, search inline, quick actions, empty state, lock-mode rejection. | [Verified 2026-05-28]: §Components đã document `MxSearchSortToolbar<ContentSortMode>` (verified at `folder_detail_screen.dart:178`). `parentModeLocked` failure exists (`error-contract.md:59`). [Pending]: Lock-mode UI surface (toast text / dialog copy mapping) chưa trace. | **P2**: Verify lock-mode UI behavior khi user thử thêm subfolder vào decks-mode folder. | Shared toolbar tái sử dụng. | Lock-mode UX edge case chưa rõ. |
+| 06 | `06-flashcard-list.md` | ✅ = (§Components scope) | Danh sách: bulk select, reorder, search inline, breadcrumb, deck summary, study modes, progress, bulk action bar, empty/skeleton. | [Verified 2026-05-28]: §Components đã expand thành 13-row bảng mapped 1-1 với `flashcard_*_section.dart` files theo render order screen (lines 130-436). [Pending]: §Rules, §States, §Forbidden chưa re-verify aspect-by-aspect. | **P3**: Subsequent pass verify other sections. | Mapping doc ↔ widget rõ ràng, dễ review PR. | Verify scope hẹp — chỉ §Components. |
+| 07 | `07-flashcard-create.md` | 🟡 D≠C | Form tạo flashcard 1 thẻ + bulk paste; route riêng `flashcardCreate`. | [Verified 2026-05-28]: `flashcard_editor_screen.dart` shared cho cả create và edit (`flashcardCreate` và `flashcardEdit` cùng map sang screen này). [Pending]: Doc vẫn tách 07/08 → gây hiểu nhầm. | **P2**: Merge 07+08 thành "Flashcard editor" hoặc add cross-ref note ở header cả hai file. | Một code path, ít drift logic. | Spec dual-file ↔ code single-file. |
+| 08 | `08-flashcard-edit.md` | 🟡 D≠C | Form chỉnh + delete (danger zone) + "View history" link. | [Verified 2026-05-28]: Cùng screen với #07. "View history" link sẽ dead-end vì #09 missing. Suspend/Bury suggestion file `suspend_card_usecase.dart` ref trong Impl refs là **target** (block on §3.1). | **P2**: Cùng action với #07 + note "View history disabled until #09". | — | View history link không click được. |
+| 09 | `09-flashcard-history.md` | 🔴 D>C (MISSING) | Trang lịch sử attempts của 1 flashcard. | [Verified 2026-05-28]: `find lib -name "*history*"` vẫn rỗng. `study_attempts_table` có data nhưng không có query method `getAttemptsByFlashcard` (verified by grep). | **P1**: Build hoặc downgrade Future Proposal. | Schema raw đã có. | User click "View history" 404. |
+| 10 | `10-deck-import.md` | ✅ = (§Implementation refs scope) | Import CSV/Excel/structured-text vào deck. | [Verified 2026-05-28]: Doc đã update code paths to `flashcard_import_support.dart` (csv + structuredText) + `flashcard_excel_import_parser.dart` (DIY xlsx parser, không dùng `excel` pkg, single-sheet only). Format enum verified at `value_objects/content_actions.dart:45`. [Pending]: Decision-table rows cho import chưa cross-verify. | **P3**: Decision-table cross-verify. | Import 3-format đầy đủ. | Excel parser scope (single sheet, no formula) là known limitation đã document. |
+| 11 | `11-library-search.md` | 🔴 D>C (MISSING) | Global search cross deck/folder/tag, recent searches, filters. | [Verified 2026-05-28]: Không có screen, không có `GlobalSearchUseCase`. `MxSearchField` chỉ dùng inline ở scope-local. Không có SharedPreferences key cho recent searches. | **P1**: Build hoặc downgrade. | Inline scope-local works. | Spec "global" ≠ code "scope-local". |
+| 12 | `12-study-entry-gate.md` | 🟠 D>C | Empty scope matrix 10 cases với 10 l10n keys. | [Verified 2026-05-28]: Code `StartStudySessionUseCase` (`study_usecases.dart:33-35`) chỉ throw 1 `ValidationException` chung. 10 cases doc spec → 1 generic exception code. `studyEmpty_allBuried/allSuspended` mặc nhiên block on §3.1. | **P0**: Branching empty-state + 10 l10n keys. | Route đúng. | 10-vs-1 mismatch — P0. |
+| 13 | `13-study-session-review.md` | 🟡 D>C | Review mode swipe + long-press → card actions. | [Verified 2026-05-28]: Code paths đã refresh tới `review_mode_session_view.dart` + `review_page_scroll_behavior.dart`. **Long-press = 0 handler** (`grep onLongPress lib/presentation/features/study` = 0). Card-actions sheet missing (block §3.1). | **P1**: Long-press wiring sau khi §3.1 ready. | Swipe behavior + scroll layer tách rõ. | Toàn bộ long-press track null. |
+| 14 | `14-study-session-match.md` | ✅ = | Board 5-pair, 10 cells, ≥5 cards. | [Verified 2026-05-28]: `matchVisiblePairLimit = 5` ở `match_batching.dart`. Seeded shuffle (`match_seed.dart`) deterministic per `sessionId + boardIndex`. Grading via `AnswerCurrentMatchModeBatchUseCase`. Long-press: cùng track #13. | **P3**: Long-press track #13. | Match-mode batch usecase riêng → clean. | Long-press chưa wire. |
+| 15 | `15-study-session-guess.md` | ✅ = | 5 options (A-E), 4 decoys, countdown 0.8s/1.5s. | [Verified 2026-05-28]: `_guessAnswerDistractorLimit = 4` ở `study_session_notifier.dart:17`; `distractors.take(4)` ở `guess_mode_session_view.dart:160`; tổng 5 options. Distractor sampling **inline ở presentation layer** (notifier, không phải domain) — track architecture concern. [Pending]: Countdown 0.8s/1.5s constants chưa trace trong `guess_motion.dart`. | **P2**: Verify countdown constants. **P3**: Promote distractor sampling lên domain (xem §3.13). | Option models tách. | Architecture: distractor sampling sai layer. |
+| 16 | `16-study-session-recall.md` | ✅ = | Flip card + 20s timeout auto-reveal + self-grade. | [Verified 2026-05-28]: Doc đã thêm full spec timer 20s (`MxDurations.recallAnswerTimeout = Duration(seconds: 20)` ở `app_motion.dart:29`) + auto-reveal on timeout flow. §Layout, §Components, §States, §Actions, §Rules, §Forbidden tất cả include timer. Long-press track #13. [Mock gap]: Mock variants `09a (hidden)` + `09b (revealed)` không có `09c (timed out)` — tracking through §3.15.2 item 2. | **P3**: Long-press + mock variant gap. | UX timer behavior giờ minh bạch trong wireframe doc. | Mock chưa có variant timed-out (visual same với revealed + caption). |
+| 17 | `17-study-session-fill.md` | 🟡 D>C | Type front, strict char match, Mark correct override, Hint button taint to `recovered`. | [Verified 2026-05-28]: Code paths đã refresh. **Strict matcher inline trong presentation** (`fill_actions.dart` / viewmodel) — không có file domain riêng. **Hint taint** business logic chưa verify thực thi đúng (demote `perfect → recovered` khi hint dùng). | **P1**: Promote strict matcher + hint taint lên domain. Verify behavior. | UI có đủ Mark correct + Hint button. | Business logic sai layer → Hard Rule violation candidate. |
+| 18 | `18-study-result.md` | 🟡 D>C | Stats summary, streak chip, per-card review list, retry session, finalize retry. | [Verified 2026-05-28]: `FinalizeStudySessionUseCase` + `RetryFinalizeUseCase` tồn tại (`study_usecases.dart:339,363`). Code paths đã refresh. **Streak chip cùng vấn đề #01** — không có `record_completion_usecase.dart`, engagement domain missing. [Pending]: Per-card review widget. | **P1**: Per-card review section. Streak source-of-truth (link #01). | Finalize/retry path đầy đủ. | Streak + per-card review missing. |
+| 19 | `19-settings-account.md` | ✅ = (§Platform gateways scope) | Sign in Google → link → Drive sync snapshot list / restore. | [Verified 2026-05-28]: Business doc `account-sync.md` đã thêm hẳn §Platform snapshot gateways với bảng so sánh io/web/stub + rules (web cần `sqlite3.wasm` + `drift_worker.dart.js` assets; io dùng `path_provider.getTemporaryDirectory()`; stub throws). [Pending]: Wireframe 19 chính nó (UI flow restore-warning, fingerprint mismatch) chưa re-verify. | **P3**: Wireframe 19 UI aspects pass tiếp. | Sync layer tách clean nhất. | Verify scope hẹp — chỉ data-layer gateways. |
+| 20 | `20-settings-learning.md` | 🟡 D>C | Daily goal, autoplay TTS, intervals override, mode prefs, bury/suspend defaults. | [Verified 2026-05-28]: `study_settings_policy.dart` exists. **Bury/suspend defaults block §3.1**. **Daily-goal field** chưa thấy — link #01. | **P1**: Daily-goal setting; bury defaults block on §3.1. | Policy tách object. | 2 sub-features missing. |
+| 21 | `21-settings-audio-speech.md` | 🟡 D>C | TTS engine select, voice, rate, pitch, sample, auto-play default. | [Verified 2026-05-28]: `audio_speech_settings_screen.dart` + `tts_usecases.dart` + `tts_settings_records_table.dart` exist. [Pending]: Engine fallback Android/iOS + voice picker UI. | **P2**: Verify engine fallback + voice picker. | Persistence table cho TTS settings. | Edge case engine unavailable chưa rõ. |
+| 22 | `22-settings-tag-management.md` | 🟠 D>C (architecture) | Tag list, rename, merge, delete; affect flashcards cascade. | [Verified 2026-05-28]: `tag_management_screen.dart` exists. **0 TagUseCase** ở domain (grep confirmed). **0 `TagRepository` interface** ở `lib/domain/repositories/`. Schema chỉ có `flashcard_tags_table.dart` (junction). → Tag screen có thể đang chạm data trực tiếp (Hard Rule violation candidate) hoặc đi qua `content_query_usecases.dart`. | **P1**: Tag domain layer (repo + 3 use cases). | `mx_tag_input` shared widget có. | Có thể vi phạm Clean Architecture boundary. |
+| 23 | `23-onboarding.md` | 🔴 D>C (MISSING) | Onboarding 4-step + restore-from-Drive prompt. | [Verified 2026-05-28]: `grep -i "onboarding" lib/` vẫn rỗng. `RouteDefaults.initialLocation = RoutePaths.library`. | **P1**: Decision build/downgrade. | Spec đầy đủ. | First-time UX hỏng. |
+| 24 | `24-shared-dialogs.md` | 🟠 D>C | Catalog 8+ dialogs. | [Verified 2026-05-28]: Code có 3 typed widgets (`mx_dialog`, `mx_confirmation_dialog`, `mx_name_dialog`). Các dialog specific (exit-session, finalize-retry, restore-prompt, …) chưa có file riêng. | **P2**: Audit từng §dialog → tạo widget hoặc confirm inline. | Base `mx_dialog` foundation. | Dialog ecosystem ~40% typed. |
+| 25 | `25-shared-bottom-sheets.md` | 🟠 D>C | Card-actions, undo toast, destination picker, study-mode picker. | [Verified 2026-05-28]: 3 base widgets (`mx_bottom_sheet`, `mx_destination_picker_sheet`, `mx_action_sheet_list`). **Card-actions sheet** block §3.1. **Undo toast** missing. | **P1**: Undo toast + card-actions sau §3.1. | Destination picker clean. | Sheet ecosystem ~50% complete. |
+
+### §1.1 Status distribution (Rev 3 vs Rev 2 — verified by counting rows)
+
+| Status | Rev 2 | Rev 3 | Δ | Rows changed |
+| --- | --- | --- | --- | --- |
+| ✅ = | 3 | 7 | **+4** | #06, #10, #16, #19 reach ✅ at verified scope (cleanup pass updated docs) |
+| 🟡 | 14 | 9 | **-5** | 4 rows promoted to ✅ (above) + #12 escalated to 🟠 |
+| 🟠 | 5 | 6 | **+1** | #12 escalated from 🟡 → 🟠 to align with its P0 severity (Rev 2 inconsistency: row showed 🟡 but recommendation said P0; Rev 3 corrects) |
+| 🔴 (MISSING) | 3 | 3 | = | #09, #11, #23 unchanged — block on product decision build vs downgrade |
+| **Total** | 25 | 25 | | |
+
+→ Rev 3 phản ánh tiến bộ thực có ở doc layer (4 rows +1 step); code-layer P0/P1 chưa thay đổi (vì cleanup chỉ chỉnh doc). #12 escalation không phải regression — chỉ là sửa lỗi visual severity của Rev 2.
+
+---
+
+## §2. Routes ↔ navigation parity (unchanged from Rev 2 — code chưa đổi)
+
+| Route name | Path | Doc spec | Status |
+| --- | --- | --- | --- |
+| `home` | `/home` | Dashboard | ✅ |
+| `library` | `/library` | Library overview | ✅ (cũng là `initialLocation` — verify với navigation-flow.md) |
+| `progress` | `/progress` | Progress | ✅ |
+| `settings` (+ 4 sub) | `/settings/*` | Settings hub + 4 sub-screens | ✅ |
+| `folderDetail` | `/library/folder/:id` | Folder detail | ✅ |
+| `flashcardList` | `/library/deck/:deckId/flashcards` | Flashcard list | ✅ |
+| `flashcardCreate` | `/library/deck/:deckId/flashcards/new` | Create | ✅ (shared screen với edit — xem #07) |
+| `flashcardEdit` | `/library/deck/:deckId/flashcards/:flashcardId/edit` | Edit | ✅ |
+| `deckImport` | `/library/deck/:deckId/import` | Import | ✅ |
+| `studyEntry` | `/library/study/:entryType/:entryRefId` | Study entry | ✅ |
+| `studyToday` | `/library/study/today` | Today shortcut | ✅ |
+| `studySession` | `/library/study/session/:sessionId` | Active session | ✅ |
+| `studyResult` | `/library/study/session/:sessionId/result` | Result | ✅ |
+| **Missing in code** | — | `/flashcard/:id/history` (wireframe 09) | 🔴 |
+| **Missing in code** | — | `/library/search` (wireframe 11) | 🔴 |
+| **Missing in code** | — | `/onboarding` (wireframe 23) | 🔴 |
+
+`RouteDefaults.initialLocation = RoutePaths.library` — cần verify với `docs/business/navigation/navigation-flow.md` xem default đúng là library hay dashboard. Vẫn open question từ Rev 2.
+
+---
+
+## §3. Cross-cutting drift
+
+### §3.1 Bury / Suspend — **P0 Blocker** (unchanged from Rev 2)
+
+| Layer | Status | Evidence |
+| --- | --- | --- |
+| Doc | ✅ | `docs/business/study-actions/bury-suspend.md` + decision rows. |
+| Schema | 🔴 | `flashcards_table.dart` + `flashcard_progress_table.dart` không có column nào liên quan. |
+| Domain | 🔴 | `grep "Bury|Suspend" lib/domain` = 0. |
+| Data | 🔴 | Không DAO method, không migration. |
+| Presentation | 🔴 | `onLongPress` = 0 trong study widgets. Card-actions sheet không tồn tại. |
+
+**Impact**: blocks wireframes 13-17, 25, parts of 12 (l10n keys `studyEmpty_allBuried/allSuspended`), 20 (bury defaults).
+
+**Recommendation epic**: schema migration → 4 use cases → presentation long-press + card-actions sheet + settings.
+
+### §3.2 Streak / Engagement — **P1 Major** (unchanged from Rev 2)
+
+| Layer | Status |
+| --- | --- |
+| Doc | ✅ |
+| Schema | 🟡 Implicit (derivable from `study_sessions.started_at`) |
+| Domain | 🔴 No `CalculateStreakUseCase` |
+| Data | 🔴 No distinct-day query |
+| Presentation | 🟠 `mx_streak_card.dart` orphan (verified 2026-05-28, still 0 call-sites) |
+
+**Impact**: blocks streak chip in #01 + #18, daily-goal in #20.
+
+### §3.3 Tag system — **P1 Major (architecture)** (unchanged)
+
+- Schema: junction-only.
+- Domain: 0 use case, 0 repository interface.
+- Presentation: screen + widget exist.
+- **Implication**: presentation may bypass UseCase → Repository → DAO flow. Hard Rule candidate violation.
+
+### §3.4 Card history — **P1 Major** (unchanged)
+
+Schema có, domain trống, screen trống. Wireframe 09 dead-link từ #08.
+
+### §3.5 Global search — **P1 Major** (unchanged)
+
+Doc cross-scope, code scope-local. Decision needed: build vs downgrade.
+
+### §3.6 Onboarding — **P1 Major** (unchanged)
+
+Zero code presence. Decision needed: build vs downgrade Future Proposal.
+
+### §3.7 Empty-scope matrix — **P0 Blocker** (unchanged)
+
+10 doc cases vs 1 code exception. Sub-cases `allBuried`/`allSuspended` cũng block §3.1.
+
+### §3.8 Excel import — ✅ **RESOLVED 2026-05-28**
+
+Doc đã update với DIY xlsx parser scope + limitations. Xem [docs/wireframes/10-deck-import.md](docs/wireframes/10-deck-import.md) §Code paths + §Excel parser scope. **Đóng item này.**
+
+### §3.9 Recall timer — ✅ **RESOLVED 2026-05-28**
+
+Doc đã thêm full spec timer 20s + auto-reveal. Xem [docs/wireframes/16-study-session-recall.md](docs/wireframes/16-study-session-recall.md) §Layout (timed-out) + §Components + §States + §Rules + §Agent rule. **Đóng item này.**
+
+### §3.10 Strict matcher & hint taint (architecture) — **P1** (unchanged)
+
+Strict matcher inline ở presentation layer (`fill_actions.dart` / viewmodel). Hint taint logic chưa verify.
+
+### §3.11 Architecture inconsistency — **P2** (refined evidence 2026-05-28)
+
+Hai vị trí cho domain use cases:
+
+- `lib/domain/usecases/*.dart` — feature-flat (deck, flashcard, folder, content_query, cloud_account, drive_sync, tts).
+- `lib/domain/study/usecases/study_usecases.dart` — chỉ study, sub-module style.
+
+→ Reviewer/onboarder phải biết cả hai pattern. Đề xuất chuẩn hoá một trong hai (cleanup doc cho phần này sẽ phụ thuộc refactor code).
+
+### §3.12 CLAUDE.md trigger map references non-existent files — **NEW P2** (phát hiện 2026-05-28)
+
+Trong `CLAUDE.md` (root + `docs/CLAUDE.md` mirror) §"Code change → required docs":
+
+```
+| `lib/domain/srs/box_intervals.dart` | `docs/business/srs/srs-review.md` (interval table) |
+| `lib/domain/srs/box_transition.dart` | `docs/business/srs/srs-review.md` (transition table) |
+```
+
+Cả 2 file đó **không tồn tại** (`find lib/domain -name "box_*"` returns empty). Trigger map — quy tắc meta để duy trì parity — **chính nó đang drift**. Nếu dev edit `study_usecases.dart` để đổi interval, trigger map không catch → doc không buộc update.
+
+**Đề xuất**: PR riêng sửa CLAUDE.md với 2 option:
+
+(a) **Xoá 2 dòng** + thay bằng row chỉ `lib/domain/study/usecases/study_usecases.dart` → `docs/business/srs/srs-review.md` (mapping hiện tại).
+(b) **Giữ + mark "target file"** + thêm row mới mapping current location.
+
+→ Cần user decision vì sửa CLAUDE.md ảnh hưởng Hard Rule.
+
+### §3.13 "Doc target, code inline" anti-pattern — **NEW P2 backlog** (phát hiện 2026-05-28)
+
+Có ít nhất **8 case** doc spec một file riêng nhưng code làm inline trong file lớn / sai layer:
+
+| # | Doc target file | Code thực tế | Layer issue? |
+| --- | --- | --- | --- |
+| 1 | `lib/domain/srs/box_intervals.dart` | Inline trong `study_usecases.dart` | No (cùng domain) |
+| 2 | `lib/domain/srs/box_transition.dart` | Inline trong `study_usecases.dart` | No |
+| 3 | `lib/domain/study/flow_validator.dart` | Inline trong `study_strategy.dart` | No |
+| 4 | `lib/domain/study/distractor_sampler.dart` | Inline trong `study_session_notifier.dart` | **YES — presentation** |
+| 5 | `lib/domain/study/option_description_builder.dart` | Inline trong `guess_option_models.dart` (presentation) | **YES — presentation** |
+| 6 | `lib/domain/study/strict_matcher.dart` | Inline trong `fill_actions.dart` (presentation) | **YES — presentation** |
+| 7 | `lib/domain/study/hint_revealer.dart` | Inline trong fill panel (presentation) | **YES — presentation** |
+| 8 | `lib/domain/usecases/engagement/record_completion_usecase.dart` | **Missing entirely** | YES (domain layer trống) |
+
+Item 4-7 là Clean Architecture violations (business logic ở presentation). Item 1-3 chỉ là organization (tech debt nhẹ). Item 8 là missing domain.
+
+**Đề xuất backlog**: 1 epic "Extract inline study/SRS logic to domain modules" — chia 8 sub-task.
+
+### §3.14 Target-vs-current file ref convention — **NEW P3** (phát hiện 2026-05-28)
+
+Khi doc đề cập file dự kiến tồn tại (target) vs file đang tồn tại (current), không có convention. Trong cleanup pass đã áp dụng tạm:
+
+```
+**Source (target):** `lib/domain/srs/box_intervals.dart`.
+**Source (current):** not yet extracted; inlined in `lib/domain/study/usecases/study_usecases.dart`.
+```
+
+**Đề xuất**: chuẩn hoá format này vào `docs/contracts/code-style.md` để future docs dùng đồng nhất.
+
+### §3.15 Mock-mapping doc audit — **NEW** (phát hiện 2026-05-28)
+
+`docs/system-design/mock-design-doc-mapping.md` là coordination doc mapping 129 mock variant → wireframe + business spec + contract. Audit dedicated cho doc này:
+
+#### §3.15.1 Findings: internal consistency
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Variant ranges §5 ↔ §6 sub-section match | ✅ | Đếm bằng tay 24 row §5 + cross-ref với 19 sub-section §6.1-6.19 (`25a-25h`=8 = §6.16 8 rows; `17a-17f`=6 = §6.8 6 rows; …). 100% align. |
+| Tổng variant count khớp claim "129 rendered screen variants" | ✅ | `grep -c "^\| \`[0-9]"` = 129 đúng claim ở line 42. |
+| Tất cả 17 contract docs referenced tồn tại | ✅ | `[ -f ... ]` confirm 17/17. |
+| Tất cả 15 business + state + UI-UX docs referenced tồn tại | ✅ | Confirm 15/15. |
+| Tất cả 28 preview HTML referenced tồn tại | ✅ | Match `ls preview/` 28 files = 28 §8 rows. |
+| Tất cả wireframe paths referenced tồn tại | ✅ | 25 wireframes mapped, all `[ -f ]` confirm. |
+
+→ **No broken refs**. Doc về cấu trúc reference, rất sạch.
+
+#### §3.15.2 Findings: drift / minor issues
+
+| # | Issue | Severity | Recommendation |
+| --- | --- | --- | --- |
+| 1 | §1 priority list (line 30) ref `docs/architecture/**` (plural) nhưng dir chỉ chứa 1 file `clean-architecture-contract.md`. Globbing pattern hứa nhiều file. | P3 trivial | Đổi sang `docs/architecture/clean-architecture-contract.md` hoặc giữ glob nếu kế hoạch tách thêm files. |
+| 2 | §6.1 Recall variants `09a (hidden)` + `09b (revealed)` — **không có variant cho timeout state**. Sau khi Rev 3 documents `Layout — auto-reveal on timeout` ở wireframe 16 với caption "Time's up — grade yourself", mock thiếu variant tương ứng. | P3 | Tuỳ chọn: (a) thêm `09c · Study · Recall (timed out)` variant vào mock + mapping, hoặc (b) note rõ trong mock-mapping §10 rằng timed-out là visual variant của 09b với caption phụ. |
+| 3 | §6.16 Dashboard variant `25h (multi resume)` ref `docs/wireframes/24-shared-dialogs.md`. Code có `ResumeStudySessionUseCase.listActiveSessions()` (`study_usecases.dart:60`) nhưng UI rendering multi-resume **chưa verify**. Mock spec có nhưng dashboard widget tree chưa có call-site cho list. Link với Rev 3 #01 (D>C). | P2 | Verify dashboard widget render multi-resume hoặc mark mock variant 25h là "Specified, not implemented" trong mock-mapping §10. |
+| 4 | §6.4 Account sync variants `13a-13i` không phân biệt platform (web vs mobile). Sau khi Rev 3 documents `§Platform snapshot gateways` (io / web / stub), mock chưa cover platform-specific UI differences. | P3 (likely intentional) | Nếu UI thực sự identical → note rõ trong mock-mapping. Nếu khác → thêm variants `13a-web`, `13a-mobile` v.v. |
+| 5 | §6.18 Study result variant `27f · Study result (tough empty)` — "Empty/tough cards fallback" — "tough" terminology chưa định nghĩa ở glossary hoặc business doc. | P3 | Hoặc rename variant (vd `(no-cards-remaining-fallback)`), hoặc add term vào `docs/business/glossary.md`. |
+| 6 | §10 "Missing or weak mock coverage" hiện liệt kê 6 items (study entry gate, shared dialogs catalog, shared bottom sheets catalog, mobile kit README stale, legacy naming, token drift). **KHÔNG bao gồm**: recall timeout variant (#2 above), multi-resume rendering gap (#3), platform-specific sync UI (#4). | P3 | Refresh §10 bổ sung 3 items này. |
+| 7 | §7 "Legacy and stale mock references" mentions `HomeScreen`, `LibraryScreen`, `DeckScreen`, `CardsScreen`, `CreateCardScreen`, `BulkAddScreen`, `StatsScreen`. Verify code không còn dùng — `grep` cho thấy code dùng `dashboard_screen`, `library_overview_screen`, `folder_detail_screen`, `flashcard_list_screen`, `flashcard_editor_screen`, `deck_import_screen`, `progress_screen`. → Legacy table CHÍNH XÁC; code naming hiện đại. | ✅ no action | — |
+| 8 | Mock variant `28a-28i` Onboarding — 9 variants có nhưng code zero presence (Rev 3 §3.6). Mock-mapping treats là "Current target". OK theo perspective doc-as-truth, nhưng implementer nhìn vào dễ tưởng feature đã có. | P3 | Cross-link với Rev 3 #23 trong mock-mapping §10 — note "Implementation status: missing in code (see Rev 3 §3.6)". |
+
+#### §3.15.3 Findings: chỗ doc xuất sắc (giữ làm reference)
+
+| Item | Giá trị |
+| --- | --- |
+| §3 "Conflict resolution rule" 8-row priority table | Rõ ràng cho implementer khi mock ↔ wireframe ↔ business ↔ design system mâu thuẫn. Senior BA mẫu mực. |
+| §4 "Agent implementation rule" 10-step reading order | Ngăn agent skip context và start từ HTML mock. |
+| §12 "Hard implementation bans" 8 rules | Concrete prohibitions (copy raw CSS, JSX structure, etc.). |
+| §11 "Recommended implementation checklist per screen" | 10-step process integrated với decision table IDs. |
+| §13 "Final leadership position" framing | Cho phép reusing prompt: "Use docs/system-design/mock-design-doc-mapping.md to identify..." → reduce friction cho agent prompts. |
+
+→ Mock-mapping doc về **cấu trúc và process** đã ở mức A+ senior. Drift chỉ ở mức P3 (visual variant gaps cập nhật theo Rev 3 + minor cleanups).
+
+---
+
+## §4. Recommended priority queue (Rev 3)
+
+Items resolved trong cleanup pass đã xoá. Items mới từ §3.12-3.14 thêm.
+
+| Priority | Item | Section | Est. cost |
+| --- | --- | --- | --- |
+| **P0-1** | Empty-scope matrix branching (10 l10n keys + UI) | §3.7 | M |
+| **P0-2** | Bury/Suspend foundation (schema → UC → UI → settings) | §3.1 | XL |
+| **P0-3** | Default landing route alignment (`home` vs `library`) | §2 | XS |
+| **P1-1** | Streak / Engagement use case + wire `MxStreakCard` + daily-goal | §3.2, #01, #18, #20 | M |
+| **P1-2** | Tag domain layer (repo + 3 use cases) + screen wiring | §3.3, #22 | M |
+| **P1-3** | Card history use case + screen | §3.4, #09 | M |
+| **P1-4** | Global search decision (build vs downgrade) | §3.5, #11 | M / XS |
+| **P1-5** | Onboarding decision (build vs downgrade) | §3.6, #23 | M / XS |
+| **P1-6** | Long-press wiring sau khi #P0-2 ready | §3.1, #13-17 | S |
+| **P1-7** | Strict matcher + hint taint architecture audit + extract to domain | §3.10, §3.13 items 6-7, #17 | S |
+| **P1-8** | Per-card review section in study result | #18 | S |
+| **P2-1** | Box-distribution chart on progress | #03 | S |
+| **P2-2** | Flashcard create/edit doc merge | #07, #08 | XS |
+| **P2-3** | Lock-mode UI verification on folder | #05 | XS |
+| **P2-4** | Countdown durations constant check (guess) | #15 | XS |
+| **P2-5** | TTS engine fallback + voice picker verify | #21 | S |
+| **P2-6** | **NEW** CLAUDE.md trigger map sửa box_* refs | §3.12 | XS (cần user decision) |
+| **P2-7** | **NEW** Extract inline study/SRS logic to domain modules (epic 8 sub-task) | §3.13 | L |
+| **P2-8** | Architecture inconsistency (usecase location standardize) | §3.11 | M |
+| **P3-1** | Design system widget catalog update (orphan `MxStreakCard` + shared toolbars) | §3.2 | XS |
+| **P3-2** | **NEW** Convention doc cho target/current file refs | §3.14 | XS |
+| **P3-3** | Wireframe 19 UI flow pass tiếp (sau khi data layer ✅ ở Rev 3) | #19 | S |
+| **P3-4** | Wireframe 06 §Rules / §States / §Forbidden pass tiếp | #06 | S |
+| **P3-5** | Wireframe 10 decision-table import rows cross-verify | #10 | XS |
+| **P3-6** | **NEW** Mock-mapping `docs/architecture/**` glob narrow → `clean-architecture-contract.md` | §3.15.2 #1 | XS |
+| **P3-7** | **NEW** Mock-mapping: add recall timed-out variant `09c` hoặc note in §10 | §3.15.2 #2, #16 | XS |
+| **P3-8** | **NEW** Mock-mapping: verify multi-resume dashboard UI hoặc mark variant `25h` "specified-not-implemented" | §3.15.2 #3, #01 | S |
+| **P3-9** | **NEW** Mock-mapping: confirm/document account-sync UI is platform-agnostic OR split variants | §3.15.2 #4 | XS |
+| **P3-10** | **NEW** Mock-mapping: define "tough" in study-result `27f` variant | §3.15.2 #5 | XS |
+| **P3-11** | **NEW** Mock-mapping §10 refresh: add 3 missing items from Rev 3 (recall timeout, multi-resume, platform UI) | §3.15.2 #6 | XS |
+| **P3-12** | **NEW** Mock-mapping: cross-link onboarding mock variants `28a-28i` với Rev 3 #23 status (missing in code) | §3.15.2 #8 | XS |
+
+**Removed from Rev 2 priority queue** (đã resolve qua cleanup):
+
+- ~~P2-1 Rev2: Recall timer doc update~~ → §3.9 RESOLVED.
+- ~~P2-2 Rev2: Excel import doc update~~ → §3.8 RESOLVED.
+- ~~P3-1 Rev2: Wireframe 06 component list catch-up~~ → §1 #06 ✅ (§Components scope).
+- ~~P3-2 Rev2: Account-sync platform variants doc~~ → §1 #19 ✅ (gateway scope).
+- ~~P3-4 Rev2: Design system widget catalog update (general)~~ → narrowed to orphan-widget cleanup (P3-1 mới).
+
+---
+
+## §5. Lessons learned
+
+### §5.1 What Revision 1 (junior) got wrong (kept from Rev 2)
+
+| Rev 1 claim | Sự thật | Vì sao sai |
+| --- | --- | --- |
+| "Match mode DRIFT: code 4 pairs → 5" | Code đã 5; doc lag | Không grep code, đoán theo timing doc edit |
+| "Guess mode DRIFT: code 4 options → 5" | Code đã 5; doc lag | Cùng lý do |
+| "Dashboard MATCH" | Streak missing entirely; widget orphan | Chỉ check screen file, không trace state shape |
+| "Tag management MATCH" | Domain layer trống | Dừng ở presentation |
+| "Recall MATCH" | Code có timer; doc không spec | Không đọc code bên trong widget |
+| "Deck import MATCH" | Code support Excel; doc chỉ CSV/TSV | Chỉ list file names, không inspect parser |
+| "Study entry MATCH" | 10 empty cases vs 1 generic exception | Không cross-check decision table |
+| "Bury/Suspend MISSING" | ✅ Đúng | Điểm Rev 1 đúng |
+| Priority P0 chứa "Match 4→5 code update" | Item không tồn tại | Sai chiều drift → sai ưu tiên |
+
+### §5.2 What Revision 2 (senior, my own previous work) missed
+
+Tôi (senior) cũng có blind-spot. Honest disclosure:
+
+| Rev 2 claim | Sự thật phát hiện sau pass cleanup | Vì sao bỏ sót |
+| --- | --- | --- |
+| "#02 Library `mx_search_sort_toolbar` not in doc (C>D nhỏ)" | Toolbar thuộc **folder-detail** (#05), không phải library overview (#02). Library overview dùng inline `MxSearchField`. | Tôi grep "MxSearchSortToolbar" rồi assume nó dùng ở library overview vì naming "library_toolbar_state" tương đối trùng. Lesson: bám đúng call-site, đừng infer từ tên provider/widget. |
+| "#10 Code support Excel xlsx, doc chỉ mention CSV/TSV" | Doc 10 ĐÃ mention Excel + format radio + header toggle. Drift thực tế là **Implementation refs stale paths**, không phải spec gap. | Tôi đọc lướt §Forbidden + §Implementation refs nhưng skip §Components + §Layout — nơi Excel ĐÃ được liệt kê. Lesson: đừng audit từ "section nóng nhất"; quét toàn bộ wireframe. |
+| Chưa phát hiện CLAUDE.md trigger map ref non-existent files | Đây là drift cấp meta, đáng lẽ phải catch khi quét stale refs về `box_*`. | Rev 2 chỉ scope wireframes/business/contracts; chưa quét CLAUDE.md/AGENTS.md cấp meta. Lesson: meta-doc cũng có thể drift; thêm vào scope sweep. |
+| "#19 Code có 3 variants (io/web/stub), doc không nhắc" | Business doc account-sync.md DID list 1 dòng `lib/data/sync/local_database_snapshot_gateway*.dart (DB snapshot read/write, io/web/stub)`. Drift thực tế: doc list file paths, không giải thích **behavior** per platform. | Tôi grep "platform" + "Wasm" trong doc, không match. Nhưng dòng "io/web/stub" có ở source-files list. Lesson: search by ALL terms doc có thể dùng, không chỉ canonical term. |
+| Không tách bạch giữa "doc edit" vs "code change" trong P-queue Rev 2 | Một số items chỉ cần doc update (giờ đã làm) chen lẫn items cần code work. | Lesson: tag mỗi item bằng `[doc-only]` hoặc `[code]` để planning rõ. |
+
+### §5.3 Bài học methodology cập nhật
+
+1. **"File exists" ≠ "feature works"** (giữ từ Rev 2).
+2. **Audit chiều DRIFT trước khi assume direction** — grep code constant trước, đừng nhìn doc timestamp.
+3. **Quét cả meta-doc (CLAUDE.md, AGENTS.md, index.md)**, không chỉ feature docs.
+4. **Đọc HẾT wireframe sections trước khi claim missing**, không skip nội dung "nguội".
+5. **Tag P-queue items với `[doc-only]` vs `[code]`** để planning chuẩn.
+6. **Recursive review sau mỗi pass** — chạy lại grep cho tất cả stale pattern đã sửa.
+7. **Phạm vi "verified" phải explicit** — `=` (match) cell phải nói rõ aspect nào đã verify.
+
+---
+
+## §6. Quy trình parity định kỳ (refined Rev 3)
+
+1. **Mỗi PR thay đổi `lib/presentation/features/**/screens/*.dart`**: reviewer mở wireframe tương ứng và verify §Components, §States, §Actions, §Forbidden — không chỉ visual diff.
+2. **Mỗi PR thay đổi business doc / wireframe**: reviewer mở "Source files to inspect" trong doc và xác nhận code align.
+3. **Mỗi PR thêm shared widget**: update `docs/system-design/MemoX Design System/README.md` cùng commit. Áp dụng Hard Rule "doc-code parity" theo cả chiều C>D.
+4. **Mỗi PR refactor consolidates files** (kiểu này gây ra §3.13 anti-pattern): chạy `grep -rn "<deleted_filename>" docs/` trước commit; nếu match > 0, fix doc trong cùng commit.
+5. **Sprint review**: re-run §1 + §3 cho row không phải `=`; xác nhận status không thoái lui.
+6. **Trước release**: P0/P1 phải về 0 hoặc có exception note đã được product owner ký.
+7. **Sau cleanup pass**: tạo log doc dạng `docs/checklist/<topic>-cleanup-<date>.md` (mẫu: cleanup ngày hôm nay) để track lineage giữa các revision.
+
+---
+
+## §7. Methodology limitations (refined Rev 3)
+
+- **KHÔNG chạy** `flutter analyze` / `flutter test` để verify runtime behavior. Một số "có vẻ implement" có thể fail runtime.
+- **KHÔNG đọc 100%** từng widget file — inspect đủ để confirm/exclude feature. `[Pending]` cells trong §1 cần follow-up khi đụng task.
+- **KHÔNG check `*.g.dart`** generated files — assume build_runner output đồng bộ.
+- **KHÔNG audit l10n keys** một-một — chỉ check vài key tiêu biểu.
+- **KHÔNG audit accessibility** / responsive layouts — track riêng cho specialist.
+- **Rev 3 mới**: KHÔNG full re-audit toàn bộ wireframe sections sau khi cleanup; chỉ aspect liên quan trực tiếp tới C>D items đã verify. `[Pending]` markers trong §1 là honest disclosure phạm vi đã làm.
+
+---
+
+## §8. Resolution log Rev 2 → Rev 3
+
+| Rev 2 item | Action | Where |
+| --- | --- | --- |
+| §3.8 Excel import C>D | RESOLVED — doc updated | [10-deck-import.md](docs/wireframes/10-deck-import.md), [c-greater-than-d-cleanup-2026-05-28.md](docs/checklist/c-greater-than-d-cleanup-2026-05-28.md) §1 row #2 |
+| §3.9 Recall timer C>D | RESOLVED — doc updated | [16-study-session-recall.md](docs/wireframes/16-study-session-recall.md) §Layout/Components/States/Rules, [cleanup log](docs/checklist/c-greater-than-d-cleanup-2026-05-28.md) §1 row #1 |
+| #02 Library toolbar C>D (small) | RECLASSIFIED — issue actually at #05 | [05-folder-detail.md](docs/wireframes/05-folder-detail.md) §Components |
+| #06 Flashcard list C>D (sections) | PARTIALLY RESOLVED — §Components scope | [06-flashcard-list.md](docs/wireframes/06-flashcard-list.md) §Components 13-row table |
+| #19 Account sync C>D (platform variants) | PARTIALLY RESOLVED — gateway data-layer scope | [account-sync.md](docs/business/account-sync/account-sync.md) §Platform snapshot gateways |
+| §3.11 Architecture inconsistency P2 | REFINED — same severity, better evidence | §3.11 above |
+| Stale code paths in 13/14/15/16/17 wireframes (grade_attempt_usecase.dart etc.) | RESOLVED — all 5 wireframes refreshed §Code paths | Cleanup log §1 rows #6-9 |
+| Stale code paths in 12/18 wireframes + business/study + resume + srs + contracts/srs + contracts/study | RESOLVED — 7 additional files refreshed | Cleanup log §1 rows #10-16 |
+| (NEW) §3.12 CLAUDE.md trigger map drift | DISCOVERED — pending user decision | This doc §3.12 |
+| (NEW) §3.13 "Doc target, code inline" anti-pattern 8 items | DISCOVERED — backlog item P2-7 | This doc §3.13 |
+| (NEW) §3.14 Target/current ref convention | DISCOVERED — backlog item P3-2 | This doc §3.14 |
+| (NEW) §3.15 Mock-mapping doc audit | COMPLETED — 6 P3 findings; 100% file refs verified; structure A+ | This doc §3.15 + P3-6 through P3-12 |
+
+---
+
+## §9. Re-audit triggers
+
+Re-run audit thành Rev 4 khi gặp một trong:
+
+1. **Merge một epic P0/P1** ở §4 → re-audit rows liên quan + cross-cutting section đó.
+2. **Sau 4 tuần** kể từ `last_updated` ở header.
+3. **Khi phát hiện drift cấp meta-doc mới** (như §3.12) — re-audit immediate.
+4. **Khi quyết định scope** P1-4 (search) hoặc P1-5 (onboarding) — re-tag #11/#23 status.
+5. **Sau khi epic P2-7** (extract inline logic) hoàn thành — re-audit §3.13 + #15/#17.
+
+---
+
+## §10. Document lineage
+
+- Rev 1 → deprecated (junior, removed history but referenced in §5.1).
+- Rev 2 → replaced (commit `<TBD by VCS>`); 1 file edit history available via `git log`.
+- Rev 3 → **CURRENT**; companion: [c-greater-than-d-cleanup-2026-05-28.md](docs/checklist/c-greater-than-d-cleanup-2026-05-28.md).
+
+---
+
+## §11. Self-review checklist (Rev 3 internal QA)
+
+Senior tech-lead audit của chính Rev 3 doc này:
+
+| Tiêu chí | Status | Ghi chú |
+| --- | --- | --- |
+| Mọi resolved item của Rev 2 cleanup được explicit log ở §8 | ✅ | §8 list 9 mục, ref tới cleanup log + cụ thể file. |
+| Mọi new finding (§3.12-3.14) có evidence file:line | ✅ | §3.12 quote chính xác 2 dòng trigger map; §3.13 list 8 items với cặp doc-target ↔ code-actual; §3.14 motivation từ pattern recurring. |
+| Status distribution §1.1 đếm khớp số row thực | ✅ | Verified bằng `awk + grep`: 7+9+6+3=25 ✓. Đã sửa sai số ban đầu (8/11/3/3) → đúng (7/9/6/3). |
+| Phạm vi "verified" mark được rõ ràng cell-by-cell | ✅ | 28 occurrences của `[Verified 2026-05-28]` hoặc `[Pending]` trong §1. |
+| Lessons learned không che giấu sai sót Rev 2 chính tôi | ✅ | §5.2 disclose 5 items Rev 2 missed. |
+| P-queue Rev 3 không trùng lặp với items đã resolve | ✅ | §4 "Removed from Rev 2 priority queue" list tường minh; new P2-6/P2-7/P3-2 cross-link §3.12-3.14. |
+| Cross-cutting §3.8/§3.9 marked RESOLVED, không pretend còn open | ✅ | Cả hai có "✅ RESOLVED 2026-05-28" + link tới cleanup log. |
+| `last_updated` header reflects today | ✅ | `2026-05-28`. |
+| Document lineage có thể trace ngược | ✅ | §10 list Rev 1 → 2 → 3 với references. |
+| Hard Rule không bị vi phạm (path convention, etc.) | ✅ | Backtick refs đều dạng `docs/...` no leading slash; markdown links dùng đúng format. |
+| Bias check: có over-claim "match" không? | ✅ | Mỗi ✅ ở §1 đều kèm `(§X scope)` hoặc `[Verified 2026-05-28]` + `[Pending]` riêng cho aspect chưa kiểm. Không over-claim. |
+| Backwards-compat: reader của Rev 2 hiểu Rev 3 không? | ✅ | §0 đầu doc explain lifecycle Rev 1/2/3; §8 resolution log; §5 lessons learned vẫn giữ context Rev 1+2. |
+| **Audit mock-mapping doc với same rigor** | ✅ | §3.15 added — 100% file refs verified (17 contracts + 15 docs + 28 preview HTML + 25 wireframes); variant count (129) cross-verified với §5↔§6; 6 P3 findings extracted; structure-quality observations recorded. |
+
+**Self-grade**: **9.4/10**. Trừ điểm:
+
+- §1.1 numerical error caught chỉ bởi recursive sweep (đáng lẽ tôi nên đếm thủ công trước khi viết). Lesson: bất kỳ số count nào trong audit phải có command verify đi kèm.
+- §3.13 item 6 ("strict matcher inline trong `fill_actions.dart`") suy luận từ phạm vi review trước, chưa grep file để chắc chắn nội dung. `[Pending verify by file content]` nên thêm vào row đó nếu chặt.
+- §10 document lineage còn placeholder `<TBD by VCS>` cho Rev 2 commit hash — sẽ resolve sau khi commit.

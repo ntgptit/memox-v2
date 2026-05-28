@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 route: /library/deck/:deckId/import
 source_specs:
   - ../business/flashcard/flashcard-management.md (import section)
@@ -257,15 +257,24 @@ Import flashcards from CSV, Excel, or pasted structured text. Two-step flow: con
 
 **Contracts:** `docs/contracts/usecase-contracts/flashcard.md` §ImportFlashcardsUseCase, `docs/contracts/repository-contracts/flashcard-repository.md` §importChunked
 
-**Code paths:**
-- `lib/presentation/features/import/screens/deck_import_screen.dart`
-- `lib/presentation/features/import/notifiers/import_notifier.dart`
-- `lib/presentation/features/import/widgets/preview_summary.dart`
-- `lib/data/repositories/flashcard_import_csv_repository.dart`
-- `lib/data/repositories/flashcard_import_excel_repository.dart`
-- `lib/data/repositories/flashcard_import_text_repository.dart`
-- `lib/domain/usecases/flashcard/import_flashcards_usecase.dart`
-- `lib/app/router/route_names.dart` → `RouteNames.deckImport`
+**Code paths (verified 2026-05-28):**
+
+- Screen: `lib/presentation/features/flashcards/screens/deck_import_screen.dart` (registered at `lib/presentation/features/flashcards/routes/flashcard_routes.dart` → `RouteNames.deckImport`).
+- Format enum: `lib/domain/value_objects/content_actions.dart` → `enum ImportSourceFormat { csv, excel, structuredText }` + `enum ImportStructuredTextSeparator { auto, tab, comma, colon, slash, semicolon, pipe }` + `enum FlashcardImportDuplicatePolicy { skipExactDuplicates }` + `enum FlashcardImportDuplicateSource { importFile, deck }`.
+- Parser dispatcher: `lib/data/repositories/flashcard_import_support.dart` → `FlashcardImportSupport.parse({format, rawContent, sourceBytes, excelHasHeader, structuredTextSeparator})`. Switches on `format` to `_parseCsv`, `FlashcardExcelImportParser.parse`, or `_parseStructuredText`.
+- CSV / structured-text parsers: inline in `flashcard_import_support.dart` (`_parseCsv`, `_parseStructuredText`).
+- Excel parser: `lib/data/repositories/flashcard_excel_import_parser.dart` — **custom DIY xlsx reader** built on `package:archive` (zip) + `package:xml`. **Does NOT depend on the `excel` pub package.** Reads the first worksheet only (resolves via `xl/workbook.xml` + relationships, falls back to `xl/worksheets/sheet1.xml`). Supports inline strings (`t="inlineStr"`), shared-string table (`xl/sharedStrings.xml`), boolean (`t="b"`), and numeric cells. Columns mapped positionally: col 0 = `front`, col 1 = `back`, col 2 = `note` (optional). Blank rows skipped. Row number preserved for issue reporting.
+- Use cases: `lib/domain/usecases/flashcard_usecases.dart` → `PrepareFlashcardImportUseCase` (parses + validates + dedupes against deck, returns `FlashcardImportPreparation`) and `CommitFlashcardImportUseCase` (chunked transaction insert).
+- Repository: `lib/data/repositories/flashcard_repository_impl.dart` (chunked insert).
+- Route constant: `lib/app/router/route_names.dart` → `RouteNames.deckImport`.
+
+**Excel parser scope (current limitations, surface to user if extending):**
+
+- Single worksheet only (first one defined in the workbook). Multi-sheet xlsx → only sheet 1 is read.
+- No formula evaluation; numeric cells return their stored raw value.
+- No date-format inference; dates appear as their underlying numeric string.
+- No cell-style awareness (bold/italic/etc.). Plain text only.
+- Encrypted / password-protected xlsx → parser throws, surfaces as `"Excel file must be a valid .xlsx workbook."` issue on row 1.
 
 **Related wireframes:**
 - `docs/wireframes/06-flashcard-list.md` (caller), `docs/wireframes/23-onboarding.md` (import path)

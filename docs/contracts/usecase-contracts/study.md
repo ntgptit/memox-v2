@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 status: contract
 ---
 
@@ -93,7 +93,7 @@ Future<Either<Failure, FlashcardProgress>> call({
   - `perfect` / `initialPassed` → `min(current+1, 8)`
   - `recovered` → `current` (stay)
   - `forgot` → `1`
-- Compute `due_at` from `box_intervals.dart` table for `box_after`.
+- Compute `due_at` from the box-interval table for `box_after` (target file: `lib/domain/srs/box_intervals.dart`; currently inlined in `lib/domain/study/usecases/study_usecases.dart` — see `docs/business/srs/srs-review.md` §Interval table).
 - Atomic: insert `study_attempts` (sessionId, flashcardId, result, studyMode, box_before, box_after, attempted_at=now, optional userInput) + update `flashcard_progress` (current_box=box_after, due_at, review_count++, lapse_count++ if forgot, last_studied_at=now, last_result=result) + advance session status `draft → in_progress` if needed. See `docs/contracts/repository-contracts/progress-repository.md`.
 
 **Errors:** `NotFoundFailure`, `UnsupportedActionFailure` (session completed), `StorageFailure`.
@@ -183,4 +183,4 @@ Returns due counts grouped (all / per deck / per folder) — used by Dashboard T
 **Repository:** `docs/contracts/repository-contracts/study-repository.md`, `docs/contracts/repository-contracts/progress-repository.md`
 **Wireframes:** `docs/wireframes/12-study-entry-gate.md` through `docs/wireframes/18-study-result.md`
 **Decision table:** rows S*, BS*, GA*, H3, F4*
-**Code paths:** `lib/domain/usecases/study/**`, `lib/domain/srs/**`
+**Code paths (verified 2026-05-28):** `lib/domain/study/usecases/study_usecases.dart` (canonical owner of all study lifecycle + grading use cases — `StartStudySessionUseCase`, `ResumeStudySessionUseCase`, `RestartStudySessionUseCase`, `AnswerFlashcardUseCase`, `AnswerCurrentModeBatchUseCase`, `AnswerCurrentModeItemGradesBatchUseCase`, `AnswerCurrentMatchModeBatchUseCase`, `SkipFlashcardUseCase`, `CancelStudySessionUseCase`, `FinalizeStudySessionUseCase`, `RetryFinalizeUseCase`); `lib/domain/study/strategy/` (per-flow strategy + mode-skip rules); `lib/data/repositories/study_repo_impl.dart` (+ helpers). The `lib/domain/usecases/study/**` and `lib/domain/srs/**` directories do NOT exist in the current codebase.

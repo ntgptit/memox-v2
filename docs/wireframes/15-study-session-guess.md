@@ -263,12 +263,14 @@ Same as Review mode.
 
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase, `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/tts.md`
 
-**Code paths:**
-- `lib/presentation/features/study/widgets/guess_mode_view.dart`
-- `lib/presentation/features/study/widgets/guess_option_card.dart`
-- `lib/domain/study/distractor_sampler.dart` (back-mode flag for guess)
-- `lib/domain/study/option_description_builder.dart` (note → example → back-truncate fallback chain)
-- `lib/domain/usecases/study/grade_attempt_usecase.dart`
+**Code paths (verified 2026-05-28):**
+
+- Mode view: `lib/presentation/features/study/widgets/study_session/guess/guess_mode_session_view.dart` + `guess_mode_panel.dart`.
+- Option card: `lib/presentation/features/study/widgets/study_session/guess/guess_option_tile.dart` + `guess_option_models.dart`.
+- Distractor sampling: inline in `lib/presentation/features/study/providers/study_session_notifier.dart` (`_studyAnswerOptions` + `distractors.shuffle` + `take(_guessAnswerDistractorLimit)` where `_guessAnswerDistractorLimit = 4`, yielding 5 total options including the correct one). There is **no standalone `distractor_sampler.dart` in `lib/domain/study/`** — sampling lives in the presentation notifier and is a candidate for promotion to domain in a future refactor.
+- Description fallback chain (note → example → back-truncate): no dedicated `option_description_builder.dart` file. Construction happens inline within `guess_option_models.dart`; if the chain becomes more complex, extract to domain.
+- Grading: `lib/domain/study/usecases/study_usecases.dart` → `AnswerFlashcardUseCase`. No standalone `grade_attempt_usecase.dart`.
+- Motion / countdown: `lib/presentation/features/study/widgets/study_session/guess/guess_motion.dart`.
 
 **Related wireframes:**
 - `docs/wireframes/13-study-session-review.md` (shared shell + color family convention)

@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 route: /library/folder/:id
 source_specs:
   - docs/business/folder/folder-management.md
@@ -143,6 +143,7 @@ Browse a folder's children: either subfolders or decks (never both, per `content
 | Deck row (decks mode) | Icon + name + "{n} cards" + optional "{m} due" badge + chevron. |
 | FAB | Plus button. Action depends on mode: New subfolder (subfolders mode), New deck (decks mode), choice both (unlocked mode). |
 | Empty state | When `unlocked` and zero children: show choice layout. |
+| Search + sort toolbar | Renders via shared `MxSearchSortToolbar<ContentSortMode>` (`lib/presentation/shared/widgets/mx_search_sort_toolbar.dart`). Combines inline search field + sort menu chip into a single sticky row above the children list. Same widget instance is also used by other browsing surfaces; do NOT fork it. Sort options come from `ContentSortMode` enum (`lib/domain/enums/content_sort_mode.dart`). |
 
 ## States
 

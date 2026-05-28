@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-28
 applies_to: SRS algorithm, flashcard_progress, review session finalization
 ---
 
@@ -19,7 +19,7 @@ applies_to: SRS algorithm, flashcard_progress, review session finalization
 - `lib/data/**study**`
 - `lib/data/datasources/local/tables/flashcard_progress_table.dart`
 - `lib/data/datasources/local/tables/study_attempts_table.dart`
-- `lib/domain/srs/box_intervals.dart` (interval source)
+- `lib/domain/study/usecases/study_usecases.dart` (canonical owner of box transitions today; the legacy `lib/domain/srs/box_intervals.dart` and `lib/domain/srs/box_transition.dart` files do NOT exist — see drift note at end of file).
 
 ## Data
 
@@ -59,7 +59,7 @@ See `docs/business/glossary.md` for result definitions.
 
 ## Box transition table
 
-This is the authoritative transition contract. Implementation in `lib/domain/srs/box_transition.dart` must match this table.
+This is the authoritative transition contract. Implementation lives in `lib/domain/study/usecases/study_usecases.dart` (within the `Answer*UseCase` family) and must match this table. There is no standalone `box_transition.dart` file at present.
 
 | Current box | Result | Next box | Next due |
 | --- | --- | --- | --- |
@@ -72,7 +72,7 @@ This is the authoritative transition contract. Implementation in `lib/domain/srs
 
 ## Interval table
 
-Intervals are defined in `lib/domain/srs/box_intervals.dart`. Current values:
+Intervals are currently defined inline within the study use-case module (`lib/domain/study/usecases/study_usecases.dart`) where `due_at` is computed. The doc-level table below remains the contract; if a future refactor extracts intervals into a dedicated file (e.g., `lib/domain/srs/box_intervals.dart`), update both this section and the `CLAUDE.md` trigger map in the same commit.
 
 | Box | Interval | Approx | Rationale |
 | --- | --- | --- | --- |
@@ -154,9 +154,13 @@ Any SRS behavior change must update:
 - `docs/business/study-actions/bury-suspend.md` — bury/suspend preserves SRS state (does NOT reset box)
 - `docs/business/flashcard/flashcard-management.md` — reset progress sets box=1, last_reset_at=now
 
-**Source files to inspect:**
-- `lib/domain/srs/box_intervals.dart`
-- `lib/domain/srs/box_transition.dart`
-- `lib/domain/srs/srs_service.dart`
-- `lib/data/repositories/srs_repository.dart`
-- `lib/domain/usecases/study/grade_attempt_usecase.dart`
+**Source files to inspect (verified 2026-05-28):**
+
+- `lib/domain/study/usecases/study_usecases.dart` — owns the grading path (`AnswerFlashcardUseCase`, `AnswerCurrentModeBatchUseCase`, `AnswerCurrentModeItemGradesBatchUseCase`, `AnswerCurrentMatchModeBatchUseCase`). Box transitions and `box_after` calculation live here today.
+- `lib/domain/study/strategy/study_strategy.dart` + `study_mode_strategy.dart` + `study_strategy_factory.dart` — per-mode behavior including transition rules.
+- `lib/domain/study/study_session_round.dart` — round model used by grading flow.
+- `lib/data/datasources/local/tables/study_attempts_table.dart` — persistence of each attempt with `box_before`, `box_after`, `result`, `study_mode`, `attempted_at`.
+- `lib/data/datasources/local/tables/flashcard_progress_table.dart` — per-card SRS state (`current_box`, `lapse_count`, `due_at`, `last_result`, `last_studied_at`).
+- `lib/data/repositories/study_repo_impl.dart` + helpers (`study_repo_impl_helpers.dart`, `study_repo_impl_mapping_helpers.dart`, `study_repo_impl_models.dart`) — write path.
+
+> **Drift note**: earlier revisions of this doc referenced `lib/domain/srs/box_intervals.dart`, `lib/domain/srs/box_transition.dart`, `lib/domain/srs/srs_service.dart`, `lib/data/repositories/srs_repository.dart`, and `lib/domain/usecases/study/grade_attempt_usecase.dart`. **None of those paths exist** in the current codebase (verified by `find lib/domain -name "box_*"` returning empty). SRS logic was consolidated into the study use-case module above. If a future refactor extracts intervals/transitions back into dedicated files, update this list AND `CLAUDE.md` §"Code change → required docs" trigger map together — the trigger map still references the old paths.
