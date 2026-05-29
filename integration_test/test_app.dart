@@ -183,19 +183,20 @@ Size? _parseWindowSize(String value) {
   return Size(width.toDouble(), height.toDouble());
 }
 
-String _formatWindowSize(Size size) => '${size.width.toInt()}x${size.height.toInt()}';
+String _formatWindowSize(Size size) =>
+    '${size.width.toInt()}x${size.height.toInt()}';
 
 AppConfig integrationTestConfig({required String initialLocation}) => AppConfig(
-    env: AppEnv.local,
-    initialLocation: initialLocation,
-    showDebugBanner: false,
-    enableRouterDiagnostics: false,
-    enableTalkerConsoleLogs: false,
-    enableTalkerRouteLogging: false,
-    enableRiverpodDiagnostics: false,
-    exposeInternalErrorDetails: true,
-    googleOAuthConfig: GoogleOAuthConfig.fromValues(),
-  );
+  env: AppEnv.local,
+  initialLocation: initialLocation,
+  showDebugBanner: false,
+  enableRouterDiagnostics: false,
+  enableTalkerConsoleLogs: false,
+  enableTalkerRouteLogging: false,
+  enableRiverpodDiagnostics: false,
+  exposeInternalErrorDetails: true,
+  googleOAuthConfig: GoogleOAuthConfig.fromValues(),
+);
 
 final class IntegrationTestAppHandle {
   IntegrationTestAppHandle._({
@@ -487,40 +488,43 @@ final class IntegrationTestAppHandle {
   }
 
   Future<Folder> findFolderByName(String name) => (database.select(
-      database.folders,
-    )..where((table) => table.name.equals(name))).getSingle();
+    database.folders,
+  )..where((table) => table.name.equals(name))).getSingle();
 
   Future<Folder?> findFolderByNameOrNull(String name) => (database.select(
-      database.folders,
-    )..where((table) => table.name.equals(name))).getSingleOrNull();
+    database.folders,
+  )..where((table) => table.name.equals(name))).getSingleOrNull();
 
   Future<Deck> findDeckByName(String name) => (database.select(
-      database.decks,
-    )..where((table) => table.name.equals(name))).getSingle();
+    database.decks,
+  )..where((table) => table.name.equals(name))).getSingle();
 
   Future<Deck?> findDeckByNameOrNull(String name) => (database.select(
-      database.decks,
-    )..where((table) => table.name.equals(name))).getSingleOrNull();
+    database.decks,
+  )..where((table) => table.name.equals(name))).getSingleOrNull();
 
-  Future<List<Deck>> listDecksInFolder(String folderId) => (database.select(database.decks)
-          ..where((table) => table.folderId.equals(folderId))
-          ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
-        .get();
+  Future<List<Deck>> listDecksInFolder(String folderId) =>
+      (database.select(database.decks)
+            ..where((table) => table.folderId.equals(folderId))
+            ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+          .get();
 
-  Future<List<Flashcard>> listFlashcardsInDeck(String deckId) => (database.select(database.flashcards)
-          ..where((table) => table.deckId.equals(deckId))
-          ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
-        .get();
+  Future<List<Flashcard>> listFlashcardsInDeck(String deckId) =>
+      (database.select(database.flashcards)
+            ..where((table) => table.deckId.equals(deckId))
+            ..orderBy([(table) => OrderingTerm.asc(table.sortOrder)]))
+          .get();
 
-  Future<FlashcardProgressData> findProgressByFlashcardId(String flashcardId) => (database.select(
-      database.flashcardProgress,
-    )..where((table) => table.flashcardId.equals(flashcardId))).getSingle();
+  Future<FlashcardProgressData> findProgressByFlashcardId(String flashcardId) =>
+      (database.select(
+        database.flashcardProgress,
+      )..where((table) => table.flashcardId.equals(flashcardId))).getSingle();
 
   Future<FlashcardProgressData?> findProgressByFlashcardIdOrNull(
     String flashcardId,
-  ) => (database.select(database.flashcardProgress)
-          ..where((table) => table.flashcardId.equals(flashcardId)))
-        .getSingleOrNull();
+  ) => (database.select(
+    database.flashcardProgress,
+  )..where((table) => table.flashcardId.equals(flashcardId))).getSingleOrNull();
 
   Future<List<String>> latestOriginalStudySessionFlashcardIds() async {
     final session =
@@ -550,19 +554,19 @@ final class IntegrationTestAppHandle {
     int? lastStudiedAt,
     int? dueAt,
   }) => database
-        .into(database.flashcardProgress)
-        .insert(
-          FlashcardProgressCompanion.insert(
-            flashcardId: flashcardId,
-            currentBox: currentBox,
-            reviewCount: reviewCount,
-            lapseCount: lapseCount,
-            createdAt: now,
-            updatedAt: now,
-            lastStudiedAt: Value(lastStudiedAt),
-            dueAt: Value(dueAt),
-          ),
-        );
+      .into(database.flashcardProgress)
+      .insert(
+        FlashcardProgressCompanion.insert(
+          flashcardId: flashcardId,
+          currentBox: currentBox,
+          reviewCount: reviewCount,
+          lapseCount: lapseCount,
+          createdAt: now,
+          updatedAt: now,
+          lastStudiedAt: Value(lastStudiedAt),
+          dueAt: Value(dueAt),
+        ),
+      );
 
   Future<void> dispose() async {
     if (_disposed) {
@@ -609,7 +613,8 @@ final class NoopTtsService implements TtsService {
   Stream<TtsState> get state => _stateController.stream;
 
   @override
-  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async => const <TtsVoice>[];
+  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async =>
+      const <TtsVoice>[];
 
   @override
   Future<void> speak(

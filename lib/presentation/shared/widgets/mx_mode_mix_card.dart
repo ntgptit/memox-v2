@@ -6,6 +6,7 @@ import '../../../core/theme/tokens/app_radius.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../../../core/utils/string_utils.dart';
 import '../layouts/mx_gap.dart';
+import 'mx_divider.dart';
 import 'mx_tappable.dart';
 
 /// Hero "Mix" call-to-action card seen on Deck Detail in the Design System.
@@ -120,12 +121,15 @@ class MxModeMixCard extends StatelessWidget {
                   ],
                 ),
                 const MxGap(AppSpacing.sm),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: scheme.outlineVariant.withValues(
-                    alpha: AppOpacity.ghostBorder,
+                DividerTheme(
+                  data: DividerThemeData(
+                    color: scheme.outlineVariant.withValues(
+                      alpha: AppOpacity.ghostBorder,
+                    ),
+                    thickness: 1,
+                    space: 1,
                   ),
+                  child: const MxDivider(),
                 ),
                 const MxGap(AppSpacing.sm),
                 Row(

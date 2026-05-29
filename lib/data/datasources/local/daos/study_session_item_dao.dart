@@ -149,12 +149,13 @@ final class StudySessionItemDao {
   /// [sessionId]. Buried/suspended cards are dropped this way and must be
   /// excluded from later modes and SRS commit.
   Future<Set<String>> listAbandonedFlashcardIds(String sessionId) async {
-    final query = _database.selectOnly(_database.studySessionItems, distinct: true)
-      ..addColumns([_database.studySessionItems.flashcardId])
-      ..where(
-        _database.studySessionItems.sessionId.equals(sessionId) &
-            _database.studySessionItems.status.equals('abandoned'),
-      );
+    final query =
+        _database.selectOnly(_database.studySessionItems, distinct: true)
+          ..addColumns([_database.studySessionItems.flashcardId])
+          ..where(
+            _database.studySessionItems.sessionId.equals(sessionId) &
+                _database.studySessionItems.status.equals('abandoned'),
+          );
     final rows = await query.get();
     return rows
         .map((row) => row.read(_database.studySessionItems.flashcardId))

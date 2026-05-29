@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/repositories/tts_settings_repository.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
@@ -74,12 +75,13 @@ void registerStudySessionScreenTests() {
     );
     await _pumpStudyScreenData(tester);
 
-    expect(find.text('Guess'), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-    expect(find.byIcon(Icons.text_fields), findsOneWidget);
-    expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.more_vert), findsOneWidget);
-    expect(find.text('40%'), findsOneWidget);
+    expect(find.text('GUESS'), findsOneWidget);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('guess-front-speak-card-001')),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
     expect(find.text('front 1'), findsOneWidget);
     expect(find.text('back 1'), findsOneWidget);
     expect(find.text('back 2'), findsOneWidget);
@@ -133,10 +135,10 @@ void registerStudySessionScreenTests() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Review'), findsOneWidget);
-      expect(find.byIcon(Icons.text_fields), findsOneWidget);
+      expect(find.text('REVIEW'), findsAtLeastNWidgets(1));
+      expect(find.byIcon(Icons.close_rounded), findsOneWidget);
       expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.more_vert), findsOneWidget);
+      expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
       expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
       expect(find.text('front 1'), findsOneWidget);
       expect(find.text('back 1'), findsOneWidget);
@@ -247,10 +249,10 @@ void registerStudySessionScreenTests() {
     );
     await _pumpStudyScreenData(tester);
 
-    expect(find.text('Match'), findsOneWidget);
-    expect(find.byIcon(Icons.text_fields), findsOneWidget);
+    expect(find.text('MATCH'), findsOneWidget);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
     expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
     expect(find.text('20%'), findsOneWidget);
     expect(
       find.byKey(const ValueKey<String>('match-front-speak-item-001')),
@@ -485,11 +487,10 @@ void registerStudySessionScreenTests() {
       ),
     );
 
-    expect(find.text('Recall'), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-    expect(find.byIcon(Icons.text_fields), findsOneWidget);
+    expect(find.text('RECALL'), findsOneWidget);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
     expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
     expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
     expect(find.text('60%'), findsOneWidget);
     expect(frontText.textAlign, TextAlign.center);
@@ -498,7 +499,7 @@ void registerStudySessionScreenTests() {
       findsOneWidget,
     );
     expect(find.byType(ImageFiltered), findsOneWidget);
-    expect(find.text('Show (20s)'), findsOneWidget);
+    expect(find.textContaining('Show'), findsOneWidget);
     expect(find.text('Forgot'), findsNothing);
     expect(find.text('Remembered'), findsNothing);
     expect(find.text('Correct'), findsNothing);
@@ -528,11 +529,10 @@ void registerStudySessionScreenTests() {
     );
     final inputTextField = tester.widget<TextField>(find.byType(TextField));
 
-    expect(find.text('Fill'), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-    expect(find.byIcon(Icons.text_fields), findsOneWidget);
+    expect(find.text('FILL'), findsOneWidget);
+    expect(find.byIcon(Icons.close_rounded), findsOneWidget);
     expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
     expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
     expect(find.text('80%'), findsOneWidget);
     expect(find.text('back 1'), findsOneWidget);
@@ -615,7 +615,7 @@ void registerStudySessionScreenTests() {
       );
       await _pumpStudyScreenData(tester);
 
-      expect(find.text('Fill'), findsOneWidget);
+      expect(find.text('FILL'), findsOneWidget);
       expect(find.byTooltip('Cancel'), findsOneWidget);
 
       await tester.tap(find.byTooltip('Cancel'));
@@ -1023,7 +1023,7 @@ void registerStudySessionScreenTests() {
     );
     await _pumpStudyScreenData(tester);
 
-    await tester.tap(find.text('Show (20s)'));
+    await tester.tap(find.textContaining('Show').first);
     await _pumpRecallRevealTransition(tester);
 
     final answerText = tester.widget<Text>(
@@ -1046,7 +1046,7 @@ void registerStudySessionScreenTests() {
     );
     expect(find.text('Forgot'), findsOneWidget);
     expect(find.text('Remembered'), findsOneWidget);
-    expect(find.text('Show (20s)'), findsNothing);
+    expect(find.textContaining('Show'), findsNothing);
     expect(answerText.maxLines, isNull);
     expect(repo.itemAnswerCount, 0);
   });
@@ -1071,7 +1071,7 @@ void registerStudySessionScreenTests() {
     );
     await _pumpStudyScreenData(tester);
 
-    await tester.tap(find.text('Show (20s)'));
+    await tester.tap(find.textContaining('Show').first);
     await _pumpRecallRevealTransition(tester);
     await tester.tap(find.text('Forgot'));
     await tester.pump();
@@ -1104,7 +1104,7 @@ void registerStudySessionScreenTests() {
     );
     await _pumpStudyScreenData(tester);
 
-    await tester.tap(find.text('Show (20s)'));
+    await tester.tap(find.textContaining('Show').first);
     await _pumpRecallRevealTransition(tester);
     await tester.tap(find.text('Remembered'));
     await tester.pump();
@@ -1134,7 +1134,7 @@ void registerStudySessionScreenTests() {
     );
     await _pumpStudyScreenData(tester);
 
-    await tester.tap(find.text('Show (20s)'));
+    await tester.tap(find.textContaining('Show').first);
     await _pumpRecallRevealTransition(tester);
     expect(find.text('Forgot'), findsOneWidget);
 
@@ -1152,7 +1152,7 @@ void registerStudySessionScreenTests() {
       find.byKey(const ValueKey<String>('recall-answer-hidden')),
       findsAtLeastNWidgets(1),
     );
-    expect(find.text('Show (20s)'), findsOneWidget);
+    expect(find.textContaining('Show'), findsOneWidget);
     expect(find.text('Forgot'), findsNothing);
     expect(find.text('Remembered'), findsNothing);
   });
@@ -1184,7 +1184,7 @@ void registerStudySessionScreenTests() {
     );
     await _pumpStudyScreenData(tester);
 
-    await tester.tap(find.text('Show (20s)'));
+    await tester.tap(find.textContaining('Show').first);
     await _pumpRecallRevealTransition(tester);
     await tester.tap(find.text('Remembered'));
     await tester.pump();
@@ -1296,7 +1296,7 @@ void registerStudySessionScreenTests() {
       );
       await _pumpStudyScreenData(tester);
 
-      await tester.tap(find.text('Show (20s)'));
+      await tester.tap(find.textContaining('Show').first);
       await _pumpRecallRevealTransition(tester);
       await tester.tap(find.text('Remembered'));
       await tester.pump();
@@ -1304,7 +1304,7 @@ void registerStudySessionScreenTests() {
       expect(find.text('front 2'), findsOneWidget);
       expect(repo.modeItemBatchAnswerCount, 0);
 
-      await tester.tap(find.text('Show (20s)'));
+      await tester.tap(find.textContaining('Show').first);
       await _pumpRecallRevealTransition(tester);
       await tester.tap(find.text('Forgot'));
       await tester.pump();
@@ -1782,40 +1782,40 @@ final _terminalSnapshot = StudySessionSnapshot(
 );
 
 StudySession _session(SessionStatus status) => StudySession(
-    id: 'session-001',
-    entryType: StudyEntryType.deck,
-    entryRefId: 'deck-001',
-    studyType: StudyType.srsReview,
-    studyFlow: StudyFlow.srsFillReview,
-    settings: const StudySettingsSnapshot(
-      batchSize: 2,
-      shuffleFlashcards: false,
-      shuffleAnswers: false,
-      prioritizeOverdue: true,
-    ),
-    status: status,
-    startedAt: 0,
-    endedAt: status == SessionStatus.inProgress ? null : 1,
-    restartedFromSessionId: null,
-  );
+  id: 'session-001',
+  entryType: StudyEntryType.deck,
+  entryRefId: 'deck-001',
+  studyType: StudyType.srsReview,
+  studyFlow: StudyFlow.srsFillReview,
+  settings: const StudySettingsSnapshot(
+    batchSize: 2,
+    shuffleFlashcards: false,
+    shuffleAnswers: false,
+    prioritizeOverdue: true,
+  ),
+  status: status,
+  startedAt: 0,
+  endedAt: status == SessionStatus.inProgress ? null : 1,
+  restartedFromSessionId: null,
+);
 
 StudySession _newStudySession(SessionStatus status) => StudySession(
-    id: 'session-001',
-    entryType: StudyEntryType.deck,
-    entryRefId: 'deck-001',
-    studyType: StudyType.newStudy,
-    studyFlow: StudyFlow.newFullCycle,
-    settings: const StudySettingsSnapshot(
-      batchSize: 2,
-      shuffleFlashcards: false,
-      shuffleAnswers: false,
-      prioritizeOverdue: true,
-    ),
-    status: status,
-    startedAt: 0,
-    endedAt: status == SessionStatus.inProgress ? null : 1,
-    restartedFromSessionId: null,
-  );
+  id: 'session-001',
+  entryType: StudyEntryType.deck,
+  entryRefId: 'deck-001',
+  studyType: StudyType.newStudy,
+  studyFlow: StudyFlow.newFullCycle,
+  settings: const StudySettingsSnapshot(
+    batchSize: 2,
+    shuffleFlashcards: false,
+    shuffleAnswers: false,
+    prioritizeOverdue: true,
+  ),
+  status: status,
+  startedAt: 0,
+  endedAt: status == SessionStatus.inProgress ? null : 1,
+  restartedFromSessionId: null,
+);
 
 StudySessionSnapshot _guessSnapshotFor(List<StudyFlashcardRef> cards) {
   final current = cards.first;
@@ -2031,12 +2031,12 @@ StudyFlashcardRef _card({
   required String front,
   required String back,
 }) => StudyFlashcardRef(
-    id: id,
-    deckId: 'deck-001',
-    front: front,
-    back: back,
-    sourcePool: SessionItemSourcePool.due,
-  );
+  id: id,
+  deckId: 'deck-001',
+  front: front,
+  back: back,
+  sourcePool: SessionItemSourcePool.due,
+);
 
 Future<void> _pumpStudyScreenData(WidgetTester tester) async {
   await tester.pump();
@@ -2107,38 +2107,41 @@ void _pressFillAction(WidgetTester tester, String key) {
 }
 
 Future<void> _tapGuessOption(WidgetTester tester, String cardId) => tester.tap(
-    find.byKey(ValueKey<String>('guess-option-$cardId')),
-    warnIfMissed: false,
-  );
+  find.byKey(ValueKey<String>('guess-option-$cardId')),
+  warnIfMissed: false,
+);
 
-Future<void> _tapMatchTile(WidgetTester tester, String key) => tester.tap(find.byKey(ValueKey<String>(key)), warnIfMissed: false);
+Future<void> _tapMatchTile(WidgetTester tester, String key) =>
+    tester.tap(find.byKey(ValueKey<String>(key)), warnIfMissed: false);
 
-MxCard _cardForKey(WidgetTester tester, String key) => tester.widget<MxCard>(_cardFinderForKey(key));
+MxCard _cardForKey(WidgetTester tester, String key) =>
+    tester.widget<MxCard>(_cardFinderForKey(key));
 
-double _cardHeightForKey(WidgetTester tester, String key) => tester.getSize(_cardFinderForKey(key)).height;
+double _cardHeightForKey(WidgetTester tester, String key) =>
+    tester.getSize(_cardFinderForKey(key)).height;
 
 Finder _cardFinderForKey(String key) => find.descendant(
-    of: find.byKey(ValueKey<String>(key)),
-    matching: find.byType(MxCard),
-  );
+  of: find.byKey(ValueKey<String>(key)),
+  matching: find.byType(MxCard),
+);
 
 double _matchTileOpacity(WidgetTester tester, String key) => tester
-      .widget<AnimatedOpacity>(
-        find.descendant(
-          of: find.byKey(ValueKey<String>(key)),
-          matching: find.byType(AnimatedOpacity),
-        ),
-      )
-      .opacity;
+    .widget<AnimatedOpacity>(
+      find.descendant(
+        of: find.byKey(ValueKey<String>(key)),
+        matching: find.byType(AnimatedOpacity),
+      ),
+    )
+    .opacity;
 
 double _matchTileHeight(WidgetTester tester, String key) => tester
-      .getSize(
-        find.descendant(
-          of: find.byKey(ValueKey<String>(key)),
-          matching: find.byType(MxCard),
-        ),
-      )
-      .height;
+    .getSize(
+      find.descendant(
+        of: find.byKey(ValueKey<String>(key)),
+        matching: find.byType(MxCard),
+      ),
+    )
+    .height;
 
 Future<void> _completeMatchPair(WidgetTester tester, int index) async {
   final itemId = _matchItemId(index);
@@ -2264,7 +2267,8 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) => Future.value(sessionSnapshot);
+  Future<StudySessionSnapshot> loadSession(String sessionId) =>
+      Future.value(sessionSnapshot);
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({
@@ -2319,13 +2323,26 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: ProviderScope(
-        overrides: [ttsServiceProvider.overrideWithValue(_defaultTtsService)],
-        child: child,
-      ),
-    );
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: ProviderScope(
+      overrides: [
+        ttsServiceProvider.overrideWithValue(_defaultTtsService),
+        ttsSettingsRepositoryProvider.overrideWith(
+          (ref) async => _NoopStudyTtsSettingsRepository(),
+        ),
+      ],
+      child: child,
+    ),
+  );
+}
+
+final class _NoopStudyTtsSettingsRepository implements TtsSettingsRepository {
+  @override
+  Future<TtsSettings> load() async => TtsSettings.defaults;
+
+  @override
+  Future<void> save(TtsSettings settings) async {}
 }
 
 final class _NoopStudyTtsService implements TtsService {
@@ -2333,7 +2350,8 @@ final class _NoopStudyTtsService implements TtsService {
   Stream<TtsState> get state => const Stream<TtsState>.empty();
 
   @override
-  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async => const <TtsVoice>[];
+  Future<List<TtsVoice>> availableVoices(TtsLanguage language) async =>
+      const <TtsVoice>[];
 
   @override
   Future<void> speak(

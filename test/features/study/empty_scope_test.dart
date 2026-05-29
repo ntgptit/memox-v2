@@ -9,13 +9,14 @@ import 'package:memox/domain/study/usecases/study_usecases.dart';
 
 void main() {
   group('P0-1 Tier 1: empty-scope matrix', () {
-    StartStudySessionUseCase useCaseFor(StudyRepo repo) => StartStudySessionUseCase(
-      repository: repo,
-      strategyFactory: StudyFlowStrategyFactory(const <StudyFlowStrategy>[
-        NewStudyStrategy(),
-        SrsReviewStrategy(),
-      ]),
-    );
+    StartStudySessionUseCase useCaseFor(StudyRepo repo) =>
+        StartStudySessionUseCase(
+          repository: repo,
+          strategyFactory: StudyFlowStrategyFactory(const <StudyFlowStrategy>[
+            NewStudyStrategy(),
+            SrsReviewStrategy(),
+          ]),
+        );
 
     Matcher throwsEmptyScope(EmptyScopeReason reason) => throwsA(
       isA<EmptyScopeException>().having(
@@ -67,35 +68,32 @@ void main() {
       },
     );
 
-    test(
-      'S4e: deck (srs_review) with cards but none due throws '
-      'EmptyScopeException(deckNoDueCards) carrying nextDueAt',
-      () async {
-        final nextDue = DateTime.utc(2026, 5, 1, 9);
-        final repo = _FakeStudyRepo(
-          deckCount: 4,
-          dueCount: 0,
-          next: nextDue,
-        );
+    test('S4e: deck (srs_review) with cards but none due throws '
+        'EmptyScopeException(deckNoDueCards) carrying nextDueAt', () async {
+      final nextDue = DateTime.utc(2026, 5, 1, 9);
+      final repo = _FakeStudyRepo(deckCount: 4, dueCount: 0, next: nextDue);
 
-        await expectLater(
-          useCaseFor(repo).execute(
-            const StudyContext(
-              entryType: StudyEntryType.deck,
-              entryRefId: 'deck-no-due',
-              studyType: StudyType.srsReview,
-              settings: _testSettings,
-            ),
+      await expectLater(
+        useCaseFor(repo).execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-no-due',
+            studyType: StudyType.srsReview,
+            settings: _testSettings,
           ),
-          throwsA(
-            isA<EmptyScopeException>()
-                .having((e) => e.reason, 'reason', EmptyScopeReason.deckNoDueCards)
-                .having((e) => e.nextDueAt, 'nextDueAt', nextDue),
-          ),
-        );
-        expect(repo.startSessionCalled, isFalse);
-      },
-    );
+        ),
+        throwsA(
+          isA<EmptyScopeException>()
+              .having(
+                (e) => e.reason,
+                'reason',
+                EmptyScopeReason.deckNoDueCards,
+              )
+              .having((e) => e.nextDueAt, 'nextDueAt', nextDue),
+        ),
+      );
+      expect(repo.startSessionCalled, isFalse);
+    });
 
     test(
       'S4e (negative): deck (srs_review) with due cards routes past the guard',
@@ -116,143 +114,121 @@ void main() {
       },
     );
 
-    test(
-      'S4b: folder whose subtree has zero cards throws '
-      'EmptyScopeException(folderNoCards)',
-      () async {
-        final repo = _FakeStudyRepo(scopeCount: 0);
+    test('S4b: folder whose subtree has zero cards throws '
+        'EmptyScopeException(folderNoCards)', () async {
+      final repo = _FakeStudyRepo(scopeCount: 0);
 
-        await expectLater(
-          useCaseFor(repo).execute(
-            const StudyContext(
-              entryType: StudyEntryType.folder,
-              entryRefId: 'folder-empty',
-              studyType: StudyType.newStudy,
-              settings: _testSettings,
-            ),
+      await expectLater(
+        useCaseFor(repo).execute(
+          const StudyContext(
+            entryType: StudyEntryType.folder,
+            entryRefId: 'folder-empty',
+            studyType: StudyType.newStudy,
+            settings: _testSettings,
           ),
-          throwsEmptyScope(EmptyScopeReason.folderNoCards),
-        );
-        expect(repo.startSessionCalled, isFalse);
-      },
-    );
+        ),
+        throwsEmptyScope(EmptyScopeReason.folderNoCards),
+      );
+      expect(repo.startSessionCalled, isFalse);
+    });
 
-    test(
-      'S4j: folder (srs_review) with cards but none due throws '
-      'EmptyScopeException(folderNoDueCards) carrying nextDueAt',
-      () async {
-        final nextDue = DateTime.utc(2026, 5, 2, 9);
-        final repo = _FakeStudyRepo(
-          scopeCount: 6,
-          dueCount: 0,
-          next: nextDue,
-        );
+    test('S4j: folder (srs_review) with cards but none due throws '
+        'EmptyScopeException(folderNoDueCards) carrying nextDueAt', () async {
+      final nextDue = DateTime.utc(2026, 5, 2, 9);
+      final repo = _FakeStudyRepo(scopeCount: 6, dueCount: 0, next: nextDue);
 
-        await expectLater(
-          useCaseFor(repo).execute(
-            const StudyContext(
-              entryType: StudyEntryType.folder,
-              entryRefId: 'folder-no-due',
-              studyType: StudyType.srsReview,
-              settings: _testSettings,
-            ),
+      await expectLater(
+        useCaseFor(repo).execute(
+          const StudyContext(
+            entryType: StudyEntryType.folder,
+            entryRefId: 'folder-no-due',
+            studyType: StudyType.srsReview,
+            settings: _testSettings,
           ),
-          throwsA(
-            isA<EmptyScopeException>()
-                .having(
-                  (e) => e.reason,
-                  'reason',
-                  EmptyScopeReason.folderNoDueCards,
-                )
-                .having((e) => e.nextDueAt, 'nextDueAt', nextDue),
+        ),
+        throwsA(
+          isA<EmptyScopeException>()
+              .having(
+                (e) => e.reason,
+                'reason',
+                EmptyScopeReason.folderNoDueCards,
+              )
+              .having((e) => e.nextDueAt, 'nextDueAt', nextDue),
+        ),
+      );
+    });
+
+    test('S4c: today (srs_review) with cards but none due throws '
+        'EmptyScopeException(todayAllDone)', () async {
+      final repo = _FakeStudyRepo(scopeCount: 9, dueCount: 0);
+
+      await expectLater(
+        useCaseFor(repo).execute(
+          const StudyContext(
+            entryType: StudyEntryType.today,
+            entryRefId: null,
+            studyType: StudyType.srsReview,
+            settings: _testSettings,
           ),
-        );
-      },
-    );
+        ),
+        throwsEmptyScope(EmptyScopeReason.todayAllDone),
+      );
+      expect(repo.startSessionCalled, isFalse);
+    });
 
-    test(
-      'S4c: today (srs_review) with cards but none due throws '
-      'EmptyScopeException(todayAllDone)',
-      () async {
-        final repo = _FakeStudyRepo(scopeCount: 9, dueCount: 0);
+    test('S4d: today (srs_review) with zero cards anywhere throws '
+        'EmptyScopeException(todayNoContent)', () async {
+      final repo = _FakeStudyRepo(scopeCount: 0);
 
-        await expectLater(
-          useCaseFor(repo).execute(
-            const StudyContext(
-              entryType: StudyEntryType.today,
-              entryRefId: null,
-              studyType: StudyType.srsReview,
-              settings: _testSettings,
-            ),
+      await expectLater(
+        useCaseFor(repo).execute(
+          const StudyContext(
+            entryType: StudyEntryType.today,
+            entryRefId: null,
+            studyType: StudyType.srsReview,
+            settings: _testSettings,
           ),
-          throwsEmptyScope(EmptyScopeReason.todayAllDone),
-        );
-        expect(repo.startSessionCalled, isFalse);
-      },
-    );
+        ),
+        throwsEmptyScope(EmptyScopeReason.todayNoContent),
+      );
+      expect(repo.startSessionCalled, isFalse);
+    });
 
-    test(
-      'S4d: today (srs_review) with zero cards anywhere throws '
-      'EmptyScopeException(todayNoContent)',
-      () async {
-        final repo = _FakeStudyRepo(scopeCount: 0);
+    test('S4f: deck whose every card is buried throws '
+        'EmptyScopeException(allBuried)', () async {
+      final repo = _FakeStudyRepo(deckCount: 3, activeBuriedCount: 3);
 
-        await expectLater(
-          useCaseFor(repo).execute(
-            const StudyContext(
-              entryType: StudyEntryType.today,
-              entryRefId: null,
-              studyType: StudyType.srsReview,
-              settings: _testSettings,
-            ),
+      await expectLater(
+        useCaseFor(repo).execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-buried',
+            studyType: StudyType.srsReview,
+            settings: _testSettings,
           ),
-          throwsEmptyScope(EmptyScopeReason.todayNoContent),
-        );
-        expect(repo.startSessionCalled, isFalse);
-      },
-    );
+        ),
+        throwsEmptyScope(EmptyScopeReason.allBuried),
+      );
+      expect(repo.startSessionCalled, isFalse);
+    });
 
-    test(
-      'S4f: deck whose every card is buried throws '
-      'EmptyScopeException(allBuried)',
-      () async {
-        final repo = _FakeStudyRepo(deckCount: 3, activeBuriedCount: 3);
+    test('S4g: deck whose every card is suspended throws '
+        'EmptyScopeException(allSuspended)', () async {
+      final repo = _FakeStudyRepo(deckCount: 3, suspendedCount: 3);
 
-        await expectLater(
-          useCaseFor(repo).execute(
-            const StudyContext(
-              entryType: StudyEntryType.deck,
-              entryRefId: 'deck-buried',
-              studyType: StudyType.srsReview,
-              settings: _testSettings,
-            ),
+      await expectLater(
+        useCaseFor(repo).execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-suspended',
+            studyType: StudyType.srsReview,
+            settings: _testSettings,
           ),
-          throwsEmptyScope(EmptyScopeReason.allBuried),
-        );
-        expect(repo.startSessionCalled, isFalse);
-      },
-    );
-
-    test(
-      'S4g: deck whose every card is suspended throws '
-      'EmptyScopeException(allSuspended)',
-      () async {
-        final repo = _FakeStudyRepo(deckCount: 3, suspendedCount: 3);
-
-        await expectLater(
-          useCaseFor(repo).execute(
-            const StudyContext(
-              entryType: StudyEntryType.deck,
-              entryRefId: 'deck-suspended',
-              studyType: StudyType.srsReview,
-              settings: _testSettings,
-            ),
-          ),
-          throwsEmptyScope(EmptyScopeReason.allSuspended),
-        );
-        expect(repo.startSessionCalled, isFalse);
-      },
-    );
+        ),
+        throwsEmptyScope(EmptyScopeReason.allSuspended),
+      );
+      expect(repo.startSessionCalled, isFalse);
+    });
 
     test(
       'allSuspended takes precedence over allBuried when some cards are buried '

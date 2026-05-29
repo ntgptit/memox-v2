@@ -72,7 +72,10 @@ final class StudyRepoImpl implements StudyRepo {
 
   @override
   Future<int> countDueCardsInScope(StudyContext context) =>
-      _countDueCardsInScope(context, endOfTodayEpochMillis: _endOfTodayEpochMillis());
+      _countDueCardsInScope(
+        context,
+        endOfTodayEpochMillis: _endOfTodayEpochMillis(),
+      );
 
   @override
   Future<DateTime?> nextDueAt(StudyContext context) =>
@@ -116,7 +119,10 @@ final class StudyRepoImpl implements StudyRepo {
 
   @override
   Future<int> countActiveBuriedInScope(StudyContext context) =>
-      _countActiveBuriedInScope(context, nowEpochMillis: _clock.nowEpochMillis());
+      _countActiveBuriedInScope(
+        context,
+        nowEpochMillis: _clock.nowEpochMillis(),
+      );
 
   @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {

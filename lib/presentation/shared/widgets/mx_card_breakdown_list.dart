@@ -4,6 +4,7 @@ import '../../../core/theme/tokens/app_opacity.dart';
 import '../../../core/theme/tokens/app_spacing.dart';
 import '../layouts/mx_gap.dart';
 import 'mx_card.dart';
+import 'mx_divider.dart';
 
 /// A single status row in [MxCardBreakdownList].
 class MxCardBreakdownEntry {
@@ -85,7 +86,14 @@ class MxCardBreakdownList extends StatelessWidget {
               ),
             ),
             if (i < entries.length - 1)
-              Divider(height: 1, thickness: 1, color: dividerColor),
+              DividerTheme(
+                data: DividerThemeData(
+                  color: dividerColor,
+                  thickness: 1,
+                  space: 1,
+                ),
+                child: const MxDivider(),
+              ),
           ],
         ],
       ),

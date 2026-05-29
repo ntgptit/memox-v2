@@ -65,12 +65,8 @@ final class FlashcardExportWriter {
       ..addFile(_archiveFile('[Content_Types].xml', _contentTypesXml()))
       ..addFile(_archiveFile('_rels/.rels', _rootRelsXml()))
       ..addFile(_archiveFile('xl/workbook.xml', _workbookXml()))
-      ..addFile(
-        _archiveFile('xl/_rels/workbook.xml.rels', _workbookRelsXml()),
-      )
-      ..addFile(
-        _archiveFile('xl/worksheets/sheet1.xml', _sheetXml(rows)),
-      );
+      ..addFile(_archiveFile('xl/_rels/workbook.xml.rels', _workbookRelsXml()))
+      ..addFile(_archiveFile('xl/worksheets/sheet1.xml', _sheetXml(rows)));
     return Uint8List.fromList(ZipEncoder().encode(archive));
   }
 
@@ -117,7 +113,8 @@ final class FlashcardExportWriter {
       '</Relationships>';
 
   static String _sheetXml(List<FlashcardExportRow> rows) {
-    final builder = XmlBuilder()..processing('xml', 'version="1.0" encoding="UTF-8" standalone="yes"');
+    final builder = XmlBuilder()
+      ..processing('xml', 'version="1.0" encoding="UTF-8" standalone="yes"');
     builder.element(
       'worksheet',
       attributes: {
@@ -127,18 +124,18 @@ final class FlashcardExportWriter {
         builder.element(
           'sheetData',
           nest: () {
-            _writeRow(builder, rowIndex: 1, cells: [
-              _headerFront,
-              _headerBack,
-              _headerNote,
-            ]);
+            _writeRow(
+              builder,
+              rowIndex: 1,
+              cells: [_headerFront, _headerBack, _headerNote],
+            );
             for (var i = 0; i < rows.length; i++) {
               final row = rows[i];
-              _writeRow(builder, rowIndex: i + 2, cells: [
-                row.front,
-                row.back,
-                row.note ?? '',
-              ]);
+              _writeRow(
+                builder,
+                rowIndex: i + 2,
+                cells: [row.front, row.back, row.note ?? ''],
+              );
             }
           },
         );
@@ -159,10 +156,7 @@ final class FlashcardExportWriter {
         for (var c = 0; c < cells.length; c++) {
           builder.element(
             'c',
-            attributes: {
-              'r': '${_columnLetter(c)}$rowIndex',
-              't': 'inlineStr',
-            },
+            attributes: {'r': '${_columnLetter(c)}$rowIndex', 't': 'inlineStr'},
             nest: () {
               builder.element(
                 'is',

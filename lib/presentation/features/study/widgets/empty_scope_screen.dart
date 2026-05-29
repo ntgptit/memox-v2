@@ -110,20 +110,23 @@ class EmptyScopeScreen extends StatelessWidget {
       title: l10n.studyEmpty_folder_noCards_title,
       actionLabel: l10n.studyEmpty_folder_noCards_cta,
       actionLeadingIcon: Icons.add,
-      onAction: folderId == null ? null : () => context.goFolderDetail(folderId),
+      onAction: folderId == null
+          ? null
+          : () => context.goFolderDetail(folderId),
     );
   }
 
-  Widget _allBuried(BuildContext context, AppLocalizations l10n) => MxEmptyState(
-    icon: Icons.bedtime_outlined,
-    title: l10n.studyEmpty_allBuried_title,
-    message: l10n.studyEmpty_allBuried_message,
-    actionLabel: l10n.studyEmpty_allBuried_cta,
-    actionLeadingIcon: Icons.school_outlined,
-    onAction: entryRefId == null
-        ? () => context.goHome()
-        : () => _studyNewInstead(context),
-  );
+  Widget _allBuried(BuildContext context, AppLocalizations l10n) =>
+      MxEmptyState(
+        icon: Icons.bedtime_outlined,
+        title: l10n.studyEmpty_allBuried_title,
+        message: l10n.studyEmpty_allBuried_message,
+        actionLabel: l10n.studyEmpty_allBuried_cta,
+        actionLeadingIcon: Icons.school_outlined,
+        onAction: entryRefId == null
+            ? () => context.goHome()
+            : () => _studyNewInstead(context),
+      );
 
   Widget _allSuspended(BuildContext context, AppLocalizations l10n) =>
       MxEmptyState(

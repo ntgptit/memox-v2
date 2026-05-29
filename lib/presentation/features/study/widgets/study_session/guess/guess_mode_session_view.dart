@@ -110,7 +110,7 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
       onCancel: widget.onCancel,
       onBack: widget.onBack,
       onCardActions: widget.onCardActions,
-  child: Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           StudyAutoSpeakEffect(

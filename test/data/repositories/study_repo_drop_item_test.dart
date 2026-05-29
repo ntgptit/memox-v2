@@ -49,7 +49,9 @@ void main() {
   );
 
   Future<void> seedCard(String id) async {
-    await database.into(database.flashcards).insert(
+    await database
+        .into(database.flashcards)
+        .insert(
           FlashcardsCompanion.insert(
             id: id,
             deckId: 'deck-1',
@@ -60,7 +62,9 @@ void main() {
             updatedAt: now.millisecondsSinceEpoch,
           ),
         );
-    await database.into(database.flashcardProgress).insert(
+    await database
+        .into(database.flashcardProgress)
+        .insert(
           FlashcardProgressCompanion.insert(
             flashcardId: id,
             currentBox: 2,
@@ -82,7 +86,9 @@ void main() {
   );
 
   Future<void> seedDeck() async {
-    await database.into(database.folders).insert(
+    await database
+        .into(database.folders)
+        .insert(
           FoldersCompanion.insert(
             id: 'folder-1',
             name: 'F',
@@ -92,7 +98,9 @@ void main() {
             updatedAt: now.millisecondsSinceEpoch,
           ),
         );
-    await database.into(database.decks).insert(
+    await database
+        .into(database.decks)
+        .insert(
           DecksCompanion.insert(
             id: 'deck-1',
             folderId: 'folder-1',
@@ -160,9 +168,9 @@ void main() {
       modes: const <StudyMode>[StudyMode.fill],
     );
 
-    final attempts = await StudyAttemptDao(database).listAttempts(
-      started.session.id,
-    );
+    final attempts = await StudyAttemptDao(
+      database,
+    ).listAttempts(started.session.id);
     expect(attempts, isEmpty);
   });
 

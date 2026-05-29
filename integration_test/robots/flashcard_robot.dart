@@ -385,19 +385,19 @@ final class FlashcardRobot extends MemoxRobot {
   }
 
   Finder _rowText(String text) => find.descendant(
-      of: find.byType(FlashcardDetailCardRow),
-      matching: find.text(text),
-    );
+    of: find.byType(FlashcardDetailCardRow),
+    matching: find.text(text),
+  );
 
-  Finder _termRow(String term) => find.ancestor(of: find.text(term), matching: find.byType(MxTermRow));
+  Finder _termRow(String term) =>
+      find.ancestor(of: find.text(term), matching: find.byType(MxTermRow));
 
   Finder _verticalScrollable() => find
-        .byWidgetPredicate(
-          (widget) =>
-              widget is Scrollable &&
-              widget.axisDirection == AxisDirection.down,
-        )
-        .first;
+      .byWidgetPredicate(
+        (widget) =>
+            widget is Scrollable && widget.axisDirection == AxisDirection.down,
+      )
+      .first;
 
   Offset _dragHandleCenterFor(Rect rowRect) {
     final handles = find.byIcon(Icons.drag_handle);

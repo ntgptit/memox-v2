@@ -27,7 +27,8 @@ void main() {
           ),
         ),
         GoRoute(
-          path: '/study/:${RoutePaths.studyEntryTypeParam}/'
+          path:
+              '/study/:${RoutePaths.studyEntryTypeParam}/'
               ':${RoutePaths.studyEntryRefIdParam}',
           name: RouteNames.studyEntry,
           builder: (_, state) => Text(
@@ -91,28 +92,29 @@ void main() {
     expect(find.text('Create deck-1'), findsOneWidget);
   });
 
-  testWidgets('deckNoDueCards shows next-due hint and "Study new instead" CTA', (
-    tester,
-  ) async {
-    await pumpScreen(
-      tester,
-      failure: EmptyScopeException(
-        EmptyScopeReason.deckNoDueCards,
-        // Margin past the 3-day boundary so Duration.inDays does not truncate
-        // to 2 between constructing nextDueAt and the widget reading now().
-        nextDueAt: DateTime.now().add(const Duration(days: 3, hours: 6)),
-      ),
-      entryType: 'deck',
-      entryRefId: 'deck-1',
-    );
+  testWidgets(
+    'deckNoDueCards shows next-due hint and "Study new instead" CTA',
+    (tester) async {
+      await pumpScreen(
+        tester,
+        failure: EmptyScopeException(
+          EmptyScopeReason.deckNoDueCards,
+          // Margin past the 3-day boundary so Duration.inDays does not truncate
+          // to 2 between constructing nextDueAt and the widget reading now().
+          nextDueAt: DateTime.now().add(const Duration(days: 3, hours: 6)),
+        ),
+        entryType: 'deck',
+        entryRefId: 'deck-1',
+      );
 
-    expect(find.text('All caught up'), findsOneWidget);
-    expect(find.textContaining('Next due in 3 days'), findsOneWidget);
+      expect(find.text('All caught up'), findsOneWidget);
+      expect(find.textContaining('Next due in 3 days'), findsOneWidget);
 
-    await tester.tap(find.text('Study new instead'));
-    await tester.pumpAndSettle();
-    expect(find.text('Entry deck/deck-1'), findsOneWidget);
-  });
+      await tester.tap(find.text('Study new instead'));
+      await tester.pumpAndSettle();
+      expect(find.text('Entry deck/deck-1'), findsOneWidget);
+    },
+  );
 
   testWidgets('deckNoDueCards omits subtitle when no future due exists', (
     tester,

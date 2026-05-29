@@ -14,10 +14,8 @@ abstract final class MxActionErrors {
 
   /// Pull the [AppFailure] out of an action state, or `null` when the state
   /// is not an error (or the error is not an [AppFailure]).
-  static AppFailure? failureOf(AsyncValue<void> actionState) =>
-      actionState.whenOrNull(
-        error: (error, _) => error is AppFailure ? error : null,
-      );
+  static AppFailure? failureOf(AsyncValue<void> actionState) => actionState
+      .whenOrNull(error: (error, _) => error is AppFailure ? error : null);
 
   /// Map an [AppFailure] to a user-facing message. Validation failures take
   /// precedence so the field-specific message reaches the user instead of the

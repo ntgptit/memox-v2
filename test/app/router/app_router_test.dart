@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/account_providers.dart';
+import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/di/sync_providers.dart';
 import 'package:memox/app/router/app_router.dart';
 import 'package:memox/app/router/route_guards.dart';
@@ -11,6 +12,7 @@ import 'package:memox/domain/entities/drive_sync_models.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/repositories/drive_sync_repository.dart';
 import 'package:memox/domain/services/google_account_auth_service.dart';
+import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/deck_import_screen.dart';
@@ -18,10 +20,13 @@ import 'package:memox/presentation/features/settings/screens/account_settings_sc
 import 'package:memox/presentation/features/settings/screens/audio_speech_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/learning_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/settings_screen.dart';
+import 'package:memox/presentation/features/settings/viewmodels/account_settings_viewmodel.dart';
+import 'package:memox/presentation/features/settings/viewmodels/study_settings_defaults_viewmodel.dart';
 import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_entry_screen.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
+import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -72,7 +77,8 @@ void main() {
     tester,
   ) async {
     await _pumpRoute(tester, '/settings');
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.byType(SettingsScreen), findsOneWidget);
     expect(find.byType(NavigationRail), findsOneWidget);
@@ -128,6 +134,14 @@ Future<void> _pumpRoute(WidgetTester tester, String initialLocation) async {
         driveSyncRepositoryProvider.overrideWith(
           (ref) async => _FakeDriveSyncRepository(),
         ),
+        accountSettingsControllerProvider.overrideWith(
+          _FakeAccountSettingsController.new,
+        ),
+        studyDefaultsSettingsProvider.overrideWith(
+          _FakeStudyDefaultsSettings.new,
+        ),
+        ttsSettingsProvider.overrideWith(_FakeTtsSettingsNotifier.new),
+        appVersionLabelProvider.overrideWith((ref) async => '1.0.0-test'),
       ],
       child: const _RouterApp(),
     ),
@@ -258,6 +272,38 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   @override
   Future<void> disconnect() async {}
+}
+
+class _FakeAccountSettingsController extends AccountSettingsController {
+  @override
+  Future<AccountSettingsState> build() async => const AccountSettingsState(
+    status: AccountLinkStatus.signedOut,
+    requiresPlatformSignInButton: false,
+  );
+}
+
+class _FakeStudyDefaultsSettings extends StudyDefaultsSettings {
+  @override
+  Future<StudyDefaultsSettingsState> build() async =>
+      const StudyDefaultsSettingsState(
+        newStudyDefaults: StudySettingsSnapshot(
+          batchSize: 10,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+        ),
+        reviewDefaults: StudySettingsSnapshot(
+          batchSize: 10,
+          shuffleFlashcards: false,
+          shuffleAnswers: false,
+          prioritizeOverdue: true,
+        ),
+      );
+}
+
+class _FakeTtsSettingsNotifier extends TtsSettingsNotifier {
+  @override
+  Future<TtsSettings> build() async => TtsSettings.defaults;
 }
 
 final class _FakeDriveSyncRepository implements DriveSyncRepository {

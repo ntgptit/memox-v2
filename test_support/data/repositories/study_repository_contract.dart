@@ -2520,30 +2520,31 @@ final class _StudyHarness {
   }
 
   Future<StudySessionSnapshot> startOneCardNewStudy() => start.execute(
-      const StudyContext(
-        entryType: StudyEntryType.deck,
-        entryRefId: 'deck-1',
-        studyType: StudyType.newStudy,
-        settings: StudySettingsSnapshot(
-          batchSize: 1,
-          shuffleFlashcards: false,
-          shuffleAnswers: false,
-          prioritizeOverdue: true,
-        ),
+    const StudyContext(
+      entryType: StudyEntryType.deck,
+      entryRefId: 'deck-1',
+      studyType: StudyType.newStudy,
+      settings: StudySettingsSnapshot(
+        batchSize: 1,
+        shuffleFlashcards: false,
+        shuffleAnswers: false,
+        prioritizeOverdue: true,
       ),
-    );
+    ),
+  );
 
   Future<void> setSessionStatus({
     required String sessionId,
     required SessionStatus status,
-  }) => (database.update(
-      database.studySessions,
-    )..where((table) => table.id.equals(sessionId))).write(
-      StudySessionsCompanion(
-        status: Value(status.storageValue),
-        endedAt: Value(clock.nowEpochMillis()),
-      ),
-    );
+  }) =>
+      (database.update(
+        database.studySessions,
+      )..where((table) => table.id.equals(sessionId))).write(
+        StudySessionsCompanion(
+          status: Value(status.storageValue),
+          endedAt: Value(clock.nowEpochMillis()),
+        ),
+      );
 
   Future<void> dispose() => database.close();
 }

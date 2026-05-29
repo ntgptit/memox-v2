@@ -42,14 +42,11 @@ enum EmptyScopeReason {
 /// Throwable (extends [AppException]) so it propagates through the existing
 /// use-case → notifier `try/catch` plumbing without restructuring.
 class EmptyScopeException extends AppException {
-  const EmptyScopeException(
-    this.reason, {
-    this.nextDueAt,
-    super.code,
-  }) : super(
-         type: AppExceptionType.validation,
-         message: 'Study session rejected: empty scope.',
-       );
+  const EmptyScopeException(this.reason, {this.nextDueAt, super.code})
+    : super(
+        type: AppExceptionType.validation,
+        message: 'Study session rejected: empty scope.',
+      );
 
   final EmptyScopeReason reason;
   final DateTime? nextDueAt;

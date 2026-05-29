@@ -190,9 +190,7 @@ class _TabPill extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final fg = selected ? scheme.onSurface : scheme.onSurfaceVariant;
     return MxTappable(
-      shape: const RoundedRectangleBorder(
-        borderRadius: AppRadius.borderSm,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderSm),
       backgroundColor: selected ? scheme.surfaceContainerLowest : null,
       onTap: onTap,
       child: Padding(

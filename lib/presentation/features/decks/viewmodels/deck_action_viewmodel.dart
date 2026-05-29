@@ -82,9 +82,8 @@ class DeckActionController extends _$DeckActionController {
 
   Future<ExportData?> exportDeck(ExportFormat format) async =>
       _actionRunner.runResultValue(
-        () => ref
-            .read(exportDeckUseCaseProvider)
-            .execute(deckId, format: format),
+        () =>
+            ref.read(exportDeckUseCaseProvider).execute(deckId, format: format),
       );
 
   MxAsyncActionRunner get _actionRunner => MxAsyncActionRunner(

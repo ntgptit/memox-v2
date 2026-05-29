@@ -323,12 +323,11 @@ final class FolderRobot extends MemoxRobot {
   }
 
   Future<void> tapRootFolderStudyAction(String folderId) => _tapStudyAction(
-      ValueKey<String>('library_folder_recursive_study_$folderId'),
-    );
+    ValueKey<String>('library_folder_recursive_study_$folderId'),
+  );
 
-  Future<void> tapVisibleFolderStudyAction(String folderId) => _tapStudyAction(
-      ValueKey<String>('folder_recursive_study_$folderId'),
-    );
+  Future<void> tapVisibleFolderStudyAction(String folderId) =>
+      _tapStudyAction(ValueKey<String>('folder_recursive_study_$folderId'));
 
   Future<void> _openRootFolderActions(String name) async {
     await longPressVisible(_folderTile(name));
@@ -381,16 +380,15 @@ final class FolderRobot extends MemoxRobot {
     await tapFloatingActionButton();
   }
 
-  Finder _folderTile(String name) => find.ancestor(
-      of: find.text(name),
-      matching: find.byType(MxFolderTile),
-    );
+  Finder _folderTile(String name) =>
+      find.ancestor(of: find.text(name), matching: find.byType(MxFolderTile));
 
   Finder _destinationPicker() => find.byWidgetPredicate(
-      (widget) => widget is MxDestinationPickerSheet<Object?>,
-    );
+    (widget) => widget is MxDestinationPickerSheet<Object?>,
+  );
 
-  Finder _moveDestinationText(String name) => find.descendant(of: _destinationPicker(), matching: find.text(name));
+  Finder _moveDestinationText(String name) =>
+      find.descendant(of: _destinationPicker(), matching: find.text(name));
 
   Offset _dragHandleCenterFor(Rect tileRect) {
     final handles = find.byIcon(Icons.drag_handle);

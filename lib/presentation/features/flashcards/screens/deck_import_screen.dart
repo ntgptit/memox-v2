@@ -219,10 +219,7 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
     final bytes = await readDeckImportFileBytes(file);
     if (!mounted) return;
     if (bytes == null) return;
-    notifier.setSourceFile(
-      sourceBytes: bytes,
-      loadedFileName: file.name,
-    );
+    notifier.setSourceFile(sourceBytes: bytes, loadedFileName: file.name);
     unawaited(_triggerPreview());
   }
 
@@ -234,8 +231,7 @@ class _DeckImportScreenState extends ConsumerState<DeckImportScreen> {
 
   Future<void> _triggerPreview() async {
     final draft = ref.read(flashcardImportDraftProvider(widget.deckId));
-    final isTextSource =
-        draft.format == ImportSourceFormat.structuredText;
+    final isTextSource = draft.format == ImportSourceFormat.structuredText;
     if (isTextSource && StringUtils.isBlank(draft.rawContent)) return;
     if (!isTextSource && draft.sourceBytes == null) return;
     await ref
@@ -390,11 +386,9 @@ class _TextModeBody extends ConsumerWidget {
           previewLabel: l10n.bulkAddTabPreview,
           previewCount: cardsCount,
           selectedPaste: tab == _BulkAddTab.paste,
-          onChanged: (bool isPaste) => onTabChanged(
-            <_BulkAddTab>{
-              isPaste ? _BulkAddTab.paste : _BulkAddTab.preview,
-            },
-          ),
+          onChanged: (bool isPaste) => onTabChanged(<_BulkAddTab>{
+            isPaste ? _BulkAddTab.paste : _BulkAddTab.preview,
+          }),
         ),
       ),
       const MxGap(MxSpace.lg),

@@ -656,6 +656,7 @@ final class _ResumeCandidateStudyRepo implements StudyRepo {
   }) {
     throw UnimplementedError();
   }
+
   int resumeCandidateLoadCount = 0;
   bool hasResumeCandidate = true;
 
@@ -802,6 +803,7 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
   }) {
     throw UnimplementedError();
   }
+
   int activeSessionLoadCount = 0;
   AttemptGrade? lastGrade;
   List<StudyMode>? lastModes;
@@ -950,6 +952,7 @@ final class _MatchBatchStudyRepo implements StudyRepo {
   }) {
     throw UnimplementedError();
   }
+
   Map<String, AttemptGrade>? lastItemGrades;
   List<StudyMode>? lastModes;
 

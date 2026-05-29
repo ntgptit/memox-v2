@@ -60,7 +60,7 @@ class MxChip extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(label),
-              const SizedBox(width: 6),
+              const SizedBox(width: 6), // guard:raw-size-reviewed count gap
               Text(
                 '$count',
                 style: textTheme.labelMedium?.copyWith(

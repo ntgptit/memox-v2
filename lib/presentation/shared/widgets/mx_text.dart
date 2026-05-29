@@ -174,7 +174,7 @@ abstract final class MxTextStyles {
       MxTextRole.monoBody => textTheme.bodyMedium!.copyWith(
         color: scheme.onSurface,
         fontFamily: 'monospace',
-        height: 1.6,
+        height: 1.6, // guard:raw-size-reviewed mono line height
       ),
     };
   }

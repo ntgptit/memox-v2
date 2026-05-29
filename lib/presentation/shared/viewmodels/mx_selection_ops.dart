@@ -38,8 +38,10 @@ abstract final class MxSelectionOps {
   static Set<TId> clear<TId>() => <TId>{};
 
   /// Adds [ids] to the current selection, preserving existing entries.
-  static Set<TId> addAll<TId>(Set<TId> current, Iterable<TId> ids) =>
-      {...current, ...ids};
+  static Set<TId> addAll<TId>(Set<TId> current, Iterable<TId> ids) => {
+    ...current,
+    ...ids,
+  };
 
   /// Removes [ids] from the current selection.
   static Set<TId> removeAll<TId>(Set<TId> current, Iterable<TId> ids) =>

@@ -68,8 +68,9 @@ void main() {
     settings: settings,
   );
 
-  Future<void> insertFolder(String id, {String? parentId}) =>
-      database.into(database.folders).insert(
+  Future<void> insertFolder(String id, {String? parentId}) => database
+      .into(database.folders)
+      .insert(
         FoldersCompanion.insert(
           id: id,
           name: id,
@@ -81,8 +82,9 @@ void main() {
         ),
       );
 
-  Future<void> insertDeck(String id, String folderId) =>
-      database.into(database.decks).insert(
+  Future<void> insertDeck(String id, String folderId) => database
+      .into(database.decks)
+      .insert(
         DecksCompanion.insert(
           id: id,
           folderId: folderId,
@@ -98,7 +100,9 @@ void main() {
     String deckId, {
     required int? dueAt,
   }) async {
-    await database.into(database.flashcards).insert(
+    await database
+        .into(database.flashcards)
+        .insert(
           FlashcardsCompanion.insert(
             id: id,
             deckId: deckId,
@@ -109,7 +113,9 @@ void main() {
             updatedAt: now.millisecondsSinceEpoch,
           ),
         );
-    await database.into(database.flashcardProgress).insert(
+    await database
+        .into(database.flashcardProgress)
+        .insert(
           FlashcardProgressCompanion.insert(
             flashcardId: id,
             currentBox: 2,
@@ -124,25 +130,19 @@ void main() {
 
   int days(int n) => now.add(Duration(days: n)).millisecondsSinceEpoch;
 
-  test(
-    'nextDueAt returns the nearest future due date in deck scope '
-    '(supports S4e/S4j next-due hint)',
-    () async {
-      await insertFolder('folder-1');
-      await insertDeck('deck-1', 'folder-1');
-      // One overdue card, two future cards at +2 and +5 days.
-      await insertCard('card-due', 'deck-1', dueAt: days(-1));
-      await insertCard('card-far', 'deck-1', dueAt: days(5));
-      await insertCard('card-near', 'deck-1', dueAt: days(2));
+  test('nextDueAt returns the nearest future due date in deck scope '
+      '(supports S4e/S4j next-due hint)', () async {
+    await insertFolder('folder-1');
+    await insertDeck('deck-1', 'folder-1');
+    // One overdue card, two future cards at +2 and +5 days.
+    await insertCard('card-due', 'deck-1', dueAt: days(-1));
+    await insertCard('card-far', 'deck-1', dueAt: days(5));
+    await insertCard('card-near', 'deck-1', dueAt: days(2));
 
-      final nextDue = await repo.nextDueAt(deckContext('deck-1'));
+    final nextDue = await repo.nextDueAt(deckContext('deck-1'));
 
-      expect(
-        nextDue,
-        DateTime.fromMillisecondsSinceEpoch(days(2)),
-      );
-    },
-  );
+    expect(nextDue, DateTime.fromMillisecondsSinceEpoch(days(2)));
+  });
 
   test('nextDueAt returns null when no future due exists', () async {
     await insertFolder('folder-1');
@@ -154,74 +154,73 @@ void main() {
     expect(nextDue, isNull);
   });
 
+  test('countDueCardsInScope counts only cards due by end of today', () async {
+    await insertFolder('folder-1');
+    await insertDeck('deck-1', 'folder-1');
+    await insertCard('card-due', 'deck-1', dueAt: days(-1));
+    await insertCard('card-future', 'deck-1', dueAt: days(3));
+    await insertCard('card-new', 'deck-1', dueAt: null);
+
+    expect(await repo.countDueCardsInScope(deckContext('deck-1')), 1);
+    expect(await repo.countFlashcardsInScope(deckContext('deck-1')), 3);
+  });
+
+  test('scope probe traverses folder subtree recursively', () async {
+    await insertFolder('root');
+    await insertFolder('child', parentId: 'root');
+    await insertDeck('deck-root', 'root');
+    await insertDeck('deck-child', 'child');
+    await insertCard('c1', 'deck-root', dueAt: days(-1));
+    await insertCard('c2', 'deck-child', dueAt: days(4));
+
+    expect(await repo.countFlashcardsInScope(folderContext('root')), 2);
+    expect(await repo.countDueCardsInScope(folderContext('root')), 1);
+    expect(
+      await repo.nextDueAt(folderContext('root')),
+      DateTime.fromMillisecondsSinceEpoch(days(4)),
+    );
+  });
+
+  Future<FlashcardProgressData> progressOf(String id) => (database.select(
+    database.flashcardProgress,
+  )..where((table) => table.flashcardId.equals(id))).getSingle();
+
   test(
-    'countDueCardsInScope counts only cards due by end of today',
+    'BS1: setBuried persists buried_until without touching SRS state',
     () async {
       await insertFolder('folder-1');
       await insertDeck('deck-1', 'folder-1');
-      await insertCard('card-due', 'deck-1', dueAt: days(-1));
-      await insertCard('card-future', 'deck-1', dueAt: days(3));
-      await insertCard('card-new', 'deck-1', dueAt: null);
+      await insertCard('c1', 'deck-1', dueAt: days(-1));
 
-      expect(await repo.countDueCardsInScope(deckContext('deck-1')), 1);
-      expect(await repo.countFlashcardsInScope(deckContext('deck-1')), 3);
+      await repo.setBuried(flashcardId: 'c1', buried: true);
+      final buried = await progressOf('c1');
+      expect(buried.buriedUntil, isNotNull);
+      expect(buried.buriedUntil! > now.millisecondsSinceEpoch, isTrue);
+      expect(buried.currentBox, 2);
+      expect(buried.dueAt, days(-1));
+
+      await repo.setBuried(flashcardId: 'c1', buried: false);
+      expect((await progressOf('c1')).buriedUntil, isNull);
     },
   );
 
   test(
-    'scope probe traverses folder subtree recursively',
+    'BS2: setSuspended toggles is_suspended without touching SRS state',
     () async {
-      await insertFolder('root');
-      await insertFolder('child', parentId: 'root');
-      await insertDeck('deck-root', 'root');
-      await insertDeck('deck-child', 'child');
-      await insertCard('c1', 'deck-root', dueAt: days(-1));
-      await insertCard('c2', 'deck-child', dueAt: days(4));
+      await insertFolder('folder-1');
+      await insertDeck('deck-1', 'folder-1');
+      await insertCard('c1', 'deck-1', dueAt: days(-1));
 
-      expect(await repo.countFlashcardsInScope(folderContext('root')), 2);
-      expect(await repo.countDueCardsInScope(folderContext('root')), 1);
-      expect(
-        await repo.nextDueAt(folderContext('root')),
-        DateTime.fromMillisecondsSinceEpoch(days(4)),
-      );
+      await repo.setSuspended(flashcardId: 'c1', suspended: true);
+      final suspended = await progressOf('c1');
+      expect(suspended.isSuspended, isTrue);
+      expect(suspended.currentBox, 2);
+      expect(suspended.dueAt, days(-1));
+
+      await repo.setSuspended(flashcardId: 'c1', suspended: false);
+      expect((await progressOf('c1')).isSuspended, isFalse);
     },
   );
-
-  Future<FlashcardProgressData> progressOf(String id) =>
-      (database.select(database.flashcardProgress)
-            ..where((table) => table.flashcardId.equals(id)))
-          .getSingle();
-
-  test('BS1: setBuried persists buried_until without touching SRS state', () async {
-    await insertFolder('folder-1');
-    await insertDeck('deck-1', 'folder-1');
-    await insertCard('c1', 'deck-1', dueAt: days(-1));
-
-    await repo.setBuried(flashcardId: 'c1', buried: true);
-    final buried = await progressOf('c1');
-    expect(buried.buriedUntil, isNotNull);
-    expect(buried.buriedUntil! > now.millisecondsSinceEpoch, isTrue);
-    expect(buried.currentBox, 2);
-    expect(buried.dueAt, days(-1));
-
-    await repo.setBuried(flashcardId: 'c1', buried: false);
-    expect((await progressOf('c1')).buriedUntil, isNull);
-  });
-
-  test('BS2: setSuspended toggles is_suspended without touching SRS state', () async {
-    await insertFolder('folder-1');
-    await insertDeck('deck-1', 'folder-1');
-    await insertCard('c1', 'deck-1', dueAt: days(-1));
-
-    await repo.setSuspended(flashcardId: 'c1', suspended: true);
-    final suspended = await progressOf('c1');
-    expect(suspended.isSuspended, isTrue);
-    expect(suspended.currentBox, 2);
-    expect(suspended.dueAt, days(-1));
-
-    await repo.setSuspended(flashcardId: 'c1', suspended: false);
-    expect((await progressOf('c1')).isSuspended, isFalse);
-  });
 
   test(
     'buried and suspended cards are excluded from the due batch; expired bury '
@@ -246,10 +245,10 @@ void main() {
           .write(FlashcardProgressCompanion(buriedUntil: Value(days(-1))));
 
       final reopened = await repo.loadDueCards(deckContext('deck-1'));
-      expect(
-        reopened.map((card) => card.id).toSet(),
-        <String>{'due-1', 'due-3'},
-      );
+      expect(reopened.map((card) => card.id).toSet(), <String>{
+        'due-1',
+        'due-3',
+      });
     },
   );
 

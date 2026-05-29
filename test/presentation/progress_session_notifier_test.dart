@@ -304,6 +304,7 @@ final class _ProgressStudyRepo implements StudyRepo {
   }) {
     throw UnimplementedError();
   }
+
   int finalizeCount = 0;
   int retryFinalizeCount = 0;
   int resumeCandidateLoadCount = 0;

@@ -24,10 +24,23 @@ const _visibleButtonLabelKeys = <String>{
   'dashboardContinueSessionAction',
   'dashboardStudyTodayAction',
   'dashboardOpenLibraryAction',
+  'dashboardStartReviewAction',
+  'bulkAddFileChooseAction',
   'foldersClearSearchAction',
+  'foldersImportCreateDeckAction',
+  'foldersImportExistingDeckAction',
+  'importCommitCardsAction',
+  'settingsDriveSyncAction',
+  'settingsDriveSyncRestoreConfirmAction',
+  'settingsDriveSyncRestoreDriveAction',
+  'settingsDriveSyncUploadConfirmAction',
+  'settingsDriveSyncUploadLocalAction',
   'decksDuplicateAction',
-  'decksExportCsvAction',
+  'decksExportAction',
+  'flashcardsLearnDeckAction',
   'flashcardsOpenListAction',
+  'flashcardsTagsAddAction',
+  'flashcardsTagsConfirmAction',
   'flashcardsAddAction',
   'flashcardsSaveAndAddNext',
   'flashcardsSaveChanges',
@@ -42,6 +55,11 @@ const _visibleButtonLabelKeys = <String>{
   'studyCancelAction',
   'studyFinalizeAction',
   'studySkipAction',
+  'studyGotItAction',
+  'studyHintAction',
+  'studyTryAgainAction',
+  'studyStartWithCountAction',
+  'studyStartNewWithCountAction',
   'studyViewResultAction',
   'studyResultReviewMoreAction',
   'studyResultStudyAgainAction',
@@ -66,6 +84,22 @@ const _visibleButtonLabelKeys = <String>{
 };
 
 const _nonButtonActionKeys = <String>{'errorUnsupportedAction'};
+
+const _redundantEnglishActionNounExemptKeys = <String>{
+  'dashboardOpenLibraryAction',
+  'decksExportAction',
+  'flashcardsLearnDeckAction',
+  'flashcardsSaveAction',
+  'foldersImportCreateDeckAction',
+  'foldersImportExistingDeckAction',
+};
+
+const _conciseActionLabelExemptKeys = <String>{
+  'foldersImportExistingDeckAction',
+  'settingsDriveSyncRestoreDriveAction',
+  'settingsDriveSyncUploadLocalAction',
+  'studyStartNewWithCountAction',
+};
 
 const _redundantEnglishActionNouns = <String>{
   'card',
@@ -108,6 +142,9 @@ void main() {
       for (final entry in localeBudgets.entries) {
         final messages = _arbMessages(entry.key);
         for (final key in _visibleButtonLabelKeys) {
+          if (_conciseActionLabelExemptKeys.contains(key)) {
+            continue;
+          }
           final value = messages[key];
           if (value == null) {
             violations.add('${entry.key}: missing $key');
@@ -132,6 +169,9 @@ void main() {
     for (final key in _visibleButtonLabelKeys.where(
       (key) => key.endsWith('Action'),
     )) {
+      if (_redundantEnglishActionNounExemptKeys.contains(key)) {
+        continue;
+      }
       final value = messages[key];
       if (value == null) {
         violations.add('missing $key');

@@ -368,17 +368,18 @@ final class DeckRobot extends MemoxRobot {
   }
 
   Finder _deckTile(String name) => find.ancestor(
-      of: find.text(name),
-      matching: find.byWidgetPredicate(
-        (widget) => widget is MxDeckCard || widget is MxStudySetTile,
-      ),
-    );
+    of: find.text(name),
+    matching: find.byWidgetPredicate(
+      (widget) => widget is MxDeckCard || widget is MxStudySetTile,
+    ),
+  );
 
   Finder _destinationPicker() => find.byWidgetPredicate(
-      (widget) => widget is MxDestinationPickerSheet<Object?>,
-    );
+    (widget) => widget is MxDestinationPickerSheet<Object?>,
+  );
 
-  Finder _moveDestinationText(String name) => find.descendant(of: _destinationPicker(), matching: find.text(name));
+  Finder _moveDestinationText(String name) =>
+      find.descendant(of: _destinationPicker(), matching: find.text(name));
 
   String _cardCountLabel(int count) {
     if (count == 1) {

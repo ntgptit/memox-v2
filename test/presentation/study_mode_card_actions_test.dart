@@ -210,24 +210,25 @@ void main() {
   };
 
   for (final entry in modeViews.entries) {
-    testWidgets('${entry.key} mode view exposes a working card-actions trigger', (
-      tester,
-    ) async {
-      var tapped = false;
-      await pump(tester, entry.value(() => tapped = true));
+    testWidgets(
+      '${entry.key} mode view exposes a working card-actions trigger',
+      (tester) async {
+        var tapped = false;
+        await pump(tester, entry.value(() => tapped = true));
 
-      final trigger = find.byTooltip('Card actions');
-      expect(trigger, findsOneWidget);
-      expect(find.textContaining('History'), findsNothing);
+        final trigger = find.byTooltip('Card actions');
+        expect(trigger, findsOneWidget);
+        expect(find.textContaining('History'), findsNothing);
 
-      await tester.tap(trigger);
-      await tester.pump();
-      expect(tapped, isTrue);
+        await tester.tap(trigger);
+        await tester.pump();
+        expect(tapped, isTrue);
 
-      // Drain mode-view auto-advance / auto-reveal timers so the test teardown
-      // does not see a pending timer.
-      await tester.pump(const Duration(seconds: 21));
-    });
+        // Drain mode-view auto-advance / auto-reveal timers so the test teardown
+        // does not see a pending timer.
+        await tester.pump(const Duration(seconds: 21));
+      },
+    );
   }
 
   testWidgets('card-actions trigger is hidden when no handler is provided', (

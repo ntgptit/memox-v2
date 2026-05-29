@@ -140,7 +140,14 @@ class _MxBottomNavItem extends StatelessWidget {
             color: foreground,
           ),
           const MxGap(MxSpace.xxs),
-          MxText(destination.label, role: MxTextRole.badge, color: foreground),
+          MxText(
+            destination.label,
+            role: MxTextRole.badge,
+            color: foreground,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            softWrap: false,
+          ),
         ],
       ),
     );

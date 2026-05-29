@@ -75,10 +75,13 @@ class MxStudyTopBar extends StatelessWidget {
             onPressed: onClose,
           ),
           const MxGap(MxSpace.xs),
-          _MxStudyModeBadge(
-            label: modeLabel,
-            accentColor: accentColor,
-            background: accentFill,
+          Flexible(
+            fit: FlexFit.loose,
+            child: _MxStudyModeBadge(
+              label: modeLabel,
+              accentColor: accentColor,
+              background: accentFill,
+            ),
           ),
           const MxGap(MxSpace.sm),
           Expanded(
@@ -93,10 +96,16 @@ class MxStudyTopBar extends StatelessWidget {
             ),
           ),
           const MxGap(MxSpace.sm),
-          MxText(
-            counterLabel,
-            role: MxTextRole.studyProgress,
-            color: scheme.onSurfaceVariant,
+          Flexible(
+            fit: FlexFit.loose,
+            child: MxText(
+              counterLabel,
+              role: MxTextRole.studyProgress,
+              color: scheme.onSurfaceVariant,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+            ),
           ),
           if (trailing != null) ...[const MxGap(MxSpace.xs), trailing!],
         ],
@@ -134,6 +143,9 @@ class _MxStudyModeBadge extends StatelessWidget {
         StringUtils.uppercased(label),
         role: MxTextRole.overline,
         color: accentColor,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        softWrap: false,
       ),
     ),
   );

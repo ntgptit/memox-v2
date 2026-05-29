@@ -16,15 +16,19 @@ import 'package:memox/core/theme/tokens/app_typography.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/dialogs/mx_action_sheet_list.dart';
 import 'package:memox/presentation/shared/dialogs/mx_bottom_sheet.dart';
+import 'package:memox/presentation/shared/dialogs/mx_card_actions_sheet.dart';
 import 'package:memox/presentation/shared/dialogs/mx_destination_picker_sheet.dart';
 import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';
 import 'package:memox/presentation/shared/dialogs/mx_name_dialog.dart';
 import 'package:memox/presentation/shared/feedback/mx_banner.dart';
 import 'package:memox/presentation/shared/layouts/mx_adaptive_scaffold.dart';
 import 'package:memox/presentation/shared/layouts/mx_content_shell.dart';
+import 'package:memox/presentation/shared/layouts/mx_form_scaffold.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
+import 'package:memox/presentation/shared/layouts/mx_list_scaffold.dart';
 import 'package:memox/presentation/shared/layouts/mx_scaffold.dart';
 import 'package:memox/presentation/shared/layouts/mx_section.dart';
+import 'package:memox/presentation/shared/layouts/mx_study_scaffold.dart';
 import 'package:memox/presentation/shared/widgets/mx_animated_switcher.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
@@ -34,13 +38,16 @@ import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_card_breakdown_list.dart';
 import 'package:memox/presentation/shared/widgets/mx_chip.dart';
 import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_deck_pill.dart';
 import 'package:memox/presentation/shared/widgets/mx_divider.dart';
 import 'package:memox/presentation/shared/widgets/mx_due_summary_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_empty_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_fab.dart';
+import 'package:memox/presentation/shared/widgets/mx_field_label.dart';
 import 'package:memox/presentation/shared/widgets/mx_flashcard.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
@@ -48,6 +55,7 @@ import 'package:memox/presentation/shared/widgets/mx_icon_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_inline_toggle.dart';
 import 'package:memox/presentation/shared/widgets/mx_list_tile.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_mode_mix_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_offline_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_page_dots.dart';
 import 'package:memox/presentation/shared/widgets/mx_pickup_tile.dart';
@@ -61,6 +69,7 @@ import 'package:memox/presentation/shared/widgets/mx_search_sort_toolbar.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_section_header.dart';
 import 'package:memox/presentation/shared/widgets/mx_segmented_control.dart';
+import 'package:memox/presentation/shared/widgets/mx_segmented_status.dart';
 import 'package:memox/presentation/shared/widgets/mx_select_field.dart';
 import 'package:memox/presentation/shared/widgets/mx_shake_transition.dart';
 import 'package:memox/presentation/shared/widgets/mx_slider.dart';
@@ -70,11 +79,15 @@ import 'package:memox/presentation/shared/widgets/mx_stat_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_streak_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_progress_action.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_set_tile.dart';
+import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
+import 'package:memox/presentation/shared/widgets/mx_tab_bar.dart';
+import 'package:memox/presentation/shared/widgets/mx_tag_input.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 import 'package:memox/presentation/shared/widgets/mx_term_row.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'package:memox/presentation/shared/widgets/mx_text_field.dart';
 import 'package:memox/presentation/shared/widgets/mx_toggle.dart';
+import 'package:memox/presentation/shared/widgets/mx_weekly_bar_chart.dart';
 
 void registerSharedWidgetContractTests() {
   testWidgets(
@@ -1970,38 +1983,38 @@ void registerSharedWidgetContractTests() {
       tester,
       Builder(
         builder: (context) => MxPrimaryButton(
-            key: openKey,
-            label: 'Open dialog',
-            onPressed: () {
-              MxDialog.show<String>(
-                context: context,
-                title: 'Delete deck',
-                child: const Text('This action removes the selected deck.'),
-                actions: [
-                  Builder(
-                    builder: (dialogContext) => MxSecondaryButton(
-                      key: secondaryKey,
-                      label: 'Cancel',
-                      onPressed: () {
-                        secondaryCalls++;
-                        Navigator.of(dialogContext).pop('cancel');
-                      },
-                    ),
+          key: openKey,
+          label: 'Open dialog',
+          onPressed: () {
+            MxDialog.show<String>(
+              context: context,
+              title: 'Delete deck',
+              child: const Text('This action removes the selected deck.'),
+              actions: [
+                Builder(
+                  builder: (dialogContext) => MxSecondaryButton(
+                    key: secondaryKey,
+                    label: 'Cancel',
+                    onPressed: () {
+                      secondaryCalls++;
+                      Navigator.of(dialogContext).pop('cancel');
+                    },
                   ),
-                  Builder(
-                    builder: (dialogContext) => MxPrimaryButton(
-                      key: primaryKey,
-                      label: 'Delete',
-                      onPressed: () {
-                        primaryCalls++;
-                        Navigator.of(dialogContext).pop('delete');
-                      },
-                    ),
+                ),
+                Builder(
+                  builder: (dialogContext) => MxPrimaryButton(
+                    key: primaryKey,
+                    label: 'Delete',
+                    onPressed: () {
+                      primaryCalls++;
+                      Navigator.of(dialogContext).pop('delete');
+                    },
                   ),
-                ],
-              );
-            },
-          ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
 
@@ -2035,43 +2048,43 @@ void registerSharedWidgetContractTests() {
       tester,
       Builder(
         builder: (context) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              MxPrimaryButton(
-                key: openLockedKey,
-                label: 'Open locked dialog',
-                onPressed: () {
-                  MxDialog.show<void>(
-                    context: context,
-                    title: 'Locked dialog',
-                    barrierDismissible: false,
-                    child: const Text('Barrier taps should do nothing.'),
-                    actions: [
-                      Builder(
-                        builder: (dialogContext) => MxSecondaryButton(
-                          key: closeLockedKey,
-                          label: 'Close',
-                          onPressed: () => Navigator.of(dialogContext).pop(),
-                        ),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MxPrimaryButton(
+              key: openLockedKey,
+              label: 'Open locked dialog',
+              onPressed: () {
+                MxDialog.show<void>(
+                  context: context,
+                  title: 'Locked dialog',
+                  barrierDismissible: false,
+                  child: const Text('Barrier taps should do nothing.'),
+                  actions: [
+                    Builder(
+                      builder: (dialogContext) => MxSecondaryButton(
+                        key: closeLockedKey,
+                        label: 'Close',
+                        onPressed: () => Navigator.of(dialogContext).pop(),
                       ),
-                    ],
-                  );
-                },
-              ),
-              const MxGap(AppSpacing.md),
-              MxPrimaryButton(
-                key: openDismissibleKey,
-                label: 'Open dismissible dialog',
-                onPressed: () {
-                  MxDialog.show<void>(
-                    context: context,
-                    title: 'Dismissible dialog',
-                    child: const Text('Barrier taps should close this dialog.'),
-                  );
-                },
-              ),
-            ],
-          ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const MxGap(AppSpacing.md),
+            MxPrimaryButton(
+              key: openDismissibleKey,
+              label: 'Open dismissible dialog',
+              onPressed: () {
+                MxDialog.show<void>(
+                  context: context,
+                  title: 'Dismissible dialog',
+                  child: const Text('Barrier taps should close this dialog.'),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
 
@@ -2107,51 +2120,51 @@ void registerSharedWidgetContractTests() {
       tester,
       Builder(
         builder: (context) => MxPrimaryButton(
-            key: openKey,
-            label: 'Open sheet',
-            onPressed: () {
-              MxBottomSheet.show<String>(
-                context: context,
-                title: 'Move cards',
-                trailing: Builder(
-                  builder: (sheetContext) => IconButton(
-                    key: closeKey,
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
-                      closeCalls++;
-                      Navigator.of(sheetContext).pop('close');
-                    },
-                  ),
+          key: openKey,
+          label: 'Open sheet',
+          onPressed: () {
+            MxBottomSheet.show<String>(
+              context: context,
+              title: 'Move cards',
+              trailing: Builder(
+                builder: (sheetContext) => IconButton(
+                  key: closeKey,
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    closeCalls++;
+                    Navigator.of(sheetContext).pop('close');
+                  },
                 ),
-                child: Builder(
-                  builder: (sheetContext) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Choose where these cards should move.'),
-                      const MxGap(AppSpacing.md),
-                      MxSecondaryButton(
-                        key: secondaryKey,
-                        label: 'Cancel',
-                        onPressed: () {
-                          secondaryCalls++;
-                          Navigator.of(sheetContext).pop('cancel');
-                        },
-                      ),
-                      const MxGap(AppSpacing.md),
-                      MxPrimaryButton(
-                        key: primaryKey,
-                        label: 'Move',
-                        onPressed: () {
-                          primaryCalls++;
-                          Navigator.of(sheetContext).pop('move');
-                        },
-                      ),
-                    ],
-                  ),
+              ),
+              child: Builder(
+                builder: (sheetContext) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Choose where these cards should move.'),
+                    const MxGap(AppSpacing.md),
+                    MxSecondaryButton(
+                      key: secondaryKey,
+                      label: 'Cancel',
+                      onPressed: () {
+                        secondaryCalls++;
+                        Navigator.of(sheetContext).pop('cancel');
+                      },
+                    ),
+                    const MxGap(AppSpacing.md),
+                    MxPrimaryButton(
+                      key: primaryKey,
+                      label: 'Move',
+                      onPressed: () {
+                        primaryCalls++;
+                        Navigator.of(sheetContext).pop('move');
+                      },
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
+        ),
       ),
     );
 
@@ -2188,42 +2201,42 @@ void registerSharedWidgetContractTests() {
       tester,
       Builder(
         builder: (context) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              MxPrimaryButton(
-                key: openLockedKey,
-                label: 'Open locked sheet',
-                onPressed: () {
-                  MxBottomSheet.show<void>(
-                    context: context,
-                    title: 'Locked sheet',
-                    isDismissible: false,
-                    enableDrag: false,
-                    trailing: Builder(
-                      builder: (sheetContext) => IconButton(
-                        key: closeLockedKey,
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(sheetContext).pop(),
-                      ),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MxPrimaryButton(
+              key: openLockedKey,
+              label: 'Open locked sheet',
+              onPressed: () {
+                MxBottomSheet.show<void>(
+                  context: context,
+                  title: 'Locked sheet',
+                  isDismissible: false,
+                  enableDrag: false,
+                  trailing: Builder(
+                    builder: (sheetContext) => IconButton(
+                      key: closeLockedKey,
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(sheetContext).pop(),
                     ),
-                    child: const Text('Barrier taps should do nothing.'),
-                  );
-                },
-              ),
-              const MxGap(AppSpacing.md),
-              MxPrimaryButton(
-                key: openDismissibleKey,
-                label: 'Open dismissible sheet',
-                onPressed: () {
-                  MxBottomSheet.show<void>(
-                    context: context,
-                    title: 'Dismissible sheet',
-                    child: const Text('Barrier taps should close this sheet.'),
-                  );
-                },
-              ),
-            ],
-          ),
+                  ),
+                  child: const Text('Barrier taps should do nothing.'),
+                );
+              },
+            ),
+            const MxGap(AppSpacing.md),
+            MxPrimaryButton(
+              key: openDismissibleKey,
+              label: 'Open dismissible sheet',
+              onPressed: () {
+                MxBottomSheet.show<void>(
+                  context: context,
+                  title: 'Dismissible sheet',
+                  child: const Text('Barrier taps should close this sheet.'),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
 
@@ -2255,11 +2268,7 @@ void registerSharedWidgetContractTests() {
       const Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          MxDialog(
-            key: dialogKey,
-            title: 'Geometry',
-            child: Text('Dialog'),
-          ),
+          MxDialog(key: dialogKey, title: 'Geometry', child: Text('Dialog')),
           MxGap(AppSpacing.lg),
           SizedBox(
             height: 220, // guard:raw-size-reviewed bounded sheet fixture
@@ -3921,9 +3930,9 @@ class _SharedWidgetCase {
   final bool scrollableHost;
 
   Widget build(_CatalogVariant variant, Key key) => switch (variant) {
-      _CatalogVariant.minimal => minimal(key),
-      _CatalogVariant.full => full(key),
-    };
+    _CatalogVariant.minimal => minimal(key),
+    _CatalogVariant.full => full(key),
+  };
 }
 
 class _LayoutCase {
@@ -4008,62 +4017,58 @@ Future<void> _pumpLayoutWidget(
   expect(tester.takeException(), isNull, reason: scenario.label);
 }
 
-Icon _buttonIcon(WidgetTester tester, Key key, IconData icon) => tester.widget<Icon>(
-    find.descendant(of: find.byKey(key), matching: find.byIcon(icon)),
-  );
+Icon _buttonIcon(WidgetTester tester, Key key, IconData icon) =>
+    tester.widget<Icon>(
+      find.descendant(of: find.byKey(key), matching: find.byIcon(icon)),
+    );
 
-List<double> _buttonGapSizes(WidgetTester tester, Key key) => _gapSizes(tester, key);
+List<double> _buttonGapSizes(WidgetTester tester, Key key) =>
+    _gapSizes(tester, key);
 
 List<double> _gapSizes(WidgetTester tester, Key key) => tester
-      .widgetList<MxGap>(
-        find.descendant(of: find.byKey(key), matching: find.byType(MxGap)),
-      )
-      .map((gap) => gap.size)
-      .toList();
+    .widgetList<MxGap>(
+      find.descendant(of: find.byKey(key), matching: find.byType(MxGap)),
+    )
+    .map((gap) => gap.size)
+    .toList();
 
-MxText _mxTextInside(WidgetTester tester, Key key, String data) => tester.widget<MxText>(
-    find.descendant(
-      of: find.byKey(key),
-      matching: find.byWidgetPredicate(
-        (widget) => widget is MxText && widget.data == data,
+MxText _mxTextInside(WidgetTester tester, Key key, String data) =>
+    tester.widget<MxText>(
+      find.descendant(
+        of: find.byKey(key),
+        matching: find.byWidgetPredicate(
+          (widget) => widget is MxText && widget.data == data,
+        ),
       ),
-    ),
-  );
+    );
 
 Size _stateContentColumnSize(WidgetTester tester, Key key) => tester.getSize(
-    find.descendant(of: find.byKey(key), matching: find.byType(Column)).first,
-  );
+  find.descendant(of: find.byKey(key), matching: find.byType(Column)).first,
+);
 
-ElevatedButton _elevatedButton(WidgetTester tester, Key key) => tester.widget<ElevatedButton>(_elevatedButtonFinder(key));
+ElevatedButton _elevatedButton(WidgetTester tester, Key key) =>
+    tester.widget<ElevatedButton>(_elevatedButtonFinder(key));
 
-OutlinedButton _outlinedButton(WidgetTester tester, Key key) => tester.widget<OutlinedButton>(_outlinedButtonFinder(key));
+OutlinedButton _outlinedButton(WidgetTester tester, Key key) =>
+    tester.widget<OutlinedButton>(_outlinedButtonFinder(key));
 
-IconButton _iconButton(WidgetTester tester, Key key) => tester.widget<IconButton>(_iconButtonFinder(key));
+IconButton _iconButton(WidgetTester tester, Key key) =>
+    tester.widget<IconButton>(_iconButtonFinder(key));
 
-Finder _elevatedButtonFinder(Key key) => find.descendant(
-    of: find.byKey(key),
-    matching: find.byType(ElevatedButton),
-  );
+Finder _elevatedButtonFinder(Key key) =>
+    find.descendant(of: find.byKey(key), matching: find.byType(ElevatedButton));
 
-Finder _outlinedButtonFinder(Key key) => find.descendant(
-    of: find.byKey(key),
-    matching: find.byType(OutlinedButton),
-  );
+Finder _outlinedButtonFinder(Key key) =>
+    find.descendant(of: find.byKey(key), matching: find.byType(OutlinedButton));
 
-Finder _filledButtonFinder(Key key) => find.descendant(
-    of: find.byKey(key),
-    matching: find.byType(FilledButton),
-  );
+Finder _filledButtonFinder(Key key) =>
+    find.descendant(of: find.byKey(key), matching: find.byType(FilledButton));
 
-Finder _textButtonFinder(Key key) => find.descendant(
-    of: find.byKey(key),
-    matching: find.byType(TextButton),
-  );
+Finder _textButtonFinder(Key key) =>
+    find.descendant(of: find.byKey(key), matching: find.byType(TextButton));
 
-Finder _iconButtonFinder(Key key) => find.descendant(
-    of: find.byKey(key),
-    matching: find.byType(IconButton),
-  );
+Finder _iconButtonFinder(Key key) =>
+    find.descendant(of: find.byKey(key), matching: find.byType(IconButton));
 
 void _expectSharedButtonStyle(
   ButtonStyle? style,
@@ -4099,14 +4104,14 @@ void _expectSharedButtonStyle(
 }
 
 ButtonStyle _hostileButtonBaseStyle(Color color) => ButtonStyle(
-    minimumSize: const WidgetStatePropertyAll(Size(0, 72)),
-    padding: const WidgetStatePropertyAll(
-      EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-    ),
-    backgroundColor: WidgetStatePropertyAll(color),
-    foregroundColor: WidgetStatePropertyAll(color),
-    side: WidgetStatePropertyAll(BorderSide(color: color)),
-  );
+  minimumSize: const WidgetStatePropertyAll(Size(0, 72)),
+  padding: const WidgetStatePropertyAll(
+    EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+  ),
+  backgroundColor: WidgetStatePropertyAll(color),
+  foregroundColor: WidgetStatePropertyAll(color),
+  side: WidgetStatePropertyAll(BorderSide(color: color)),
+);
 
 class _ButtonStyleCase {
   const _ButtonStyleCase({
@@ -4167,9 +4172,11 @@ final List<_ButtonStyleCase> _buttonStyleCases = [
   ),
 ];
 
-Finder _cardFinder(Key key) => find.descendant(of: find.byKey(key), matching: find.byType(Card));
+Finder _cardFinder(Key key) =>
+    find.descendant(of: find.byKey(key), matching: find.byType(Card));
 
-Card _materialCard(WidgetTester tester, Key key) => tester.widget<Card>(_cardFinder(key));
+Card _materialCard(WidgetTester tester, Key key) =>
+    tester.widget<Card>(_cardFinder(key));
 
 RoundedRectangleBorder _cardShape(Card card) {
   final shape = card.shape;
@@ -4207,9 +4214,10 @@ const List<_CardVisualCase> _cardVisualCases = [
   ),
 ];
 
-TextField _sharedTextField(WidgetTester tester, Key key) => tester.widget<TextField>(
-    find.descendant(of: find.byKey(key), matching: find.byType(TextField)),
-  );
+TextField _sharedTextField(WidgetTester tester, Key key) =>
+    tester.widget<TextField>(
+      find.descendant(of: find.byKey(key), matching: find.byType(TextField)),
+    );
 
 OutlineInputBorder _outlineInputBorder(InputBorder? border) {
   expect(border, isA<OutlineInputBorder>());
@@ -4217,19 +4225,19 @@ OutlineInputBorder _outlineInputBorder(InputBorder? border) {
 }
 
 List<EdgeInsetsGeometry> _paddingValues(WidgetTester tester, Key key) => tester
-      .widgetList<Padding>(
-        find.descendant(of: find.byKey(key), matching: find.byType(Padding)),
-      )
-      .map((padding) => padding.padding)
-      .toList();
+    .widgetList<Padding>(
+      find.descendant(of: find.byKey(key), matching: find.byType(Padding)),
+    )
+    .map((padding) => padding.padding)
+    .toList();
 
 List<Widget> _longContentRows(String label, int count) => List<Widget>.generate(
-    count,
-    (index) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-      child: Text('$label ${index + 1}'),
-    ),
-  );
+  count,
+  (index) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+    child: Text('$label ${index + 1}'),
+  ),
+);
 
 Finder _scrollableInside(Key key) {
   expect(
@@ -4493,273 +4501,273 @@ class _GoldenHost extends StatelessWidget {
 }
 
 Widget _buildNormalGoldenContent() => const Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      MxStudySetTile(
-        key: ValueKey('golden-normal-study-set'),
-        title: 'Japanese vocabulary',
-        icon: Icons.style_outlined,
-        metaLine: '24 cards - 8 due today',
-        ownerInitials: 'MX',
-        ownerLabel: 'MemoX',
-        ownerBadge: 'Core',
-        trailing: Icon(Icons.chevron_right),
-        onTap: _noop,
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    MxStudySetTile(
+      key: ValueKey('golden-normal-study-set'),
+      title: 'Japanese vocabulary',
+      icon: Icons.style_outlined,
+      metaLine: '24 cards - 8 due today',
+      ownerInitials: 'MX',
+      ownerLabel: 'MemoX',
+      ownerBadge: 'Core',
+      trailing: Icon(Icons.chevron_right),
+      onTap: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    MxCard(
+      key: ValueKey('golden-normal-progress-card'),
+      variant: MxCardVariant.outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MxText('Today progress', role: MxTextRole.tileTitle),
+          MxGap(AppSpacing.md),
+          MxLinearProgress(
+            value: 0.68,
+            label: 'Mastery',
+            showPercentage: true,
+            size: MxProgressSize.large,
+          ),
+        ],
       ),
-      MxGap(AppSpacing.md),
-      MxCard(
-        key: ValueKey('golden-normal-progress-card'),
-        variant: MxCardVariant.outlined,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            MxText('Today progress', role: MxTextRole.tileTitle),
-            MxGap(AppSpacing.md),
-            MxLinearProgress(
-              value: 0.68,
-              label: 'Mastery',
-              showPercentage: true,
-              size: MxProgressSize.large,
-            ),
-          ],
-        ),
-      ),
-      MxGap(AppSpacing.md),
-      MxAnswerOptionCard(
-        key: ValueKey('golden-normal-answer'),
-        label: 'Translate the prompt before revealing the answer.',
-        leadingIcon: Icons.menu_book_outlined,
-        onPressed: _noop,
-      ),
-      MxGap(AppSpacing.md),
-      MxPrimaryButton(
-        key: ValueKey('golden-normal-primary-button'),
-        label: 'Start review',
-        leadingIcon: Icons.play_arrow,
-        trailingIcon: Icons.arrow_forward,
-        fullWidth: true,
-        onPressed: _noop,
-      ),
-    ],
-  );
+    ),
+    MxGap(AppSpacing.md),
+    MxAnswerOptionCard(
+      key: ValueKey('golden-normal-answer'),
+      label: 'Translate the prompt before revealing the answer.',
+      leadingIcon: Icons.menu_book_outlined,
+      onPressed: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    MxPrimaryButton(
+      key: ValueKey('golden-normal-primary-button'),
+      label: 'Start review',
+      leadingIcon: Icons.play_arrow,
+      trailingIcon: Icons.arrow_forward,
+      fullWidth: true,
+      onPressed: _noop,
+    ),
+  ],
+);
 
 Widget _buildButtonNormalGoldenContent() => const Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      MxPrimaryButton(
-        key: ValueKey('golden-button-primary-normal'),
-        label: 'Continue',
-        leadingIcon: Icons.play_arrow,
-        trailingIcon: Icons.arrow_forward,
-        fullWidth: true,
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    MxPrimaryButton(
+      key: ValueKey('golden-button-primary-normal'),
+      label: 'Continue',
+      leadingIcon: Icons.play_arrow,
+      trailingIcon: Icons.arrow_forward,
+      fullWidth: true,
+      onPressed: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    MxSecondaryButton(
+      key: ValueKey('golden-button-secondary-outlined'),
+      label: 'Cancel',
+      leadingIcon: Icons.close,
+      fullWidth: true,
+      onPressed: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    MxSecondaryButton(
+      key: ValueKey('golden-button-secondary-tonal'),
+      label: 'Review later',
+      variant: MxSecondaryVariant.tonal,
+      trailingIcon: Icons.schedule,
+      fullWidth: true,
+      onPressed: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    MxSecondaryButton(
+      key: ValueKey('golden-button-secondary-text'),
+      label: 'Skip',
+      variant: MxSecondaryVariant.text,
+      fullWidth: true,
+      onPressed: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    Align(
+      alignment: Alignment.centerLeft,
+      child: MxIconButton(
+        key: ValueKey('golden-button-icon-normal'),
+        icon: Icons.search,
+        tooltip: 'Search',
         onPressed: _noop,
       ),
-      MxGap(AppSpacing.md),
-      MxSecondaryButton(
-        key: ValueKey('golden-button-secondary-outlined'),
-        label: 'Cancel',
-        leadingIcon: Icons.close,
-        fullWidth: true,
-        onPressed: _noop,
-      ),
-      MxGap(AppSpacing.md),
-      MxSecondaryButton(
-        key: ValueKey('golden-button-secondary-tonal'),
-        label: 'Review later',
-        variant: MxSecondaryVariant.tonal,
-        trailingIcon: Icons.schedule,
-        fullWidth: true,
-        onPressed: _noop,
-      ),
-      MxGap(AppSpacing.md),
-      MxSecondaryButton(
-        key: ValueKey('golden-button-secondary-text'),
-        label: 'Skip',
-        variant: MxSecondaryVariant.text,
-        fullWidth: true,
-        onPressed: _noop,
-      ),
-      MxGap(AppSpacing.md),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: MxIconButton(
-          key: ValueKey('golden-button-icon-normal'),
-          icon: Icons.search,
-          tooltip: 'Search',
-          onPressed: _noop,
-        ),
-      ),
-    ],
-  );
+    ),
+  ],
+);
 
 Widget _buildButtonStateGoldenContent() => const Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      MxPrimaryButton(
-        key: ValueKey('golden-button-primary-disabled'),
-        label: 'Continue',
-        fullWidth: true,
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    MxPrimaryButton(
+      key: ValueKey('golden-button-primary-disabled'),
+      label: 'Continue',
+      fullWidth: true,
+      onPressed: null,
+    ),
+    MxGap(AppSpacing.md),
+    MxSecondaryButton(
+      key: ValueKey('golden-button-secondary-disabled'),
+      label: 'Cancel',
+      fullWidth: true,
+      onPressed: null,
+    ),
+    MxGap(AppSpacing.md),
+    Align(
+      alignment: Alignment.centerLeft,
+      child: MxIconButton(
+        key: ValueKey('golden-button-icon-disabled'),
+        icon: Icons.search,
+        tooltip: 'Search',
         onPressed: null,
       ),
-      MxGap(AppSpacing.md),
-      MxSecondaryButton(
-        key: ValueKey('golden-button-secondary-disabled'),
-        label: 'Cancel',
-        fullWidth: true,
-        onPressed: null,
-      ),
-      MxGap(AppSpacing.md),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: MxIconButton(
-          key: ValueKey('golden-button-icon-disabled'),
-          icon: Icons.search,
-          tooltip: 'Search',
-          onPressed: null,
-        ),
-      ),
-      MxGap(AppSpacing.lg),
-      MxPrimaryButton(
-        key: ValueKey('golden-button-primary-loading'),
-        label: 'Saving',
-        fullWidth: true,
-        isLoading: true,
-        onPressed: _noop,
-      ),
-      MxGap(AppSpacing.md),
-      MxSecondaryButton(
-        key: ValueKey('golden-button-secondary-loading'),
-        label: 'Retry',
-        fullWidth: true,
-        isLoading: true,
-        onPressed: _noop,
-      ),
-    ],
-  );
+    ),
+    MxGap(AppSpacing.lg),
+    MxPrimaryButton(
+      key: ValueKey('golden-button-primary-loading'),
+      label: 'Saving',
+      fullWidth: true,
+      isLoading: true,
+      onPressed: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    MxSecondaryButton(
+      key: ValueKey('golden-button-secondary-loading'),
+      label: 'Retry',
+      fullWidth: true,
+      isLoading: true,
+      onPressed: _noop,
+    ),
+  ],
+);
 
 Widget _buildStateGoldenContent() => const Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      MxPrimaryButton(
-        key: ValueKey('golden-state-disabled-button'),
-        label: 'Review unavailable',
-        fullWidth: true,
-        onPressed: null,
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    MxPrimaryButton(
+      key: ValueKey('golden-state-disabled-button'),
+      label: 'Review unavailable',
+      fullWidth: true,
+      onPressed: null,
+    ),
+    MxGap(AppSpacing.md),
+    MxAnswerOptionCard(
+      key: ValueKey('golden-state-disabled-answer'),
+      label: 'Disabled answer option',
+      enabled: false,
+      onPressed: _noop,
+    ),
+    MxGap(AppSpacing.lg),
+    MxCard(
+      key: ValueKey('golden-state-loading-card'),
+      child: MxLoadingState(
+        message: 'Loading next review',
+        progressSize: MxProgressSize.medium,
       ),
-      MxGap(AppSpacing.md),
-      MxAnswerOptionCard(
-        key: ValueKey('golden-state-disabled-answer'),
-        label: 'Disabled answer option',
-        enabled: false,
-        onPressed: _noop,
-      ),
-      MxGap(AppSpacing.lg),
-      MxCard(
-        key: ValueKey('golden-state-loading-card'),
-        child: MxLoadingState(
-          message: 'Loading next review',
-          progressSize: MxProgressSize.medium,
-        ),
-      ),
-      MxGap(AppSpacing.lg),
-      MxErrorState(
-        key: ValueKey('golden-state-error'),
-        title: 'Sync failed',
-        message: 'Use cached cards and retry when the connection is back.',
-        retryLabel: 'Retry',
-        onRetry: _noop,
-      ),
-    ],
-  );
+    ),
+    MxGap(AppSpacing.lg),
+    MxErrorState(
+      key: ValueKey('golden-state-error'),
+      title: 'Sync failed',
+      message: 'Use cached cards and retry when the connection is back.',
+      retryLabel: 'Retry',
+      onRetry: _noop,
+    ),
+  ],
+);
 
 Widget _buildTextScaleGoldenContent() => const Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      MxStudySetTile(
-        key: ValueKey('golden-text-scale-study-set'),
-        title: 'Long vocabulary deck name',
-        icon: Icons.style_outlined,
-        metaLine: '120 cards due today',
-        ownerInitials: 'MX',
-        ownerLabel: 'MemoX study group',
-        onTap: _noop,
-      ),
-      MxGap(AppSpacing.md),
-      MxAnswerOptionCard(
-        key: ValueKey('golden-text-scale-answer'),
-        label:
-            'A longer answer option that should wrap cleanly at text scale 1.2.',
-        selected: true,
-        onPressed: _noop,
-      ),
-      MxGap(AppSpacing.md),
-      MxPrimaryButton(
-        key: ValueKey('golden-text-scale-primary-button'),
-        label: 'Continue learning',
-        leadingIcon: Icons.play_arrow,
-        trailingIcon: Icons.arrow_forward,
-        fullWidth: true,
-        onPressed: _noop,
-      ),
-    ],
-  );
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    MxStudySetTile(
+      key: ValueKey('golden-text-scale-study-set'),
+      title: 'Long vocabulary deck name',
+      icon: Icons.style_outlined,
+      metaLine: '120 cards due today',
+      ownerInitials: 'MX',
+      ownerLabel: 'MemoX study group',
+      onTap: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    MxAnswerOptionCard(
+      key: ValueKey('golden-text-scale-answer'),
+      label:
+          'A longer answer option that should wrap cleanly at text scale 1.2.',
+      selected: true,
+      onPressed: _noop,
+    ),
+    MxGap(AppSpacing.md),
+    MxPrimaryButton(
+      key: ValueKey('golden-text-scale-primary-button'),
+      label: 'Continue learning',
+      leadingIcon: Icons.play_arrow,
+      trailingIcon: Icons.arrow_forward,
+      fullWidth: true,
+      onPressed: _noop,
+    ),
+  ],
+);
 
 Widget _buildCardGoldenContent() => const Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      MxCard(
-        key: ValueKey('golden-card-normal'),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            MxText('Normal card', role: MxTextRole.tileTitle),
-            MxGap(AppSpacing.sm),
-            MxText(
-              'Token padding, radius, elevation, and themed background.',
-              role: MxTextRole.tileMeta,
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    MxCard(
+      key: ValueKey('golden-card-normal'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MxText('Normal card', role: MxTextRole.tileTitle),
+          MxGap(AppSpacing.sm),
+          MxText(
+            'Token padding, radius, elevation, and themed background.',
+            role: MxTextRole.tileMeta,
+          ),
+        ],
+      ),
+    ),
+    MxGap(AppSpacing.md),
+    MxCard(
+      key: ValueKey('golden-card-clickable'),
+      variant: MxCardVariant.outlined,
+      onTap: _noop,
+      child: Row(
+        children: [
+          Icon(Icons.touch_app_outlined),
+          MxGap(AppSpacing.md),
+          Expanded(
+            child: MxText(
+              'Clickable outlined card',
+              role: MxTextRole.tileTitle,
             ),
-          ],
-        ),
+          ),
+          Icon(Icons.chevron_right),
+        ],
       ),
-      MxGap(AppSpacing.md),
-      MxCard(
-        key: ValueKey('golden-card-clickable'),
-        variant: MxCardVariant.outlined,
-        onTap: _noop,
-        child: Row(
-          children: [
-            Icon(Icons.touch_app_outlined),
-            MxGap(AppSpacing.md),
-            Expanded(
-              child: MxText(
-                'Clickable outlined card',
-                role: MxTextRole.tileTitle,
-              ),
-            ),
-            Icon(Icons.chevron_right),
-          ],
-        ),
+    ),
+    MxGap(AppSpacing.md),
+    MxCard(
+      key: ValueKey('golden-card-elevated'),
+      variant: MxCardVariant.elevated,
+      child: MxLinearProgress(
+        value: 0.72,
+        label: 'Card mastery',
+        showPercentage: true,
       ),
-      MxGap(AppSpacing.md),
-      MxCard(
-        key: ValueKey('golden-card-elevated'),
-        variant: MxCardVariant.elevated,
-        child: MxLinearProgress(
-          value: 0.72,
-          label: 'Card mastery',
-          showPercentage: true,
-        ),
-      ),
-    ],
-  );
+    ),
+  ],
+);
 
 class _AppHarness extends StatelessWidget {
   const _AppHarness({
@@ -5249,6 +5257,27 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
     ),
   ),
   _SharedWidgetCase(
+    name: 'MxCardActionsSheet',
+    minimal: (key) => MxCardActionsSheet(key: key),
+    full: (key) => MxCardActionsSheet(key: key, onSelected: (_) {}),
+  ),
+  _SharedWidgetCase(
+    name: 'MxCardBreakdownList',
+    minimal: (key) => MxCardBreakdownList(
+      key: key,
+      entries: const [
+        MxCardBreakdownEntry(label: 'New', count: 1, color: Colors.grey),
+      ],
+    ),
+    full: (key) => MxCardBreakdownList(
+      key: key,
+      entries: const [
+        MxCardBreakdownEntry(label: 'Learning', count: 2, color: Colors.orange),
+        MxCardBreakdownEntry(label: 'Mastered', count: 3, color: Colors.green),
+      ],
+    ),
+  ),
+  _SharedWidgetCase(
     name: 'MxDeckCard',
     minimal: (key) =>
         MxDeckCard(key: key, title: 'Vocabulary', icon: Icons.style_outlined),
@@ -5261,6 +5290,12 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       onTap: () {},
       onLongPress: () {},
     ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxDeckPill',
+    minimal: (key) => MxDeckPill(key: key, deckName: 'Korean deck'),
+    full: (key) =>
+        MxDeckPill(key: key, deckName: 'Biology essentials', onTap: () {}),
   ),
   _SharedWidgetCase(
     name: 'MxDueSummaryCard',
@@ -5307,6 +5342,26 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       tooltip: 'Create',
       variant: MxFabVariant.tonal,
       extendedLabel: 'Create',
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxFieldLabel',
+    minimal: (key) => MxFieldLabel(key: key, label: 'Front'),
+    full: (key) => MxFieldLabel(key: key, label: 'Front', used: 12, max: 120),
+  ),
+  _SharedWidgetCase(
+    name: 'MxFormScaffold',
+    scrollableHost: false,
+    minimal: (key) => MxFormScaffold(
+      key: key,
+      title: 'Create card',
+      body: const Text('Form body'),
+    ),
+    full: (key) => MxFormScaffold(
+      key: key,
+      title: 'Create card',
+      body: const Text('Form body'),
+      bottomAction: MxPrimaryButton(label: 'Save', onPressed: () {}),
     ),
   ),
   _SharedWidgetCase(
@@ -5377,6 +5432,21 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
     ),
   ),
   _SharedWidgetCase(
+    name: 'MxListScaffold',
+    scrollableHost: false,
+    minimal: (key) => MxListScaffold(
+      key: key,
+      title: 'Library',
+      body: const Text('List body'),
+    ),
+    full: (key) => MxListScaffold(
+      key: key,
+      title: 'Library',
+      body: const Text('List body'),
+      floatingActionButton: MxFab(icon: Icons.add, onPressed: () {}),
+    ),
+  ),
+  _SharedWidgetCase(
     name: 'MxListTile',
     minimal: (key) => MxListTile(key: key, title: 'List item'),
     full: (key) => MxListTile(
@@ -5389,6 +5459,30 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       showChevron: true,
       onTap: () {},
       onLongPress: () {},
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxModeMixCard',
+    minimal: (key) => MxModeMixCard(
+      key: key,
+      title: 'Mix',
+      subtitle: 'Adaptive study',
+      badgeLabel: 'Adaptive',
+      modeIcons: const [Icons.style_outlined],
+      modesSummary: 'All modes',
+    ),
+    full: (key) => MxModeMixCard(
+      key: key,
+      title: 'Mix',
+      subtitle: 'Adaptive study across every mode',
+      badgeLabel: 'Adaptive',
+      modeIcons: const [
+        Icons.style_outlined,
+        Icons.compare_arrows_rounded,
+        Icons.quiz_outlined,
+      ],
+      modesSummary: 'Review, Match, Guess',
+      onTap: () {},
     ),
   ),
   _SharedWidgetCase(
@@ -5688,6 +5782,80 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
     ),
   ),
   _SharedWidgetCase(
+    name: 'MxSegmentedStatus',
+    minimal: (key) => MxSegmentedStatus<String>(
+      key: key,
+      options: const [
+        MxSegmentedStatusOption(
+          value: 'new',
+          label: 'New',
+          dotRole: RepetitionColorRole.first,
+        ),
+      ],
+      selected: 'new',
+      onSelected: (_) {},
+    ),
+    full: (key) => MxSegmentedStatus<String>(
+      key: key,
+      options: const [
+        MxSegmentedStatusOption(
+          value: 'new',
+          label: 'New',
+          dotRole: RepetitionColorRole.first,
+        ),
+        MxSegmentedStatusOption(
+          value: 'learning',
+          label: 'Learning',
+          dotRole: RepetitionColorRole.mid,
+        ),
+      ],
+      selected: 'learning',
+      onSelected: (_) {},
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxStudyScaffold',
+    scrollableHost: false,
+    minimal: (key) => MxStudyScaffold(
+      key: key,
+      modeLabel: 'Review',
+      accent: MxStudyTopBarAccent.primary,
+      progressValue: 0.4,
+      counterLabel: '2 / 10',
+      body: const Text('Study body'),
+    ),
+    full: (key) => MxStudyScaffold(
+      key: key,
+      modeLabel: 'Review',
+      accent: MxStudyTopBarAccent.primary,
+      progressValue: 0.4,
+      counterLabel: '2 / 10',
+      onClose: () {},
+      body: const Text('Study body'),
+      bottomAction: MxPrimaryButton(label: 'Continue', onPressed: () {}),
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxStudyTopBar',
+    minimal: (key) => MxStudyTopBar(
+      key: key,
+      modeLabel: 'Review',
+      accent: MxStudyTopBarAccent.primary,
+      progressValue: 0.25,
+      counterLabel: '1 / 4',
+      onClose: () {},
+    ),
+    full: (key) => MxStudyTopBar(
+      key: key,
+      modeLabel: 'Review',
+      accent: MxStudyTopBarAccent.mastery,
+      progressValue: 0.75,
+      counterLabel: '3 / 4',
+      onClose: () {},
+      trailing: const Icon(Icons.more_vert),
+    ),
+  ),
+  _SharedWidgetCase(
     name: 'MxStudyProgressAction',
     minimal: (key) => MxStudyProgressAction(
       key: key,
@@ -5702,6 +5870,47 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       badgeCount: 120,
       tooltip: 'Study due cards',
       onPressed: _noop,
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxTabBar',
+    minimal: (key) => MxTabBar(
+      key: key,
+      items: const [MxTabBarItem(label: 'Decks')],
+      selectedIndex: 0,
+      onChanged: (_) {},
+    ),
+    full: (key) => MxTabBar(
+      key: key,
+      items: const [
+        MxTabBarItem(label: 'Decks', count: 3),
+        MxTabBarItem(label: 'Folders', count: 1),
+      ],
+      selectedIndex: 1,
+      onChanged: (_) {},
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxTagInput',
+    minimal: (key) => MxTagInput(
+      key: key,
+      tags: const ['grammar'],
+      onAdd: (_) {},
+      onRemove: (_) {},
+      addLabel: 'Add tag',
+      sheetTitle: 'Add tag',
+      hintText: 'Tag name',
+      confirmLabel: 'Add',
+    ),
+    full: (key) => MxTagInput(
+      key: key,
+      tags: const ['grammar', 'verbs'],
+      onAdd: (_) {},
+      onRemove: (_) {},
+      addLabel: 'Add tag',
+      sheetTitle: 'Add tag',
+      hintText: 'Tag name',
+      confirmLabel: 'Add',
     ),
   ),
   _SharedWidgetCase(
@@ -5764,6 +5973,21 @@ final List<_SharedWidgetCase> _sharedWidgetCases = [
       softWrap: true,
       overflow: TextOverflow.ellipsis,
       textAlign: TextAlign.center,
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxWeeklyBarChart',
+    minimal: (key) => MxWeeklyBarChart(
+      key: key,
+      entries: const [MxWeeklyBarChartEntry(label: 'M', value: 4)],
+    ),
+    full: (key) => MxWeeklyBarChart(
+      key: key,
+      entries: const [
+        MxWeeklyBarChartEntry(label: 'M', value: 4),
+        MxWeeklyBarChartEntry(label: 'T', value: 8),
+        MxWeeklyBarChartEntry(label: 'W', value: 2),
+      ],
     ),
   ),
   _SharedWidgetCase(
@@ -6484,7 +6708,8 @@ List<File> _sharedStateSourceFiles() {
   return files;
 }
 
-Set<String> _sharedWidgetCatalogNames() => _sharedWidgetCases.map((entry) => entry.name).toSet();
+Set<String> _sharedWidgetCatalogNames() =>
+    _sharedWidgetCases.map((entry) => entry.name).toSet();
 
 Set<String> _sharedWidgetClassNames() {
   final names = <String>{};
@@ -6504,30 +6729,33 @@ Set<String> _sharedWidgetClassNames() {
 }
 
 Set<String> _interactionCoverageWidgetNames() => {
-    ..._interactionCaseNames(_tapCallbackCases),
-    ..._dedicatedInteractionCoverageWidgetNames,
-  };
+  ..._interactionCaseNames(_tapCallbackCases),
+  ..._dedicatedInteractionCoverageWidgetNames,
+};
 
 Set<String> _stateCoverageWidgetNames() => {
-    ..._interactionCaseNames(_disabledInteractionCases),
-    ..._interactionCaseNames(_loadingInteractionCases),
-    ..._dedicatedStateCoverageWidgetNames,
-  };
+  ..._interactionCaseNames(_disabledInteractionCases),
+  ..._interactionCaseNames(_loadingInteractionCases),
+  ..._dedicatedStateCoverageWidgetNames,
+};
 
 Set<String> _layoutCoverageWidgetNames() => _sharedWidgetCatalogNames();
 
 Set<String> _themeCoverageWidgetNames() => _sharedWidgetCatalogNames();
 
 Set<String> _accessibilityCoverageWidgetNames() => {
-    ..._layoutCaseNames(_accessibilityTextScaleCases),
-    ..._dedicatedAccessibilityCoverageWidgetNames,
-  };
+  ..._layoutCaseNames(_accessibilityTextScaleCases),
+  ..._dedicatedAccessibilityCoverageWidgetNames,
+};
 
-Set<String> _interactionCaseNames(List<_InteractionCase> cases) => cases.map((entry) => entry.name).toSet();
+Set<String> _interactionCaseNames(List<_InteractionCase> cases) =>
+    cases.map((entry) => entry.name).toSet();
 
-Set<String> _layoutCaseNames(List<_LayoutCase> cases) => cases.map((entry) => entry.name).toSet();
+Set<String> _layoutCaseNames(List<_LayoutCase> cases) =>
+    cases.map((entry) => entry.name).toSet();
 
-List<String> _missingCoverage(Set<String> required, Set<String> actual) => required.difference(actual).toList()..sort();
+List<String> _missingCoverage(Set<String> required, Set<String> actual) =>
+    required.difference(actual).toList()..sort();
 
 List<String> _findGoldenNondeterminism() {
   final source = _goldenSourceUnderTest();
@@ -6570,8 +6798,8 @@ String _goldenSourceUnderTest() {
 }
 
 String _stripComments(String source) => source
-      .replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '')
-      .replaceAll(RegExp(r'//.*$', multiLine: true), '');
+    .replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '')
+    .replaceAll(RegExp(r'//.*$', multiLine: true), '');
 
 List<String> _findRawEdgeInsets(File file, String source) {
   final violations = <String>[];

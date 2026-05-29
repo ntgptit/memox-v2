@@ -54,15 +54,18 @@ class MxTabBar extends StatelessWidget {
           ),
         ),
       ),
-      child: Row(
-        children: [
-          for (var i = 0; i < items.length; i++)
-            _MxTabBarTab(
-              item: items[i],
-              isSelected: i == selectedIndex,
-              onTap: () => onChanged(i),
-            ),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (var i = 0; i < items.length; i++)
+              _MxTabBarTab(
+                item: items[i],
+                isSelected: i == selectedIndex,
+                onTap: () => onChanged(i),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -107,7 +110,14 @@ class _MxTabBarTab extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            MxText(item.label, role: MxTextRole.tileTitle, color: foreground),
+            MxText(
+              item.label,
+              role: MxTextRole.tileTitle,
+              color: foreground,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+            ),
             if (item.count != null) ...[
               const MxGap(AppSpacing.sm),
               _MxTabBarCountBadge(count: item.count!, isActive: isSelected),
@@ -138,10 +148,7 @@ class _MxTabBarCountBadge extends StatelessWidget {
         horizontal: AppSpacing.sm,
         vertical: AppSpacing.xxs,
       ),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: AppRadius.borderFull,
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: AppRadius.borderFull),
       child: MxText(count.toString(), role: MxTextRole.badge, color: fg),
     );
   }

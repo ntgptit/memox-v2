@@ -21,16 +21,12 @@ import 'package:memox/presentation/features/flashcards/screens/flashcard_list_sc
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_deck_summary_section.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_detail_card_row.dart';
-import 'package:memox/presentation/features/flashcards/widgets/flashcard_preview_section.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_study_modes_section.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_toolbar_section.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
-import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
-import 'package:memox/presentation/shared/widgets/mx_badge.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
-import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
-import 'package:memox/presentation/shared/widgets/mx_search_field.dart';
+import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
 void main() {
@@ -92,10 +88,10 @@ void main() {
     expect(find.text('Front 1'), findsWidgets);
     expect(find.text('Back 1'), findsOneWidget);
     expect(find.text('Front 2'), findsWidgets);
-    await _scrollToText(tester, 'Your progress');
-    expect(find.text('Your progress'), findsOneWidget);
-    await _scrollToText(tester, 'Study modes');
-    expect(find.text('Study modes'), findsOneWidget);
+    await _scrollToText(tester, 'YOUR PROGRESS');
+    expect(find.text('YOUR PROGRESS'), findsOneWidget);
+    await _scrollToText(tester, 'STUDY FLOW');
+    expect(find.text('STUDY FLOW'), findsOneWidget);
   });
 
   testWidgets(
@@ -180,22 +176,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Import'), findsOneWidget);
-      final studyButtonFinder = find.widgetWithText(
-        MxPrimaryButton,
-        'Study this deck',
-      );
-      expect(studyButtonFinder, findsOneWidget);
-      expect(
-        tester.widget<MxPrimaryButton>(studyButtonFinder).onPressed,
-        isNull,
-      );
+      await _scrollToText(tester, 'STUDY FLOW');
+      expect(find.byTooltip('Import'), findsOneWidget);
+      expect(find.byKey(const ValueKey('study_mode_mix')), findsNothing);
 
       await _scrollToText(tester, 'No flashcards yet');
       expect(find.text('No flashcards yet'), findsOneWidget);
       expect(find.text('Add'), findsOneWidget);
 
-      await _scrollToText(tester, 'Study modes');
+      await _scrollToText(tester, 'STUDY FLOW');
       final disabledTiles = tester
           .widgetList<MxCard>(_studyModeTiles())
           .toList();
@@ -236,19 +225,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.file_upload_outlined), findsOneWidget);
+      await _scrollToText(tester, 'STUDY FLOW');
+      await _scrollToText(tester, 'Cards');
+      expect(find.byTooltip('Import'), findsOneWidget);
       expect(find.byTooltip('Reorder'), findsOneWidget);
       await _scrollToText(tester, 'Cards');
       expect(find.text('Cards'), findsOneWidget);
-      await _scrollToText(tester, 'Your progress');
-      expect(find.text('Your progress'), findsOneWidget);
+      await _scrollToText(tester, 'YOUR PROGRESS');
+      expect(find.text('YOUR PROGRESS'), findsOneWidget);
       expect(
         find.text("Progress is derived from this deck's SRS state."),
         findsNothing,
       );
-      await _scrollToText(tester, 'Study flow');
-      expect(find.text('Study flow'), findsOneWidget);
-      expect(find.text('Study modes'), findsNothing);
+      await _scrollToText(tester, 'STUDY FLOW');
+      expect(find.text('STUDY FLOW'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -279,20 +269,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final studyButton = find.widgetWithText(
-        MxPrimaryButton,
-        'Study this deck',
-      );
+      await _scrollToText(tester, 'STUDY FLOW');
+      final studyModes = find.byType(FlashcardStudyModesSection);
+      await _scrollToText(tester, 'Cards');
       final toolbar = find.byType(FlashcardToolbarSection);
-      final preview = find.byType(FlashcardPreviewSection);
 
-      expect(studyButton, findsOneWidget);
+      expect(studyModes, findsOneWidget);
       expect(toolbar, findsOneWidget);
-      expect(preview, findsOneWidget);
-      expect(find.byType(MxSearchField), findsOneWidget);
       expect(
-        tester.getTopLeft(toolbar).dy,
-        lessThan(tester.getTopLeft(preview).dy),
+        tester.getTopLeft(studyModes).dy,
+        lessThan(tester.getTopLeft(toolbar).dy),
       );
       expect(tester.takeException(), isNull);
     },
@@ -320,32 +306,23 @@ void main() {
       await tester.pumpAndSettle();
 
       final summary = find.byType(FlashcardDeckSummarySection);
-      final summaryBadge = find.descendant(
-        of: summary,
-        matching: find.byType(MxBadge),
-      );
 
       expect(
-        find.descendant(of: summary, matching: find.byType(MxAvatar)),
+        find.descendant(of: summary, matching: find.byType(MxProgressRing)),
         findsOneWidget,
       );
-      expect(summaryBadge, findsOneWidget);
       expect(
         find.descendant(
-          of: summaryBadge,
-          matching: find.text('2 cards · 7% mastery'),
+          of: summary,
+          matching: find.textContaining('0 of 2 cards mastered'),
         ),
         findsOneWidget,
       );
 
-      await _scrollToText(tester, 'Your progress');
-      final progressBars = tester
-          .widgetList<LinearProgressIndicator>(
-            find.byType(LinearProgressIndicator),
-          )
-          .toList();
-
-      expect(progressBars.any((bar) => bar.value == 0.07), isTrue);
+      await _scrollToText(tester, 'YOUR PROGRESS');
+      expect(find.text('Mastered'), findsOneWidget);
+      expect(find.text('Learning'), findsOneWidget);
+      expect(find.text('New'), findsOneWidget);
     },
   );
 
@@ -370,7 +347,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await _scrollToText(tester, 'Study modes');
+      await _scrollToText(tester, 'STUDY FLOW');
 
       final tiles = tester.widgetList<MxCard>(_studyModeTiles()).toList();
       final section = _studyModeSection();
@@ -487,19 +464,25 @@ void main() {
     addTearDown(container.dispose);
 
     final router = GoRouter(
-      initialLocation: '/deck/$deckId/flashcards',
+      initialLocation: '/library/deck/$deckId/flashcards',
       routes: [
         GoRoute(
-          path: '/${RoutePaths.flashcardListSegment}',
-          name: RouteNames.flashcardList,
-          builder: (context, state) => FlashcardListScreen(
-            deckId: state.pathParameters[RoutePaths.deckIdParam]!,
-          ),
-        ),
-        GoRoute(
-          path: '/${RoutePaths.studyEntrySegment}',
-          name: RouteNames.studyEntry,
+          path: '/library',
           builder: (context, state) => const SizedBox.shrink(),
+          routes: [
+            GoRoute(
+              path: RoutePaths.flashcardListSegment,
+              name: RouteNames.flashcardList,
+              builder: (context, state) => FlashcardListScreen(
+                deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+              ),
+            ),
+            GoRoute(
+              path: RoutePaths.studyEntrySegment,
+              name: RouteNames.studyEntry,
+              builder: (context, state) => const SizedBox.shrink(),
+            ),
+          ],
         ),
       ],
     );
@@ -518,16 +501,16 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.scrollUntilVisible(
-      find.text('Study this deck'),
+      find.byKey(const ValueKey('study_mode_Review')),
       300,
       scrollable: _verticalScrollable(),
     );
-    await tester.tap(find.text('Study this deck'));
-    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('study_mode_Review')));
+    await _pumpUntilPath(tester, router, '/library/study/deck/$deckId');
 
     expect(
       router.routeInformationProvider.value.uri.path,
-      '/study/deck/$deckId',
+      '/library/study/deck/$deckId',
     );
   });
 
@@ -545,19 +528,25 @@ void main() {
       addTearDown(container.dispose);
 
       final router = GoRouter(
-        initialLocation: '/deck/$deckId/flashcards',
+        initialLocation: '/library/deck/$deckId/flashcards',
         routes: [
           GoRoute(
-            path: '/${RoutePaths.flashcardListSegment}',
-            name: RouteNames.flashcardList,
-            builder: (context, state) => FlashcardListScreen(
-              deckId: state.pathParameters[RoutePaths.deckIdParam]!,
-            ),
-          ),
-          GoRoute(
-            path: '/${RoutePaths.studyEntrySegment}',
-            name: RouteNames.studyEntry,
+            path: '/library',
             builder: (context, state) => const SizedBox.shrink(),
+            routes: [
+              GoRoute(
+                path: RoutePaths.flashcardListSegment,
+                name: RouteNames.flashcardList,
+                builder: (context, state) => FlashcardListScreen(
+                  deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+                ),
+              ),
+              GoRoute(
+                path: RoutePaths.studyEntrySegment,
+                name: RouteNames.studyEntry,
+                builder: (context, state) => const SizedBox.shrink(),
+              ),
+            ],
           ),
         ],
       );
@@ -582,11 +571,11 @@ void main() {
         scrollable: _verticalScrollable(),
       );
       await tester.tap(mixCard);
-      await tester.pumpAndSettle();
+      await _pumpUntilPath(tester, router, '/library/study/deck/$deckId');
 
       expect(
         router.routeInformationProvider.value.uri.path,
-        '/study/deck/$deckId',
+        '/library/study/deck/$deckId',
       );
     },
   );
@@ -620,7 +609,7 @@ void main() {
       expect(find.text('Move'), findsOneWidget);
       expect(find.text('Duplicate'), findsOneWidget);
       expect(find.text('Import flashcards'), findsOneWidget);
-      expect(find.text('Export CSV'), findsOneWidget);
+      expect(find.text('Export deck'), findsOneWidget);
       expect(find.text('Delete'), findsOneWidget);
     },
   );
@@ -639,23 +628,29 @@ void main() {
     addTearDown(container.dispose);
 
     final router = GoRouter(
-      initialLocation: '/deck/$deckId/flashcards',
+      initialLocation: '/library/deck/$deckId/flashcards',
       routes: [
         GoRoute(
-          path: '/${RoutePaths.flashcardListSegment}',
-          name: RouteNames.flashcardList,
-          builder: (context, state) => FlashcardListScreen(
-            deckId: state.pathParameters[RoutePaths.deckIdParam]!,
-          ),
-        ),
-        GoRoute(
-          path: '/library/${RoutePaths.deckImportSegment}',
-          name: RouteNames.deckImport,
-          builder: (context, state) => SizedBox(
-            key: ValueKey(
-              'deck_import_${state.pathParameters[RoutePaths.deckIdParam]}',
+          path: '/library',
+          builder: (context, state) => const SizedBox.shrink(),
+          routes: [
+            GoRoute(
+              path: RoutePaths.flashcardListSegment,
+              name: RouteNames.flashcardList,
+              builder: (context, state) => FlashcardListScreen(
+                deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+              ),
             ),
-          ),
+            GoRoute(
+              path: RoutePaths.deckImportSegment,
+              name: RouteNames.deckImport,
+              builder: (context, state) => SizedBox(
+                key: ValueKey(
+                  'deck_import_${state.pathParameters[RoutePaths.deckIdParam]}',
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -784,14 +779,9 @@ void main() {
     expect(_rowIcon('Front 1', Icons.star_rounded), findsOneWidget);
   });
 
-  testWidgets('DT3 onSelect: preview card flips inline and in fullscreen', (
+  testWidgets('DT3 onSelect: flashcard row shows front and back together', (
     WidgetTester tester,
   ) async {
-    await tester.binding.setSurfaceSize(const Size(390, 844));
-    addTearDown(() async {
-      await tester.binding.setSurfaceSize(null);
-    });
-
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
@@ -810,45 +800,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final preview = find.byType(FlashcardPreviewSection);
-    final frontInPreview = find.descendant(
-      of: preview,
-      matching: find.text('Front 1'),
-    );
-    final backInPreview = find.descendant(
-      of: preview,
-      matching: find.text('Back 1'),
-    );
+    await _scrollToRowText(tester, 'Front 1');
 
-    expect(frontInPreview, findsOneWidget);
-    expect(backInPreview, findsNothing);
-
-    await tester.tap(frontInPreview);
-    await tester.pumpAndSettle();
-
-    expect(backInPreview, findsOneWidget);
-
-    await tester.tap(
-      find
-          .descendant(of: preview, matching: find.byTooltip('Fullscreen'))
-          .first,
-    );
-    await tester.pumpAndSettle();
-
-    final dialog = find.byType(Dialog);
-    expect(find.text('Preview card'), findsOneWidget);
+    final row = _rowForText('Front 1');
     expect(
-      find.descendant(of: dialog, matching: find.text('Back 1')),
+      find.descendant(of: row, matching: find.text('Front 1')),
       findsOneWidget,
     );
-
-    await tester.tap(
-      find.descendant(of: dialog, matching: find.text('Back 1')),
-    );
-    await tester.pumpAndSettle();
-
     expect(
-      find.descendant(of: dialog, matching: find.text('Front 1')),
+      find.descendant(of: row, matching: find.text('Back 1')),
       findsOneWidget,
     );
   });
@@ -919,20 +879,26 @@ void main() {
       addTearDown(container.dispose);
 
       final router = GoRouter(
-        initialLocation: '/deck/$deckId/flashcards',
+        initialLocation: '/library/deck/$deckId/flashcards',
         routes: [
           GoRoute(
-            path: '/${RoutePaths.flashcardListSegment}',
-            name: RouteNames.flashcardList,
-            builder: (context, state) => FlashcardListScreen(
-              deckId: state.pathParameters[RoutePaths.deckIdParam]!,
-            ),
-          ),
-          GoRoute(
-            path: '/${RoutePaths.flashcardEditSegment}',
-            name: RouteNames.flashcardEdit,
-            builder: (context, state) =>
-                const SizedBox(key: ValueKey('flashcard_edit_destination')),
+            path: '/library',
+            builder: (context, state) => const SizedBox.shrink(),
+            routes: [
+              GoRoute(
+                path: RoutePaths.flashcardListSegment,
+                name: RouteNames.flashcardList,
+                builder: (context, state) => FlashcardListScreen(
+                  deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+                ),
+              ),
+              GoRoute(
+                path: RoutePaths.flashcardEditSegment,
+                name: RouteNames.flashcardEdit,
+                builder: (context, state) =>
+                    const SizedBox(key: ValueKey('flashcard_edit_destination')),
+              ),
+            ],
           ),
         ],
       );
@@ -1075,6 +1041,23 @@ Finder _verticalScrollable() => find
           widget is Scrollable && widget.axisDirection == AxisDirection.down,
     )
     .first;
+
+Future<void> _pumpUntilPath(
+  WidgetTester tester,
+  GoRouter router,
+  String expectedPath,
+) async {
+  for (var attempt = 0; attempt < 30; attempt++) {
+    await tester.pump(const Duration(milliseconds: 50));
+    if (router.routeInformationProvider.value.uri.path == expectedPath) {
+      return;
+    }
+  }
+  fail(
+    'Timed out waiting for path $expectedPath; '
+    'actual=${router.routeInformationProvider.value.uri.path}',
+  );
+}
 
 Future<void> _scrollToText(WidgetTester tester, String text) async {
   await _scrollUntilAny(tester, find.text(text));

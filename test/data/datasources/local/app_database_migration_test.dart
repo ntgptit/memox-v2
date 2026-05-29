@@ -134,35 +134,30 @@ void main() {
     },
   );
 
-  test(
-    'DT4 onNavigate: adds bury/suspend columns and preserves rows during '
-    'schema v10 migration',
-    () async {
-      final database = AppDatabase(
-        executor: NativeDatabase.memory(
-          setup: _createSchemaV9WithoutBurySuspend,
-        ),
-      );
-      addTearDown(database.close);
+  test('DT4 onNavigate: adds bury/suspend columns and preserves rows during '
+      'schema v10 migration', () async {
+    final database = AppDatabase(
+      executor: NativeDatabase.memory(setup: _createSchemaV9WithoutBurySuspend),
+    );
+    addTearDown(database.close);
 
-      await database.ensureOpen();
+    await database.ensureOpen();
 
-      final columns = await _columnNames(database, 'flashcard_progress');
-      expect(columns, containsAll(<String>['buried_until', 'is_suspended']));
+    final columns = await _columnNames(database, 'flashcard_progress');
+    expect(columns, containsAll(<String>['buried_until', 'is_suspended']));
 
-      final progress = await database.select(database.flashcardProgress).get();
-      expect(progress, hasLength(1));
-      final row = progress.single;
-      // Existing pre-migration data preserved.
-      expect(row.flashcardId, 'card-1');
-      expect(row.currentBox, 3);
-      expect(row.reviewCount, 1);
-      expect(row.dueAt, 200);
-      // New columns get safe defaults.
-      expect(row.isSuspended, isFalse);
-      expect(row.buriedUntil, isNull);
-    },
-  );
+    final progress = await database.select(database.flashcardProgress).get();
+    expect(progress, hasLength(1));
+    final row = progress.single;
+    // Existing pre-migration data preserved.
+    expect(row.flashcardId, 'card-1');
+    expect(row.currentBox, 3);
+    expect(row.reviewCount, 1);
+    expect(row.dueAt, 200);
+    // New columns get safe defaults.
+    expect(row.isSuspended, isFalse);
+    expect(row.buriedUntil, isNull);
+  });
 }
 
 /// Builds a schema-v9 database (current shape minus `flashcard_progress`'s

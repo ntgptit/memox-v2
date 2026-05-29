@@ -792,43 +792,38 @@ Future<_FlashcardFlowHarness> _pumpEmptyDailyDeck(
   String deckName = 'Daily Words',
   File? databaseFile,
 }) => _pumpFlashcardFlow(
-    tester,
-    databaseFile: databaseFile,
-    seedData: (app) => app.seedDeckWithoutFlashcards(
-      folderId: 'folder-korean',
-      deckId: 'deck-daily',
-      folderName: 'Korean',
-      deckName: deckName,
-    ),
-  );
+  tester,
+  databaseFile: databaseFile,
+  seedData: (app) => app.seedDeckWithoutFlashcards(
+    folderId: 'folder-korean',
+    deckId: 'deck-daily',
+    folderName: 'Korean',
+    deckName: deckName,
+  ),
+);
 
 Future<_FlashcardFlowHarness> _pumpDailyDeck(
   WidgetTester tester, {
   required List<_SeedCard> cards,
   File? databaseFile,
 }) => _pumpFlashcardFlow(
-    tester,
-    databaseFile: databaseFile,
-    seedData: (app) => _seedDailyDeck(app, cards: cards),
-  );
+  tester,
+  databaseFile: databaseFile,
+  seedData: (app) => _seedDailyDeck(app, cards: cards),
+);
 
 Future<_FlashcardFlowHarness> _pumpOrderedCards(
   WidgetTester tester, {
   File? databaseFile,
 }) => _pumpDailyDeck(
-    tester,
-    databaseFile: databaseFile,
-    cards: const [
-      _SeedCard(id: 'card-apple', front: '사과', back: 'quả táo'),
-      _SeedCard(
-        id: 'card-school',
-        front: '학교',
-        back: 'trường học',
-        sortOrder: 1,
-      ),
-      _SeedCard(id: 'card-eat', front: '먹다', back: 'ăn', sortOrder: 2),
-    ],
-  );
+  tester,
+  databaseFile: databaseFile,
+  cards: const [
+    _SeedCard(id: 'card-apple', front: '사과', back: 'quả táo'),
+    _SeedCard(id: 'card-school', front: '학교', back: 'trường học', sortOrder: 1),
+    _SeedCard(id: 'card-eat', front: '먹다', back: 'ăn', sortOrder: 2),
+  ],
+);
 
 Future<_FlashcardFlowHarness> _pumpFlashcardFlow(
   WidgetTester tester, {

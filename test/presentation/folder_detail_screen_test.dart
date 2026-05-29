@@ -15,6 +15,7 @@ import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
+import 'package:memox/presentation/shared/widgets/mx_progress_indicator.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 
 void main() {
@@ -181,7 +182,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('0 subfolders · 1 deck · 2 cards'), findsOneWidget);
+      expect(
+        find.text('0 subfolders · 1 deck · 2 cards · 2 due'),
+        findsOneWidget,
+      );
     },
   );
 
@@ -282,9 +286,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Vitamin B1'), findsOneWidget);
-    expect(find.text('1 card'), findsAtLeastNWidgets(1));
+    final deckCard = find.widgetWithText(MxDeckCard, 'Vitamin B1');
+    expect(
+      find.descendant(of: deckCard, matching: find.textContaining('1 card')),
+      findsOneWidget,
+    );
     expect(find.text('1 cards · 1 due today'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(
+      find.descendant(of: deckCard, matching: find.textContaining('· 1 due')),
+      findsOneWidget,
+    );
   });
 
   testWidgets(
@@ -510,140 +521,71 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Legacy'), findsOneWidget);
-      expect(find.text('0%'), findsOneWidget);
+      expect(find.byType(MxLinearProgress), findsOneWidget);
     },
   );
 
-  testWidgets(
-    'DT3 onNavigate: opens recursive folder study from the subfolder card icon with due badge',
-    (WidgetTester tester) async {
-      const folderId = 'folder-001';
-      const subfolderId = 'folder-002';
-      final container = ProviderContainer(
-        overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
-            (ref) => Future<FolderDetailState>.value(_sampleFolderState),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      final router = GoRouter(
-        initialLocation: '/folder/$folderId',
-        routes: [
-          GoRoute(
-            path: '/${RoutePaths.folderDetailSegment}',
-            name: RouteNames.folderDetail,
-            builder: (context, state) => FolderDetailScreen(
-              folderId: state.pathParameters[RoutePaths.folderIdParam]!,
-            ),
-          ),
-          GoRoute(
-            path: '/${RoutePaths.studyEntrySegment}',
-            name: RouteNames.studyEntry,
-            builder: (context, state) => const SizedBox.shrink(),
-          ),
-        ],
-      );
-      addTearDown(router.dispose);
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp.router(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            routerConfig: router,
-          ),
+  testWidgets('DT3 onNavigate: opens subfolder detail from the subfolder row', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    const subfolderId = 'folder-002';
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_sampleFolderState),
         ),
-      );
-      await tester.pumpAndSettle();
+      ],
+    );
+    addTearDown(container.dispose);
 
-      final studyButton = find.byKey(
-        const ValueKey('folder_recursive_study_$subfolderId'),
-      );
-
-      expect(find.text('Study'), findsNothing);
-      expect(studyButton, findsOneWidget);
-      expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
-      expect(find.text('19%'), findsOneWidget);
-      expect(find.text('2'), findsOneWidget);
-      expect(
-        tester.getCenter(studyButton).dy,
-        closeTo(tester.getCenter(find.text('Vocabulary')).dy, 16),
-      );
-
-      await tester.tap(studyButton);
-      await tester.pumpAndSettle();
-
-      expect(
-        router.routeInformationProvider.value.uri.path,
-        '/study/folder/$subfolderId',
-      );
-    },
-  );
-
-  testWidgets(
-    'DT4 onNavigate: opens deck study from the deck card progress action',
-    (WidgetTester tester) async {
-      const folderId = 'folder-001';
-      const deckId = 'deck-001';
-      final container = ProviderContainer(
-        overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
-            (ref) => Future<FolderDetailState>.value(_deckFolderState),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      final router = GoRouter(
-        initialLocation: '/folder/$folderId',
-        routes: [
-          GoRoute(
-            path: '/${RoutePaths.folderDetailSegment}',
-            name: RouteNames.folderDetail,
-            builder: (context, state) => FolderDetailScreen(
-              folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+    final router = GoRouter(
+      initialLocation: '/library/folder/$folderId',
+      routes: [
+        GoRoute(
+          path: '/library',
+          builder: (context, state) => const SizedBox.shrink(),
+          routes: [
+            GoRoute(
+              path: RoutePaths.folderDetailSegment,
+              name: RouteNames.folderDetail,
+              builder: (context, state) => FolderDetailScreen(
+                folderId: state.pathParameters[RoutePaths.folderIdParam]!,
+              ),
             ),
-          ),
-          GoRoute(
-            path: '/${RoutePaths.studyEntrySegment}',
-            name: RouteNames.studyEntry,
-            builder: (context, state) => const SizedBox.shrink(),
-          ),
-        ],
-      );
-      addTearDown(router.dispose);
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp.router(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            routerConfig: router,
-          ),
+          ],
         ),
-      );
-      await tester.pumpAndSettle();
+      ],
+    );
+    addTearDown(router.dispose);
 
-      final studyButton = find.byKey(const ValueKey('deck_study_$deckId'));
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(find.text('Vitamin B1'), findsOneWidget);
-      expect(studyButton, findsOneWidget);
-      expect(find.text('42%'), findsOneWidget);
-      expect(find.text('1'), findsOneWidget);
+    expect(find.text('Vocabulary'), findsOneWidget);
+    expect(
+      find.text('0 subfolders · 1 deck · 2 cards · 2 due'),
+      findsOneWidget,
+    );
 
-      await tester.tap(studyButton);
-      await tester.pumpAndSettle();
+    await tester.tap(find.text('Vocabulary'));
+    await tester.pump();
+    await tester.pumpAndSettle();
 
-      expect(
-        router.routeInformationProvider.value.uri.path,
-        '/study/deck/$deckId',
-      );
-    },
-  );
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/library/folder/$subfolderId',
+    );
+  });
 
   testWidgets('DT5 onNavigate: tapping a deck row opens flashcard management', (
     WidgetTester tester,
@@ -957,7 +899,7 @@ void main() {
     expect(find.text('Move'), findsOneWidget);
     expect(find.text('Duplicate'), findsOneWidget);
     expect(find.text('Import flashcards'), findsOneWidget);
-    expect(find.text('Export CSV'), findsOneWidget);
+    expect(find.text('Export deck'), findsOneWidget);
     expect(find.text('Delete'), findsOneWidget);
   });
 }

@@ -9,45 +9,51 @@ import 'package:memox/presentation/features/study/providers/study_session_notifi
 /// P0-2 fix: bury/suspend from the card-actions sheet must DROP the current
 /// card (remove it from the session), never `skipCurrentItem` (which requeues).
 void main() {
-  test('buryCurrentCard buries then drops, and never requeues (no skip)', () async {
-    final repo = _RecordingStudyRepo();
-    final container = ProviderContainer(
-      overrides: [studyRepoProvider.overrideWithValue(repo)],
-    );
-    addTearDown(container.dispose);
+  test(
+    'buryCurrentCard buries then drops, and never requeues (no skip)',
+    () async {
+      final repo = _RecordingStudyRepo();
+      final container = ProviderContainer(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
 
-    final controller = container.read(
-      studySessionActionControllerProvider('session-1').notifier,
-    );
+      final controller = container.read(
+        studySessionActionControllerProvider('session-1').notifier,
+      );
 
-    final buriedId = await controller.buryCurrentCard();
+      final buriedId = await controller.buryCurrentCard();
 
-    expect(buriedId, 'c1');
-    expect(repo.buriedIds, <String>['c1']);
-    expect(repo.dropCallCount, 1);
-    expect(repo.skipCalled, isFalse);
-    expect(repo.suspendedIds, isEmpty);
-  });
+      expect(buriedId, 'c1');
+      expect(repo.buriedIds, <String>['c1']);
+      expect(repo.dropCallCount, 1);
+      expect(repo.skipCalled, isFalse);
+      expect(repo.suspendedIds, isEmpty);
+    },
+  );
 
-  test('suspendCurrentCard suspends then drops, and never requeues (no skip)', () async {
-    final repo = _RecordingStudyRepo();
-    final container = ProviderContainer(
-      overrides: [studyRepoProvider.overrideWithValue(repo)],
-    );
-    addTearDown(container.dispose);
+  test(
+    'suspendCurrentCard suspends then drops, and never requeues (no skip)',
+    () async {
+      final repo = _RecordingStudyRepo();
+      final container = ProviderContainer(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+      );
+      addTearDown(container.dispose);
 
-    final controller = container.read(
-      studySessionActionControllerProvider('session-1').notifier,
-    );
+      final controller = container.read(
+        studySessionActionControllerProvider('session-1').notifier,
+      );
 
-    final suspendedId = await controller.suspendCurrentCard();
+      final suspendedId = await controller.suspendCurrentCard();
 
-    expect(suspendedId, 'c1');
-    expect(repo.suspendedIds, <String>['c1']);
-    expect(repo.dropCallCount, 1);
-    expect(repo.skipCalled, isFalse);
-    expect(repo.buriedIds, isEmpty);
-  });
+      expect(suspendedId, 'c1');
+      expect(repo.suspendedIds, <String>['c1']);
+      expect(repo.dropCallCount, 1);
+      expect(repo.skipCalled, isFalse);
+      expect(repo.buriedIds, isEmpty);
+    },
+  );
 }
 
 class _RecordingStudyRepo implements StudyRepo {

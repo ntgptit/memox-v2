@@ -151,9 +151,7 @@ class BulkAddPreviewSection extends StatelessWidget {
     if (actionState.isLoading && preparation == null) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: AppSpacing.xxl),
-        child: Center(
-          child: MxCircularProgress(size: MxProgressSize.large),
-        ),
+        child: Center(child: MxCircularProgress(size: MxProgressSize.large)),
       );
     }
 

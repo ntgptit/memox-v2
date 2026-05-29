@@ -43,8 +43,7 @@ class BulkAddFileSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final hasFile =
-        draft.sourceBytes != null && draft.loadedFileName != null;
+    final hasFile = draft.sourceBytes != null && draft.loadedFileName != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
