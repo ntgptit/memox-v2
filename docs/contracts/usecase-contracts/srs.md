@@ -29,6 +29,7 @@ class BoxIntervals {
 ```
 
 **Rules:**
+
 - Returns Duration for a given box (1-8 inclusive).
 - Asserts box in 1..8. Out-of-range = programmer error.
 
@@ -67,6 +68,7 @@ class DueDateComputer {
 ```
 
 **Rules:**
+
 - `computeFromBox(box) = clock.now() + BoxIntervals.forBox(box)`.
 - Uses injected `Clock` for testability.
 
@@ -81,6 +83,7 @@ class NextCardSelector {
 ```
 
 **Rules:**
+
 - For `srsReview`: order by `due_at ASC`, then `current_box ASC` (oldest-due first, lowest box first as tiebreak).
 - For `newCards`: order by `flashcards.created_at ASC` among cards in box 1 with no attempts.
 - Stable sort.
@@ -96,6 +99,7 @@ class LifetimeStatsComputer {
 ```
 
 **Rules:**
+
 - `accuracy = (review_count - lapse_count) / review_count` if review_count > 0, else 0.0.
 - Uses counters on `flashcard_progress` directly. Does NOT scan `study_attempts`.
 

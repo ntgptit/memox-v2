@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Per-language settings, gating by `deck.target_language`, front-only playback.
 
 ## SpeakFrontUseCase
@@ -17,6 +16,7 @@ Future<Either<Failure, Unit>> call({required Flashcard card, required Deck deck}
 ```
 
 **Rules:**
+
 - If `deck.target_language == TargetLanguage.unsupported` → silently return `Right(unit)`. No error.
 - Map `target_language` to `TtsLanguageCode`.
 - Apply per-language settings (voice, rate, pitch, volume).
@@ -52,6 +52,7 @@ Future<Either<Failure, Unit>> updateLanguageSettings(TtsLanguageCode lang, TtsLa
 ```
 
 **Rules:**
+
 - Validate rate ∈ [0.3, 0.7], pitch ∈ [0.7, 1.5], volume ∈ [0.0, 1.0]. Else `ValidationFailure(code: outOfRange)`.
 - Per-language settings stored independently.
 - Persist to SharedPreferences.

@@ -152,22 +152,25 @@ After a mutation use case returns success, the notifier MUST NOT manually update
 
 Exception: state owned only by the notifier (e.g., selection mode IDs, current page index, ephemeral toggles) is locally managed and never persisted.
 
-
-
 **Architecture:**
+
 - `docs/architecture/clean-architecture-contract.md` — notifier orchestrates, use case decides
 
 **Storage:**
+
 - `docs/database/storage-boundaries.md` — provider memory is NOT a persistence layer
 
 **Wireframes touching async state heavily:**
+
 - `docs/wireframes/12-study-entry-gate.md` — parallel scope+resume checks
 - `docs/wireframes/13-study-session-review.md` through `docs/wireframes/17-study-session-fill.md` — session state machine
 - `docs/wireframes/19-settings-account.md` — sync state (idle / uploading / restoring)
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "State" (provider invalidation, AsyncValue handling)
 
 **Source files to inspect:**
+
 - `lib/presentation/features/**/notifiers/**`
 - `lib/presentation/features/**/providers/**`

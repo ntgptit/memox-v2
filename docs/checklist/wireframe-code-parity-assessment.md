@@ -13,6 +13,7 @@ companion_docs:
 # Wireframe ↔ Code Parity Assessment (Revision 4)
 
 > **Lifecycle**:
+>
 > - Rev 1 (junior, deprecated) — đánh giá theo "file tồn tại" bề mặt; sai chiều drift ở Match/Guess; sai MATCH cho Dashboard/Tag/Recall/Import/Study-entry.
 > - Rev 2 (senior, replaced) — đào sâu 3 layer, evidence file:line, phát hiện streak orphan, schema thiếu bury/suspend, code paths stale; nhưng còn vài chỗ over-broad (xem §5.1).
 > - Rev 3 — refresh sau C>D cleanup pass đã commit; 4 cross-cutting items resolved, 3 cross-cutting items mới phát hiện qua recursive review.
@@ -188,6 +189,7 @@ Tier 1 (6 cases: deck_noCards, deck_noDueCards, folder_noCards, folder_noDueCard
 Tier 3 (`allBuried`, `allSuspended`) implemented 2026-05-29 (P0-2) — `countSuspendedInScope`/`countActiveBuriedInScope` pre-checks (allSuspended precedes allBuried), screen arms, l10n, tests (decision rows S4f/S4g). See §3.1.
 
 Remaining blocked:
+
 - **Tier 2** `tag_noCards` / `tag_noDueCards` — needs `StudyEntryType.tag` + tag-scope queries.
 
 ### §3.8 Excel import — ✅ **RESOLVED 2026-05-28**

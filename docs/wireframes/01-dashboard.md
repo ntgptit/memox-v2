@@ -230,21 +230,25 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/engagement/dashboard-engagement.md` — daily goal, streak, reminder logic
 - `docs/business/resume/resume-session.md` — Resume card behavior
 - `docs/business/study/study-flow.md` — Today CTA scope
 
 **Decision rows:**
+
 - Engagement section (streak broken banner, goal-off freezes streak, single reminder)
 - Resume section (30-day expiry, scope match)
 
 **Schema / storage:**
+
 - SharedPreferences keys: `goalEnabled`, `dailyGoal`, `streakEnabled`, `reminderEnabled`, `reminderTime`, `currentStreak`, `longestStreak`, `lastGoalMetDate`, `firstLaunchCompletedAt`
 - `study_sessions` table (status filter)
 
 **Contracts:** `docs/contracts/usecase-contracts/engagement.md`, `docs/contracts/usecase-contracts/study.md` (resume + due), `docs/contracts/repository-contracts/study-repository.md`, `docs/contracts/repository-contracts/deck-repository.md`
 
 **Code paths (where to implement):**
+
 - `lib/presentation/features/dashboard/screens/dashboard_screen.dart`
 - `lib/presentation/features/dashboard/notifiers/dashboard_notifier.dart`
 - `lib/presentation/features/dashboard/widgets/resume_card.dart`
@@ -254,6 +258,7 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 - `lib/app/router/route_names.dart` → `RouteNames.home`
 
 **Related wireframes:**
+
 - `docs/wireframes/23-onboarding.md` — empty Dashboard state is the onboarding hub
 - `docs/wireframes/12-study-entry-gate.md` — Today/Resume CTAs route here
 - `docs/wireframes/18-study-result.md` — Done returns to Dashboard via `go`

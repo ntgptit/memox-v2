@@ -224,17 +224,20 @@ flutter test test/integration
 ## Related
 
 **Repo-level:**
+
 - `CLAUDE.md` §Mandatory workflow step 9 (verification)
 - `AGENTS.md` self-audit Q1
 - `docs/checklist/implementation-checklist.md` test requirements
 
 **Contracts:**
+
 - `docs/contracts/error-contract.md` — every failure type has a corresponding failure-path test
 - `docs/contracts/types-catalog.md` — enums under test
 - `docs/contracts/code-style.md` — test file naming
 - `docs/decision-tables/memox-core-decision-table.md` — row IDs referenced in test names
 
 **Code paths:**
+
 - `test/**`
 - `test/test_doubles/**` (FakeTtsEngine, FakeDriveService)
 - `test/fixtures/**`

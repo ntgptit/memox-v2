@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 ## CreateDeckUseCase
 
 ```dart
@@ -19,10 +18,12 @@ Future<Either<Failure, Deck>> call({
 ```
 
 **Preconditions:**
+
 - Parent folder (if any) exists.
 - Parent `content_mode` ∈ (`unlocked`, `decks`).
 
 **Rules:**
+
 - Trim name. Reject empty.
 - Reject duplicate within same parent (case-insensitive).
 - Atomic insert + parent mode update. See `docs/contracts/repository-contracts/deck-repository.md`.
@@ -42,6 +43,7 @@ Future<Either<Failure, Deck>> call({
 ```
 
 **Rules:**
+
 - At least one of `newName`/`newTargetLanguage` provided; else `ValidationFailure`.
 - Trim name. Reject empty.
 - Reject duplicate name in same parent.
@@ -60,9 +62,11 @@ Future<Either<Failure, Deck>> call({
 ```
 
 **Preconditions:**
+
 - New parent's `content_mode` ∈ (`unlocked`, `decks`).
 
 **Rules:**
+
 - Atomic deck-parent + both folder modes; recompute `sort_order`. See `docs/contracts/repository-contracts/deck-repository.md`.
 
 **Errors:** `NotFoundFailure`, `UnsupportedActionFailure`, `StorageFailure`.
@@ -76,6 +80,7 @@ Future<Either<Failure, Unit>> call({required DeckId id});
 ```
 
 **Rules:**
+
 - Atomic cascade across progress, tags, attempts, flashcards, sessions, deck row + old parent mode update. Full cascade list in `docs/contracts/repository-contracts/deck-repository.md`.
 
 **Errors:** `NotFoundFailure`, `StorageFailure`.

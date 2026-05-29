@@ -246,12 +246,15 @@ Import flashcards from CSV, Excel, or pasted structured text. Two-step flow: con
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/flashcard/flashcard-management.md` (import section)
 
 **Decision rows:**
+
 - Import section (canCommit rule, duplicate detection, format change clears source, chunked transaction)
 
 **Schema / storage:**
+
 - INSERT `flashcards` (+ optional `flashcard_tags`) in chunked transactions
 - Duplicate detection: trim + case-insensitive on (front, back)
 
@@ -277,5 +280,6 @@ Import flashcards from CSV, Excel, or pasted structured text. Two-step flow: con
 - Encrypted / password-protected xlsx → parser throws, surfaces as `"Excel file must be a valid .xlsx workbook."` issue on row 1.
 
 **Related wireframes:**
+
 - `docs/wireframes/06-flashcard-list.md` (caller), `docs/wireframes/23-onboarding.md` (import path)
 - `docs/wireframes/24-shared-dialogs.md` §discard-changes (variant)

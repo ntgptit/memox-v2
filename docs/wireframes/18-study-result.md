@@ -169,14 +169,17 @@ End-of-session summary. Celebrate completion, show what improved, motivate next 
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/study/study-flow.md` (finalization)
 - `docs/business/srs/srs-review.md` (box change aggregates)
 - `docs/business/engagement/dashboard-engagement.md` (streak/goal update on completion)
 
 **Decision rows:**
+
 - Session finalization: failed_to_finalize handling, box change aggregates, Done uses go (not pop/push)
 
 **Schema / storage:**
+
 - READ aggregates from `study_attempts` (box_before vs box_after counts, result counts)
 - UPDATE `study_sessions.status = completed`
 - UPDATE engagement preferences (currentStreak, lastGoalMetDate)
@@ -192,5 +195,6 @@ End-of-session summary. Celebrate completion, show what improved, motivate next 
 - Route constant: `lib/app/router/route_names.dart` → `RouteNames.studyResult`.
 
 **Related wireframes:**
+
 - `docs/wireframes/12-study-entry-gate.md` → `13-17` → here (full session flow)
 - `docs/wireframes/25-shared-bottom-sheets.md` §scope-picker, §streak-history

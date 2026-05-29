@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Naming, file organization, import order, and forbidden patterns for MemoX Flutter code. This contract supplements (does NOT replace) `analysis_options.yaml`. When linter and this doc disagree, fix the linter rule, not the convention.
 
 ## File and folder layout
@@ -147,6 +146,7 @@ class DashboardNotifier extends _$DashboardNotifier {
 ```
 
 Forbidden:
+
 - Manual `Provider`/`StateProvider`/`StateNotifierProvider` (use annotation codegen).
 - Two providers with same logical purpose but different names (e.g., `flashcardListProvider` AND `currentDeckFlashcardsProvider`).
 - Provider for `BuildContext` or other transient.
@@ -154,7 +154,6 @@ Forbidden:
 ## Imports order
 
 The import example below includes `fpdart` as target architecture. Omit `package:fpdart/fpdart.dart` until the dependency/API migration is approved and applied.
-
 
 ```dart
 // 1. dart: imports
@@ -211,6 +210,7 @@ result.fold(
 ```
 
 Forbidden:
+
 - `result.toNullable()` to ignore error.
 - `result.getOrElse(() => somethingFake)` without logging the failure.
 - Pattern-matching on string of failure: always pattern-match on type.
@@ -252,13 +252,17 @@ Forbidden:
 ## Generated files
 
 Generated files (`*.g.dart`, `*.freezed.dart`, Drift `*.g.dart`, l10n `app_localizations*.dart`):
+
 - ARE checked into git (so reviewers see schema changes).
 - Never hand-edit.
 - Regenerate via:
+
   ```bash
   dart run build_runner build --delete-conflicting-outputs
   ```
+
 - L10n regenerate via:
+
   ```bash
   flutter gen-l10n
   ```
@@ -301,11 +305,13 @@ See `docs/testing/test-strategy.md`.
 ## Related
 
 **Repo-level:**
+
 - `CLAUDE.md` §Hard rules (overlap)
 - `AGENTS.md` self-audit
 - `analysis_options.yaml` (lint rules, enforced by CI)
 
 **Contracts:**
+
 - `docs/contracts/types-catalog.md` — type names this contract refers to
 - `docs/contracts/error-contract.md` — Failure naming
 - `docs/testing/test-strategy.md` — test naming
@@ -313,6 +319,7 @@ See `docs/testing/test-strategy.md`.
 - `docs/quality/performance-contract.md` — perf-related patterns
 
 **Architecture:**
+
 - `docs/architecture/clean-architecture-contract.md` — layer boundaries
 - `docs/state/state-management-contract.md` — Riverpod patterns
 - `docs/ui-ux/ui-ux-contract.md` — design tokens

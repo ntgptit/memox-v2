@@ -152,23 +152,29 @@ flowchart TD
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/06-flashcard-list.md` — Export action in deck overflow ⋮
 - `docs/wireframes/25-shared-bottom-sheets.md` §item-context (deck variant adds Export action)
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → exports read from `flashcards` (front, back, note only — per simple scope decision); SRS progress not exported
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Export" (format support, field set, encoding)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → "export", "CSV", "Excel/XLSX"
 
 **Related business specs:**
+
 - `docs/business/flashcard/flashcard-management.md` — fields that travel
 - `docs/business/deck/deck-management.md` — deck is the export unit
 - `docs/business/account-sync/account-sync.md` — full backup via Drive sync (the "backup" path; export is the "share" path)
 
 **Source files to inspect:**
+
 - `lib/data/repositories/flashcard_export_*.dart`
 - `lib/domain/usecases/export/**`

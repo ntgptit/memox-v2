@@ -204,23 +204,28 @@ All bulk operations are transactional.
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/07-flashcard-create.md` — tag input with comma rejection
 - `docs/wireframes/08-flashcard-edit.md` — tag list edit
 - `docs/wireframes/22-settings-tag-management.md` — global tag management (rename / merge / delete)
 - `docs/wireframes/25-shared-bottom-sheets.md` §tag-picker (multi-select, AND filter, create-new)
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `flashcard_tags` (`flashcard_id`, `tag`)
 - Recommended index: `flashcard_tags(LOWER(tag), flashcard_id)` for case-insensitive lookup
 - Reserved use in `study_sessions.entry_ref_id` when `entry_type=tag`: sorted, lowercased, comma-joined tag names
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows TG1-TG11 (incl. TG9 comma rejection, TG10 max 50, TG11 entry_ref_id construction)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → `tag`, "case-insensitive uniqueness", "study by tag", `entry_ref_id`
 
 **Related business specs:**
+
 - `docs/business/flashcard/flashcard-management.md` — tag input on create/edit
 - `docs/business/study/study-flow.md` — `entry_type=tag` study entry
 - `docs/business/bulk/bulk-operations.md` — bulk add/remove tag
@@ -228,6 +233,7 @@ All bulk operations are transactional.
 - `docs/business/navigation/navigation-flow.md` — `/library/study/tag/<tags>` route + `/settings/learning/tags` route
 
 **Source files to inspect:**
+
 - `lib/data/datasources/local/tables/flashcard_tags_table.dart`
 - `lib/domain/usecases/tag/**` (rename, merge, delete, study-by-tag)
 - `lib/presentation/features/settings/tag_management/**`

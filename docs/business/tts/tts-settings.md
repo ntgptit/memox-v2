@@ -168,24 +168,30 @@ Loading/error states use shared `Mx*` widgets per UI/UX contract.
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/21-settings-audio-speech.md` — per-language TTS settings (Korean, English tabs; rate/pitch/volume sliders; preview)
 - `docs/wireframes/13-study-session-review.md` through `docs/wireframes/17-study-session-fill.md` — TTS button per mode (front only, never back)
 
 **Schema:**
+
 - SharedPreferences keys (see `docs/database/storage-boundaries.md`): `tts.autoPlay`, `tts.korean.voice`, `tts.korean.rate`, `tts.korean.pitch`, `tts.korean.volume`, `tts.english.*`
 - Schema: `decks.target_language` (one of 6 pending migrations) gates TTS
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "TTS" (gating, autoplay, range validation, front-only policy)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → `target_language`, `korean`, `english`, `unsupported`, "auto-play", "front-only playback"
 
 **Related business specs:**
+
 - `docs/business/deck/deck-management.md` — `target_language` field on deck
 - `docs/business/study/study-flow.md` — TTS is invoked per study mode
 
 **Source files to inspect:**
+
 - `lib/core/tts/tts_engine.dart`
 - `lib/data/datasources/local/preferences/tts_preferences.dart`
 - `lib/presentation/features/settings/audio_speech/**`

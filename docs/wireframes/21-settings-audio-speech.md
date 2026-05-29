@@ -179,18 +179,22 @@ Configure Text-to-Speech (TTS) per supported language. TTS is gated by `deck.tar
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/tts/tts-settings.md`
 - `docs/business/deck/deck-management.md` (target_language gate)
 
 **Decision rows:**
+
 - TTS section: per-language settings, autoplay default off, front-only policy
 
 **Schema / storage:**
+
 - SharedPreferences per language: `tts.{lang}.voice`, `tts.{lang}.rate`, `tts.{lang}.pitch`, `tts.{lang}.volume`, plus global `tts.autoPlay`
 
 **Contracts:** `docs/contracts/usecase-contracts/tts.md`
 
 **Code paths:**
+
 - `lib/presentation/features/settings/audio_speech/screens/audio_speech_settings_screen.dart`
 - `lib/presentation/features/settings/audio_speech/notifiers/audio_speech_notifier.dart`
 - `lib/core/tts/tts_engine.dart`
@@ -199,4 +203,5 @@ Configure Text-to-Speech (TTS) per supported language. TTS is gated by `deck.tar
 - `lib/app/router/route_names.dart` → `RouteNames.settingsAudioSpeech`
 
 **Related wireframes:**
+
 - `docs/wireframes/04-settings-hub.md` (entry), `13-17` (consumers)

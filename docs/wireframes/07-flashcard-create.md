@@ -181,19 +181,23 @@ Create a single flashcard in the current deck. Optimized for repeated entry — 
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/flashcard/flashcard-management.md`
 - `docs/business/tags/tag-system.md` (validation rules)
 
 **Decision rows:**
+
 - Flashcard validation, TG9 (comma rejection), TG10 (max 50)
 
 **Schema / storage:**
+
 - INSERT `flashcards` + `flashcard_tags` in one transaction
 - "Save and add another" toggle = session memory (NOT persisted)
 
 **Contracts:** `docs/contracts/usecase-contracts/flashcard.md` §CreateFlashcardUseCase, `docs/contracts/usecase-contracts/tag.md` §TagValidator
 
 **Code paths:**
+
 - `lib/presentation/features/flashcard_form/screens/flashcard_create_screen.dart`
 - `lib/presentation/features/flashcard_form/notifiers/flashcard_form_notifier.dart`
 - `lib/presentation/features/flashcard_form/widgets/tag_chip_input.dart`
@@ -201,6 +205,7 @@ Create a single flashcard in the current deck. Optimized for repeated entry — 
 - `lib/app/router/route_names.dart` → `RouteNames.flashcardCreate`
 
 **Related wireframes:**
+
 - `docs/wireframes/06-flashcard-list.md` (caller)
 - `docs/wireframes/08-flashcard-edit.md` (shares form structure)
 - `docs/wireframes/24-shared-dialogs.md` §discard-changes

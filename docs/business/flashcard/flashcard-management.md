@@ -213,6 +213,7 @@ Do not add new flashcard fields without updating schema, mapper, docs, l10n, tes
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/06-flashcard-list.md` — list, filter, selection mode, bulk bar
 - `docs/wireframes/07-flashcard-create.md` — create flow + save-and-add-another
 - `docs/wireframes/08-flashcard-edit.md` — edit + card actions
@@ -222,15 +223,19 @@ Do not add new flashcard fields without updating schema, mapper, docs, l10n, tes
 - `docs/wireframes/25-shared-bottom-sheets.md` §card-context, §tag-picker
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `flashcards` (front/back/note/example/pronunciation/hint/deck_id), `flashcard_progress` (current_box, due_at, buried_until, is_suspended, last_reset_at), `flashcard_tags`
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Flashcard management", "Import", "Validation"
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → flashcard, front, back, note, example, pronunciation, hint
 
 **Related business specs:**
+
 - `docs/business/deck/deck-management.md` — flashcards belong to decks
 - `docs/business/tags/tag-system.md` — tag validation rules apply on create/edit
 - `docs/business/srs/srs-review.md` — flashcard_progress drives SRS
@@ -240,6 +245,7 @@ Do not add new flashcard fields without updating schema, mapper, docs, l10n, tes
 - `docs/business/navigation/navigation-flow.md` — flashcard CRUD routes
 
 **Source files to inspect:**
+
 - `lib/data/datasources/local/tables/flashcards_table.dart`
 - `lib/data/datasources/local/tables/flashcard_progress_table.dart`
 - `lib/data/datasources/local/tables/flashcard_tags_table.dart`

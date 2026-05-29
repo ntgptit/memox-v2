@@ -91,6 +91,7 @@ Examples:
 - ✅ Every string has an ARB key.
 - ✅ Use `@key` annotations in ARB for descriptions to translators.
 - ✅ Use ICU plural:
+
   ```json
   {
     "library_deck_count": "{count, plural, =0{No decks} =1{1 deck} other{{count} decks}}",
@@ -99,12 +100,14 @@ Examples:
     }
   }
   ```
+
 - ✅ Use ICU select for gender/role variations (not applicable in MemoX v1, but reserve pattern).
 - ✅ Date formatting via `DateFormat` from `intl`.
 
 ## Pluralization
 
 Always plural-aware:
+
 - "1 card" / "0 cards" / "2 cards" → ICU plural.
 - "1 deck" / "N decks".
 - "1 minute ago" / "N minutes ago" / "yesterday" / "{date}" — use a `RelativeTime` helper.
@@ -148,14 +151,17 @@ Always plural-aware:
 ## Related
 
 **Repo-level:**
+
 - `CLAUDE.md` §Doc-code parity — l10n updates count as docs
 - `docs/contracts/code-style.md` — forbids hardcoded strings
 
 **Contracts:**
+
 - `docs/contracts/error-contract.md` — error_* keys catalog
 - `../wireframes/**` — every wireframe example copy
 
 **Code paths:**
+
 - `lib/l10n/app_en.arb`
 - `lib/l10n/generated/**`
 - `lib/core/utils/relative_time.dart`

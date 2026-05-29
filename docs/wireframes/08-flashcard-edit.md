@@ -181,15 +181,18 @@ Same as create (front/back required, tag rules). Apply on Save.
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/flashcard/flashcard-management.md`
 - `docs/business/tags/tag-system.md`
 - `docs/business/study-actions/bury-suspend.md` (suspend toggle)
 - `docs/business/history/card-history.md` (View history action; reset progress sets `last_reset_at`)
 
 **Decision rows:**
+
 - Flashcard edit, validation, reset progress, suspend toggle
 
 **Schema / storage:**
+
 - UPDATE `flashcards`, `flashcard_progress`, `flashcard_tags` (atomic)
 - Reset → `box=1`, `due_at=now`, `last_reset_at=now`
 - Move → UPDATE `flashcards.deck_id`, recompute `sort_order`
@@ -197,6 +200,7 @@ Same as create (front/back required, tag rules). Apply on Save.
 **Contracts:** `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/usecase-contracts/study.md` §SuspendCardUseCase, `docs/contracts/usecase-contracts/tag.md`
 
 **Code paths:**
+
 - `lib/presentation/features/flashcard_form/screens/flashcard_edit_screen.dart`
 - `lib/presentation/features/flashcard_form/notifiers/flashcard_edit_notifier.dart`
 - `lib/domain/usecases/flashcard/update_flashcard_usecase.dart`
@@ -206,6 +210,7 @@ Same as create (front/back required, tag rules). Apply on Save.
 - `lib/app/router/route_names.dart` → `RouteNames.flashcardEdit`
 
 **Related wireframes:**
+
 - `docs/wireframes/06-flashcard-list.md` (caller), `docs/wireframes/09-flashcard-history.md` (action target)
 - `docs/wireframes/24-shared-dialogs.md` §discard-changes, §reset-progress, §delete-confirm
 - `docs/wireframes/25-shared-bottom-sheets.md` §deck-picker, §undo-toast

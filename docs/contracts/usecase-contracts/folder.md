@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 All folder-mutation logic lives in use cases. Widgets and notifiers MUST NOT call `FolderRepository` directly for mutations.
 
 Each section below specifies: signature, preconditions, rules, side effects, errors, test refs.
@@ -21,12 +20,14 @@ Future<Either<Failure, Folder>> call({required String name});
 **Preconditions:** none.
 
 **Rules:**
+
 - Trim `name`.
 - Reject empty after trim → `ValidationFailure(field: 'name', code: empty)`.
 - Reject duplicate name among root folders (case-insensitive) → `ValidationFailure(code: duplicate)`.
 - Insert with `parent_id = NULL`, `content_mode = unlocked`, `sort_order = MAX(sort_order)+1` among root.
 
 **Side effects:**
+
 - INSERT into `folders`.
 
 **Errors:** `ValidationFailure`, `StorageFailure`.
@@ -40,10 +41,12 @@ Future<Either<Failure, Folder>> call({required FolderId parentId, required Strin
 ```
 
 **Preconditions:**
+
 - Parent folder exists.
 - Parent `content_mode` ∈ (`unlocked`, `subfolders`).
 
 **Rules:**
+
 - Trim name. Reject empty.
 - Reject duplicate name among siblings.
 - INSERT child folder with `parent_id`, `content_mode=unlocked`, next `sort_order`.
@@ -65,6 +68,7 @@ Future<Either<Failure, Folder>> call({required FolderId id, required String newN
 ```
 
 **Rules:**
+
 - Trim name. Reject empty.
 - Reject duplicate among siblings (same `parent_id`).
 - No-op (return `Right(folder)`) if new name equals current after trim.
@@ -80,12 +84,14 @@ Future<Either<Failure, Folder>> call({required FolderId id, required FolderId? n
 ```
 
 **Preconditions:**
+
 - Folder exists.
 - New parent exists (or null for root).
 - New parent's `content_mode` allows subfolders.
 - Move does NOT create a cycle (new parent is not the folder itself OR any of its descendants).
 
 **Rules:**
+
 - Atomic update of folder + parent modes; recompute `sort_order`. See `docs/contracts/repository-contracts/folder-repository.md` for table list.
 
 **Errors:** `NotFoundFailure`, `ValidationFailure(code: cycleDetected)`, `UnsupportedActionFailure`, `StorageFailure`.
@@ -99,6 +105,7 @@ Future<Either<Failure, Unit>> call({required FolderId id});
 ```
 
 **Rules:**
+
 - Atomic recursive cascade (descendants + their content + sessions targeting them). Full cascade list in `docs/contracts/repository-contracts/folder-repository.md`.
 - UPDATE old parent's `content_mode` to `unlocked` if no more children remain.
 
@@ -115,6 +122,7 @@ Future<Either<Failure, Unit>> call({required FolderId? parentId, required List<F
 ```
 
 **Rules:**
+
 - Atomic batch `sort_order` UPDATE. All ids MUST belong to the same parent (else `ValidationFailure`).
 
 **Errors:** `ValidationFailure`, `StorageFailure`.

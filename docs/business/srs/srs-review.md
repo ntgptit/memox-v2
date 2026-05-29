@@ -6,6 +6,7 @@ applies_to: SRS algorithm, flashcard_progress, review session finalization
 # SRS Review
 
 > **Status: Target — Partial Migration Required.** Box transition logic itself is implementable today on `flashcard_progress` and `study_attempts`. However, persisting per-attempt box transitions for history requires the following columns from `docs/database/schema-contract.md` §Pending schema changes:
+>
 > - `study_attempts.box_before INTEGER NOT NULL DEFAULT 0`
 > - `study_attempts.box_after INTEGER NOT NULL DEFAULT 0`
 >
@@ -135,20 +136,25 @@ Any SRS behavior change must update:
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/13-study-session-review.md` through `docs/wireframes/17-study-session-fill.md` — every mode persists SRS update via this contract
 - `docs/wireframes/18-study-result.md` — Box changes block aggregates from `box_before` / `box_after`
 - `docs/wireframes/03-progress.md` — Box distribution chart
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `flashcard_progress` (current_box 1-8, due_at, review_count, lapse_count, last_studied_at, last_result, last_reset_at), `study_attempts` (box_before, box_after, result)
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "SRS" + history rows H1-H8
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → `current_box`, `due_at`, `result`, `perfect`, `initial_passed`, `recovered`, `forgot`, `lapse_count`
 
 **Related business specs:**
+
 - `docs/business/study/study-flow.md` — caller of SRS update
 - `docs/business/history/card-history.md` — read-only view of attempts
 - `docs/business/study-actions/bury-suspend.md` — bury/suspend preserves SRS state (does NOT reset box)

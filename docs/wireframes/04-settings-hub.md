@@ -152,22 +152,27 @@ Subtitles populate independently; rows render immediately, subtitles fill in.
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/navigation/navigation-flow.md` (settings routes)
 - `docs/business/account-sync/account-sync.md` (subtitle reflects sync state)
 
 **Decision rows:**
+
 - Navigation section (settings sub-screens push from hub)
 
 **Schema / storage:**
+
 - Live aggregates: deck count, tag count, sync manifest fetch
 
 **Contracts:** `docs/contracts/usecase-contracts/account-sync.md`, `docs/contracts/usecase-contracts/engagement.md`, `docs/contracts/usecase-contracts/tts.md`, `docs/contracts/usecase-contracts/tag.md`
 
 **Code paths:**
+
 - `lib/presentation/features/settings/screens/settings_hub_screen.dart`
 - `lib/presentation/features/settings/notifiers/settings_hub_notifier.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.settings`
 
 **Related wireframes:**
+
 - `docs/wireframes/19-settings-account.md`, `docs/wireframes/20-settings-learning.md`, `docs/wireframes/21-settings-audio-speech.md`, `docs/wireframes/22-settings-tag-management.md`
 - `docs/wireframes/25-shared-bottom-sheets.md` §about

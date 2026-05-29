@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Session lifecycle, scope resolution, grading, finalization.
 
 ## ResolveScopeUseCase
@@ -31,6 +30,7 @@ Future<Either<Failure, ResumableSession?>> call({required StudyScope scope});
 ```
 
 **Rules:**
+
 - Match `study_sessions` where `(entry_type, entry_ref_id, study_type)` equals scope AND `status IN (draft, in_progress)` AND `started_at > now - 30 days`.
 - Return most recent match (or null).
 
@@ -46,6 +46,7 @@ Future<Either<Failure, Session>> call({
 ```
 
 **Rules:**
+
 - Atomic insert session + per-card session_items (order preserved). See `docs/contracts/repository-contracts/study-repository.md`.
 
 **Errors:** `StorageFailure`.
@@ -57,6 +58,7 @@ Future<Either<Failure, Session>> call({required SessionId id});
 ```
 
 **Rules:**
+
 - LOAD session. Validate `status IN (draft, in_progress)`. Else `UnsupportedActionFailure`.
 - Return session + remaining items.
 
@@ -69,6 +71,7 @@ Future<Either<Failure, Unit>> call({required SessionId id});
 ```
 
 **Rules:**
+
 - UPDATE `study_sessions.status = cancelled`.
 - Already-recorded `study_attempts` preserved.
 
@@ -88,6 +91,7 @@ Future<Either<Failure, FlashcardProgress>> call({
 ```
 
 **Rules:**
+
 - LOAD session. Validate status=`in_progress` or transitioning from `draft` → `in_progress`.
 - LOAD current `flashcard_progress`. Compute `box_before = current_box`, `box_after` per SRS rules:
   - `perfect` / `initialPassed` → `min(current+1, 8)`
@@ -107,6 +111,7 @@ Future<Either<Failure, SessionAggregate>> call({required SessionId id});
 ```
 
 **Rules:**
+
 - LOAD session. Validate all `study_session_items` answered. Else `ValidationFailure(code: incompleteSession)`.
 - Compute aggregate from `study_attempts`.
 - Atomic: mark session completed + engagement counter updates. On partial failure (attempts saved, aggregate write failed): mark `failed_to_finalize`, return `FinalizationFailure`. See `docs/contracts/repository-contracts/study-repository.md`.
@@ -128,6 +133,7 @@ Future<Either<Failure, FlashcardProgress>> call({required FlashcardId id});
 ```
 
 **Rules:**
+
 - UPDATE `flashcard_progress.buried_until = next local midnight`.
 - SRS state (current_box, due_at) UNCHANGED.
 
@@ -143,6 +149,7 @@ Future<Either<Failure, FlashcardProgress>> unsuspend({required FlashcardId id});
 ```
 
 **Rules:**
+
 - Toggle `flashcard_progress.is_suspended`.
 - SRS state UNCHANGED.
 

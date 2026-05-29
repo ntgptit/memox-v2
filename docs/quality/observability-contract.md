@@ -52,6 +52,7 @@ In production builds, level threshold is `Level.INFO`. In debug builds, `Level.F
 ## PII rule (strict)
 
 NEVER log:
+
 - Flashcard `front` or `back` text content.
 - Tag names (user-created could contain personal info).
 - Folder/deck names.
@@ -98,6 +99,7 @@ Example:
 MemoX v1 does NOT send crash reports. Optional future: opt-in local dump exported when user taps "Report a bug" in About.
 
 For now:
+
 - Crashes during development go to console.
 - Uncaught zones go to console + persistent log file (rotated).
 - Persistent log file path: `{appSupportDir}/logs/memox-{date}.log`. Rotation: keep last 7 days.
@@ -105,6 +107,7 @@ For now:
 ## Talker integration (optional)
 
 If/when integrating Talker:
+
 - Use as a viewer for the same `package:logging` events (Talker can consume).
 - Talker history MUST respect PII rule.
 - Talker UI accessible via Settings → About → Show logs (developer mode only).
@@ -142,14 +145,17 @@ If/when integrating Talker:
 ## Related
 
 **Repo-level:**
+
 - `CLAUDE.md` — code style forbids print/debugPrint
 
 **Contracts:**
+
 - `docs/contracts/error-contract.md` — what to log per failure type
 - `docs/contracts/code-style.md` — logger naming
 - `docs/quality/performance-contract.md` — trace events for perf-sensitive ops
 
 **Code paths:**
+
 - `lib/core/logging/log_config.dart` — root setup
 - `lib/main.dart` — runZonedGuarded
 - `lib/core/logging/persistent_log_writer.dart` — file rotation

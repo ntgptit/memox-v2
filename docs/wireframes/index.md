@@ -87,10 +87,13 @@ Conventions used in every wireframe doc:
 Every wireframe file ends with two sections that link to all required reading for that screen:
 
 ### `## Dialogs and bottom-sheets used`
+
 Lists the specific shared dialog (24) and bottom-sheet (25) anchors used in this screen. AI agents implementing this screen MUST resolve these refs to avoid re-inventing shared widgets.
 
 ### `## Implementation refs`
+
 A 4-block jump table:
+
 - **Business specs** — required business doc reading
 - **Decision rows** — which decision table sections govern behavior
 - **Schema / storage** — exact column/key names this screen reads or writes

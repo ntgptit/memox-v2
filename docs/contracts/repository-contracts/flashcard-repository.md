@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Handles flashcards + their `flashcard_progress` rows (1:1) + `flashcard_tags` (1:N).
 
 ## Methods
@@ -95,6 +94,7 @@ When returning `FlashcardWithState`, compute priority: Suspended > Buried > Due 
 **Use cases:** `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/usecase-contracts/bulk.md`
 **Schema:** `docs/database/schema-contract.md` `flashcards`, `flashcard_progress`, `flashcard_tags`
 **Code paths:**
+
 - `lib/domain/repositories/flashcard_repository.dart`
 - `lib/data/repositories/flashcard_repository_impl.dart`
 - `lib/data/datasources/local/daos/flashcard_dao.dart`

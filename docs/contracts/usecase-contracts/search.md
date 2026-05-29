@@ -7,7 +7,6 @@ status: V1 inline search guidance; GlobalSearchUseCase is Future Proposal
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 V1 uses inline/scope-local search. The dedicated recursive global search use cases below are **Future Proposal** and must not be implemented in V1 unless promoted by `docs/checklist/v1-implementation-scope-2026-05-29.md`.
 
 ## V1 inline search
@@ -24,6 +23,7 @@ Future<Either<Failure, SearchResults>> call({
 ```
 
 **Rules:**
+
 - Trim query. Reject if length < 2 → `ValidationFailure(code: tooShort)`.
 - Escape special LIKE chars (`%`, `_`) before passing to DB.
 - Run 4 parallel queries (folders, decks, flashcards, tags), each section LIKE-based.
@@ -52,6 +52,7 @@ Future<void> call(String query);
 ```
 
 **Rules:**
+
 - Trim. Skip if < 2 chars.
 - Insert at top. Dedup case-insensitive. Trim list to 5.
 - Persist to SharedPreferences.

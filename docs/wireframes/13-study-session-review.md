@@ -16,6 +16,7 @@ source_specs:
 Front + back shown together on a single card. User reads, self-evaluates whether they knew it, then advances by swipe. Lightest mode in the 5-mode cycle; serves as the **anchor screen** that establishes the visual grammar reused by modes 14-17 (top app bar, progress bar, mode pill convention).
 
 > **Mode pill / progress-bar color convention (applies to wireframes 13-17).** Modes split into two visual families:
+>
 > - **Blue family** (recognition modes): Review, Match, Guess. Progress bar fills with the primary blue token. Mode pill (when shown) uses blue.
 > - **Green family** (production modes): Recall, Fill. Progress bar fills with the secondary green token. Mode pill uses green.
 >
@@ -194,15 +195,18 @@ When `autoPlay = true` AND `deck.target_language` is supported, the engine still
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/study/study-flow.md` (review mode)
 - `docs/business/srs/srs-review.md` (perfect / forgot transitions)
 - `docs/business/study-actions/bury-suspend.md` (overflow actions via sheet)
 - `docs/business/tts/tts-settings.md` (front-only playback)
 
 **Decision rows:**
+
 - S section (review mode), SRS section (perfect/forgot transitions)
 
 **Schema / storage:**
+
 - INSERT `study_attempts` (box_before, box_after, result, study_mode='review', attempted_at)
 - UPDATE `flashcard_progress` (current_box, due_at, review_count, lapse_count, last_studied_at)
 
@@ -218,6 +222,7 @@ When `autoPlay = true` AND `deck.target_language` is supported, the engine still
 - TTS: see `lib/presentation/features/study/widgets/study_session/study_speak_button.dart` for the in-mode button; engine lives behind `lib/presentation/features/tts/providers/`.
 
 **Related wireframes:**
+
 - `docs/wireframes/14-study-session-match.md`, `docs/wireframes/15-study-session-guess.md`, `docs/wireframes/16-study-session-recall.md`, `docs/wireframes/17-study-session-fill.md` (other modes; shared shell + progress-bar color convention)
 - `docs/wireframes/18-study-result.md` (next after last card)
 - `docs/wireframes/25-shared-bottom-sheets.md` §card-actions, §undo-toast

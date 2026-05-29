@@ -195,20 +195,24 @@ Sort preference persists per user via SharedPreferences (key `library.sort`).
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/folder/folder-management.md`
 - `docs/business/deck/deck-management.md`
 - `docs/business/search/global-search.md` (search icon entry)
 
 **Decision rows:**
+
 - Folder management, Deck management (top-level rules)
 
 **Schema / storage:**
+
 - `folders` (parent_id = null = root), `decks` (folder_id = null = root)
 - SharedPreferences: `library.sort`
 
 **Contracts:** `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/usecase-contracts/deck.md`, `docs/contracts/repository-contracts/folder-repository.md`, `docs/contracts/repository-contracts/deck-repository.md`
 
 **Code paths:**
+
 - `lib/presentation/features/library/screens/library_screen.dart`
 - `lib/presentation/features/library/notifiers/library_notifier.dart`
 - `lib/presentation/features/library/widgets/library_row.dart`
@@ -216,6 +220,7 @@ Sort preference persists per user via SharedPreferences (key `library.sort`).
 - `lib/app/router/route_names.dart` → `RouteNames.library`
 
 **Related wireframes:**
+
 - `docs/wireframes/05-folder-detail.md` — child folder detail
 - `docs/wireframes/06-flashcard-list.md` — deck content
 - `docs/wireframes/11-library-search.md` — search target

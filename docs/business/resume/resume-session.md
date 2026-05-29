@@ -181,6 +181,7 @@ This is opt-in via notification settings; do not push by default.
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/01-dashboard.md` — Resume card on Dashboard (always above other CTAs when present)
 - `docs/wireframes/05-folder-detail.md` — folder-scoped resume banner
 - `docs/wireframes/06-flashcard-list.md` — deck-scoped resume banner
@@ -189,15 +190,19 @@ This is opt-in via notification settings; do not push by default.
 - `docs/wireframes/25-shared-bottom-sheets.md` §paused-sessions
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `study_sessions` (`status` in_progress / draft / completed / cancelled / failed_to_finalize; `started_at`, `entry_type`, `entry_ref_id`)
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Resume session" (30-day expiry, scope match)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → `study_sessions.status`, `entry_ref_id`, "resumable session", "paused session"
 
 **Related business specs:**
+
 - `docs/business/study/study-flow.md` — session lifecycle parent contract
 - `docs/business/engagement/dashboard-engagement.md` — Dashboard Resume card consumer
 - `docs/business/tags/tag-system.md` — tag-scope `entry_ref_id` format (sorted, comma-joined, lowercased)

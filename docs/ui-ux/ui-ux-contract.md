@@ -146,20 +146,25 @@ When introducing a new shared widget, name it `Mx<Name>` and place in `lib/prese
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/index.md` — all 25 wireframes follow the tokens defined here (Slate Meridian theme, Plus Jakarta Sans, breakpoints 600dp / 1024dp)
 - `docs/wireframes/24-shared-dialogs.md` — reusable dialogs
 - `docs/wireframes/25-shared-bottom-sheets.md` — reusable bottom-sheets
 
 **Architecture:**
+
 - `docs/architecture/clean-architecture-contract.md` — presentation layer scope
 
 **Repo-level:**
+
 - `CLAUDE.md` — hardcoded styles/colors/durations forbidden
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "UI/UX" (touch target, accessibility, l10n)
 
 **Source files to inspect:**
+
 - `lib/core/theme/**`
 - `lib/core/widgets/**` (Mx* shared widgets)
 - `lib/l10n/**` (ARB sources)

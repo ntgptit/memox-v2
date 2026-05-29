@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Sessions + session items. Attempts and progress live in `docs/contracts/repository-contracts/progress-repository.md`.
 
 ## Methods
@@ -45,6 +44,7 @@ Future<Either<Failure, int>> expireOldSessions();  // cancel sessions > 30 days 
 ## Resumable matching rules
 
 `findResumable(scope)` matches:
+
 - `entry_type` equals scope.entryType
 - `entry_ref_id` equals scope.entryRefId (NULL-safe)
 - `study_type` equals scope.studyType
@@ -85,6 +85,7 @@ Order by `started_at DESC`, return first.
 **Use cases:** `docs/contracts/usecase-contracts/study.md`
 **Schema:** `docs/database/schema-contract.md` `study_sessions`, `study_session_items`
 **Code paths:**
+
 - `lib/domain/repositories/study_session_repository.dart`
 - `lib/data/repositories/study_session_repository_impl.dart`
 - `lib/data/datasources/local/daos/study_session_dao.dart`

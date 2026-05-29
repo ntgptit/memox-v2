@@ -146,18 +146,23 @@ If engine init blocks UI in study session, agent MUST move it to background and 
 ## Related
 
 **Repo-level:**
+
 - `CLAUDE.md` — Doc-code parity, performance budget changes require update here
 
 **Contracts:**
+
 - `docs/contracts/code-style.md` — widget rebuild rules
 - `docs/contracts/repository-contracts/index.md` — transaction requirements
 
 **Database:**
+
 - `docs/database/schema-contract.md` — index list
 - `docs/database/migration-contract.md` — adding indexes via migration
 
 **Wireframes:**
+
 - All — each wireframe has a Performance section that should align with budgets here
 
 **Code paths:**
+
 - `lib/core/perf/**` — trace helpers (planned)

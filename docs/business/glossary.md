@@ -7,7 +7,6 @@ applies_to: all areas
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Centralized vocabulary for MemoX. When a term appears in any doc, this file defines it.
 
 ## Entity terms
@@ -181,13 +180,17 @@ When a doc uses ambiguous wording, refer here instead of redefining locally.
 This glossary is referenced by every business spec, decision table, and wireframe.
 
 **Wireframes:**
+
 - `docs/wireframes/index.md` — every wireframe assumes glossary terms
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` — uses terms defined here
 
 **Schema:**
+
 - `docs/database/schema-contract.md` — column names are aligned to glossary terms (e.g., `entry_ref_id`, `box_before`, `last_reset_at`)
 
 **Maintenance rule:**
+
 - When renaming a term, run `grep -rn "{old_term}" docs/` and update ALL refs in the same commit, including this glossary. Per `CLAUDE.md` §Doc-code parity rule.

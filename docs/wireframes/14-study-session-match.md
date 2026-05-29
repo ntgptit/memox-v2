@@ -207,13 +207,16 @@ Same as Review mode.
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/study/study-flow.md` (match mode — board format, mode availability)
 - `docs/business/srs/srs-review.md` (initial_passed / forgot transitions)
 
 **Decision rows:**
+
 - Match mode: board size, mode unavailability (< 5 cards), per-tap attempt persistence
 
 **Schema / storage:**
+
 - INSERT `study_attempts` per pair-evaluation with `study_mode='match'`
 - Board layout NOT persisted (recomputed deterministically from `sessionId` + board index using seeded RNG, so resume works)
 
@@ -228,6 +231,7 @@ Same as Review mode.
 - Grading: `lib/domain/study/usecases/study_usecases.dart` → `AnswerCurrentMatchModeBatchUseCase` for the match-specific batch grade path; no standalone `grade_attempt_usecase.dart`.
 
 **Related wireframes:**
+
 - `docs/wireframes/13-study-session-review.md` (shared shell + color family convention)
 - `docs/wireframes/15-study-session-guess.md`, `docs/wireframes/16-study-session-recall.md`, `docs/wireframes/17-study-session-fill.md`
 - `docs/wireframes/18-study-result.md`

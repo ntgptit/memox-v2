@@ -173,19 +173,23 @@ None native to this screen. Read-only.
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/engagement/dashboard-engagement.md` (streak, goal)
 - `docs/business/srs/srs-review.md` (box distribution semantics)
 
 **Decision rows:**
+
 - Engagement section, SRS section
 
 **Schema / storage:**
+
 - `study_attempts` (range aggregates)
 - `flashcard_progress` (box distribution snapshot, `is_suspended`, `buried_until`)
 
 **Contracts:** `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/engagement.md`, `docs/contracts/repository-contracts/progress-repository.md`
 
 **Code paths:**
+
 - `lib/presentation/features/progress/screens/progress_screen.dart`
 - `lib/presentation/features/progress/notifiers/progress_notifier.dart`
 - `lib/domain/usecases/progress/get_range_aggregates_usecase.dart`
@@ -193,5 +197,6 @@ None native to this screen. Read-only.
 - `lib/app/router/route_names.dart` → `RouteNames.progress`
 
 **Related wireframes:**
+
 - `docs/wireframes/01-dashboard.md` — Dashboard streak chip uses same source of truth
 - `docs/wireframes/06-flashcard-list.md` — suspended/buried links navigate here (filtered)

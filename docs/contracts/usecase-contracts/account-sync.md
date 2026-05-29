@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Google sign-in, account-scoped DB, Drive App Folder backup/restore with mandatory pre-restore snapshot.
 
 ## SignInWithGoogleUseCase
@@ -17,6 +16,7 @@ Future<Either<Failure, Account>> call();
 ```
 
 **Rules:**
+
 - Launch OAuth flow via `google_auth.dart`.
 - Persist account tokens to `flutter_secure_storage` (NEVER SharedPreferences).
 - Switch active DB file to account-scoped path (e.g., `memox-{accountId}.db`).
@@ -31,6 +31,7 @@ Future<Either<Failure, Unit>> call();
 ```
 
 **Rules:**
+
 - Clear tokens.
 - DO NOT delete account-scoped DB. User can sign in again and resume.
 
@@ -43,6 +44,7 @@ Future<Either<Failure, Unit>> call({required AccountId id});
 ```
 
 **Rules:**
+
 - Strong destructive (user typed ERASE confirmation upstream).
 - DELETE account-scoped DB file.
 - Clear tokens.
@@ -59,6 +61,7 @@ Future<Either<Failure, Fingerprint>> call();
 ```
 
 **Rules:**
+
 - Compute SHA-256 over canonical content of DB (deterministic ordering).
 - Cached for 30s; recompute on data change.
 
@@ -81,6 +84,7 @@ Future<Either<Failure, DriveManifest>> call();
 ```
 
 **Rules:**
+
 - Compute fingerprint.
 - Build manifest: `{ device_label, fingerprint, uploaded_at, size_bytes, schema_version }`.
 - Upload DB file + manifest to Drive App Folder. Replace previous.
@@ -95,6 +99,7 @@ Future<Either<Failure, SnapshotInfo>> call();
 ```
 
 **Rules:**
+
 - Copy current DB file to safe local snapshot path.
 - VERIFY snapshot integrity (file size, can re-open).
 - If verification fails → `StorageFailure`. Caller MUST abort restore.
@@ -111,6 +116,7 @@ Future<Either<Failure, RestoreResult>> call({
 ```
 
 **Rules:**
+
 - If `!skipSnapshot`:
   - Call `CreatePreRestoreSnapshotUseCase`. If fails → return `StorageFailure`, abort, original DB UNCHANGED.
 - Download DB from Drive.
@@ -127,6 +133,7 @@ Future<Either<Failure, Unit>> call({required String label});
 ```
 
 **Rules:**
+
 - Trim. Reject empty. Reject > 50 chars.
 - Persist to SharedPreferences `account.deviceLabel`.
 

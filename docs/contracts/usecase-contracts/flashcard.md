@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 ## CreateFlashcardUseCase
 
 ```dart
@@ -24,6 +23,7 @@ Future<Either<Failure, Flashcard>> call({
 ```
 
 **Rules:**
+
 - Trim front and back. Reject empty for either → `ValidationFailure(field, code: empty)`.
 - Validate each tag via `TagValidator` (no comma, max 50 chars, not empty after trim). Dedupe case-insensitively.
 - Atomic insert flashcard + initial `flashcard_progress` row (current_box=1, due_at=now, review_count=0, lapse_count=0) + each unique tag in `flashcard_tags`. See `docs/contracts/repository-contracts/flashcard-repository.md`.
@@ -43,6 +43,7 @@ Future<Either<Failure, Flashcard>> call({
 ```
 
 **Rules:**
+
 - Same validation as create for provided fields.
 - Tag list (if provided) replaces; old tags removed, new tags inserted, dedup applied. Atomic. See `docs/contracts/repository-contracts/flashcard-repository.md`.
 
@@ -57,10 +58,12 @@ Future<Either<Failure, Flashcard>> call({required FlashcardId id, required DeckI
 ```
 
 **Preconditions:**
+
 - New deck exists.
 - New deck's parent folder allows decks (parent is `decks` or `unlocked`).
 
 **Rules:**
+
 - UPDATE `flashcards.deck_id`.
 - Recompute `sort_order` at new deck.
 - Preserve `flashcard_progress` and `flashcard_tags`.
@@ -76,6 +79,7 @@ Future<Either<Failure, Unit>> call({required FlashcardId id});
 ```
 
 **Rules:**
+
 - Atomic cascade: attempts, tags, progress, flashcard row. See `docs/contracts/repository-contracts/flashcard-repository.md`.
 
 **Errors:** `NotFoundFailure`, `StorageFailure`.
@@ -91,6 +95,7 @@ Future<Either<Failure, FlashcardProgress>> call({required FlashcardId id});
 ```
 
 **Rules:**
+
 - UPDATE `flashcard_progress`: `current_box = 1`, `due_at = now`, `last_reset_at = now`. `review_count` and `lapse_count` UNCHANGED.
 - Do NOT delete `study_attempts`. History preserved.
 
@@ -109,6 +114,7 @@ Future<Either<Failure, ImportResult>> call({
 ```
 
 **Phases:**
+
 1. Parse source → list of (front, back) candidates.
 2. Validate each candidate. Issues collected.
 3. Deduplicate within file (in-file duplicates marked).

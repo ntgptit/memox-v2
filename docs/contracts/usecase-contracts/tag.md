@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Tags are global (cross-deck), case-insensitive by name, with strict input validation (no comma, max 50 chars).
 
 ## TagValidator (pure)
@@ -19,6 +18,7 @@ class TagValidator {
 ```
 
 **Rules:**
+
 - Trim input.
 - Reject empty → `ValidationFailure(field: 'tag', code: empty)`.
 - Reject if contains comma `,` → `code: invalidCharacter`.
@@ -34,6 +34,7 @@ Future<Either<Failure, Unit>> call({required FlashcardId cardId, required String
 ```
 
 **Rules:**
+
 - Validate via `TagValidator`.
 - INSERT into `flashcard_tags` UNLESS already present (dedupe by `LOWER(tag)`).
 - Atomic. See `docs/contracts/repository-contracts/tag-repository.md`.
@@ -47,6 +48,7 @@ Future<Either<Failure, Unit>> call({required FlashcardId cardId, required String
 ```
 
 **Rules:**
+
 - DELETE matching row by `LOWER(tag)`.
 - Idempotent (no error if not present).
 
@@ -59,6 +61,7 @@ Future<Either<Failure, Unit>> call({required String oldName, required String new
 ```
 
 **Rules:**
+
 - Validate `newName` via `TagValidator`.
 - If `LOWER(newName) == LOWER(oldName)` → no-op.
 - If new name exists as another tag → return `ConflictFailure` so UI shows merge confirmation. Do NOT auto-merge.
@@ -73,6 +76,7 @@ Future<Either<Failure, MergeResult>> call({required String sourceName, required 
 ```
 
 **Rules:**
+
 - Validate destinationName.
 - Atomic: for each card tagged with source, ensure destination exists (insert if missing); DELETE source rows. Per-card dedup. See `docs/contracts/repository-contracts/tag-repository.md`.
 
@@ -87,6 +91,7 @@ Future<Either<Failure, int>> call({required String tag});  // returns affected c
 ```
 
 **Rules:**
+
 - DELETE all `flashcard_tags WHERE LOWER(tag) = LOWER(:tag)`.
 - Cards themselves NOT deleted.
 
@@ -103,6 +108,7 @@ String call(List<String> selectedTags);
 ```
 
 Pure function. Returns canonical `entry_ref_id` for `entry_type=tag`:
+
 1. Validate each via `TagValidator`.
 2. Lowercase each.
 3. Sort alphabetically.

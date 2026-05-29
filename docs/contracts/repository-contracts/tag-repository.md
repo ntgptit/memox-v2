@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 `flashcard_tags` operations. Tag storage = lowercased trimmed string keyed by `(flashcard_id, LOWER(tag))`.
 
 ## Methods
@@ -66,6 +65,7 @@ Future<Either<Failure, int>> delete(String name);  // returns affected card coun
 **Use cases:** `docs/contracts/usecase-contracts/tag.md`
 **Schema:** `docs/database/schema-contract.md` `flashcard_tags`
 **Code paths:**
+
 - `lib/domain/repositories/tag_repository.dart`
 - `lib/data/repositories/tag_repository_impl.dart`
 - `lib/data/datasources/local/daos/flashcard_tag_dao.dart`

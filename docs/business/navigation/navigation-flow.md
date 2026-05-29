@@ -157,24 +157,30 @@ When params are invalid or entity is deleted:
 ## Related
 
 **Wireframes:**
+
 - All wireframes — each documents its `route:` in frontmatter and Navigation in/out section
 - `docs/wireframes/index.md` — index of screens grouped by tree
 
 **Schema:**
+
 - No direct schema dependency. Routes operate on entity IDs.
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Navigation" (push vs go, invalid route recovery, deep link rules)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → "push", "go", "pushReplacement" semantics
 
 **Related business specs:**
+
 - Every business spec that introduces a route (most of `docs/business/**`)
 - `docs/business/resume/resume-session.md` — entry gate uses `pushReplacement` so back returns to caller
 - `docs/business/study/study-flow.md` — `/library/study/...` family
 
 **Source files to inspect:**
+
 - `lib/app/router/route_names.dart`
 - `lib/app/router/route_paths.dart`
 - `lib/app/router/app_router.dart`

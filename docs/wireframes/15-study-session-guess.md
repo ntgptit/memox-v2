@@ -61,6 +61,7 @@ Multiple-choice recognition with **rich option cards** showing both the candidat
 ```
 
 Options list is **scrollable** when content exceeds viewport. Each option card holds:
+
 - A circle label `(A)` / `(B)` / `(C)` / `(D)` / `(E)` on the left.
 - Option **title** (the candidate back term).
 - Option **description** (a definition snippet — first ~1-2 lines of the candidate's `back` extended with `note` or `example`, truncated).
@@ -250,14 +251,17 @@ Same as Review mode.
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/study/study-flow.md` (guess mode — front → back direction in v1)
 - `docs/business/srs/srs-review.md`
 - `docs/business/tts/tts-settings.md` (TTS gating; no inline TTS on options)
 
 **Decision rows:**
+
 - Guess mode: front→back direction, description snippet derivation, decoy sampling, countdown durations
 
 **Schema / storage:**
+
 - INSERT `study_attempts` with `study_mode='guess'`
 - Decoy pool query: `flashcards` in scope EXCLUDING current card
 
@@ -273,6 +277,7 @@ Same as Review mode.
 - Motion / countdown: `lib/presentation/features/study/widgets/study_session/guess/guess_motion.dart`.
 
 **Related wireframes:**
+
 - `docs/wireframes/13-study-session-review.md` (shared shell + color family convention)
 - `docs/wireframes/14-study-session-match.md`, `docs/wireframes/16-study-session-recall.md`, `docs/wireframes/17-study-session-fill.md`
 - `docs/wireframes/18-study-result.md`

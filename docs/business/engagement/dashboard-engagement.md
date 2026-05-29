@@ -242,6 +242,7 @@ All queries SHOULD be cheap (indexed on `attempted_at`, `due_at`, `status`). If 
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/01-dashboard.md` — Dashboard full layout: resume card, streak chip, goal ring, Today CTA, recent decks, onboarding empty state
 - `docs/wireframes/18-study-result.md` — streak/goal block on session result
 - `docs/wireframes/20-settings-learning.md` — daily goal slider, streak toggle, reminder configuration
@@ -249,20 +250,25 @@ All queries SHOULD be cheap (indexed on `attempted_at`, `due_at`, `status`). If 
 - `docs/wireframes/25-shared-bottom-sheets.md` §streak-history, §daily-goal, §reminder-time
 
 **Schema:**
+
 - SharedPreferences keys (see `docs/database/storage-boundaries.md`): `goalEnabled`, `dailyGoal`, `streakEnabled`, `reminderEnabled`, `reminderTime`, `lastGoalMetDate`, `currentStreak`, `longestStreak`, `firstLaunchCompletedAt`
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Dashboard engagement" (goal-off freezes streak, single reminder, streak broken one-time banner)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → "daily goal", "streak", "reminder", `today` entry type
 
 **Related business specs:**
+
 - `docs/business/study/study-flow.md` — `today` entry creates global SRS review session
 - `docs/business/resume/resume-session.md` — Dashboard surfaces resumable sessions
 - `docs/business/navigation/navigation-flow.md` — `/home` is the landing route (NOT Library)
 
 **Source files to inspect:**
+
 - `lib/domain/usecases/engagement/**`
 - `lib/data/datasources/local/preferences/engagement_preferences.dart`
 - `lib/presentation/features/dashboard/**`

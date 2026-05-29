@@ -7,7 +7,6 @@ status: Future Proposal — Migration Required
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Read-only timeline of per-card attempts + lifetime stats. This contract is **Future Proposal** for V1 and also requires schema migration before implementation.
 
 ## V1 rule
@@ -25,6 +24,7 @@ Future<Either<Failure, CardHistoryPage>> call({
 ```
 
 **Rules:**
+
 - READ `study_attempts WHERE flashcard_id = :id` ORDER BY `attempted_at DESC` LIMIT :limit (with cursor on `attempted_at < :before` if provided).
 - Cursor pagination (NOT offset).
 
@@ -41,6 +41,7 @@ Future<Either<Failure, LifetimeStats>> call({required FlashcardId id});
 ```
 
 **Rules:**
+
 - READ counters from `flashcard_progress` directly. Do NOT scan attempts.
 - Return `LifetimeStats` value object (see types-catalog.md).
 

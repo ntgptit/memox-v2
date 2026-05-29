@@ -10,12 +10,14 @@ Single registry for every enum, typedef, value-object, and named tuple in MemoX 
 ## What belongs in this catalog (and what doesn't)
 
 **Catalog-worthy (here):**
+
 - Enums used across multiple features (`AttemptResult`, `StudyMode`, `EntryType`, `ContentMode`, etc.).
 - ID typedefs (`FlashcardId`, `DeckId`, `FolderId`, ...).
 - Sealed value classes representing a domain concept used cross-feature (`CardState`, `StudyScope`).
 - Aggregate types referenced by multiple wireframes or contracts (`LifetimeStats`, `SessionAggregate`).
 
 **NOT catalog-worthy (lives in the use case contract that defines it):**
+
 - Per-feature DTOs: `DashboardState`, `DueCounts`, `ImportPreview`, `ImportResult`, `ImportCommitResult`, `BulkMoveResult`, `BulkTagResult`, `MergeResult`, `RestoreResult`, `CardHistoryPage`, `RootChildren`, `FolderChildren`, `FolderDetail`, `DeckDetail`, `DeckCounts`, `FlashcardDetail`, `FlashcardCreationData`, `FlashcardUpdateData`, `SnapshotInfo`, etc.
 - Test fixtures, fake services, mock objects.
 - Presentation-only view-models.
@@ -94,7 +96,6 @@ Use target names in new docs. Migration or mapper compatibility is required befo
 
 Source: `docs/business/srs/srs-review.md`.
 
-
 ### StudyMode
 
 **Status:** Target domain type.
@@ -127,7 +128,6 @@ enum StudyMode {
 
 Source: `docs/business/study/study-flow.md`.
 
-
 ### EntryType
 
 How a study session was started.
@@ -155,12 +155,12 @@ tag // entry_ref_id = sorted lowercased comma-joined tag names
 - `tag` is a target/future tag-study entry and must not be treated as current unless the implementation/migration task explicitly adds support.
 
 **entry_ref_id rules:**
+
 - `deck` / `folder`: UUID string.
 - `today`: NULL.
 - `tag` target behavior: lowercased tag names, sorted alphabetically, joined by comma. Example: `"grammar,weak"` for tags #Weak + #Grammar.
 
 Source: `docs/business/study/study-flow.md`, `docs/business/tags/tag-system.md`.
-
 
 ### StudyType
 
@@ -393,7 +393,6 @@ class SessionAggregate with _$SessionAggregate {
 
 Add forbidden synonym entries only after observed drift in docs, code, or reviews. Do not add speculative bans.
 
-
 To prevent agent drift, the following are **canonical** — agents MUST NOT introduce variations:
 
 | Canonical | Forbidden synonyms |
@@ -444,15 +443,19 @@ Type imports should always be from `lib/domain/types/` (or its barrel `lib/domai
 ## Related
 
 **Contracts:**
+
 - `docs/contracts/error-contract.md` — `ValidationCode`, `NetworkErrorKind`, `StorageOp` live there
 - `docs/contracts/code-style.md` — naming conventions
 - `docs/testing/test-strategy.md` — type usage in tests
 
 **Business specs:**
+
 - Every business spec uses these types; this catalog is the registry.
 
 **Schema:**
+
 - `docs/database/schema-contract.md` — column types map to enums here
 
 **Code paths:**
+
 - `lib/domain/types/**`

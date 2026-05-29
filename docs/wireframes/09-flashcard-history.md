@@ -224,7 +224,6 @@ When `box_before = 0` or `box_after = 0` (pre-migration data), render `—` inst
 - V1: Do NOT wire a live `View history` action.
 - Future: implement only after the schema migration and scope promotion are approved.
 
-
 - Do NOT recalculate accuracy on every render; use stored counters.
 - Do NOT add inline edit of attempts. Read-only.
 - Reset progress from this screen MUST update `last_reset_at = now` AND refresh the timeline so divider appears.
@@ -233,13 +232,16 @@ When `box_before = 0` or `box_after = 0` (pre-migration data), render `—` inst
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/history/card-history.md`
 - `docs/business/srs/srs-review.md` (box transitions)
 
 **Decision rows:**
+
 - H1-H8 (history rendering, divider, pre-migration row handling, header sub-label)
 
 **Schema / storage:**
+
 - READ `study_attempts` (box_before, box_after, result, attempted_at) paginated DESC
 - READ `flashcard_progress.last_reset_at`, lifetime counters
 - Cursor-based pagination on `attempted_at DESC`
@@ -247,6 +249,7 @@ When `box_before = 0` or `box_after = 0` (pre-migration data), render `—` inst
 **Contracts:** `docs/contracts/usecase-contracts/history.md`, `docs/contracts/repository-contracts/progress-repository.md`
 
 **Code paths:**
+
 - `lib/presentation/features/history/screens/card_history_screen.dart`
 - `lib/presentation/features/history/notifiers/card_history_notifier.dart`
 - `lib/presentation/features/history/widgets/timeline_row.dart`
@@ -256,4 +259,5 @@ When `box_before = 0` or `box_after = 0` (pre-migration data), render `—` inst
 - `lib/app/router/route_names.dart` → `RouteNames.flashcardHistory`
 
 **Related wireframes:**
+
 - `docs/wireframes/08-flashcard-edit.md` (entry point), `docs/wireframes/18-study-result.md` (timeline row tap target if completed)

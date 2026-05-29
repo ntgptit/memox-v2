@@ -10,6 +10,7 @@ related_decision: docs/checklist/product-decisions-pending-2026-05-29.md
 > **Status: Future Proposal — Migration Required.** This is not V1 implementation scope. Do not build the screen, route, use cases, repository queries, or entry links until the feature is promoted in `docs/checklist/v1-implementation-scope-2026-05-29.md`.
 >
 > **Migration dependency.** This spec depends on the following columns from `docs/database/schema-contract.md` §Pending schema changes:
+>
 > - `flashcard_progress.last_reset_at INTEGER NULL`
 > - `study_attempts.box_before INTEGER NOT NULL DEFAULT 0`
 > - `study_attempts.box_after INTEGER NOT NULL DEFAULT 0`
@@ -181,28 +182,34 @@ Lifetime stats remain cumulative across resets (preserve "total times reviewed" 
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/09-flashcard-history.md` — full timeline screen with divider row and lifetime stats
 - `docs/wireframes/08-flashcard-edit.md` — "View history" action launches this screen
 - `docs/wireframes/24-shared-dialogs.md` §reset-progress (single + bulk variants)
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `study_attempts` with NEW columns `box_before` and `box_after` (both in 6 pending migrations)
 - `flashcard_progress.last_reset_at INTEGER NULL` (in 6 pending migrations)
 - Recommended index: `study_attempts(box_after)` (after profiling)
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows H1-H8 (history rendering, divider rules, pre-migration row handling)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → "card history", "progress reset", "reset divider", `last_reset_at`, `box_before`, `box_after`
 
 **Related business specs:**
+
 - `docs/business/srs/srs-review.md` — attempt insert MUST populate box_before/box_after
 - `docs/business/study/study-flow.md` — attempts written during study session
 - `docs/business/flashcard/flashcard-management.md` — reset progress action
 - `docs/business/bulk/bulk-operations.md` — bulk reset progress sets last_reset_at per card
 
 **Source files to inspect:**
+
 - `lib/domain/usecases/history/get_card_history_usecase.dart`
 - `lib/domain/usecases/history/reset_progress_usecase.dart`
 - `lib/data/repositories/study_attempt_repository.dart`

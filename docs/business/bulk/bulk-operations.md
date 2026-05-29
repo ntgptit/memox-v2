@@ -143,20 +143,25 @@ Toast-undo MUST genuinely revert via inverse transaction.
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/06-flashcard-list.md` — selection mode + bulk action bar (7 icons: delete, move, tag+, tag-, suspend, unsuspend, reset)
 - `docs/wireframes/24-shared-dialogs.md` §bulk-delete, §reset-progress (bulk variant)
 - `docs/wireframes/25-shared-bottom-sheets.md` §tag-picker (add/remove modes), §deck-picker (move target), §undo-toast (non-destructive ops)
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → atomic transactions across `flashcards`, `flashcard_progress`, `flashcard_tags`
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Bulk operations" (atomicity, snapshot-at-confirm rule)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → "selection mode", "bulk operation", "undo toast"
 
 **Related business specs:**
+
 - `docs/business/flashcard/flashcard-management.md` — single-card semantics that bulk extends
 - `docs/business/tags/tag-system.md` — bulk tag add/remove validation
 - `docs/business/study-actions/bury-suspend.md` — bulk suspend / unsuspend
@@ -164,6 +169,7 @@ Toast-undo MUST genuinely revert via inverse transaction.
 - `docs/business/deck/deck-management.md` — bulk move-to-deck destination rules
 
 **Source files to inspect:**
+
 - `lib/domain/usecases/bulk/**`
 - `lib/data/repositories/flashcard_bulk_repository.dart`
 - `lib/presentation/features/flashcard_list/selection_controller.dart`

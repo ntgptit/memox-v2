@@ -250,12 +250,15 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/tags/tag-system.md`
 
 **Decision rows:**
+
 - Tag section: TG7 (delete keeps cards), TG9 (no comma), TG10 (max 50), rename collision = merge with confirmation, merge dedup per card
 
 **Schema / storage:**
+
 - READ aggregate count from `flashcard_tags` GROUP BY tag
 - UPDATE: rename = single-tag UPDATE; merge = atomic delete-source + dedup-insert
 - DELETE tag = remove `flashcard_tags` rows; cards untouched
@@ -263,6 +266,7 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 **Contracts:** `docs/contracts/usecase-contracts/tag.md`, `docs/contracts/repository-contracts/tag-repository.md`
 
 **Code paths:**
+
 - `lib/presentation/features/settings/tag_management/screens/tag_management_screen.dart`
 - `lib/presentation/features/settings/tag_management/notifiers/tag_management_notifier.dart`
 - `lib/domain/usecases/tag/rename_tag_usecase.dart`
@@ -272,5 +276,6 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 - `lib/app/router/route_names.dart` → `RouteNames.settingsLearningTags` (NEW, see navigation-flow.md)
 
 **Related wireframes:**
+
 - `docs/wireframes/04-settings-hub.md`, `docs/wireframes/20-settings-learning.md` (entries)
 - `docs/wireframes/06-flashcard-list.md`, `docs/wireframes/25-shared-bottom-sheets.md` §tag-picker (other tag UIs)

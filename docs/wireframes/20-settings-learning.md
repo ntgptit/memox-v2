@@ -178,18 +178,22 @@ Configure study defaults: daily goal, streak/reminder behavior, and future learn
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/engagement/dashboard-engagement.md`
 
 **Decision rows:**
+
 - Engagement: goal range 5-200 step 5, single reminder, goal-off freezes streak
 
 **Schema / storage:**
+
 - SharedPreferences keys: `goalEnabled`, `dailyGoal`, `streakEnabled`, `reminderEnabled`, `reminderTime`
 - Future: `study.showSwipeHint`, `study.autoAdvanceCorrect`, `study.autoAdvanceWrong`
 
 **Contracts:** `docs/contracts/usecase-contracts/engagement.md`
 
 **Code paths:**
+
 - `lib/presentation/features/settings/learning/screens/learning_settings_screen.dart`
 - `lib/presentation/features/settings/learning/notifiers/learning_settings_notifier.dart`
 - `lib/data/datasources/local/preferences/engagement_preferences.dart`
@@ -197,5 +201,6 @@ Configure study defaults: daily goal, streak/reminder behavior, and future learn
 - `lib/app/router/route_names.dart` → `RouteNames.settingsLearning`
 
 **Related wireframes:**
+
 - `docs/wireframes/04-settings-hub.md` (entry), `docs/wireframes/22-settings-tag-management.md` (Manage tags row)
 - `docs/wireframes/25-shared-bottom-sheets.md` §reminder-time

@@ -70,11 +70,13 @@ class EmptyScopeFailure extends AppFailure {
 ```
 
 Modify `StartStudySessionUseCase.execute()`:
+
 1. Before calling `strategy.loadBatch`, branch on `context.entryType + context.studyType`.
 2. Query repository for each tier-1 case condition.
 3. Throw `EmptyScopeFailure(reason: <specific>)` instead of generic `ValidationException`.
 
 Need 2 new repo methods:
+
 - `StudyRepo.queryNextDueAt(StudyContext context)` → `DateTime?` (cho *_noDueCards relative time)
 - `StudyRepo.hasAnyFlashcard()` → `bool` (cho `todayNoContent` discrimination)
 
@@ -116,6 +118,7 @@ if (_otherError != null) { ... existing error UI ... }
 ```
 
 Create `lib/presentation/features/study/widgets/empty_scope_screen.dart` (NEW):
+
 - Switch on `failure.reason` → render matching `MxEmptyState` widget.
 - Each case has: icon, title (l10n), subtitle (l10n if applicable), CTA button.
 - CTA wiring:

@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Daily goal, streak, reminder, recent decks, dashboard aggregate.
 
 ## GetDashboardStateUseCase
@@ -35,6 +34,7 @@ Future<Either<Failure, Unit>> call({bool? enabled, int? target, bool? streakEnab
 ```
 
 **Rules:**
+
 - If `target` provided: assert 5 ≤ target ≤ 200 AND target % 5 == 0. Else `ValidationFailure(code: outOfRange)`.
 - Persist to SharedPreferences.
 - Side effect: if `enabled` toggled off → freeze streak (do NOT reset).
@@ -48,6 +48,7 @@ Future<StreakInfo> call();
 ```
 
 **Rules:**
+
 - READ `lastGoalMetDate`, `currentStreak`, `longestStreak` from SharedPreferences.
 - If `lastGoalMetDate < today - 1 day` AND `goalEnabled` AND `currentStreak > 0`:
   - Detect broken streak. Return `StreakInfo { currentStreak: 0, brokenStreakInfo: { previousStreak: N, brokenDate } }`.
@@ -63,6 +64,7 @@ Future<Either<Failure, GoalProgress>> call({required int cardsAnsweredToday});
 Called by `FinalizeSessionUseCase` and any other point where attempts complete.
 
 **Rules:**
+
 - If `cardsAnsweredToday >= dailyGoal` AND today != `lastGoalMetDate`:
   - Increment `currentStreak`. Update `lastGoalMetDate = today`. Update `longestStreak = max(longest, current)`.
 
@@ -75,6 +77,7 @@ Future<Either<Failure, Unit>> call({required TimeOfDay time});
 ```
 
 **Rules:**
+
 - Request OS notification permission if not granted.
 - Schedule daily local notification at `time` in user's local timezone.
 - Cancel previous reminder before scheduling new.

@@ -122,15 +122,19 @@ Do not add new product behavior without updating business docs, decision table, 
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/index.md` — screen map for all 25 wireframes corresponding to features here
 
 **Schema:**
+
 - `docs/database/schema-contract.md` — full schema including 6 pending migrations
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` — full event-condition-expected matrix
 
 **Related contracts:**
+
 - `docs/architecture/clean-architecture-contract.md`
 - `docs/state/state-management-contract.md`
 - `docs/ui-ux/ui-ux-contract.md`
@@ -138,7 +142,9 @@ Do not add new product behavior without updating business docs, decision table, 
 - `docs/database/migration-contract.md`
 
 **Per-feature business spec:**
+
 - See "Feature status" table above; each row links to its dedicated business doc.
 
 **Source files to inspect:**
+
 - `lib/main.dart`, `lib/app/**` (app shell, theme, router boot)

@@ -20,30 +20,30 @@ Core content lifecycle:
 
 Study and progress:
 
-7. `docs/business/study/study-flow.md`
-8. `docs/business/srs/srs-review.md`
-9. `docs/business/study-actions/bury-suspend.md`
-10. `docs/business/resume/resume-session.md`
+1. `docs/business/study/study-flow.md`
+2. `docs/business/srs/srs-review.md`
+3. `docs/business/study-actions/bury-suspend.md`
+4. `docs/business/resume/resume-session.md`
 
 Organization and discovery:
 
-11. `docs/business/tags/tag-system.md`
-12. `docs/business/bulk/bulk-operations.md`
-13. `docs/business/search/global-search.md`
-14. `docs/business/history/card-history.md`
+1. `docs/business/tags/tag-system.md`
+2. `docs/business/bulk/bulk-operations.md`
+3. `docs/business/search/global-search.md`
+4. `docs/business/history/card-history.md`
 
 Engagement and supporting features:
 
-15. `docs/business/engagement/dashboard-engagement.md`
-16. `docs/business/export/export.md`
-17. `docs/business/tts/tts-settings.md`
-18. `docs/business/account-sync/account-sync.md`
+1. `docs/business/engagement/dashboard-engagement.md`
+2. `docs/business/export/export.md`
+3. `docs/business/tts/tts-settings.md`
+4. `docs/business/account-sync/account-sync.md`
 
 Cross-cutting contracts (in `docs/` siblings):
 
-19. `docs/database/schema-contract.md`
-20. `docs/database/storage-boundaries.md`
-21. `docs/architecture/clean-architecture-contract.md`
+1. `docs/database/schema-contract.md`
+2. `docs/database/storage-boundaries.md`
+3. `docs/architecture/clean-architecture-contract.md`
 
 ## Rule
 
@@ -77,13 +77,16 @@ When docs and code disagree, do not silently choose one. Report the mismatch or 
 ## Related
 
 **Top-level contracts:**
+
 - `docs/business/glossary.md` — domain terms
 - `docs/business/system/overview.md` — feature status matrix
 
 **Wireframes:**
+
 - `docs/wireframes/index.md` — screen index (25 wireframes + index)
 
 **Database / architecture / state / UI:**
+
 - `docs/database/schema-contract.md`
 - `docs/database/migration-contract.md`
 - `docs/database/storage-boundaries.md`
@@ -92,12 +95,15 @@ When docs and code disagree, do not silently choose one. Report the mismatch or 
 - `docs/ui-ux/ui-ux-contract.md`
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md`
 
 **Checklists:**
+
 - `docs/checklist/implementation-checklist.md` — per-task checklist with parity rules
 - `docs/checklist/recursive-agent-review.md` — code review checklist
 
 **Repo-level:**
+
 - `CLAUDE.md` — agent rules with Doc-code parity contract
 - `AGENTS.md` — agent responsibilities

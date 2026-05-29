@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Drive App Folder backup/restore. NOT a Drift repository — operates on file system, Drive REST API, and `flutter_secure_storage`.
 
 ## Methods
@@ -92,6 +91,7 @@ Use `FakeDriveService` in tests.
 **Storage boundaries:** `docs/database/storage-boundaries.md`
 **Wireframes:** `docs/wireframes/19-settings-account.md`
 **Code paths:**
+
 - `lib/domain/repositories/sync_repository.dart`
 - `lib/data/sync/sync_repository_impl.dart`
 - `lib/data/sync/drive_upload_service.dart`

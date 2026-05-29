@@ -258,7 +258,6 @@ The agent must not start from the HTML mock alone.
 
 V1 status: Future Proposal. These variants are visual references only until Card History is promoted and its migration is approved.
 
-
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
 | `22a · Flashcard history (loaded)` | History loaded | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/business/srs/srs-review.md` |
@@ -284,7 +283,6 @@ V1 status: Future Proposal. These variants are visual references only until Card
 ### 6.15 Library search variants
 
 V1 status: full global search is Future Proposal. V1 may reuse visual patterns for inline/scope-local search only.
-
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
@@ -333,7 +331,6 @@ V1 status: full global search is Future Proposal. V1 may reuse visual patterns f
 ### 6.19 Onboarding variants
 
 V1 status: full onboarding is Future Proposal. V1 implements only zero-content empty-state CTAs; do not create an onboarding route or feature folder from these variants.
-
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |

@@ -6,6 +6,7 @@ applies_to: deck entity and deck management feature
 # Deck Management
 
 > **Status: Partial Target — Migration Required for `target_language`.** Deck CRUD itself is implementable today. However, the `target_language` field (referenced throughout this spec) is a pending column from `docs/database/schema-contract.md` §Pending schema changes:
+>
 > - `decks.target_language TEXT NOT NULL DEFAULT 'korean'`
 >
 > Migration backfills existing decks to `'korean'`; user adjusts per-deck after. Blocks (until migration): TTS gating in study modes 13-17, settings audio-speech screen, target-language picker in deck create/edit flows.
@@ -99,6 +100,7 @@ Do not add a separate deck detail route unless route contract and navigation doc
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/02-library.md` — Library shows top-level decks
 - `docs/wireframes/05-folder-detail.md` — decks listed inside a folder (decks mode)
 - `docs/wireframes/06-flashcard-list.md` — deck content view + deck-level CTAs
@@ -106,15 +108,19 @@ Do not add a separate deck detail route unless route contract and navigation doc
 - `docs/wireframes/25-shared-bottom-sheets.md` §deck-create, §deck-picker
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `decks` table (`id`, `folder_id`, `name`, `target_language`, `sort_order`, timestamps). `target_language` is one of the 6 pending migrations.
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Deck management" and "TTS gating" (target_language influences TTS UI in study modes)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → `target_language`, `korean`, `english`, `unsupported`
 
 **Related business specs:**
+
 - `docs/business/folder/folder-management.md` — folder mode lock affects whether deck can be created here
 - `docs/business/flashcard/flashcard-management.md` — deck owns flashcards
 - `docs/business/tts/tts-settings.md` — `target_language` gates TTS at deck level
@@ -122,6 +128,7 @@ Do not add a separate deck detail route unless route contract and navigation doc
 - `docs/business/navigation/navigation-flow.md` — `/library/deck/:deckId/...` routes
 
 **Source files to inspect:**
+
 - `lib/data/datasources/local/tables/decks_table.dart`
 - `lib/domain/entities/deck.dart`
 - `lib/domain/repositories/deck_repository.dart`

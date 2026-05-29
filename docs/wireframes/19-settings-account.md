@@ -258,12 +258,15 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/account-sync/account-sync.md`
 
 **Decision rows:**
+
 - Account/Sync: pre-snapshot abort, fingerprint mismatch warning, two-tier confirm, token refresh
 
 **Schema / storage:**
+
 - Account-scoped DB file path switch on account change
 - Drive manifest (remote): `device_label`, `fingerprint`, `uploaded_at`, `size_bytes`, `schema_version`
 - SharedPreferences: `account.deviceLabel`, `account.lastSyncAt`, `account.lastSyncFingerprint`
@@ -271,6 +274,7 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 **Contracts:** `docs/contracts/usecase-contracts/account-sync.md`, `docs/contracts/repository-contracts/sync-repository.md`
 
 **Code paths:**
+
 - `lib/presentation/features/settings/account/screens/account_settings_screen.dart`
 - `lib/presentation/features/settings/account/notifiers/account_settings_notifier.dart`
 - `lib/data/sync/drive_upload_service.dart`
@@ -281,5 +285,6 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 - `lib/app/router/route_names.dart` → `RouteNames.settingsAccount`
 
 **Related wireframes:**
+
 - `docs/wireframes/04-settings-hub.md` (entry), `docs/wireframes/23-onboarding.md` (sign-in path)
 - `docs/wireframes/24-shared-dialogs.md` §restore-warning, §rename (device label), §delete-confirm (strong variant)

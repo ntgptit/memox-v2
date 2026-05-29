@@ -309,6 +309,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/flashcard/flashcard-management.md`
 - `docs/business/bulk/bulk-operations.md`
 - `docs/business/study-actions/bury-suspend.md` (state badge priority)
@@ -316,9 +317,11 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 - `docs/business/resume/resume-session.md` (banner)
 
 **Decision rows:**
+
 - Flashcard management, Bulk operations, Bury/Suspend (badge priority), Tags (TG filter)
 
 **Schema / storage:**
+
 - `flashcards`, `flashcard_progress.is_suspended`, `flashcard_progress.buried_until`, `flashcard_progress.due_at`, `flashcard_tags`
 - URL params for filter/tag state
 
@@ -333,6 +336,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 - Route constant: `lib/app/router/route_names.dart` → `RouteNames.flashcardList`.
 
 **Related wireframes:**
+
 - `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/08-flashcard-edit.md`, `docs/wireframes/09-flashcard-history.md`, `docs/wireframes/10-deck-import.md`
 - `docs/wireframes/24-shared-dialogs.md` §bulk-delete, §reset-progress, §discard-session
 - `docs/wireframes/25-shared-bottom-sheets.md` §tag-picker, §deck-picker, §filter-status, §undo-toast, §card-context

@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 `flashcard_progress` + `study_attempts`. The SRS heart of the data layer.
 
 ## Methods
@@ -56,6 +55,7 @@ Future<Either<Failure, int>> bulkResetProgress(List<FlashcardId> ids);
 ## Index dependencies
 
 These methods rely on indexes (recommend in `docs/database/schema-contract.md`):
+
 - `getDueInScope` → `flashcard_progress(is_suspended, buried_until, due_at)`
 - `watchAttemptsByCard` → `study_attempts(flashcard_id, attempted_at DESC)`
 - `getBoxDistribution` → cheap aggregate, no special index
@@ -95,6 +95,7 @@ These methods rely on indexes (recommend in `docs/database/schema-contract.md`):
 **Use cases:** `docs/contracts/usecase-contracts/study.md`, `docs/contracts/usecase-contracts/history.md`, `docs/contracts/usecase-contracts/srs.md`
 **Schema:** `docs/database/schema-contract.md` `flashcard_progress`, `study_attempts`
 **Code paths:**
+
 - `lib/domain/repositories/flashcard_progress_repository.dart`
 - `lib/domain/repositories/study_attempt_repository.dart` (may be split or unified)
 - `lib/data/repositories/progress_repository_impl.dart`

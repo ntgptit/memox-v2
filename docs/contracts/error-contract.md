@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 Single source of truth for: failure type taxonomy, error propagation rules, UI mapping, recovery actions, and user-facing message conventions. Every layer of MemoX uses these failure types — no ad-hoc exception subclasses.
 
 ## Principles
@@ -90,6 +89,7 @@ NetworkFailure(
 ### IntegrityFailure
 
 Reserved for **data corruption** — should never happen in normal operation. When raised:
+
 1. Logger.severe with full stack.
 2. Abort current operation.
 3. Show user blocking dialog with "Contact support" CTA (file path: bug report).
@@ -182,6 +182,7 @@ l10n keys live in `lib/l10n/app_en.arb` under prefix `error_`. Per-field validat
 ## Test contract for errors
 
 Every use case test MUST include:
+
 - At least one happy-path test → `Right(T)`.
 - At least one failure-path test per failure type the use case can return.
 - Validation tests covering every `ValidationCode` the use case checks.
@@ -199,23 +200,28 @@ See `docs/testing/test-strategy.md`.
 ## Related
 
 **Repo-level:**
+
 - `CLAUDE.md` §Doc-code parity rule
 - `AGENTS.md`
 
 **Contracts:**
+
 - `docs/contracts/types-catalog.md` — enums referenced here (ValidationCode, NetworkErrorKind, StorageOp)
 - `docs/contracts/code-style.md` — naming for failure classes
 - `docs/testing/test-strategy.md` — error-path test requirements
 - `docs/quality/observability-contract.md` — when to log which severity
 
 **Business specs:**
+
 - Every business doc references failure types via inline mentions; this contract is the registry.
 
 **Wireframes:**
+
 - `docs/wireframes/24-shared-dialogs.md` — error confirmation dialogs
 - `docs/wireframes/25-shared-bottom-sheets.md` §undo-toast — recovery via undo
 
 **Code paths:**
+
 - `lib/core/error/failure.dart` (sealed Failure base)
 - `lib/core/error/validation_messages.dart` (mapping)
 - `lib/core/widgets/error/mx_error_state.dart`

@@ -228,26 +228,31 @@ Browse a folder's children: either subfolders or decks (never both, per `content
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/folder/folder-management.md`
 - `docs/business/deck/deck-management.md`
 - `docs/business/resume/resume-session.md` (banner)
 
 **Decision rows:**
+
 - Folder management (mode lock, mode-choice empty state)
 - Resume section
 
 **Schema / storage:**
+
 - `folders.content_mode`, `folders.parent_id`
 - Resume: `study_sessions` filtered by entry_type=folder
 
 **Contracts:** `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/usecase-contracts/deck.md`, `docs/contracts/repository-contracts/folder-repository.md`
 
 **Code paths:**
+
 - `lib/presentation/features/library/screens/folder_detail_screen.dart`
 - `lib/presentation/features/library/notifiers/folder_detail_notifier.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.folderDetail`
 
 **Related wireframes:**
+
 - `docs/wireframes/02-library.md` (parent)
 - `docs/wireframes/06-flashcard-list.md` (deck child)
 - `docs/wireframes/12-study-entry-gate.md` (folder-scoped study)

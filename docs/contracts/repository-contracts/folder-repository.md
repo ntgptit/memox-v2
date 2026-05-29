@@ -7,7 +7,6 @@ status: contract
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
-
 `abstract class FolderRepository` in `lib/domain/repositories/folder_repository.dart`.
 Implementation `FolderRepositoryImpl` in `lib/data/repositories/folder_repository_impl.dart`.
 
@@ -68,6 +67,7 @@ Future<Either<Failure, Unit>> updateContentMode(FolderId id, ContentMode newMode
 ## Required mappers
 
 `FolderMapper` in `lib/data/mappers/folder_mapper.dart`:
+
 - `Folder fromRow(FolderRow row)`
 - `FolderRow toRow(Folder entity)`
 - `ContentMode fromString(String value)` / `String toStorage(ContentMode mode)`
@@ -93,6 +93,7 @@ Future<Either<Failure, Unit>> updateContentMode(FolderId id, ContentMode newMode
 **Use cases:** `docs/contracts/usecase-contracts/folder.md`
 **Schema:** `docs/database/schema-contract.md` `folders` table
 **Code paths:**
+
 - `lib/domain/repositories/folder_repository.dart` (interface)
 - `lib/data/repositories/folder_repository_impl.dart`
 - `lib/data/datasources/local/daos/folder_dao.dart`

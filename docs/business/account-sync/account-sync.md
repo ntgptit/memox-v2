@@ -469,24 +469,30 @@ Has a separate sign-in button (`google_account_web_button_web.dart`). `requiresP
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/19-settings-account.md` — signed-in/out states, fingerprint match indicator, upload/restore controls, pre-snapshot notice
 - `docs/wireframes/23-onboarding.md` — "Sign in to restore" path during onboarding
 - `docs/wireframes/24-shared-dialogs.md` §restore-warning (two-tier with 5s timeout), §delete-confirm (strong variant for account removal with typed ERASE confirmation)
 
 **Schema:**
+
 - `docs/database/storage-boundaries.md` → account-scoped database file path; Drive manifest schema (`device_label`, `fingerprint`, `uploaded_at`, `size_bytes`, `schema_version`)
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Account / Sync" (pre-snapshot abort rule, fingerprint mismatch warning, token refresh)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → "account-scoped", "device label", "fingerprint", "pre-restore snapshot", "Drive App Folder"
 
 **Related business specs:**
+
 - `docs/business/system/overview.md` — sync status of feature
 - `docs/business/navigation/navigation-flow.md` — `/settings/account` route
 
 **Source files to inspect:**
+
 - `lib/data/sync/**` (upload, restore, snapshot, manifest)
 - `lib/core/auth/google_auth.dart`
 - `lib/presentation/features/settings/account/**`

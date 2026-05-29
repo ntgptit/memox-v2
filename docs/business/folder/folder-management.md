@@ -89,26 +89,32 @@ Do not enforce folder content mode only in UI. The rule must be protected by use
 ## Related
 
 **Wireframes:**
+
 - `docs/wireframes/02-library.md` — Library root showing top-level folders
 - `docs/wireframes/05-folder-detail.md` — folder detail (subfolders / decks / unlocked modes)
 - `docs/wireframes/24-shared-dialogs.md` §folder-create, §rename, §delete-confirm
 - `docs/wireframes/25-shared-bottom-sheets.md` §folder-picker, §item-context
 
 **Schema:**
+
 - `docs/database/schema-contract.md` → `folders` table (`id`, `parent_id`, `name`, `content_mode`, `sort_order`, timestamps)
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Folder management" (folder mode lock, move cycle prevention, delete cascade)
 
 **Glossary terms:**
+
 - `docs/business/glossary.md` → `content_mode`, `unlocked`, `subfolders`, `decks` modes; folder hierarchy
 
 **Related business specs:**
+
 - `docs/business/deck/deck-management.md` — decks live inside folders, share parent rules
 - `docs/business/navigation/navigation-flow.md` — `/library/folder/:id` route contract
 - `docs/business/bulk/bulk-operations.md` — folder is one of the bulk-move destinations
 
 **Source files to inspect:**
+
 - `lib/data/datasources/local/tables/folders_table.dart`
 - `lib/domain/entities/folder.dart`
 - `lib/domain/repositories/folder_repository.dart`

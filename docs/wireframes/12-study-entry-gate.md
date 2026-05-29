@@ -272,13 +272,16 @@ When scope is empty, this screen renders the appropriate empty state from `docs/
 ## Implementation refs
 
 **Business specs:**
+
 - `docs/business/study/study-flow.md` (empty scope matrix)
 - `docs/business/resume/resume-session.md` (resume-or-start-over)
 
 **Decision rows:**
+
 - S1-S4i (session creation, empty scope variants), Resume section
 
 **Schema / storage:**
+
 - READ scope content (flashcards by entry_type/entry_ref_id)
 - READ resumable `study_sessions` by scope match
 - INSERT `study_sessions` + `study_session_items` on commit
@@ -286,6 +289,7 @@ When scope is empty, this screen renders the appropriate empty state from `docs/
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §ResolveScopeUseCase, §FindResumableSessionUseCase, §CreateSessionUseCase
 
 **Code paths:**
+
 - `lib/presentation/features/study/screens/study_entry_gate_screen.dart`
 - Screen: `lib/presentation/features/study/screens/study_entry_screen.dart` + viewmodel under `lib/presentation/features/study/viewmodels/`. No standalone `study_entry_notifier.dart`.
 - Scope + session lifecycle: `lib/domain/study/usecases/study_usecases.dart` → `StartStudySessionUseCase` (resolves scope + creates session), `ResumeStudySessionUseCase` (covers `listActiveSessions` + `findCandidate(StudyContext)` + `execute(sessionId)`), `RestartStudySessionUseCase`. No separate `resolve_scope_usecase.dart` / `find_resumable_session_usecase.dart` / `create_session_usecase.dart`.
@@ -293,6 +297,7 @@ When scope is empty, this screen renders the appropriate empty state from `docs/
 - Route constants: `lib/app/router/route_names.dart` → `RouteNames.studyEntry`, `RouteNames.studyToday`.
 
 **Related wireframes:**
+
 - All 5 study mode wireframes 13-17
 - `docs/wireframes/01-dashboard.md`, `docs/wireframes/05-folder-detail.md`, `docs/wireframes/06-flashcard-list.md` (callers)
 - `docs/wireframes/24-shared-dialogs.md` §resume-or-start-over, §discard-session

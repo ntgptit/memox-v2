@@ -111,13 +111,16 @@ When in doubt about whether to use Stream or Future: use Stream.
 ## Related
 
 **Schema:**
+
 - `docs/database/schema-contract.md` — what belongs in Drift
 
 **Related contracts:**
+
 - `docs/database/migration-contract.md`
 - `docs/state/state-management-contract.md` — provider memory is NOT a persistence boundary
 
 **Business specs touching non-Drift storage:**
+
 - `docs/business/engagement/dashboard-engagement.md` → daily goal, streak, reminder time in SharedPreferences
 - `docs/business/tts/tts-settings.md` → per-language TTS settings in SharedPreferences
 - `docs/business/search/global-search.md` → recent searches in SharedPreferences
@@ -125,4 +128,5 @@ When in doubt about whether to use Stream or Future: use Stream.
 - `docs/business/flashcard/flashcard-management.md` → "Save and add another" toggle (session memory, NOT persisted)
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Storage boundaries" (account-scoped DB switching, prefs key prefixes)

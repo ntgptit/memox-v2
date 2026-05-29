@@ -89,7 +89,6 @@ A pending column listed here does not automatically approve every dependent feat
 - `flashcard_progress.last_reset_at`, `study_attempts.box_before`, and `study_attempts.box_after` are reserved for the Future Proposal Card History feature unless promoted.
 - `decks.target_language` may be implemented only with the deck/TTS migration task that updates Drift schema, mapper, tests, and generated code.
 
-
 | Change | Source spec | Notes |
 | --- | --- | --- |
 | Add `decks.target_language TEXT NOT NULL DEFAULT 'korean'` | `docs/business/deck/deck-management.md` | Migration backfills existing rows to `'korean'`. |
@@ -180,19 +179,23 @@ This schema is referenced by every business spec that touches persistent state.
 | `study_attempts` (incl. `box_before`, `box_after` pending migrations) | `docs/business/srs/srs-review.md`, `docs/business/history/card-history.md` |
 
 **Related contracts:**
+
 - `docs/database/migration-contract.md` — how schema changes ship
 - `docs/database/storage-boundaries.md` — what lives in Drift vs SharedPreferences vs files
 - `docs/architecture/clean-architecture-contract.md` — DAO/repository pattern
 
 **Wireframes that depend on schema:**
+
 - `docs/wireframes/06-flashcard-list.md` — filters consume status columns
 - `docs/wireframes/09-flashcard-history.md` — timeline reads `study_attempts`
 - `docs/wireframes/19-settings-account.md` — sync reads/writes whole DB
 
 **Decision table:**
+
 - `docs/decision-tables/memox-core-decision-table.md` rows under "Schema" (column existence, default values, NOT NULL)
 
 **Source files to inspect:**
+
 - `lib/data/datasources/local/tables/**`
 - `lib/data/datasources/local/app_database.dart`
 - `lib/data/datasources/local/migrations/**`

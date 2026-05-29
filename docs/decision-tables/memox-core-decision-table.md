@@ -285,18 +285,23 @@ When changing existing behavior:
 This table cross-references every behavior branch. When a row is added or modified, the corresponding business doc and test MUST be updated in the same commit (per `CLAUDE.md` §Doc-code parity rule).
 
 **Business specs (rows reference these for "Source of truth"):**
+
 - All of `../business/**`
 
 **Wireframes (rows reference for UI verification):**
+
 - All of `../wireframes/**`
 
 **Schema:**
+
 - `docs/database/schema-contract.md` — column-level rows under "Schema"
 
 **Checklists:**
+
 - `docs/checklist/implementation-checklist.md` — "Tests" section requires a test per touched decision row
 - `docs/checklist/recursive-agent-review.md` — verifies row coverage
 
 **Maintenance rule:**
+
 - Every C0 row MUST have at least one test referenced by ID.
 - Every new branch logic in code MUST add a row before merge.
