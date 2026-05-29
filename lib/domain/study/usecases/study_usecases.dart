@@ -1,5 +1,6 @@
 import '../../../core/errors/app_exception.dart';
 import '../../enums/study_enums.dart';
+import '../entities/empty_scope_reason.dart';
 import '../entities/study_models.dart';
 import '../ports/study_repo.dart';
 import '../strategy/study_mode_strategy.dart';
@@ -30,6 +31,8 @@ final class StartStudySessionUseCase {
     final effectiveModes = modes ?? strategy.modes;
     final flow = _flowForModes(context.studyType, effectiveModes);
 
+    await _rejectEmptyScope(context);
+
     final batch = await strategy.loadBatch(context, _repository);
     if (batch.isEmpty) {
       throw const ValidationException(
@@ -44,6 +47,25 @@ final class StartStudySessionUseCase {
       batch: batch,
     );
     return _withFlowPlan(snapshot, _flowPlan(context.studyType, flow));
+  }
+
+  /// P0-1 Tier 1: pre-check scope and throw typed [EmptyScopeException] so the
+  /// presentation layer can render a dedicated empty state with an actionable
+  /// CTA. Currently covers `deck_noCards` only; other Tier 1 cases will be
+  /// added in a follow-up PR (see
+  /// `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md`).
+  Future<void> _rejectEmptyScope(StudyContext context) async {
+    if (context.entryType != StudyEntryType.deck) {
+      return;
+    }
+    final deckId = context.entryRefId;
+    if (deckId == null) {
+      return;
+    }
+    final count = await _repository.countFlashcardsInDeck(deckId);
+    if (count == 0) {
+      throw const EmptyScopeException(EmptyScopeReason.deckNoCards);
+    }
   }
 }
 

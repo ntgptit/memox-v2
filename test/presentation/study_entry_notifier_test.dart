@@ -77,6 +77,9 @@ final class _SuccessfulStudyRepo implements StudyRepo {
   int activeSessionLoadCount = 0;
 
   @override
+  Future<int> countFlashcardsInDeck(String deckId) async => 1;
+
+  @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => [
     _card(),
   ];
@@ -165,6 +168,9 @@ final class _SuccessfulStudyRepo implements StudyRepo {
 
 final class _EmptyStudyRepo implements StudyRepo {
   const _EmptyStudyRepo();
+
+  @override
+  Future<int> countFlashcardsInDeck(String deckId) async => 1;
 
   @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async =>

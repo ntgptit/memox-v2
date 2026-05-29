@@ -59,7 +59,7 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | S1 | Create session | Deck with cards | Persist session/items | C0+C1 | `test/features/study/create_session_test.dart::S1` |
 | S2 | Create session | Folder with recursive cards | Persist session/items | C0+C1 | `test/features/study/create_session_test.dart::S2` |
 | S3 | Create session | Today with due cards | Persist SRS session | C0+C1 | `test/features/study/create_session_test.dart::S3` |
-| S4 | Create session | Deck with zero cards | Empty state `studyEmpty_deck_noCards`, no session | C1 | `test/features/study/empty_scope_test.dart::S4` |
+| S4 | Create session | Deck with zero cards | `EmptyScopeException(deckNoCards)` → render `EmptyScopeScreen` (`studyEmpty_deck_noCards_title`) with "Add flashcards" CTA pushing `flashcardCreate`; no session persisted | C1 | `test/features/study/empty_scope_test.dart::S4` + `test/presentation/study_entry_screen_test.dart::S4 onTap` |
 | S4b | Create session | Folder with zero descendant cards | Empty state `studyEmpty_folder_noCards`, no session | C1 | `test/features/study/empty_scope_test.dart::S4b` |
 | S4c | Create session | Today with zero due cards | Empty state `studyEmpty_today_allDone`, no session | C1 | `test/features/study/empty_scope_test.dart::S4c` |
 | S4d | Create session | Today with zero cards in DB | Empty state `studyEmpty_today_noContent` | C1 | `test/features/study/empty_scope_test.dart::S4d` |

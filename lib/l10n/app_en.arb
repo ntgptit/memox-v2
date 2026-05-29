@@ -1045,6 +1045,14 @@
   },
   "studyContinueAction": "Continue",
   "studyEmptyAnswerMessage": "Enter an answer before submitting.",
+  "studyEmpty_deck_noCards_title": "No flashcards in this deck",
+  "@studyEmpty_deck_noCards_title": {
+    "description": "Empty-scope title shown when a user opens Study on a deck with zero flashcards. P0-1 Tier 1; copy pending product review."
+  },
+  "studyEmpty_deck_noCards_cta": "Add flashcards",
+  "@studyEmpty_deck_noCards_cta": {
+    "description": "Empty-scope CTA that pushes the flashcard-create screen for the current deck."
+  },
   "studyCancelConfirmTitle": "Cancel this session?",
   "studyCancelConfirmMessage": "Your current study session will stop and you will be taken to the result screen.",
   "studyCancelConfirmAction": "Cancel",

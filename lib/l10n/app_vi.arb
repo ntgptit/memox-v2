@@ -1045,6 +1045,14 @@
   },
   "studyContinueAction": "Tiếp tục",
   "studyEmptyAnswerMessage": "Hãy nhập đáp án trước khi gửi.",
+  "studyEmpty_deck_noCards_title": "Bộ này chưa có thẻ nào",
+  "@studyEmpty_deck_noCards_title": {
+    "description": "Empty-scope title shown when a user opens Study on a deck with zero flashcards. P0-1 Tier 1; copy pending product review."
+  },
+  "studyEmpty_deck_noCards_cta": "Thêm thẻ",
+  "@studyEmpty_deck_noCards_cta": {
+    "description": "Empty-scope CTA that pushes the flashcard-create screen for the current deck."
+  },
   "studyCancelConfirmTitle": "Hủy phiên học này?",
   "studyCancelConfirmMessage": "Phiên học hiện tại sẽ dừng lại và bạn sẽ được đưa đến màn hình kết quả.",
   "studyCancelConfirmAction": "Hủy",

@@ -2094,6 +2094,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyEmptyAnswerMessage => 'Enter an answer before submitting.';
 
   @override
+  String get studyEmpty_deck_noCards_title => 'No flashcards in this deck';
+
+  @override
+  String get studyEmpty_deck_noCards_cta => 'Add flashcards';
+
+  @override
   String get studyCancelConfirmTitle => 'Cancel this session?';
 
   @override

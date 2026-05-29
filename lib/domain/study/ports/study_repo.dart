@@ -2,6 +2,11 @@ import '../../enums/study_enums.dart';
 import '../entities/study_models.dart';
 
 abstract interface class StudyRepo {
+  /// Returns the total flashcard count for [deckId] regardless of progress
+  /// state. Used by empty-scope pre-checks (P0-1) to distinguish
+  /// `deck_noCards` from `deck_noDueCards`.
+  Future<int> countFlashcardsInDeck(String deckId);
+
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context);
 
   Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context);

@@ -3492,6 +3492,18 @@ abstract class AppLocalizations {
   /// **'Enter an answer before submitting.'**
   String get studyEmptyAnswerMessage;
 
+  /// Empty-scope title shown when a user opens Study on a deck with zero flashcards. P0-1 Tier 1; copy pending product review.
+  ///
+  /// In en, this message translates to:
+  /// **'No flashcards in this deck'**
+  String get studyEmpty_deck_noCards_title;
+
+  /// Empty-scope CTA that pushes the flashcard-create screen for the current deck.
+  ///
+  /// In en, this message translates to:
+  /// **'Add flashcards'**
+  String get studyEmpty_deck_noCards_cta;
+
   /// No description provided for @studyCancelConfirmTitle.
   ///
   /// In en, this message translates to:

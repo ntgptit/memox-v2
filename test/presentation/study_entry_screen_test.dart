@@ -141,6 +141,35 @@ void main() {
     expect(find.byType(MxErrorState), findsOneWidget);
     expect(find.textContaining('No eligible flashcards'), findsOneWidget);
   });
+
+  testWidgets(
+    'S4 onTap: deck_noCards empty state CTA pushes flashcardCreate route',
+    (tester) async {
+      final repo = _CapturingStudyRepo()..deckFlashcardCount = 0;
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_deckEntryState)),
+          ],
+          child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('No flashcards in this deck'), findsOneWidget);
+      expect(repo.startCount, 0);
+
+      await tester.tap(find.text('Add flashcards'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('FlashcardCreate deck-001'), findsOneWidget);
+    },
+  );
 }
 
 String _deckEntryLocation({StudyMode? studyMode}) {
@@ -232,6 +261,12 @@ class _TestRouterApp extends StatelessWidget {
           builder: (_, state) =>
               Text('Session ${state.pathParameters['sessionId']}'),
         ),
+        GoRoute(
+          path: '/deck/:deckId/flashcards/new',
+          name: RouteNames.flashcardCreate,
+          builder: (_, state) =>
+              Text('FlashcardCreate ${state.pathParameters['deckId']}'),
+        ),
       ],
     );
     return MaterialApp.router(
@@ -246,6 +281,10 @@ class _CapturingStudyRepo implements StudyRepo {
   int startCount = 0;
   StudyFlow? startedFlow;
   List<StudyMode>? startedModes;
+  int deckFlashcardCount = 1;
+
+  @override
+  Future<int> countFlashcardsInDeck(String deckId) async => deckFlashcardCount;
 
   @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => [

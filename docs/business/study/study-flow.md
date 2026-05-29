@@ -133,6 +133,13 @@ Every "Start study" trigger must validate scope content BEFORE creating a sessio
 
 Rejection MUST NOT be a generic toast or error dialog. Always render dedicated empty state with actionable CTA where possible.
 
+### Implementation status (P0-1)
+
+| Case | Status | Source |
+| --- | --- | --- |
+| `studyEmpty_deck_noCards` | ✅ Implemented (Tier 1 vertical slice) | `lib/domain/study/usecases/study_usecases.dart` (`_rejectEmptyScope`) + `lib/presentation/features/study/widgets/empty_scope_screen.dart` |
+| All other rows | ⏳ Specified — replicate the deck_noCards slice pattern (typed `EmptyScopeReason`, repo pre-check, `EmptyScopeScreen` switch arm, l10n keys) per `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md` | — |
+
 ## "Next due" calculation
 
 For "no due cards" cases, the empty state displays "Next due in {relativeTime}":

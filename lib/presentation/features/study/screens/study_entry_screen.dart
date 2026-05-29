@@ -5,12 +5,14 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
+import '../../../../domain/study/entities/empty_scope_reason.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/widgets/mx_error_state.dart';
 import '../../../shared/widgets/mx_loading_state.dart';
 import '../providers/study_entry_notifier.dart';
 import '../providers/study_session_notifier.dart';
+import '../widgets/empty_scope_screen.dart';
 
 class StudyEntryScreen extends ConsumerStatefulWidget {
   const StudyEntryScreen({
@@ -50,6 +52,13 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final error = _error;
+    if (error is EmptyScopeException) {
+      return EmptyScopeScreen(
+        failure: error,
+        entryRefId: widget.entryRefId,
+      );
+    }
     if (_error != null) {
       final l10n = AppLocalizations.of(context);
       return MxScaffold(

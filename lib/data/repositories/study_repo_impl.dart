@@ -56,6 +56,16 @@ final class StudyRepoImpl implements StudyRepo {
   final AppLogger _logger;
 
   @override
+  Future<int> countFlashcardsInDeck(String deckId) async {
+    final countExpr = _database.flashcards.id.count();
+    final query = _database.selectOnly(_database.flashcards)
+      ..addColumns([countExpr])
+      ..where(_database.flashcards.deckId.equals(deckId));
+    final row = await query.getSingle();
+    return row.read(countExpr) ?? 0;
+  }
+
+  @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
     final rows = await _eligibleFlashcards(
       context: context,

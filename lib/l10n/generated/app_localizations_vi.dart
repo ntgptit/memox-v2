@@ -1977,6 +1977,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyEmptyAnswerMessage => 'Hãy nhập đáp án trước khi gửi.';
 
   @override
+  String get studyEmpty_deck_noCards_title => 'Bộ này chưa có thẻ nào';
+
+  @override
+  String get studyEmpty_deck_noCards_cta => 'Thêm thẻ';
+
+  @override
   String get studyCancelConfirmTitle => 'Hủy phiên học này?';
 
   @override

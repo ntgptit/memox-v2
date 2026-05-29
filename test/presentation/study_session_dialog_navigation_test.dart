@@ -118,6 +118,9 @@ final class _CancelDialogStudyRepo implements StudyRepo {
   int cancelCount = 0;
 
   @override
+  Future<int> countFlashcardsInDeck(String deckId) async => 1;
+
+  @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) {
     throw UnimplementedError();
   }

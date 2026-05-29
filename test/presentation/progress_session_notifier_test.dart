@@ -266,6 +266,9 @@ final class _ProgressStudyRepo implements StudyRepo {
 
   final List<StudySessionSnapshot> activeSessions;
   int cancelCount = 0;
+
+  @override
+  Future<int> countFlashcardsInDeck(String deckId) async => 1;
   int finalizeCount = 0;
   int retryFinalizeCount = 0;
   int resumeCandidateLoadCount = 0;

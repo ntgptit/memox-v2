@@ -488,6 +488,9 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   int cancelCount = 0;
 
   @override
+  Future<int> countFlashcardsInDeck(String deckId) async => 1;
+
+  @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
     cancelCount += 1;
     return _snapshot(
@@ -580,6 +583,9 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
 
 final class _ResumeCandidateStudyRepo implements StudyRepo {
   int cancelCount = 0;
+
+  @override
+  Future<int> countFlashcardsInDeck(String deckId) async => 1;
   int resumeCandidateLoadCount = 0;
   bool hasResumeCandidate = true;
 
@@ -688,6 +694,9 @@ final class _ResumeCandidateStudyRepo implements StudyRepo {
 
 final class _ReviewBatchStudyRepo implements StudyRepo {
   int batchAnswerCount = 0;
+
+  @override
+  Future<int> countFlashcardsInDeck(String deckId) async => 1;
   int activeSessionLoadCount = 0;
   AttemptGrade? lastGrade;
   List<StudyMode>? lastModes;
@@ -798,6 +807,9 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
 
 final class _MatchBatchStudyRepo implements StudyRepo {
   int matchBatchAnswerCount = 0;
+
+  @override
+  Future<int> countFlashcardsInDeck(String deckId) async => 1;
   Map<String, AttemptGrade>? lastItemGrades;
   List<StudyMode>? lastModes;
 
