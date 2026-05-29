@@ -535,6 +535,11 @@ void main() {
         folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_sampleFolderState),
         ),
+        // The pushed subfolder screen needs a resolved state too, otherwise it
+        // loads forever and pumpAndSettle never completes.
+        folderDetailQueryProvider(subfolderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_subfolderDetailState),
+        ),
       ],
     );
     addTearDown(container.dispose);
@@ -578,13 +583,12 @@ void main() {
     );
 
     await tester.tap(find.text('Vocabulary'));
-    await tester.pump();
     await tester.pumpAndSettle();
 
-    expect(
-      router.routeInformationProvider.value.uri.path,
-      '/library/folder/$subfolderId',
-    );
+    // pushFolderDetail pushes the subfolder route; verify by its rendered
+    // (distinct) screen title rather than the location (imperative pushes do
+    // not round-trip through the router's reported location).
+    expect(find.text('N5 Vocabulary'), findsAtLeastNWidgets(1));
   });
 
   testWidgets('DT5 onNavigate: tapping a deck row opens flashcard management', (
@@ -929,6 +933,23 @@ const _sampleFolderState = FolderDetailState(
       canImportFlashcards: true,
     ),
   ],
+  decks: <FolderDeckItem>[],
+);
+
+const _subfolderDetailState = FolderDetailState(
+  header: FolderDetailHeader(
+    id: 'folder-002',
+    name: 'N5 Vocabulary',
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'Japanese', folderId: 'folder-000'),
+      BreadcrumbSegmentReadModel(label: 'Japanese N5', folderId: 'folder-001'),
+      BreadcrumbSegmentReadModel(label: 'N5 Vocabulary', folderId: 'folder-002'),
+    ],
+  ),
+  mode: FolderDetailMode.subfolders,
+  sortMode: ContentSortMode.manual,
+  searchTerm: '',
+  subfolders: <FolderSubfolderItem>[],
   decks: <FolderDeckItem>[],
 );
 

@@ -176,15 +176,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Scroll strictly downward through the screen: STUDY FLOW (disabled
+      // tiles) → Import (cards toolbar) → empty state.
       await _scrollToText(tester, 'STUDY FLOW');
-      expect(find.byTooltip('Import'), findsOneWidget);
       expect(find.byKey(const ValueKey('study_mode_mix')), findsNothing);
-
-      await _scrollToText(tester, 'No flashcards yet');
-      expect(find.text('No flashcards yet'), findsOneWidget);
-      expect(find.text('Add'), findsOneWidget);
-
-      await _scrollToText(tester, 'STUDY FLOW');
       final disabledTiles = tester
           .widgetList<MxCard>(_studyModeTiles())
           .toList();
@@ -196,6 +191,14 @@ void main() {
         ),
         findsNothing,
       );
+
+      // Import stays available for empty decks (cards toolbar, lazy sliver).
+      await _scrollUntilAny(tester, find.byTooltip('Import'));
+      expect(find.byTooltip('Import'), findsOneWidget);
+
+      await _scrollToText(tester, 'No flashcards yet');
+      expect(find.text('No flashcards yet'), findsOneWidget);
+      expect(find.text('Add'), findsOneWidget);
     },
   );
 
@@ -480,7 +483,10 @@ void main() {
             GoRoute(
               path: RoutePaths.studyEntrySegment,
               name: RouteNames.studyEntry,
-              builder: (context, state) => const SizedBox.shrink(),
+              builder: (context, state) => Text(
+                'study-entry-${state.pathParameters[RoutePaths.studyEntryTypeParam]}'
+                '-${state.pathParameters[RoutePaths.studyEntryRefIdParam]}',
+              ),
             ),
           ],
         ),
@@ -506,12 +512,10 @@ void main() {
       scrollable: _verticalScrollable(),
     );
     await tester.tap(find.byKey(const ValueKey('study_mode_Review')));
-    await _pumpUntilPath(tester, router, '/library/study/deck/$deckId');
+    await tester.pumpAndSettle();
 
-    expect(
-      router.routeInformationProvider.value.uri.path,
-      '/library/study/deck/$deckId',
-    );
+    // Study start pushes the study-entry route (preserving the flashcard stack).
+    expect(find.text('study-entry-deck-$deckId'), findsOneWidget);
   });
 
   testWidgets(
@@ -544,7 +548,10 @@ void main() {
               GoRoute(
                 path: RoutePaths.studyEntrySegment,
                 name: RouteNames.studyEntry,
-                builder: (context, state) => const SizedBox.shrink(),
+                builder: (context, state) => Text(
+                  'study-entry-${state.pathParameters[RoutePaths.studyEntryTypeParam]}'
+                  '-${state.pathParameters[RoutePaths.studyEntryRefIdParam]}',
+                ),
               ),
             ],
           ),
@@ -571,12 +578,10 @@ void main() {
         scrollable: _verticalScrollable(),
       );
       await tester.tap(mixCard);
-      await _pumpUntilPath(tester, router, '/library/study/deck/$deckId');
+      await tester.pumpAndSettle();
 
-      expect(
-        router.routeInformationProvider.value.uri.path,
-        '/library/study/deck/$deckId',
-      );
+      // Mix card pushes the study-entry route (preserving the flashcard stack).
+      expect(find.text('study-entry-deck-$deckId'), findsOneWidget);
     },
   );
 
@@ -1042,22 +1047,6 @@ Finder _verticalScrollable() => find
     )
     .first;
 
-Future<void> _pumpUntilPath(
-  WidgetTester tester,
-  GoRouter router,
-  String expectedPath,
-) async {
-  for (var attempt = 0; attempt < 30; attempt++) {
-    await tester.pump(const Duration(milliseconds: 50));
-    if (router.routeInformationProvider.value.uri.path == expectedPath) {
-      return;
-    }
-  }
-  fail(
-    'Timed out waiting for path $expectedPath; '
-    'actual=${router.routeInformationProvider.value.uri.path}',
-  );
-}
 
 Future<void> _scrollToText(WidgetTester tester, String text) async {
   await _scrollUntilAny(tester, find.text(text));

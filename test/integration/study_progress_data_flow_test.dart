@@ -200,7 +200,14 @@ void main() {
       await harness.pumpApp(tester, _studySessionLocation(session.session.id));
       await _pumpUntilFound(tester, find.text('REVIEW'));
 
+      // Closing an active session opens the cancel-confirmation dialog;
+      // confirming routes to the result screen, whose Back action falls back
+      // to the library overview when there is no session route to pop.
       await tester.tap(find.byIcon(Icons.close_rounded).first);
+      await _pumpUntilFound(tester, find.text('Cancel this session?'));
+      await _tapText(tester, 'Cancel');
+      await _pumpUntilFound(tester, find.text('Back'));
+      await _tapText(tester, 'Back');
       await _pumpUntilFound(tester, find.text('Library'));
 
       expect(find.text('Integration Folder'), findsOneWidget);
@@ -211,7 +218,9 @@ void main() {
     'DT7 onNavigate: result study again opens same deck study entry',
     (tester) async {
       final harness = await _IntegrationHarness.create(tester);
-      await harness.seedDeck(dueProgress: true);
+      // Alpha is due (drives the SRS review); beta stays new so the deck's
+      // "Study again" entry (which defaults to New Study) has eligible cards.
+      await harness.seedDeck(dueProgress: true, secondCardDueProgress: false);
       final ready = await harness.driver.startReadySrsReview();
       await harness.driver.finalize(ready);
 
@@ -817,7 +826,9 @@ void main() {
     'DT1 onExternalChange: completing session refreshes cached Study Entry resume candidate',
     (tester) async {
       final harness = await _IntegrationHarness.create(tester);
-      await harness.seedDeck(dueProgress: true);
+      // Alpha is due (the SRS session under test); beta stays new so the deck
+      // entry can start a fresh session after the SRS session completes.
+      await harness.seedDeck(dueProgress: true, secondCardDueProgress: false);
       final ready = await harness.driver.startReadySrsReview();
 
       await harness.pumpApp(tester, RoutePaths.progress);
@@ -1236,8 +1247,8 @@ Future<void> _completeGuessMode(WidgetTester tester) async {
 }
 
 Future<void> _completeRecallMode(WidgetTester tester) async {
-  await _answerRecallPrompt(tester, front: _alphaFront, action: 'Remembered');
-  await _answerRecallPrompt(tester, front: _betaFront, action: 'Remembered');
+  await _answerRecallPrompt(tester, front: _alphaFront, action: 'Got it');
+  await _answerRecallPrompt(tester, front: _betaFront, action: 'Got it');
   await _pumpUntilFound(tester, find.text('FILL'));
 }
 
@@ -1257,7 +1268,12 @@ Future<void> _answerRecallPrompt(
   required String action,
 }) async {
   await _pumpUntilFound(tester, find.text(front));
-  await _tapText(tester, 'Show');
+  // The reveal button carries a live countdown label ("Show (20s)"), so match
+  // on the prefix rather than an exact string.
+  final showFinder = find.textContaining('Show').first;
+  await tester.ensureVisible(showFinder);
+  await tester.pump(const Duration(milliseconds: 100));
+  await tester.tap(showFinder);
   await tester.pump(const Duration(milliseconds: 300));
   await _tapText(tester, action);
   await tester.pump(const Duration(milliseconds: 100));
@@ -1370,6 +1386,7 @@ class _IntegrationHarness {
   Future<void> seedDeck({
     bool dueProgress = false,
     bool includeSecondCard = true,
+    bool secondCardDueProgress = true,
   }) async {
     final now = clock.nowEpochMillis();
     await database
@@ -1414,7 +1431,7 @@ class _IntegrationHarness {
       return;
     }
     await _insertDueProgress('integration-card-alpha');
-    if (includeSecondCard) {
+    if (includeSecondCard && secondCardDueProgress) {
       await _insertDueProgress('integration-card-beta');
     }
   }

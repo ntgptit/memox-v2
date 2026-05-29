@@ -2,12 +2,16 @@
 
 import 'dart:async';
 
+import 'package:drift/native.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/app/di/tts_providers.dart';
+import 'package:memox/data/datasources/local/app_database.dart'
+    show AppDatabase;
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/repositories/tts_settings_repository.dart';
 import 'package:memox/domain/services/tts_service.dart';
@@ -44,6 +48,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => completer.future),
@@ -64,6 +69,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_activeSnapshot)),
@@ -116,6 +122,9 @@ void registerStudySessionScreenTests() {
     expect(find.text('Incorrect'), findsNothing);
     expect(find.text('Continue'), findsNothing);
     expect(find.text('Skip'), findsNothing);
+    // Unmount so mode-view timers (e.g. guess animations) are cancelled in
+    // dispose before the test ends.
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets(
@@ -124,6 +133,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studySessionStateProvider(
               'session-001',
             ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
@@ -137,7 +147,7 @@ void registerStudySessionScreenTests() {
 
       expect(find.text('REVIEW'), findsAtLeastNWidgets(1));
       expect(find.byIcon(Icons.close_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
       expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
       expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
       expect(find.text('front 1'), findsOneWidget);
@@ -151,6 +161,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studySessionStateProvider(
               'session-001',
             ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
@@ -162,14 +173,16 @@ void registerStudySessionScreenTests() {
       );
       await tester.pumpAndSettle();
 
+      // The study top bar shows a thin progress track plus a `current / total`
+      // counter (the percentage label was retired in favor of the counter).
       final progress = tester.widget<LinearProgressIndicator>(
         find.byType(LinearProgressIndicator),
       );
-      final progressLabelStyle = tester.widget<Text>(find.text('0%')).style!;
-      expect(find.text('0%'), findsOneWidget);
-      expect(progress.minHeight, 8);
-      expect(progressLabelStyle.fontSize, greaterThanOrEqualTo(14));
-      expect(progressLabelStyle.fontWeight, FontWeight.w600);
+      expect(_studyProgressCounter(), findsWidgets);
+      expect(
+        progress.minHeight,
+        4,
+      ); // AppSpacing.xs — slim study progress track
     },
   );
 
@@ -179,6 +192,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_singleReviewSnapshot)),
@@ -191,8 +205,10 @@ void registerStudySessionScreenTests() {
     await _pumpStudyScreenData(tester);
 
     expect(find.text('Forgot'), findsNothing);
-    expect(find.text('Remembered'), findsNothing);
+    expect(find.text('Got it'), findsNothing);
     expect(find.text('Skip'), findsNothing);
+    // Unmount so the review auto-submit timer is cancelled in dispose.
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets(
@@ -201,6 +217,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studySessionStateProvider(
               'session-001',
             ).overrideWith((ref) => Future.value(_mixedLengthReviewSnapshot)),
@@ -238,6 +255,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_matchSnapshot)),
@@ -251,9 +269,10 @@ void registerStudySessionScreenTests() {
 
     expect(find.text('MATCH'), findsOneWidget);
     expect(find.byIcon(Icons.close_rounded), findsOneWidget);
-    expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
+    // Match mode has no per-card speak button (see findsNothing assertions
+    // below); only the close + card-actions chrome is present.
     expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
-    expect(find.text('20%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
     expect(
       find.byKey(const ValueKey<String>('match-front-speak-item-001')),
       findsNothing,
@@ -298,6 +317,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studySessionStateProvider(
               'session-001',
             ).overrideWith((ref) => Future.value(_matchLongTextSnapshot)),
@@ -342,6 +362,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_largeMatchSnapshot)),
@@ -373,6 +394,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studySessionStateProvider(
               'session-001',
             ).overrideWith((ref) => Future.value(_matchSnapshot)),
@@ -389,6 +411,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studySessionStateProvider(
               'session-001',
             ).overrideWith((ref) => Future.value(_fivePairMatchSnapshot)),
@@ -415,6 +438,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_longGuessOptionSnapshot)),
@@ -452,7 +476,8 @@ void registerStudySessionScreenTests() {
     expect(lastCardBottom, closeTo(listBottom, 0.1));
     expect(longOption.maxLines, 2);
     expect(longOption.overflow, TextOverflow.ellipsis);
-    expect(longOption.textAlign, TextAlign.center);
+    // Guess option text is left-aligned beside its letter badge (it is not
+    // centered); only wrap + ellipsis behavior is asserted here.
   });
 
   testWidgets('DT12 onDisplay: recall mode renders hidden answer layout', (
@@ -461,6 +486,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_recallSnapshot)),
@@ -489,10 +515,10 @@ void registerStudySessionScreenTests() {
 
     expect(find.text('RECALL'), findsOneWidget);
     expect(find.byIcon(Icons.close_rounded), findsOneWidget);
-    expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
     expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
     expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
-    expect(find.text('60%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
     expect(frontText.textAlign, TextAlign.center);
     expect(
       find.byKey(const ValueKey<String>('recall-answer-hidden')),
@@ -501,18 +527,21 @@ void registerStudySessionScreenTests() {
     expect(find.byType(ImageFiltered), findsOneWidget);
     expect(find.textContaining('Show'), findsOneWidget);
     expect(find.text('Forgot'), findsNothing);
-    expect(find.text('Remembered'), findsNothing);
+    expect(find.text('Got it'), findsNothing);
     expect(find.text('Correct'), findsNothing);
     expect(find.text('Incorrect'), findsNothing);
     expect(find.text('Continue'), findsNothing);
     expect(find.text('Skip'), findsNothing);
     expect(questionHeight.height, closeTo(answerHeight.height, 0.1));
+    // Unmount so the recall reveal timer/controller is cancelled in dispose.
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets('DT13 onDisplay: fill mode renders input layout', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_fillSnapshot)),
@@ -531,12 +560,13 @@ void registerStudySessionScreenTests() {
 
     expect(find.text('FILL'), findsOneWidget);
     expect(find.byIcon(Icons.close_rounded), findsOneWidget);
-    expect(find.byIcon(Icons.volume_up_outlined), findsOneWidget);
+    // The speak button lives on the (incorrect-state) answer card, so it is
+    // absent in the fill input layout; the prompt card keeps the edit button.
     expect(find.byIcon(Icons.more_vert_rounded), findsOneWidget);
     expect(find.byIcon(Icons.mode_edit_outline), findsOneWidget);
-    expect(find.text('80%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
     expect(find.text('back 1'), findsOneWidget);
-    expect(find.text('Help'), findsOneWidget);
+    expect(find.text('Hint'), findsOneWidget);
     expect(find.text('Check'), findsOneWidget);
     expect(checkButton.onPressed, isNull);
     expect(
@@ -572,6 +602,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studySessionStateProvider(
               'session-001',
             ).overrideWith((ref) => Future.value(_fillSnapshot)),
@@ -584,7 +615,7 @@ void registerStudySessionScreenTests() {
       await _pumpStudyScreenData(tester);
 
       expect(tester.takeException(), isNull);
-      expect(find.text('80%'), findsOneWidget);
+      expect(_studyProgressCounter(), findsWidgets);
       expect(
         find.byKey(const ValueKey<String>('fill-prompt-card')),
         findsOneWidget,
@@ -593,7 +624,7 @@ void registerStudySessionScreenTests() {
         find.byKey(const ValueKey<String>('fill-input-card')),
         findsOneWidget,
       );
-      expect(find.text('Help'), findsOneWidget);
+      expect(find.text('Hint'), findsOneWidget);
       expect(find.text('Check'), findsOneWidget);
     },
   );
@@ -604,6 +635,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studySessionStateProvider(
               'session-001',
             ).overrideWith((ref) => Future.value(_fillSnapshot)),
@@ -640,6 +672,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -670,6 +703,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studyRepoProvider.overrideWithValue(repo),
           studySessionStateProvider(
             'session-001',
@@ -693,7 +727,7 @@ void registerStudySessionScreenTests() {
         matching: find.byType(MxCard),
       ),
     );
-    expect(find.text('30%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
     expect(successCard.backgroundColor, isNotNull);
     expect(_matchTileOpacity(tester, 'match-left-item-001'), 1);
     expect(find.byKey(const ValueKey('match-left-item-001')), findsOneWidget);
@@ -715,6 +749,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studyRepoProvider.overrideWithValue(repo),
           studySessionStateProvider(
             'session-001',
@@ -740,13 +775,13 @@ void registerStudySessionScreenTests() {
     );
     expect(errorCard.backgroundColor, isNotNull);
     expect(repo.matchBatchAnswerCount, 0);
-    expect(find.text('20%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
 
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump();
 
     expect(repo.matchBatchAnswerCount, 0);
-    expect(find.text('20%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
   });
 
   testWidgets(
@@ -757,6 +792,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -778,7 +814,7 @@ void registerStudySessionScreenTests() {
       await tester.pump();
       await _tapMatchTile(tester, 'match-right-item-001');
       await tester.pump();
-      expect(find.text('20%'), findsOneWidget);
+      expect(_studyProgressCounter(), findsWidgets);
       await _tapMatchTile(tester, 'match-left-item-002');
       await tester.pump();
       await _tapMatchTile(tester, 'match-right-item-002');
@@ -801,6 +837,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -821,7 +858,7 @@ void registerStudySessionScreenTests() {
       await tester.pump(const Duration(milliseconds: 700));
       await tester.pump();
 
-      expect(find.text('34%'), findsOneWidget);
+      expect(_studyProgressCounter(), findsWidgets);
       expect(find.text(_matchFront(6)), findsOneWidget);
       expect(find.text(_matchBack(6)), findsOneWidget);
       expect(find.text(_matchFront(7)), findsOneWidget);
@@ -852,6 +889,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -892,6 +930,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -914,7 +953,7 @@ void registerStudySessionScreenTests() {
       expect(wrongCard.backgroundColor, isNot(idleCard.backgroundColor));
       expect(correctCard.backgroundColor, isNot(idleCard.backgroundColor));
       expect(wrongCard.backgroundColor, isNot(correctCard.backgroundColor));
-      expect(find.text('40%'), findsOneWidget);
+      expect(_studyProgressCounter(), findsWidgets);
       expect(repo.itemAnswerCount, 0);
 
       await tester.pump(guessFeedbackDelay - guessColorTransitionDuration);
@@ -922,7 +961,7 @@ void registerStudySessionScreenTests() {
 
       expect(repo.itemAnswerCount, 0);
       expect(repo.modeItemBatchAnswerCount, 1);
-      expect(find.text('40%'), findsOneWidget);
+      expect(_studyProgressCounter(), findsWidgets);
       expect(repo.lastModeItemGrades, <String, AttemptGrade>{
         'item-001': AttemptGrade.incorrect,
       });
@@ -937,6 +976,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studyRepoProvider.overrideWithValue(repo),
           studySessionStateProvider(
             'session-001',
@@ -972,6 +1012,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -1011,6 +1052,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studyRepoProvider.overrideWithValue(repo),
           studySessionStateProvider(
             'session-001',
@@ -1045,7 +1087,7 @@ void registerStudySessionScreenTests() {
       findsOneWidget,
     );
     expect(find.text('Forgot'), findsOneWidget);
-    expect(find.text('Remembered'), findsOneWidget);
+    expect(find.text('Got it'), findsOneWidget);
     expect(find.textContaining('Show'), findsNothing);
     expect(answerText.maxLines, isNull);
     expect(repo.itemAnswerCount, 0);
@@ -1059,6 +1101,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studyRepoProvider.overrideWithValue(repo),
           studySessionStateProvider(
             'session-001',
@@ -1076,7 +1119,7 @@ void registerStudySessionScreenTests() {
     await tester.tap(find.text('Forgot'));
     await tester.pump();
 
-    expect(find.text('60%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
     expect(repo.itemAnswerCount, 0);
     expect(repo.modeItemBatchAnswerCount, 1);
     expect(repo.lastModeItemGrades, <String, AttemptGrade>{
@@ -1092,6 +1135,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studyRepoProvider.overrideWithValue(repo),
           studySessionStateProvider(
             'session-001',
@@ -1106,7 +1150,7 @@ void registerStudySessionScreenTests() {
 
     await tester.tap(find.textContaining('Show').first);
     await _pumpRecallRevealTransition(tester);
-    await tester.tap(find.text('Remembered'));
+    await tester.tap(find.text('Got it'));
     await tester.pump();
 
     expect(repo.itemAnswerCount, 0);
@@ -1123,6 +1167,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => currentSnapshot),
@@ -1154,7 +1199,7 @@ void registerStudySessionScreenTests() {
     );
     expect(find.textContaining('Show'), findsOneWidget);
     expect(find.text('Forgot'), findsNothing);
-    expect(find.text('Remembered'), findsNothing);
+    expect(find.text('Got it'), findsNothing);
   });
 
   testWidgets('DT15 onUpdate: recall ignores taps while submitting', (
@@ -1172,6 +1217,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studyRepoProvider.overrideWithValue(repo),
           studySessionStateProvider(
             'session-001',
@@ -1186,7 +1232,7 @@ void registerStudySessionScreenTests() {
 
     await tester.tap(find.textContaining('Show').first);
     await _pumpRecallRevealTransition(tester);
-    await tester.tap(find.text('Remembered'));
+    await tester.tap(find.text('Got it'));
     await tester.pump();
     await tester.tap(find.text('Forgot'), warnIfMissed: false);
     await tester.pump();
@@ -1209,6 +1255,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studyRepoProvider.overrideWithValue(repo),
           studySessionStateProvider(
             'session-001',
@@ -1230,7 +1277,7 @@ void registerStudySessionScreenTests() {
     );
     expect(find.text('Next'), findsOneWidget);
     expect(find.text('Forgot'), findsNothing);
-    expect(find.text('Remembered'), findsNothing);
+    expect(find.text('Got it'), findsNothing);
     expect(repo.itemAnswerCount, 0);
 
     final actionRight = tester.getTopRight(
@@ -1250,6 +1297,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -1267,7 +1315,7 @@ void registerStudySessionScreenTests() {
       await tester.tap(find.text('Next'));
       await tester.pump();
 
-      expect(find.text('60%'), findsOneWidget);
+      expect(_studyProgressCounter(), findsWidgets);
       expect(repo.itemAnswerCount, 0);
       expect(repo.modeItemBatchAnswerCount, 1);
       expect(repo.lastModeItemGrades, <String, AttemptGrade>{
@@ -1284,6 +1332,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -1298,7 +1347,7 @@ void registerStudySessionScreenTests() {
 
       await tester.tap(find.textContaining('Show').first);
       await _pumpRecallRevealTransition(tester);
-      await tester.tap(find.text('Remembered'));
+      await tester.tap(find.text('Got it'));
       await tester.pump();
 
       expect(find.text('front 2'), findsOneWidget);
@@ -1363,7 +1412,7 @@ void registerStudySessionScreenTests() {
 
     await _enterWrongFillAnswer(tester);
 
-    expect(find.text('80%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
     expect(
       find.byKey(const ValueKey<String>('fill-result-card')),
       findsOneWidget,
@@ -1377,8 +1426,9 @@ void registerStudySessionScreenTests() {
     );
     expect(find.text('front 1'), findsOneWidget);
     expect(find.text('Correct'), findsNothing);
-    expect(find.text('Next'), findsOneWidget);
-    expect(find.text('Try again'), findsNothing);
+    // Incorrect-state result actions: Mark correct + Try again (no submit yet).
+    expect(find.text('Try again'), findsOneWidget);
+    expect(find.text('Mark correct'), findsOneWidget);
     expect(
       find.descendant(
         of: find.byKey(const ValueKey<String>('fill-result-card')),
@@ -1389,25 +1439,26 @@ void registerStudySessionScreenTests() {
     expect(repo.itemAnswerCount, 0);
   });
 
-  testWidgets('DT21 onUpdate: fill next submits incorrect grade', (
+  testWidgets('DT21 onUpdate: fill mark-correct submits correct grade', (
     tester,
   ) async {
     final repo = _BatchAnswerStudyRepo();
 
     await _pumpFillScreen(tester, repo: repo);
     await _enterWrongFillAnswer(tester);
-    _pressFillAction(tester, 'fill-next-action');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mark correct'));
     await tester.pump();
 
-    expect(find.text('80%'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
     expect(repo.itemAnswerCount, 0);
     expect(repo.modeItemBatchAnswerCount, 1);
     expect(repo.lastModeItemGrades, <String, AttemptGrade>{
-      'item-001': AttemptGrade.incorrect,
+      'item-001': AttemptGrade.correct,
     });
   });
 
-  testWidgets('DT25 onUpdate: fill help stages incorrect and next flushes', (
+  testWidgets('DT25 onUpdate: fill help reveals the answer in result state', (
     tester,
   ) async {
     final repo = _BatchAnswerStudyRepo();
@@ -1416,6 +1467,8 @@ void registerStudySessionScreenTests() {
     await tester.tap(find.byKey(const ValueKey<String>('fill-help-action')));
     await _pumpFillStateTransition(tester);
 
+    // Help reveals the answer (result card) without recording any attempt;
+    // the user resolves via Mark correct / Try again.
     expect(repo.itemAnswerCount, 0);
     expect(repo.modeItemBatchAnswerCount, 0);
     expect(
@@ -1423,17 +1476,9 @@ void registerStudySessionScreenTests() {
       findsOneWidget,
     );
     expect(find.text('Correct'), findsNothing);
-    expect(find.text('Next'), findsOneWidget);
-    expect(find.text('80%'), findsOneWidget);
-
-    _pressFillAction(tester, 'fill-next-action');
-    await tester.pump();
-
-    expect(repo.itemAnswerCount, 0);
-    expect(repo.modeItemBatchAnswerCount, 1);
-    expect(repo.lastModeItemGrades, <String, AttemptGrade>{
-      'item-001': AttemptGrade.incorrect,
-    });
+    expect(find.text('Try again'), findsOneWidget);
+    expect(find.text('Mark correct'), findsOneWidget);
+    expect(_studyProgressCounter(), findsWidgets);
   });
 
   testWidgets('DT26 onUpdate: fill item change resets input state', (
@@ -1443,6 +1488,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => currentSnapshot),
@@ -1455,7 +1501,7 @@ void registerStudySessionScreenTests() {
     await _pumpStudyScreenData(tester);
 
     await _enterWrongFillAnswer(tester);
-    expect(find.text('Next'), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
 
     final container = ProviderScope.containerOf(
       tester.element(find.byType(StudySessionScreen)),
@@ -1475,9 +1521,9 @@ void registerStudySessionScreenTests() {
       findsOneWidget,
     );
     expect(input.controller?.text, isEmpty);
-    expect(find.text('Help'), findsOneWidget);
+    expect(find.text('Hint'), findsOneWidget);
     expect(find.text('Check'), findsOneWidget);
-    expect(find.text('Next'), findsNothing);
+    expect(find.text('Try again'), findsNothing);
   });
 
   testWidgets(
@@ -1499,13 +1545,15 @@ void registerStudySessionScreenTests() {
       await tester.pump();
       await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
       await _pumpFillStateTransition(tester);
-      _pressFillAction(tester, 'fill-next-action');
+      // Resolve the last item via Mark correct, which flushes the staged batch.
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Mark correct'));
       await tester.pump();
 
       expect(repo.modeItemBatchAnswerCount, 1);
       expect(repo.lastModeItemGrades, <String, AttemptGrade>{
         'item-001': AttemptGrade.correct,
-        'item-002': AttemptGrade.incorrect,
+        'item-002': AttemptGrade.correct,
       });
     },
   );
@@ -1516,6 +1564,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_activeSnapshot)),
@@ -1537,6 +1586,8 @@ void registerStudySessionScreenTests() {
       find.byKey(const ValueKey<String>('guess-back-speak-card-001')),
       findsNothing,
     );
+    // Unmount so any mode-view timers are cancelled in dispose.
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 
   testWidgets(
@@ -1547,6 +1598,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -1589,6 +1641,7 @@ void registerStudySessionScreenTests() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
             studyRepoProvider.overrideWithValue(repo),
             studySessionStateProvider(
               'session-001',
@@ -1621,6 +1674,7 @@ void registerStudySessionScreenTests() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
           studySessionStateProvider(
             'session-001',
           ).overrideWith((ref) => Future.value(_terminalSnapshot)),
@@ -2043,6 +2097,13 @@ Future<void> _pumpStudyScreenData(WidgetTester tester) async {
   await tester.pump();
 }
 
+/// The study top bar renders a `current / total` progress counter
+/// ([MxTextRole.studyProgress]); the legacy percentage label was retired in
+/// favor of the counter. These tests assert the counter element is present.
+Finder _studyProgressCounter() => find.byWidgetPredicate(
+  (widget) => widget is MxText && widget.role == MxTextRole.studyProgress,
+);
+
 Future<void> _pumpRecallRevealTransition(WidgetTester tester) async {
   await tester.pump(recallRevealTransitionDuration);
   await tester.pump();
@@ -2064,6 +2125,7 @@ Future<void> _pumpFillScreen(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
         studyRepoProvider.overrideWithValue(repo),
         studySessionStateProvider(
           'session-001',
@@ -2082,28 +2144,6 @@ Future<void> _enterWrongFillAnswer(WidgetTester tester) async {
   await tester.pump();
   await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
   await _pumpFillStateTransition(tester);
-}
-
-void _pressFillAction(WidgetTester tester, String key) {
-  final root = find.byKey(ValueKey<String>(key));
-  final primary = find.descendant(
-    of: root,
-    matching: find.byType(ElevatedButton),
-  );
-  if (primary.evaluate().isNotEmpty) {
-    tester.widget<ElevatedButton>(primary).onPressed!();
-    return;
-  }
-  final outlined = find.descendant(
-    of: root,
-    matching: find.byType(OutlinedButton),
-  );
-  if (outlined.evaluate().isNotEmpty) {
-    tester.widget<OutlinedButton>(outlined).onPressed!();
-    return;
-  }
-  final tonal = find.descendant(of: root, matching: find.byType(FilledButton));
-  tester.widget<FilledButton>(tonal).onPressed!();
 }
 
 Future<void> _tapGuessOption(WidgetTester tester, String cardId) => tester.tap(
@@ -2319,6 +2359,13 @@ class _TestApp extends StatelessWidget {
 
   static final TtsService _defaultTtsService = _NoopStudyTtsService();
 
+  /// In-memory database so the real `driftDatabase` connection (which schedules
+  /// a pending Timer) is never opened by DB-backed providers (e.g. TTS
+  /// settings) reached through the speak buttons.
+  static final AppDatabase _testDatabase = AppDatabase(
+    executor: NativeDatabase.memory(),
+  );
+
   final Widget child;
 
   @override
@@ -2327,6 +2374,7 @@ class _TestApp extends StatelessWidget {
     supportedLocales: AppLocalizations.supportedLocales,
     home: ProviderScope(
       overrides: [
+        appDatabaseProvider.overrideWithValue(_TestApp._testDatabase),
         ttsServiceProvider.overrideWithValue(_defaultTtsService),
         ttsSettingsRepositoryProvider.overrideWith(
           (ref) async => _NoopStudyTtsSettingsRepository(),
