@@ -33,6 +33,86 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
     return rows;
   }
 
+  Future<int> _countFlashcardsInScope(StudyContext context) async {
+    final scope = await _scopeSql(context);
+    final row = await _database
+        .customSelect(
+          '''
+      SELECT COUNT(f.id) AS card_count
+      FROM flashcards f
+      INNER JOIN decks d ON d.id = f.deck_id
+      WHERE ${scope.whereClause}
+      ''',
+          variables: scope.variables,
+          readsFrom: {_database.flashcards, _database.decks},
+        )
+        .getSingle();
+    return row.read<int>('card_count');
+  }
+
+  Future<int> _countDueCardsInScope(
+    StudyContext context, {
+    required int endOfTodayEpochMillis,
+  }) async {
+    final scope = await _scopeSql(context);
+    final row = await _database
+        .customSelect(
+          '''
+      SELECT COUNT(f.id) AS due_count
+      FROM flashcards f
+      INNER JOIN decks d ON d.id = f.deck_id
+      INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
+      WHERE ${scope.whereClause}
+        AND p.due_at IS NOT NULL
+        AND p.due_at <= ?
+      ''',
+          variables: <Variable>[
+            ...scope.variables,
+            Variable<int>(endOfTodayEpochMillis),
+          ],
+          readsFrom: {
+            _database.flashcards,
+            _database.decks,
+            _database.flashcardProgress,
+          },
+        )
+        .getSingle();
+    return row.read<int>('due_count');
+  }
+
+  Future<DateTime?> _nextDueAt(
+    StudyContext context, {
+    required int endOfTodayEpochMillis,
+  }) async {
+    final scope = await _scopeSql(context);
+    final row = await _database
+        .customSelect(
+          '''
+      SELECT MIN(p.due_at) AS next_due_at
+      FROM flashcards f
+      INNER JOIN decks d ON d.id = f.deck_id
+      INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
+      WHERE ${scope.whereClause}
+        AND p.due_at IS NOT NULL
+        AND p.due_at > ?
+      ''',
+          variables: <Variable>[
+            ...scope.variables,
+            Variable<int>(endOfTodayEpochMillis),
+          ],
+          readsFrom: {
+            _database.flashcards,
+            _database.decks,
+            _database.flashcardProgress,
+          },
+        )
+        .getSingle();
+    final nextDue = row.read<int?>('next_due_at');
+    return nextDue == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(nextDue);
+  }
+
   Future<_SqlScope> _scopeSql(StudyContext context) async =>
       switch (context.entryType) {
         StudyEntryType.deck => _SqlScope(

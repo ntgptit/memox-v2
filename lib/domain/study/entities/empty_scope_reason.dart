@@ -3,16 +3,31 @@ import '../../../core/errors/app_exception.dart';
 /// Identifies which empty-scope case rejected a study-session start.
 ///
 /// Spec: `docs/business/study/study-flow.md` §Empty scope matrix.
-/// Currently implemented (Tier 1, P0-1):
-/// - [deckNoCards]
+/// Implemented (Tier 1, P0-1):
+/// - [deckNoCards], [deckNoDueCards],
+///   [folderNoCards], [folderNoDueCards],
+///   [todayAllDone], [todayNoContent]
 ///
-/// Tier 1 remaining (mechanical replication):
-/// - deckNoDueCards, folderNoCards, folderNoDueCards,
-///   todayAllDone, todayNoContent
 /// Tier 2 (blocked on tag entry type): tagNoCards, tagNoDueCards
 /// Tier 3 (blocked on P0-2 bury/suspend): allBuried, allSuspended
 enum EmptyScopeReason {
+  /// Deck scope contains zero flashcards (any study type).
   deckNoCards,
+
+  /// Deck scope has flashcards but none are due now (srs_review).
+  deckNoDueCards,
+
+  /// Folder subtree contains zero flashcards (any study type).
+  folderNoCards,
+
+  /// Folder subtree has flashcards but none are due now (srs_review).
+  folderNoDueCards,
+
+  /// Today scope has flashcards but none are due now (srs_review).
+  todayAllDone,
+
+  /// User has no flashcards at all (today scope, srs_review).
+  todayNoContent,
 }
 
 /// Thrown by `StartStudySessionUseCase` when the requested scope contains no

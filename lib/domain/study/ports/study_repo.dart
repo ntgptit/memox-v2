@@ -7,6 +7,21 @@ abstract interface class StudyRepo {
   /// `deck_noCards` from `deck_noDueCards`.
   Future<int> countFlashcardsInDeck(String deckId);
 
+  /// Total flashcards in the scope described by [context] (folder subtree or
+  /// today = all decks). Used by empty-scope pre-checks (P0-1) to distinguish
+  /// `folder_noCards` / `today_noContent`.
+  Future<int> countFlashcardsInScope(StudyContext context);
+
+  /// Count of flashcards in [context]'s scope that are due on or before the
+  /// end of today. Used by empty-scope pre-checks (P0-1) to distinguish the
+  /// `*_noDueCards` / `today_allDone` cases.
+  Future<int> countDueCardsInScope(StudyContext context);
+
+  /// Nearest future due date in [context]'s scope (`MIN(due_at)` where
+  /// `due_at` is after end of today), or `null` when no future due exists.
+  /// Powers the "Next due in {relativeTime}" hint on `*_noDueCards` states.
+  Future<DateTime?> nextDueAt(StudyContext context);
+
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context);
 
   Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context);

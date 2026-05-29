@@ -56,6 +56,7 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
     if (error is EmptyScopeException) {
       return EmptyScopeScreen(
         failure: error,
+        entryType: widget.entryType,
         entryRefId: widget.entryRefId,
       );
     }

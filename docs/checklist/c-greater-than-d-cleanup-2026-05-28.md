@@ -55,6 +55,7 @@ grep -rn "<các stale path patterns>" docs/wireframes/ docs/business/ docs/contr
 Kết quả của lần đầu (sau khi finish #1-5) phát hiện **thêm 11 stale refs khác** mà Revision 2 audit chưa list cụ thể. Các refs này đều là biến thể của cùng vấn đề: code đã refactor consolidating SRS + study use cases vào `lib/domain/study/usecases/study_usecases.dart`, nhưng docs trên nhiều file còn refs cấu trúc cũ (`lib/domain/srs/*`, `lib/domain/usecases/study/**`).
 
 Tôi chọn xử lý ngay (#6-16) vì:
+
 1. Cùng phạm trù C>D với task gốc.
 2. Sửa rời rạc nhiều đợt dễ miss refs.
 3. Senior BA preview: nếu để treo, lần audit tiếp theo lại bắt lỗi cùng kiểu — anti-pattern review.
@@ -150,6 +151,7 @@ Tôi đã tự kiểm tra theo các tiêu chí của senior reviewer:
 | Convention path: backtick + repo-root no leading slash | ✅ | Tuân theo `CLAUDE.md` §Path convention. |
 
 **Self-grade**: 9.5/10. Trừ điểm cho:
+
 - §3.1 (meta-doc drift về box_intervals/box_transition trong CLAUDE.md trigger map) phát hiện đúng nhưng không tự fix — đúng quyết định vì sửa CLAUDE.md hard-rule nên có user approval, nhưng senior BA tốt sẽ propose patch sẵn cho user duyệt thay vì chỉ flag. Sẽ propose hai option (xoá / mark target) trong PR follow-up.
 
 ## §6. Đề xuất bước kế tiếp

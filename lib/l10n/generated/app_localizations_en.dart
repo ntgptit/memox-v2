@@ -2100,6 +2100,77 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyEmpty_deck_noCards_cta => 'Add flashcards';
 
   @override
+  String get studyEmpty_deck_noDueCards_title => 'All caught up';
+
+  @override
+  String studyEmpty_deck_noDueCards_subtitle(String relativeTime) {
+    return 'Next due $relativeTime.';
+  }
+
+  @override
+  String get studyEmpty_deck_noDueCards_cta => 'Study new instead';
+
+  @override
+  String get studyEmpty_folder_noCards_title => 'No cards in this folder';
+
+  @override
+  String get studyEmpty_folder_noCards_cta => 'Add a deck';
+
+  @override
+  String get studyEmpty_folder_noDueCards_title =>
+      'All caught up for this folder';
+
+  @override
+  String studyEmpty_folder_noDueCards_subtitle(String relativeTime) {
+    return 'Next due $relativeTime.';
+  }
+
+  @override
+  String get studyEmpty_folder_noDueCards_cta => 'Study new instead';
+
+  @override
+  String get studyEmpty_today_allDone_title => 'All done for today!';
+
+  @override
+  String get studyEmpty_today_allDone_message =>
+      'Great work. Check back tomorrow for your next review.';
+
+  @override
+  String get studyEmpty_today_allDone_cta => 'Back to dashboard';
+
+  @override
+  String get studyEmpty_today_noContent_title =>
+      'You haven\'t created any flashcards yet';
+
+  @override
+  String get studyEmpty_today_noContent_cta => 'Create your first deck';
+
+  @override
+  String studyEmptyNextDueInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return 'in $_temp0';
+  }
+
+  @override
+  String studyEmptyNextDueInHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hours',
+      one: '1 hour',
+    );
+    return 'in $_temp0';
+  }
+
+  @override
+  String get studyEmptyNextDueSoon => 'soon';
+
+  @override
   String get studyCancelConfirmTitle => 'Cancel this session?';
 
   @override

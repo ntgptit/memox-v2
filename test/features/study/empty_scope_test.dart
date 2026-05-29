@@ -9,21 +9,29 @@ import 'package:memox/domain/study/usecases/study_usecases.dart';
 
 void main() {
   group('P0-1 Tier 1: empty-scope matrix', () {
+    StartStudySessionUseCase useCaseFor(StudyRepo repo) => StartStudySessionUseCase(
+      repository: repo,
+      strategyFactory: StudyFlowStrategyFactory(const <StudyFlowStrategy>[
+        NewStudyStrategy(),
+        SrsReviewStrategy(),
+      ]),
+    );
+
+    Matcher throwsEmptyScope(EmptyScopeReason reason) => throwsA(
+      isA<EmptyScopeException>().having(
+        (error) => error.reason,
+        'reason',
+        reason,
+      ),
+    );
+
     test(
-      'S4: StartStudySessionUseCase throws EmptyScopeException(deckNoCards) '
-      'when entry deck has 0 flashcards',
+      'S4: deck with zero flashcards throws EmptyScopeException(deckNoCards)',
       () async {
         final repo = _FakeStudyRepo(deckCount: 0);
-        final useCase = StartStudySessionUseCase(
-          repository: repo,
-          strategyFactory: StudyFlowStrategyFactory(const <StudyFlowStrategy>[
-            NewStudyStrategy(),
-            SrsReviewStrategy(),
-          ]),
-        );
 
         await expectLater(
-          useCase.execute(
+          useCaseFor(repo).execute(
             const StudyContext(
               entryType: StudyEntryType.deck,
               entryRefId: 'deck-empty',
@@ -31,35 +39,22 @@ void main() {
               settings: _testSettings,
             ),
           ),
-          throwsA(
-            isA<EmptyScopeException>().having(
-              (error) => error.reason,
-              'reason',
-              EmptyScopeReason.deckNoCards,
-            ),
-          ),
+          throwsEmptyScope(EmptyScopeReason.deckNoCards),
         );
-        expect(repo.countCalls, <String>['deck-empty']);
+        expect(repo.deckCountCalls, <String>['deck-empty']);
         expect(repo.startSessionCalled, isFalse);
       },
     );
 
     test(
-      'S4 (negative): does not throw EmptyScopeException when deck has cards',
+      'S4 (negative): deck with cards (new) routes past the empty-scope guard',
       () async {
         final repo = _FakeStudyRepo(deckCount: 3);
-        final useCase = StartStudySessionUseCase(
-          repository: repo,
-          strategyFactory: StudyFlowStrategyFactory(const <StudyFlowStrategy>[
-            NewStudyStrategy(),
-            SrsReviewStrategy(),
-          ]),
-        );
 
-        // _rejectEmptyScope passes; downstream loadBatch is _FakeStudyRepo's
-        // UnimplementedError — proves we routed past the empty-scope guard.
+        // _rejectEmptyScope passes; downstream loadBatch throws
+        // UnimplementedError via noSuchMethod — proves we routed past the guard.
         await expectLater(
-          useCase.execute(
+          useCaseFor(repo).execute(
             const StudyContext(
               entryType: StudyEntryType.deck,
               entryRefId: 'deck-with-cards',
@@ -69,6 +64,151 @@ void main() {
           ),
           throwsA(isNot(isA<EmptyScopeException>())),
         );
+      },
+    );
+
+    test(
+      'S4e: deck (srs_review) with cards but none due throws '
+      'EmptyScopeException(deckNoDueCards) carrying nextDueAt',
+      () async {
+        final nextDue = DateTime.utc(2026, 5, 1, 9);
+        final repo = _FakeStudyRepo(
+          deckCount: 4,
+          dueCount: 0,
+          next: nextDue,
+        );
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.deck,
+              entryRefId: 'deck-no-due',
+              studyType: StudyType.srsReview,
+              settings: _testSettings,
+            ),
+          ),
+          throwsA(
+            isA<EmptyScopeException>()
+                .having((e) => e.reason, 'reason', EmptyScopeReason.deckNoDueCards)
+                .having((e) => e.nextDueAt, 'nextDueAt', nextDue),
+          ),
+        );
+        expect(repo.startSessionCalled, isFalse);
+      },
+    );
+
+    test(
+      'S4e (negative): deck (srs_review) with due cards routes past the guard',
+      () async {
+        final repo = _FakeStudyRepo(deckCount: 4, dueCount: 2);
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.deck,
+              entryRefId: 'deck-due',
+              studyType: StudyType.srsReview,
+              settings: _testSettings,
+            ),
+          ),
+          throwsA(isNot(isA<EmptyScopeException>())),
+        );
+      },
+    );
+
+    test(
+      'S4b: folder whose subtree has zero cards throws '
+      'EmptyScopeException(folderNoCards)',
+      () async {
+        final repo = _FakeStudyRepo(scopeCount: 0);
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.folder,
+              entryRefId: 'folder-empty',
+              studyType: StudyType.newStudy,
+              settings: _testSettings,
+            ),
+          ),
+          throwsEmptyScope(EmptyScopeReason.folderNoCards),
+        );
+        expect(repo.startSessionCalled, isFalse);
+      },
+    );
+
+    test(
+      'S4j: folder (srs_review) with cards but none due throws '
+      'EmptyScopeException(folderNoDueCards) carrying nextDueAt',
+      () async {
+        final nextDue = DateTime.utc(2026, 5, 2, 9);
+        final repo = _FakeStudyRepo(
+          scopeCount: 6,
+          dueCount: 0,
+          next: nextDue,
+        );
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.folder,
+              entryRefId: 'folder-no-due',
+              studyType: StudyType.srsReview,
+              settings: _testSettings,
+            ),
+          ),
+          throwsA(
+            isA<EmptyScopeException>()
+                .having(
+                  (e) => e.reason,
+                  'reason',
+                  EmptyScopeReason.folderNoDueCards,
+                )
+                .having((e) => e.nextDueAt, 'nextDueAt', nextDue),
+          ),
+        );
+      },
+    );
+
+    test(
+      'S4c: today (srs_review) with cards but none due throws '
+      'EmptyScopeException(todayAllDone)',
+      () async {
+        final repo = _FakeStudyRepo(scopeCount: 9, dueCount: 0);
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.today,
+              entryRefId: null,
+              studyType: StudyType.srsReview,
+              settings: _testSettings,
+            ),
+          ),
+          throwsEmptyScope(EmptyScopeReason.todayAllDone),
+        );
+        expect(repo.startSessionCalled, isFalse);
+      },
+    );
+
+    test(
+      'S4d: today (srs_review) with zero cards anywhere throws '
+      'EmptyScopeException(todayNoContent)',
+      () async {
+        final repo = _FakeStudyRepo(scopeCount: 0);
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.today,
+              entryRefId: null,
+              studyType: StudyType.srsReview,
+              settings: _testSettings,
+            ),
+          ),
+          throwsEmptyScope(EmptyScopeReason.todayNoContent),
+        );
+        expect(repo.startSessionCalled, isFalse);
       },
     );
   });
@@ -82,17 +222,35 @@ const _testSettings = StudySettingsSnapshot(
 );
 
 class _FakeStudyRepo implements StudyRepo {
-  _FakeStudyRepo({required this.deckCount});
+  _FakeStudyRepo({
+    this.deckCount = 0,
+    this.scopeCount = 0,
+    this.dueCount = 0,
+    this.next,
+  });
 
   final int deckCount;
-  final List<String> countCalls = <String>[];
+  final int scopeCount;
+  final int dueCount;
+  final DateTime? next;
+
+  final List<String> deckCountCalls = <String>[];
   bool startSessionCalled = false;
 
   @override
   Future<int> countFlashcardsInDeck(String deckId) async {
-    countCalls.add(deckId);
+    deckCountCalls.add(deckId);
     return deckCount;
   }
+
+  @override
+  Future<int> countFlashcardsInScope(StudyContext context) async => scopeCount;
+
+  @override
+  Future<int> countDueCardsInScope(StudyContext context) async => dueCount;
+
+  @override
+  Future<DateTime?> nextDueAt(StudyContext context) async => next;
 
   @override
   Future<StudySessionSnapshot> startSession({

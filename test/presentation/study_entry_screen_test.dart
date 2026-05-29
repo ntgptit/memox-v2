@@ -287,6 +287,15 @@ class _CapturingStudyRepo implements StudyRepo {
   Future<int> countFlashcardsInDeck(String deckId) async => deckFlashcardCount;
 
   @override
+  Future<int> countFlashcardsInScope(StudyContext context) async => 1;
+
+  @override
+  Future<int> countDueCardsInScope(StudyContext context) async => 1;
+
+  @override
+  Future<DateTime?> nextDueAt(StudyContext context) async => null;
+
+  @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async => [
     _card(),
   ];

@@ -66,6 +66,18 @@ final class StudyRepoImpl implements StudyRepo {
   }
 
   @override
+  Future<int> countFlashcardsInScope(StudyContext context) =>
+      _countFlashcardsInScope(context);
+
+  @override
+  Future<int> countDueCardsInScope(StudyContext context) =>
+      _countDueCardsInScope(context, endOfTodayEpochMillis: _endOfTodayEpochMillis());
+
+  @override
+  Future<DateTime?> nextDueAt(StudyContext context) =>
+      _nextDueAt(context, endOfTodayEpochMillis: _endOfTodayEpochMillis());
+
+  @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
     final rows = await _eligibleFlashcards(
       context: context,

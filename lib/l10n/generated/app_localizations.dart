@@ -3504,6 +3504,102 @@ abstract class AppLocalizations {
   /// **'Add flashcards'**
   String get studyEmpty_deck_noCards_cta;
 
+  /// Empty-scope title when a deck has cards but none are due for SRS review. P0-1 Tier 1.
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up'**
+  String get studyEmpty_deck_noDueCards_title;
+
+  /// Empty-scope subtitle showing when the next deck card becomes due. Omitted when no future due date exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Next due {relativeTime}.'**
+  String studyEmpty_deck_noDueCards_subtitle(String relativeTime);
+
+  /// Empty-scope CTA that restarts study on the deck as a New Study session.
+  ///
+  /// In en, this message translates to:
+  /// **'Study new instead'**
+  String get studyEmpty_deck_noDueCards_cta;
+
+  /// Empty-scope title when a folder subtree has zero flashcards. P0-1 Tier 1.
+  ///
+  /// In en, this message translates to:
+  /// **'No cards in this folder'**
+  String get studyEmpty_folder_noCards_title;
+
+  /// Empty-scope CTA that returns to the folder so the user can add a deck.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a deck'**
+  String get studyEmpty_folder_noCards_cta;
+
+  /// Empty-scope title when a folder subtree has cards but none are due for SRS review. P0-1 Tier 1.
+  ///
+  /// In en, this message translates to:
+  /// **'All caught up for this folder'**
+  String get studyEmpty_folder_noDueCards_title;
+
+  /// Empty-scope subtitle showing when the next folder card becomes due. Omitted when no future due date exists.
+  ///
+  /// In en, this message translates to:
+  /// **'Next due {relativeTime}.'**
+  String studyEmpty_folder_noDueCards_subtitle(String relativeTime);
+
+  /// Empty-scope CTA that restarts study on the folder as a New Study session.
+  ///
+  /// In en, this message translates to:
+  /// **'Study new instead'**
+  String get studyEmpty_folder_noDueCards_cta;
+
+  /// Empty-scope title when today's SRS review queue is empty but the user has cards. P0-1 Tier 1.
+  ///
+  /// In en, this message translates to:
+  /// **'All done for today!'**
+  String get studyEmpty_today_allDone_title;
+
+  /// Empty-scope motivational message shown when today's review queue is clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Great work. Check back tomorrow for your next review.'**
+  String get studyEmpty_today_allDone_message;
+
+  /// Empty-scope CTA that returns to the dashboard when today's review queue is clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to dashboard'**
+  String get studyEmpty_today_allDone_cta;
+
+  /// Empty-scope title when the user has zero flashcards anywhere. P0-1 Tier 1.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t created any flashcards yet'**
+  String get studyEmpty_today_noContent_title;
+
+  /// Empty-scope CTA that opens the library so the user can create their first deck.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first deck'**
+  String get studyEmpty_today_noContent_cta;
+
+  /// Relative time fragment for the next-due hint, in days.
+  ///
+  /// In en, this message translates to:
+  /// **'in {count, plural, =1{1 day} other{{count} days}}'**
+  String studyEmptyNextDueInDays(int count);
+
+  /// Relative time fragment for the next-due hint, in hours.
+  ///
+  /// In en, this message translates to:
+  /// **'in {count, plural, =1{1 hour} other{{count} hours}}'**
+  String studyEmptyNextDueInHours(int count);
+
+  /// Relative time fragment for the next-due hint when the next card is due in under an hour.
+  ///
+  /// In en, this message translates to:
+  /// **'soon'**
+  String get studyEmptyNextDueSoon;
+
   /// No description provided for @studyCancelConfirmTitle.
   ///
   /// In en, this message translates to:

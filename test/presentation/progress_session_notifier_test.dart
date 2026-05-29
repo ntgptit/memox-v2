@@ -269,6 +269,15 @@ final class _ProgressStudyRepo implements StudyRepo {
 
   @override
   Future<int> countFlashcardsInDeck(String deckId) async => 1;
+
+  @override
+  Future<int> countFlashcardsInScope(StudyContext context) async => 1;
+
+  @override
+  Future<int> countDueCardsInScope(StudyContext context) async => 1;
+
+  @override
+  Future<DateTime?> nextDueAt(StudyContext context) async => null;
   int finalizeCount = 0;
   int retryFinalizeCount = 0;
   int resumeCandidateLoadCount = 0;

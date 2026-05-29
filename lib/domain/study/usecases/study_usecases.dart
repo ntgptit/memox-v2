@@ -51,21 +51,70 @@ final class StartStudySessionUseCase {
 
   /// P0-1 Tier 1: pre-check scope and throw typed [EmptyScopeException] so the
   /// presentation layer can render a dedicated empty state with an actionable
-  /// CTA. Currently covers `deck_noCards` only; other Tier 1 cases will be
-  /// added in a follow-up PR (see
-  /// `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md`).
+  /// CTA instead of a generic error. Covers all six Tier 1 cases. Tier 2
+  /// (`tag`) and Tier 3 (`allBuried`/`allSuspended`) remain blocked — see
+  /// `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md`.
+  ///
+  /// Spec: `docs/business/study/study-flow.md` §Empty scope matrix.
   Future<void> _rejectEmptyScope(StudyContext context) async {
-    if (context.entryType != StudyEntryType.deck) {
-      return;
+    switch (context.entryType) {
+      case StudyEntryType.deck:
+        await _rejectEmptyDeck(context);
+      case StudyEntryType.folder:
+        await _rejectEmptyFolder(context);
+      case StudyEntryType.today:
+        await _rejectEmptyToday(context);
     }
+  }
+
+  Future<void> _rejectEmptyDeck(StudyContext context) async {
     final deckId = context.entryRefId;
     if (deckId == null) {
       return;
     }
-    final count = await _repository.countFlashcardsInDeck(deckId);
-    if (count == 0) {
+    final total = await _repository.countFlashcardsInDeck(deckId);
+    if (total == 0) {
       throw const EmptyScopeException(EmptyScopeReason.deckNoCards);
     }
+    if (context.studyType == StudyType.srsReview) {
+      await _rejectNoDueCards(context, EmptyScopeReason.deckNoDueCards);
+    }
+  }
+
+  Future<void> _rejectEmptyFolder(StudyContext context) async {
+    if (context.entryRefId == null) {
+      return;
+    }
+    final total = await _repository.countFlashcardsInScope(context);
+    if (total == 0) {
+      throw const EmptyScopeException(EmptyScopeReason.folderNoCards);
+    }
+    if (context.studyType == StudyType.srsReview) {
+      await _rejectNoDueCards(context, EmptyScopeReason.folderNoDueCards);
+    }
+  }
+
+  Future<void> _rejectEmptyToday(StudyContext context) async {
+    final total = await _repository.countFlashcardsInScope(context);
+    if (total == 0) {
+      throw const EmptyScopeException(EmptyScopeReason.todayNoContent);
+    }
+    final due = await _repository.countDueCardsInScope(context);
+    if (due == 0) {
+      throw const EmptyScopeException(EmptyScopeReason.todayAllDone);
+    }
+  }
+
+  Future<void> _rejectNoDueCards(
+    StudyContext context,
+    EmptyScopeReason reason,
+  ) async {
+    final due = await _repository.countDueCardsInScope(context);
+    if (due > 0) {
+      return;
+    }
+    final nextDueAt = await _repository.nextDueAt(context);
+    throw EmptyScopeException(reason, nextDueAt: nextDueAt);
   }
 }
 

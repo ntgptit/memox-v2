@@ -298,6 +298,15 @@ final class _ProgressScreenStudyRepo implements StudyRepo {
   Future<int> countFlashcardsInDeck(String deckId) async => 1;
 
   @override
+  Future<int> countFlashcardsInScope(StudyContext context) async => 1;
+
+  @override
+  Future<int> countDueCardsInScope(StudyContext context) async => 1;
+
+  @override
+  Future<DateTime?> nextDueAt(StudyContext context) async => null;
+
+  @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
     cancelCount += 1;
     return _snapshot(status: SessionStatus.cancelled);

@@ -1053,6 +1053,90 @@
   "@studyEmpty_deck_noCards_cta": {
     "description": "Empty-scope CTA that pushes the flashcard-create screen for the current deck."
   },
+  "studyEmpty_deck_noDueCards_title": "All caught up",
+  "@studyEmpty_deck_noDueCards_title": {
+    "description": "Empty-scope title when a deck has cards but none are due for SRS review. P0-1 Tier 1."
+  },
+  "studyEmpty_deck_noDueCards_subtitle": "Next due {relativeTime}.",
+  "@studyEmpty_deck_noDueCards_subtitle": {
+    "description": "Empty-scope subtitle showing when the next deck card becomes due. Omitted when no future due date exists.",
+    "placeholders": {
+      "relativeTime": {
+        "type": "String"
+      }
+    }
+  },
+  "studyEmpty_deck_noDueCards_cta": "Study new instead",
+  "@studyEmpty_deck_noDueCards_cta": {
+    "description": "Empty-scope CTA that restarts study on the deck as a New Study session."
+  },
+  "studyEmpty_folder_noCards_title": "No cards in this folder",
+  "@studyEmpty_folder_noCards_title": {
+    "description": "Empty-scope title when a folder subtree has zero flashcards. P0-1 Tier 1."
+  },
+  "studyEmpty_folder_noCards_cta": "Add a deck",
+  "@studyEmpty_folder_noCards_cta": {
+    "description": "Empty-scope CTA that returns to the folder so the user can add a deck."
+  },
+  "studyEmpty_folder_noDueCards_title": "All caught up for this folder",
+  "@studyEmpty_folder_noDueCards_title": {
+    "description": "Empty-scope title when a folder subtree has cards but none are due for SRS review. P0-1 Tier 1."
+  },
+  "studyEmpty_folder_noDueCards_subtitle": "Next due {relativeTime}.",
+  "@studyEmpty_folder_noDueCards_subtitle": {
+    "description": "Empty-scope subtitle showing when the next folder card becomes due. Omitted when no future due date exists.",
+    "placeholders": {
+      "relativeTime": {
+        "type": "String"
+      }
+    }
+  },
+  "studyEmpty_folder_noDueCards_cta": "Study new instead",
+  "@studyEmpty_folder_noDueCards_cta": {
+    "description": "Empty-scope CTA that restarts study on the folder as a New Study session."
+  },
+  "studyEmpty_today_allDone_title": "All done for today!",
+  "@studyEmpty_today_allDone_title": {
+    "description": "Empty-scope title when today's SRS review queue is empty but the user has cards. P0-1 Tier 1."
+  },
+  "studyEmpty_today_allDone_message": "Great work. Check back tomorrow for your next review.",
+  "@studyEmpty_today_allDone_message": {
+    "description": "Empty-scope motivational message shown when today's review queue is clear."
+  },
+  "studyEmpty_today_allDone_cta": "Back to dashboard",
+  "@studyEmpty_today_allDone_cta": {
+    "description": "Empty-scope CTA that returns to the dashboard when today's review queue is clear."
+  },
+  "studyEmpty_today_noContent_title": "You haven't created any flashcards yet",
+  "@studyEmpty_today_noContent_title": {
+    "description": "Empty-scope title when the user has zero flashcards anywhere. P0-1 Tier 1."
+  },
+  "studyEmpty_today_noContent_cta": "Create your first deck",
+  "@studyEmpty_today_noContent_cta": {
+    "description": "Empty-scope CTA that opens the library so the user can create their first deck."
+  },
+  "studyEmptyNextDueInDays": "in {count, plural, =1{1 day} other{{count} days}}",
+  "@studyEmptyNextDueInDays": {
+    "description": "Relative time fragment for the next-due hint, in days.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyEmptyNextDueInHours": "in {count, plural, =1{1 hour} other{{count} hours}}",
+  "@studyEmptyNextDueInHours": {
+    "description": "Relative time fragment for the next-due hint, in hours.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "studyEmptyNextDueSoon": "soon",
+  "@studyEmptyNextDueSoon": {
+    "description": "Relative time fragment for the next-due hint when the next card is due in under an hour."
+  },
   "studyCancelConfirmTitle": "Cancel this session?",
   "studyCancelConfirmMessage": "Your current study session will stop and you will be taken to the result screen.",
   "studyCancelConfirmAction": "Cancel",

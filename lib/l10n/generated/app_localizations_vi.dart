@@ -1983,6 +1983,75 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyEmpty_deck_noCards_cta => 'Thêm thẻ';
 
   @override
+  String get studyEmpty_deck_noDueCards_title => 'Đã ôn hết hôm nay';
+
+  @override
+  String studyEmpty_deck_noDueCards_subtitle(String relativeTime) {
+    return 'Hạn ôn tiếp theo $relativeTime.';
+  }
+
+  @override
+  String get studyEmpty_deck_noDueCards_cta => 'Học bài mới';
+
+  @override
+  String get studyEmpty_folder_noCards_title => 'Thư mục này chưa có thẻ';
+
+  @override
+  String get studyEmpty_folder_noCards_cta => 'Thêm bộ thẻ';
+
+  @override
+  String get studyEmpty_folder_noDueCards_title => 'Thư mục này đã ôn xong';
+
+  @override
+  String studyEmpty_folder_noDueCards_subtitle(String relativeTime) {
+    return 'Hạn ôn tiếp theo $relativeTime.';
+  }
+
+  @override
+  String get studyEmpty_folder_noDueCards_cta => 'Học bài mới';
+
+  @override
+  String get studyEmpty_today_allDone_title => 'Đã ôn xong hôm nay!';
+
+  @override
+  String get studyEmpty_today_allDone_message =>
+      'Tuyệt vời. Hẹn gặp lại ngày mai cho lượt ôn tiếp theo.';
+
+  @override
+  String get studyEmpty_today_allDone_cta => 'Về trang chính';
+
+  @override
+  String get studyEmpty_today_noContent_title => 'Bạn chưa tạo thẻ nào';
+
+  @override
+  String get studyEmpty_today_noContent_cta => 'Tạo bộ thẻ đầu tiên';
+
+  @override
+  String studyEmptyNextDueInDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ngày',
+      one: '1 ngày',
+    );
+    return 'sau $_temp0';
+  }
+
+  @override
+  String studyEmptyNextDueInHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count giờ',
+      one: '1 giờ',
+    );
+    return 'sau $_temp0';
+  }
+
+  @override
+  String get studyEmptyNextDueSoon => 'sắp tới';
+
+  @override
   String get studyCancelConfirmTitle => 'Hủy phiên học này?';
 
   @override

@@ -77,7 +77,7 @@ Cột "Điểm khác biệt" trình bày theo format `[Verified 2026-05-28]: ...
 | 09 | `09-flashcard-history.md` | ⚪ Future | Trang lịch sử attempts của 1 flashcard. | [Verified 2026-05-28]: `find lib -name "*history*"` vẫn rỗng. [Scope 2026-05-29]: downgraded to Future Proposal for V1; also requires `last_reset_at`, `box_before`, `box_after` migration. | No V1 implementation. Hide/disable entry links. Promote only via scope-guard + migration PR. | Schema raw attempts exist. | Not a V1 blocker after decision. |
 | 10 | `10-deck-import.md` | ✅ = (§Implementation refs scope) | Import CSV/Excel/structured-text vào deck. | [Verified 2026-05-28]: Doc đã update code paths to `flashcard_import_support.dart` (csv + structuredText) + `flashcard_excel_import_parser.dart` (DIY xlsx parser, không dùng `excel` pkg, single-sheet only). Format enum verified at `value_objects/content_actions.dart:45`. [Pending]: Decision-table rows cho import chưa cross-verify. | **P3**: Decision-table cross-verify. | Import 3-format đầy đủ. | Excel parser scope (single sheet, no formula) là known limitation đã document. |
 | 11 | `11-library-search.md` | ⚪ Future / V1 guideline | Full global search cross deck/folder/tag, plus V1 inline search rules. | [Verified 2026-05-28]: Không có screen, không có `GlobalSearchUseCase`; inline `MxSearchField` is scope-local. [Scope 2026-05-29]: full global search downgraded to Future Proposal; V1 keeps inline/scope-local guidelines. | No V1 global route/use case. Use doc only to standardize inline search. | Inline scope-local works. | Full global search not a V1 blocker after decision. |
-| 12 | `12-study-entry-gate.md` | 🟠 D>C | Empty scope matrix 10 cases với 10 l10n keys. | [Verified 2026-05-28]: Code `StartStudySessionUseCase` (`study_usecases.dart:33-35`) chỉ throw 1 `ValidationException` chung. 10 cases doc spec → 1 generic exception code. `studyEmpty_allBuried/allSuspended` mặc nhiên block on §3.1. | **P0**: Branching empty-state + 10 l10n keys. | Route đúng. | 10-vs-1 mismatch — P0. |
+| 12 | `12-study-entry-gate.md` | 🟡 D>C (Tier 1 done) | Empty scope matrix 10 cases với l10n keys. | [Verified 2026-05-29]: **6 Tier 1 cases implemented**. `StartStudySessionUseCase._rejectEmptyScope` (`study_usecases.dart`) branches per entry/study type, throwing typed `EmptyScopeException(reason, nextDueAt)` for deck_noCards / deck_noDueCards / folder_noCards / folder_noDueCards / today_allDone / today_noContent. Repo probe queries `countFlashcardsInScope` / `countDueCardsInScope` / `nextDueAt` in `study_repo_impl.dart`. `EmptyScopeScreen` renders all 6 arms with CTAs; 16 l10n keys added. Remaining 4 cases (`tag_noCards`/`tag_noDueCards` Tier 2, `allBuried`/`allSuspended` Tier 3) still block on §3.1 + `StudyEntryType.tag`. | **P0 Tier 1 resolved.** Remaining: Tier 2 (tag) + Tier 3 (bury/suspend). | Typed failure + dedicated empty states + tests (decision rows S4/S4b/S4c/S4d/S4e/S4j). | 4 of 10 cases still blocked (tag + bury/suspend). |
 | 13 | `13-study-session-review.md` | 🟡 D>C | Review mode swipe + long-press → card actions. | [Verified 2026-05-28]: Code paths đã refresh tới `review_mode_session_view.dart` + `review_page_scroll_behavior.dart`. **Long-press = 0 handler** (`grep onLongPress lib/presentation/features/study` = 0). Card-actions sheet missing (block §3.1). | **P1**: Long-press wiring sau khi §3.1 ready. | Swipe behavior + scroll layer tách rõ. | Toàn bộ long-press track null. |
 | 14 | `14-study-session-match.md` | ✅ = | Board 5-pair, 10 cells, ≥5 cards. | [Verified 2026-05-28]: `matchVisiblePairLimit = 5` ở `match_batching.dart`. Seeded shuffle (`match_seed.dart`) deterministic per `sessionId + boardIndex`. Grading via `AnswerCurrentMatchModeBatchUseCase`. Long-press: cùng track #13. | **P3**: Long-press track #13. | Match-mode batch usecase riêng → clean. | Long-press chưa wire. |
 | 15 | `15-study-session-guess.md` | ✅ = | 5 options (A-E), 4 decoys, countdown 0.8s/1.5s. | [Verified 2026-05-28]: `_guessAnswerDistractorLimit = 4` ở `study_session_notifier.dart:17`; `distractors.take(4)` ở `guess_mode_session_view.dart:160`; tổng 5 options. Distractor sampling **inline ở presentation layer** (notifier, không phải domain) — track architecture concern. [Pending]: Countdown 0.8s/1.5s constants chưa trace trong `guess_motion.dart`. | **P2**: Verify countdown constants. **P3**: Promote distractor sampling lên domain (xem §3.13). | Option models tách. | Architecture: distractor sampling sai layer. |
@@ -104,6 +104,8 @@ Cột "Điểm khác biệt" trình bày theo format `[Verified 2026-05-28]: ...
 | **Total** | 25 | 25 | | |
 
 → Rev 4 is a docs-scope correction. It does not claim code improved; it removes three false V1 blockers by explicitly downgrading them or narrowing their scope.
+
+> **Post-Rev 4 implementation delta (2026-05-29, P0-1 Empty-Scope Tier 1 merge):** row #12 moved 🟠 → 🟡 after the 6 Tier 1 empty-scope cases landed in code (see §1 row #12 + §3.7). Net effect on the distribution: 🟠 6 → 5, 🟡 10 → 11. A full Rev 5 re-audit is the right vehicle to re-tally; this note records the single-row delta in the interim per §9 re-audit trigger #1.
 
 ---
 
@@ -179,9 +181,13 @@ Full cross-scope global search is Future Proposal. V1 keeps inline/scope-local s
 
 Standalone onboarding remains absent by design. V1 scope is stronger zero-content empty states with Create / Import / Restore CTAs. Full welcome screen, onboarding feature folder, and restore prompt branch are Future Proposal.
 
-### §3.7 Empty-scope matrix — **P0 Blocker** (unchanged)
+### §3.7 Empty-scope matrix — **Tier 1 RESOLVED 2026-05-29; Tier 2/3 still blocked**
 
-10 doc cases vs 1 code exception. Sub-cases `allBuried`/`allSuspended` cũng block §3.1.
+Tier 1 (6 cases: deck_noCards, deck_noDueCards, folder_noCards, folder_noDueCards, today_allDone, today_noContent) implemented — typed `EmptyScopeException` + repo scope-probe queries + `EmptyScopeScreen` arms + l10n + tests (decision rows S4/S4b–S4e/S4j). Evidence: `lib/domain/study/usecases/study_usecases.dart` `_rejectEmptyScope`, `lib/data/repositories/study_repo_impl_helpers.dart` (`_countFlashcardsInScope`/`_countDueCardsInScope`/`_nextDueAt`), `lib/presentation/features/study/widgets/empty_scope_screen.dart`.
+
+Remaining blocked:
+- **Tier 2** `tag_noCards` / `tag_noDueCards` — needs `StudyEntryType.tag` + tag-scope queries.
+- **Tier 3** `allBuried` / `allSuspended` — block on §3.1 bury/suspend schema migration.
 
 ### §3.8 Excel import — ✅ **RESOLVED 2026-05-28**
 

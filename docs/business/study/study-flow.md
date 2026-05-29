@@ -137,8 +137,14 @@ Rejection MUST NOT be a generic toast or error dialog. Always render dedicated e
 
 | Case | Status | Source |
 | --- | --- | --- |
-| `studyEmpty_deck_noCards` | ✅ Implemented (Tier 1 vertical slice) | `lib/domain/study/usecases/study_usecases.dart` (`_rejectEmptyScope`) + `lib/presentation/features/study/widgets/empty_scope_screen.dart` |
-| All other rows | ⏳ Specified — replicate the deck_noCards slice pattern (typed `EmptyScopeReason`, repo pre-check, `EmptyScopeScreen` switch arm, l10n keys) per `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md` | — |
+| `studyEmpty_deck_noCards` | ✅ Implemented (Tier 1) | `lib/domain/study/usecases/study_usecases.dart` (`_rejectEmptyScope`) + `lib/presentation/features/study/widgets/empty_scope_screen.dart` |
+| `studyEmpty_deck_noDueCards` | ✅ Implemented (Tier 1) | `study_usecases.dart` (`_rejectNoDueCards`) + `StudyRepo.countDueCardsInScope` / `nextDueAt` + `empty_scope_screen.dart` |
+| `studyEmpty_folder_noCards` | ✅ Implemented (Tier 1) | `study_usecases.dart` (`_rejectEmptyFolder`) + `StudyRepo.countFlashcardsInScope` + `empty_scope_screen.dart` |
+| `studyEmpty_folder_noDueCards` | ✅ Implemented (Tier 1) | `study_usecases.dart` (`_rejectNoDueCards`) + `StudyRepo.countDueCardsInScope` / `nextDueAt` + `empty_scope_screen.dart` |
+| `studyEmpty_today_allDone` | ✅ Implemented (Tier 1) | `study_usecases.dart` (`_rejectEmptyToday`) + `StudyRepo.countDueCardsInScope` + `empty_scope_screen.dart`. Streak inset still pending (engagement use cases are `Target`). |
+| `studyEmpty_today_noContent` | ✅ Implemented (Tier 1) | `study_usecases.dart` (`_rejectEmptyToday`) + `StudyRepo.countFlashcardsInScope` + `empty_scope_screen.dart` |
+| `studyEmpty_tag_noCards` / `studyEmpty_tag_noDueCards` | 🔴 Blocked (Tier 2) — `StudyEntryType.tag` not yet defined; needs tag-scope queries + tag picker | `docs/business/tags/tag-system.md` |
+| `studyEmpty_allBuried` / `studyEmpty_allSuspended` | 🔴 Blocked (Tier 3) — depends on P0-2 bury/suspend schema migration | `docs/business/study-actions/bury-suspend.md` |
 
 ## "Next due" calculation
 
