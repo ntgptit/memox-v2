@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-05-26
-status: contract
+last_updated: 2026-05-29
+status: Future Proposal — Migration Required
 ---
 
 # History Use Cases Contract
@@ -8,9 +8,13 @@ status: contract
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
 
-Read-only timeline of per-card attempts + lifetime stats.
+Read-only timeline of per-card attempts + lifetime stats. This contract is **Future Proposal** for V1 and also requires schema migration before implementation.
 
-## GetCardHistoryUseCase
+## V1 rule
+
+Do not implement these use cases in V1 unless Card History is promoted in `docs/checklist/v1-implementation-scope-2026-05-29.md` and the migration for `last_reset_at`, `box_before`, and `box_after` is included.
+
+## Future Proposal: GetCardHistoryUseCase
 
 ```dart
 Future<Either<Failure, CardHistoryPage>> call({
@@ -30,7 +34,7 @@ Future<Either<Failure, CardHistoryPage>> call({
 
 **Test refs:** H1.
 
-## GetCardLifetimeStatsUseCase
+## Future Proposal: GetCardLifetimeStatsUseCase
 
 ```dart
 Future<Either<Failure, LifetimeStats>> call({required FlashcardId id});
@@ -44,7 +48,7 @@ Future<Either<Failure, LifetimeStats>> call({required FlashcardId id});
 
 **Test refs:** H4.
 
-## GetCardResetMarkerUseCase
+## Future Proposal: GetCardResetMarkerUseCase
 
 ```dart
 Future<Either<Failure, DateTime?>> call({required FlashcardId id});

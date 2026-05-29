@@ -1,19 +1,22 @@
 ---
-last_updated: 2026-05-28
-revision: 3 (post C>D cleanup, recursive review of Rev 2)
+last_updated: 2026-05-29
+revision: 4 (scope-resolution update after product decisions)
 author: technical leader recursive audit
 scope: docs/wireframes/** ↔ lib/{presentation,domain,data}/**
-purpose: Đối chiếu wireframe ↔ code ở mức aspect-by-aspect, với evidence cụ thể (file:line + symbol). Rev 3 phản ánh trạng thái sau khi đợt C>D cleanup ngày 2026-05-28 hoàn thành.
+purpose: Đối chiếu wireframe ↔ code ở mức aspect-by-aspect, với evidence cụ thể (file:line + symbol). Rev 4 cập nhật scope sau khi 3 product decisions ngày 2026-05-29 được chốt.
 companion_docs:
-  - docs/checklist/c-greater-than-d-cleanup-2026-05-28.md (log của đợt cleanup vừa xong)
+  - docs/checklist/c-greater-than-d-cleanup-2026-05-28.md (log của đợt cleanup trước đó)
+  - docs/checklist/product-decisions-pending-2026-05-29.md (resolved V1 decisions)
+  - docs/checklist/v1-implementation-scope-2026-05-29.md (current V1 scope guard)
 ---
 
-# Wireframe ↔ Code Parity Assessment (Revision 3)
+# Wireframe ↔ Code Parity Assessment (Revision 4)
 
 > **Lifecycle**:
 > - Rev 1 (junior, deprecated) — đánh giá theo "file tồn tại" bề mặt; sai chiều drift ở Match/Guess; sai MATCH cho Dashboard/Tag/Recall/Import/Study-entry.
 > - Rev 2 (senior, replaced) — đào sâu 3 layer, evidence file:line, phát hiện streak orphan, schema thiếu bury/suspend, code paths stale; nhưng còn vài chỗ over-broad (xem §5.1).
-> - Rev 3 (CURRENT) — refresh sau C>D cleanup pass đã commit; 4 cross-cutting items resolved, 3 cross-cutting items mới phát hiện qua recursive review. Re-tag status hàng nào còn vướng.
+> - Rev 3 — refresh sau C>D cleanup pass đã commit; 4 cross-cutting items resolved, 3 cross-cutting items mới phát hiện qua recursive review.
+> - Rev 4 (CURRENT) — scope-resolution update: #09 Card History, #11 Global Search, and full #23 Onboarding are no longer V1 blockers; they are Future Proposal except V1 thin zero-content guidance.
 
 ---
 
@@ -70,10 +73,10 @@ Cột "Điểm khác biệt" trình bày theo format `[Verified 2026-05-28]: ...
 | 05 | `05-folder-detail.md` | 🟡 D>C | Breadcrumb, children list, sort, search inline, quick actions, empty state, lock-mode rejection. | [Verified 2026-05-28]: §Components đã document `MxSearchSortToolbar<ContentSortMode>` (verified at `folder_detail_screen.dart:178`). `parentModeLocked` failure exists (`error-contract.md:59`). [Pending]: Lock-mode UI surface (toast text / dialog copy mapping) chưa trace. | **P2**: Verify lock-mode UI behavior khi user thử thêm subfolder vào decks-mode folder. | Shared toolbar tái sử dụng. | Lock-mode UX edge case chưa rõ. |
 | 06 | `06-flashcard-list.md` | ✅ = (§Components scope) | Danh sách: bulk select, reorder, search inline, breadcrumb, deck summary, study modes, progress, bulk action bar, empty/skeleton. | [Verified 2026-05-28]: §Components đã expand thành 13-row bảng mapped 1-1 với `flashcard_*_section.dart` files theo render order screen (lines 130-436). [Pending]: §Rules, §States, §Forbidden chưa re-verify aspect-by-aspect. | **P3**: Subsequent pass verify other sections. | Mapping doc ↔ widget rõ ràng, dễ review PR. | Verify scope hẹp — chỉ §Components. |
 | 07 | `07-flashcard-create.md` | 🟡 D≠C | Form tạo flashcard 1 thẻ + bulk paste; route riêng `flashcardCreate`. | [Verified 2026-05-28]: `flashcard_editor_screen.dart` shared cho cả create và edit (`flashcardCreate` và `flashcardEdit` cùng map sang screen này). [Pending]: Doc vẫn tách 07/08 → gây hiểu nhầm. | **P2**: Merge 07+08 thành "Flashcard editor" hoặc add cross-ref note ở header cả hai file. | Một code path, ít drift logic. | Spec dual-file ↔ code single-file. |
-| 08 | `08-flashcard-edit.md` | 🟡 D≠C | Form chỉnh + delete (danger zone) + "View history" link. | [Verified 2026-05-28]: Cùng screen với #07. "View history" link sẽ dead-end vì #09 missing. Suspend/Bury suggestion file `suspend_card_usecase.dart` ref trong Impl refs là **target** (block on §3.1). | **P2**: Cùng action với #07 + note "View history disabled until #09". | — | View history link không click được. |
-| 09 | `09-flashcard-history.md` | 🔴 D>C (MISSING) | Trang lịch sử attempts của 1 flashcard. | [Verified 2026-05-28]: `find lib -name "*history*"` vẫn rỗng. `study_attempts_table` có data nhưng không có query method `getAttemptsByFlashcard` (verified by grep). | **P1**: Build hoặc downgrade Future Proposal. | Schema raw đã có. | User click "View history" 404. |
+| 08 | `08-flashcard-edit.md` | 🟡 D≠C | Form chỉnh + delete (danger zone) + future "View history" action. | [Verified 2026-05-28]: Cùng screen với #07. [Scope 2026-05-29]: `View history` is Future Proposal and must not be exposed as a live V1 action. Suspend/Bury suggestion remains target/block on §3.1. | **P2**: Cùng action với #07 + ensure `View history` is hidden/disabled in V1. | — | History action is intentionally future. |
+| 09 | `09-flashcard-history.md` | ⚪ Future | Trang lịch sử attempts của 1 flashcard. | [Verified 2026-05-28]: `find lib -name "*history*"` vẫn rỗng. [Scope 2026-05-29]: downgraded to Future Proposal for V1; also requires `last_reset_at`, `box_before`, `box_after` migration. | No V1 implementation. Hide/disable entry links. Promote only via scope-guard + migration PR. | Schema raw attempts exist. | Not a V1 blocker after decision. |
 | 10 | `10-deck-import.md` | ✅ = (§Implementation refs scope) | Import CSV/Excel/structured-text vào deck. | [Verified 2026-05-28]: Doc đã update code paths to `flashcard_import_support.dart` (csv + structuredText) + `flashcard_excel_import_parser.dart` (DIY xlsx parser, không dùng `excel` pkg, single-sheet only). Format enum verified at `value_objects/content_actions.dart:45`. [Pending]: Decision-table rows cho import chưa cross-verify. | **P3**: Decision-table cross-verify. | Import 3-format đầy đủ. | Excel parser scope (single sheet, no formula) là known limitation đã document. |
-| 11 | `11-library-search.md` | 🔴 D>C (MISSING) | Global search cross deck/folder/tag, recent searches, filters. | [Verified 2026-05-28]: Không có screen, không có `GlobalSearchUseCase`. `MxSearchField` chỉ dùng inline ở scope-local. Không có SharedPreferences key cho recent searches. | **P1**: Build hoặc downgrade. | Inline scope-local works. | Spec "global" ≠ code "scope-local". |
+| 11 | `11-library-search.md` | ⚪ Future / V1 guideline | Full global search cross deck/folder/tag, plus V1 inline search rules. | [Verified 2026-05-28]: Không có screen, không có `GlobalSearchUseCase`; inline `MxSearchField` is scope-local. [Scope 2026-05-29]: full global search downgraded to Future Proposal; V1 keeps inline/scope-local guidelines. | No V1 global route/use case. Use doc only to standardize inline search. | Inline scope-local works. | Full global search not a V1 blocker after decision. |
 | 12 | `12-study-entry-gate.md` | 🟠 D>C | Empty scope matrix 10 cases với 10 l10n keys. | [Verified 2026-05-28]: Code `StartStudySessionUseCase` (`study_usecases.dart:33-35`) chỉ throw 1 `ValidationException` chung. 10 cases doc spec → 1 generic exception code. `studyEmpty_allBuried/allSuspended` mặc nhiên block on §3.1. | **P0**: Branching empty-state + 10 l10n keys. | Route đúng. | 10-vs-1 mismatch — P0. |
 | 13 | `13-study-session-review.md` | 🟡 D>C | Review mode swipe + long-press → card actions. | [Verified 2026-05-28]: Code paths đã refresh tới `review_mode_session_view.dart` + `review_page_scroll_behavior.dart`. **Long-press = 0 handler** (`grep onLongPress lib/presentation/features/study` = 0). Card-actions sheet missing (block §3.1). | **P1**: Long-press wiring sau khi §3.1 ready. | Swipe behavior + scroll layer tách rõ. | Toàn bộ long-press track null. |
 | 14 | `14-study-session-match.md` | ✅ = | Board 5-pair, 10 cells, ≥5 cards. | [Verified 2026-05-28]: `matchVisiblePairLimit = 5` ở `match_batching.dart`. Seeded shuffle (`match_seed.dart`) deterministic per `sessionId + boardIndex`. Grading via `AnswerCurrentMatchModeBatchUseCase`. Long-press: cùng track #13. | **P3**: Long-press track #13. | Match-mode batch usecase riêng → clean. | Long-press chưa wire. |
@@ -85,21 +88,22 @@ Cột "Điểm khác biệt" trình bày theo format `[Verified 2026-05-28]: ...
 | 20 | `20-settings-learning.md` | 🟡 D>C | Daily goal, autoplay TTS, intervals override, mode prefs, bury/suspend defaults. | [Verified 2026-05-28]: `study_settings_policy.dart` exists. **Bury/suspend defaults block §3.1**. **Daily-goal field** chưa thấy — link #01. | **P1**: Daily-goal setting; bury defaults block on §3.1. | Policy tách object. | 2 sub-features missing. |
 | 21 | `21-settings-audio-speech.md` | 🟡 D>C | TTS engine select, voice, rate, pitch, sample, auto-play default. | [Verified 2026-05-28]: `audio_speech_settings_screen.dart` + `tts_usecases.dart` + `tts_settings_records_table.dart` exist. [Pending]: Engine fallback Android/iOS + voice picker UI. | **P2**: Verify engine fallback + voice picker. | Persistence table cho TTS settings. | Edge case engine unavailable chưa rõ. |
 | 22 | `22-settings-tag-management.md` | 🟠 D>C (architecture) | Tag list, rename, merge, delete; affect flashcards cascade. | [Verified 2026-05-28]: `tag_management_screen.dart` exists. **0 TagUseCase** ở domain (grep confirmed). **0 `TagRepository` interface** ở `lib/domain/repositories/`. Schema chỉ có `flashcard_tags_table.dart` (junction). → Tag screen có thể đang chạm data trực tiếp (Hard Rule violation candidate) hoặc đi qua `content_query_usecases.dart`. | **P1**: Tag domain layer (repo + 3 use cases). | `mx_tag_input` shared widget có. | Có thể vi phạm Clean Architecture boundary. |
-| 23 | `23-onboarding.md` | 🔴 D>C (MISSING) | Onboarding 4-step + restore-from-Drive prompt. | [Verified 2026-05-28]: `grep -i "onboarding" lib/` vẫn rỗng. `RouteDefaults.initialLocation = RoutePaths.library`. | **P1**: Decision build/downgrade. | Spec đầy đủ. | First-time UX hỏng. |
+| 23 | `23-onboarding.md` | 🟡 V1 thin / Future full | V1 zero-content guidance; full onboarding flow is future. | [Verified 2026-05-28]: `grep -i "onboarding" lib/` rỗng and initial route is Library. [Scope 2026-05-29]: this is acceptable for V1; implement stronger empty-state CTAs, not standalone onboarding. | **P1**: Add create/import/restore CTAs to empty states. Do not create onboarding route/feature. | Avoids M-size onboarding scope. | Full welcome/restore prompt remains future. |
 | 24 | `24-shared-dialogs.md` | 🟠 D>C | Catalog 8+ dialogs. | [Verified 2026-05-28]: Code có 3 typed widgets (`mx_dialog`, `mx_confirmation_dialog`, `mx_name_dialog`). Các dialog specific (exit-session, finalize-retry, restore-prompt, …) chưa có file riêng. | **P2**: Audit từng §dialog → tạo widget hoặc confirm inline. | Base `mx_dialog` foundation. | Dialog ecosystem ~40% typed. |
 | 25 | `25-shared-bottom-sheets.md` | 🟠 D>C | Card-actions, undo toast, destination picker, study-mode picker. | [Verified 2026-05-28]: 3 base widgets (`mx_bottom_sheet`, `mx_destination_picker_sheet`, `mx_action_sheet_list`). **Card-actions sheet** block §3.1. **Undo toast** missing. | **P1**: Undo toast + card-actions sau §3.1. | Destination picker clean. | Sheet ecosystem ~50% complete. |
 
-### §1.1 Status distribution (Rev 3 vs Rev 2 — verified by counting rows)
+### §1.1 Status distribution (Rev 4 vs Rev 3 — docs-scope update)
 
-| Status | Rev 2 | Rev 3 | Δ | Rows changed |
+| Status | Rev 3 | Rev 4 | Δ | Rows changed |
 | --- | --- | --- | --- | --- |
-| ✅ = | 3 | 7 | **+4** | #06, #10, #16, #19 reach ✅ at verified scope (cleanup pass updated docs) |
-| 🟡 | 14 | 9 | **-5** | 4 rows promoted to ✅ (above) + #12 escalated to 🟠 |
-| 🟠 | 5 | 6 | **+1** | #12 escalated from 🟡 → 🟠 to align with its P0 severity (Rev 2 inconsistency: row showed 🟡 but recommendation said P0; Rev 3 corrects) |
-| 🔴 (MISSING) | 3 | 3 | = | #09, #11, #23 unchanged — block on product decision build vs downgrade |
+| ✅ = | 7 | 7 | = | No implementation parity change in this docs-only scope update. |
+| 🟡 / V1 thin | 9 | 10 | +1 | #23 becomes V1 thin zero-content guidance rather than missing standalone onboarding. |
+| 🟠 | 6 | 6 | = | No change. |
+| 🔴 (MISSING V1 blocker) | 3 | 0 | -3 | #09, #11, #23 no longer counted as V1 missing blockers after product decision. |
+| ⚪ Future | 0 | 2 | +2 | #09 Card History and #11 full Global Search. Full #23 onboarding is also future, while thin empty-state guidance remains V1. |
 | **Total** | 25 | 25 | | |
 
-→ Rev 3 phản ánh tiến bộ thực có ở doc layer (4 rows +1 step); code-layer P0/P1 chưa thay đổi (vì cleanup chỉ chỉnh doc). #12 escalation không phải regression — chỉ là sửa lỗi visual severity của Rev 2.
+→ Rev 4 is a docs-scope correction. It does not claim code improved; it removes three false V1 blockers by explicitly downgrading them or narrowing their scope.
 
 ---
 
@@ -163,17 +167,17 @@ Cột "Điểm khác biệt" trình bày theo format `[Verified 2026-05-28]: ...
 - Presentation: screen + widget exist.
 - **Implication**: presentation may bypass UseCase → Repository → DAO flow. Hard Rule candidate violation.
 
-### §3.4 Card history — **P1 Major** (unchanged)
+### §3.4 Card history — **Future Proposal** (scope resolved 2026-05-29)
 
-Schema có, domain trống, screen trống. Wireframe 09 dead-link từ #08.
+Schema attempts có, nhưng domain/screen trống. V1 decision: không build Card History; `View history` must be hidden/disabled. Future promotion requires schema migration for `last_reset_at`, `box_before`, `box_after`.
 
-### §3.5 Global search — **P1 Major** (unchanged)
+### §3.5 Global search — **Future Proposal / V1 inline guideline** (scope resolved 2026-05-29)
 
-Doc cross-scope, code scope-local. Decision needed: build vs downgrade.
+Full cross-scope global search is Future Proposal. V1 keeps inline/scope-local search only. Do not add `/library/search`, `GlobalSearchUseCase`, grouped results, or `search.recent` persistence.
 
-### §3.6 Onboarding — **P1 Major** (unchanged)
+### §3.6 Onboarding — **P1 Thin V1 / Future full flow** (scope resolved 2026-05-29)
 
-Zero code presence. Decision needed: build vs downgrade Future Proposal.
+Standalone onboarding remains absent by design. V1 scope is stronger zero-content empty states with Create / Import / Restore CTAs. Full welcome screen, onboarding feature folder, and restore prompt branch are Future Proposal.
 
 ### §3.7 Empty-scope matrix — **P0 Blocker** (unchanged)
 
@@ -202,7 +206,7 @@ Hai vị trí cho domain use cases:
 
 ### §3.12 CLAUDE.md trigger map references non-existent files — **NEW P2** (phát hiện 2026-05-28)
 
-Trong `CLAUDE.md` (root + `docs/CLAUDE.md` mirror) §"Code change → required docs":
+Trong project-root `CLAUDE.md` §"Code change → required docs":
 
 ```
 | `lib/domain/srs/box_intervals.dart` | `docs/business/srs/srs-review.md` (interval table) |
@@ -303,9 +307,9 @@ Items resolved trong cleanup pass đã xoá. Items mới từ §3.12-3.14 thêm.
 | **P0-3** | Default landing route alignment (`home` vs `library`) | §2 | XS |
 | **P1-1** | Streak / Engagement use case + wire `MxStreakCard` + daily-goal | §3.2, #01, #18, #20 | M |
 | **P1-2** | Tag domain layer (repo + 3 use cases) + screen wiring | §3.3, #22 | M |
-| **P1-3** | Card history use case + screen | §3.4, #09 | M |
-| **P1-4** | Global search decision (build vs downgrade) | §3.5, #11 | M / XS |
-| **P1-5** | Onboarding decision (build vs downgrade) | §3.6, #23 | M / XS |
+| **FUT-1** | Card history use case + screen | §3.4, #09 | M |
+| **FUT-2** | Full global search screen | §3.5, #11 | M |
+| **P1-3** | Thin zero-content onboarding CTAs | §3.6, #23 | S |
 | **P1-6** | Long-press wiring sau khi #P0-2 ready | §3.1, #13-17 | S |
 | **P1-7** | Strict matcher + hint taint architecture audit + extract to domain | §3.10, §3.13 items 6-7, #17 | S |
 | **P1-8** | Per-card review section in study result | #18 | S |
@@ -328,7 +332,7 @@ Items resolved trong cleanup pass đã xoá. Items mới từ §3.12-3.14 thêm.
 | **P3-9** | **NEW** Mock-mapping: confirm/document account-sync UI is platform-agnostic OR split variants | §3.15.2 #4 | XS |
 | **P3-10** | **NEW** Mock-mapping: define "tough" in study-result `27f` variant | §3.15.2 #5 | XS |
 | **P3-11** | **NEW** Mock-mapping §10 refresh: add 3 missing items from Rev 3 (recall timeout, multi-resume, platform UI) | §3.15.2 #6 | XS |
-| **P3-12** | **NEW** Mock-mapping: cross-link onboarding mock variants `28a-28i` với Rev 3 #23 status (missing in code) | §3.15.2 #8 | XS |
+| **P3-12** | Mock-mapping: mark onboarding mock variants `28a-28i` as Future visual reference, not V1 implementation target | §3.15.2 #8 | XS |
 
 **Removed from Rev 2 priority queue** (đã resolve qua cleanup):
 
@@ -429,7 +433,7 @@ Re-run audit thành Rev 4 khi gặp một trong:
 1. **Merge một epic P0/P1** ở §4 → re-audit rows liên quan + cross-cutting section đó.
 2. **Sau 4 tuần** kể từ `last_updated` ở header.
 3. **Khi phát hiện drift cấp meta-doc mới** (như §3.12) — re-audit immediate.
-4. **Khi quyết định scope** P1-4 (search) hoặc P1-5 (onboarding) — re-tag #11/#23 status.
+4. **Khi Future Proposal được promote** (Card History, Global Search, full Onboarding) — re-tag #09/#11/#23 status and update the scope guard.
 5. **Sau khi epic P2-7** (extract inline logic) hoàn thành — re-audit §3.13 + #15/#17.
 
 ---

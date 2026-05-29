@@ -1,12 +1,22 @@
 ---
-last_updated: 2026-05-26
-route: /library/deck/:deckId/flashcards/:flashcardId/history
+last_updated: 2026-05-29
+status: Future Proposal — not V1 scope
+route: future /library/deck/:deckId/flashcards/:flashcardId/history
 source_specs:
   - docs/business/history/card-history.md
   - docs/business/study-actions/bury-suspend.md
+related_decision: docs/checklist/product-decisions-pending-2026-05-29.md
 ---
 
 # 09 — Flashcard History
+
+## V1 decision
+
+This screen is a **Future Proposal** for V1. Do not implement the route, screen, use cases, repository queries, or entry links during V1.
+
+If a UI surface still contains `View history`, hide it or keep it disabled until this feature is promoted.
+
+Promotion requires schema migration for `flashcard_progress.last_reset_at`, `study_attempts.box_before`, and `study_attempts.box_after`, plus route/use case/repository/test work.
 
 ## Purpose
 
@@ -209,6 +219,11 @@ When `box_before = 0` or `box_after = 0` (pre-migration data), render `—` inst
 - `box_before` / `box_after` from `study_attempts`. If 0, render `—`.
 
 ## Agent rule
+
+- V1: Do NOT implement this screen.
+- V1: Do NOT wire a live `View history` action.
+- Future: implement only after the schema migration and scope promotion are approved.
+
 
 - Do NOT recalculate accuracy on every render; use stored counters.
 - Do NOT add inline edit of attempts. Read-only.

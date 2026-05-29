@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-29
 applies_to: product scope
 ---
 
@@ -22,8 +22,8 @@ It helps users:
 - Resume paused sessions from Dashboard.
 - Set a daily goal and build a streak.
 - Receive optional daily study reminders.
-- Search across folders, decks, flashcards, and tags.
-- View per-card history (every attempt, accuracy, box progression).
+- Search/filter inside the current screen scope in V1; full global search is Future Proposal.
+- View per-card history is Future Proposal, not V1 scope.
 - Configure audio/speech (TTS) preferences for Korean and English.
 - Optionally link a Google account for Drive AppData backup and restore with conflict protection.
 
@@ -47,8 +47,11 @@ This overview lists product capabilities. The detailed contract for each lives i
 | Bury / suspend cards | Specified | `docs/business/study-actions/bury-suspend.md` |
 | Tag filter + study-by-tag + management | Specified | `docs/business/tags/tag-system.md` |
 | Bulk operations on flashcards | Specified | `docs/business/bulk/bulk-operations.md` |
-| Card history view | Specified | `docs/business/history/card-history.md` |
-| Global search | Specified | `docs/business/search/global-search.md` |
+| Card history view | Future Proposal — Migration Required | `docs/business/history/card-history.md` |
+| Inline/scope-local search | V1 guideline | `docs/business/search/global-search.md` |
+| Global search screen | Future Proposal | `docs/business/search/global-search.md`, `docs/wireframes/11-library-search.md` |
+| Zero-content guidance / thin onboarding | V1 guideline | `docs/wireframes/23-onboarding.md`, `docs/wireframes/01-dashboard.md`, `docs/wireframes/02-library.md` |
+| Full onboarding flow | Future Proposal | `docs/wireframes/23-onboarding.md` |
 | Daily goal + streak + reminders | Specified | `docs/business/engagement/dashboard-engagement.md` |
 | Progress tracking | Partially specified | `docs/business/srs/srs-review.md` (data only) |
 | TTS / audio settings | Specified | `docs/business/tts/tts-settings.md` |
@@ -58,7 +61,7 @@ This overview lists product capabilities. The detailed contract for each lives i
 | Export with metadata (tags, SRS, etc.) | Out of scope | use Drive sync for backup |
 | Multi-language TTS | Out of scope (current phase) | English/Korean only; deck `target_language` gates playback |
 
-Agents must not implement capabilities outside this table without first creating or extending a spec doc.
+Agents must not implement capabilities outside this table without first creating or extending a spec doc. Agents also must not implement rows marked Future Proposal without promoting them in `docs/checklist/v1-implementation-scope-2026-05-29.md`.
 
 ## Product principles
 

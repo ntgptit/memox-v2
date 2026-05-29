@@ -94,9 +94,9 @@ The agent must not start from the HTML mock alone.
 | Flashcard list | `19a`-`19h` | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/deck/deck-management.md`, `docs/business/study-actions/bury-suspend.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current target. |
 | Flashcard create | `20a`-`20f` | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/tags/tag-system.md`, `docs/business/tts/tts-settings.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current target. |
 | Flashcard edit | `21a`-`21g` | `docs/wireframes/08-flashcard-edit.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/tags/tag-system.md`, `docs/business/study-actions/bury-suspend.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current target. |
-| Flashcard history | `22a`-`22e` | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/history.md`, `docs/contracts/repository-contracts/progress-repository.md` | Some schema fields are migration-dependent. Check database docs before coding. |
+| Flashcard history | `22a`-`22e` | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/history.md`, `docs/contracts/repository-contracts/progress-repository.md` | Future Proposal for V1; visual reference only until promoted. Requires schema migration. |
 | Deck import | `23a`-`23i` | `docs/wireframes/10-deck-import.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/bulk/bulk-operations.md`, `docs/business/deck/deck-management.md` | `docs/contracts/usecase-contracts/bulk.md`, `docs/contracts/usecase-contracts/flashcard.md` | Current target. Import must be transactional/chunked as required by docs. |
-| Library search | `24a`-`24e` | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` | `docs/contracts/usecase-contracts/search.md`, `docs/contracts/repository-contracts/*` | Current target. |
+| Library search | `24a`-`24e` | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` | `docs/contracts/usecase-contracts/search.md`, `docs/contracts/repository-contracts/*` | Full global screen is Future Proposal; V1 uses inline/scope-local search guidelines. |
 | Study entry gate | Not directly rendered as a named gallery group | `docs/wireframes/12-study-entry-gate.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/business/resume/resume-session.md` | `docs/contracts/usecase-contracts/study.md`, `docs/contracts/repository-contracts/study-repository.md` | Missing explicit mock variant. Use wireframe as source of truth. |
 | Study review | `06` | `docs/wireframes/13-study-session-review.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/study.md`, `docs/state/state-management-contract.md` | Confirm final SRS review behavior before implementation. |
 | Study match | `07` | `docs/wireframes/14-study-session-match.md` | `docs/business/study/study-flow.md` | `docs/contracts/usecase-contracts/study.md` | Current target. |
@@ -108,7 +108,7 @@ The agent must not start from the HTML mock alone.
 | Learning settings | `14a`-`14e` | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/resume/resume-session.md` | `docs/contracts/usecase-contracts/engagement.md`, `docs/state/state-management-contract.md` | Current target. |
 | Audio/Speech settings | `15a`-`15g` | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` | `docs/contracts/usecase-contracts/tts.md` | Current target. Some behavior may depend on `decks.target_language` migration. |
 | Tag management | `16a`-`16k` | `docs/wireframes/22-settings-tag-management.md` | `docs/business/tags/tag-system.md`, `docs/business/search/global-search.md` | `docs/contracts/usecase-contracts/tag.md`, `docs/contracts/repository-contracts/tag-repository.md` | Current target. |
-| Onboarding | `28a`-`28i` | `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md`, `docs/business/account-sync/account-sync.md`, `docs/business/deck/deck-management.md`, `docs/business/flashcard/flashcard-management.md` | `docs/contracts/usecase-contracts/account-sync.md`, `docs/state/state-management-contract.md` | Current target. |
+| Onboarding | `28a`-`28i` | `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md`, `docs/business/account-sync/account-sync.md`, `docs/business/deck/deck-management.md`, `docs/business/flashcard/flashcard-management.md` | `docs/contracts/usecase-contracts/account-sync.md`, `docs/state/state-management-contract.md` | Full onboarding mock set is Future Proposal; V1 implements only zero-content empty-state CTAs. |
 | Shared dialogs | Several overlay states across groups | `docs/wireframes/24-shared-dialogs.md` | Feature-specific docs | `docs/contracts/error-contract.md`, `docs/ui-ux/l10n-copy-contract.md` | Reuse shared dialog widgets. Do not recreate per screen. |
 | Shared bottom sheets | Several sheet states across groups | `docs/wireframes/25-shared-bottom-sheets.md` | Feature-specific docs | `docs/contracts/code-style.md`, `docs/ui-ux/ui-ux-contract.md` | Reuse shared bottom-sheet widgets. Do not recreate per screen. |
 
@@ -256,6 +256,9 @@ The agent must not start from the HTML mock alone.
 
 ### 6.13 Flashcard history variants
 
+V1 status: Future Proposal. These variants are visual references only until Card History is promoted and its migration is approved.
+
+
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
 | `22a · Flashcard history (loaded)` | History loaded | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/business/srs/srs-review.md` |
@@ -279,6 +282,9 @@ The agent must not start from the HTML mock alone.
 | `23i · Deck import (failed)` | Import failed | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/error-contract.md` |
 
 ### 6.15 Library search variants
+
+V1 status: full global search is Future Proposal. V1 may reuse visual patterns for inline/scope-local search only.
+
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
@@ -325,6 +331,9 @@ The agent must not start from the HTML mock alone.
 | `27f · Study result (tough empty)` | Empty/tough cards fallback | `docs/wireframes/18-study-result.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` |
 
 ### 6.19 Onboarding variants
+
+V1 status: full onboarding is Future Proposal. V1 implements only zero-content empty-state CTAs; do not create an onboarding route or feature folder from these variants.
+
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |

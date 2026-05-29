@@ -1,6 +1,6 @@
 ---
-last_updated: 2026-05-26
-status: contract
+last_updated: 2026-05-29
+status: V1 inline search guidance; GlobalSearchUseCase is Future Proposal
 ---
 
 # Search Use Cases Contract
@@ -8,9 +8,13 @@ status: contract
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
 
-Recursive-by-default global search across folders, decks, flashcards, tags.
+V1 uses inline/scope-local search. The dedicated recursive global search use cases below are **Future Proposal** and must not be implemented in V1 unless promoted by `docs/checklist/v1-implementation-scope-2026-05-29.md`.
 
-## GlobalSearchUseCase
+## V1 inline search
+
+V1 search improvements should reuse existing screen-level providers/widgets and keep search inside the current screen scope. Do not add recent-search persistence or a dedicated global route.
+
+## Future Proposal: GlobalSearchUseCase
 
 ```dart
 Future<Either<Failure, SearchResults>> call({
@@ -33,7 +37,7 @@ Future<Either<Failure, SearchResults>> call({
 
 **Test refs:** SR1-SR10.
 
-## GetRecentSearchesUseCase
+## Future Proposal: GetRecentSearchesUseCase
 
 ```dart
 Future<List<String>> call();
@@ -41,7 +45,7 @@ Future<List<String>> call();
 
 Read SharedPreferences `search.recent` (capped 5).
 
-## SaveRecentSearchUseCase
+## Future Proposal: SaveRecentSearchUseCase
 
 ```dart
 Future<void> call(String query);
@@ -52,19 +56,26 @@ Future<void> call(String query);
 - Insert at top. Dedup case-insensitive. Trim list to 5.
 - Persist to SharedPreferences.
 
-## RemoveRecentSearchUseCase
+## Future Proposal: RemoveRecentSearchUseCase
 
 ```dart
 Future<void> call(String query);
 ```
 
-## GetPopularTagsUseCase
+## Future Proposal: GetPopularTagsUseCase
 
 ```dart
 Future<Either<Failure, List<TagWithCount>>> call({int limit = 5});
 ```
 
 Top tags by usage. Cached in screen state.
+
+## V1 forbidden patterns
+
+- ❌ Do not implement `GlobalSearchUseCase` in V1.
+- ❌ Do not add `/library/search` in V1.
+- ❌ Do not persist `search.recent` in V1.
+- ❌ Do not add grouped cross-scope result UI in V1.
 
 ## Forbidden patterns
 

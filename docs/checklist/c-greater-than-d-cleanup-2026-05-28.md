@@ -74,7 +74,7 @@ Trong lúc review, phát hiện một số drift cấp meta (root cause) — bá
 
 ### §3.1 `CLAUDE.md` trigger map tham chiếu file không tồn tại
 
-CLAUDE.md (root) và `docs/CLAUDE.md` đều có dòng:
+Project-root `CLAUDE.md` có dòng:
 
 ```
 | `lib/domain/srs/box_intervals.dart` | `docs/business/srs/srs-review.md` (interval table) |

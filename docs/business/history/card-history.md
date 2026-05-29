@@ -1,16 +1,24 @@
 ---
-last_updated: 2026-05-26
-applies_to: per-card study history view, attempt timeline
+last_updated: 2026-05-29
+applies_to: future per-card study history view, attempt timeline
+status: Future Proposal — Migration Required
+related_decision: docs/checklist/product-decisions-pending-2026-05-29.md
 ---
 
 # Card History
 
-> **Status: Target — Migration Required.** This spec depends on the following columns from `docs/database/schema-contract.md` §Pending schema changes:
+> **Status: Future Proposal — Migration Required.** This is not V1 implementation scope. Do not build the screen, route, use cases, repository queries, or entry links until the feature is promoted in `docs/checklist/v1-implementation-scope-2026-05-29.md`.
+>
+> **Migration dependency.** This spec depends on the following columns from `docs/database/schema-contract.md` §Pending schema changes:
 > - `flashcard_progress.last_reset_at INTEGER NULL`
 > - `study_attempts.box_before INTEGER NOT NULL DEFAULT 0`
 > - `study_attempts.box_after INTEGER NOT NULL DEFAULT 0`
 >
 > Migration MUST run before card-history view, reset progress, or any attempt insert that needs box transition. Backfill: pre-migration `study_attempts` rows get `box_before=0`, `box_after=0`; UI renders `0` as `—`. Blocks: card history screen, reset progress (single + bulk), study result box-change aggregates, progress screen box-distribution chart.
+
+## V1 decision
+
+Card History is downgraded to Future Proposal for V1. The data model is still documented so the future implementation remains clear, but V1 must not expose a live `View history` action.
 
 ## Purpose
 

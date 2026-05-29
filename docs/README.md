@@ -1,11 +1,45 @@
-# MemoX
+# MemoX Documentation
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
+This folder is the **`docs/` subtree** of MemoX, a local-first Flutter flashcard learning app.
 
-MemoX is a local-first Flutter flashcard learning app.
+Project-root files such as `CLAUDE.md` and `AGENTS.md` intentionally live outside this folder.
 
-The app helps users organize learning content into folders, decks, and flashcards, then study and review cards through persisted learning sessions and spaced repetition.
+## Before implementation
+
+Read these in order:
+
+1. `CLAUDE.md` at project root.
+2. `AGENTS.md` at project root.
+3. `docs/MANIFEST.md`.
+4. `docs/checklist/v1-implementation-scope-2026-05-29.md`.
+5. The matching row in `docs/checklist/screen-function-task-matrix.md`.
+6. Related business, wireframe, database, architecture, state, UI/UX and contract docs.
+7. Related source files.
+
+Do not implement from assumption when repo contracts already exist.
+
+## Current V1 scope guard
+
+The authoritative V1 scope guard is:
+
+```text
+docs/checklist/v1-implementation-scope-2026-05-29.md
+```
+
+Important V1 decisions:
+
+| Feature | V1 status |
+| --- | --- |
+| Flashcard history screen | Future Proposal |
+| Global search screen | Future Proposal |
+| Full onboarding flow | Future Proposal |
+| Inline/scope-local search patterns | V1 guideline |
+| Strong zero-content empty states + restore CTA | V1 scope |
+| Empty-scope matrix Tier 1 | V1 P0 |
+| Bury / suspend | V1 after migration |
+| Tag domain cleanup | V1/P1 |
 
 ## Stack
 
@@ -20,26 +54,12 @@ The app helps users organize learning content into folders, decks, and flashcard
 - MemoX Design System
 - code-verification-guard
 
-## Main areas
-
-- Dashboard
-- Library
-- Folder management
-- Deck management
-- Flashcard management
-- Study session
-- SRS review
-- Progress
-- Settings
-- Audio/speech settings
-- Optional account/backup
-
 ## Documentation map
 
 | Area | Document |
 | --- | --- |
-| Agent entry | `CLAUDE.md` |
-| Agent contract | `AGENTS.md` |
+| Docs manifest | `docs/MANIFEST.md` |
+| V1 scope guard | `docs/checklist/v1-implementation-scope-2026-05-29.md` |
 | Business index | `docs/business/index.md` |
 | Glossary | `docs/business/glossary.md` |
 | Product overview | `docs/business/system/overview.md` |
@@ -53,10 +73,10 @@ The app helps users organize learning content into folders, decks, and flashcard
 | Resume session | `docs/business/resume/resume-session.md` |
 | Tag system | `docs/business/tags/tag-system.md` |
 | Bulk operations | `docs/business/bulk/bulk-operations.md` |
-| Global search | `docs/business/search/global-search.md` |
+| Inline/global search | `docs/business/search/global-search.md` |
 | Card history | `docs/business/history/card-history.md` |
 | Daily engagement | `docs/business/engagement/dashboard-engagement.md` |
-| Export (CSV/Excel) | `docs/business/export/export.md` |
+| Export | `docs/business/export/export.md` |
 | TTS / audio | `docs/business/tts/tts-settings.md` |
 | Account + Drive sync | `docs/business/account-sync/account-sync.md` |
 | Database schema | `docs/database/schema-contract.md` |
@@ -69,18 +89,11 @@ The app helps users organize learning content into folders, decks, and flashcard
 | Decision table | `docs/decision-tables/memox-core-decision-table.md` |
 | Implementation checklist | `docs/checklist/implementation-checklist.md` |
 | Recursive review | `docs/checklist/recursive-agent-review.md` |
+| Acceptance criteria | `docs/acceptance-criteria/README.md` |
 
 ## Agent instruction
 
-Before implementation, read in order:
-
-1. `CLAUDE.md` (entry point)
-2. `AGENTS.md` (agent contract)
-3. `docs/business/index.md` and `docs/business/glossary.md`
-4. Related docs under `docs/business/**`
-5. Related docs under `docs/database/**`
-6. Related architecture/UI/state docs
-7. Related decision table
-8. Related source files
-
-Do not implement from assumption when repo contracts already exist.
+- Do not create routes for Future Proposal screens.
+- Do not wire dead links to Future Proposal screens.
+- Do not implement migration-required behavior unless the migration is explicitly part of the task.
+- Do not add product behavior without updating business docs, wireframes, matrix, decision table and tests.

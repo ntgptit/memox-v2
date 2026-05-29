@@ -1,0 +1,429 @@
+---
+last_updated: 2026-05-29
+author: technical lead
+status: living tracker (update each PR)
+purpose: Master coordination table for AI coding agents — one row per (screen × function). Use this to scope work, avoid duplicate effort, and ensure each task touches the right code + doc + wireframe.
+---
+
+# MemoX — Screen × Function task matrix
+
+This matrix is a **navigator**, not the source of truth. Business docs, wireframes, architecture contracts, use case contracts, and repository contracts remain authoritative. If this matrix disagrees with those docs, correct the matrix to point to the right source docs — do not silently change product behavior here.
+
+## Status values
+
+| Value | Meaning |
+| --- | --- |
+| `Current` | Implemented in code AND aligned with the referenced docs AND covered by tests (or with an explicit rationale why tests are not applicable). |
+| `Partial` | Code exists but is incomplete, placeholder, missing edge cases, or not sufficiently test-verified. |
+| `Target` | Specified as target behavior in docs but the product decision is not approved yet or the design is not ready for implementation. Do not implement. |
+| `Future` | Explicitly downgraded out of V1. Keep docs for future planning, but do not implement until promoted by a later docs PR. |
+| `NotStarted` | Approved, unblocked work that has not been implemented yet. Safe to pick up. |
+| `Blocked` | Cannot be implemented until a listed dependency (schema migration, missing enum, missing repository capability, pending product decision, upstream epic) is resolved. The `Notes` column MUST name the blocker. |
+
+Do not use emoji as status values. Do not embed status markers inside the `Function` column.
+
+## How to use
+
+- Pick **exactly one row** per implementation task. If a feature naturally spans multiple rows, ship them as separate PRs.
+- Before coding, read the row's `Doc refs` and `Wireframe`. These are authoritative; the matrix is not.
+- Confirm the row's `Status`:
+  - `Current` → do not re-implement; pick a different row or extend existing tests.
+  - `Partial` → scope the gap explicitly before coding; do not silently widen.
+  - `Target` → DO NOT implement until the product decision is approved. Promote to `NotStarted` in a docs PR first.
+  - `Future` → DO NOT implement in V1. Promotion requires updating the V1 scope guard, matrix, parity audit and related docs.
+  - `NotStarted` → safe to pick up; verify nothing else in the matrix already covers the same code path.
+  - `Blocked` → DO NOT implement until the `Notes` blocker is resolved. Picking up a `Blocked` row without resolving the blocker breaks downstream work.
+- If the code disagrees with the referenced docs while you are reading them, stop and report drift (per Doc-code parity rule in ../../CLAUDE.md §"Drift detection") before coding.
+- For any screen row, before coding, also read the matching **mock variants** listed under each screen section. The mapping doc `docs/system-design/mock-design-doc-mapping.md` enumerates the mobile mock variants per screen group and defines the conflict-resolution rule between mock visuals, wireframes, business specs, and contracts. The mock is a **visual reference only** — do not copy CSS, JSX, demo data, or mock-only states into Flutter code (see §12 of the mapping doc).
+- Cross-check the **parity audit** before trusting a row's `Status`. `docs/checklist/wireframe-code-parity-assessment.md` (Revision 3) holds the empirical evidence base — §1 per-screen rows (#01–#25), §2 routes-vs-navigation, §3 cross-cutting drift items (bury/suspend §3.1, streak/engagement §3.2, tag domain §3.3, card history §3.4, global search §3.5, onboarding §3.6, empty-scope matrix §3.7, strict matcher / hint taint §3.10, "doc target, code inline" anti-pattern §3.13). Each screen section in this matrix points to the matching parity row. If parity audit and this matrix disagree, the parity audit usually wins — re-verify status in the same PR.
+- Update this matrix in the **same PR** that changes implementation status. Stale status here misleads future agents.
+- This matrix does not replace business docs, wireframes, contracts, the decision table, the mock-design mapping, or the parity audit. It indexes them.
+
+Path convention for cross-references follows ../../CLAUDE.md §"Path convention for cross-references": repo-root absolute, no leading slash.
+
+## Testing expectation
+
+- Every `Current` row should have related tests in `test/` or an explicit rationale in `Notes` for why test coverage is not applicable (for example: foundation tokens, generated files).
+- Every row that changes user-visible behavior should add or update tests in the relevant layer (domain use case, repository, or presentation widget).
+- Reference the matching decision-table row IDs (`S*`, `D*`, `F*`, `SY*`) in test descriptions when applicable so tests cross-link to `docs/decision-tables/memox-core-decision-table.md`.
+- Missing or skipped tests for behavior that already ships make the row `Partial`, never `Current`.
+- A row may not be promoted from `Partial` to `Current` solely because the screen renders visually. Business behavior and tests must both align.
+
+## Status governance
+
+- `Current` requires implementation + doc alignment + test alignment, verified in the same PR that flips the status.
+- `Partial` is the correct status whenever code exists but any of the above is incomplete; do not hide partial work as `Current`.
+- `Target` means design/spec exists but implementation is not yet approved. Promotion to `NotStarted` requires a docs PR that records the product decision.
+- `Future` means the feature was explicitly downgraded out of V1. Promotion to `NotStarted` requires updating `docs/checklist/v1-implementation-scope-2026-05-29.md` and the related docs.
+- `NotStarted` means implementation is approved and unblocked.
+- `Blocked` means implementation must not proceed until the `Notes` blocker is resolved. The blocker SHOULD reference a concrete artifact (schema field name, enum value, epic ID, decision memo).
+- Status changes happen in the same PR as the corresponding code or doc change. Drift between status here and reality is treated as a bug.
+- Never mark a row `Current` solely because a screen renders visually.
+- Status assignments here SHOULD be reconcilable with the parity audit (`docs/checklist/wireframe-code-parity-assessment.md` §1 + §3). A row marked `Current` while the parity audit shows the screen as major-drift (D>C) or missing-in-code, or while a cross-cutting §3 item is still open against that screen, is a defect — either upgrade the parity audit in the same PR or downgrade the status here.
+
+## Cross-screen / foundational
+
+Mock refs: no mock variants — these are foundation / cross-cutting concerns. Visual tokens live in `docs/system-design/MemoX Design System/README.md` and `docs/system-design/MemoX Design System/colors_and_type.css`; conflict resolution policy in `docs/system-design/mock-design-doc-mapping.md` §3.
+
+Parity audit: routes-vs-navigation tracked in `docs/checklist/wireframe-code-parity-assessment.md` §2 (all top-level routes aligned). Cross-cutting drift items §3.1 (bury/suspend P0), §3.2 (streak/engagement P1), §3.3 (tag domain P1 architecture), §3.4 (card history Future), §3.5 (global search Future), §3.6 (thin onboarding V1 / full onboarding Future), §3.7 (empty-scope matrix P0), §3.10 (strict matcher/hint taint P1), §3.13 ("doc target, code inline" anti-pattern P2 backlog) explain most `Blocked` / `Partial` / `Target` rows in this matrix.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | _foundation_ | Error / Failure taxonomy | `AppFailure`, `AppException`, `MxActionErrors` | `lib/core/errors/**`, `lib/presentation/shared/viewmodels/mx_action_errors.dart` | `docs/contracts/error-contract.md` | — | Foundation; covered by use-case-level tests. |
+| Current | _foundation_ | Type catalog (enums, value objects) | `StudyEntryType`, `StudyType`, `AttemptGrade`, `ContentQuery`, `ContentSortMode` | `lib/domain/enums/**`, `lib/domain/value_objects/**` | `docs/contracts/types-catalog.md` | — | Foundation; coverage via consumer tests. |
+| Current | _foundation_ | Code style / naming | Repo-wide style contract | Repo-wide (no single owner) | `docs/contracts/code-style.md` | — | Enforced by `flutter analyze` + reviewer judgment; no dedicated tests. |
+| Current | _foundation_ | Route registry | `RouteNames`, `RoutePaths`, `RouteDefaults`, `AppNavigation` | `lib/app/router/route_names.dart`, `lib/app/router/app_navigation.dart`, `lib/app/router/app_router.dart` | `docs/business/navigation/navigation-flow.md` | — | Covered by router/navigation tests under `test/app/router/`. |
+| Current | _foundation_ | Theme tokens + design system | `AppSpacing`, `AppRadius`, `AppIconSizes`, color scheme | `lib/core/theme/**` | `docs/ui-ux/ui-ux-contract.md`, `docs/system-design/MemoX Design System/README.md` | — | Foundation; coverage via consumer widget tests. |
+| Current | _foundation_ | Localization keys | EN/VI ARB sources + generated delegates | `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/ui-ux/l10n-copy-contract.md` | — | Generated `lib/l10n/generated/**` MUST NOT be hand-edited (per ../../CLAUDE.md hard rules). |
+| Current | _foundation_ | Decision-table rows | `S*`, `D*`, `F*`, `SY*` row IDs | `docs/decision-tables/memox-core-decision-table.md` | self | — | Tests cite row IDs in description strings. |
+
+## 01. Dashboard (`/home`)
+
+Mock refs: variants `25a`–`25h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.16 + §5.
+
+Parity audit: row #01 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — major drift (doc beyond code), P1. `MxStreakCard` exists but has zero call-sites; multi-resume UI not verified. Cross-cutting: §3.2 streak/engagement (blocks streak chip + daily goal); §3.15.2 item 3 (multi-resume mock variant `25h` not verified rendered).
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Dashboard | Render landing populated state | `DashboardNotifier`, `DashboardScreen` | `lib/presentation/features/dashboard/screens/dashboard_screen.dart`, `lib/presentation/features/dashboard/**` | `docs/business/engagement/dashboard-engagement.md` | `docs/wireframes/01-dashboard.md` | Confirm each subsection is covered by spec before flipping to `Current`. |
+| Target | Dashboard | Render onboarding (zero-content) state | `DashboardOnboardingSection` (decomposition TBD) | TBD — decomposition task required before implementation | `docs/business/engagement/dashboard-engagement.md`, `docs/business/system/overview.md` | `docs/wireframes/01-dashboard.md`, `docs/wireframes/23-onboarding.md` | Target spec only. Do not implement until product decision for onboarding is approved. |
+| Partial | Dashboard | Resume card | `ResumeStudySessionUseCase.findCandidate` consumed by dashboard | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/dashboard/**` | `docs/business/resume/resume-session.md`, `docs/contracts/usecase-contracts/study.md` §FindResumableSessionUseCase | `docs/wireframes/01-dashboard.md` | Use case exists and is tested; dashboard wiring/visibility rules need verification before `Current`. |
+| Current | Dashboard | Today's review CTA | Push `RouteNames.studyEntry` with `entryType=today` | `lib/app/router/app_navigation.dart`, `lib/presentation/features/dashboard/**` | `docs/business/study/study-flow.md`, `docs/business/engagement/dashboard-engagement.md` | `docs/wireframes/01-dashboard.md`, `docs/wireframes/12-study-entry-gate.md` | Navigation covered by router tests. |
+| NotStarted | Dashboard | Start new learning (scope picker) | Scope picker bottom-sheet → entry gate | `lib/presentation/features/dashboard/**`, `lib/presentation/shared/dialogs/mx_bottom_sheet.dart` (host), scope picker body TBD under `lib/presentation/shared/dialogs/**` | `docs/business/study/study-flow.md` | `docs/wireframes/01-dashboard.md`, `docs/wireframes/25-shared-bottom-sheets.md` §scope-picker | Picker body is `TBD — decomposition task required before implementation`. |
+| Target | Dashboard | Streak chip + history | `GetStreakUseCase`, streak history sheet | TBD — decomposition task required before implementation; will live under `lib/domain/usecases/engagement_*` and `lib/presentation/features/dashboard/**` | `docs/business/engagement/dashboard-engagement.md`, `docs/contracts/usecase-contracts/engagement.md` | `docs/wireframes/01-dashboard.md`, `docs/wireframes/25-shared-bottom-sheets.md` §streak-history | Target spec only. Streak engagement contract not yet wired; do not implement until product decision is approved. |
+| Target | Dashboard | Daily goal ring | `GetDailyGoalUseCase`, `SetDailyGoalUseCase`, goal slider sheet | TBD — decomposition task required before implementation | `docs/business/engagement/dashboard-engagement.md`, `docs/contracts/usecase-contracts/engagement.md` | `docs/wireframes/01-dashboard.md`, `docs/wireframes/25-shared-bottom-sheets.md` §daily-goal | Target spec only. Do not implement until product decision is approved. |
+| NotStarted | Dashboard | Recent decks (top 3) | `GetRecentDecksUseCase` consumed by dashboard | `lib/domain/usecases/**` (deck use case path TBD), `lib/presentation/features/dashboard/**` | `docs/business/engagement/dashboard-engagement.md`, `docs/contracts/usecase-contracts/deck.md` | `docs/wireframes/01-dashboard.md` | Use case not yet present; create following existing deck use case naming convention. |
+| NotStarted | Dashboard | Discard paused session dialog | `MxConfirmationDialog` composition for discard flow | `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/presentation/features/dashboard/**` | `docs/business/resume/resume-session.md` | `docs/wireframes/24-shared-dialogs.md` §discard-session | Reuse existing confirmation dialog primitive; no new dialog primitive required. |
+| NotStarted | Dashboard | Paused sessions list sheet | Bottom-sheet listing resumable sessions | `lib/presentation/shared/dialogs/mx_bottom_sheet.dart` (host), sheet body TBD under `lib/presentation/features/dashboard/**` or `lib/presentation/shared/dialogs/**` | `docs/business/resume/resume-session.md`, `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/25-shared-bottom-sheets.md` §paused-sessions | Sheet body widget is `TBD — decomposition task required before implementation`. |
+
+## 02. Library (`/library`)
+
+Mock refs: variants `17a`–`17f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.8.
+
+Parity audit: row #02 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code). Inline search field in app bar verified; recursive folder count in `WatchLibraryOverviewUseCase` pending verification. P2.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Library | List top-level folders + root decks | `LibraryOverviewNotifier`, `library_overview_screen.dart` | `lib/presentation/features/folders/screens/library_overview_screen.dart`, `lib/presentation/features/folders/**` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` | `docs/wireframes/02-library.md` | Confirm sort/empty/responsive states are covered before `Current`. |
+| Partial | Library | Empty state | Empty-state section + create-first CTA | `lib/presentation/features/folders/screens/library_overview_screen.dart`, `lib/presentation/features/folders/**` | `docs/business/folder/folder-management.md` | `docs/wireframes/02-library.md` | Verify behavior matches wireframe; promote to `Current` only with widget tests. |
+| Partial | Library | Sort overflow | `ContentSortMode` switcher exposed via overflow | `lib/presentation/features/folders/**`, `lib/presentation/shared/widgets/mx_sort_menu_chip.dart`, `lib/presentation/shared/widgets/mx_search_sort_toolbar.dart` | `docs/contracts/types-catalog.md`, `docs/business/folder/folder-management.md` | `docs/wireframes/02-library.md` | Confirm parity with wireframe sort menu before `Current`. |
+| Partial | Library | Create folder | `CreateFolderUseCase` invoked via `MxNameDialog` | `lib/domain/usecases/folder_usecases.dart`, `lib/presentation/shared/dialogs/mx_name_dialog.dart`, `lib/presentation/features/folders/**` | `docs/business/folder/folder-management.md`, `docs/contracts/usecase-contracts/folder.md` | `docs/wireframes/02-library.md`, `docs/wireframes/24-shared-dialogs.md` | Verify validation messages match `docs/ui-ux/l10n-copy-contract.md`. |
+| Partial | Library | Create deck | `CreateDeckUseCase` invoked via `MxNameDialog` | `lib/domain/usecases/deck_usecases.dart`, `lib/presentation/shared/dialogs/mx_name_dialog.dart`, `lib/presentation/features/folders/**` | `docs/business/deck/deck-management.md`, `docs/contracts/usecase-contracts/deck.md` | `docs/wireframes/02-library.md`, `docs/wireframes/24-shared-dialogs.md` | Verify validation messages match `docs/ui-ux/l10n-copy-contract.md`. |
+| Current | Library | Search entry | Navigate to library search route | `lib/app/router/app_navigation.dart`, `lib/presentation/features/folders/screens/library_overview_screen.dart` | `docs/business/search/global-search.md` | `docs/wireframes/02-library.md`, `docs/wireframes/11-library-search.md` | Navigation only; target screen is `Target` (see §11). |
+
+## 03. Progress (`/progress`)
+
+Mock refs: variants `26a`–`26g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.17. Legacy variant `11 · Stats` is a deprecated visual reference (see §6.2 of the mapping doc); do not implement against it.
+
+Parity audit: row #03 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — major drift (doc beyond code), P1. Streak history widget is tone-only (color hint) without data source; box-distribution widget missing. Cross-cutting: §3.2 streak/engagement; §3.4 card history (history list source).
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Progress | Active sessions list | `ResumeStudySessionUseCase.listActiveSessions` | `lib/presentation/features/progress/screens/progress_screen.dart`, `lib/domain/study/usecases/study_usecases.dart` | `docs/business/resume/resume-session.md`, `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/03-progress.md` | Covered by `test/presentation/progress_screen_test.dart` + progress notifier tests. |
+| Target | Progress | Aggregate metrics (cards/day, accuracy) | `GetProgressMetricsUseCase` | TBD — decomposition task required before implementation; will live under `lib/domain/usecases/` | `docs/business/engagement/dashboard-engagement.md` | `docs/wireframes/03-progress.md` | Target spec only. Do not implement until product decision is approved. |
+| Current | Progress | Discard session row | `MxConfirmationDialog` triggering `CancelStudySessionUseCase` | `lib/presentation/features/progress/screens/progress_screen.dart`, `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/domain/study/usecases/study_usecases.dart` | `docs/business/resume/resume-session.md` | `docs/wireframes/03-progress.md`, `docs/wireframes/24-shared-dialogs.md` | Covered by progress screen + session notifier tests. |
+
+## 04. Settings hub (`/settings`)
+
+Mock refs: variants `12a`–`12e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.3.
+
+Parity audit: row #04 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned (`✅ =`). 4 sub-routes match `RouteNames`; only minor doc gap on tag-mgmt hierarchy under Learning.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Settings hub | Navigation list to sub-screens | Static rows pushing named routes | `lib/presentation/features/settings/screens/settings_screen.dart`, `lib/app/router/app_navigation.dart` | `docs/business/system/overview.md` | `docs/wireframes/04-settings-hub.md` | Covered by router tests. |
+| Partial | Settings hub | Account status row | `AccountStateNotifier` summary row | `lib/presentation/features/settings/screens/settings_screen.dart`, `lib/presentation/features/settings/**` | `docs/business/account-sync/account-sync.md` | `docs/wireframes/04-settings-hub.md`, `docs/wireframes/19-settings-account.md` | Depends on Account sub-screen state (see §19). |
+
+## 05. Folder detail (`/library/folder/:id`)
+
+Mock refs: variants `18a`–`18h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.9.
+
+Parity audit: row #05 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code). Components doc up to date; lock-mode UI surface (toast/dialog mapping) and `parentModeLocked` failure UX not yet traced. P2.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Folder detail | Render `subfolders` / `decks` / `unlocked` mode | `FolderDetailNotifier` mode resolution | `lib/presentation/features/folders/screens/folder_detail_screen.dart`, `lib/presentation/features/folders/**` | `docs/business/folder/folder-management.md` | `docs/wireframes/05-folder-detail.md` | Verify mode transitions match wireframe before `Current`. |
+| Partial | Folder detail | Create child folder | `CreateFolderUseCase(parentId)` via `MxNameDialog` | `lib/domain/usecases/folder_usecases.dart`, `lib/presentation/shared/dialogs/mx_name_dialog.dart`, `lib/presentation/features/folders/screens/folder_detail_screen.dart` | `docs/business/folder/folder-management.md`, `docs/contracts/usecase-contracts/folder.md` | `docs/wireframes/05-folder-detail.md`, `docs/wireframes/24-shared-dialogs.md` | Verify dialog copy parity with wireframe. |
+| Partial | Folder detail | Create deck | `CreateDeckUseCase(folderId)` via `MxNameDialog` | `lib/domain/usecases/deck_usecases.dart`, `lib/presentation/shared/dialogs/mx_name_dialog.dart`, `lib/presentation/features/folders/screens/folder_detail_screen.dart` | `docs/business/deck/deck-management.md`, `docs/contracts/usecase-contracts/deck.md` | `docs/wireframes/05-folder-detail.md`, `docs/wireframes/24-shared-dialogs.md` | Verify dialog copy parity with wireframe. |
+| Partial | Folder detail | Rename folder | `RenameFolderUseCase` via `MxNameDialog` | `lib/domain/usecases/folder_usecases.dart`, `lib/presentation/shared/dialogs/mx_name_dialog.dart`, `lib/presentation/features/folders/screens/folder_detail_screen.dart` | `docs/contracts/usecase-contracts/folder.md` | `docs/wireframes/24-shared-dialogs.md` | Verify name validation matches contract. |
+| NotStarted | Folder detail | Move folder/deck | `MoveFolderUseCase`, `MoveDeckUseCase` via `MxDestinationPickerSheet` | `lib/domain/usecases/folder_usecases.dart`, `lib/domain/usecases/deck_usecases.dart`, `lib/presentation/shared/dialogs/mx_destination_picker_sheet.dart`, `lib/presentation/features/folders/screens/folder_detail_screen.dart` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/usecase-contracts/bulk.md` | `docs/wireframes/25-shared-bottom-sheets.md` §move-picker | Confirm whether move is owned by bulk contract or folder/deck contract before opening the task. |
+| Partial | Folder detail | Delete folder/deck (cascade) | `DeleteFolderUseCase`, `DeleteDeckUseCase` via `MxConfirmationDialog` | `lib/domain/usecases/folder_usecases.dart`, `lib/domain/usecases/deck_usecases.dart`, `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/presentation/features/folders/screens/folder_detail_screen.dart` | `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/usecase-contracts/deck.md` | `docs/wireframes/24-shared-dialogs.md` | Verify cascade rules and confirmation copy. |
+| Current | Folder detail | Start study (folder scope) | Push `RouteNames.studyEntry` with `entryType=folder` | `lib/app/router/app_navigation.dart`, `lib/presentation/features/folders/screens/folder_detail_screen.dart` | `docs/business/study/study-flow.md` | `docs/wireframes/12-study-entry-gate.md` | Navigation covered; entry-gate folder-scope empty states tracked under §12. |
+
+## 06. Flashcard list (`/library/deck/:deckId/flashcards`)
+
+Mock refs: variants `19a`–`19h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.10.
+
+Parity audit: row #06 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned at §Components scope (`✅ =` partial). 13-row §Components mapping 1-1 with `flashcard_*_section.dart`. §Rules, §States, §Forbidden not yet re-verified aspect-by-aspect; treat full-screen `Current` claims here as scoped.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Flashcard list | Normal mode list + filter | `FlashcardListNotifier`, `ContentQuery` | `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart`, `lib/presentation/features/flashcards/**` | `docs/business/flashcard/flashcard-management.md` | `docs/wireframes/06-flashcard-list.md` | Confirm sort + filter parity with wireframe. |
+| Current | Flashcard list | Empty state (no flashcards) | `flashcard_empty_state_section.dart` + Add CTA | `lib/presentation/features/flashcards/widgets/flashcard_empty_state_section.dart`, `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart` | `docs/business/flashcard/flashcard-management.md` | `docs/wireframes/06-flashcard-list.md` | CTA wiring exercised by flashcards widget tests. |
+| Partial | Flashcard list | Filtered empty state | Dedicated filtered-empty state | `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart`, `lib/presentation/features/flashcards/**` | `docs/business/flashcard/flashcard-management.md` | `docs/wireframes/06-flashcard-list.md` | Verify copy and reset-filter affordance match wireframe. |
+| Partial | Flashcard list | Selection mode + bulk actions | `SelectionController`, `BulkDeleteFlashcardsUseCase`, `BulkMoveFlashcardsUseCase`, `BulkTagFlashcardsUseCase` | `lib/presentation/features/flashcards/**`, `lib/domain/usecases/**` (bulk use case paths TBD), `lib/presentation/shared/widgets/mx_bulk_action_bar.dart` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/usecase-contracts/bulk.md` | `docs/wireframes/06-flashcard-list.md` | Confirm which bulk use cases already exist before opening. |
+| Current | Flashcard list | Add flashcard CTA | `AppNavigation.pushFlashcardCreate(deckId)` | `lib/app/router/app_navigation.dart`, `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart` | `docs/business/flashcard/flashcard-management.md` | `docs/wireframes/07-flashcard-create.md` | Covered by router/widget tests. |
+| Partial | Flashcard list | Import flashcards | Push `RouteNames.deckImport` | `lib/app/router/app_navigation.dart`, `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart` | `docs/business/flashcard/flashcard-management.md` (import section) | `docs/wireframes/10-deck-import.md` | Entry navigation works; import flow itself tracked under §10. |
+| NotStarted | Flashcard list | Reorder (manual sort) | `ReorderFlashcardsUseCase` driven by drag handle | `lib/domain/usecases/flashcard_usecases.dart`, `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart` | `docs/business/flashcard/flashcard-management.md`, `docs/contracts/usecase-contracts/flashcard.md` | `docs/wireframes/06-flashcard-list.md` | Confirm sort_order semantics in contract before implementation. |
+
+## 07. Flashcard create (`/library/deck/:deckId/flashcards/new`)
+
+Mock refs: variants `20a`–`20f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.11.
+
+Parity audit: row #07 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — D≠C (shared screen `flashcard_editor_screen.dart` covers both create and edit routes). Wireframes 07 and 08 spec dual files; code is single file. P2 doc-organization issue, not behavior drift.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Flashcard create | Front/back editor | `FlashcardEditorNotifier` (create mode) | `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart`, `lib/presentation/features/flashcards/**` | `docs/business/flashcard/flashcard-management.md` | `docs/wireframes/07-flashcard-create.md` | Verify validation parity with wireframe before `Current`. |
+| Partial | Flashcard create | Tag input | `EnsureTagUseCase` + tag input widget | `lib/domain/usecases/**` (tag use case path TBD), `lib/presentation/features/flashcards/widgets/**` | `docs/business/tags/tag-system.md`, `docs/contracts/usecase-contracts/tag.md` | `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/22-settings-tag-management.md` | Confirm whether shared tag input widget already exists. |
+| Partial | Flashcard create | Starting status picker | `FlashcardStartingStatus` selector | `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart`, `lib/presentation/features/flashcards/**` | `docs/business/flashcard/flashcard-management.md`, `docs/business/srs/srs-review.md` | `docs/wireframes/07-flashcard-create.md` | Confirm initial-box mapping in `lib/data/datasources/local/daos/flashcard_dao.dart`. |
+| Current | Flashcard create | Validation + submit | `CreateFlashcardUseCase` | `lib/domain/usecases/flashcard_usecases.dart`, `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart` | `docs/contracts/usecase-contracts/flashcard.md` | `docs/wireframes/07-flashcard-create.md` | Covered by domain use case tests. |
+| Target | Flashcard create | TTS preview | `PreviewTtsUseCase` from editor | `lib/domain/usecases/**` (TTS use case path TBD), `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart` | `docs/business/tts/tts-settings.md`, `docs/contracts/usecase-contracts/tts.md` | `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/21-settings-audio-speech.md` | Target spec only. Do not implement until product decision is approved. |
+
+## 08. Flashcard edit (`/library/deck/:deckId/flashcards/:flashcardId/edit`)
+
+Mock refs: variants `21a`–`21g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.12.
+
+Parity audit: row #08 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — D≠C (same `flashcard_editor_screen.dart` shared with row #07). `View history` is Future Proposal for V1 and must not be exposed as a live action. Bury/Suspend action remains blocked by §3.1. Cross-cutting: §3.1 bury/suspend, §3.4 card history Future.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Flashcard edit | Load existing card | `FlashcardEditorNotifier` (edit mode) | `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart`, `lib/data/datasources/local/daos/flashcard_dao.dart` | `docs/business/flashcard/flashcard-management.md` | `docs/wireframes/08-flashcard-edit.md` | Covered by editor notifier tests. |
+| Current | Flashcard edit | Update card | `UpdateFlashcardUseCase` | `lib/domain/usecases/flashcard_usecases.dart`, `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart` | `docs/contracts/usecase-contracts/flashcard.md` | `docs/wireframes/08-flashcard-edit.md` | Covered by domain use case tests. |
+| NotStarted | Flashcard edit | Reset SRS progress | `ResetFlashcardProgressUseCase` confirmed via `MxConfirmationDialog` | `lib/domain/usecases/flashcard_usecases.dart`, `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart` | `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/flashcard.md` | `docs/wireframes/08-flashcard-edit.md`, `docs/wireframes/24-shared-dialogs.md` | Confirm contract names the reset use case before implementing. |
+| Blocked | Flashcard edit | Bury / Suspend | `BuryFlashcardUseCase`, `SuspendFlashcardUseCase` | `lib/domain/usecases/flashcard_usecases.dart`, `lib/data/datasources/local/tables/flashcard_progress_table.dart`, `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart` | `docs/business/study-actions/bury-suspend.md`, `docs/contracts/usecase-contracts/study.md` §Bury/Suspend | `docs/wireframes/08-flashcard-edit.md`, `docs/wireframes/25-shared-bottom-sheets.md` §card-actions | Blocked by P0-2 bury/suspend schema migration: `flashcard_progress.buried_until` and `flashcard_progress.is_suspended` are not present in current schema. |
+| Future | Flashcard edit | View history | Future history sub-route from editor | — | `docs/business/history/card-history.md` | `docs/wireframes/09-flashcard-history.md` | Future Proposal for V1. Do not expose a live `View history` action until Card History is promoted and its migration is approved. |
+| Current | Flashcard edit | Delete card | `DeleteFlashcardUseCase` confirmed via `MxConfirmationDialog` | `lib/domain/usecases/flashcard_usecases.dart`, `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart` | `docs/contracts/usecase-contracts/flashcard.md` | `docs/wireframes/24-shared-dialogs.md` | Covered by flashcard use case + dialog tests. |
+
+## 09. Flashcard history
+
+Mock refs: variants `22a`–`22e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.13. Note: variant `22e` (partial history) hints at the migration dependency tracked in the `Blocked` status of these rows.
+
+Parity audit: row #09 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — missing in code (D>C, the parity audit's "MISSING" tier), P1. `grep "*history*" lib/` empty; `study_attempts_table` data exists but no `getAttemptsByFlashcard` query. Cross-cutting: §3.4 card history — schema present, domain empty, screen empty. Product decision resolved 2026-05-29: downgraded to Future Proposal for V1.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Future | History | Timeline of attempts + box transitions | `GetFlashcardHistoryUseCase` | — | `docs/business/history/card-history.md`, `docs/contracts/usecase-contracts/history.md` | `docs/wireframes/09-flashcard-history.md` | Future Proposal for V1. Also requires migration fields: `box_before`, `box_after`, `last_reset_at`. |
+| Future | History | Empty state | Dedicated empty section for history | — | `docs/business/history/card-history.md` | `docs/wireframes/09-flashcard-history.md` | Future Proposal for V1. Do not implement until history screen is promoted. |
+| Future | History | Filter (mode / outcome) | Local filter state over history rows | — | `docs/business/history/card-history.md` | `docs/wireframes/09-flashcard-history.md` | Future Proposal for V1. Do not implement until history screen is promoted. |
+
+## 10. Deck import
+
+Mock refs: variants `23a`–`23i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.14.
+
+Parity audit: row #10 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned at §Implementation refs scope (`✅ =` partial). CSV / structured-text via `flashcard_import_support.dart` + Excel via DIY `flashcard_excel_import_parser.dart` (single sheet, no formulas — known limitation). Decision-table rows for import not yet cross-verified. P3.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Deck import | Step 1: configure source | `DeckImportNotifier` source step | `lib/presentation/features/flashcards/screens/deck_import_screen.dart`, `lib/presentation/features/flashcards/**` | `docs/business/flashcard/flashcard-management.md` (import section) | `docs/wireframes/10-deck-import.md` | Verify supported source types against wireframe. |
+| Partial | Deck import | Step 2: preview parsed rows | Parsing pipeline + preview rendering | `lib/data/repositories/flashcard_import_*`, `lib/presentation/features/flashcards/screens/deck_import_screen.dart` | `docs/business/flashcard/flashcard-management.md` (import section) | `docs/wireframes/10-deck-import.md` | Confirm error-per-row rendering matches wireframe. |
+| Partial | Deck import | Step 3: commit + result | `ImportFlashcardsUseCase` | `lib/domain/usecases/flashcard_usecases.dart`, `lib/presentation/features/flashcards/screens/deck_import_screen.dart` | `docs/contracts/usecase-contracts/flashcard.md` | `docs/wireframes/10-deck-import.md` | Add result-step tests before promoting to `Current`. |
+| Partial | Deck import | Error handling per row | Typed `ImportFailure` surfaced in preview | `lib/data/repositories/flashcard_import_*`, `lib/core/errors/**` | `docs/contracts/error-contract.md` | `docs/wireframes/10-deck-import.md` | Confirm failure taxonomy alignment. |
+
+## 11. Library search
+
+Mock refs: variants `24a`–`24e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.15. The mapping doc now treats this group as a future visual reference; matrix status is `Future` because the full global search screen was downgraded out of V1.
+
+Parity audit: row #11 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — full global search is missing in code by design after the 2026-05-29 decision. V1 keeps inline/scope-local search only. Do not add `SearchScreen`, `GlobalSearchUseCase`, `/library/search`, or `search.recent` until the Future Proposal is promoted.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Future | Search | Full global search: initial state | Search screen build | — | `docs/business/search/global-search.md` | `docs/wireframes/11-library-search.md` | Future Proposal. V1 uses inline/scope-local search only; do not create a search feature folder or route. |
+| Future | Search | Full global search: query debounce + min length | Local state + `ContentQuery` rules | — | `docs/business/search/global-search.md` | `docs/wireframes/11-library-search.md` | Future Proposal for the full global route. Inline screens may reuse the V1 query rules from this doc. |
+| Future | Search | Full global search: grouped results | `GlobalSearchUseCase` | — | `docs/business/search/global-search.md`, `docs/contracts/usecase-contracts/search.md` | `docs/wireframes/11-library-search.md` | Future Proposal. Do not implement `GlobalSearchUseCase` in V1. |
+| Future | Search | Full global search: no-results state | Dedicated empty section | — | `docs/business/search/global-search.md` | `docs/wireframes/11-library-search.md` | Future Proposal for global screen. Existing inline screens may implement local no-results states. |
+
+## 12. Study entry gate (`/study/:entryType/:entryRefId`)
+
+Mock refs: **no direct mock variant exists** for the entry gate; the mapping doc flags this as a gap in §10 ("Study entry gate"). Implement from `docs/wireframes/12-study-entry-gate.md` + business specs. Empty-state variants on adjacent screens (`19b`, `25c`) may inform visual feel but are not authoritative.
+
+Parity audit: row #12 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — major drift (doc beyond code), **P0** (escalated in Rev 3). The deck_noCards row here is `Current` because vertical-slice landed after the parity audit; other 5 Tier 1 cases + tag + buried/suspended still match the audit's "10 doc cases vs 1 code exception" gap. Cross-cutting: §3.7 empty-scope matrix (P0 Blocker); sub-cases `allBuried` / `allSuspended` also block on §3.1 bury/suspend.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Entry gate | Resolve resume vs start | `ResumeStudySessionUseCase.findCandidate` + `StartStudySessionUseCase` | `lib/presentation/features/study/screens/study_entry_screen.dart`, `lib/domain/study/usecases/study_usecases.dart` | `docs/business/study/study-flow.md`, `docs/business/resume/resume-session.md`, `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/12-study-entry-gate.md` | Covered by `test/presentation/study_entry_screen_test.dart`. |
+| Current | Entry gate | Empty state: deck_noCards | `_rejectEmptyScope` + `EmptyScopeScreen` (deckNoCards arm) | `lib/domain/study/usecases/study_usecases.dart`, `lib/domain/study/entities/empty_scope_reason.dart`, `lib/presentation/features/study/widgets/empty_scope_screen.dart` | `docs/business/study/study-flow.md` §Empty scope matrix, `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md` | `docs/wireframes/12-study-entry-gate.md` §Variant — deck has zero cards | Decision row `S4`. Covered by `test/features/study/empty_scope_test.dart` + `test/presentation/study_entry_screen_test.dart` S4 onTap. |
+| NotStarted | Entry gate | Empty state: deck_noDueCards | Add `deckNoDueCards` reason + repo next-due lookup + screen arm | `lib/domain/study/entities/empty_scope_reason.dart`, `lib/domain/study/ports/study_repo.dart`, `lib/data/repositories/study_repo_impl.dart`, `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/empty_scope_screen.dart`, `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/business/study/study-flow.md` §Empty scope matrix, `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md` | `docs/wireframes/12-study-entry-gate.md` §Variant — no due cards (srs_review path) | Mechanical replication of `deck_noCards`. |
+| NotStarted | Entry gate | Empty state: folder_noCards | Add `folderNoCards` reason + folder count repo method + screen arm | `lib/domain/study/entities/empty_scope_reason.dart`, `lib/domain/study/ports/study_repo.dart`, `lib/data/repositories/study_repo_impl.dart`, `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/empty_scope_screen.dart`, `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/business/study/study-flow.md` §Empty scope matrix, `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md` | `docs/wireframes/12-study-entry-gate.md` §Variant — deck has zero cards (folder analog) | Mechanical replication; recursive folder traversal needed. |
+| NotStarted | Entry gate | Empty state: folder_noDueCards | Add `folderNoDueCards` reason + folder next-due lookup + screen arm | `lib/domain/study/entities/empty_scope_reason.dart`, `lib/domain/study/ports/study_repo.dart`, `lib/data/repositories/study_repo_impl.dart`, `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/empty_scope_screen.dart`, `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/business/study/study-flow.md` §Empty scope matrix, `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md` | `docs/wireframes/12-study-entry-gate.md` §Variant — no due cards (folder analog) | Mechanical replication. |
+| NotStarted | Entry gate | Empty state: today_allDone | Add `todayAllDone` reason + today-scope due lookup + screen arm | `lib/domain/study/entities/empty_scope_reason.dart`, `lib/domain/study/ports/study_repo.dart`, `lib/data/repositories/study_repo_impl.dart`, `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/empty_scope_screen.dart`, `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/business/study/study-flow.md` §Empty scope matrix, `docs/business/engagement/dashboard-engagement.md` (streak chip), `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md` | `docs/wireframes/12-study-entry-gate.md` §Variant — today, all done | Streak chip inset depends on engagement use cases that are `Target` in §01. |
+| NotStarted | Entry gate | Empty state: today_noContent | Add `todayNoContent` reason + `hasAnyFlashcard` repo method + screen arm | `lib/domain/study/entities/empty_scope_reason.dart`, `lib/domain/study/ports/study_repo.dart`, `lib/data/repositories/study_repo_impl.dart`, `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/empty_scope_screen.dart`, `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/business/study/study-flow.md` §Empty scope matrix, `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md` | `docs/wireframes/12-study-entry-gate.md` §Variant — today, no content at all | Mechanical replication. |
+| Blocked | Entry gate | Empty state: tag_noCards / tag_noDueCards | Add `tagNoCards`/`tagNoDueCards` reasons + tag-scope queries + screen arms | `lib/domain/enums/study_enums.dart`, `lib/domain/study/strategy/study_strategy.dart`, `lib/data/repositories/study_repo_impl.dart`, `lib/domain/study/entities/empty_scope_reason.dart`, `lib/presentation/features/study/widgets/empty_scope_screen.dart` | `docs/business/tags/tag-system.md`, `docs/business/study/study-flow.md` §Empty scope matrix | `docs/wireframes/12-study-entry-gate.md` §Variant — tag scope, no matching cards | Blocked until `StudyEntryType.tag` is added and repository queries support tag scope. |
+| Blocked | Entry gate | Empty state: allBuried / allSuspended | Add `allBuried`/`allSuspended` reasons + buried/suspended filters + screen arms | `lib/data/datasources/local/tables/flashcard_progress_table.dart`, `lib/domain/study/entities/empty_scope_reason.dart`, `lib/domain/study/strategy/study_strategy.dart`, `lib/data/repositories/study_repo_impl.dart`, `lib/presentation/features/study/widgets/empty_scope_screen.dart` | `docs/business/study-actions/bury-suspend.md`, `docs/business/study/study-flow.md` §Empty scope matrix | `docs/wireframes/12-study-entry-gate.md` §Variant — all buried / all suspended | Blocked by P0-2 bury/suspend schema migration: `flashcard_progress.buried_until` and `flashcard_progress.is_suspended` are not present in current schema. |
+
+## 13. Study session — Review mode
+
+Mock refs: variant `06 · Study · Review` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.1.
+
+Parity audit: row #13 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code). Swipe + scroll layers clean, but `grep onLongPress lib/presentation/features/study` = 0 handlers. Card-actions sheet missing. P1 long-press wiring depends on §3.1 bury/suspend foundation.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Session/Review | Prompt + answer render | `ReviewModePanel`, `ReviewModeSessionView` | `lib/presentation/features/study/widgets/study_session/review/**` | `docs/business/study/study-flow.md` | `docs/wireframes/13-study-session-review.md` | Covered by session widget tests. |
+| Current | Session/Review | Grade selection | `AnswerFlashcardUseCase` + `AttemptGrade` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/study_session/review/**` | `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/13-study-session-review.md` | Covered by study repository tests. |
+| Current | Session/Review | Batch "all correct" | `AnswerCurrentModeBatchUseCase` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/study_session/review/**` | `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/13-study-session-review.md` | Covered by repository batch tests. |
+| Partial | Session/Review | TTS auto-play | `PlayTtsUseCase` driven by mode | `lib/domain/usecases/**` (TTS use case path TBD), `lib/presentation/features/study/widgets/study_session/review/**` | `docs/business/tts/tts-settings.md` | `docs/wireframes/13-study-session-review.md`, `docs/wireframes/21-settings-audio-speech.md` | Verify auto-play hook is wired before `Current`. |
+
+## 14. Study session — Match mode
+
+Mock refs: variant `07 · Study · Match` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.1.
+
+Parity audit: row #14 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned (`✅ =`). `matchVisiblePairLimit = 5` + seeded deterministic shuffle verified; long-press still 0 handlers (tracked via row #13).
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Session/Match | Pair board | `MatchModePanel`, `MatchBoard` | `lib/presentation/features/study/widgets/study_session/match/**` | `docs/business/study/study-flow.md` | `docs/wireframes/14-study-session-match.md` | Covered by match widget tests. |
+| Current | Session/Match | Submit batch result | `AnswerCurrentMatchModeBatchUseCase` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/study_session/match/**` | `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/14-study-session-match.md` | Covered by repository tests. |
+| Partial | Session/Match | Animations / motion | `match_motion.dart` tokens | `lib/presentation/features/study/widgets/study_session/match/match_motion.dart`, `lib/core/theme/**` | `docs/ui-ux/ui-ux-contract.md` | `docs/wireframes/14-study-session-match.md` | Visual parity audit pending. |
+
+## 15. Study session — Guess mode
+
+Mock refs: variant `08 · Study · Guess` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.1.
+
+Parity audit: row #15 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned (`✅ =`). `_guessAnswerDistractorLimit = 4` + 5 options total verified; countdown constants (0.8s/1.5s) pending verification. Architecture note: distractor sampling lives inline in `study_session_notifier.dart` (presentation layer) — Clean Architecture violation candidate tracked in §3.13 item 4 (P3, candidate for "Extract inline study/SRS logic to domain modules" backlog epic).
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Session/Guess | Option tile render | `GuessModePanel`, `GuessOptionTile` | `lib/presentation/features/study/widgets/study_session/guess/**` | `docs/business/study/study-flow.md` | `docs/wireframes/15-study-session-guess.md` | Covered by guess widget tests. |
+| Current | Session/Guess | Distractor selection logic | `studyGuessAnswerOptions` | `lib/presentation/features/study/providers/study_session_notifier.dart` | `docs/business/study/study-flow.md` | `docs/wireframes/15-study-session-guess.md` | Covered by session notifier tests. |
+| Current | Session/Guess | Per-item grade batch | `AnswerCurrentModeItemGradesBatchUseCase` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/study_session/guess/**` | `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/15-study-session-guess.md` | Covered by repository tests. |
+
+## 16. Study session — Recall mode
+
+Mock refs: variants `09a · Study · Recall (hidden)` and `09b · Study · Recall (revealed)` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.1.
+
+Parity audit: row #16 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned (`✅ =`). Timer 20s + auto-reveal flow documented and implemented; long-press tracked via row #13. Mock gap: no `09c · timed out` variant — tracked via §3.15.2 item 2.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Session/Recall | Card flip + self-grade | `RecallModePanel`, `RecallModeSessionView` | `lib/presentation/features/study/widgets/study_session/recall/**` | `docs/business/study/study-flow.md` | `docs/wireframes/16-study-session-recall.md` | Covered by recall widget tests. |
+| Current | Session/Recall | Submit per-item grade | `AnswerCurrentModeItemGradesBatchUseCase` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/study_session/recall/**` | `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/16-study-session-recall.md` | Covered by repository tests. |
+
+## 17. Study session — Fill mode
+
+Mock refs: variants `10a · Study · Fill (input)` and `10b · Study · Fill (wrong)` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.1.
+
+Parity audit: row #17 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code), P1. UI Mark-correct + Hint button present. Architecture issue: strict matcher inlined in `fill_actions.dart` / viewmodel (presentation layer) — Hard Rule violation candidate. Hint taint (`perfect → recovered` demotion when hint used) behavior not verified. Cross-cutting: §3.10 strict matcher / hint taint; §3.13 items 6–7 (presentation-layer business logic).
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Session/Fill | Input + answer check | `FillModePanel`, `FillModeSessionView` | `lib/presentation/features/study/widgets/study_session/fill/**` | `docs/business/study/study-flow.md` | `docs/wireframes/17-study-session-fill.md` | Covered by fill widget tests. |
+| Current | Session/Fill | Validation (empty input) | `studyEmptyAnswerMessage` | `lib/presentation/features/study/widgets/study_session/fill/**`, `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/business/study/study-flow.md` | `docs/wireframes/17-study-session-fill.md` | Covered by fill widget tests. |
+| Current | Session/Fill | Submit grade | `AnswerFlashcardUseCase` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/widgets/study_session/fill/**` | `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/17-study-session-fill.md` | Covered by repository tests. |
+| Current | Session (shared) | Cancel mid-session | `CancelStudySessionUseCase` confirmed via `MxConfirmationDialog` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/presentation/features/study/screens/study_session_screen.dart` | `docs/business/study/study-flow.md` | `docs/wireframes/24-shared-dialogs.md` §cancel-session | Covered by `test/presentation/study_session_dialog_navigation_test.dart`. |
+| Current | Session (shared) | Skip current item | `SkipFlashcardUseCase` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/screens/study_session_screen.dart` | `docs/contracts/usecase-contracts/study.md` | — | In-session control; no dedicated wireframe. Covered by session notifier tests. |
+| Current | Session (shared) | Finalize → result | `FinalizeStudySessionUseCase`, `RetryFinalizeUseCase` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/screens/study_session_screen.dart` | `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/18-study-result.md` | Covered by repository finalize tests. |
+
+## 18. Study result
+
+Mock refs: variants `27a`–`27f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.18.
+
+Parity audit: row #18 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code), P1. `FinalizeStudySessionUseCase` + `RetryFinalizeUseCase` verified at `study_usecases.dart:339,363`. Streak chip blocked by same gap as row #01; per-card review widget missing. Cross-cutting: §3.2 streak/engagement; §3.13 item 8 (`record_completion_usecase.dart` missing).
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Result | Summary metrics | `StudySummary` derivation | `lib/presentation/features/study/screens/study_result_screen.dart`, `lib/domain/study/entities/study_models.dart` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/18-study-result.md` | Covered by `test/presentation/study_result_screen_test.dart`. |
+| Current | Result | Retry / restart | `RestartStudySessionUseCase` | `lib/domain/study/usecases/study_usecases.dart`, `lib/presentation/features/study/screens/study_result_screen.dart` | `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/18-study-result.md` | Covered by repository restart tests. |
+| Current | Result | Return to entry / dashboard | `AppNavigation` push/pop | `lib/app/router/app_navigation.dart`, `lib/presentation/features/study/screens/study_result_screen.dart` | `docs/business/navigation/navigation-flow.md` | `docs/wireframes/18-study-result.md` | Covered by router tests. |
+
+## 19. Settings — Account
+
+Mock refs: variants `13a`–`13i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.4.
+
+Parity audit: row #19 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned at §Platform gateways scope (`✅ =` partial). Data-layer io/web/stub gateways verified. UI flow (restore-warning, fingerprint mismatch) and platform-specific UI differences not yet re-verified. P3. Mock gap: variants `13a`–`13i` do not distinguish platform — tracked in §3.15.2 item 4.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Settings/Account | Sign in / out (Google) | `SignInUseCase`, `SignOutUseCase` | `lib/domain/usecases/**` (account use case paths TBD), `lib/presentation/features/settings/screens/account_settings_screen.dart` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` | `docs/wireframes/19-settings-account.md` | Confirm whether the contract use case names exist before treating as `Current`. |
+| Target | Settings/Account | Drive sync toggle + push/pull | `EnableSyncUseCase`, `PushSyncUseCase`, `PullSyncUseCase` | `lib/data/sync/**` (path TBD), `lib/domain/usecases/**` (sync use case paths TBD), `lib/presentation/features/settings/screens/account_settings_screen.dart` | `docs/business/account-sync/account-sync.md`, `docs/contracts/repository-contracts/sync-repository.md` | `docs/wireframes/19-settings-account.md` | Target spec only. Do not implement until product decision and sync repository contract are approved. |
+| Target | Settings/Account | Remove account (strong confirm) | `RemoveAccountUseCase` with strong-confirm dialog variant | `lib/domain/usecases/**` (account use case paths TBD), `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart` (strong variant TBD), `lib/presentation/features/settings/screens/account_settings_screen.dart` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` | `docs/wireframes/19-settings-account.md`, `docs/wireframes/24-shared-dialogs.md` §Strong variant | Target spec only. Strong-confirm variant may not yet exist in `mx_confirmation_dialog.dart`. |
+
+## 20. Settings — Learning
+
+Mock refs: variants `14a`–`14e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.5.
+
+Parity audit: row #20 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code), P1. `study_settings_policy.dart` exists. Bury/suspend default settings blocked by §3.1. Daily-goal field not present — linked to row #01 streak gap. Cross-cutting: §3.1 bury/suspend, §3.2 streak/engagement.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Settings/Learning | New-study defaults editor | `StudySettingsStore.saveNewStudyDefaults` | `lib/presentation/features/settings/screens/learning_settings_screen.dart`, `lib/app/di/study/study_settings_providers.dart` | `docs/state/state-management-contract.md` §Per-notifier, `docs/business/study/study-flow.md` | `docs/wireframes/20-settings-learning.md` | Covered by settings notifier tests. |
+| Current | Settings/Learning | SRS-review defaults editor | `StudySettingsStore.saveReviewDefaults` | `lib/presentation/features/settings/screens/learning_settings_screen.dart`, `lib/app/di/study/study_settings_providers.dart` | `docs/state/state-management-contract.md` §Per-notifier, `docs/business/study/study-flow.md` | `docs/wireframes/20-settings-learning.md` | Covered by settings notifier tests. |
+| Current | Settings/Learning | Interval table view (read-only) | `box_intervals.dart` source | `lib/domain/srs/box_intervals.dart`, `lib/presentation/features/settings/screens/learning_settings_screen.dart` | `docs/business/srs/srs-review.md` | `docs/wireframes/20-settings-learning.md` | Read-only render; covered by widget render tests. |
+| Current | Settings/Learning | Tags sub-screen entry | Push `RouteNames.settingsLearningTags` | `lib/app/router/app_navigation.dart`, `lib/presentation/features/settings/screens/learning_settings_screen.dart` | `docs/business/tags/tag-system.md` | `docs/wireframes/22-settings-tag-management.md` | Navigation covered by router tests. |
+
+## 21. Settings — Audio / Speech
+
+Mock refs: variants `15a`–`15g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.6.
+
+Parity audit: row #21 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code). `tts_settings_records_table.dart` persistence verified. Engine fallback (Android/iOS unavailable) + voice picker UI pending verification. P2.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Settings/TTS | Voice picker | `TtsSettingsNotifier`, `SelectVoiceUseCase` | `lib/presentation/features/settings/screens/audio_speech_settings_screen.dart`, `lib/domain/usecases/**` (TTS use case path TBD) | `docs/business/tts/tts-settings.md`, `docs/contracts/usecase-contracts/tts.md` | `docs/wireframes/21-settings-audio-speech.md` | Confirm SelectVoice use case exists with the spec'd name. |
+| Partial | Settings/TTS | Rate / pitch sliders | TTS settings notifier slider state | `lib/presentation/features/settings/screens/audio_speech_settings_screen.dart` | `docs/business/tts/tts-settings.md` | `docs/wireframes/21-settings-audio-speech.md` | Visual + persistence parity check pending. |
+| Partial | Settings/TTS | Auto-play toggle per mode | Per-mode auto-play map in TTS settings notifier | `lib/presentation/features/settings/screens/audio_speech_settings_screen.dart` | `docs/business/tts/tts-settings.md` | `docs/wireframes/21-settings-audio-speech.md` | Per-mode default semantics need re-check. |
+| Partial | Settings/TTS | Preview sample | `PreviewTtsUseCase` | `lib/domain/usecases/**` (TTS use case path TBD), `lib/presentation/features/settings/screens/audio_speech_settings_screen.dart` | `docs/contracts/usecase-contracts/tts.md` | `docs/wireframes/21-settings-audio-speech.md` | Verify contract exposes a preview use case. |
+
+## 22. Settings — Tag management
+
+Mock refs: variants `16a`–`16k` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.7.
+
+Parity audit: row #22 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — major drift (architecture), P1. `tag_management_screen.dart` exists but **0 TagUseCase** in domain layer (verified by grep) and **0 TagRepository** interface in `lib/domain/repositories/`. Schema is junction-only (`flashcard_tags_table.dart`). Tag screen may bypass UseCase → Repository → DAO flow — Hard Rule violation candidate. Cross-cutting: §3.3 tag system — needs domain layer (repo interface + at least 3 use cases) before Rename/Merge/Delete rows can move past `NotStarted`.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Partial | Settings/Tags | List tags + usage count | `ListTagsUseCase` | `lib/domain/usecases/**` (tag use case path TBD), `lib/presentation/features/settings/screens/tag_management_screen.dart` | `docs/business/tags/tag-system.md`, `docs/contracts/usecase-contracts/tag.md` | `docs/wireframes/22-settings-tag-management.md` | Confirm tag use cases exist before promoting to `Current`. |
+| NotStarted | Settings/Tags | Rename tag | `RenameTagUseCase` via `MxNameDialog` | `lib/domain/usecases/**` (tag use case path TBD), `lib/presentation/shared/dialogs/mx_name_dialog.dart`, `lib/presentation/features/settings/screens/tag_management_screen.dart` | `docs/business/tags/tag-system.md`, `docs/contracts/usecase-contracts/tag.md` | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/24-shared-dialogs.md` | Confirm contract behavior for collisions. |
+| NotStarted | Settings/Tags | Merge tags | `MergeTagsUseCase` | `lib/domain/usecases/**` (tag use case path TBD), `lib/presentation/features/settings/screens/tag_management_screen.dart` | `docs/business/tags/tag-system.md`, `docs/contracts/usecase-contracts/tag.md` | `docs/wireframes/22-settings-tag-management.md` | Confirm contract behavior for usage count rollup. |
+| NotStarted | Settings/Tags | Delete tag | `DeleteTagUseCase` confirmed via `MxConfirmationDialog` | `lib/domain/usecases/**` (tag use case path TBD), `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/presentation/features/settings/screens/tag_management_screen.dart` | `docs/business/tags/tag-system.md`, `docs/contracts/usecase-contracts/tag.md` | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/24-shared-dialogs.md` | Confirm cascade rules on flashcards. |
+
+## 23. Onboarding
+
+Mock refs: variants `28a`–`28i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.19. Mapping doc variants remain visual references, but full onboarding is `Future`; V1 scope is thin zero-content guidance.
+
+Parity audit: row #23 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — missing in code (D>C, the parity audit's "MISSING" tier), P1. `grep -i "onboarding" lib/` empty; `RouteDefaults.initialLocation = RoutePaths.library` (no welcome route). Cross-cutting: §3.6 onboarding + §3.15.2 item 8 (mock variants `28a`–`28i` look implementable but zero code presence). Decision resolved 2026-05-29: V1 only improves zero-content empty states; full onboarding is Future Proposal.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| NotStarted | Onboarding | V1 zero-content create/import CTAs | Strengthen Library/Dashboard empty states | `lib/presentation/features/folders/**`, `lib/presentation/features/dashboard/**`, existing deck/import dialog paths | `docs/business/system/overview.md`, `docs/business/deck/deck-management.md`, `docs/business/flashcard/flashcard-management.md` | `docs/wireframes/23-onboarding.md`, `docs/wireframes/01-dashboard.md`, `docs/wireframes/02-library.md`, `docs/wireframes/10-deck-import.md` | Approved V1 thin onboarding. Use existing create/import flows; no standalone onboarding route. |
+| Future | Onboarding | Full onboarding: welcome step | `OnboardingNotifier` | — | `docs/business/system/overview.md` | `docs/wireframes/23-onboarding.md` | Future Proposal. V1 must not create `lib/presentation/features/onboarding/**` or a first-launch welcome screen. |
+| Future | Onboarding | Full onboarding: inline "Create deck for import" | Reuses create-deck dialog + import flow | — | `docs/business/flashcard/flashcard-management.md` (import section) | `docs/wireframes/23-onboarding.md` | Future Proposal as part of full onboarding. V1 can reuse existing deck creation before import only when required by import flow. |
+| NotStarted | Onboarding | V1 zero-content restore CTA | Reuse existing account/restore flow from empty state | `lib/presentation/features/folders/**`, `lib/presentation/features/dashboard/**`, `lib/presentation/features/settings/**` (exact owner depends on current empty-state widgets) | `docs/business/account-sync/account-sync.md`, `docs/business/system/overview.md` | `docs/wireframes/23-onboarding.md`, `docs/wireframes/01-dashboard.md`, `docs/wireframes/02-library.md`, `docs/wireframes/19-settings-account.md` | Approved V1 thin onboarding. Add CTA only; do not create standalone onboarding route/feature. |
+
+## 24. Shared dialogs
+
+Mock refs: **no standalone gallery** for dialogs. They appear as embedded states across other variants (e.g. `13g` restore warn, `16f`/`16g`/`16i` tag dialogs, `18g` delete folder, `19f`/`19g` delete card/deck, `21g` flashcard delete). Mapping doc flags this as a gap in §10 ("Shared dialogs catalog"). Source of truth is `docs/wireframes/24-shared-dialogs.md`.
+
+Parity audit: row #24 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — major drift (doc beyond code), P2. Code has 3 typed widgets (`mx_dialog`, `mx_confirmation_dialog`, `mx_name_dialog`); specific dialogs (exit-session, finalize-retry, restore-prompt, …) do not have dedicated widget files yet — dialog ecosystem ~40% typed.
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Current | Shared | Confirm dialog (standard) | `MxConfirmationDialog` | `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart` | `docs/ui-ux/ui-ux-contract.md` | `docs/wireframes/24-shared-dialogs.md` | Covered by dialog widget tests. |
+| Target | Shared | Strong confirm (typed input) | Strong-confirm variant of `MxConfirmationDialog` | `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart` (variant TBD) | `docs/ui-ux/ui-ux-contract.md` | `docs/wireframes/24-shared-dialogs.md` §Strong variant | Target spec only. Variant not yet built; do not implement until product decision is approved. |
+| Current | Shared | Input dialog (single-field) | `MxNameDialog` | `lib/presentation/shared/dialogs/mx_name_dialog.dart` | `docs/ui-ux/ui-ux-contract.md` | `docs/wireframes/24-shared-dialogs.md` | Covered by dialog widget tests. |
+| Current | Shared | Cancel-session dialog | `MxConfirmationDialog` composition | `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/presentation/features/study/screens/study_session_screen.dart` | `docs/business/study/study-flow.md` | `docs/wireframes/24-shared-dialogs.md` §cancel-session | Covered by `test/presentation/study_session_dialog_navigation_test.dart`. |
+| NotStarted | Shared | Discard paused session | `MxConfirmationDialog` composition for discard | `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart`, `lib/presentation/features/dashboard/**`, `lib/presentation/features/progress/screens/progress_screen.dart` | `docs/business/resume/resume-session.md` | `docs/wireframes/24-shared-dialogs.md` §discard-session | Dashboard wiring is `NotStarted` (see §01); progress side already lands via cancel use case. |
+
+## 25. Shared bottom sheets
+
+Mock refs: **no standalone gallery** for bottom sheets. They appear as embedded states (e.g. `16e`/`16h` tag sheets, `17f` overflow, `18h` move sheet, `20c` create details). Mapping doc flags this as a gap in §10 ("Shared bottom sheets catalog"). Source of truth is `docs/wireframes/25-shared-bottom-sheets.md`.
+
+Parity audit: row #25 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — major drift (doc beyond code), P1. Code has 3 base widgets (`mx_bottom_sheet`, `mx_destination_picker_sheet`, `mx_action_sheet_list`). Card-actions sheet blocked by §3.1 bury/suspend; undo toast missing. Sheet ecosystem ~50% complete. Cross-cutting: §3.1 bury/suspend (card-actions sheet).
+
+| Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| NotStarted | Shared | Scope picker | `ScopePickerSheet` | TBD — decomposition task required before implementation; will live under `lib/presentation/shared/dialogs/**`. Host primitive `lib/presentation/shared/dialogs/mx_bottom_sheet.dart` exists. | `docs/business/study/study-flow.md` | `docs/wireframes/25-shared-bottom-sheets.md` §scope-picker | Sheet body not yet present. |
+| Partial | Shared | Move folder/deck picker | `MxDestinationPickerSheet` | `lib/presentation/shared/dialogs/mx_destination_picker_sheet.dart` | `docs/business/bulk/bulk-operations.md` | `docs/wireframes/25-shared-bottom-sheets.md` §move-picker | Primitive exists; folder/deck wiring tracked under §05. |
+| Target | Shared | Daily-goal slider | `DailyGoalSheet` | TBD — decomposition task required before implementation | `docs/business/engagement/dashboard-engagement.md` | `docs/wireframes/25-shared-bottom-sheets.md` §daily-goal | Target spec only. Tied to dashboard engagement (`Target` in §01). |
+| Target | Shared | Streak history | `StreakHistorySheet` | TBD — decomposition task required before implementation | `docs/business/engagement/dashboard-engagement.md` | `docs/wireframes/25-shared-bottom-sheets.md` §streak-history | Target spec only. Tied to streak engagement (`Target` in §01). |
+| NotStarted | Shared | Paused sessions list | `PausedSessionsSheet` | TBD — decomposition task required before implementation; will live under `lib/presentation/shared/dialogs/**` or `lib/presentation/features/dashboard/**` | `docs/business/resume/resume-session.md`, `docs/contracts/usecase-contracts/study.md` | `docs/wireframes/25-shared-bottom-sheets.md` §paused-sessions | Sheet body not yet present. |
+| Blocked | Shared | Card actions (bury/suspend/edit) | `CardActionsSheet` using `MxActionSheetList` | `lib/presentation/shared/dialogs/mx_action_sheet_list.dart`, sheet body TBD under `lib/presentation/shared/dialogs/**` | `docs/business/study-actions/bury-suspend.md` | `docs/wireframes/25-shared-bottom-sheets.md` §card-actions | Blocked by P0-2 bury/suspend schema migration: `flashcard_progress.buried_until` and `flashcard_progress.is_suspended` are not present in current schema. |
+| NotStarted | Shared | Sort options | `SortOptionsSheet` | `lib/presentation/shared/widgets/mx_sort_menu_chip.dart`, `lib/presentation/shared/dialogs/mx_bottom_sheet.dart` (host), sheet body TBD | `docs/contracts/types-catalog.md` (`ContentSortMode`) | `docs/wireframes/25-shared-bottom-sheets.md` §sort | Confirm whether existing chip menu already covers the spec'd UX before opening. |
+
+## Maintenance rules
+
+1. Adding a screen: append a new H2 section using the same column order. Update `docs/business/navigation/navigation-flow.md` first; this matrix mirrors that doc. Also add (a) a "Mock refs" line pointing to the matching variants in `docs/system-design/mock-design-doc-mapping.md` — if no mock variant exists, state that explicitly and reference §10 of the mapping doc — and (b) a "Parity audit" line pointing to the matching §1 row in `docs/checklist/wireframe-code-parity-assessment.md` + any cross-cutting §3 item that constrains the screen.
+2. Adding a function row: confirm the row maps to exactly one feature; if it spans many, split it. If a `Blocked` row's blocker is also tracked under a §3 cross-cutting item in the parity audit, cite the §3.N reference in `Notes`.
+3. Status changes happen in the same PR that lands the corresponding code or doc change. Stale status here misleads future agents.
+4. Removing a row: only when the feature is removed from the spec. Otherwise change the status to `NotStarted` or `Blocked` with a note explaining why.
+5. Doc-code parity: this file is a navigator, not a source of truth. If a doc cell disagrees with reality, update the underlying doc first, then mirror here. See Doc-code parity rule in ../../CLAUDE.md.

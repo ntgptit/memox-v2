@@ -81,6 +81,15 @@ Rationale: these are device-local user preferences. Putting them in Drift would 
 
 The following schema changes are required to implement new specs. Each requires a migration per `docs/database/migration-contract.md`.
 
+### V1 migration gate
+
+A pending column listed here does not automatically approve every dependent feature. Before coding, check `docs/checklist/v1-implementation-scope-2026-05-29.md` and `docs/checklist/screen-function-task-matrix.md`.
+
+- `flashcard_progress.buried_until` and `flashcard_progress.is_suspended` are V1-approved only when the migration is part of the task.
+- `flashcard_progress.last_reset_at`, `study_attempts.box_before`, and `study_attempts.box_after` are reserved for the Future Proposal Card History feature unless promoted.
+- `decks.target_language` may be implemented only with the deck/TTS migration task that updates Drift schema, mapper, tests, and generated code.
+
+
 | Change | Source spec | Notes |
 | --- | --- | --- |
 | Add `decks.target_language TEXT NOT NULL DEFAULT 'korean'` | `docs/business/deck/deck-management.md` | Migration backfills existing rows to `'korean'`. |
