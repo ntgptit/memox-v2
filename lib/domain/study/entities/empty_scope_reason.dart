@@ -9,7 +9,6 @@ import '../../../core/errors/app_exception.dart';
 ///   [todayAllDone], [todayNoContent]
 ///
 /// Tier 2 (blocked on tag entry type): tagNoCards, tagNoDueCards
-/// Tier 3 (blocked on P0-2 bury/suspend): allBuried, allSuspended
 enum EmptyScopeReason {
   /// Deck scope contains zero flashcards (any study type).
   deckNoCards,
@@ -28,6 +27,12 @@ enum EmptyScopeReason {
 
   /// User has no flashcards at all (today scope, srs_review).
   todayNoContent,
+
+  /// Every card in scope is buried for today (Tier 3, P0-2).
+  allBuried,
+
+  /// Every card in scope is suspended (Tier 3, P0-2).
+  allSuspended,
 }
 
 /// Thrown by `StartStudySessionUseCase` when the requested scope contains no

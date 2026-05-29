@@ -1137,6 +1137,54 @@
   "@studyEmptyNextDueSoon": {
     "description": "Relative time fragment for the next-due hint when the next card is due in under an hour."
   },
+  "studyEmpty_allBuried_title": "Đã ẩn hết thẻ hôm nay",
+  "@studyEmpty_allBuried_title": {
+    "description": "Empty-scope title when every card in scope is buried for today. P0-2 Tier 3."
+  },
+  "studyEmpty_allBuried_message": "Bạn đã ẩn tất cả thẻ. Chúng sẽ quay lại vào ngày mai.",
+  "@studyEmpty_allBuried_message": {
+    "description": "Empty-scope message for the all-buried state."
+  },
+  "studyEmpty_allBuried_cta": "Học bài mới",
+  "@studyEmpty_allBuried_cta": {
+    "description": "Empty-scope CTA that restarts study as a New Study session when all cards are buried."
+  },
+  "studyEmpty_allSuspended_title": "Tất cả thẻ đã tạm dừng",
+  "@studyEmpty_allSuspended_title": {
+    "description": "Empty-scope title when every card in scope is suspended. P0-2 Tier 3."
+  },
+  "studyEmpty_allSuspended_message": "Khôi phục một vài thẻ để học lại.",
+  "@studyEmpty_allSuspended_message": {
+    "description": "Empty-scope message for the all-suspended state."
+  },
+  "studyEmpty_allSuspended_cta": "Xem thẻ",
+  "@studyEmpty_allSuspended_cta": {
+    "description": "Empty-scope CTA that opens the flashcard list so the user can unsuspend cards."
+  },
+  "cardActionsTitle": "Tùy chọn thẻ",
+  "@cardActionsTitle": {
+    "description": "Title of the card-actions bottom sheet shown during a study session."
+  },
+  "cardActionBury": "Ẩn đến ngày mai",
+  "@cardActionBury": {
+    "description": "Card-actions sheet entry that buries the current card until tomorrow."
+  },
+  "cardActionSuspend": "Tạm dừng thẻ",
+  "@cardActionSuspend": {
+    "description": "Card-actions sheet entry that suspends the current card indefinitely."
+  },
+  "studyCardBuriedMessage": "Đã ẩn thẻ đến ngày mai.",
+  "@studyCardBuriedMessage": {
+    "description": "Snackbar shown after burying a card."
+  },
+  "studyCardSuspendedMessage": "Đã tạm dừng thẻ.",
+  "@studyCardSuspendedMessage": {
+    "description": "Snackbar shown after suspending a card."
+  },
+  "commonUndo": "Hoàn tác",
+  "@commonUndo": {
+    "description": "Generic undo action label used by bury/suspend toasts."
+  },
   "studyCancelConfirmTitle": "Hủy phiên học này?",
   "studyCancelConfirmMessage": "Phiên học hiện tại sẽ dừng lại và bạn sẽ được đưa đến màn hình kết quả.",
   "studyCancelConfirmAction": "Hủy",

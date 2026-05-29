@@ -211,6 +211,73 @@ void main() {
         expect(repo.startSessionCalled, isFalse);
       },
     );
+
+    test(
+      'S4f: deck whose every card is buried throws '
+      'EmptyScopeException(allBuried)',
+      () async {
+        final repo = _FakeStudyRepo(deckCount: 3, activeBuriedCount: 3);
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.deck,
+              entryRefId: 'deck-buried',
+              studyType: StudyType.srsReview,
+              settings: _testSettings,
+            ),
+          ),
+          throwsEmptyScope(EmptyScopeReason.allBuried),
+        );
+        expect(repo.startSessionCalled, isFalse);
+      },
+    );
+
+    test(
+      'S4g: deck whose every card is suspended throws '
+      'EmptyScopeException(allSuspended)',
+      () async {
+        final repo = _FakeStudyRepo(deckCount: 3, suspendedCount: 3);
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.deck,
+              entryRefId: 'deck-suspended',
+              studyType: StudyType.srsReview,
+              settings: _testSettings,
+            ),
+          ),
+          throwsEmptyScope(EmptyScopeReason.allSuspended),
+        );
+        expect(repo.startSessionCalled, isFalse);
+      },
+    );
+
+    test(
+      'allSuspended takes precedence over allBuried when some cards are buried '
+      'and the rest suspended',
+      () async {
+        // 1 suspended + 2 buried of 3 → not all suspended, but all hidden.
+        final repo = _FakeStudyRepo(
+          deckCount: 3,
+          suspendedCount: 1,
+          activeBuriedCount: 2,
+        );
+
+        await expectLater(
+          useCaseFor(repo).execute(
+            const StudyContext(
+              entryType: StudyEntryType.deck,
+              entryRefId: 'deck-mixed',
+              studyType: StudyType.srsReview,
+              settings: _testSettings,
+            ),
+          ),
+          throwsEmptyScope(EmptyScopeReason.allBuried),
+        );
+      },
+    );
   });
 }
 
@@ -226,12 +293,16 @@ class _FakeStudyRepo implements StudyRepo {
     this.deckCount = 0,
     this.scopeCount = 0,
     this.dueCount = 0,
+    this.suspendedCount = 0,
+    this.activeBuriedCount = 0,
     this.next,
   });
 
   final int deckCount;
   final int scopeCount;
   final int dueCount;
+  final int suspendedCount;
+  final int activeBuriedCount;
   final DateTime? next;
 
   final List<String> deckCountCalls = <String>[];
@@ -248,6 +319,14 @@ class _FakeStudyRepo implements StudyRepo {
 
   @override
   Future<int> countDueCardsInScope(StudyContext context) async => dueCount;
+
+  @override
+  Future<int> countSuspendedInScope(StudyContext context) async =>
+      suspendedCount;
+
+  @override
+  Future<int> countActiveBuriedInScope(StudyContext context) async =>
+      activeBuriedCount;
 
   @override
   Future<DateTime?> nextDueAt(StudyContext context) async => next;

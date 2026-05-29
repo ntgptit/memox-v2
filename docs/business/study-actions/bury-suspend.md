@@ -5,12 +5,9 @@ applies_to: bury (skip card today), suspend (hide card indefinitely)
 
 # Bury and Suspend
 
-> **Status: Target — Migration Required.** This spec depends on the following columns from `docs/database/schema-contract.md` §Pending schema changes:
+> **Status: Foundation implemented (P0-2).** Schema v10 added `flashcard_progress.buried_until INTEGER NULL` and `flashcard_progress.is_suspended BOOL NOT NULL DEFAULT 0` (+ index `idx_flashcard_progress_eligibility`). Implemented: bury/suspend/unbury/unsuspend use cases + repository persistence, study-batch + due-count filtering (excludes suspended and currently-buried; expired bury re-enters), empty-scope variants `studyEmpty_allBuried` / `studyEmpty_allSuspended`, and the card-actions bottom sheet (Edit / Bury / Suspend) wired into the study session.
 >
-> - `flashcard_progress.buried_until INTEGER NULL`
-> - `flashcard_progress.is_suspended BOOL NOT NULL DEFAULT 0`
->
-> Migration MUST run before any code reads or writes these columns. Blocks: bury action, suspend toggle, study queue filter, flashcard list state badges (Suspended > Buried > Due > Active), bulk suspend/unsuspend, empty-scope matrix variants `studyEmpty_allBuried` and `studyEmpty_allSuspended`.
+> **Still pending (separate tasks):** flashcard-list state badges + status filter chips, bulk suspend/unsuspend, surfacing the card-actions trigger inside each in-session mode view (review/match/guess/recall/fill), and unsuspend from the flashcard list. These build on this foundation.
 
 ## Purpose
 

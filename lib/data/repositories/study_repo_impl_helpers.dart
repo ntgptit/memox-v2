@@ -20,9 +20,14 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
       INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
       WHERE ${scope.whereClause}
         AND $whereProgress
+        AND $_eligibilityClause
       $orderBy
       ''',
-          variables: <Variable>[...scope.variables, ...extraVariables],
+          variables: <Variable>[
+            ...scope.variables,
+            ...extraVariables,
+            Variable<int>(_clock.nowEpochMillis()),
+          ],
           readsFrom: {
             _database.flashcards,
             _database.decks,
@@ -65,10 +70,12 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
       WHERE ${scope.whereClause}
         AND p.due_at IS NOT NULL
         AND p.due_at <= ?
+        AND $_eligibilityClause
       ''',
           variables: <Variable>[
             ...scope.variables,
             Variable<int>(endOfTodayEpochMillis),
+            Variable<int>(_clock.nowEpochMillis()),
           ],
           readsFrom: {
             _database.flashcards,
@@ -95,6 +102,7 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
       WHERE ${scope.whereClause}
         AND p.due_at IS NOT NULL
         AND p.due_at > ?
+        AND p.is_suspended = 0
       ''',
           variables: <Variable>[
             ...scope.variables,
@@ -111,6 +119,73 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
     return nextDue == null
         ? null
         : DateTime.fromMillisecondsSinceEpoch(nextDue);
+  }
+
+  Future<int> _countSuspendedInScope(StudyContext context) async {
+    final scope = await _scopeSql(context);
+    final row = await _database
+        .customSelect(
+          '''
+      SELECT COUNT(f.id) AS suspended_count
+      FROM flashcards f
+      INNER JOIN decks d ON d.id = f.deck_id
+      INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
+      WHERE ${scope.whereClause}
+        AND p.is_suspended = 1
+      ''',
+          variables: scope.variables,
+          readsFrom: {
+            _database.flashcards,
+            _database.decks,
+            _database.flashcardProgress,
+          },
+        )
+        .getSingle();
+    return row.read<int>('suspended_count');
+  }
+
+  Future<int> _countActiveBuriedInScope(
+    StudyContext context, {
+    required int nowEpochMillis,
+  }) async {
+    final scope = await _scopeSql(context);
+    final row = await _database
+        .customSelect(
+          '''
+      SELECT COUNT(f.id) AS buried_count
+      FROM flashcards f
+      INNER JOIN decks d ON d.id = f.deck_id
+      INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
+      WHERE ${scope.whereClause}
+        AND p.is_suspended = 0
+        AND p.buried_until IS NOT NULL
+        AND p.buried_until > ?
+      ''',
+          variables: <Variable>[
+            ...scope.variables,
+            Variable<int>(nowEpochMillis),
+          ],
+          readsFrom: {
+            _database.flashcards,
+            _database.decks,
+            _database.flashcardProgress,
+          },
+        )
+        .getSingle();
+    return row.read<int>('buried_count');
+  }
+
+  /// Start of the next local calendar day, as UTC epoch ms. A card buried now
+  /// becomes available again at this instant. Spec:
+  /// `docs/business/study-actions/bury-suspend.md` §Bury.
+  int _nextLocalMidnightEpochMillis() {
+    final localNow = _clock.nowUtc().toLocal();
+    final tomorrow = DateTime(
+      localNow.year,
+      localNow.month,
+      localNow.day,
+    ).add(const Duration(days: 1));
+    return tomorrow.toUtc().millisecondsSinceEpoch;
   }
 
   Future<_SqlScope> _scopeSql(StudyContext context) async =>

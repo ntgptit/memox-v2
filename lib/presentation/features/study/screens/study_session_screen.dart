@@ -6,6 +6,7 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
+import '../../../shared/dialogs/mx_card_actions_sheet.dart';
 import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
@@ -136,6 +137,9 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       context: context,
       canCancel: canCancel,
       actionState: actionState,
+      onCardActions: snapshot.currentItem == null
+          ? null
+          : () => _openCardActions(context, snapshot),
       child: ListView(
         children: [
           MxText(
@@ -200,11 +204,18 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     required bool canCancel,
     required AsyncValue<void> actionState,
     required Widget child,
+    VoidCallback? onCardActions,
   }) {
     final l10n = AppLocalizations.of(context);
     return MxScaffold(
       title: l10n.studySessionTitle,
       actions: [
+        if (onCardActions != null)
+          MxIconButton.toolbar(
+            tooltip: l10n.cardActionsTitle,
+            onPressed: actionState.isLoading ? null : onCardActions,
+            icon: Icons.more_vert_rounded,
+          ),
         if (canCancel)
           MxIconButton.toolbar(
             tooltip: l10n.studyCancelAction,
@@ -268,6 +279,62 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
     setState(() {
       _feedback = null;
     });
+  }
+
+  Future<void> _openCardActions(
+    BuildContext context,
+    StudySessionSnapshot snapshot,
+  ) async {
+    final item = snapshot.currentItem;
+    if (item == null) {
+      return;
+    }
+    final action = await MxCardActionsSheet.show(context: context);
+    if (!context.mounted) {
+      return;
+    }
+    if (action == null) {
+      return;
+    }
+    final controller = ref.read(
+      studySessionActionControllerProvider(widget.sessionId).notifier,
+    );
+    final l10n = AppLocalizations.of(context);
+    switch (action) {
+      case MxCardAction.edit:
+        context.pushFlashcardEdit(
+          deckId: item.flashcard.deckId,
+          flashcardId: item.flashcard.id,
+        );
+      case MxCardAction.bury:
+        final buriedId = await controller.buryCurrentCard();
+        if (!context.mounted) {
+          return;
+        }
+        if (buriedId == null) {
+          return;
+        }
+        MxSnackbar.show(
+          context,
+          message: l10n.studyCardBuriedMessage,
+          actionLabel: l10n.commonUndo,
+          onAction: () => controller.unburyCard(buriedId),
+        );
+      case MxCardAction.suspend:
+        final suspendedId = await controller.suspendCurrentCard();
+        if (!context.mounted) {
+          return;
+        }
+        if (suspendedId == null) {
+          return;
+        }
+        MxSnackbar.show(
+          context,
+          message: l10n.studyCardSuspendedMessage,
+          actionLabel: l10n.commonUndo,
+          onAction: () => controller.unsuspendCard(suspendedId),
+        );
+    }
   }
 
   Future<void> _confirmCancel(BuildContext context) async {

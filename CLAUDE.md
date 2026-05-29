@@ -191,7 +191,7 @@ This convention applies to **backtick references** in markdown body text and tab
 
 ```text
 dart run build_runner build --delete-conflicting-outputs
-python code-verification-guard/guard/run.py check --project .   # if available
+python code-verification-guard/guard/run.py check --project . --ruleset memox   # if available
 flutter analyze
 flutter test <targeted tests>
 ```

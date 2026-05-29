@@ -79,7 +79,7 @@ Run these commands and ensure they pass:
 dart run build_runner build --delete-conflicting-outputs
 flutter analyze
 flutter test {targeted_test_paths}
-python code-verification-guard/guard/run.py check --project .   # if guard present in repo; else skip and note in report
+python code-verification-guard/guard/run.py check --project . --ruleset memox   # if guard present in repo; else skip and note in report
 ```
 
 For UI-touching tasks, also run a profile-mode build on Pixel 6 emulator and verify the perf budget from `docs/quality/performance-contract.md`.

@@ -278,6 +278,24 @@ final class _ProgressStudyRepo implements StudyRepo {
 
   @override
   Future<DateTime?> nextDueAt(StudyContext context) async => null;
+
+  @override
+  Future<void> setBuried({
+    required String flashcardId,
+    required bool buried,
+  }) async {}
+
+  @override
+  Future<void> setSuspended({
+    required String flashcardId,
+    required bool suspended,
+  }) async {}
+
+  @override
+  Future<int> countSuspendedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
   int finalizeCount = 0;
   int retryFinalizeCount = 0;
   int resumeCandidateLoadCount = 0;

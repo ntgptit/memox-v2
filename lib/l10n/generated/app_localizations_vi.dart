@@ -2052,6 +2052,44 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyEmptyNextDueSoon => 'sắp tới';
 
   @override
+  String get studyEmpty_allBuried_title => 'Đã ẩn hết thẻ hôm nay';
+
+  @override
+  String get studyEmpty_allBuried_message =>
+      'Bạn đã ẩn tất cả thẻ. Chúng sẽ quay lại vào ngày mai.';
+
+  @override
+  String get studyEmpty_allBuried_cta => 'Học bài mới';
+
+  @override
+  String get studyEmpty_allSuspended_title => 'Tất cả thẻ đã tạm dừng';
+
+  @override
+  String get studyEmpty_allSuspended_message =>
+      'Khôi phục một vài thẻ để học lại.';
+
+  @override
+  String get studyEmpty_allSuspended_cta => 'Xem thẻ';
+
+  @override
+  String get cardActionsTitle => 'Tùy chọn thẻ';
+
+  @override
+  String get cardActionBury => 'Ẩn đến ngày mai';
+
+  @override
+  String get cardActionSuspend => 'Tạm dừng thẻ';
+
+  @override
+  String get studyCardBuriedMessage => 'Đã ẩn thẻ đến ngày mai.';
+
+  @override
+  String get studyCardSuspendedMessage => 'Đã tạm dừng thẻ.';
+
+  @override
+  String get commonUndo => 'Hoàn tác';
+
+  @override
   String get studyCancelConfirmTitle => 'Hủy phiên học này?';
 
   @override

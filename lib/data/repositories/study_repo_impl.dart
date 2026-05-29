@@ -78,6 +78,46 @@ final class StudyRepoImpl implements StudyRepo {
       _nextDueAt(context, endOfTodayEpochMillis: _endOfTodayEpochMillis());
 
   @override
+  Future<void> setBuried({
+    required String flashcardId,
+    required bool buried,
+  }) async {
+    final now = _clock.nowEpochMillis();
+    await (_database.update(
+      _database.flashcardProgress,
+    )..where((table) => table.flashcardId.equals(flashcardId))).write(
+      local.FlashcardProgressCompanion(
+        buriedUntil: Value(buried ? _nextLocalMidnightEpochMillis() : null),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+
+  @override
+  Future<void> setSuspended({
+    required String flashcardId,
+    required bool suspended,
+  }) async {
+    final now = _clock.nowEpochMillis();
+    await (_database.update(
+      _database.flashcardProgress,
+    )..where((table) => table.flashcardId.equals(flashcardId))).write(
+      local.FlashcardProgressCompanion(
+        isSuspended: Value(suspended),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+
+  @override
+  Future<int> countSuspendedInScope(StudyContext context) =>
+      _countSuspendedInScope(context);
+
+  @override
+  Future<int> countActiveBuriedInScope(StudyContext context) =>
+      _countActiveBuriedInScope(context, nowEpochMillis: _clock.nowEpochMillis());
+
+  @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) async {
     final rows = await _eligibleFlashcards(
       context: context,

@@ -2171,6 +2171,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyEmptyNextDueSoon => 'soon';
 
   @override
+  String get studyEmpty_allBuried_title => 'All cards buried';
+
+  @override
+  String get studyEmpty_allBuried_message =>
+      'You buried every card for now. They\'ll return tomorrow.';
+
+  @override
+  String get studyEmpty_allBuried_cta => 'Study new instead';
+
+  @override
+  String get studyEmpty_allSuspended_title => 'All cards suspended';
+
+  @override
+  String get studyEmpty_allSuspended_message =>
+      'Resume some cards to study them again.';
+
+  @override
+  String get studyEmpty_allSuspended_cta => 'View flashcards';
+
+  @override
+  String get cardActionsTitle => 'Card actions';
+
+  @override
+  String get cardActionBury => 'Bury until tomorrow';
+
+  @override
+  String get cardActionSuspend => 'Suspend card';
+
+  @override
+  String get studyCardBuriedMessage => 'Card buried until tomorrow.';
+
+  @override
+  String get studyCardSuspendedMessage => 'Card suspended.';
+
+  @override
+  String get commonUndo => 'Undo';
+
+  @override
   String get studyCancelConfirmTitle => 'Cancel this session?';
 
   @override

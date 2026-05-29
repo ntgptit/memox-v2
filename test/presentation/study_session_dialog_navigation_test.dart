@@ -130,6 +130,24 @@ final class _CancelDialogStudyRepo implements StudyRepo {
   Future<DateTime?> nextDueAt(StudyContext context) async => null;
 
   @override
+  Future<void> setBuried({
+    required String flashcardId,
+    required bool buried,
+  }) async {}
+
+  @override
+  Future<void> setSuspended({
+    required String flashcardId,
+    required bool suspended,
+  }) async {}
+
+  @override
+  Future<int> countSuspendedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
+
+  @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) {
     throw UnimplementedError();
   }

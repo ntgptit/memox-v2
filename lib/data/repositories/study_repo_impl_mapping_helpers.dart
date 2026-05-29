@@ -334,3 +334,9 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
 
 String _studyRepoPlaceholders(int count) =>
     List<String>.filled(count, '?').join(', ');
+
+/// SQL fragment excluding suspended and currently-buried cards from study
+/// eligibility. Binds one trailing positional `?` = current epoch ms (now).
+/// Spec: `docs/business/study-actions/bury-suspend.md` §Auto-unbury.
+const String _eligibilityClause =
+    'p.is_suspended = 0 AND (p.buried_until IS NULL OR p.buried_until <= ?)';

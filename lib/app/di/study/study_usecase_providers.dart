@@ -80,3 +80,19 @@ RetryFinalizeUseCase retryFinalizeUseCase(Ref ref) => RetryFinalizeUseCase(
   repository: ref.watch(studyRepoProvider),
   strategyFactory: ref.watch(studyStrategyFactoryProvider),
 );
+
+@riverpod
+BuryFlashcardUseCase buryFlashcardUseCase(Ref ref) =>
+    BuryFlashcardUseCase(ref.watch(studyRepoProvider));
+
+@riverpod
+UnburyFlashcardUseCase unburyFlashcardUseCase(Ref ref) =>
+    UnburyFlashcardUseCase(ref.watch(studyRepoProvider));
+
+@riverpod
+SuspendFlashcardUseCase suspendFlashcardUseCase(Ref ref) =>
+    SuspendFlashcardUseCase(ref.watch(studyRepoProvider));
+
+@riverpod
+UnsuspendFlashcardUseCase unsuspendFlashcardUseCase(Ref ref) =>
+    UnsuspendFlashcardUseCase(ref.watch(studyRepoProvider));

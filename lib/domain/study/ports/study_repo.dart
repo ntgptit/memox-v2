@@ -22,6 +22,27 @@ abstract interface class StudyRepo {
   /// Powers the "Next due in {relativeTime}" hint on `*_noDueCards` states.
   Future<DateTime?> nextDueAt(StudyContext context);
 
+  /// Buries [flashcardId] until the next local midnight when [buried] is true,
+  /// or clears `buried_until` (unbury) when false. SRS state is never altered.
+  /// Spec: `docs/business/study-actions/bury-suspend.md`.
+  Future<void> setBuried({required String flashcardId, required bool buried});
+
+  /// Toggles `flashcard_progress.is_suspended` for [flashcardId]. SRS state is
+  /// preserved so unsuspend resumes from the same box/due date.
+  Future<void> setSuspended({
+    required String flashcardId,
+    required bool suspended,
+  });
+
+  /// Count of suspended cards in [context]'s scope. Used by the empty-scope
+  /// `allSuspended` pre-check (Tier 3).
+  Future<int> countSuspendedInScope(StudyContext context);
+
+  /// Count of cards in [context]'s scope that are currently buried
+  /// (`buried_until > now`) and NOT suspended. Used by the empty-scope
+  /// `allBuried` pre-check (Tier 3).
+  Future<int> countActiveBuriedInScope(StudyContext context);
+
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context);
 
   Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context);

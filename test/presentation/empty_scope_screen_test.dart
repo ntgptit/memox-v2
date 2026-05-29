@@ -43,6 +43,12 @@ void main() {
               Text('Folder ${state.pathParameters[RoutePaths.folderIdParam]}'),
         ),
         GoRoute(
+          path: '/library/deck/:${RoutePaths.deckIdParam}/flashcards',
+          name: RouteNames.flashcardList,
+          builder: (_, state) =>
+              Text('List ${state.pathParameters[RoutePaths.deckIdParam]}'),
+        ),
+        GoRoute(
           path: '/deck/:${RoutePaths.deckIdParam}/flashcards/new',
           name: RouteNames.flashcardCreate,
           builder: (_, state) =>
@@ -177,5 +183,33 @@ void main() {
     await tester.tap(find.text('Create your first deck'));
     await tester.pumpAndSettle();
     expect(find.text('Library'), findsOneWidget);
+  });
+
+  testWidgets('allBuried CTA re-enters study as new', (tester) async {
+    await pumpScreen(
+      tester,
+      failure: const EmptyScopeException(EmptyScopeReason.allBuried),
+      entryType: 'deck',
+      entryRefId: 'deck-1',
+    );
+
+    expect(find.text('All cards buried'), findsOneWidget);
+    await tester.tap(find.text('Study new instead'));
+    await tester.pumpAndSettle();
+    expect(find.text('Entry deck/deck-1'), findsOneWidget);
+  });
+
+  testWidgets('allSuspended CTA opens the flashcard list', (tester) async {
+    await pumpScreen(
+      tester,
+      failure: const EmptyScopeException(EmptyScopeReason.allSuspended),
+      entryType: 'deck',
+      entryRefId: 'deck-1',
+    );
+
+    expect(find.text('All cards suspended'), findsOneWidget);
+    await tester.tap(find.text('View flashcards'));
+    await tester.pumpAndSettle();
+    expect(find.text('List deck-1'), findsOneWidget);
   });
 }

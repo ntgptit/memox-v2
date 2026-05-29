@@ -15,6 +15,7 @@ import 'tables/tts_settings_records_table.dart';
 
 part 'app_database.g.dart';
 part 'migrations/app_database_migrations.dart';
+part 'migrations/app_database_migration_assets.dart';
 
 @DriftDatabase(
   tables: <Type>[
@@ -32,7 +33,7 @@ part 'migrations/app_database_migrations.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
-  static const int currentSchemaVersion = 9;
+  static const int currentSchemaVersion = 10;
 
   @override
   int get schemaVersion => currentSchemaVersion;

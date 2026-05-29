@@ -3600,6 +3600,78 @@ abstract class AppLocalizations {
   /// **'soon'**
   String get studyEmptyNextDueSoon;
 
+  /// Empty-scope title when every card in scope is buried for today. P0-2 Tier 3.
+  ///
+  /// In en, this message translates to:
+  /// **'All cards buried'**
+  String get studyEmpty_allBuried_title;
+
+  /// Empty-scope message for the all-buried state.
+  ///
+  /// In en, this message translates to:
+  /// **'You buried every card for now. They\'ll return tomorrow.'**
+  String get studyEmpty_allBuried_message;
+
+  /// Empty-scope CTA that restarts study as a New Study session when all cards are buried.
+  ///
+  /// In en, this message translates to:
+  /// **'Study new instead'**
+  String get studyEmpty_allBuried_cta;
+
+  /// Empty-scope title when every card in scope is suspended. P0-2 Tier 3.
+  ///
+  /// In en, this message translates to:
+  /// **'All cards suspended'**
+  String get studyEmpty_allSuspended_title;
+
+  /// Empty-scope message for the all-suspended state.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume some cards to study them again.'**
+  String get studyEmpty_allSuspended_message;
+
+  /// Empty-scope CTA that opens the flashcard list so the user can unsuspend cards.
+  ///
+  /// In en, this message translates to:
+  /// **'View flashcards'**
+  String get studyEmpty_allSuspended_cta;
+
+  /// Title of the card-actions bottom sheet shown during a study session.
+  ///
+  /// In en, this message translates to:
+  /// **'Card actions'**
+  String get cardActionsTitle;
+
+  /// Card-actions sheet entry that buries the current card until tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Bury until tomorrow'**
+  String get cardActionBury;
+
+  /// Card-actions sheet entry that suspends the current card indefinitely.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend card'**
+  String get cardActionSuspend;
+
+  /// Snackbar shown after burying a card.
+  ///
+  /// In en, this message translates to:
+  /// **'Card buried until tomorrow.'**
+  String get studyCardBuriedMessage;
+
+  /// Snackbar shown after suspending a card.
+  ///
+  /// In en, this message translates to:
+  /// **'Card suspended.'**
+  String get studyCardSuspendedMessage;
+
+  /// Generic undo action label used by bury/suspend toasts.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get commonUndo;
+
   /// No description provided for @studyCancelConfirmTitle.
   ///
   /// In en, this message translates to:

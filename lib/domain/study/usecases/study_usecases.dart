@@ -49,61 +49,64 @@ final class StartStudySessionUseCase {
     return _withFlowPlan(snapshot, _flowPlan(context.studyType, flow));
   }
 
-  /// P0-1 Tier 1: pre-check scope and throw typed [EmptyScopeException] so the
+  /// Pre-check scope and throw a typed [EmptyScopeException] so the
   /// presentation layer can render a dedicated empty state with an actionable
-  /// CTA instead of a generic error. Covers all six Tier 1 cases. Tier 2
-  /// (`tag`) and Tier 3 (`allBuried`/`allSuspended`) remain blocked — see
-  /// `docs/checklist/p0-1-empty-scope-matrix-plan-2026-05-29.md`.
+  /// CTA instead of a generic error.
   ///
+  /// Precedence (after confirming the scope has cards):
+  /// 1. `allSuspended` — every card suspended (Tier 3).
+  /// 2. `allBuried` — every remaining card buried for today (Tier 3).
+  /// 3. `*_noDueCards` / `today_allDone` — eligible cards exist but none due
+  ///    (srs_review only, Tier 1).
+  ///
+  /// Tier 2 (`tag`) remains blocked on `StudyEntryType.tag`.
   /// Spec: `docs/business/study/study-flow.md` §Empty scope matrix.
   Future<void> _rejectEmptyScope(StudyContext context) async {
-    switch (context.entryType) {
-      case StudyEntryType.deck:
-        await _rejectEmptyDeck(context);
-      case StudyEntryType.folder:
-        await _rejectEmptyFolder(context);
-      case StudyEntryType.today:
-        await _rejectEmptyToday(context);
-    }
-  }
-
-  Future<void> _rejectEmptyDeck(StudyContext context) async {
-    final deckId = context.entryRefId;
-    if (deckId == null) {
+    if (context.entryType != StudyEntryType.today &&
+        context.entryRefId == null) {
       return;
     }
-    final total = await _repository.countFlashcardsInDeck(deckId);
+
+    final total = await _totalCardsInScope(context);
     if (total == 0) {
-      throw const EmptyScopeException(EmptyScopeReason.deckNoCards);
+      throw EmptyScopeException(_noContentReason(context.entryType));
     }
+
+    final suspended = await _repository.countSuspendedInScope(context);
+    if (suspended >= total) {
+      throw const EmptyScopeException(EmptyScopeReason.allSuspended);
+    }
+
+    final activeBuried = await _repository.countActiveBuriedInScope(context);
+    if (suspended + activeBuried >= total) {
+      throw const EmptyScopeException(EmptyScopeReason.allBuried);
+    }
+
     if (context.studyType == StudyType.srsReview) {
-      await _rejectNoDueCards(context, EmptyScopeReason.deckNoDueCards);
+      await _rejectNoDueCards(context, _noDueReason(context.entryType));
     }
   }
 
-  Future<void> _rejectEmptyFolder(StudyContext context) async {
-    if (context.entryRefId == null) {
-      return;
+  Future<int> _totalCardsInScope(StudyContext context) {
+    if (context.entryType == StudyEntryType.deck) {
+      return _repository.countFlashcardsInDeck(context.entryRefId!);
     }
-    final total = await _repository.countFlashcardsInScope(context);
-    if (total == 0) {
-      throw const EmptyScopeException(EmptyScopeReason.folderNoCards);
-    }
-    if (context.studyType == StudyType.srsReview) {
-      await _rejectNoDueCards(context, EmptyScopeReason.folderNoDueCards);
-    }
+    return _repository.countFlashcardsInScope(context);
   }
 
-  Future<void> _rejectEmptyToday(StudyContext context) async {
-    final total = await _repository.countFlashcardsInScope(context);
-    if (total == 0) {
-      throw const EmptyScopeException(EmptyScopeReason.todayNoContent);
-    }
-    final due = await _repository.countDueCardsInScope(context);
-    if (due == 0) {
-      throw const EmptyScopeException(EmptyScopeReason.todayAllDone);
-    }
-  }
+  EmptyScopeReason _noContentReason(StudyEntryType entryType) =>
+      switch (entryType) {
+        StudyEntryType.deck => EmptyScopeReason.deckNoCards,
+        StudyEntryType.folder => EmptyScopeReason.folderNoCards,
+        StudyEntryType.today => EmptyScopeReason.todayNoContent,
+      };
+
+  EmptyScopeReason _noDueReason(StudyEntryType entryType) =>
+      switch (entryType) {
+        StudyEntryType.deck => EmptyScopeReason.deckNoDueCards,
+        StudyEntryType.folder => EmptyScopeReason.folderNoDueCards,
+        StudyEntryType.today => EmptyScopeReason.todayAllDone,
+      };
 
   Future<void> _rejectNoDueCards(
     StudyContext context,
@@ -405,6 +408,51 @@ final class CancelStudySessionUseCase {
 
   Future<StudySessionSnapshot> execute(String sessionId) =>
       _repository.cancelSession(sessionId);
+}
+
+/// Buries a flashcard until the next local midnight. SRS state is unchanged.
+/// Spec: `docs/business/study-actions/bury-suspend.md`,
+/// `docs/contracts/usecase-contracts/study.md` §BuryCardUseCase.
+final class BuryFlashcardUseCase {
+  const BuryFlashcardUseCase(this._repository);
+
+  final StudyRepo _repository;
+
+  Future<void> execute(String flashcardId) =>
+      _repository.setBuried(flashcardId: flashcardId, buried: true);
+}
+
+/// Clears a flashcard's buried state (used by the undo toast).
+final class UnburyFlashcardUseCase {
+  const UnburyFlashcardUseCase(this._repository);
+
+  final StudyRepo _repository;
+
+  Future<void> execute(String flashcardId) =>
+      _repository.setBuried(flashcardId: flashcardId, buried: false);
+}
+
+/// Suspends a flashcard indefinitely. SRS state is preserved for unsuspend.
+/// Spec: `docs/contracts/usecase-contracts/study.md` §SuspendCardUseCase.
+final class SuspendFlashcardUseCase {
+  const SuspendFlashcardUseCase(this._repository);
+
+  final StudyRepo _repository;
+
+  Future<void> execute(String flashcardId) =>
+      _repository.setSuspended(flashcardId: flashcardId, suspended: true);
+}
+
+/// Resumes a suspended flashcard. It re-enters the due flow from its existing
+/// `due_at`. Spec: `docs/contracts/usecase-contracts/study.md`
+/// §UnsuspendCardUseCase.
+final class UnsuspendFlashcardUseCase {
+  const UnsuspendFlashcardUseCase(this._repository);
+
+  final StudyRepo _repository;
+
+  Future<void> execute(String flashcardId) =>
+      _repository.setSuspended(flashcardId: flashcardId, suspended: false);
 }
 
 final class FinalizeStudySessionUseCase {

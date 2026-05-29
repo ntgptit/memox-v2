@@ -88,11 +88,11 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 
 | ID | Event | Condition | Expected | Coverage | Test |
 | --- | --- | --- | --- | --- | --- |
-| BS1 | Bury card | During study session | Set `buried_until` to tomorrow midnight local; skip in session | C0+C1 | `test/features/study/bury_test.dart::BS1` |
-| BS2 | Bury card | Action | Do NOT record attempt; SRS state unchanged | C1 | `test/features/study/bury_test.dart::BS2` |
-| BS3 | Auto-unbury | `buried_until <= now` | Card returns to due queue | C0+C1 | `test/data/repositories/due_query_test.dart::BS3` |
-| BS4 | Suspend card | Any time | Set `is_suspended=true`; hide from study queues | C0+C1 | `test/features/flashcards/suspend_test.dart::BS4` |
-| BS5 | Suspend card | Action | Preserve SRS state | C1 | `test/features/flashcards/suspend_test.dart::BS5` |
+| BS1 | Bury card | During study session | Set `buried_until` to tomorrow midnight local; skip in session | C0+C1 | `test/data/repositories/study_repo_next_due_test.dart::BS1` (persistence + midnight) + `test/presentation/card_actions_sheet_test.dart` (action) |
+| BS2 | Bury card | Action | Do NOT record attempt; SRS state unchanged | C1 | `test/data/repositories/study_repo_next_due_test.dart::BS1` (currentBox/dueAt unchanged) |
+| BS3 | Auto-unbury | `buried_until <= now` | Card returns to due queue | C0+C1 | `test/data/repositories/study_repo_next_due_test.dart` (expired bury is eligible again) |
+| BS4 | Suspend card | Any time | Set `is_suspended=true`; hide from study queues | C0+C1 | `test/data/repositories/study_repo_next_due_test.dart::BS2` + (excluded from due/new batch) |
+| BS5 | Suspend card | Action | Preserve SRS state | C1 | `test/data/repositories/study_repo_next_due_test.dart::BS2` (currentBox/dueAt unchanged) |
 | BS6 | Unsuspend | Past `due_at` | Card immediately due | C0+C1 | `test/features/flashcards/suspend_test.dart::BS6` |
 | BS7 | Toast undo | Within 5s | Revert state | C1 | `test/features/flashcards/suspend_test.dart::BS7` |
 | BS8 | Filter | "Suspended" | Show only suspended cards | C0+C1 | `test/features/flashcards/filter_test.dart::BS8` |

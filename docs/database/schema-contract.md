@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-05-26
 applies_to: Drift schema, all tables, migrations
-schema_version: 9 (see lib/data/datasources/local/app_database.dart `currentSchemaVersion`)
+schema_version: 10 (see lib/data/datasources/local/app_database.dart `currentSchemaVersion`)
 ---
 
 # Database Schema Contract
@@ -51,7 +51,7 @@ This table describes the target persistence contract. Some entries are ahead of 
 | Folders | `folders` |
 | Decks | `decks`; `target_language` is Target / Migration Required per `docs/business/deck/deck-management.md` |
 | Flashcards | `flashcards` |
-| SRS progress | `flashcard_progress`; `buried_until`, `is_suspended`, and related fields are Target / Migration Required per `docs/business/study-actions/bury-suspend.md` |
+| SRS progress | `flashcard_progress`; `buried_until` and `is_suspended` implemented in schema v10 (P0-2). `last_reset_at` remains Target / Migration Required per `docs/business/history/card-history.md` |
 | Tags | `flashcard_tags` |
 | Sessions | `study_sessions` |
 | Session items | `study_session_items` |
@@ -85,7 +85,7 @@ The following schema changes are required to implement new specs. Each requires 
 
 A pending column listed here does not automatically approve every dependent feature. Before coding, check `docs/checklist/v1-implementation-scope-2026-05-29.md` and `docs/checklist/screen-function-task-matrix.md`.
 
-- `flashcard_progress.buried_until` and `flashcard_progress.is_suspended` are V1-approved only when the migration is part of the task.
+- `flashcard_progress.buried_until` and `flashcard_progress.is_suspended` — ✅ implemented in schema v10 (P0-2 bury/suspend foundation), with index `idx_flashcard_progress_eligibility (is_suspended, buried_until, due_at)`.
 - `flashcard_progress.last_reset_at`, `study_attempts.box_before`, and `study_attempts.box_after` are reserved for the Future Proposal Card History feature unless promoted.
 - `decks.target_language` may be implemented only with the deck/TTS migration task that updates Drift schema, mapper, tests, and generated code.
 
@@ -93,12 +93,12 @@ A pending column listed here does not automatically approve every dependent feat
 | Change | Source spec | Notes |
 | --- | --- | --- |
 | Add `decks.target_language TEXT NOT NULL DEFAULT 'korean'` | `docs/business/deck/deck-management.md` | Migration backfills existing rows to `'korean'`. |
-| Add `flashcard_progress.buried_until INTEGER NULL` | `docs/business/study-actions/bury-suspend.md` | Default null. |
-| Add `flashcard_progress.is_suspended BOOL NOT NULL DEFAULT 0` | `docs/business/study-actions/bury-suspend.md` | Default false. |
+| ✅ DONE (v10) `flashcard_progress.buried_until INTEGER NULL` | `docs/business/study-actions/bury-suspend.md` | Default null. Shipped in schema v10. |
+| ✅ DONE (v10) `flashcard_progress.is_suspended BOOL NOT NULL DEFAULT 0` | `docs/business/study-actions/bury-suspend.md` | Default false. Shipped in schema v10. |
 | Add `flashcard_progress.last_reset_at INTEGER NULL` | `docs/business/history/card-history.md` | Default null. Updated when user resets a card's progress. |
 | Add `study_attempts.box_before INTEGER NOT NULL DEFAULT 0` | `docs/business/history/card-history.md` | Migration backfill: set to 0 for pre-migration rows (treated as "unknown"; history view displays "—" for box transition on those rows). |
 | Add `study_attempts.box_after INTEGER NOT NULL DEFAULT 0` | `docs/business/history/card-history.md` | Same migration semantics as `box_before`. |
-| Consider compound index on `flashcard_progress(is_suspended, buried_until, due_at)` | `docs/business/study-actions/bury-suspend.md` | Profile before adding. |
+| ✅ DONE (v10) compound index `flashcard_progress(is_suspended, buried_until, due_at)` | `docs/business/study-actions/bury-suspend.md` | Added as `idx_flashcard_progress_eligibility`. |
 | Consider compound index on `flashcard_tags(LOWER(tag), flashcard_id)` | `docs/business/tags/tag-system.md` | For tag filter performance. |
 | Consider index on `study_attempts(box_after)` | `docs/business/history/card-history.md` | Only if box-progression analytics need it; profile first. |
 

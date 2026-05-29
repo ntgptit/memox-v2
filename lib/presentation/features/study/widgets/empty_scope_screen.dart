@@ -3,6 +3,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
+import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/empty_scope_reason.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
@@ -61,6 +62,8 @@ class EmptyScopeScreen extends StatelessWidget {
           ),
           EmptyScopeReason.todayAllDone => _todayAllDone(context, l10n),
           EmptyScopeReason.todayNoContent => _todayNoContent(context, l10n),
+          EmptyScopeReason.allBuried => _allBuried(context, l10n),
+          EmptyScopeReason.allSuspended => _allSuspended(context, l10n),
         },
       ),
     );
@@ -109,6 +112,41 @@ class EmptyScopeScreen extends StatelessWidget {
       actionLeadingIcon: Icons.add,
       onAction: folderId == null ? null : () => context.goFolderDetail(folderId),
     );
+  }
+
+  Widget _allBuried(BuildContext context, AppLocalizations l10n) => MxEmptyState(
+    icon: Icons.bedtime_outlined,
+    title: l10n.studyEmpty_allBuried_title,
+    message: l10n.studyEmpty_allBuried_message,
+    actionLabel: l10n.studyEmpty_allBuried_cta,
+    actionLeadingIcon: Icons.school_outlined,
+    onAction: entryRefId == null
+        ? () => context.goHome()
+        : () => _studyNewInstead(context),
+  );
+
+  Widget _allSuspended(BuildContext context, AppLocalizations l10n) =>
+      MxEmptyState(
+        icon: Icons.pause_circle_outline,
+        title: l10n.studyEmpty_allSuspended_title,
+        message: l10n.studyEmpty_allSuspended_message,
+        actionLabel: l10n.studyEmpty_allSuspended_cta,
+        actionLeadingIcon: Icons.style_outlined,
+        onAction: () => _viewScope(context),
+      );
+
+  /// Navigates to where the user can manage (e.g. unsuspend) the scope's cards.
+  void _viewScope(BuildContext context) {
+    final refId = entryRefId;
+    if (refId == null) {
+      context.goLibrary();
+      return;
+    }
+    if (entryType == StudyEntryType.folder.storageValue) {
+      context.goFolderDetail(refId);
+      return;
+    }
+    context.goFlashcardList(refId);
   }
 
   Widget _todayAllDone(BuildContext context, AppLocalizations l10n) =>

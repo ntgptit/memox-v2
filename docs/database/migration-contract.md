@@ -51,7 +51,7 @@ Run in order:
 
 ```text
 dart run build_runner build --delete-conflicting-outputs
-python code-verification-guard/guard/run.py check --project .
+python code-verification-guard/guard/run.py check --project . --ruleset memox
 flutter analyze
 flutter test test/data/migrations/
 flutter test <targeted feature tests>

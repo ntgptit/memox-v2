@@ -500,6 +500,24 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   Future<DateTime?> nextDueAt(StudyContext context) async => null;
 
   @override
+  Future<void> setBuried({
+    required String flashcardId,
+    required bool buried,
+  }) async {}
+
+  @override
+  Future<void> setSuspended({
+    required String flashcardId,
+    required bool suspended,
+  }) async {}
+
+  @override
+  Future<int> countSuspendedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
+
+  @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
     cancelCount += 1;
     return _snapshot(
@@ -604,6 +622,24 @@ final class _ResumeCandidateStudyRepo implements StudyRepo {
 
   @override
   Future<DateTime?> nextDueAt(StudyContext context) async => null;
+
+  @override
+  Future<void> setBuried({
+    required String flashcardId,
+    required bool buried,
+  }) async {}
+
+  @override
+  Future<void> setSuspended({
+    required String flashcardId,
+    required bool suspended,
+  }) async {}
+
+  @override
+  Future<int> countSuspendedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
   int resumeCandidateLoadCount = 0;
   bool hasResumeCandidate = true;
 
@@ -724,6 +760,24 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
 
   @override
   Future<DateTime?> nextDueAt(StudyContext context) async => null;
+
+  @override
+  Future<void> setBuried({
+    required String flashcardId,
+    required bool buried,
+  }) async {}
+
+  @override
+  Future<void> setSuspended({
+    required String flashcardId,
+    required bool suspended,
+  }) async {}
+
+  @override
+  Future<int> countSuspendedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
   int activeSessionLoadCount = 0;
   AttemptGrade? lastGrade;
   List<StudyMode>? lastModes;
@@ -846,6 +900,24 @@ final class _MatchBatchStudyRepo implements StudyRepo {
 
   @override
   Future<DateTime?> nextDueAt(StudyContext context) async => null;
+
+  @override
+  Future<void> setBuried({
+    required String flashcardId,
+    required bool buried,
+  }) async {}
+
+  @override
+  Future<void> setSuspended({
+    required String flashcardId,
+    required bool suspended,
+  }) async {}
+
+  @override
+  Future<int> countSuspendedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
   Map<String, AttemptGrade>? lastItemGrades;
   List<StudyMode>? lastModes;
 

@@ -133,6 +133,72 @@ void main() {
       expect(repaired.updatedAt, 3);
     },
   );
+
+  test(
+    'DT4 onNavigate: adds bury/suspend columns and preserves rows during '
+    'schema v10 migration',
+    () async {
+      final database = AppDatabase(
+        executor: NativeDatabase.memory(
+          setup: _createSchemaV9WithoutBurySuspend,
+        ),
+      );
+      addTearDown(database.close);
+
+      await database.ensureOpen();
+
+      final columns = await _columnNames(database, 'flashcard_progress');
+      expect(columns, containsAll(<String>['buried_until', 'is_suspended']));
+
+      final progress = await database.select(database.flashcardProgress).get();
+      expect(progress, hasLength(1));
+      final row = progress.single;
+      // Existing pre-migration data preserved.
+      expect(row.flashcardId, 'card-1');
+      expect(row.currentBox, 3);
+      expect(row.reviewCount, 1);
+      expect(row.dueAt, 200);
+      // New columns get safe defaults.
+      expect(row.isSuspended, isFalse);
+      expect(row.buriedUntil, isNull);
+    },
+  );
+}
+
+/// Builds a schema-v9 database (current shape minus `flashcard_progress`'s
+/// `buried_until` / `is_suspended` columns) with one progress row, so the
+/// v10 ADD COLUMN migration can be exercised. Tables not covered by an index
+/// are omitted; the indexed study tables exist with their referenced columns.
+void _createSchemaV9WithoutBurySuspend(dynamic database) {
+  const statements = <String>[
+    'PRAGMA foreign_keys = OFF',
+    'CREATE TABLE folders (id TEXT NOT NULL PRIMARY KEY, parent_id TEXT, sort_order INTEGER)',
+    'CREATE TABLE decks (id TEXT NOT NULL PRIMARY KEY, folder_id TEXT, sort_order INTEGER)',
+    'CREATE TABLE flashcards (id TEXT NOT NULL PRIMARY KEY, deck_id TEXT, sort_order INTEGER)',
+    '''
+    CREATE TABLE flashcard_progress (
+      flashcard_id TEXT NOT NULL PRIMARY KEY,
+      current_box INTEGER NOT NULL,
+      review_count INTEGER NOT NULL,
+      lapse_count INTEGER NOT NULL,
+      last_result TEXT,
+      last_studied_at INTEGER,
+      due_at INTEGER,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    )
+    ''',
+    'CREATE TABLE study_sessions (id TEXT NOT NULL PRIMARY KEY, entry_type TEXT, entry_ref_id TEXT, study_type TEXT, status TEXT, started_at INTEGER)',
+    'CREATE TABLE study_session_items (id TEXT NOT NULL PRIMARY KEY, session_id TEXT, study_mode TEXT, mode_order INTEGER, round_index INTEGER, queue_position INTEGER, status TEXT)',
+    'CREATE TABLE study_attempts (id TEXT NOT NULL PRIMARY KEY, session_id TEXT, session_item_id TEXT, answered_at INTEGER)',
+    "INSERT INTO flashcards (id, deck_id, sort_order) VALUES ('card-1', 'deck-1', 0)",
+    "INSERT INTO flashcard_progress (flashcard_id, current_box, review_count, lapse_count, last_result, last_studied_at, due_at, created_at, updated_at) VALUES ('card-1', 3, 1, 0, 'perfect', 100, 200, 1, 2)",
+    'PRAGMA user_version = 9',
+  ];
+
+  for (final statement in statements) {
+    database.execute(statement);
+  }
 }
 
 Future<List<String>> _columnNames(

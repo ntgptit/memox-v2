@@ -144,7 +144,7 @@ Rejection MUST NOT be a generic toast or error dialog. Always render dedicated e
 | `studyEmpty_today_allDone` | ✅ Implemented (Tier 1) | `study_usecases.dart` (`_rejectEmptyToday`) + `StudyRepo.countDueCardsInScope` + `empty_scope_screen.dart`. Streak inset still pending (engagement use cases are `Target`). |
 | `studyEmpty_today_noContent` | ✅ Implemented (Tier 1) | `study_usecases.dart` (`_rejectEmptyToday`) + `StudyRepo.countFlashcardsInScope` + `empty_scope_screen.dart` |
 | `studyEmpty_tag_noCards` / `studyEmpty_tag_noDueCards` | 🔴 Blocked (Tier 2) — `StudyEntryType.tag` not yet defined; needs tag-scope queries + tag picker | `docs/business/tags/tag-system.md` |
-| `studyEmpty_allBuried` / `studyEmpty_allSuspended` | 🔴 Blocked (Tier 3) — depends on P0-2 bury/suspend schema migration | `docs/business/study-actions/bury-suspend.md` |
+| `studyEmpty_allBuried` / `studyEmpty_allSuspended` | ✅ Implemented (Tier 3, P0-2) | `study_usecases.dart` `_rejectEmptyScope` (allSuspended precedes allBuried) + `StudyRepo.countSuspendedInScope` / `countActiveBuriedInScope` + `empty_scope_screen.dart`. Decision rows S4f/S4g. |
 
 ## "Next due" calculation
 

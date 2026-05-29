@@ -36,6 +36,15 @@ class FlashcardProgress extends Table {
 
   IntColumn get dueAt => integer().named('due_at').nullable()();
 
+  /// UTC epoch ms; card is hidden from study queues while `buried_until > now`.
+  /// Null means not buried. See `docs/business/study-actions/bury-suspend.md`.
+  IntColumn get buriedUntil => integer().named('buried_until').nullable()();
+
+  /// When true, the card is hidden from all study queues regardless of
+  /// due/buried state. SRS state is preserved for unsuspend.
+  BoolColumn get isSuspended =>
+      boolean().named('is_suspended').withDefault(const Constant(false))();
+
   IntColumn get createdAt => integer().named('created_at')();
 
   IntColumn get updatedAt => integer().named('updated_at')();

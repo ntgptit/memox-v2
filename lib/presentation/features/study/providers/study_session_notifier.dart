@@ -65,6 +65,47 @@ class StudySessionActionController extends _$StudySessionActionController {
     (_) => ref.read(cancelStudySessionUseCaseProvider).execute(sessionId),
   );
 
+  /// Buries the current card and advances past it. Returns the buried card id
+  /// (for the undo toast) or null when there is no current card / on failure.
+  Future<String?> buryCurrentCard() => _mutateCurrentCard((card) async {
+    await ref.read(buryFlashcardUseCaseProvider).execute(card.id);
+    await ref.read(skipFlashcardUseCaseProvider).execute(sessionId);
+  });
+
+  /// Suspends the current card and advances past it. Returns the suspended
+  /// card id (for the undo toast) or null when unavailable / on failure.
+  Future<String?> suspendCurrentCard() => _mutateCurrentCard((card) async {
+    await ref.read(suspendFlashcardUseCaseProvider).execute(card.id);
+    await ref.read(skipFlashcardUseCaseProvider).execute(sessionId);
+  });
+
+  Future<void> unburyCard(String flashcardId) => _executeMutation(
+    () => ref.read(unburyFlashcardUseCaseProvider).execute(flashcardId),
+  );
+
+  Future<void> unsuspendCard(String flashcardId) => _executeMutation(
+    () => ref.read(unsuspendFlashcardUseCaseProvider).execute(flashcardId),
+  );
+
+  Future<String?> _mutateCurrentCard(
+    Future<void> Function(StudyFlashcardRef card) action,
+  ) async {
+    state = const AsyncLoading<void>();
+    final snapshot = await ref.read(
+      studySessionStateProvider(sessionId).future,
+    );
+    if (!ref.mounted) {
+      return null;
+    }
+    final card = snapshot.currentItem?.flashcard;
+    if (card == null) {
+      state = const AsyncData<void>(null);
+      return null;
+    }
+    final succeeded = await _executeMutation(() => action(card));
+    return succeeded ? card.id : null;
+  }
+
   Future<bool> finalizeSession() async => _executeWithCurrentSession(
     (snapshot) => ref
         .read(finalizeStudySessionUseCaseProvider)

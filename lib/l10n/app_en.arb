@@ -1137,6 +1137,54 @@
   "@studyEmptyNextDueSoon": {
     "description": "Relative time fragment for the next-due hint when the next card is due in under an hour."
   },
+  "studyEmpty_allBuried_title": "All cards buried",
+  "@studyEmpty_allBuried_title": {
+    "description": "Empty-scope title when every card in scope is buried for today. P0-2 Tier 3."
+  },
+  "studyEmpty_allBuried_message": "You buried every card for now. They'll return tomorrow.",
+  "@studyEmpty_allBuried_message": {
+    "description": "Empty-scope message for the all-buried state."
+  },
+  "studyEmpty_allBuried_cta": "Study new instead",
+  "@studyEmpty_allBuried_cta": {
+    "description": "Empty-scope CTA that restarts study as a New Study session when all cards are buried."
+  },
+  "studyEmpty_allSuspended_title": "All cards suspended",
+  "@studyEmpty_allSuspended_title": {
+    "description": "Empty-scope title when every card in scope is suspended. P0-2 Tier 3."
+  },
+  "studyEmpty_allSuspended_message": "Resume some cards to study them again.",
+  "@studyEmpty_allSuspended_message": {
+    "description": "Empty-scope message for the all-suspended state."
+  },
+  "studyEmpty_allSuspended_cta": "View flashcards",
+  "@studyEmpty_allSuspended_cta": {
+    "description": "Empty-scope CTA that opens the flashcard list so the user can unsuspend cards."
+  },
+  "cardActionsTitle": "Card actions",
+  "@cardActionsTitle": {
+    "description": "Title of the card-actions bottom sheet shown during a study session."
+  },
+  "cardActionBury": "Bury until tomorrow",
+  "@cardActionBury": {
+    "description": "Card-actions sheet entry that buries the current card until tomorrow."
+  },
+  "cardActionSuspend": "Suspend card",
+  "@cardActionSuspend": {
+    "description": "Card-actions sheet entry that suspends the current card indefinitely."
+  },
+  "studyCardBuriedMessage": "Card buried until tomorrow.",
+  "@studyCardBuriedMessage": {
+    "description": "Snackbar shown after burying a card."
+  },
+  "studyCardSuspendedMessage": "Card suspended.",
+  "@studyCardSuspendedMessage": {
+    "description": "Snackbar shown after suspending a card."
+  },
+  "commonUndo": "Undo",
+  "@commonUndo": {
+    "description": "Generic undo action label used by bury/suspend toasts."
+  },
   "studyCancelConfirmTitle": "Cancel this session?",
   "studyCancelConfirmMessage": "Your current study session will stop and you will be taken to the result screen.",
   "studyCancelConfirmAction": "Cancel",
