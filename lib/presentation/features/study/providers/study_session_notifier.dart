@@ -65,18 +65,20 @@ class StudySessionActionController extends _$StudySessionActionController {
     (_) => ref.read(cancelStudySessionUseCaseProvider).execute(sessionId),
   );
 
-  /// Buries the current card and advances past it. Returns the buried card id
-  /// (for the undo toast) or null when there is no current card / on failure.
+  /// Buries the current card and removes it from the active session (it does
+  /// not reappear this session). Returns the buried card id (for the undo
+  /// toast) or null when there is no current card / on failure.
   Future<String?> buryCurrentCard() => _mutateCurrentCard((card) async {
     await ref.read(buryFlashcardUseCaseProvider).execute(card.id);
-    await ref.read(skipFlashcardUseCaseProvider).execute(sessionId);
+    await ref.read(dropCurrentStudyItemUseCaseProvider).execute(sessionId);
   });
 
-  /// Suspends the current card and advances past it. Returns the suspended
-  /// card id (for the undo toast) or null when unavailable / on failure.
+  /// Suspends the current card and removes it from the active session (it does
+  /// not reappear this session). Returns the suspended card id (for the undo
+  /// toast) or null when unavailable / on failure.
   Future<String?> suspendCurrentCard() => _mutateCurrentCard((card) async {
     await ref.read(suspendFlashcardUseCaseProvider).execute(card.id);
-    await ref.read(skipFlashcardUseCaseProvider).execute(sessionId);
+    await ref.read(dropCurrentStudyItemUseCaseProvider).execute(sessionId);
   });
 
   Future<void> unburyCard(String flashcardId) => _executeMutation(

@@ -129,4 +129,36 @@ final class StudySessionItemDao {
                 table.status.equals('pending'),
           ))
           .write(const StudySessionItemsCompanion(status: Value('abandoned')));
+
+  /// Abandons every still-pending item for [flashcardId] in [sessionId].
+  /// Used by bury/suspend to remove the card from the active session queue
+  /// without recording an attempt.
+  Future<void> abandonFlashcardPendingItems({
+    required String sessionId,
+    required String flashcardId,
+  }) =>
+      (_database.update(_database.studySessionItems)..where(
+            (table) =>
+                table.sessionId.equals(sessionId) &
+                table.flashcardId.equals(flashcardId) &
+                table.status.equals('pending'),
+          ))
+          .write(const StudySessionItemsCompanion(status: Value('abandoned')));
+
+  /// Distinct flashcard ids that have at least one abandoned item in
+  /// [sessionId]. Buried/suspended cards are dropped this way and must be
+  /// excluded from later modes and SRS commit.
+  Future<Set<String>> listAbandonedFlashcardIds(String sessionId) async {
+    final query = _database.selectOnly(_database.studySessionItems, distinct: true)
+      ..addColumns([_database.studySessionItems.flashcardId])
+      ..where(
+        _database.studySessionItems.sessionId.equals(sessionId) &
+            _database.studySessionItems.status.equals('abandoned'),
+      );
+    final rows = await query.get();
+    return rows
+        .map((row) => row.read(_database.studySessionItems.flashcardId))
+        .whereType<String>()
+        .toSet();
+  }
 }

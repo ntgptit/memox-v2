@@ -65,6 +65,10 @@ SkipFlashcardUseCase skipFlashcardUseCase(Ref ref) =>
     SkipFlashcardUseCase(ref.watch(studyRepoProvider));
 
 @riverpod
+DropCurrentStudyItemUseCase dropCurrentStudyItemUseCase(Ref ref) =>
+    DropCurrentStudyItemUseCase(ref.watch(studyRepoProvider));
+
+@riverpod
 CancelStudySessionUseCase cancelStudySessionUseCase(Ref ref) =>
     CancelStudySessionUseCase(ref.watch(studyRepoProvider));
 

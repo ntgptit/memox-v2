@@ -32,6 +32,7 @@ class ReviewModeSessionView extends StatefulWidget {
     required this.onSubmit,
     required this.onCancel,
     required this.onBack,
+    this.onCardActions,
     super.key,
   });
 
@@ -41,6 +42,7 @@ class ReviewModeSessionView extends StatefulWidget {
   final Future<bool> Function() onSubmit;
   final VoidCallback onCancel;
   final VoidCallback onBack;
+  final VoidCallback? onCardActions;
 
   @override
   State<ReviewModeSessionView> createState() => _ReviewModeSessionViewState();
@@ -98,6 +100,7 @@ class _ReviewModeSessionViewState extends State<ReviewModeSessionView> {
       isActionBusy: widget.isSubmitting,
       onCancel: widget.onCancel,
       onBack: widget.onBack,
+      onCardActions: widget.onCardActions,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

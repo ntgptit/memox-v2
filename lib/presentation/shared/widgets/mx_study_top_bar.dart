@@ -34,6 +34,7 @@ class MxStudyTopBar extends StatelessWidget {
     required this.counterLabel,
     required this.onClose,
     this.closeTooltip,
+    this.trailing,
     super.key,
   });
 
@@ -43,6 +44,10 @@ class MxStudyTopBar extends StatelessWidget {
   final String counterLabel;
   final VoidCallback? onClose;
   final String? closeTooltip;
+
+  /// Optional trailing action rendered after the counter (e.g. a card-actions
+  /// overflow button). Kept generic so this shared widget stays study-agnostic.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +98,7 @@ class MxStudyTopBar extends StatelessWidget {
             role: MxTextRole.studyProgress,
             color: scheme.onSurfaceVariant,
           ),
+          if (trailing != null) ...[const MxGap(MxSpace.xs), trailing!],
         ],
       ),
     );

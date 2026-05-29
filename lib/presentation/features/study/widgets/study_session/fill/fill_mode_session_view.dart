@@ -24,6 +24,7 @@ class FillModeSessionView extends StatefulWidget {
     required this.onSubmit,
     required this.onCancel,
     required this.onBack,
+    this.onCardActions,
     super.key,
   });
 
@@ -33,6 +34,7 @@ class FillModeSessionView extends StatefulWidget {
   final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
   final VoidCallback onCancel;
   final VoidCallback onBack;
+  final VoidCallback? onCardActions;
 
   @override
   State<FillModeSessionView> createState() => _FillModeSessionViewState();
@@ -102,6 +104,7 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
       isActionBusy: widget.isSubmitting,
       onCancel: widget.onCancel,
       onBack: widget.onBack,
+      onCardActions: widget.onCardActions,
       child: item == null
           ? const SizedBox.shrink()
           : Column(

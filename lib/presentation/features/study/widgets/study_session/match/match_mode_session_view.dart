@@ -26,6 +26,7 @@ class MatchModeSessionView extends StatefulWidget {
     required this.onSubmit,
     required this.onCancel,
     required this.onBack,
+    this.onCardActions,
     super.key,
   });
 
@@ -35,6 +36,7 @@ class MatchModeSessionView extends StatefulWidget {
   final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
   final VoidCallback onCancel;
   final VoidCallback onBack;
+  final VoidCallback? onCardActions;
 
   @override
   State<MatchModeSessionView> createState() => _MatchModeSessionViewState();
@@ -126,6 +128,7 @@ class _MatchModeSessionViewState extends State<MatchModeSessionView> {
       isActionBusy: widget.isSubmitting,
       onCancel: widget.onCancel,
       onBack: widget.onBack,
+      onCardActions: widget.onCardActions,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

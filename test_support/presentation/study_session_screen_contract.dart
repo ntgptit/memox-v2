@@ -2226,6 +2226,14 @@ final class _BatchAnswerStudyRepo implements StudyRepo {
   Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
 
   @override
+  Future<StudySessionSnapshot> dropCurrentItemFromSession({
+    required String sessionId,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<List<StudyFlashcardRef>> loadNewCards(StudyContext context) {
     throw UnimplementedError();
   }

@@ -401,6 +401,30 @@ final class SkipFlashcardUseCase {
       _repository.skipCurrentItem(sessionId);
 }
 
+/// Removes the current card from the active session after a bury/suspend.
+/// Unlike [SkipFlashcardUseCase] (which requeues), the card is abandoned and
+/// never reappears in this session. No attempt is recorded; the session
+/// advances or becomes ready to finalize. Spec:
+/// `docs/business/study-actions/bury-suspend.md` §Bury.
+final class DropCurrentStudyItemUseCase {
+  const DropCurrentStudyItemUseCase(this._repository);
+
+  final StudyRepo _repository;
+
+  Future<StudySessionSnapshot> execute(String sessionId) async {
+    final snapshot = await _repository.loadSession(sessionId);
+    final modes = studyModesForFlow(snapshot.session.studyFlow);
+    final result = await _repository.dropCurrentItemFromSession(
+      sessionId: sessionId,
+      modes: modes,
+    );
+    return _withFlowPlan(
+      result,
+      _flowPlan(result.session.studyType, result.session.studyFlow),
+    );
+  }
+}
+
 final class CancelStudySessionUseCase {
   const CancelStudySessionUseCase(this._repository);
 

@@ -20,6 +20,7 @@ import '../mappers/database_enum_codecs.dart';
 part 'study_repo_impl_helpers.dart';
 part 'study_repo_impl_mapping_helpers.dart';
 part 'study_repo_impl_models.dart';
+part 'study_repo_impl_session_helpers.dart';
 
 final class StudyRepoImpl implements StudyRepo {
   const StudyRepoImpl({
@@ -458,6 +459,12 @@ final class StudyRepoImpl implements StudyRepo {
     });
     return _loadSnapshot(sessionId);
   }
+
+  @override
+  Future<StudySessionSnapshot> dropCurrentItemFromSession({
+    required String sessionId,
+    required List<StudyMode> modes,
+  }) => _dropCurrentItemFromSession(sessionId: sessionId, modes: modes);
 
   @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {

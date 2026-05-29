@@ -74,6 +74,16 @@ abstract interface class StudyRepo {
 
   Future<StudySessionSnapshot> skipCurrentItem(String sessionId);
 
+  /// Removes the current pending card from the active session (used by
+  /// bury/suspend): abandons every still-pending item for that flashcard
+  /// WITHOUT recording an attempt, then advances to the next card, or
+  /// transitions the session to ready-to-finalize when no pending cards
+  /// remain. SRS progress is never touched here.
+  Future<StudySessionSnapshot> dropCurrentItemFromSession({
+    required String sessionId,
+    required List<StudyMode> modes,
+  });
+
   Future<StudySessionSnapshot> cancelSession(String sessionId);
 
   Future<StudySessionSnapshot> finalizeSession({

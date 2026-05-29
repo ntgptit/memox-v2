@@ -277,8 +277,16 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
     String sessionId,
   ) async {
     final items = await _studySessionItemDao.listOriginalBatchItems(sessionId);
+    // Cards dropped via bury/suspend (abandoned) must not be re-presented in
+    // later modes nor committed to SRS. See bury-suspend.md.
+    final dropped = await _studySessionItemDao.listAbandonedFlashcardIds(
+      sessionId,
+    );
     final cards = <StudyFlashcardRef>[];
     for (final item in items) {
+      if (dropped.contains(item.flashcardId)) {
+        continue;
+      }
       cards.add(await _flashcardRefForItem(item));
     }
     return cards;

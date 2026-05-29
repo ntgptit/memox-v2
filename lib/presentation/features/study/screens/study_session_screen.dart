@@ -125,6 +125,9 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
           .answerCurrentModeItemGradesBatch(itemGrades),
       onCancel: () => _confirmCancel(context),
       onBack: () => context.popRoute(fallback: context.goLibrary),
+      onCardActions: snapshot.currentItem == null
+          ? null
+          : () => _openCardActions(context, snapshot),
     );
     if (activeModeView != null) {
       return activeModeView;

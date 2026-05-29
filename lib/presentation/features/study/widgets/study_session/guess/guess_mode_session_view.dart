@@ -32,6 +32,7 @@ class GuessModeSessionView extends StatefulWidget {
     required this.onSubmit,
     required this.onCancel,
     required this.onBack,
+    this.onCardActions,
     super.key,
   });
 
@@ -41,6 +42,7 @@ class GuessModeSessionView extends StatefulWidget {
   final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
   final VoidCallback onCancel;
   final VoidCallback onBack;
+  final VoidCallback? onCardActions;
 
   @override
   State<GuessModeSessionView> createState() => _GuessModeSessionViewState();
@@ -93,6 +95,7 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
         isActionBusy: widget.isSubmitting,
         onCancel: widget.onCancel,
         onBack: widget.onBack,
+        onCardActions: widget.onCardActions,
         child: const SizedBox.shrink(),
       );
     }
@@ -106,7 +109,8 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
       isActionBusy: widget.isSubmitting,
       onCancel: widget.onCancel,
       onBack: widget.onBack,
-      child: Column(
+      onCardActions: widget.onCardActions,
+  child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           StudyAutoSpeakEffect(

@@ -296,6 +296,14 @@ final class _ProgressStudyRepo implements StudyRepo {
 
   @override
   Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<StudySessionSnapshot> dropCurrentItemFromSession({
+    required String sessionId,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
   int finalizeCount = 0;
   int retryFinalizeCount = 0;
   int resumeCandidateLoadCount = 0;

@@ -20,6 +20,7 @@ class MxStudyScaffold extends StatelessWidget {
     required this.body,
     this.onClose,
     this.closeTooltip,
+    this.topBarTrailing,
     this.bottomAction,
     this.resizeToAvoidBottomInset,
     super.key,
@@ -32,6 +33,7 @@ class MxStudyScaffold extends StatelessWidget {
   final Widget body;
   final VoidCallback? onClose;
   final String? closeTooltip;
+  final Widget? topBarTrailing;
   final Widget? bottomAction;
   final bool? resizeToAvoidBottomInset;
 
@@ -53,6 +55,7 @@ class MxStudyScaffold extends StatelessWidget {
             counterLabel: counterLabel,
             onClose: onClose,
             closeTooltip: closeTooltip,
+            trailing: topBarTrailing,
           ),
           Expanded(
             child: MxContentShell(

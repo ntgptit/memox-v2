@@ -5,9 +5,9 @@ applies_to: bury (skip card today), suspend (hide card indefinitely)
 
 # Bury and Suspend
 
-> **Status: Foundation implemented (P0-2).** Schema v10 added `flashcard_progress.buried_until INTEGER NULL` and `flashcard_progress.is_suspended BOOL NOT NULL DEFAULT 0` (+ index `idx_flashcard_progress_eligibility`). Implemented: bury/suspend/unbury/unsuspend use cases + repository persistence, study-batch + due-count filtering (excludes suspended and currently-buried; expired bury re-enters), empty-scope variants `studyEmpty_allBuried` / `studyEmpty_allSuspended`, and the card-actions bottom sheet (Edit / Bury / Suspend) wired into the study session.
+> **Status: Implemented (P0-2).** Schema v10 added `flashcard_progress.buried_until INTEGER NULL` and `flashcard_progress.is_suspended BOOL NOT NULL DEFAULT 0` (+ index `idx_flashcard_progress_eligibility`). Implemented: bury/suspend/unbury/unsuspend use cases + repository persistence; study-batch + due-count filtering (excludes suspended and currently-buried; expired bury re-enters); empty-scope variants `studyEmpty_allBuried` / `studyEmpty_allSuspended`; the card-actions bottom sheet (Edit / Bury / Suspend) reachable via the overflow trigger in all five study mode views (review/match/guess/recall/fill) + the session app bar; and **active-session removal** — burying/suspending the current card abandons it (no attempt, SRS preserved), removes it from the queue so it does not reappear in the session, and advances or finalizes the session (`DropCurrentStudyItemUseCase` → `StudyRepo.dropCurrentItemFromSession`).
 >
-> **Still pending (separate tasks):** flashcard-list state badges + status filter chips, bulk suspend/unsuspend, surfacing the card-actions trigger inside each in-session mode view (review/match/guess/recall/fill), and unsuspend from the flashcard list. These build on this foundation.
+> **Still pending (separate tasks):** undo re-insert of a buried/suspended card into the *active* session (undo currently reverts the progress state only); flashcard-list state badges + status filter chips; bulk suspend/unsuspend; unsuspend from the flashcard list; optional long-press shortcut alongside the overflow trigger.
 
 ## Purpose
 

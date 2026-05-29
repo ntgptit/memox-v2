@@ -518,6 +518,14 @@ final class _CancelOnlyStudyRepo implements StudyRepo {
   Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
 
   @override
+  Future<StudySessionSnapshot> dropCurrentItemFromSession({
+    required String sessionId,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<StudySessionSnapshot> cancelSession(String sessionId) async {
     cancelCount += 1;
     return _snapshot(
@@ -640,6 +648,14 @@ final class _ResumeCandidateStudyRepo implements StudyRepo {
 
   @override
   Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<StudySessionSnapshot> dropCurrentItemFromSession({
+    required String sessionId,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
   int resumeCandidateLoadCount = 0;
   bool hasResumeCandidate = true;
 
@@ -778,6 +794,14 @@ final class _ReviewBatchStudyRepo implements StudyRepo {
 
   @override
   Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<StudySessionSnapshot> dropCurrentItemFromSession({
+    required String sessionId,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
   int activeSessionLoadCount = 0;
   AttemptGrade? lastGrade;
   List<StudyMode>? lastModes;
@@ -918,6 +942,14 @@ final class _MatchBatchStudyRepo implements StudyRepo {
 
   @override
   Future<int> countActiveBuriedInScope(StudyContext context) async => 0;
+
+  @override
+  Future<StudySessionSnapshot> dropCurrentItemFromSession({
+    required String sessionId,
+    required List<StudyMode> modes,
+  }) {
+    throw UnimplementedError();
+  }
   Map<String, AttemptGrade>? lastItemGrades;
   List<StudyMode>? lastModes;
 

@@ -20,6 +20,7 @@ typedef _ModeViewBuilder =
       required StudyModeBatchSubmit onBatchSubmit,
       required VoidCallback onCancel,
       required VoidCallback onBack,
+      required VoidCallback? onCardActions,
     });
 
 final class StudyModeSessionViewFactory {
@@ -36,6 +37,7 @@ final class StudyModeSessionViewFactory {
               required onBatchSubmit,
               required onCancel,
               required onBack,
+              required onCardActions,
             }) => ReviewModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
@@ -43,6 +45,7 @@ final class StudyModeSessionViewFactory {
               onSubmit: onReviewSubmit,
               onCancel: onCancel,
               onBack: onBack,
+              onCardActions: onCardActions,
             ),
         StudyMode.match:
             ({
@@ -53,6 +56,7 @@ final class StudyModeSessionViewFactory {
               required onBatchSubmit,
               required onCancel,
               required onBack,
+              required onCardActions,
             }) => MatchModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
@@ -60,6 +64,7 @@ final class StudyModeSessionViewFactory {
               onSubmit: onBatchSubmit,
               onCancel: onCancel,
               onBack: onBack,
+              onCardActions: onCardActions,
             ),
         StudyMode.guess:
             ({
@@ -70,6 +75,7 @@ final class StudyModeSessionViewFactory {
               required onBatchSubmit,
               required onCancel,
               required onBack,
+              required onCardActions,
             }) => GuessModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
@@ -77,6 +83,7 @@ final class StudyModeSessionViewFactory {
               onSubmit: onBatchSubmit,
               onCancel: onCancel,
               onBack: onBack,
+              onCardActions: onCardActions,
             ),
         StudyMode.recall:
             ({
@@ -87,6 +94,7 @@ final class StudyModeSessionViewFactory {
               required onBatchSubmit,
               required onCancel,
               required onBack,
+              required onCardActions,
             }) => RecallModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
@@ -94,6 +102,7 @@ final class StudyModeSessionViewFactory {
               onSubmit: onBatchSubmit,
               onCancel: onCancel,
               onBack: onBack,
+              onCardActions: onCardActions,
             ),
         StudyMode.fill:
             ({
@@ -104,6 +113,7 @@ final class StudyModeSessionViewFactory {
               required onBatchSubmit,
               required onCancel,
               required onBack,
+              required onCardActions,
             }) => FillModeSessionView(
               snapshot: snapshot,
               isSubmitting: isSubmitting,
@@ -111,6 +121,7 @@ final class StudyModeSessionViewFactory {
               onSubmit: onBatchSubmit,
               onCancel: onCancel,
               onBack: onBack,
+              onCardActions: onCardActions,
             ),
       };
 
@@ -122,6 +133,7 @@ final class StudyModeSessionViewFactory {
     required StudyModeBatchSubmit onBatchSubmit,
     required VoidCallback onCancel,
     required VoidCallback onBack,
+    VoidCallback? onCardActions,
   }) {
     final mode = snapshot.currentItem?.studyMode;
     if (mode == null || snapshot.session.status != SessionStatus.inProgress) {
@@ -139,6 +151,7 @@ final class StudyModeSessionViewFactory {
       onBatchSubmit: onBatchSubmit,
       onCancel: onCancel,
       onBack: onBack,
+      onCardActions: onCardActions,
     );
   }
 }

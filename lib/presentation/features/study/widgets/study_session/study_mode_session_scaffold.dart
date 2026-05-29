@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/layouts/mx_study_scaffold.dart';
+import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_study_top_bar.dart';
 
 /// Study-session shell.
@@ -19,6 +20,7 @@ class StudyModeSessionScaffold extends StatelessWidget {
     required this.onCancel,
     required this.onBack,
     required this.child,
+    this.onCardActions,
     this.resizeToAvoidBottomInset,
     super.key,
   });
@@ -32,12 +34,17 @@ class StudyModeSessionScaffold extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onBack;
   final Widget child;
+
+  /// Opens the card-actions sheet (Edit / Bury / Suspend) for the current card.
+  /// When null, the overflow trigger is hidden.
+  final VoidCallback? onCardActions;
   final bool? resizeToAvoidBottomInset;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final closeHandler = isActionBusy ? null : (canCancel ? onCancel : onBack);
+    final cardActions = onCardActions;
     return MxStudyScaffold(
       modeLabel: modeLabel,
       accent: accent,
@@ -47,6 +54,13 @@ class StudyModeSessionScaffold extends StatelessWidget {
       closeTooltip: canCancel
           ? l10n.studyCancelAction
           : MaterialLocalizations.of(context).backButtonTooltip,
+      topBarTrailing: cardActions == null
+          ? null
+          : MxIconButton.toolbar(
+              icon: Icons.more_vert_rounded,
+              tooltip: l10n.cardActionsTitle,
+              onPressed: isActionBusy ? null : cardActions,
+            ),
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       body: child,
     );

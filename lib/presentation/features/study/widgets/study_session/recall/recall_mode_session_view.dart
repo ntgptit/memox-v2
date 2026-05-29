@@ -29,6 +29,7 @@ class RecallModeSessionView extends StatefulWidget {
     required this.onSubmit,
     required this.onCancel,
     required this.onBack,
+    this.onCardActions,
     super.key,
   });
 
@@ -38,6 +39,7 @@ class RecallModeSessionView extends StatefulWidget {
   final Future<bool> Function(Map<String, AttemptGrade> itemGrades) onSubmit;
   final VoidCallback onCancel;
   final VoidCallback onBack;
+  final VoidCallback? onCardActions;
 
   @override
   State<RecallModeSessionView> createState() => _RecallModeSessionViewState();
@@ -106,6 +108,7 @@ class _RecallModeSessionViewState extends State<RecallModeSessionView>
       isActionBusy: widget.isSubmitting,
       onCancel: widget.onCancel,
       onBack: widget.onBack,
+      onCardActions: widget.onCardActions,
       child: item == null
           ? const SizedBox.shrink()
           : Column(
