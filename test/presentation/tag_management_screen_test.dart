@@ -9,9 +9,12 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/settings/screens/tag_management_screen.dart';
 
 class _FakeTagRepository implements TagRepository {
-  _FakeTagRepository(this.tags);
+  _FakeTagRepository(this.tags, {this.existsWhenChecked = false});
 
   final List<TagWithCount> tags;
+
+  /// When true, [existsCaseInsensitive] returns true — simulating a collision.
+  final bool existsWhenChecked;
 
   ({String oldName, String newName})? renamed;
   ({String source, String destination})? merged;
@@ -22,7 +25,8 @@ class _FakeTagRepository implements TagRepository {
       Stream<List<TagWithCount>>.value(tags);
 
   @override
-  Future<bool> existsCaseInsensitive(String lowerName) async => false;
+  Future<bool> existsCaseInsensitive(String lowerName) async =>
+      existsWhenChecked;
 
   @override
   Future<Result<void>> addTagToCard({
@@ -63,9 +67,10 @@ class _FakeTagRepository implements TagRepository {
 
 Future<_FakeTagRepository> _pump(
   WidgetTester tester,
-  List<TagWithCount> tags,
-) async {
-  final fake = _FakeTagRepository(tags);
+  List<TagWithCount> tags, {
+  bool existsWhenChecked = false,
+}) async {
+  final fake = _FakeTagRepository(tags, existsWhenChecked: existsWhenChecked);
   await tester.pumpWidget(
     ProviderScope(
       overrides: [tagRepositoryProvider.overrideWithValue(fake)],
@@ -156,4 +161,39 @@ void main() {
     expect(fake.merged?.source, 'verb');
     expect(fake.merged?.destination, 'noun');
   });
+
+  testWidgets(
+    'rename collision shows merge confirmation and merges when confirmed',
+    (tester) async {
+      // existsWhenChecked = true → RenameTagUseCase returns tagNameConflict →
+      // screen shows merge-confirm dialog → user confirms → merge executes.
+      final fake = await _pump(
+        tester,
+        const [TagWithCount(tag: 'verb', cardCount: 3)],
+        existsWhenChecked: true,
+      );
+
+      await tester.tap(find.text('#verb'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Rename'));
+      await tester.pumpAndSettle();
+
+      // Enter a name that exists (collision).
+      await tester.enterText(find.byType(TextField).last, 'verbs');
+      await tester.tap(find.text('Rename'));
+      await tester.pumpAndSettle();
+
+      // Merge-confirm dialog must appear (not rename snackbar).
+      expect(find.text('Merge tags?'), findsOneWidget);
+      expect(fake.merged, isNull); // not merged yet
+
+      await tester.tap(find.text('Merge'));
+      await tester.pumpAndSettle();
+
+      // After confirm, merge is executed with the right names.
+      expect(fake.merged?.source, 'verb');
+      expect(fake.merged?.destination, 'verbs');
+      expect(fake.renamed, isNull); // rename was not called
+    },
+  );
 }

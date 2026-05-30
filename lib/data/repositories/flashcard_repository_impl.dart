@@ -8,6 +8,7 @@ import '../../core/utils/string_utils.dart';
 import '../../domain/entities/flashcard_entity.dart';
 import '../../domain/enums/content_sort_mode.dart';
 import '../../domain/repositories/flashcard_repository.dart';
+import '../../domain/tag/tag_validator.dart';
 import '../../domain/value_objects/content_actions.dart';
 import '../../domain/value_objects/content_queries.dart';
 import '../../domain/value_objects/content_read_models.dart';
@@ -426,18 +427,31 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       '${StringUtils.normalizedForComparison(front)}\u0001'
       '${StringUtils.normalizedForComparison(back)}';
 
+  /// Normalizes and validates a draft before persistence.
+  ///
+  /// Tag validation runs through [TagValidator] at the repository boundary so
+  /// that invalid tags are rejected regardless of the call path (editor, import,
+  /// bulk operations, etc.). Each tag is: trimmed, stripped of a leading `#`,
+  /// lowercased, and checked for commas and max-50-char length. Throws
+  /// [ValidationException] on the first invalid tag — caught by
+  /// [runRepositoryAction] and surfaced as a [FailureResult].
   FlashcardDraft _normalizeDraft(FlashcardDraft draft) {
     final front = StringUtils.trimmed(draft.front);
     final back = StringUtils.trimmed(draft.back);
     if (front.isEmpty || back.isEmpty) {
       throw const ValidationException(message: 'front and back are required.');
     }
-    final cleanedTags = <String>{};
+    const validator = TagValidator();
+    final cleanedTags = <String>{}; // Set dedupes case-insensitive variants
     for (final tag in draft.tags) {
-      final trimmed = StringUtils.trimmed(tag);
-      if (trimmed.isNotEmpty) {
-        cleanedTags.add(trimmed);
+      final result = validator.validate(tag);
+      if (result is FailureResult<String>) {
+        throw ValidationException(
+          message: result.failure.message,
+          code: result.failure.code,
+        );
       }
+      cleanedTags.add((result as Success<String>).value);
     }
     return FlashcardDraft(
       front: front,

@@ -74,7 +74,8 @@ void main() {
       final useCase = AddTagToCardUseCase(repo, validator);
       final result = await useCase.execute(flashcardId: 'card-1', tag: '#Verb');
 
-      expect(result.valueOrNull, 'verb');
+      // Return type is Result<void> per contract (Either<Failure, Unit>).
+      expect(result.isSuccess, isTrue);
       expect(repo.addedToCard, (flashcardId: 'card-1', tag: 'verb'));
     });
 

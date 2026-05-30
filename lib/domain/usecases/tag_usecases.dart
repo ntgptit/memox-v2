@@ -18,32 +18,25 @@ final class WatchAllTagsWithCountUseCase {
 
 /// Validates + normalizes a tag, then idempotently attaches it to a card.
 ///
-/// Returns the normalized (lowercased) tag on success. There is no standalone
-/// tag entity — a tag exists only as a `(flashcard_id, tag)` row — so this is
-/// how a tag is "ensured" against an existing card.
+/// Returns [Result<void>] (contract: `Either<Failure, Unit>`). The use case
+/// validates through [TagValidator] and rejects commas, over-length names, and
+/// empty input before touching the repository.
 final class AddTagToCardUseCase {
   const AddTagToCardUseCase(this._repository, this._validator);
 
   final TagRepository _repository;
   final TagValidator _validator;
 
-  Future<Result<String>> execute({
+  Future<Result<void>> execute({
     required String flashcardId,
     required String tag,
   }) async {
     final validation = _validator.validate(tag);
     if (validation is FailureResult<String>) {
-      return FailureResult<String>(validation.failure);
+      return FailureResult<void>(validation.failure);
     }
     final normalized = (validation as Success<String>).value;
-    final result = await _repository.addTagToCard(
-      flashcardId: flashcardId,
-      tag: normalized,
-    );
-    if (result is FailureResult<void>) {
-      return FailureResult<String>(result.failure);
-    }
-    return Success<String>(normalized);
+    return _repository.addTagToCard(flashcardId: flashcardId, tag: normalized);
   }
 }
 
