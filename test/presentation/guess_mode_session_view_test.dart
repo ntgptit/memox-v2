@@ -6,6 +6,7 @@ import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/repositories/tts_settings_repository.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/guess/guess_option_builder.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/guess/guess_mode_session_view.dart';
 import 'package:memox/presentation/features/study/widgets/study_session/guess/guess_option_tile.dart';
@@ -187,28 +188,27 @@ void main() {
     expect(backs.toSet().length, backs.length);
   });
 
-  testWidgets(
-    'tapping correct option submits correct grade after 800ms',
-    (tester) async {
-      final submissions = await _pump(
-        tester,
-        _snapshot(current: current, pool: fivePool),
-      );
-      final correctTile = tester
-          .widgetList<GuessOptionTile>(find.byType(GuessOptionTile))
-          .firstWhere((t) => t.option.isCorrect);
-      correctTile.onTap();
-      await tester.pump();
-      // Before 800ms, no submit.
-      await tester.pump(const Duration(milliseconds: 799));
-      expect(submissions.calls, isEmpty);
-      // Cross the 800ms boundary.
-      await tester.pump(const Duration(milliseconds: 2));
-      await tester.pumpAndSettle();
-      expect(submissions.calls, hasLength(1));
-      expect(submissions.calls.single.values.single, AttemptGrade.correct);
-    },
-  );
+  testWidgets('tapping correct option submits correct grade after 800ms', (
+    tester,
+  ) async {
+    final submissions = await _pump(
+      tester,
+      _snapshot(current: current, pool: fivePool),
+    );
+    final correctTile = tester
+        .widgetList<GuessOptionTile>(find.byType(GuessOptionTile))
+        .firstWhere((t) => t.option.isCorrect);
+    correctTile.onTap();
+    await tester.pump();
+    // Before 800ms, no submit.
+    await tester.pump(const Duration(milliseconds: 799));
+    expect(submissions.calls, isEmpty);
+    // Cross the 800ms boundary.
+    await tester.pump(const Duration(milliseconds: 2));
+    await tester.pumpAndSettle();
+    expect(submissions.calls, hasLength(1));
+    expect(submissions.calls.single.values.single, AttemptGrade.correct);
+  });
 
   testWidgets(
     'tapping wrong option holds feedback ~1500ms then submits incorrect',
@@ -251,6 +251,40 @@ void main() {
         .map((t) => t.option.id)
         .toList();
     expect(secondOrder, firstOrder);
+  });
+
+  testWidgets('rendered options use GuessOptionBuilder full-pool selection', (
+    tester,
+  ) async {
+    final pool = <StudyFlashcardRef>[
+      current,
+      _card('c2', back: 'school'),
+      _card('c3', back: 'office'),
+      _card('c4', back: 'hospital'),
+      _card('c5', back: 'kitchen'),
+      _card('c6', back: 'museum'),
+      _card('c7', back: 'station'),
+      _card('c8', back: 'market'),
+    ];
+    final snapshot = _snapshot(current: current, pool: pool);
+    final expected = GuessOptionBuilder.build(
+      currentCard: current,
+      candidateCards: pool,
+      seed: 'session-1:item-c1:guess:c1:false',
+      shuffle: false,
+    ).options.map((o) => o.id).toList();
+
+    await _pump(tester, snapshot);
+
+    final rendered = tester
+        .widgetList<GuessOptionTile>(find.byType(GuessOptionTile))
+        .map((t) => t.option.id)
+        .toList();
+    expect(rendered, expected);
+    expect(
+      rendered.toSet().containsAll(<String>{'c2', 'c3', 'c4', 'c5'}),
+      isFalse,
+    );
   });
 
   testWidgets('fewer than 4 valid decoys does not crash', (tester) async {

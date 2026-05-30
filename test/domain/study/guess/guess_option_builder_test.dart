@@ -12,6 +12,14 @@ StudyFlashcardRef _card(String id, {String? front, String? back}) =>
       sourcePool: SessionItemSourcePool.due,
     );
 
+List<String> _optionIds(GuessOptionSet set) =>
+    set.options.map((o) => o.id).toList(growable: false);
+
+List<String> _decoyIds(GuessOptionSet set) => set.options
+    .where((o) => !o.isCorrect)
+    .map((o) => o.id)
+    .toList(growable: false);
+
 void main() {
   group('GuessOptionBuilder', () {
     test('includes the correct answer exactly once', () {
@@ -113,7 +121,7 @@ void main() {
       expect(normalized.toSet().length, normalized.length);
     });
 
-    test('deterministic order with same seed', () {
+    test('same seed selects same decoy ids and same order', () {
       final current = _card('c1');
       final candidates = [
         _card('c2'),
@@ -132,13 +140,11 @@ void main() {
         candidateCards: candidates,
         seed: 'stable-seed',
       );
-      expect(
-        a.options.map((o) => o.id).toList(),
-        b.options.map((o) => o.id).toList(),
-      );
+      expect(_decoyIds(a), _decoyIds(b));
+      expect(_optionIds(a), _optionIds(b));
     });
 
-    test('different seed may produce different order when enough options', () {
+    test('different seeds can select different decoy ids', () {
       final current = _card('c1');
       final candidates = [
         _card('c2'),
@@ -154,20 +160,84 @@ void main() {
         currentCard: current,
         candidateCards: candidates,
         seed: 'seed-A',
-      ).options.map((o) => o.id).toList();
+      );
+      final baseDecoyIds = _decoyIds(base).toSet();
       for (final seed in ['seed-B', 'seed-C', 'seed-D', 'seed-E']) {
-        final order = GuessOptionBuilder.build(
+        final next = GuessOptionBuilder.build(
           currentCard: current,
           candidateCards: candidates,
           seed: seed,
-        ).options.map((o) => o.id).toList();
-        if (order.join(',') != base.join(',')) {
+        );
+        if (_decoyIds(next).toSet().difference(baseDecoyIds).isNotEmpty ||
+            baseDecoyIds.difference(_decoyIds(next).toSet()).isNotEmpty) {
           sameOrderEverywhere = false;
           break;
         }
       }
       expect(sameOrderEverywhere, isFalse);
     });
+
+    test('selected decoys are sampled after full-pool seeded shuffle', () {
+      final current = _card('c1');
+      final candidates = [
+        _card('c2'),
+        _card('c3'),
+        _card('c4'),
+        _card('c5'),
+        _card('c6'),
+        _card('c7'),
+        _card('c8'),
+      ];
+      const firstFourInputDecoys = {'c2', 'c3', 'c4', 'c5'};
+      var foundNonInputPrefixSelection = false;
+
+      for (var index = 0; index < 20; index += 1) {
+        final set = GuessOptionBuilder.build(
+          currentCard: current,
+          candidateCards: candidates,
+          seed: 'full-pool-seed-$index',
+          shuffle: false,
+        );
+        final selectedDecoys = _decoyIds(set).toSet();
+        if (selectedDecoys.difference(firstFourInputDecoys).isNotEmpty) {
+          foundNonInputPrefixSelection = true;
+          break;
+        }
+      }
+
+      expect(foundNonInputPrefixSelection, isTrue);
+    });
+
+    test(
+      'shuffle false keeps correct first and selected decoys deterministic',
+      () {
+        final current = _card('c1');
+        final candidates = [
+          _card('c2'),
+          _card('c3'),
+          _card('c4'),
+          _card('c5'),
+          _card('c6'),
+          _card('c7'),
+        ];
+        final a = GuessOptionBuilder.build(
+          currentCard: current,
+          candidateCards: candidates,
+          seed: 'no-final-shuffle',
+          shuffle: false,
+        );
+        final b = GuessOptionBuilder.build(
+          currentCard: current,
+          candidateCards: candidates,
+          seed: 'no-final-shuffle',
+          shuffle: false,
+        );
+
+        expect(a.options.first.id, 'c1');
+        expect(_optionIds(a), _optionIds(b));
+        expect(_decoyIds(a), hasLength(kGuessDecoyLimit));
+      },
+    );
 
     test(
       'fewer than 4 valid decoys returns available decoys without crashing',
@@ -179,10 +249,7 @@ void main() {
           seed: 'seed-fewer',
         );
         expect(set.options, hasLength(3));
-        expect(
-          set.options.where((o) => o.isCorrect).map((o) => o.id),
-          ['c1'],
-        );
+        expect(set.options.where((o) => o.isCorrect).map((o) => o.id), ['c1']);
       },
     );
 
@@ -190,7 +257,10 @@ void main() {
       final current = _card('c1', back: 'library');
       final set = GuessOptionBuilder.build(
         currentCard: current,
-        candidateCards: [_card('c2', back: ''), _card('c3', back: 'library')],
+        candidateCards: [
+          _card('c2', back: ''),
+          _card('c3', back: 'library'),
+        ],
         seed: 'seed-empty',
       );
       expect(set.options, hasLength(1));

@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:memox/core/utils/string_utils.dart';
+
 import '../entities/study_models.dart';
 
 /// Maximum number of decoy (incorrect) options surfaced by Guess mode.
@@ -62,13 +64,12 @@ abstract final class GuessOptionBuilder {
     final correctFrontKey = _normalize(currentCard.front);
 
     final seenIds = <String>{currentCard.id};
-    final seenBackKeys = <String>{if (correctBackKey.isNotEmpty) correctBackKey};
+    final seenBackKeys = <String>{
+      if (correctBackKey.isNotEmpty) correctBackKey,
+    };
 
-    final validDecoys = <StudyFlashcardRef>[];
+    final decoyCandidates = <StudyFlashcardRef>[];
     for (final candidate in candidateCards) {
-      if (validDecoys.length >= decoyLimit) {
-        break;
-      }
       if (candidate.id == currentCard.id) continue;
       if (!seenIds.add(candidate.id)) continue;
       final backKey = _normalize(candidate.back);
@@ -76,8 +77,13 @@ abstract final class GuessOptionBuilder {
       if (backKey == correctBackKey) continue;
       if (backKey == correctFrontKey) continue;
       if (!seenBackKeys.add(backKey)) continue;
-      validDecoys.add(candidate);
+      decoyCandidates.add(candidate);
     }
+    final selectedDecoys = decoyCandidates.toList(growable: true);
+    if (selectedDecoys.length > 1) {
+      selectedDecoys.shuffle(Random(_stableSeed('$seed:decoys')));
+    }
+    final validDecoys = selectedDecoys.take(decoyLimit).toList(growable: false);
 
     final options = <GuessOption>[
       correct,
@@ -91,7 +97,7 @@ abstract final class GuessOptionBuilder {
     ];
 
     if (shuffle && options.length > 1) {
-      options.shuffle(Random(_stableSeed(seed)));
+      options.shuffle(Random(_stableSeed('$seed:options')));
     }
 
     return GuessOptionSet(
@@ -102,7 +108,7 @@ abstract final class GuessOptionBuilder {
   }
 }
 
-String _normalize(String value) => value.trim().toLowerCase();
+String _normalize(String value) => StringUtils.normalizedForComparison(value);
 
 int _stableSeed(String raw) {
   var hash = 0;

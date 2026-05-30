@@ -17,30 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   test(
-    'DT1 onUpdate: studyAnswerOptions preserves source order when answer shuffle is off',
-    () {
-      final snapshot = _snapshot(
-        mode: StudyMode.match,
-        currentCard: _card(id: 'card-2', front: 'front 2', back: 'back 2'),
-        cards: [
-          _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-          _card(id: 'card-2', front: 'front 2', back: 'back 2'),
-          _card(id: 'card-3', front: 'front 3', back: 'back 3'),
-          _card(id: 'card-4', front: 'front 4', back: 'back 4'),
-        ],
-        shuffleAnswers: false,
-      );
-
-      expect(studyAnswerOptions(snapshot).map((card) => card.id), [
-        'card-1',
-        'card-2',
-        'card-3',
-        'card-4',
-      ]);
-    },
-  );
-
-  test(
     'DT2 onUpdate: session action controller cancels without provider error',
     () async {
       final repo = _CancelOnlyStudyRepo();
@@ -60,32 +36,6 @@ void main() {
             .hasError,
         isFalse,
       );
-    },
-  );
-
-  test(
-    'DT15 onUpdate: studyGuessAnswerOptions returns five source-order options',
-    () {
-      final snapshot = _snapshot(
-        mode: StudyMode.guess,
-        currentCard: _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-        cards: [
-          _card(id: 'card-1', front: 'front 1', back: 'back 1'),
-          _card(id: 'card-2', front: 'front 2', back: 'back 2'),
-          _card(id: 'card-3', front: 'front 3', back: 'back 3'),
-          _card(id: 'card-4', front: 'front 4', back: 'back 4'),
-          _card(id: 'card-5', front: 'front 5', back: 'back 5'),
-        ],
-        shuffleAnswers: false,
-      );
-
-      expect(studyGuessAnswerOptions(snapshot).map((card) => card.id), [
-        'card-1',
-        'card-2',
-        'card-3',
-        'card-4',
-        'card-5',
-      ]);
     },
   );
 
@@ -1098,7 +1048,7 @@ class _StudyModeHost extends StatelessWidget {
     home: Scaffold(
       body: StudyModePanel(
         snapshot: snapshot,
-        answerOptions: studyAnswerOptions(snapshot),
+        answerOptions: snapshot.sessionFlashcards,
         isSubmitting: isSubmitting,
         feedback: feedback,
         onAnswer: onAnswer ?? (_) {},

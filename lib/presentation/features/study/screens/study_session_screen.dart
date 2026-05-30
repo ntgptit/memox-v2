@@ -154,7 +154,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
           const MxGap(MxSpace.md),
           StudyModePanel(
             snapshot: snapshot,
-            answerOptions: studyAnswerOptions(snapshot),
+            answerOptions: const <StudyFlashcardRef>[],
             isSubmitting: actionState.isLoading,
             feedback: feedback,
             onAnswer: (submission) => _recordFeedback(snapshot, submission),

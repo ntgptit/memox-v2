@@ -464,9 +464,12 @@ void registerStudySessionScreenTests() {
     final listBottom = tester
         .getBottomLeft(find.byKey(const ValueKey('guess-options-list')))
         .dy;
-    final lastCardBottom = tester
-        .getBottomLeft(_cardFinderForKey('guess-option-card-005'))
-        .dy;
+    final lastCardBottom = [
+      for (var index = 1; index <= 5; index++)
+        tester
+            .getBottomLeft(_cardFinderForKey('guess-option-card-00$index'))
+            .dy,
+    ].reduce((left, right) => left > right ? left : right);
 
     expect(find.byType(ListView), findsOneWidget);
     expect(find.text(_longGuessBack), findsOneWidget);
@@ -958,9 +961,7 @@ void registerStudySessionScreenTests() {
       expect(_studyProgressCounter(), findsWidgets);
       expect(repo.itemAnswerCount, 0);
 
-      await tester.pump(
-        guessWrongFeedbackDelay - guessColorTransitionDuration,
-      );
+      await tester.pump(guessWrongFeedbackDelay - guessColorTransitionDuration);
       await tester.pump();
 
       expect(repo.itemAnswerCount, 0);
