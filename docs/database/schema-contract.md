@@ -1,7 +1,7 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-31
 applies_to: Drift schema, all tables, migrations
-schema_version: 11 (see lib/data/datasources/local/app_database.dart `currentSchemaVersion`)
+schema_version: 12 (see lib/data/datasources/local/app_database.dart `currentSchemaVersion`)
 ---
 
 # Database Schema Contract
@@ -86,6 +86,7 @@ The following schema changes are required to implement new specs. Each requires 
 A pending column listed here does not automatically approve every dependent feature. Before coding, check `docs/checklist/v1-implementation-scope-2026-05-29.md` and `docs/checklist/screen-function-task-matrix.md`.
 
 - `flashcard_progress.buried_until` and `flashcard_progress.is_suspended` — ✅ implemented in schema v10 (P0-2 bury/suspend foundation), with index `idx_flashcard_progress_eligibility (is_suspended, buried_until, due_at)`.
+- `study_attempts.result = 'recovered'` — ✅ implemented in schema v12 for Fill hint-taint / Mark-correct grading.
 - `flashcard_progress.last_reset_at`, `study_attempts.box_before`, and `study_attempts.box_after` are reserved for the Future Proposal Card History feature unless promoted.
 - `decks.target_language` may be implemented only with the deck/TTS migration task that updates Drift schema, mapper, tests, and generated code.
 
@@ -100,6 +101,7 @@ A pending column listed here does not automatically approve every dependent feat
 | ✅ DONE (v10) compound index `flashcard_progress(is_suspended, buried_until, due_at)` | `docs/business/study-actions/bury-suspend.md` | Added as `idx_flashcard_progress_eligibility`. |
 | ✅ DONE (v11) compound index `flashcard_tags(tag, flashcard_id)` | `docs/business/tags/tag-system.md` | Added as `idx_flashcard_tags_tag`. Tags are stored lowercased, so a plain index on `tag` supports `LOWER(tag)` lookups for lowercased input. |
 | ✅ DONE (v11) lowercase `flashcard_tags.tag` storage | `docs/business/tags/tag-system.md` | Tags are stored lowercased (case-insensitive identity). Schema v11 dedupes case variants per card then lowercases existing rows; writers (`FlashcardDao`, `FlashcardTagDao`) normalize on insert. |
+| ✅ DONE (v12) allow `study_attempts.result = 'recovered'` | `docs/wireframes/17-study-session-fill.md`, `docs/business/srs/srs-review.md` | Rebuilds the `study_attempts.result` CHECK constraint so hint-tainted Fill exact matches and Mark-correct overrides can persist a passing-but-not-perfect attempt without faking `incorrect`. |
 | Consider index on `study_attempts(box_after)` | `docs/business/history/card-history.md` | Only if box-progression analytics need it; profile first. |
 
 When implementing, bump `AppDatabase.currentSchemaVersion` accordingly and update this doc's frontmatter `schema_version`.

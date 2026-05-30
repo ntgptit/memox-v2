@@ -81,7 +81,5 @@ StudyProgressValue studyModeProgressFromGrades({
   localCorrectCount: localCorrectGradeCount(localGrades),
 );
 
-double localCorrectGradeCount(Map<String, AttemptGrade> grades) => grades.values
-    .where((grade) => grade == AttemptGrade.correct)
-    .length
-    .toDouble();
+double localCorrectGradeCount(Map<String, AttemptGrade> grades) =>
+    grades.values.where((grade) => grade.isPassing).length.toDouble();

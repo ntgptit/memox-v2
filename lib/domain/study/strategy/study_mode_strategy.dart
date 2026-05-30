@@ -59,6 +59,7 @@ abstract class AbstractStudyModeStrategy implements StudyModeStrategy {
   @override
   Set<AttemptGrade> get acceptedGrades => const <AttemptGrade>{
     AttemptGrade.correct,
+    AttemptGrade.recovered,
     AttemptGrade.incorrect,
   };
 

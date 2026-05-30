@@ -168,7 +168,7 @@ void main() {
     );
 
     test(
-      'DT1 normalizeUiResult: maps mode UI outcomes to correct or incorrect',
+      'DT1 normalizeUiResult: maps UI outcomes while accepting recovered submissions',
       () {
         const review = ReviewModeStrategy();
         const scoringStrategies = <StudyModeStrategy>[
@@ -184,6 +184,7 @@ void main() {
         for (final strategy in scoringStrategies) {
           expect(strategy.acceptedGrades, const <AttemptGrade>{
             AttemptGrade.correct,
+            AttemptGrade.recovered,
             AttemptGrade.incorrect,
           });
           expect(

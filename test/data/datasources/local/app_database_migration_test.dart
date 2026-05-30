@@ -158,6 +158,39 @@ void main() {
     expect(row.isSuspended, isFalse);
     expect(row.buriedUntil, isNull);
   });
+
+  test(
+    'DT5 onNavigate: allows recovered study attempts during schema v12 migration',
+    () async {
+      final database = AppDatabase(
+        executor: NativeDatabase.memory(
+          setup: _createSchemaV11WithoutRecoveredStudyAttemptResult,
+        ),
+      );
+      addTearDown(database.close);
+
+      await database.ensureOpen();
+
+      await database
+          .into(database.studyAttempts)
+          .insert(
+            StudyAttemptsCompanion.insert(
+              id: 'attempt-recovered',
+              sessionId: 'session-1',
+              sessionItemId: 'item-1',
+              flashcardId: 'card-1',
+              attemptNumber: 1,
+              result: AttemptGrade.recovered.storageValue,
+              answeredAt: 2,
+            ),
+          );
+
+      final attempt = await (database.select(
+        database.studyAttempts,
+      )..where((table) => table.id.equals('attempt-recovered'))).getSingle();
+      expect(attempt.result, AttemptGrade.recovered.storageValue);
+    },
+  );
 }
 
 /// Builds a schema-v9 database (current shape minus `flashcard_progress`'s
@@ -189,6 +222,88 @@ void _createSchemaV9WithoutBurySuspend(dynamic database) {
     "INSERT INTO flashcards (id, deck_id, sort_order) VALUES ('card-1', 'deck-1', 0)",
     "INSERT INTO flashcard_progress (flashcard_id, current_box, review_count, lapse_count, last_result, last_studied_at, due_at, created_at, updated_at) VALUES ('card-1', 3, 1, 0, 'perfect', 100, 200, 1, 2)",
     'PRAGMA user_version = 9',
+  ];
+
+  for (final statement in statements) {
+    database.execute(statement);
+  }
+}
+
+void _createSchemaV11WithoutRecoveredStudyAttemptResult(dynamic database) {
+  const statements = <String>[
+    'PRAGMA foreign_keys = OFF',
+    'CREATE TABLE folders (id TEXT NOT NULL PRIMARY KEY, parent_id TEXT, name TEXT NOT NULL, content_mode TEXT NOT NULL, sort_order INTEGER NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)',
+    'CREATE TABLE decks (id TEXT NOT NULL PRIMARY KEY, folder_id TEXT NOT NULL, name TEXT NOT NULL, sort_order INTEGER NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)',
+    'CREATE TABLE flashcards (id TEXT NOT NULL PRIMARY KEY, deck_id TEXT NOT NULL, front TEXT NOT NULL, back TEXT NOT NULL, note TEXT, example TEXT, pronunciation TEXT, hint TEXT, sort_order INTEGER NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)',
+    '''
+    CREATE TABLE flashcard_progress (
+      flashcard_id TEXT NOT NULL PRIMARY KEY,
+      current_box INTEGER NOT NULL,
+      review_count INTEGER NOT NULL,
+      lapse_count INTEGER NOT NULL,
+      last_result TEXT,
+      last_studied_at INTEGER,
+      due_at INTEGER,
+      buried_until INTEGER,
+      is_suspended INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE study_sessions (
+      id TEXT NOT NULL PRIMARY KEY,
+      entry_type TEXT NOT NULL,
+      entry_ref_id TEXT,
+      study_type TEXT NOT NULL,
+      study_flow TEXT NOT NULL,
+      batch_size INTEGER NOT NULL,
+      shuffle_flashcards INTEGER NOT NULL,
+      shuffle_answers INTEGER NOT NULL,
+      prioritize_overdue INTEGER NOT NULL,
+      status TEXT NOT NULL,
+      started_at INTEGER NOT NULL,
+      ended_at INTEGER,
+      restarted_from_session_id TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE study_session_items (
+      id TEXT NOT NULL PRIMARY KEY,
+      session_id TEXT NOT NULL,
+      flashcard_id TEXT NOT NULL,
+      study_mode TEXT NOT NULL,
+      mode_order INTEGER NOT NULL,
+      round_index INTEGER NOT NULL,
+      queue_position INTEGER NOT NULL,
+      source_pool TEXT NOT NULL,
+      status TEXT NOT NULL,
+      completed_at INTEGER
+    )
+    ''',
+    '''
+    CREATE TABLE study_attempts (
+      id TEXT NOT NULL PRIMARY KEY,
+      session_id TEXT NOT NULL,
+      session_item_id TEXT NOT NULL,
+      flashcard_id TEXT NOT NULL,
+      attempt_number INTEGER NOT NULL,
+      result TEXT NOT NULL CHECK (result IN ('correct', 'incorrect')),
+      old_box INTEGER,
+      new_box INTEGER,
+      next_due_at INTEGER,
+      answered_at INTEGER NOT NULL
+    )
+    ''',
+    'CREATE TABLE tts_settings (id TEXT NOT NULL PRIMARY KEY, auto_play INTEGER NOT NULL, front_language TEXT NOT NULL, rate REAL NOT NULL, pitch REAL NOT NULL, volume REAL NOT NULL, front_voice_name TEXT)',
+    'CREATE TABLE flashcard_tags (flashcard_id TEXT NOT NULL, tag TEXT NOT NULL, PRIMARY KEY (flashcard_id, tag))',
+    "INSERT INTO folders (id, parent_id, name, content_mode, sort_order, created_at, updated_at) VALUES ('folder-1', NULL, 'Folder', 'decks', 0, 1, 1)",
+    "INSERT INTO decks (id, folder_id, name, sort_order, created_at, updated_at) VALUES ('deck-1', 'folder-1', 'Deck', 0, 1, 1)",
+    "INSERT INTO flashcards (id, deck_id, front, back, sort_order, created_at, updated_at) VALUES ('card-1', 'deck-1', 'front', 'back', 0, 1, 1)",
+    "INSERT INTO flashcard_progress (flashcard_id, current_box, review_count, lapse_count, created_at, updated_at) VALUES ('card-1', 4, 0, 0, 1, 1)",
+    "INSERT INTO study_sessions (id, entry_type, entry_ref_id, study_type, study_flow, batch_size, shuffle_flashcards, shuffle_answers, prioritize_overdue, status, started_at) VALUES ('session-1', 'deck', 'deck-1', 'srs_review', 'srs_fill_review', 1, 0, 0, 1, 'in_progress', 1)",
+    "INSERT INTO study_session_items (id, session_id, flashcard_id, study_mode, mode_order, round_index, queue_position, source_pool, status) VALUES ('item-1', 'session-1', 'card-1', 'fill', 1, 1, 1, 'due', 'pending')",
+    'PRAGMA user_version = 11',
   ];
 
   for (final statement in statements) {

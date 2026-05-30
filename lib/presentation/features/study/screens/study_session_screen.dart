@@ -256,7 +256,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       _feedback = StudyAnswerFeedback(
         itemId: item.id,
         selectedGrade: submission.grade,
-        isCorrect: submission.grade == AttemptGrade.correct,
+        isCorrect: submission.grade.isPassing,
         correctAnswer: item.flashcard.back,
         submittedAnswer: submission.submittedAnswer,
         selectedOptionId: submission.selectedOptionId,

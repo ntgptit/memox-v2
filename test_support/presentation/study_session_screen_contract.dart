@@ -1441,7 +1441,7 @@ void registerStudySessionScreenTests() {
     expect(repo.itemAnswerCount, 0);
   });
 
-  testWidgets('DT21 onUpdate: fill mark-correct submits correct grade', (
+  testWidgets('DT21 onUpdate: fill mark-correct submits recovered grade', (
     tester,
   ) async {
     final repo = _BatchAnswerStudyRepo();
@@ -1456,7 +1456,7 @@ void registerStudySessionScreenTests() {
     expect(repo.itemAnswerCount, 0);
     expect(repo.modeItemBatchAnswerCount, 1);
     expect(repo.lastModeItemGrades, <String, AttemptGrade>{
-      'item-001': AttemptGrade.correct,
+      'item-001': AttemptGrade.recovered,
     });
   });
 
@@ -1558,7 +1558,7 @@ void registerStudySessionScreenTests() {
       await tester.pump();
       await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
       await _pumpFillStateTransition(tester);
-      // Resolve the last item via Mark correct, which flushes the staged batch.
+      // Resolve the last item via Mark correct, which flushes as recovered.
       await tester.pumpAndSettle();
       await tester.tap(find.text('Mark correct'));
       await tester.pump();
@@ -1566,7 +1566,7 @@ void registerStudySessionScreenTests() {
       expect(repo.modeItemBatchAnswerCount, 1);
       expect(repo.lastModeItemGrades, <String, AttemptGrade>{
         'item-001': AttemptGrade.correct,
-        'item-002': AttemptGrade.correct,
+        'item-002': AttemptGrade.recovered,
       });
     },
   );

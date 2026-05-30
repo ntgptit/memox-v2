@@ -364,6 +364,15 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
         lapseDelta: 1,
       );
     }
+    if (grades.any((grade) => !grade.isPerfectEligible)) {
+      return _SrsOutcome(
+        result: ReviewResult.recovered,
+        oldBox: oldBox,
+        newBox: oldBox,
+        nextDueAt: now + _intervalForBox(oldBox).inMilliseconds,
+        lapseDelta: 0,
+      );
+    }
     final newBox = min(8, oldBox + 1);
     return _SrsOutcome(
       result: ReviewResult.perfect,

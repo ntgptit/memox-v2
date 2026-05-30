@@ -59,6 +59,22 @@ final class _AppDatabaseMigrationRunner {
     if (from < 11) {
       await _lowercaseFlashcardTagsForSchemaV11();
     }
+    if (from < 12) {
+      await _allowRecoveredStudyAttemptResultForSchemaV12();
+    }
+  }
+
+  /// Schema v12: Fill hint/override attempts can be persisted as
+  /// `recovered`, a passing-but-not-perfect grade.
+  Future<void> _allowRecoveredStudyAttemptResultForSchemaV12() async {
+    if (!await _hasTable(_TableName.studyAttempts)) {
+      await migrator.createTable(database.studyAttempts);
+      return;
+    }
+    final tableSql = await _tableSql(_TableName.studyAttempts) ?? '';
+    if (!tableSql.contains("'recovered'")) {
+      await _alterTable(TableMigration(database.studyAttempts));
+    }
   }
 
   /// Schema v11: tags become case-insensitive with lowercased storage

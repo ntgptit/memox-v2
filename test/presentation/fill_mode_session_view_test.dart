@@ -362,6 +362,118 @@ void main() {
     );
   });
 
+  group('Fill hint-taint grading', () {
+    testWidgets('DT15 onSubmit: exact match without hint submits correct', (
+      tester,
+    ) async {
+      final harness = await pump(
+        tester,
+        snapshotFor('abcde', secondFront: 'xyzab'),
+      );
+
+      await tester.enterText(inputField(), 'abcde');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+      await tester.enterText(inputField(), 'xyzab');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+
+      expect(harness.submissions, hasLength(1));
+      expect(harness.submissions.single, <String, AttemptGrade>{
+        'item-c1': AttemptGrade.correct,
+        'item-c2': AttemptGrade.correct,
+      });
+    });
+
+    testWidgets('DT15 onSubmit: exact match after hint submits recovered', (
+      tester,
+    ) async {
+      final harness = await pump(
+        tester,
+        snapshotFor('abcde', secondFront: 'xyzab'),
+      );
+
+      await tester.tap(hintButton());
+      await tester.pump();
+      await tester.enterText(inputField(), 'abcde');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+      await tester.enterText(inputField(), 'xyzab');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+
+      expect(harness.submissions, hasLength(1));
+      expect(harness.submissions.single, <String, AttemptGrade>{
+        'item-c1': AttemptGrade.recovered,
+        'item-c2': AttemptGrade.correct,
+      });
+    });
+
+    testWidgets('DT15 onSubmit: try again preserves hint taint', (
+      tester,
+    ) async {
+      final harness = await pump(
+        tester,
+        snapshotFor('abcde', secondFront: 'xyzab'),
+      );
+
+      await tester.tap(hintButton());
+      await tester.pump();
+      await tester.enterText(inputField(), 'wrong');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 500));
+      final tryAgain = tester.widget(tryAgainButton());
+      // ignore: avoid_dynamic_calls
+      (tryAgain as dynamic).onPressed.call();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.enterText(inputField(), 'abcde');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+      await tester.enterText(inputField(), 'xyzab');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+
+      expect(harness.submissions, hasLength(1));
+      expect(harness.submissions.single, <String, AttemptGrade>{
+        'item-c1': AttemptGrade.recovered,
+        'item-c2': AttemptGrade.correct,
+      });
+    });
+
+    testWidgets('DT15 onSubmit: new card resets hint taint', (tester) async {
+      final harness = await pump(
+        tester,
+        snapshotFor('abcde', secondFront: 'xyzab'),
+      );
+
+      await tester.tap(hintButton());
+      await tester.pump();
+      await tester.enterText(inputField(), 'abcde');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+      await tester.enterText(inputField(), 'xyzab');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+
+      expect(harness.submissions, hasLength(1));
+      expect(harness.submissions.single, <String, AttemptGrade>{
+        'item-c1': AttemptGrade.recovered,
+        'item-c2': AttemptGrade.correct,
+      });
+    });
+  });
+
   group('Fill Mark correct', () {
     testWidgets(
       'Mark correct on a non-last item advances to the next card without submitting',
@@ -403,8 +515,7 @@ void main() {
       'Mark correct on the LAST item flushes the staged batch via onSubmit',
       (tester) async {
         // Pass card 1 with an exact match, then on card 2 (last) trigger wrong
-        // feedback and tap Mark correct. The view must submit both grades as
-        // AttemptGrade.correct.
+        // feedback and tap Mark correct. Override is recovered, not perfect.
         final harness = await pump(
           tester,
           snapshotFor('abcde', secondFront: 'xyzab'),
@@ -428,7 +539,7 @@ void main() {
         expect(harness.submissions, hasLength(1));
         expect(harness.submissions.single, <String, AttemptGrade>{
           'item-c1': AttemptGrade.correct,
-          'item-c2': AttemptGrade.correct,
+          'item-c2': AttemptGrade.recovered,
         });
       },
     );

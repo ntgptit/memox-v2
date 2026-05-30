@@ -33,7 +33,7 @@ part 'migrations/app_database_migration_assets.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
-  static const int currentSchemaVersion = 11;
+  static const int currentSchemaVersion = 12;
 
   @override
   int get schemaVersion => currentSchemaVersion;

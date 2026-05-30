@@ -1983,6 +1983,73 @@ void registerStudyRepositoryTests() {
     );
 
     test(
+      'DT15 onUpdate: recovered SRS Review keeps box and records no lapse',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
+
+        var snapshot = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.srsReview,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        snapshot = await harness.answer.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+          grade: AttemptGrade.recovered,
+        );
+        expect(snapshot.session.status, SessionStatus.readyToFinalize);
+        expect(snapshot.currentItem, isNull);
+
+        await harness.finalize.execute(
+          sessionId: snapshot.session.id,
+          studyType: snapshot.session.studyType,
+        );
+
+        final expectedDueAt = DateTime.utc(
+          2026,
+          4,
+          24,
+          9,
+        ).add(const Duration(days: 7)).millisecondsSinceEpoch;
+
+        await _expectAttemptRow(
+          harness,
+          id: 'id-0002',
+          sessionId: 'id-0000',
+          sessionItemId: 'id-0001',
+          flashcardId: 'card-1',
+          attemptNumber: 1,
+          result: AttemptGrade.recovered,
+          oldBox: 4,
+          newBox: 4,
+          nextDueAt: expectedDueAt,
+          answeredAt: _studyNow,
+        );
+        await _expectProgressRow(
+          harness,
+          flashcardId: 'card-1',
+          currentBox: 4,
+          reviewCount: 1,
+          lapseCount: 0,
+          lastResult: ReviewResult.recovered,
+          lastStudiedAt: _studyNow,
+          dueAt: expectedDueAt,
+          createdAt: _studyNow,
+          updatedAt: _studyNow,
+        );
+      },
+    );
+
+    test(
       'DT5 onUpdate: overdue priority chooses overdue card before due card when batch is limited',
       () async {
         await harness.seedDeckWithCards(cardCount: 2);

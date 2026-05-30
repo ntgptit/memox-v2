@@ -81,6 +81,7 @@ enum SessionItemStatus {
 
 enum RawStudyResult {
   correct('correct'),
+  recovered('recovered'),
   incorrect('incorrect');
 
   const RawStudyResult(this.storageValue);
@@ -90,15 +91,18 @@ enum RawStudyResult {
 
 enum AttemptGrade {
   correct('correct'),
+  recovered('recovered'),
   incorrect('incorrect');
 
   const AttemptGrade(this.storageValue);
 
   final String storageValue;
 
-  bool get isPassing => this == correct;
+  bool get isPassing => this != incorrect;
 
-  bool get isFailing => !isPassing;
+  bool get isFailing => this == incorrect;
+
+  bool get isPerfectEligible => this == correct;
 }
 
 enum ReviewResult {

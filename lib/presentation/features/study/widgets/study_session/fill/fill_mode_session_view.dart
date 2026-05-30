@@ -185,7 +185,7 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
         : FillResultActions(
             key: const ValueKey<String>('fill-result-actions'),
             isSubmitting: _isBusy,
-            onMarkCorrect: () => _submit(AttemptGrade.correct),
+            onMarkCorrect: () => _submit(AttemptGrade.recovered),
             onTryAgain: _tryAgain,
           ),
   );
@@ -214,7 +214,11 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
     );
     if (evaluation.isExactMatch) {
       _focusNode.unfocus();
-      unawaited(_submit(AttemptGrade.correct));
+      unawaited(
+        _submit(
+          _hintRevealCount == 0 ? AttemptGrade.correct : AttemptGrade.recovered,
+        ),
+      );
       return;
     }
     _focusNode.unfocus();

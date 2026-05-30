@@ -374,6 +374,7 @@ final class StudyRepoImpl implements StudyRepo {
 
       const acceptedGrades = <AttemptGrade>{
         AttemptGrade.correct,
+        AttemptGrade.recovered,
         AttemptGrade.incorrect,
       };
       if (itemGrades.values.any((grade) => !acceptedGrades.contains(grade))) {
