@@ -185,7 +185,7 @@ When scope is empty, this screen renders the appropriate empty state from `docs/
 | --- | --- | --- |
 | Scope resolution (does scope contain cards?) | repository per entryType | parallel with resume check |
 | Empty-scope variant (which empty layout to show) | derived from scope content + study_type + bury/suspend state | once |
-| Resumable session for scope | `study_sessions` matched on `(entry_type, entry_ref_id, study_type)` | parallel |
+| Resumable session for scope | `study_sessions` matched on `(entry_type, entry_ref_id)` | parallel |
 | Currently active session (for redirect) | follows resume check | conditional |
 
 ## Forbidden
@@ -291,7 +291,7 @@ When scope is empty, this screen renders the appropriate empty state from `docs/
 **Code paths:**
 
 - Screen: `lib/presentation/features/study/screens/study_entry_screen.dart` + `lib/presentation/features/study/providers/study_entry_notifier.dart` (`studyEntryStateProvider` + `StudyEntryActionController`). There is no `study_entry_gate_screen.dart`.
-- Resume / Start-over dialog: `lib/presentation/shared/dialogs/mx_dialog_resume_or_start_over.dart` (`MxDialogResumeOrStartOver`, typed `MxResumeChoice`); the Start-over discard confirmation reuses `MxConfirmationDialog`. The gate offers Resume only when the candidate's `study_flow` matches the intended flow for the entry (scope + mode-flow match per `docs/business/resume/resume-session.md`); a mismatch starts fresh. Cancel pops back to the caller and creates no session.
+- Resume / Start-over dialog: `lib/presentation/shared/dialogs/mx_dialog_resume_or_start_over.dart` (`MxDialogResumeOrStartOver`, typed `MxResumeChoice`); the Start-over discard confirmation reuses `MxConfirmationDialog`. The gate offers Resume for any resumable session with the same scope `(entry_type, entry_ref_id)`, even when the existing session's `study_flow` differs from the currently requested flow. Cancel pops back to the caller and creates no session. Start over creates the requested flow and passes `restartedFromSessionId` so the repository atomically cancels the old session and creates the replacement.
 - Scope + session lifecycle: `lib/domain/study/usecases/study_usecases.dart` → `StartStudySessionUseCase` (resolves scope + creates session), `ResumeStudySessionUseCase` (covers `listActiveSessions` + `findCandidate(StudyContext)` + `execute(sessionId)`), `RestartStudySessionUseCase` (accepts an optional `modes` override so Start-over preserves a single-mode entry's flow). No separate `resolve_scope_usecase.dart` / `find_resumable_session_usecase.dart` / `create_session_usecase.dart`.
 - Mode flow rules: `lib/domain/study/strategy/study_strategy.dart` + `study_mode_strategy.dart` + `study_strategy_factory.dart`. There is no dedicated `flow_validator.dart`.
 - Route constants: `lib/app/router/route_names.dart` → `RouteNames.studyEntry`, `RouteNames.studyToday`.

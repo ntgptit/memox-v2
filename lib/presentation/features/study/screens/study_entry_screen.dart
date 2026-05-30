@@ -9,7 +9,6 @@ import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/empty_scope_reason.dart';
 import '../../../../domain/study/entities/study_models.dart';
-import '../../../../domain/study/strategy/study_strategy.dart';
 import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/dialogs/mx_dialog_resume_or_start_over.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
@@ -101,17 +100,15 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
       }
 
       final studyType = _defaultStudyType(state.entryType);
-      final modes = _selectedModes(widget.studyMode) ?? _defaultModes(studyType);
-      final intendedFlow = studyFlowForModes(studyType, modes);
+      final modes =
+          _selectedModes(widget.studyMode) ?? _defaultModes(studyType);
       final settings = _settingsFor(studyType, state);
 
       // Resume gate (spec: docs/wireframes/12-study-entry-gate.md,
-      // docs/business/resume/resume-session.md): only offer resume when a
-      // resumable session matches BOTH this scope AND the requested mode flow.
-      // A different mode flow falls through to a fresh start.
+      // docs/business/resume/resume-session.md): any resumable session for
+      // this scope must be resolved before creating another session.
       final candidate = state.resumeCandidate;
-      if (candidate != null &&
-          candidate.session.studyFlow == intendedFlow) {
+      if (candidate != null) {
         await _resolveResume(
           candidate: candidate,
           studyType: studyType,

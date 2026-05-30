@@ -196,6 +196,21 @@ flutter analyze
 flutter test <targeted tests>
 ```
 
+### Analyze / dart fix pairing rule
+
+When `flutter analyze` reports diagnostics that `dart fix` can safely apply, run:
+
+```text
+dart fix --apply
+flutter analyze
+```
+
+Treat these as a pair: do not run `dart fix --apply` without rerunning
+`flutter analyze`, and do not leave fixable analyzer diagnostics unresolved
+without either applying the fix or explaining why the fix is unsafe/out of
+scope. After `dart fix --apply`, inspect the diff and keep only changes that
+belong to the current task.
+
 `code-verification-guard` is an optional repo-side tool maintained separately. If it is not present in the working directory (clone), agent SHOULD skip it and note in report: "guard: skipped (tool not present)". The other commands are mandatory.
 
 Doc parity verification (chạy trước khi finish):

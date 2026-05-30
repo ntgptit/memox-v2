@@ -106,11 +106,14 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | R2 | Dashboard load | Multiple in_progress sessions | Show most recent + "{n-1} more" link | C1 | `test/features/dashboard/resume_card_test.dart::R2` |
 | R3 | Dashboard load | No in_progress sessions | Hide resume card | C0 | `test/features/dashboard/resume_card_test.dart::R3` |
 | R4 | Open deck/folder | Has resumable session for scope | Show banner | C0+C1 | `test/features/decks/resume_banner_test.dart::R4` |
-| R5 | Start study | Scope has resumable session | Show "Resume or Start over" dialog | C0+C1 | `test/features/study/start_with_existing_test.dart::R5` |
-| R6 | Start over | Confirmed twice | Cancel previous, create new | C1 | `test/features/study/start_with_existing_test.dart::R6` |
+| R5 | Start study | Scope has resumable session, regardless of study flow | Show "Resume or Start over" dialog; do not silently create a second active session | C0+C1 | `test/presentation/study_entry_screen_test.dart::DT3/DT5` |
+| R6 | Start over | Confirmed twice | Start requested flow with `restartedFromSessionId`; repository `startSession` atomically cancels previous and creates new session | C1 | `test/presentation/study_entry_screen_test.dart::DT3/DT5` + `test/domain/study/restart_study_session_usecase_test.dart::R6` |
 | R7 | Resume | Tap continue | Open session at correct item; bump updated_at | C0+C1 | `test/features/study/resume_test.dart::R7` |
 | R8 | Auto-expiry | Session updated_at > 30 days old | Auto-cancel on app open with notice | C1 | `test/features/study/resume_expiry_test.dart::R8` |
 | R9 | Resume race | Entity (deck) deleted | Cancel session, show notice | C1 | `test/features/study/resume_expiry_test.dart::R9` |
+| R10 | Restart session | Previous session belongs to a different entry scope | Reject before loading a new batch; do not cancel or create | C1 | `test/domain/study/restart_study_session_usecase_test.dart::R10` |
+| R11 | Restart session | Previous session is not restartable | Reject before loading a new batch; do not cancel or create | C1 | `test/domain/study/restart_study_session_usecase_test.dart::R11` |
+| R12 | Restart session | Eligible batch is empty | Reject; do not cancel previous session or create a new session | C1 | `test/domain/study/restart_study_session_usecase_test.dart::R12` |
 
 ## Tags
 

@@ -7,11 +7,11 @@ import 'mx_dialog.dart';
 /// Typed outcome of the [MxDialogResumeOrStartOver] choice dialog.
 ///
 /// `null` (the dialog `show` return type is nullable) means the user cancelled
-/// or dismissed — the caller must stay on the entry gate and create no session.
+/// or dismissed. The caller owns the cancel behavior and must create no session.
 enum MxResumeChoice { resume, startOver }
 
 /// Shared "Resume or Start over" dialog shown by the study entry gate when a
-/// resumable session matches the requested scope AND mode flow.
+/// resumable session matches the requested scope.
 ///
 /// Spec: `docs/wireframes/24-shared-dialogs.md` §resume-or-start-over and
 /// `docs/business/resume/resume-session.md`. The caller owns all data and
@@ -39,8 +39,7 @@ class MxDialogResumeOrStartOver {
           builder: (ctx) => MxSecondaryButton(
             label: startOverLabel,
             variant: MxSecondaryVariant.text,
-            onPressed: () =>
-                Navigator.of(ctx).pop(MxResumeChoice.startOver),
+            onPressed: () => Navigator.of(ctx).pop(MxResumeChoice.startOver),
           ),
         ),
         Builder(

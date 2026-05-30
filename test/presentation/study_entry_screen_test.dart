@@ -176,9 +176,38 @@ void main() {
     await _pumpDialogs(tester);
 
     expect(find.text('Session session-001'), findsOneWidget);
-    expect(repo.cancelledSessionId, 'resume-session-001');
+    expect(repo.cancelledSessionId, isNull);
+    expect(repo.restartedFromSessionId, 'resume-session-001');
     expect(repo.startCount, 1);
     expect(repo.startedFlow, StudyFlow.newFullCycle);
+  });
+
+  testWidgets('DT3 onStartOver: Start over opens second confirmation', (
+    tester,
+  ) async {
+    final repo = _CapturingStudyRepo();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studyEntryStateProvider(
+            'deck',
+            'deck-001',
+          ).overrideWith((ref) => Future.value(_resumeEntryState)),
+        ],
+        child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+      ),
+    );
+    await _pumpDialogs(tester);
+
+    await tester.tap(find.text('Start over'));
+    await _pumpDialogs(tester);
+
+    expect(find.text('Start a new session?'), findsOneWidget);
+    expect(repo.startCount, 0);
+    expect(repo.cancelledSessionId, isNull);
+    expect(repo.restartedFromSessionId, isNull);
   });
 
   testWidgets('DT3 onCancel: dismissing the choice creates no session', (
@@ -211,7 +240,7 @@ void main() {
   });
 
   testWidgets(
-    'DT3 onModeMismatch: different mode flow skips resume and starts new',
+    'DT5 onModeMismatch: different mode flow still shows choice dialog',
     (tester) async {
       final repo = _CapturingStudyRepo();
 
@@ -224,18 +253,105 @@ void main() {
               'deck-001',
             ).overrideWith((ref) => Future.value(_resumeEntryState)),
           ],
-          // Resume candidate is full-cycle; entering with mode=match is a
-          // different flow → no resume sheet, fresh match-only session.
           child: _TestRouterApp(
             initialLocation: _deckEntryLocation(studyMode: StudyMode.match),
           ),
+        ),
+      );
+      await _pumpDialogs(tester);
+
+      expect(find.text('Resume previous session?'), findsOneWidget);
+      expect(repo.startCount, 0);
+    },
+  );
+
+  testWidgets(
+    'DT5 onModeMismatch: Resume opens existing different-flow session',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_resumeEntryState)),
+          ],
+          child: _TestRouterApp(
+            initialLocation: _deckEntryLocation(studyMode: StudyMode.match),
+          ),
+        ),
+      );
+      await _pumpDialogs(tester);
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Resume'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Session resume-session-001'), findsOneWidget);
+      expect(repo.startCount, 0);
+      expect(repo.cancelledSessionId, isNull);
+    },
+  );
+
+  testWidgets(
+    'DT5 onModeMismatch: Start over confirm creates requested mode flow',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_resumeEntryState)),
+          ],
+          child: _TestRouterApp(
+            initialLocation: _deckEntryLocation(studyMode: StudyMode.match),
+          ),
+        ),
+      );
+      await _pumpDialogs(tester);
+
+      await tester.tap(find.text('Start over'));
+      await _pumpDialogs(tester);
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Start over'));
+      await _pumpDialogs(tester);
+
+      expect(find.text('Session session-001'), findsOneWidget);
+      expect(repo.startCount, 1);
+      expect(repo.cancelledSessionId, isNull);
+      expect(repo.restartedFromSessionId, 'resume-session-001');
+      expect(repo.startedFlow, StudyFlow.newMatchOnly);
+      expect(repo.startedModes, const <StudyMode>[StudyMode.match]);
+    },
+  );
+
+  testWidgets(
+    'DT6 onNavigate: non-matching scope starts normally without dialog',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_deckEntryState)),
+          ],
+          child: _TestRouterApp(initialLocation: _deckEntryLocation()),
         ),
       );
       await tester.pumpAndSettle();
 
       expect(find.text('Resume previous session?'), findsNothing);
       expect(find.text('Session session-001'), findsOneWidget);
-      expect(repo.startedFlow, StudyFlow.newMatchOnly);
+      expect(repo.startCount, 1);
     },
   );
 
@@ -415,6 +531,7 @@ class _CapturingStudyRepo implements StudyRepo {
   List<StudyMode>? startedModes;
   int deckFlashcardCount = 1;
   String? cancelledSessionId;
+  String? restartedFromSessionId;
 
   @override
   Future<int> countFlashcardsInDeck(String deckId) async => deckFlashcardCount;
@@ -474,6 +591,7 @@ class _CapturingStudyRepo implements StudyRepo {
     startCount += 1;
     startedFlow = flow;
     startedModes = modes;
+    restartedFromSessionId = context.restartedFromSessionId;
     return _snapshot(
       studyType: context.studyType,
       studyFlow: flow,

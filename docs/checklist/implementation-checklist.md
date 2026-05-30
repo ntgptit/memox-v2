@@ -121,6 +121,12 @@ flutter analyze
 flutter test <targeted tests>
 ```
 
+Analyze / dart-fix pairing:
+
+- If `flutter analyze` reports diagnostics that are safely fixable, run `dart fix --apply`, inspect the diff, then rerun `flutter analyze`.
+- Do not run `dart fix --apply` as a standalone cleanup step without the follow-up analyzer pass.
+- If a fixable analyzer diagnostic is not applied, report the reason under "Skipped checks or risks".
+
 All must pass. If any is skipped, justify in final report.
 
 ## Final report template

@@ -31,7 +31,7 @@ Future<Either<Failure, ResumableSession?>> call({required StudyScope scope});
 
 **Rules:**
 
-- Match `study_sessions` where `(entry_type, entry_ref_id, study_type)` equals scope AND `status IN (draft, in_progress)` AND `started_at > now - 30 days`.
+- Match `study_sessions` where `(entry_type, entry_ref_id)` equals scope AND `status IN (draft, in_progress)` AND `started_at > now - 30 days`.
 - Return most recent match (or null).
 
 **Errors:** `StorageFailure`.

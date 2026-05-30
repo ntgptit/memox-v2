@@ -190,7 +190,6 @@ final class RestartStudySessionUseCase {
       );
     }
 
-    await _repository.cancelSession(sessionId);
     final snapshot = await _repository.startSession(
       context: StudyContext(
         entryType: context.entryType,
