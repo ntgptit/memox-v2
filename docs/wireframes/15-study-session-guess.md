@@ -267,14 +267,15 @@ Same as Review mode.
 
 **Contracts:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase, `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/tts.md`
 
-**Code paths (verified 2026-05-28):**
+**Code paths (verified 2026-05-31, Prompt 10):**
 
 - Mode view: `lib/presentation/features/study/widgets/study_session/guess/guess_mode_session_view.dart` + `guess_mode_panel.dart`.
-- Option card: `lib/presentation/features/study/widgets/study_session/guess/guess_option_tile.dart` + `guess_option_models.dart`.
-- Distractor sampling: inline in `lib/presentation/features/study/providers/study_session_notifier.dart` (`_studyAnswerOptions` + `distractors.shuffle` + `take(_guessAnswerDistractorLimit)` where `_guessAnswerDistractorLimit = 4`, yielding 5 total options including the correct one). There is **no standalone `distractor_sampler.dart` in `lib/domain/study/`** — sampling lives in the presentation notifier and is a candidate for promotion to domain in a future refactor.
+- Option card: `lib/presentation/features/study/widgets/study_session/guess/guess_option_tile.dart` + `guess_option_models.dart`. The tile now binds to `GuessOption` (domain) rather than `StudyFlashcardRef`.
+- Distractor sampling: domain `lib/domain/study/guess/guess_option_builder.dart` (`GuessOptionBuilder.build`, `kGuessDecoyLimit = 4`). Deterministic seeded shuffle (`Random(stableSeed(seed))`); correct option included exactly once; dedup by id and normalized `back`; blank/whitespace backs filtered; up to 4 valid decoys → 5 options when available. Presentation (`guess_mode_session_view.dart::_options`) and the notifier helper `studyGuessAnswerOptions` both delegate to the builder; no `dart:math` or `shuffle()` remains in the view.
 - Description fallback chain (note → example → back-truncate): no dedicated `option_description_builder.dart` file. Construction happens inline within `guess_option_models.dart`; if the chain becomes more complex, extract to domain.
 - Grading: `lib/domain/study/usecases/study_usecases.dart` → `AnswerFlashcardUseCase`. No standalone `grade_attempt_usecase.dart`.
-- Motion / countdown: `lib/presentation/features/study/widgets/study_session/guess/guess_motion.dart`.
+- Motion / countdown: `lib/presentation/features/study/widgets/study_session/guess/guess_motion.dart` re-exports `MxDurations.guessCorrectAdvanceDelay` (800ms) as `guessCorrectAdvanceDelay` and `MxDurations.guessWrongFeedbackDelay` (1500ms) as `guessWrongFeedbackDelay`. Source tokens live in `lib/core/theme/tokens/app_motion.dart` (`AppDurations.guessCorrectAdvanceDelay` / `AppDurations.guessWrongFeedbackDelay`). The footer countdown progress bar and the staged-grade delay both consume the per-grade duration (0.8s on correct selection, 1.5s on wrong selection).
+- Tests: `test/domain/study/guess/guess_option_builder_test.dart` (11 cases — correctness, decoy limit, dedup, blank filter, determinism, fewer-decoy fallback); `test/presentation/guess_mode_session_view_test.dart` (option count, no duplicates, 799/800ms correct boundary, 1499/1500ms wrong boundary, stable order, fewer-decoy no crash); `test_support/presentation/study_session_screen_contract.dart` DT8/DT9/DT10/DT27 updated to per-grade durations.
 
 **Related wireframes:**
 

@@ -911,7 +911,9 @@ void registerStudySessionScreenTests() {
       expect(selectedCard.backgroundColor, isNot(idleCard.backgroundColor));
       expect(repo.itemAnswerCount, 0);
 
-      await tester.pump(guessFeedbackDelay - guessColorTransitionDuration);
+      await tester.pump(
+        guessCorrectAdvanceDelay - guessColorTransitionDuration,
+      );
       await tester.pump();
 
       expect(repo.itemAnswerCount, 0);
@@ -956,7 +958,9 @@ void registerStudySessionScreenTests() {
       expect(_studyProgressCounter(), findsWidgets);
       expect(repo.itemAnswerCount, 0);
 
-      await tester.pump(guessFeedbackDelay - guessColorTransitionDuration);
+      await tester.pump(
+        guessWrongFeedbackDelay - guessColorTransitionDuration,
+      );
       await tester.pump();
 
       expect(repo.itemAnswerCount, 0);
@@ -994,7 +998,7 @@ void registerStudySessionScreenTests() {
     await _tapGuessOption(tester, 'card-001');
     await tester.pump();
 
-    await tester.pump(guessFeedbackDelay);
+    await tester.pump(guessWrongFeedbackDelay);
     await tester.pump();
 
     expect(repo.itemAnswerCount, 0);
@@ -1026,14 +1030,14 @@ void registerStudySessionScreenTests() {
       await tester.pumpAndSettle();
 
       await _tapGuessOption(tester, 'card-001');
-      await tester.pump(guessFeedbackDelay);
+      await tester.pump(guessCorrectAdvanceDelay);
       await tester.pump();
 
       expect(find.text('front 2'), findsOneWidget);
       expect(repo.modeItemBatchAnswerCount, 0);
 
       await _tapGuessOption(tester, 'card-001');
-      await tester.pump(guessFeedbackDelay);
+      await tester.pump(guessWrongFeedbackDelay);
       await tester.pump();
 
       expect(repo.modeItemBatchAnswerCount, 1);

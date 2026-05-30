@@ -15,4 +15,6 @@ abstract final class MxDurations {
   static const reviewAutoSubmit = AppDurations.reviewAutoSubmit;
   static const recallAnswerTimeout = AppDurations.recallAnswerTimeout;
   static const matchTimerTick = AppDurations.matchTimerTick;
+  static const guessCorrectAdvanceDelay = AppDurations.guessCorrectAdvanceDelay;
+  static const guessWrongFeedbackDelay = AppDurations.guessWrongFeedbackDelay;
 }

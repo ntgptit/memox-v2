@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:memox/core/utils/string_utils.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/guess/guess_option_builder.dart';
 import 'package:memox/domain/study/study_session_round.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
@@ -132,7 +132,10 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
               onOptionTap: _handleOptionTap,
             ),
           ),
-          _GuessAutoAdvanceFooter(isVisible: _isResolving),
+          _GuessAutoAdvanceFooter(
+            isVisible: _isResolving,
+            duration: _activeFeedbackDelay,
+          ),
         ],
       ),
     );
@@ -144,48 +147,39 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
       _hasSubmitted ||
       _isLocalSubmitting;
 
-  List<StudyFlashcardRef> get _options {
+  List<GuessOption> get _options {
     final item = _currentItem;
     if (item == null) {
-      return const <StudyFlashcardRef>[];
+      return const <GuessOption>[];
     }
-    final distractors = widget.snapshot.sessionFlashcards
-        .where((flashcard) => flashcard.id != item.flashcard.id)
-        .toList(growable: true);
-    distractors.shuffle(
-      math.Random(
-        _stableSeed(
-          '${widget.snapshot.session.id}:${item.id}:${item.studyMode.storageValue}:${item.flashcard.id}',
-        ),
-      ),
+    final shuffleAnswers = widget.snapshot.session.settings.shuffleAnswers;
+    final set = GuessOptionBuilder.build(
+      currentCard: item.flashcard,
+      candidateCards: widget.snapshot.sessionFlashcards,
+      seed:
+          '${widget.snapshot.session.id}:${item.id}:${item.studyMode.storageValue}:${item.flashcard.id}:$shuffleAnswers',
+      shuffle: shuffleAnswers,
     );
-    final optionIds = <String>{
-      item.flashcard.id,
-      for (final distractor in distractors.take(4)) distractor.id,
-    };
-    final options = widget.snapshot.sessionFlashcards
-        .where((flashcard) => optionIds.contains(flashcard.id))
-        .toList(growable: true);
-    if (!widget.snapshot.session.settings.shuffleAnswers) {
-      return options;
-    }
-    options.shuffle(
-      math.Random(
-        _stableSeed(
-          '${item.id}:${item.flashcard.id}:${widget.snapshot.session.settings.shuffleAnswers}',
-        ),
-      ),
-    );
-    return options;
+    return set.options;
   }
 
-  GuessOptionState _optionState(StudyFlashcardRef option) {
+  Duration get _activeFeedbackDelay {
+    final selectedOptionId = _selectedOptionId;
+    if (selectedOptionId == null) {
+      return guessCorrectAdvanceDelay;
+    }
+    final correctOptionId = _currentItem?.flashcard.id;
+    return selectedOptionId == correctOptionId
+        ? guessCorrectAdvanceDelay
+        : guessWrongFeedbackDelay;
+  }
+
+  GuessOptionState _optionState(GuessOption option) {
     final selectedOptionId = _selectedOptionId;
     if (selectedOptionId == null) {
       return GuessOptionState.idle;
     }
-    final correctOptionId = _currentItem?.flashcard.id;
-    if (option.id == correctOptionId) {
+    if (option.isCorrect) {
       return GuessOptionState.success;
     }
     if (option.id == selectedOptionId) {
@@ -194,7 +188,7 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     return GuessOptionState.idle;
   }
 
-  void _handleOptionTap(StudyFlashcardRef option) {
+  void _handleOptionTap(GuessOption option) {
     if (_isLocked) {
       return;
     }
@@ -202,21 +196,25 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
     if (current == null) {
       return;
     }
-    final grade = option.id == current.flashcard.id
+    final grade = option.isCorrect
         ? AttemptGrade.correct
         : AttemptGrade.incorrect;
+    final delay = option.isCorrect
+        ? guessCorrectAdvanceDelay
+        : guessWrongFeedbackDelay;
     setState(() {
       _selectedOptionId = option.id;
       _isResolving = true;
     });
-    unawaited(_stageAfterFeedback(current, grade));
+    unawaited(_stageAfterFeedback(current, grade, delay));
   }
 
   Future<void> _stageAfterFeedback(
     StudySessionItem item,
     AttemptGrade grade,
+    Duration delay,
   ) async {
-    await Future<void>.delayed(guessFeedbackDelay);
+    await Future<void>.delayed(delay);
     if (!mounted) {
       return;
     }
@@ -278,16 +276,6 @@ class _GuessModeSessionViewState extends State<GuessModeSessionView> {
   }
 }
 
-int _stableSeed(String raw) {
-  var hash = 0;
-  for (final codeUnit in raw.codeUnits) {
-    hash = 0x1fffffff & (hash + codeUnit);
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    hash ^= hash >> 6;
-  }
-  return hash;
-}
-
 class _GuessOptionsList extends StatelessWidget {
   const _GuessOptionsList({
     required this.options,
@@ -296,10 +284,10 @@ class _GuessOptionsList extends StatelessWidget {
     required this.onOptionTap,
   });
 
-  final List<StudyFlashcardRef> options;
+  final List<GuessOption> options;
   final bool isLocked;
-  final GuessOptionState Function(StudyFlashcardRef option) optionStateFor;
-  final ValueChanged<StudyFlashcardRef> onOptionTap;
+  final GuessOptionState Function(GuessOption option) optionStateFor;
+  final ValueChanged<GuessOption> onOptionTap;
 
   @override
   Widget build(BuildContext context) {
@@ -397,9 +385,13 @@ class _GuessTargetCard extends StatelessWidget {
 }
 
 class _GuessAutoAdvanceFooter extends StatelessWidget {
-  const _GuessAutoAdvanceFooter({required this.isVisible});
+  const _GuessAutoAdvanceFooter({
+    required this.isVisible,
+    required this.duration,
+  });
 
   final bool isVisible;
+  final Duration duration;
 
   @override
   Widget build(BuildContext context) {
@@ -408,9 +400,7 @@ class _GuessAutoAdvanceFooter extends StatelessWidget {
     }
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final seconds = (guessFeedbackDelay.inMilliseconds / 1000).toStringAsFixed(
-      1,
-    );
+    final seconds = (duration.inMilliseconds / 1000).toStringAsFixed(1);
     return Padding(
       padding: const EdgeInsets.only(top: MxSpace.md),
       child: Column(
@@ -428,7 +418,7 @@ class _GuessAutoAdvanceFooter extends StatelessWidget {
           TweenAnimationBuilder<double>(
             key: const ValueKey<String>('guess-auto-advance-progress'),
             tween: Tween<double>(begin: 0, end: 1),
-            duration: guessFeedbackDelay,
+            duration: duration,
             curve: Curves.linear,
             builder: (context, value, _) =>
                 MxLinearProgress(value: value, size: MxProgressSize.small),

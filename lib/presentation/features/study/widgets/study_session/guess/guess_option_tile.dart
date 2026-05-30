@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/guess/guess_option_builder.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
@@ -27,7 +27,7 @@ class GuessOptionTile extends StatefulWidget {
     super.key,
   });
 
-  final StudyFlashcardRef option;
+  final GuessOption option;
   final GuessOptionState state;
   final bool enabled;
   final String letter;
@@ -46,7 +46,7 @@ class _GuessOptionTileState extends State<GuessOptionTile>
     super.initState();
     _shakeController = AnimationController(
       vsync: this,
-      duration: guessFeedbackDelay,
+      duration: guessWrongFeedbackDelay,
     );
     if (widget.state == GuessOptionState.error) {
       unawaited(_shakeController.forward(from: 0));

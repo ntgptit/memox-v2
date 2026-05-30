@@ -28,6 +28,10 @@ abstract final class AppDurations {
   static const Duration reviewAutoSubmit = Duration(seconds: 2);
   static const Duration recallAnswerTimeout = Duration(seconds: 20);
   static const Duration matchTimerTick = Duration(seconds: 1);
+
+  // Guess mode auto-advance countdown durations (per wireframe 15).
+  static const Duration guessCorrectAdvanceDelay = Duration(milliseconds: 800);
+  static const Duration guessWrongFeedbackDelay = Duration(milliseconds: 1500);
 }
 
 /// Easing curves aligned with Material 3 motion.
