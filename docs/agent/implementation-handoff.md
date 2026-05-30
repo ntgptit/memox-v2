@@ -23,23 +23,39 @@ in the same commit when a prompt completes or scope changes.
   contract + UI density gate docs; shared-widget contract coverage + dedicated
   density tests; warning-level guard rules for card/list/dashboard action
   density. Does NOT implement any Dashboard feature behavior.
+- **Prompt 04 — Dashboard study entry + resume flow** (2026-05-30): resume card
+  above all content (Continue/Discard + "+N more" → paused-sessions sheet);
+  multi-session paused sheet with live refresh; discard via `MxConfirmationDialog`
+  → `CancelStudySessionUseCase`; "Start new learning" two-step scope picker
+  (Today/Deck/Folder) → Study Entry Gate (Tag excluded, Future); recent decks
+  (top 3) confirmed Current. New read-only `ListAllFoldersUseCase` +
+  `FolderScopeOption` for Folder scope (no schema change). UI follows the action
+  density contract (compact stacked card actions, no full-width hero CTAs).
+  Verified: 804 tests green, analyzer clean, guard 0 errors. The Prompt 04 WIP
+  stash was broken (referenced untracked files; pre-UI-0 `fullWidth` actions) and
+  was discarded; the feature was reimplemented cleanly on the semantic components.
 
 ## In progress
 
-- **Prompt 04 — Dashboard**: local WIP (resume section, scope picker sheet,
-  paused sessions sheet, action list, l10n keys). Stashed during Prompt UI-0 to
-  keep the foundation change isolated. Re-apply before resuming Prompt 04.
+- None.
 
 ## Future / blocked (do not implement opportunistically)
 
-- Dashboard study entry / resume / recent decks (Prompt 04 scope).
+- Dashboard engagement: streak chip + history, daily-goal ring, streak-broken
+  banner (`Target`; blocked on engagement product decision).
+- Dashboard onboarding (zero-content) dedicated route/screen/carousel.
+- Tag-scoped study (scope picker Tag tab).
 - Library, Flashcard, Global Search, Flashcard History, full Onboarding,
-  Drive sync, tag-scoped study, schema migration.
+  Drive sync, schema migration.
 
 ## Notes for the next agent
 
 - Prefer `MxActionButton` / `MxCardActions` over raw `MxPrimaryButton` /
   `MxSecondaryButton`. Read `docs/ui-ux/action-hierarchy-contract.md` and run
   the UI Density Gate in `docs/agent/agent-task-template.md` for UI work.
-- When restarting Prompt 04, restore the stash and migrate its action surfaces
-  to the semantic components per the density contract.
+- Prompt 04 is complete; there is no Prompt 04 stash to restore (the broken WIP
+  stash was discarded and the feature reimplemented on the semantic components).
+- Dashboard resume/discard reuses `progressSessionActionControllerProvider`
+  (cancel → revision bump → `dashboardOverviewProvider` refresh). The two-step
+  scope picker reuses `MxDestinationPickerSheet`; deck/folder lists come from
+  `dashboardDeckScopeOptionsProvider` / `dashboardFolderScopeOptionsProvider`.

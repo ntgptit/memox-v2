@@ -150,14 +150,15 @@ Future<void> discardDashboardSession(
     icon: Icons.delete_outline_rounded,
     tone: MxConfirmationTone.danger,
   );
-  if (!confirmed || !context.mounted) return;
+  if (!context.mounted) return;
+  if (!confirmed) return;
   final success = await ref
       .read(progressSessionActionControllerProvider.notifier)
       .cancel(session.sessionId);
   if (!context.mounted) return;
-  if (success) {
-    MxSnackbar.success(context, l10n.dashboardSessionDiscardedMessage);
-  } else {
+  if (!success) {
     MxSnackbar.error(context, l10n.dashboardSessionDiscardFailedMessage);
+    return;
   }
+  MxSnackbar.success(context, l10n.dashboardSessionDiscardedMessage);
 }

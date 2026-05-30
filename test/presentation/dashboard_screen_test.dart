@@ -265,9 +265,11 @@ void main() {
       const ValueKey('dashboard_resume_continue_action'),
     );
 
+    // goStudySession pushes (imperative), so assert the pushed destination
+    // rather than the base location.
     expect(
-      router.routeInformationProvider.value.uri.path,
-      '/library/study/session/session-001',
+      find.byKey(const ValueKey('study_session_destination')),
+      findsOneWidget,
     );
   });
 
@@ -402,7 +404,7 @@ void main() {
         tester,
         const ValueKey('dashboard_start_new_study_action'),
       );
-      await tester.tap(find.text('Deck'));
+      await tester.tap(find.text('Pick a deck to study'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Korean N5'));
       await tester.pumpAndSettle();
@@ -445,7 +447,7 @@ void main() {
         tester,
         const ValueKey('dashboard_start_new_study_action'),
       );
-      await tester.tap(find.text('Folder'));
+      await tester.tap(find.text('Pick a folder to study'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Grammar'));
       await tester.pumpAndSettle();
@@ -468,7 +470,8 @@ void main() {
         tester,
         const ValueKey('dashboard_start_new_study_action'),
       );
-      await tester.tap(find.text('Today'));
+      // Tap the Today scope option via its unique due-count subtitle.
+      await tester.tap(find.text('5 cards due now'));
       await tester.pumpAndSettle();
 
       expect(
@@ -716,7 +719,8 @@ GoRouter _dashboardRouter() => GoRouter(
         GoRoute(
           path: RoutePaths.studySessionSegment,
           name: RouteNames.studySession,
-          builder: (context, state) => const SizedBox.shrink(),
+          builder: (context, state) =>
+              const SizedBox(key: ValueKey('study_session_destination')),
         ),
         GoRoute(
           path: RoutePaths.studyEntrySegment,

@@ -182,6 +182,11 @@ final class _ProgressFolderRepo implements FolderRepository {
   );
 
   @override
+  Future<List<FolderScopeOption>> listAllFolders() {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Result<FolderEntity>> createRootFolder(String name) {
     throw UnimplementedError();
   }

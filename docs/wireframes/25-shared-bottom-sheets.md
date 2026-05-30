@@ -232,6 +232,17 @@ Used by: Dashboard "Start new learning" CTA, study result "Study more" CTA.
 - Start CTA navigates to study entry gate with chosen scope.
 - Tag tab uses lowercased comma-joined sorted tag names as `entry_ref_id`.
 
+> **V1 implementation note (Prompt 04, 2026-05-30):** The Dashboard "Start new
+> learning" entry ships a **two-step** realization instead of the tabbed layout
+> above: step one is a scope-kind list (Today / Deck / Folder); choosing Deck or
+> Folder opens the shared searchable picker (`MxDestinationPickerSheet`) to pick
+> the target, then routes through the Study Entry Gate. **Tag scope is
+> intentionally excluded in V1** (tag-scoped study is Future). Today routes via
+> `goStudyToday`; Deck/Folder via `goStudyEntry(entryType: deck|folder)`. The
+> Folder list is sourced from the read-only `ListAllFoldersUseCase`. Code:
+> `lib/presentation/features/dashboard/widgets/dashboard_scope_picker_sheet.dart`.
+> The tabbed layout remains the target for the study-result "Study more" caller.
+
 ---
 
 ## §library-fab

@@ -50,7 +50,8 @@ Future<void> showDashboardScopePicker(
     ),
   );
 
-  if (kind == null || !context.mounted) return;
+  if (!context.mounted) return;
+  if (kind == null) return;
 
   switch (kind) {
     case _StudyScopeKind.today:
@@ -81,7 +82,8 @@ Future<void> _pickDeckScope(BuildContext context, WidgetRef ref) async {
         ),
     ],
   );
-  if (deckId == null || !context.mounted) return;
+  if (!context.mounted) return;
+  if (deckId == null) return;
   context.goStudyEntry(
     entryType: StudyEntryType.deck.storageValue,
     entryRefId: deckId,
@@ -110,7 +112,8 @@ Future<void> _pickFolderScope(BuildContext context, WidgetRef ref) async {
         ),
     ],
   );
-  if (folderId == null || !context.mounted) return;
+  if (!context.mounted) return;
+  if (folderId == null) return;
   context.goStudyEntry(
     entryType: StudyEntryType.folder.storageValue,
     entryRefId: folderId,

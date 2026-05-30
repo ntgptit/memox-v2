@@ -157,6 +157,16 @@ Stream<Either<Failure, FolderChildren>> call({required FolderId id});
 
 Returns folder + appropriate children based on `content_mode`. Used by Folder detail screen.
 
+## ListAllFoldersUseCase
+
+```dart
+Future<List<FolderScopeOption>> execute();
+```
+
+`FolderScopeOption` = `{ id: FolderId, name: String, breadcrumb: List<String> }` (breadcrumb is root→leaf including the folder itself; `parentBreadcrumb` drops the leaf for parent context).
+
+Pure read path that lists **every** folder as a flat scope option. Unlike `GetFolderMoveTargetsUseCase`, it performs **no** move validation and **no** descendant exclusion. Backed by the existing `FolderDao.listAllFolders()` + `getBreadcrumbNames()` (no schema change). Used by the Dashboard "Start new learning" scope picker (Folder scope). Impl: `FolderRepositoryImpl.listAllFolders`; provider `listAllFoldersUseCaseProvider`.
+
 ## Forbidden patterns
 
 - ❌ Update `content_mode` without a transaction that also touches children.

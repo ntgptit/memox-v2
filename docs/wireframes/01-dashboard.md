@@ -142,6 +142,14 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 | New learning CTA | Secondary outlined button. Tap → opens scope picker bottom-sheet (pick deck/folder/today). |
 | Recent decks list | Last 3 opened decks ordered by `decks.updated_at` desc among rows touched by the user. |
 
+## V1 implementation note (Prompt 04, 2026-05-30)
+
+- **Resume card, recent decks, Today CTA, and "Start new learning"** are implemented and tested (`test/presentation/dashboard_screen_test.dart`).
+- **Action density** follows `docs/ui-ux/action-hierarchy-contract.md`: the due/next-action card uses **compact, trailing-aligned, stacked** card actions (`MxActionButton` `cardPrimary`/`cardSecondary`) — not full-width hero CTAs. Exactly one dominant primary per card ("Start review" when due, otherwise "Start new learning"); the companion is a lighter secondary. The resume card uses `MxCardActions` (Continue primary / Discard secondary).
+- **"Start new learning"** opens a two-step scope picker (Today / Deck / Folder); see `docs/wireframes/25-shared-bottom-sheets.md` §scope-picker V1 note. **Tag scope is excluded in V1.**
+- **Streak chip, daily-goal ring, and streak-broken banner remain `Target`/Future** (blocked on the engagement product decision). The stats row shows a streak placeholder only; no streak/goal source-of-truth use case is wired yet.
+- **Onboarding (zero-content) layout** is not a dedicated route/screen in V1; thin empty-deck guidance is surfaced by the existing deck empty state (Prompt 01). No onboarding carousel/route is created.
+
 ## States
 
 | State | Trigger | Behavior |
