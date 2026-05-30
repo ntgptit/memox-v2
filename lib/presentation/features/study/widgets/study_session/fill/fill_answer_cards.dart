@@ -99,11 +99,6 @@ class FillIncorrectCard extends StatelessWidget {
               ),
             ),
           ),
-          StudyAutoSpeakEffect(
-            triggerKey: 'fill-correct-answer:$correctAnswer',
-            text: correctAnswer,
-            side: TtsTextSide.front,
-          ),
           Align(
             alignment: Alignment.bottomRight,
             child: StudySpeakButton(

@@ -155,38 +155,40 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
                   ),
                 ),
                 const MxGap(MxSpace.md),
-                AnimatedSwitcher(
-                  duration: fillStateTransitionDuration,
-                  switchInCurve: fillStateTransitionCurve,
-                  switchOutCurve: fillStateExitCurve,
-                  transitionBuilder: (child, animation) => FadeTransition(
-                    opacity: animation,
-                    child: SizeTransition(
-                      sizeFactor: animation,
-                      axisAlignment: -1,
-                      child: child,
-                    ),
-                  ),
-                  child: _answerState == _FillAnswerState.input
-                      ? FillInputActions(
-                          key: const ValueKey<String>('fill-input-actions'),
-                          canCheck: _canCheck,
-                          isSubmitting: _isBusy,
-                          canHint: canRevealHint,
-                          onHelp: _revealHint,
-                          onCheck: _checkAnswer,
-                        )
-                      : FillResultActions(
-                          key: const ValueKey<String>('fill-result-actions'),
-                          isSubmitting: _isBusy,
-                          onMarkCorrect: () => _submit(AttemptGrade.correct),
-                          onTryAgain: _tryAgain,
-                        ),
-                ),
+                _buildActions(canRevealHint: canRevealHint),
               ],
             ),
     );
   }
+
+  Widget _buildActions({required bool canRevealHint}) => AnimatedSwitcher(
+    duration: fillStateTransitionDuration,
+    switchInCurve: fillStateTransitionCurve,
+    switchOutCurve: fillStateExitCurve,
+    transitionBuilder: (child, animation) => FadeTransition(
+      opacity: animation,
+      child: SizeTransition(
+        sizeFactor: animation,
+        axisAlignment: -1,
+        child: child,
+      ),
+    ),
+    child: _answerState == _FillAnswerState.input
+        ? FillInputActions(
+            key: const ValueKey<String>('fill-input-actions'),
+            canCheck: _canCheck,
+            isSubmitting: _isBusy,
+            canHint: canRevealHint,
+            onHelp: _revealHint,
+            onCheck: _checkAnswer,
+          )
+        : FillResultActions(
+            key: const ValueKey<String>('fill-result-actions'),
+            isSubmitting: _isBusy,
+            onMarkCorrect: () => _submit(AttemptGrade.correct),
+            onTryAgain: _tryAgain,
+          ),
+  );
 
   bool get _isBusy => widget.isSubmitting || _isLocalSubmitting;
 
@@ -256,7 +258,6 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
       );
     });
   }
-
 
   Future<void> _submit(AttemptGrade grade) async {
     if (_isBusy) {

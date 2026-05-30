@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/tts_providers.dart';
 import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/repositories/tts_settings_repository.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
@@ -33,7 +36,10 @@ void main() {
     completedAt: null,
   );
 
-  StudySessionSnapshot snapshotFor(String front, {String secondFront = 'xyzab'}) {
+  StudySessionSnapshot snapshotFor(
+    String front, {
+    String secondFront = 'xyzab',
+  }) {
     final i1 = item('c1', front);
     final i2 = item('c2', secondFront);
     return StudySessionSnapshot(
@@ -70,16 +76,31 @@ void main() {
     );
   }
 
-  Future<List<Map<String, AttemptGrade>>> pump(
+  Future<_FillHarness> pump(
     WidgetTester tester,
     StudySessionSnapshot snapshot,
   ) async {
+    final fakeTts = _RecordingTts();
     final submissions = <Map<String, AttemptGrade>>[];
     await tester.binding.setSurfaceSize(const Size(430, 1200));
     addTearDown(() => tester.binding.setSurfaceSize(null));
+    addTearDown(fakeTts.dispose);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [ttsServiceProvider.overrideWithValue(_NoopTts())],
+        overrides: [
+          ttsServiceProvider.overrideWithValue(fakeTts),
+          ttsSettingsRepositoryProvider.overrideWith(
+            (ref) async => _FakeTtsSettingsRepository(
+              settings: const TtsSettings(
+                autoPlay: true,
+                frontLanguage: TtsLanguage.korean,
+                rate: TtsSettings.defaultRate,
+                pitch: TtsSettings.defaultPitch,
+                volume: TtsSettings.defaultVolume,
+              ),
+            ),
+          ),
+        ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
@@ -98,16 +119,20 @@ void main() {
       ),
     );
     await tester.pump();
-    return submissions;
+    return _FillHarness(submissions: submissions, tts: fakeTts);
   }
 
-  Finder inputField() => find.byKey(const ValueKey<String>('fill-answer-input'));
-  Finder checkButton() => find.byKey(const ValueKey<String>('fill-check-action'));
+  Finder inputField() =>
+      find.byKey(const ValueKey<String>('fill-answer-input'));
+  Finder checkButton() =>
+      find.byKey(const ValueKey<String>('fill-check-action'));
   Finder hintButton() => find.byKey(const ValueKey<String>('fill-help-action'));
   Finder tryAgainButton() =>
       find.byKey(const ValueKey<String>('fill-try-again-action'));
   Finder markCorrectButton() =>
       find.byKey(const ValueKey<String>('fill-mark-correct-action'));
+  Finder speakButton(String text) =>
+      find.byKey(ValueKey<String>('fill-front-speak-$text'));
 
   group('Fill matcher (strict)', () {
     testWidgets('case difference is treated as wrong', (tester) async {
@@ -118,12 +143,10 @@ void main() {
       await tester.pump();
       // Wrong feedback card appears.
       expect(find.byType(FillIncorrectCard), findsOneWidget);
-      // Drain TTS auto-speak timers spawned by the wrong-feedback card.
-      await tester.pump(const Duration(seconds: 21));
     });
 
     testWidgets('trim-only difference still passes', (tester) async {
-      final submissions = await pump(tester, snapshotFor('웃기다'));
+      final harness = await pump(tester, snapshotFor('웃기다'));
       await tester.enterText(inputField(), '  웃기다  ');
       await tester.pump();
       await tester.tap(checkButton());
@@ -131,8 +154,51 @@ void main() {
       // No wrong feedback — advanced to next card.
       expect(find.byType(FillIncorrectCard), findsNothing);
       // First card pass does NOT submit yet (not last item) but staged grade exists.
-      expect(submissions, isEmpty);
+      expect(harness.submissions, isEmpty);
     });
+  });
+
+  group('Fill TTS', () {
+    testWidgets('DT14 onDisplay: typing state hides the manual speak button', (
+      tester,
+    ) async {
+      await pump(tester, snapshotFor('abcde'));
+
+      expect(speakButton('abcde'), findsNothing);
+    });
+
+    testWidgets('DT14 onDisplay: wrong feedback does not auto-play TTS', (
+      tester,
+    ) async {
+      final harness = await pump(tester, snapshotFor('abcde'));
+      await tester.enterText(inputField(), 'wrong');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FillIncorrectCard), findsOneWidget);
+      expect(speakButton('abcde'), findsOneWidget);
+      expect(harness.tts.speakCalls, isEmpty);
+    });
+
+    testWidgets(
+      'DT14 onSelect: manual speak button speaks the correct front after wrong feedback',
+      (tester) async {
+        final harness = await pump(tester, snapshotFor('abcde'));
+        await tester.enterText(inputField(), 'wrong');
+        await tester.pump();
+        await tester.tap(checkButton());
+        await tester.pumpAndSettle();
+
+        expect(speakButton('abcde'), findsOneWidget);
+        await tester.tap(speakButton('abcde'));
+        await tester.pump();
+
+        expect(harness.tts.speakCalls, hasLength(1));
+        expect(harness.tts.speakCalls.single.text, 'abcde');
+        expect(harness.tts.speakCalls.single.language, TtsLanguage.korean);
+      },
+    );
   });
 
   group('Fill hint reveal', () {
@@ -141,19 +207,29 @@ void main() {
       await tester.tap(hintButton());
       await tester.pump();
       expect(
-        tester.widget<TextField>(find.descendant(
-          of: inputField(),
-          matching: find.byType(TextField),
-        )).controller!.text,
+        tester
+            .widget<TextField>(
+              find.descendant(
+                of: inputField(),
+                matching: find.byType(TextField),
+              ),
+            )
+            .controller!
+            .text,
         'a',
       );
       await tester.tap(hintButton());
       await tester.pump();
       expect(
-        tester.widget<TextField>(find.descendant(
-          of: inputField(),
-          matching: find.byType(TextField),
-        )).controller!.text,
+        tester
+            .widget<TextField>(
+              find.descendant(
+                of: inputField(),
+                matching: find.byType(TextField),
+              ),
+            )
+            .controller!
+            .text,
         'ab',
       );
     });
@@ -167,15 +243,14 @@ void main() {
 
     testWidgets('hint tap does not submit an attempt', (tester) async {
       // Wireframe §Components (Hint button): hint only reveals; no attempt is
-      // persisted. With a multi-item snapshot, onSubmit is only invoked on the
-      // final item — so a Hint tap alone must leave submissions empty AND must
-      // not advance the card (input card stays, no result card surfaces).
-      final submissions = await pump(tester, snapshotFor('abcde'));
+      // persisted. With a multi-item snapshot, a Hint tap alone must leave
+      // submissions empty and keep the input card visible.
+      final harness = await pump(tester, snapshotFor('abcde'));
       await tester.tap(hintButton());
       await tester.pump();
       await tester.tap(hintButton());
       await tester.pump();
-      expect(submissions, isEmpty);
+      expect(harness.submissions, isEmpty);
       expect(
         find.byKey(const ValueKey<String>('fill-input-card')),
         findsOneWidget,
@@ -204,10 +279,15 @@ void main() {
       await tester.tap(hintButton());
       await tester.pump();
       expect(
-        tester.widget<TextField>(find.descendant(
-          of: inputField(),
-          matching: find.byType(TextField),
-        )).controller!.text,
+        tester
+            .widget<TextField>(
+              find.descendant(
+                of: inputField(),
+                matching: find.byType(TextField),
+              ),
+            )
+            .controller!
+            .text,
         'x',
       );
     });
@@ -222,10 +302,15 @@ void main() {
       await tester.tap(hintButton(), warnIfMissed: false);
       await tester.pump();
       expect(
-        tester.widget<TextField>(find.descendant(
-          of: inputField(),
-          matching: find.byType(TextField),
-        )).controller!.text,
+        tester
+            .widget<TextField>(
+              find.descendant(
+                of: inputField(),
+                matching: find.byType(TextField),
+              ),
+            )
+            .controller!
+            .text,
         'ab',
       );
     });
@@ -262,14 +347,17 @@ void main() {
         await tester.tap(hintButton());
         await tester.pump();
         expect(
-          tester.widget<TextField>(find.descendant(
-            of: inputField(),
-            matching: find.byType(TextField),
-          )).controller!.text,
+          tester
+              .widget<TextField>(
+                find.descendant(
+                  of: inputField(),
+                  matching: find.byType(TextField),
+                ),
+              )
+              .controller!
+              .text,
           'ab',
         );
-        // Drain TTS auto-speak timers from the brief wrong-feedback state.
-        await tester.pump(const Duration(seconds: 21));
       },
     );
   });
@@ -281,8 +369,10 @@ void main() {
         // Two-item snapshot: Mark correct on the FIRST card stages the grade
         // locally and advances to card 2; onSubmit is only called when the
         // last item is graded.
-        final submissions =
-            await pump(tester, snapshotFor('abcde', secondFront: 'xyzab'));
+        final harness = await pump(
+          tester,
+          snapshotFor('abcde', secondFront: 'xyzab'),
+        );
         await tester.enterText(inputField(), 'wrong');
         await tester.pump();
         await tester.tap(checkButton());
@@ -305,8 +395,7 @@ void main() {
           find.descendant(of: inputField(), matching: find.byType(TextField)),
         );
         expect(input.controller!.text, '');
-        expect(submissions, isEmpty);
-        await tester.pump(const Duration(seconds: 21));
+        expect(harness.submissions, isEmpty);
       },
     );
 
@@ -316,8 +405,10 @@ void main() {
         // Pass card 1 with an exact match, then on card 2 (last) trigger wrong
         // feedback and tap Mark correct. The view must submit both grades as
         // AttemptGrade.correct.
-        final submissions =
-            await pump(tester, snapshotFor('abcde', secondFront: 'xyzab'));
+        final harness = await pump(
+          tester,
+          snapshotFor('abcde', secondFront: 'xyzab'),
+        );
         await tester.enterText(inputField(), 'abcde');
         await tester.pump();
         await tester.tap(checkButton());
@@ -334,20 +425,52 @@ void main() {
         (markCorrect as dynamic).onPressed.call();
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 500));
-        expect(submissions, hasLength(1));
-        expect(submissions.single, <String, AttemptGrade>{
+        expect(harness.submissions, hasLength(1));
+        expect(harness.submissions.single, <String, AttemptGrade>{
           'item-c1': AttemptGrade.correct,
           'item-c2': AttemptGrade.correct,
         });
-        await tester.pump(const Duration(seconds: 21));
       },
     );
   });
 }
 
-final class _NoopTts implements TtsService {
+final class _FillHarness {
+  const _FillHarness({required this.submissions, required this.tts});
+
+  final List<Map<String, AttemptGrade>> submissions;
+  final _RecordingTts tts;
+}
+
+final class _SpeakCall {
+  const _SpeakCall({required this.text, required this.language});
+
+  final String text;
+  final TtsLanguage language;
+}
+
+final class _FakeTtsSettingsRepository implements TtsSettingsRepository {
+  _FakeTtsSettingsRepository({required this.settings});
+
+  TtsSettings settings;
+
   @override
-  Stream<TtsState> get state => const Stream<TtsState>.empty();
+  Future<TtsSettings> load() async => settings;
+
+  @override
+  Future<void> save(TtsSettings settings) async {
+    this.settings = settings;
+  }
+}
+
+final class _RecordingTts implements TtsService {
+  final StreamController<TtsState> _states =
+      StreamController<TtsState>.broadcast();
+  final List<_SpeakCall> speakCalls = <_SpeakCall>[];
+  int stopCount = 0;
+
+  @override
+  Stream<TtsState> get state => _states.stream;
 
   @override
   Future<List<TtsVoice>> availableVoices(TtsLanguage language) async =>
@@ -361,11 +484,23 @@ final class _NoopTts implements TtsService {
     required double pitch,
     required double volume,
     String? voiceName,
-  }) async {}
+  }) async {
+    speakCalls.add(_SpeakCall(text: text, language: language));
+    if (!_states.isClosed) {
+      _states.add(TtsState.speaking);
+    }
+  }
 
   @override
-  Future<void> stop() async {}
+  Future<void> stop() async {
+    stopCount += 1;
+    if (!_states.isClosed) {
+      _states.add(TtsState.idle);
+    }
+  }
 
   @override
-  Future<void> dispose() async {}
+  Future<void> dispose() async {
+    await _states.close();
+  }
 }

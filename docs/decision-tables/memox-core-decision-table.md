@@ -234,6 +234,7 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | T11 | Speak action | Deck `target_language = unsupported` | Speak button disabled; auto-play suppressed silently | C0+C1 | `test/features/study/tts_deck_gate_test.dart::T11` |
 | T12 | Speak action | Deck `target_language = korean` | Use ko-KR voice from settings | C0+C1 | `test/features/study/tts_deck_gate_test.dart::T12` |
 | T13 | Deck create form | New deck | `target_language` field required, defaults to `korean` | C0+C1 | `test/features/decks/create_deck_target_language_test.dart::T13` |
+| T14 | Fill feedback TTS | Fill wrong feedback with `autoPlay=true` | No automatic speech; manual speak button remains available and speaks front on tap | C0+C1 | `test/presentation/fill_mode_session_view_test.dart::DT14` |
 
 ## Account / Drive sync
 
