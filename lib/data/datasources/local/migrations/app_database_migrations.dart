@@ -59,14 +59,13 @@ final class _AppDatabaseMigrationRunner {
     if (from < 11) {
       await _lowercaseFlashcardTagsForSchemaV11();
     }
-    if (from < 12) {
-      await _allowRecoveredStudyAttemptResultForSchemaV12();
+    if (from < 13) {
+      await _allowRecoveredStudyAttemptResultForSchemaV13();
     }
   }
 
-  /// Schema v12: Fill hint/override attempts can be persisted as
-  /// `recovered`, a passing-but-not-perfect grade.
-  Future<void> _allowRecoveredStudyAttemptResultForSchemaV12() async {
+  /// Schema v13: allow recovered study attempt result.
+  Future<void> _allowRecoveredStudyAttemptResultForSchemaV13() async {
     if (!await _hasTable(_TableName.studyAttempts)) {
       await migrator.createTable(database.studyAttempts);
       return;

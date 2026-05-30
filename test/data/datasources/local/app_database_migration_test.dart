@@ -160,11 +160,44 @@ void main() {
   });
 
   test(
-    'DT5 onNavigate: allows recovered study attempts during schema v12 migration',
+    'DT5 onNavigate: allows recovered study attempts during schema v13 migration',
     () async {
       final database = AppDatabase(
         executor: NativeDatabase.memory(
           setup: _createSchemaV11WithoutRecoveredStudyAttemptResult,
+        ),
+      );
+      addTearDown(database.close);
+
+      await database.ensureOpen();
+
+      await database
+          .into(database.studyAttempts)
+          .insert(
+            StudyAttemptsCompanion.insert(
+              id: 'attempt-recovered',
+              sessionId: 'session-1',
+              sessionItemId: 'item-1',
+              flashcardId: 'card-1',
+              attemptNumber: 1,
+              result: AttemptGrade.recovered.storageValue,
+              answeredAt: 2,
+            ),
+          );
+
+      final attempt = await (database.select(
+        database.studyAttempts,
+      )..where((table) => table.id.equals('attempt-recovered'))).getSingle();
+      expect(attempt.result, AttemptGrade.recovered.storageValue);
+    },
+  );
+
+  test(
+    'DT6 onNavigate: repairs schema v12 attempt-result constraint gap',
+    () async {
+      final database = AppDatabase(
+        executor: NativeDatabase.memory(
+          setup: _createSchemaV12WithoutRecoveredStudyAttemptResult,
         ),
       );
       addTearDown(database.close);
@@ -230,6 +263,17 @@ void _createSchemaV9WithoutBurySuspend(dynamic database) {
 }
 
 void _createSchemaV11WithoutRecoveredStudyAttemptResult(dynamic database) {
+  _createSchemaWithoutRecoveredStudyAttemptResult(database, userVersion: 11);
+}
+
+void _createSchemaV12WithoutRecoveredStudyAttemptResult(dynamic database) {
+  _createSchemaWithoutRecoveredStudyAttemptResult(database, userVersion: 12);
+}
+
+void _createSchemaWithoutRecoveredStudyAttemptResult(
+  dynamic database, {
+  required int userVersion,
+}) {
   const statements = <String>[
     'PRAGMA foreign_keys = OFF',
     'CREATE TABLE folders (id TEXT NOT NULL PRIMARY KEY, parent_id TEXT, name TEXT NOT NULL, content_mode TEXT NOT NULL, sort_order INTEGER NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)',
@@ -303,12 +347,12 @@ void _createSchemaV11WithoutRecoveredStudyAttemptResult(dynamic database) {
     "INSERT INTO flashcard_progress (flashcard_id, current_box, review_count, lapse_count, created_at, updated_at) VALUES ('card-1', 4, 0, 0, 1, 1)",
     "INSERT INTO study_sessions (id, entry_type, entry_ref_id, study_type, study_flow, batch_size, shuffle_flashcards, shuffle_answers, prioritize_overdue, status, started_at) VALUES ('session-1', 'deck', 'deck-1', 'srs_review', 'srs_fill_review', 1, 0, 0, 1, 'in_progress', 1)",
     "INSERT INTO study_session_items (id, session_id, flashcard_id, study_mode, mode_order, round_index, queue_position, source_pool, status) VALUES ('item-1', 'session-1', 'card-1', 'fill', 1, 1, 1, 'due', 'pending')",
-    'PRAGMA user_version = 11',
   ];
 
   for (final statement in statements) {
     database.execute(statement);
   }
+  database.execute('PRAGMA user_version = $userVersion');
 }
 
 Future<List<String>> _columnNames(

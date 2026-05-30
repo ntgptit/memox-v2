@@ -85,6 +85,7 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | S18 | Interval table | Box 6, 7, 8 | 12, 30, 60 days | C0 | `test/domain/srs/box_intervals_test.dart::S18` |
 | S19 | Attempt grade codec | result=`recovered` | Codec accepts `recovered`; grade is passing but not perfect-eligible | C0+C1 | `test/domain/study/attempt_grade_codec_test.dart::DT15` |
 | S20 | SRS Review finalize | All persisted attempts pass, at least one `recovered` | `ReviewResult.recovered`, current box unchanged, no lapse, no retry | C0+C1 | `test/data/repositories/study_repository_test.dart::DT15` |
+| S21 | Schema migration | Existing DB reports `user_version=12` but `study_attempts.result` CHECK still allows only `correct`/`incorrect` | Schema v13 rebuilds `study_attempts`; inserting `recovered` succeeds | C1 | `test/data/datasources/local/app_database_migration_test.dart::DT6` |
 
 ## Bury / Suspend
 
