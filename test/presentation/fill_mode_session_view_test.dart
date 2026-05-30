@@ -106,6 +106,8 @@ void main() {
   Finder hintButton() => find.byKey(const ValueKey<String>('fill-help-action'));
   Finder tryAgainButton() =>
       find.byKey(const ValueKey<String>('fill-try-again-action'));
+  Finder markCorrectButton() =>
+      find.byKey(const ValueKey<String>('fill-mark-correct-action'));
 
   group('Fill matcher (strict)', () {
     testWidgets('case difference is treated as wrong', (tester) async {
@@ -161,6 +163,53 @@ void main() {
       await tester.tap(hintButton());
       await tester.pump();
       expect(find.byType(FillIncorrectCard), findsNothing);
+    });
+
+    testWidgets('hint tap does not submit an attempt', (tester) async {
+      // Wireframe §Components (Hint button): hint only reveals; no attempt is
+      // persisted. With a multi-item snapshot, onSubmit is only invoked on the
+      // final item — so a Hint tap alone must leave submissions empty AND must
+      // not advance the card (input card stays, no result card surfaces).
+      final submissions = await pump(tester, snapshotFor('abcde'));
+      await tester.tap(hintButton());
+      await tester.pump();
+      await tester.tap(hintButton());
+      await tester.pump();
+      expect(submissions, isEmpty);
+      expect(
+        find.byKey(const ValueKey<String>('fill-input-card')),
+        findsOneWidget,
+      );
+      expect(find.byType(FillIncorrectCard), findsNothing);
+    });
+
+    testWidgets('new card resets hint reveal count', (tester) async {
+      // First card front: 'abcde'; second card front: 'xyzab'. After tapping
+      // Hint once on card 1 and clearing card 1 via a correct exact match, the
+      // view advances to card 2 with reveal count back to 0 — the next Hint
+      // tap reveals 'x', not 'xy'.
+      await pump(tester, snapshotFor('abcde', secondFront: 'xyzab'));
+      await tester.tap(hintButton());
+      await tester.pump();
+      // Overwrite the revealed prefix with the full exact answer for card 1.
+      await tester.enterText(inputField(), 'abcde');
+      await tester.pump();
+      await tester.tap(checkButton());
+      await tester.pump();
+      // Now on card 2, controller cleared, reveal count reset.
+      final inputAfter = tester.widget<TextField>(
+        find.descendant(of: inputField(), matching: find.byType(TextField)),
+      );
+      expect(inputAfter.controller!.text, '');
+      await tester.tap(hintButton());
+      await tester.pump();
+      expect(
+        tester.widget<TextField>(find.descendant(
+          of: inputField(),
+          matching: find.byType(TextField),
+        )).controller!.text,
+        'x',
+      );
     });
 
     testWidgets('hint stops revealing at cap (floor(len/2))', (tester) async {
@@ -220,6 +269,76 @@ void main() {
           'ab',
         );
         // Drain TTS auto-speak timers from the brief wrong-feedback state.
+        await tester.pump(const Duration(seconds: 21));
+      },
+    );
+  });
+
+  group('Fill Mark correct', () {
+    testWidgets(
+      'Mark correct on a non-last item advances to the next card without submitting',
+      (tester) async {
+        // Two-item snapshot: Mark correct on the FIRST card stages the grade
+        // locally and advances to card 2; onSubmit is only called when the
+        // last item is graded.
+        final submissions =
+            await pump(tester, snapshotFor('abcde', secondFront: 'xyzab'));
+        await tester.enterText(inputField(), 'wrong');
+        await tester.pump();
+        await tester.tap(checkButton());
+        await tester.pump(const Duration(milliseconds: 500));
+        await tester.pump(const Duration(milliseconds: 500));
+        expect(find.byType(FillIncorrectCard), findsOneWidget);
+        // Invoke onPressed directly to avoid AnimatedSwitcher hit-test flake.
+        final markCorrect = tester.widget(markCorrectButton());
+        // ignore: avoid_dynamic_calls
+        (markCorrect as dynamic).onPressed.call();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+        // Advanced to card 2: input card visible, controller cleared, no
+        // onSubmit yet (still not the last item).
+        expect(
+          find.byKey(const ValueKey<String>('fill-input-card')),
+          findsOneWidget,
+        );
+        final input = tester.widget<TextField>(
+          find.descendant(of: inputField(), matching: find.byType(TextField)),
+        );
+        expect(input.controller!.text, '');
+        expect(submissions, isEmpty);
+        await tester.pump(const Duration(seconds: 21));
+      },
+    );
+
+    testWidgets(
+      'Mark correct on the LAST item flushes the staged batch via onSubmit',
+      (tester) async {
+        // Pass card 1 with an exact match, then on card 2 (last) trigger wrong
+        // feedback and tap Mark correct. The view must submit both grades as
+        // AttemptGrade.correct.
+        final submissions =
+            await pump(tester, snapshotFor('abcde', secondFront: 'xyzab'));
+        await tester.enterText(inputField(), 'abcde');
+        await tester.pump();
+        await tester.tap(checkButton());
+        await tester.pump();
+        // Now on card 2. Wrong guess → wrong feedback.
+        await tester.enterText(inputField(), 'nope');
+        await tester.pump();
+        await tester.tap(checkButton());
+        await tester.pump(const Duration(milliseconds: 500));
+        await tester.pump(const Duration(milliseconds: 500));
+        expect(find.byType(FillIncorrectCard), findsOneWidget);
+        final markCorrect = tester.widget(markCorrectButton());
+        // ignore: avoid_dynamic_calls
+        (markCorrect as dynamic).onPressed.call();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+        expect(submissions, hasLength(1));
+        expect(submissions.single, <String, AttemptGrade>{
+          'item-c1': AttemptGrade.correct,
+          'item-c2': AttemptGrade.correct,
+        });
         await tester.pump(const Duration(seconds: 21));
       },
     );

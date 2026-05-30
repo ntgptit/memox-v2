@@ -208,7 +208,9 @@ Doc đã thêm full spec timer 20s + auto-reveal. Xem [docs/wireframes/16-study-
 - ✅ **Hint reveal policy promoted to domain**: `lib/domain/study/fill/fill_hint_policy.dart` (`floor(len/2)` cap, per-card reveal count, taint flag). `FillModeSessionView` tracks reveal count per current card; Hint button reveals one char per tap, disables at cap, Try again clears input but retains reveal count, new card resets. Tests: `test/domain/study/fill_hint_policy_test.dart`, `test/presentation/fill_mode_session_view_test.dart`.
 - ⚠ **Hint-taint → SRS downgrade NOT implemented**: `AttemptGrade` is binary (`correct`/`incorrect`); `_reviewOutcome` in `study_repo_impl_helpers.dart` only emits `ReviewResult.recovered` if at least one persisted attempt is `incorrect`. A hint-tainted exact match currently submits `AttemptGrade.correct` and thus reaches `ReviewResult.perfect` instead of `recovered`. Implementing this without faking an `incorrect` attempt requires either a ternary `AttemptGrade.recovered` (touches `database_enum_codecs.dart` + `study_attempts.result` codec) or a parallel `hint_used` column on `study_attempts`. Both are schema-affecting; deliberately left to a follow-up scoped specifically for grading.
 
-**Remaining P1**: extend the grading channel to demote hint-tainted exact match → `recovered` at finalize time.
+**Remaining work** (tracked separately in the backlog):
+- **P1-9** — Fill hint-taint grading channel (schema/model decision required).
+- **P1-10** — Fill TTS auto-play disabled enforcement (no schema impact; audit + small gate + test).
 
 ### §3.11 Architecture inconsistency — **P2** (refined evidence 2026-05-28)
 
@@ -326,7 +328,9 @@ Items resolved trong cleanup pass đã xoá. Items mới từ §3.12-3.14 thêm.
 | **FUT-2** | Full global search screen | §3.5, #11 | M |
 | **P1-3** | Thin zero-content onboarding CTAs | §3.6, #23 | S |
 | **P1-6** | Long-press wiring sau khi #P0-2 ready | §3.1, #13-17 | S |
-| **P1-7** | Strict matcher + hint taint architecture audit + extract to domain | §3.10, §3.13 items 6-7, #17 | S |
+| **P1-7** | ✅ PARTIAL (2026-05-31, Prompt 06) Strict matcher + hint reveal policy extracted to domain (`lib/domain/study/fill/`). Hint-taint → SRS downgrade still open — see **P1-9**. | §3.10, §3.13 items 6-7, #17 | S |
+| **P1-9** | **NEW** Fill hint-taint grading channel: extend `AttemptGrade` or attempt row so hint-tainted exact match grades `recovered` instead of `perfect` at finalize, without persisting a fake `incorrect` attempt. Requires schema/codec change (`AttemptGrade.recovered` + `database_enum_codecs.dart` + `study_attempts.result` codec, or a new `hint_used` column on `study_attempts`). Blocked on schema/model decision; not a Prompt 06 scope item. | §3.10, #17 | M (schema + migration + repo + finalize logic + tests) |
+| **P1-10** | **NEW** Fill TTS auto-play disabled enforcement: per `docs/wireframes/17-study-session-fill.md` §TTS behavior and §Rules, Fill mode must disable auto-play TTS regardless of the `audio_speech_settings` user toggle. Audit `StudyAutoSpeakEffect` / `TtsController.autoPlayTextSide` call sites under `lib/presentation/features/study/widgets/study_session/fill/**` and gate auto-play off for Fill mode. UI Speak button (manual tap, post-feedback) stays unchanged. Add widget test asserting no `speak(...)` call fires when entering correct or wrong feedback state in Fill mode. | §3.10, #17 wireframe §TTS, `docs/business/tts/tts-settings.md` | S |
 | **P1-8** | Per-card review section in study result | #18 | S |
 | **P2-1** | Box-distribution chart on progress | #03 | S |
 | **P2-2** | Flashcard create/edit doc merge | #07, #08 | XS |
