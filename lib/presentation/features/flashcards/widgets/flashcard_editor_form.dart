@@ -42,6 +42,7 @@ class FlashcardEditorForm extends StatefulWidget {
     required this.onAddTag,
     required this.onRemoveTag,
     required this.onStartingStatusChanged,
+    this.onValidateTag,
     this.onPickDestination,
     super.key,
   });
@@ -62,6 +63,10 @@ class FlashcardEditorForm extends StatefulWidget {
   final ValueChanged<String> onAddTag;
   final ValueChanged<String> onRemoveTag;
   final ValueChanged<FlashcardStartingStatus> onStartingStatusChanged;
+
+  /// Inline tag validation surfaced inside the add-tag sheet (no comma, max
+  /// length). Returns a localized error message, or null when valid.
+  final String? Function(String value)? onValidateTag;
 
   /// Opens the destination-deck picker. Null disables the pill chevron
   /// (e.g., in edit mode where moving the card belongs to a separate flow).
@@ -153,6 +158,7 @@ class _FlashcardEditorFormState extends State<FlashcardEditorForm> {
           confirmLabel: l10n.flashcardsTagsConfirmAction,
           onAdd: widget.onAddTag,
           onRemove: widget.onRemoveTag,
+          validate: widget.onValidateTag,
         ),
         const MxGap(MxSpace.lg),
         _AdvancedToggle(

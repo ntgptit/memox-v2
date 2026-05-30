@@ -41,6 +41,8 @@ const _visibleButtonLabelKeys = <String>{
   'flashcardsOpenListAction',
   'flashcardsTagsAddAction',
   'flashcardsTagsConfirmAction',
+  'settingsTagsEmptyAction',
+  'settingsTagsMergeConfirmAction',
   'flashcardsAddAction',
   'flashcardsSaveAndAddNext',
   'flashcardsSaveChanges',
@@ -87,6 +89,7 @@ const _nonButtonActionKeys = <String>{'errorUnsupportedAction'};
 
 const _redundantEnglishActionNounExemptKeys = <String>{
   'dashboardOpenLibraryAction',
+  'settingsTagsEmptyAction',
   'decksExportAction',
   'flashcardsLearnDeckAction',
   'flashcardsSaveAction',

@@ -88,7 +88,7 @@ Cột "Điểm khác biệt" trình bày theo format `[Verified 2026-05-28]: ...
 | 19 | `19-settings-account.md` | ✅ = (§Platform gateways scope) | Sign in Google → link → Drive sync snapshot list / restore. | [Verified 2026-05-28]: Business doc `account-sync.md` đã thêm hẳn §Platform snapshot gateways với bảng so sánh io/web/stub + rules (web cần `sqlite3.wasm` + `drift_worker.dart.js` assets; io dùng `path_provider.getTemporaryDirectory()`; stub throws). [Pending]: Wireframe 19 chính nó (UI flow restore-warning, fingerprint mismatch) chưa re-verify. | **P3**: Wireframe 19 UI aspects pass tiếp. | Sync layer tách clean nhất. | Verify scope hẹp — chỉ data-layer gateways. |
 | 20 | `20-settings-learning.md` | 🟡 D>C | Daily goal, autoplay TTS, intervals override, mode prefs, bury/suspend defaults. | [Verified 2026-05-28]: `study_settings_policy.dart` exists. Bury/suspend foundation done (§3.1); exposing bury/suspend default-behavior settings is a separate follow-up. **Daily-goal field** chưa thấy — link #01. | **P1**: Daily-goal setting; optional bury/suspend default settings. | Policy tách object. | 2 sub-features missing. |
 | 21 | `21-settings-audio-speech.md` | 🟡 D>C | TTS engine select, voice, rate, pitch, sample, auto-play default. | [Verified 2026-05-28]: `audio_speech_settings_screen.dart` + `tts_usecases.dart` + `tts_settings_records_table.dart` exist. [Pending]: Engine fallback Android/iOS + voice picker UI. | **P2**: Verify engine fallback + voice picker. | Persistence table cho TTS settings. | Edge case engine unavailable chưa rõ. |
-| 22 | `22-settings-tag-management.md` | 🟠 D>C (architecture) | Tag list, rename, merge, delete; affect flashcards cascade. | [Verified 2026-05-28]: `tag_management_screen.dart` exists. **0 TagUseCase** ở domain (grep confirmed). **0 `TagRepository` interface** ở `lib/domain/repositories/`. Schema chỉ có `flashcard_tags_table.dart` (junction). → Tag screen có thể đang chạm data trực tiếp (Hard Rule violation candidate) hoặc đi qua `content_query_usecases.dart`. | **P1**: Tag domain layer (repo + 3 use cases). | `mx_tag_input` shared widget có. | Có thể vi phạm Clean Architecture boundary. |
+| 22 | `22-settings-tag-management.md` | ✅ = (V1 scope) | Tag list, rename, merge, delete; affect flashcards cascade. | [Verified 2026-05-30]: Tag domain layer added — `TagRepository` + `TagRepositoryImpl` + `FlashcardTagDao` + `TagValidator` + use cases (`WatchAllTagsWithCount`/`AddTagToCard`/`RemoveTagFromCard`/`RenameTag`/`MergeTag`/`DeleteTag`). Screen rewritten with rename/merge/delete via shared dialogs; UseCase → Repository → DAO flow (no data access from presentation). Tags lowercased (schema v11). See §3.3. | — (resolved) | `mx_tag_input` shared widget (now with inline validation). | "Study cards with this tag" Blocked (`StudyEntryType.tag`); global "View cards" Future (global search) — not exposed in V1. |
 | 23 | `23-onboarding.md` | 🟡 V1 thin / Future full | V1 zero-content guidance; full onboarding flow is future. | [Verified 2026-05-28]: `grep -i "onboarding" lib/` rỗng and initial route is Library. [Scope 2026-05-29]: this is acceptable for V1; implement stronger empty-state CTAs, not standalone onboarding. | **P1**: Add create/import/restore CTAs to empty states. Do not create onboarding route/feature. | Avoids M-size onboarding scope. | Full welcome/restore prompt remains future. |
 | 24 | `24-shared-dialogs.md` | 🟠 D>C | Catalog 8+ dialogs. | [Verified 2026-05-28]: Code có 3 typed widgets (`mx_dialog`, `mx_confirmation_dialog`, `mx_name_dialog`). Các dialog specific (exit-session, finalize-retry, restore-prompt, …) chưa có file riêng. | **P2**: Audit từng §dialog → tạo widget hoặc confirm inline. | Base `mx_dialog` foundation. | Dialog ecosystem ~40% typed. |
 | 25 | `25-shared-bottom-sheets.md` | 🟠 D>C | Card-actions, undo toast, destination picker, study-mode picker. | [Verified 2026-05-29]: base widgets + **`MxCardActionsSheet`** (Edit/Bury/Suspend, no History) with **undo toast**, reachable from all five mode views + session app bar (P0-2, §3.1 resolved). | **P1**: scope picker / paused-sessions sheets still TBD. | Card-actions + in-session triggers + undo done. | Sheet ecosystem ~65% complete. |
@@ -163,12 +163,14 @@ Cột "Điểm khác biệt" trình bày theo format `[Verified 2026-05-28]: ...
 
 **Impact**: blocks streak chip in #01 + #18, daily-goal in #20.
 
-### §3.3 Tag system — **P1 Major (architecture)** (unchanged)
+### §3.3 Tag system — ✅ **RESOLVED 2026-05-30** (domain layer + management screen)
 
-- Schema: junction-only.
-- Domain: 0 use case, 0 repository interface.
-- Presentation: screen + widget exist.
-- **Implication**: presentation may bypass UseCase → Repository → DAO flow. Hard Rule candidate violation.
+- Schema: junction-only (`flashcard_tags`), now case-insensitive with **lowercased storage**; schema v11 backfills existing rows to lowercase (`_lowercaseFlashcardTagsForSchemaV11`).
+- Domain: `TagValidator` (`lib/domain/tag/tag_validator.dart`), `TagRepository` interface (`lib/domain/repositories/tag_repository.dart`), value objects (`TagWithCount`, `TagMergeResult`), use cases (`lib/domain/usecases/tag_usecases.dart`): `WatchAllTagsWithCountUseCase`, `AddTagToCardUseCase`, `RemoveTagFromCardUseCase`, `RenameTagUseCase`, `MergeTagUseCase`, `DeleteTagUseCase`. Names follow `docs/contracts/usecase-contracts/tag.md`; the prompt's `ListTags`/`EnsureTag`/`MergeTags` map to `WatchAllTagsWithCount`/(`TagValidator`+`AddTagToCard`)/`MergeTag`.
+- Data: `TagRepositoryImpl` + `FlashcardTagDao`; merge/delete/rename are transaction-wrapped; result type is the project's `Result<T>` (not `fpdart`).
+- Presentation: `tag_management_screen.dart` rewritten — empty/populated/search states, rename (collision → merge confirm), merge (destination picker), delete (confirm). Flow is UseCase → Repository → DAO; **no presentation→Drift access**. Flashcard editor tag input validates/normalizes through `TagValidator`.
+- **Out of V1**: "Study cards with this tag" (Blocked on `StudyEntryType.tag`, §3.7 Tier 2) and global "View cards" (Future global search, §3.5) are not exposed in the context sheet.
+- Tests: `test/domain/tag/tag_validator_test.dart`, `test/domain/tag/tag_usecases_test.dart`, `test/data/repositories/tag_repository_impl_test.dart`, `test/data/datasources/local/tag_lowercase_migration_test.dart`, `test/presentation/tag_management_screen_test.dart`, editor tag tests in `test/presentation/flashcard_editor_screen_test.dart`.
 
 ### §3.4 Card history — **Future Proposal** (scope resolved 2026-05-29)
 
@@ -315,7 +317,7 @@ Items resolved trong cleanup pass đã xoá. Items mới từ §3.12-3.14 thêm.
 | **P0-2** | Bury/Suspend foundation (schema → UC → UI → settings) | §3.1 | XL |
 | **P0-3** | Default landing route alignment (`home` vs `library`) | §2 | XS |
 | **P1-1** | Streak / Engagement use case + wire `MxStreakCard` + daily-goal | §3.2, #01, #18, #20 | M |
-| **P1-2** | Tag domain layer (repo + 3 use cases) + screen wiring | §3.3, #22 | M |
+| **P1-2** | ✅ DONE (2026-05-30) Tag domain layer (repo + use cases + validator) + management screen + editor wiring | §3.3, #22 | M |
 | **FUT-1** | Card history use case + screen | §3.4, #09 | M |
 | **FUT-2** | Full global search screen | §3.5, #11 | M |
 | **P1-3** | Thin zero-content onboarding CTAs | §3.6, #23 | S |

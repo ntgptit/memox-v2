@@ -57,6 +57,10 @@ abstract final class _SchemaIndex {
     'idx_study_attempts_item',
     'CREATE INDEX IF NOT EXISTS idx_study_attempts_item ON study_attempts (session_item_id)',
   );
+  static final Index flashcardTagsTag = Index(
+    'idx_flashcard_tags_tag',
+    'CREATE INDEX IF NOT EXISTS idx_flashcard_tags_tag ON flashcard_tags (tag, flashcard_id)',
+  );
 }
 
 final List<Index> _schemaIndexes = <Index>[
@@ -73,6 +77,7 @@ final List<Index> _schemaIndexes = <Index>[
   _SchemaIndex.studySessionItemsModeRound,
   _SchemaIndex.studyAttemptsSessionAnsweredAt,
   _SchemaIndex.studyAttemptsItem,
+  _SchemaIndex.flashcardTagsTag,
 ];
 
 const String _legacyFlashcardProgressResultExpression = '''
@@ -121,6 +126,21 @@ WHERE last_result = 'perfect'
       AND attempts.new_box = flashcard_progress.current_box
       AND attempts.next_due_at = flashcard_progress.due_at
   )
+''';
+
+/// Schema v11: collapse case-variant duplicates per card, keeping the lowest
+/// rowid, so the subsequent lowercase UPDATE cannot hit the
+/// `(flashcard_id, tag)` primary key.
+const String _dedupeFlashcardTagsCaseVariantsSql = '''
+DELETE FROM flashcard_tags
+WHERE rowid NOT IN (
+  SELECT MIN(rowid) FROM flashcard_tags GROUP BY flashcard_id, LOWER(tag)
+)
+''';
+
+/// Schema v11: normalize remaining tag rows to their lowercased storage form.
+const String _lowercaseFlashcardTagsSql = '''
+UPDATE flashcard_tags SET tag = LOWER(tag) WHERE tag <> LOWER(tag)
 ''';
 
 const String _repairMissingFlashcardProgressSql = '''

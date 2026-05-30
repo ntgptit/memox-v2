@@ -457,8 +457,71 @@
   },
   "settingsManageTagsTitle": "Quản lý tag",
   "settingsManageTagsOverviewSubtitle": "14 tag",
-  "settingsManageTagsShellTitle": "Màn quản lý tag đã có route",
-  "settingsManageTagsShellMessage": "Route đã sẵn sàng. Các thao tác đổi tên, gộp, xóa, học theo tag và xem thẻ sẽ được triển khai cùng feature quản lý tag đầy đủ.",
+  "tagHashLabel": "#{tag}",
+  "@tagHashLabel": {
+    "placeholders": {
+      "tag": { "type": "String" }
+    }
+  },
+  "settingsTagsSearchHint": "Tìm tag",
+  "settingsTagsCount": "{count, plural, other{{count} tag}}",
+  "@settingsTagsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "settingsTagsCardCount": "{count, plural, other{{count} thẻ}}",
+  "@settingsTagsCardCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "settingsTagsSortMostCards": "Nhiều thẻ nhất",
+  "settingsTagsSortNameAsc": "A → Z",
+  "settingsTagsSortNameDesc": "Z → A",
+  "settingsTagsEmptyTitle": "Chưa có tag nào",
+  "settingsTagsEmptyMessage": "Tag được thêm khi bạn tạo hoặc sửa thẻ. Mở một thẻ để thêm tag đầu tiên.",
+  "settingsTagsEmptyAction": "Tới thư viện",
+  "settingsTagsSearchEmptyTitle": "Không có tag phù hợp",
+  "settingsTagsSearchEmptyMessage": "Không có tag nào khớp với tìm kiếm.",
+  "settingsTagsActionRename": "Đổi tên",
+  "settingsTagsActionMerge": "Gộp vào tag khác",
+  "settingsTagsActionDelete": "Xóa tag (giữ thẻ)",
+  "settingsTagsRenameTitle": "Đổi tên tag",
+  "settingsTagsRenameLabel": "Tên tag",
+  "settingsTagsRenameHint": "Nhập tên mới",
+  "settingsTagsRenameConfirm": "Đổi tên",
+  "settingsTagsRenamedMessage": "Đã đổi tên tag.",
+  "settingsTagsMergeSheetTitle": "Gộp \"{source}\" vào…",
+  "@settingsTagsMergeSheetTitle": {
+    "placeholders": {
+      "source": { "type": "String" }
+    }
+  },
+  "settingsTagsMergeSheetEmpty": "Không có tag nào khác để gộp.",
+  "settingsTagsMergeConfirmTitle": "Gộp tag?",
+  "settingsTagsMergeConfirmMessage": "Tất cả thẻ gắn \"{source}\" sẽ được gắn lại \"{destination}\". Tag \"{source}\" sẽ bị xóa.",
+  "@settingsTagsMergeConfirmMessage": {
+    "placeholders": {
+      "source": { "type": "String" },
+      "destination": { "type": "String" }
+    }
+  },
+  "settingsTagsMergeConfirmAction": "Gộp",
+  "settingsTagsMergedMessage": "Đã gộp tag.",
+  "settingsTagsDeleteTitle": "Xóa tag?",
+  "settingsTagsDeleteMessage": "Xóa \"{tag}\"? Thao tác này gỡ tag khỏi {count, plural, other{{count} thẻ}}. Các thẻ không bị xóa.",
+  "@settingsTagsDeleteMessage": {
+    "placeholders": {
+      "tag": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "settingsTagsDeleteConfirm": "Xóa",
+  "settingsTagsDeletedMessage": "Đã xóa tag.",
+  "flashcardsTagErrorEmpty": "Cần nhập tên tag.",
+  "flashcardsTagErrorComma": "Tag không được chứa dấu phẩy.",
+  "flashcardsTagErrorTooLong": "Tag quá dài (tối đa 50 ký tự).",
   "settingsSpeechTitle": "Giọng nói",
   "settingsAudioSpeechTitle": "Âm thanh & giọng nói",
   "settingsAudioSpeechEnabled": "Bật",

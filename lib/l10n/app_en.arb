@@ -457,8 +457,71 @@
   },
   "settingsManageTagsTitle": "Manage tags",
   "settingsManageTagsOverviewSubtitle": "14 tags",
-  "settingsManageTagsShellTitle": "Tag management is ready to wire",
-  "settingsManageTagsShellMessage": "The route is available now. Rename, merge, delete, study, and view-card actions will be implemented with the full tag-management feature.",
+  "tagHashLabel": "#{tag}",
+  "@tagHashLabel": {
+    "placeholders": {
+      "tag": { "type": "String" }
+    }
+  },
+  "settingsTagsSearchHint": "Search tags",
+  "settingsTagsCount": "{count, plural, =1{1 tag} other{{count} tags}}",
+  "@settingsTagsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "settingsTagsCardCount": "{count, plural, =1{1 card} other{{count} cards}}",
+  "@settingsTagsCardCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "settingsTagsSortMostCards": "Most cards",
+  "settingsTagsSortNameAsc": "A → Z",
+  "settingsTagsSortNameDesc": "Z → A",
+  "settingsTagsEmptyTitle": "No tags yet",
+  "settingsTagsEmptyMessage": "Tags are added when you create or edit flashcards. Open a card to add your first tag.",
+  "settingsTagsEmptyAction": "Go to library",
+  "settingsTagsSearchEmptyTitle": "No matching tags",
+  "settingsTagsSearchEmptyMessage": "No tags match your search.",
+  "settingsTagsActionRename": "Rename",
+  "settingsTagsActionMerge": "Merge into another tag",
+  "settingsTagsActionDelete": "Delete tag (keeps cards)",
+  "settingsTagsRenameTitle": "Rename tag",
+  "settingsTagsRenameLabel": "Tag name",
+  "settingsTagsRenameHint": "Enter a new name",
+  "settingsTagsRenameConfirm": "Rename",
+  "settingsTagsRenamedMessage": "Tag renamed.",
+  "settingsTagsMergeSheetTitle": "Merge \"{source}\" into…",
+  "@settingsTagsMergeSheetTitle": {
+    "placeholders": {
+      "source": { "type": "String" }
+    }
+  },
+  "settingsTagsMergeSheetEmpty": "No other tags to merge into.",
+  "settingsTagsMergeConfirmTitle": "Merge tags?",
+  "settingsTagsMergeConfirmMessage": "All cards tagged \"{source}\" will be re-tagged with \"{destination}\". The tag \"{source}\" will be deleted.",
+  "@settingsTagsMergeConfirmMessage": {
+    "placeholders": {
+      "source": { "type": "String" },
+      "destination": { "type": "String" }
+    }
+  },
+  "settingsTagsMergeConfirmAction": "Merge",
+  "settingsTagsMergedMessage": "Tags merged.",
+  "settingsTagsDeleteTitle": "Delete tag?",
+  "settingsTagsDeleteMessage": "Delete \"{tag}\"? This removes the tag from {count, plural, =1{1 card} other{{count} cards}}. Cards are not deleted.",
+  "@settingsTagsDeleteMessage": {
+    "placeholders": {
+      "tag": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "settingsTagsDeleteConfirm": "Delete",
+  "settingsTagsDeletedMessage": "Tag deleted.",
+  "flashcardsTagErrorEmpty": "Tag name is required.",
+  "flashcardsTagErrorComma": "Tags cannot contain commas.",
+  "flashcardsTagErrorTooLong": "Tag too long (max 50 chars).",
   "settingsSpeechTitle": "Speech",
   "settingsAudioSpeechTitle": "Audio & speech",
   "settingsAudioSpeechEnabled": "On",

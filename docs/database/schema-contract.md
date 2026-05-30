@@ -1,7 +1,7 @@
 ---
 last_updated: 2026-05-26
 applies_to: Drift schema, all tables, migrations
-schema_version: 10 (see lib/data/datasources/local/app_database.dart `currentSchemaVersion`)
+schema_version: 11 (see lib/data/datasources/local/app_database.dart `currentSchemaVersion`)
 ---
 
 # Database Schema Contract
@@ -98,7 +98,8 @@ A pending column listed here does not automatically approve every dependent feat
 | Add `study_attempts.box_before INTEGER NOT NULL DEFAULT 0` | `docs/business/history/card-history.md` | Migration backfill: set to 0 for pre-migration rows (treated as "unknown"; history view displays "—" for box transition on those rows). |
 | Add `study_attempts.box_after INTEGER NOT NULL DEFAULT 0` | `docs/business/history/card-history.md` | Same migration semantics as `box_before`. |
 | ✅ DONE (v10) compound index `flashcard_progress(is_suspended, buried_until, due_at)` | `docs/business/study-actions/bury-suspend.md` | Added as `idx_flashcard_progress_eligibility`. |
-| Consider compound index on `flashcard_tags(LOWER(tag), flashcard_id)` | `docs/business/tags/tag-system.md` | For tag filter performance. |
+| ✅ DONE (v11) compound index `flashcard_tags(tag, flashcard_id)` | `docs/business/tags/tag-system.md` | Added as `idx_flashcard_tags_tag`. Tags are stored lowercased, so a plain index on `tag` supports `LOWER(tag)` lookups for lowercased input. |
+| ✅ DONE (v11) lowercase `flashcard_tags.tag` storage | `docs/business/tags/tag-system.md` | Tags are stored lowercased (case-insensitive identity). Schema v11 dedupes case variants per card then lowercases existing rows; writers (`FlashcardDao`, `FlashcardTagDao`) normalize on insert. |
 | Consider index on `study_attempts(box_after)` | `docs/business/history/card-history.md` | Only if box-progression analytics need it; profile first. |
 
 When implementing, bump `AppDatabase.currentSchemaVersion` accordingly and update this doc's frontmatter `schema_version`.

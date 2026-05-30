@@ -105,6 +105,12 @@ Future<_SettingsHarness> _pumpSettingsRouter(
       if (googleConfig != null)
         googleOAuthConfigProvider.overrideWithValue(googleConfig),
       googleAccountAuthServiceProvider.overrideWithValue(effectiveGoogleAuth),
+      // Tag management screen watches a live Drift stream. Override with an
+      // immediately-completing stream so pumpAndSettle can settle and no timer
+      // leaks into subsequent tests.
+      tagListProvider.overrideWith(
+        (_) => Stream<List<TagWithCount>>.value(const <TagWithCount>[]),
+      ),
     ],
   );
   final router = GoRouter(

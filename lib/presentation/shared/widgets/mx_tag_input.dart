@@ -25,6 +25,7 @@ class MxTagInput extends StatelessWidget {
     required this.sheetTitle,
     required this.hintText,
     required this.confirmLabel,
+    this.validate,
     super.key,
   });
 
@@ -36,11 +37,20 @@ class MxTagInput extends StatelessWidget {
   final String hintText;
   final String confirmLabel;
 
+  /// Optional inline validation run inside the add-tag sheet. Returns a
+  /// localized error message to display, or null when the input is valid. When
+  /// provided, the sheet refuses to commit invalid input.
+  final String? Function(String value)? validate;
+
   Future<void> _openSheet(BuildContext context) async {
     final tag = await MxBottomSheet.show<String>(
       context: context,
       title: sheetTitle,
-      child: _TagInputSheetBody(hintText: hintText, confirmLabel: confirmLabel),
+      child: _TagInputSheetBody(
+        hintText: hintText,
+        confirmLabel: confirmLabel,
+        validate: validate,
+      ),
     );
     if (tag == null) return;
     final trimmed = StringUtils.trimmed(tag);
@@ -164,10 +174,12 @@ class _TagInputSheetBody extends StatefulWidget {
   const _TagInputSheetBody({
     required this.hintText,
     required this.confirmLabel,
+    this.validate,
   });
 
   final String hintText;
   final String confirmLabel;
+  final String? Function(String value)? validate;
 
   @override
   State<_TagInputSheetBody> createState() => _TagInputSheetBodyState();
@@ -175,6 +187,7 @@ class _TagInputSheetBody extends StatefulWidget {
 
 class _TagInputSheetBodyState extends State<_TagInputSheetBody> {
   final TextEditingController _controller = TextEditingController();
+  String? _errorText;
 
   @override
   void dispose() {
@@ -188,6 +201,11 @@ class _TagInputSheetBodyState extends State<_TagInputSheetBody> {
       Navigator.of(context).pop();
       return;
     }
+    final error = widget.validate?.call(trimmed);
+    if (error != null) {
+      setState(() => _errorText = error);
+      return;
+    }
     Navigator.of(context).pop(trimmed);
   }
 
@@ -199,9 +217,13 @@ class _TagInputSheetBodyState extends State<_TagInputSheetBody> {
       MxTextField(
         controller: _controller,
         hintText: widget.hintText,
+        errorText: _errorText,
         autofocus: true,
         textInputAction: TextInputAction.done,
         textCapitalization: TextCapitalization.none,
+        onChanged: (_) {
+          if (_errorText != null) setState(() => _errorText = null);
+        },
         onSubmitted: (_) => _submit(),
       ),
       const SizedBox(height: AppSpacing.md),

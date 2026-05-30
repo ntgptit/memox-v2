@@ -858,11 +858,132 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsManageTagsOverviewSubtitle => '14 tag';
 
   @override
-  String get settingsManageTagsShellTitle => 'Màn quản lý tag đã có route';
+  String tagHashLabel(String tag) {
+    return '#$tag';
+  }
 
   @override
-  String get settingsManageTagsShellMessage =>
-      'Route đã sẵn sàng. Các thao tác đổi tên, gộp, xóa, học theo tag và xem thẻ sẽ được triển khai cùng feature quản lý tag đầy đủ.';
+  String get settingsTagsSearchHint => 'Tìm tag';
+
+  @override
+  String settingsTagsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settingsTagsCardCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsTagsSortMostCards => 'Nhiều thẻ nhất';
+
+  @override
+  String get settingsTagsSortNameAsc => 'A → Z';
+
+  @override
+  String get settingsTagsSortNameDesc => 'Z → A';
+
+  @override
+  String get settingsTagsEmptyTitle => 'Chưa có tag nào';
+
+  @override
+  String get settingsTagsEmptyMessage =>
+      'Tag được thêm khi bạn tạo hoặc sửa thẻ. Mở một thẻ để thêm tag đầu tiên.';
+
+  @override
+  String get settingsTagsEmptyAction => 'Tới thư viện';
+
+  @override
+  String get settingsTagsSearchEmptyTitle => 'Không có tag phù hợp';
+
+  @override
+  String get settingsTagsSearchEmptyMessage =>
+      'Không có tag nào khớp với tìm kiếm.';
+
+  @override
+  String get settingsTagsActionRename => 'Đổi tên';
+
+  @override
+  String get settingsTagsActionMerge => 'Gộp vào tag khác';
+
+  @override
+  String get settingsTagsActionDelete => 'Xóa tag (giữ thẻ)';
+
+  @override
+  String get settingsTagsRenameTitle => 'Đổi tên tag';
+
+  @override
+  String get settingsTagsRenameLabel => 'Tên tag';
+
+  @override
+  String get settingsTagsRenameHint => 'Nhập tên mới';
+
+  @override
+  String get settingsTagsRenameConfirm => 'Đổi tên';
+
+  @override
+  String get settingsTagsRenamedMessage => 'Đã đổi tên tag.';
+
+  @override
+  String settingsTagsMergeSheetTitle(String source) {
+    return 'Gộp \"$source\" vào…';
+  }
+
+  @override
+  String get settingsTagsMergeSheetEmpty => 'Không có tag nào khác để gộp.';
+
+  @override
+  String get settingsTagsMergeConfirmTitle => 'Gộp tag?';
+
+  @override
+  String settingsTagsMergeConfirmMessage(String source, String destination) {
+    return 'Tất cả thẻ gắn \"$source\" sẽ được gắn lại \"$destination\". Tag \"$source\" sẽ bị xóa.';
+  }
+
+  @override
+  String get settingsTagsMergeConfirmAction => 'Gộp';
+
+  @override
+  String get settingsTagsMergedMessage => 'Đã gộp tag.';
+
+  @override
+  String get settingsTagsDeleteTitle => 'Xóa tag?';
+
+  @override
+  String settingsTagsDeleteMessage(String tag, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ',
+    );
+    return 'Xóa \"$tag\"? Thao tác này gỡ tag khỏi $_temp0. Các thẻ không bị xóa.';
+  }
+
+  @override
+  String get settingsTagsDeleteConfirm => 'Xóa';
+
+  @override
+  String get settingsTagsDeletedMessage => 'Đã xóa tag.';
+
+  @override
+  String get flashcardsTagErrorEmpty => 'Cần nhập tên tag.';
+
+  @override
+  String get flashcardsTagErrorComma => 'Tag không được chứa dấu phẩy.';
+
+  @override
+  String get flashcardsTagErrorTooLong => 'Tag quá dài (tối đa 50 ký tự).';
 
   @override
   String get settingsSpeechTitle => 'Giọng nói';

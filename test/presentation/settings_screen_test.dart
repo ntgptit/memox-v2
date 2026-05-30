@@ -27,6 +27,8 @@ import 'package:memox/domain/services/google_account_auth_service.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/settings/screens/account_settings_screen.dart';
+import 'package:memox/domain/value_objects/tag_read_models.dart';
+import 'package:memox/presentation/features/settings/providers/tag_management_notifier.dart';
 import 'package:memox/presentation/features/settings/screens/audio_speech_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/learning_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/settings_screen.dart';
@@ -839,7 +841,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(SettingsTagManagementScreen), findsOneWidget);
-    expect(find.text('Tag management is ready to wire'), findsOneWidget);
+    // With an empty stream override the screen shows its empty state.
+    expect(find.text('No tags yet'), findsOneWidget);
   });
 
   testWidgets('DT6 onNavigate: about row opens MemoX dialog', (tester) async {

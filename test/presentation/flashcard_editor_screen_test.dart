@@ -155,6 +155,89 @@ void main() {
       );
     },
   );
+
+  testWidgets('attaches a newly created tag (normalized) to the draft', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildCreateApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Add tag'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).last, 'Verb');
+    await tester.pump();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    // Stored lowercased per tag-system.md.
+    expect(find.text('verb'), findsOneWidget);
+  });
+
+  testWidgets('rejects a tag containing a comma with an inline error', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildCreateApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Add tag'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).last, 'a,b');
+    await tester.pump();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    // Inline error shown; the sheet stays open and no chip is committed.
+    expect(find.text('Tags cannot contain commas.'), findsOneWidget);
+  });
+
+  testWidgets('keeps existing tags and attaches new ones in edit mode', (
+    tester,
+  ) async {
+    const deckId = 'deck-001';
+    const flashcardId = 'card-001';
+    final repository = _EditorFlashcardRepository(
+      flashcard: const FlashcardEntity(
+        id: flashcardId,
+        deckId: deckId,
+        front: 'Front',
+        back: 'Back',
+        note: null,
+        sortOrder: 0,
+        createdAt: 1,
+        updatedAt: 1,
+        tags: <String>['verb'],
+      ),
+    );
+    final container = _editorContainer(repository);
+    final router = _editorRouter(deckId: deckId, flashcardId: flashcardId);
+    addTearDown(container.dispose);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Existing tag rendered as a chip.
+    expect(find.text('verb'), findsOneWidget);
+
+    await tester.tap(find.text('Add tag'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).last, 'noun');
+    await tester.pump();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('noun'), findsOneWidget);
+    expect(find.text('verb'), findsOneWidget);
+  });
 }
 
 Widget _buildCreateApp() {

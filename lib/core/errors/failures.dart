@@ -8,6 +8,12 @@ abstract final class FailureCodes {
   static const String invalidData = 'invalid_data';
   static const String unsupportedAction = 'unsupported_action';
   static const String unknown = 'unknown';
+
+  // Tag domain (docs/contracts/usecase-contracts/tag.md §TagValidator).
+  static const String tagEmpty = 'tag_empty';
+  static const String tagInvalidCharacter = 'tag_invalid_character';
+  static const String tagTooLong = 'tag_too_long';
+  static const String tagNameConflict = 'tag_name_conflict';
 }
 
 enum FailureType {

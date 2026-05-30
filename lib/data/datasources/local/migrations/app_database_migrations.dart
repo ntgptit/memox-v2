@@ -56,6 +56,21 @@ final class _AppDatabaseMigrationRunner {
     if (from < 10) {
       await _addBurySuspendColumnsForSchemaV10();
     }
+    if (from < 11) {
+      await _lowercaseFlashcardTagsForSchemaV11();
+    }
+  }
+
+  /// Schema v11: tags become case-insensitive with lowercased storage
+  /// (`docs/business/tags/tag-system.md`). Collapse case-variant duplicates per
+  /// card first, then lowercase the survivors. Card rows are untouched.
+  Future<void> _lowercaseFlashcardTagsForSchemaV11() async {
+    if (!await _hasTable(_TableName.flashcardTags)) {
+      await migrator.createTable(database.flashcardTags);
+      return;
+    }
+    await database.customStatement(_dedupeFlashcardTagsCaseVariantsSql);
+    await database.customStatement(_lowercaseFlashcardTagsSql);
   }
 
   /// Schema v10: add `flashcard_progress.buried_until` (nullable) and

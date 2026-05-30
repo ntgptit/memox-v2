@@ -236,9 +236,11 @@ final class FlashcardDao {
     )..where((table) => table.flashcardId.equals(flashcardId))).go();
     final cleaned = <String>{};
     for (final tag in tags) {
-      final trimmed = StringUtils.trimmed(tag);
-      if (trimmed.isNotEmpty) {
-        cleaned.add(trimmed);
+      // Tags are stored lowercased (case-insensitive identity); see
+      // docs/business/tags/tag-system.md. The Set dedupes case variants.
+      final normalized = StringUtils.normalizedForComparison(tag);
+      if (normalized.isNotEmpty) {
+        cleaned.add(normalized);
       }
     }
     if (cleaned.isEmpty) {

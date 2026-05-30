@@ -933,11 +933,134 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsManageTagsOverviewSubtitle => '14 tags';
 
   @override
-  String get settingsManageTagsShellTitle => 'Tag management is ready to wire';
+  String tagHashLabel(String tag) {
+    return '#$tag';
+  }
 
   @override
-  String get settingsManageTagsShellMessage =>
-      'The route is available now. Rename, merge, delete, study, and view-card actions will be implemented with the full tag-management feature.';
+  String get settingsTagsSearchHint => 'Search tags';
+
+  @override
+  String settingsTagsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tags',
+      one: '1 tag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settingsTagsCardCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsTagsSortMostCards => 'Most cards';
+
+  @override
+  String get settingsTagsSortNameAsc => 'A → Z';
+
+  @override
+  String get settingsTagsSortNameDesc => 'Z → A';
+
+  @override
+  String get settingsTagsEmptyTitle => 'No tags yet';
+
+  @override
+  String get settingsTagsEmptyMessage =>
+      'Tags are added when you create or edit flashcards. Open a card to add your first tag.';
+
+  @override
+  String get settingsTagsEmptyAction => 'Go to library';
+
+  @override
+  String get settingsTagsSearchEmptyTitle => 'No matching tags';
+
+  @override
+  String get settingsTagsSearchEmptyMessage => 'No tags match your search.';
+
+  @override
+  String get settingsTagsActionRename => 'Rename';
+
+  @override
+  String get settingsTagsActionMerge => 'Merge into another tag';
+
+  @override
+  String get settingsTagsActionDelete => 'Delete tag (keeps cards)';
+
+  @override
+  String get settingsTagsRenameTitle => 'Rename tag';
+
+  @override
+  String get settingsTagsRenameLabel => 'Tag name';
+
+  @override
+  String get settingsTagsRenameHint => 'Enter a new name';
+
+  @override
+  String get settingsTagsRenameConfirm => 'Rename';
+
+  @override
+  String get settingsTagsRenamedMessage => 'Tag renamed.';
+
+  @override
+  String settingsTagsMergeSheetTitle(String source) {
+    return 'Merge \"$source\" into…';
+  }
+
+  @override
+  String get settingsTagsMergeSheetEmpty => 'No other tags to merge into.';
+
+  @override
+  String get settingsTagsMergeConfirmTitle => 'Merge tags?';
+
+  @override
+  String settingsTagsMergeConfirmMessage(String source, String destination) {
+    return 'All cards tagged \"$source\" will be re-tagged with \"$destination\". The tag \"$source\" will be deleted.';
+  }
+
+  @override
+  String get settingsTagsMergeConfirmAction => 'Merge';
+
+  @override
+  String get settingsTagsMergedMessage => 'Tags merged.';
+
+  @override
+  String get settingsTagsDeleteTitle => 'Delete tag?';
+
+  @override
+  String settingsTagsDeleteMessage(String tag, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+    );
+    return 'Delete \"$tag\"? This removes the tag from $_temp0. Cards are not deleted.';
+  }
+
+  @override
+  String get settingsTagsDeleteConfirm => 'Delete';
+
+  @override
+  String get settingsTagsDeletedMessage => 'Tag deleted.';
+
+  @override
+  String get flashcardsTagErrorEmpty => 'Tag name is required.';
+
+  @override
+  String get flashcardsTagErrorComma => 'Tags cannot contain commas.';
+
+  @override
+  String get flashcardsTagErrorTooLong => 'Tag too long (max 50 chars).';
 
   @override
   String get settingsSpeechTitle => 'Speech';

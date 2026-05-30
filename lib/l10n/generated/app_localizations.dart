@@ -1488,17 +1488,203 @@ abstract class AppLocalizations {
   /// **'14 tags'**
   String get settingsManageTagsOverviewSubtitle;
 
-  /// No description provided for @settingsManageTagsShellTitle.
+  /// No description provided for @tagHashLabel.
   ///
   /// In en, this message translates to:
-  /// **'Tag management is ready to wire'**
-  String get settingsManageTagsShellTitle;
+  /// **'#{tag}'**
+  String tagHashLabel(String tag);
 
-  /// No description provided for @settingsManageTagsShellMessage.
+  /// No description provided for @settingsTagsSearchHint.
   ///
   /// In en, this message translates to:
-  /// **'The route is available now. Rename, merge, delete, study, and view-card actions will be implemented with the full tag-management feature.'**
-  String get settingsManageTagsShellMessage;
+  /// **'Search tags'**
+  String get settingsTagsSearchHint;
+
+  /// No description provided for @settingsTagsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 tag} other{{count} tags}}'**
+  String settingsTagsCount(int count);
+
+  /// No description provided for @settingsTagsCardCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card} other{{count} cards}}'**
+  String settingsTagsCardCount(int count);
+
+  /// No description provided for @settingsTagsSortMostCards.
+  ///
+  /// In en, this message translates to:
+  /// **'Most cards'**
+  String get settingsTagsSortMostCards;
+
+  /// No description provided for @settingsTagsSortNameAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'A → Z'**
+  String get settingsTagsSortNameAsc;
+
+  /// No description provided for @settingsTagsSortNameDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Z → A'**
+  String get settingsTagsSortNameDesc;
+
+  /// No description provided for @settingsTagsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags yet'**
+  String get settingsTagsEmptyTitle;
+
+  /// No description provided for @settingsTagsEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags are added when you create or edit flashcards. Open a card to add your first tag.'**
+  String get settingsTagsEmptyMessage;
+
+  /// No description provided for @settingsTagsEmptyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to library'**
+  String get settingsTagsEmptyAction;
+
+  /// No description provided for @settingsTagsSearchEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching tags'**
+  String get settingsTagsSearchEmptyTitle;
+
+  /// No description provided for @settingsTagsSearchEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags match your search.'**
+  String get settingsTagsSearchEmptyMessage;
+
+  /// No description provided for @settingsTagsActionRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get settingsTagsActionRename;
+
+  /// No description provided for @settingsTagsActionMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge into another tag'**
+  String get settingsTagsActionMerge;
+
+  /// No description provided for @settingsTagsActionDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete tag (keeps cards)'**
+  String get settingsTagsActionDelete;
+
+  /// No description provided for @settingsTagsRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename tag'**
+  String get settingsTagsRenameTitle;
+
+  /// No description provided for @settingsTagsRenameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag name'**
+  String get settingsTagsRenameLabel;
+
+  /// No description provided for @settingsTagsRenameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new name'**
+  String get settingsTagsRenameHint;
+
+  /// No description provided for @settingsTagsRenameConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get settingsTagsRenameConfirm;
+
+  /// No description provided for @settingsTagsRenamedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag renamed.'**
+  String get settingsTagsRenamedMessage;
+
+  /// No description provided for @settingsTagsMergeSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge \"{source}\" into…'**
+  String settingsTagsMergeSheetTitle(String source);
+
+  /// No description provided for @settingsTagsMergeSheetEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No other tags to merge into.'**
+  String get settingsTagsMergeSheetEmpty;
+
+  /// No description provided for @settingsTagsMergeConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge tags?'**
+  String get settingsTagsMergeConfirmTitle;
+
+  /// No description provided for @settingsTagsMergeConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All cards tagged \"{source}\" will be re-tagged with \"{destination}\". The tag \"{source}\" will be deleted.'**
+  String settingsTagsMergeConfirmMessage(String source, String destination);
+
+  /// No description provided for @settingsTagsMergeConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get settingsTagsMergeConfirmAction;
+
+  /// No description provided for @settingsTagsMergedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags merged.'**
+  String get settingsTagsMergedMessage;
+
+  /// No description provided for @settingsTagsDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete tag?'**
+  String get settingsTagsDeleteTitle;
+
+  /// No description provided for @settingsTagsDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{tag}\"? This removes the tag from {count, plural, =1{1 card} other{{count} cards}}. Cards are not deleted.'**
+  String settingsTagsDeleteMessage(String tag, int count);
+
+  /// No description provided for @settingsTagsDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get settingsTagsDeleteConfirm;
+
+  /// No description provided for @settingsTagsDeletedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag deleted.'**
+  String get settingsTagsDeletedMessage;
+
+  /// No description provided for @flashcardsTagErrorEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag name is required.'**
+  String get flashcardsTagErrorEmpty;
+
+  /// No description provided for @flashcardsTagErrorComma.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags cannot contain commas.'**
+  String get flashcardsTagErrorComma;
+
+  /// No description provided for @flashcardsTagErrorTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag too long (max 50 chars).'**
+  String get flashcardsTagErrorTooLong;
 
   /// No description provided for @settingsSpeechTitle.
   ///

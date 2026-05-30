@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../app/di/content/tag_providers.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/value_objects/content_actions.dart';
@@ -9,6 +10,7 @@ import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/dialogs/mx_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
+import '../../../shared/feedback/mx_tag_failure_text.dart';
 import '../../../shared/layouts/mx_form_scaffold.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
@@ -192,8 +194,9 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
           onExampleChanged: draftNotifier.setExample,
           onPronunciationChanged: draftNotifier.setPronunciation,
           onHintChanged: draftNotifier.setHint,
-          onAddTag: draftNotifier.addTag,
+          onAddTag: (raw) => _addTag(raw, draftNotifier, l10n),
           onRemoveTag: draftNotifier.removeTag,
+          onValidateTag: (raw) => _validateTag(raw, l10n),
           onStartingStatusChanged: draftNotifier.setStartingStatus,
           // Edit mode keeps the deck destination read-only; moving an existing
           // card belongs to the separate "Move flashcards" action on the list
@@ -208,6 +211,29 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
         ),
       ],
     );
+  }
+
+  /// Inline validation for the add-tag sheet (no comma, max length), routed
+  /// through the domain [TagValidator]. Returns a localized error or null.
+  String? _validateTag(String raw, AppLocalizations l10n) {
+    final failure = ref.read(tagValidatorProvider).validate(raw).failureOrNull;
+    return failure == null ? null : tagValidationMessage(l10n, failure);
+  }
+
+  /// Adds a tag to the draft after normalizing it through [TagValidator]
+  /// (lowercased storage form). Create and edit modes share this path; tags are
+  /// persisted with the card on save, never written directly from the UI.
+  void _addTag(String raw, FlashcardEditorDraft draftNotifier, AppLocalizations l10n) {
+    final result = ref.read(tagValidatorProvider).validate(raw);
+    final normalized = result.valueOrNull;
+    if (normalized == null) {
+      final failure = result.failureOrNull;
+      if (failure != null) {
+        MxSnackbar.error(context, tagValidationMessage(l10n, failure));
+      }
+      return;
+    }
+    draftNotifier.addTag(normalized);
   }
 
   Future<void> _pickDestination({
