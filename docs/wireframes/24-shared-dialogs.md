@@ -449,9 +449,10 @@ When fingerprints match, this dialog still appears but the warning is softer and
 **Contracts:** Dialogs invoke use cases listed per spec above; primary refs: `docs/contracts/usecase-contracts/study.md` (resume/discard/finalize), `docs/contracts/usecase-contracts/folder.md`/`docs/contracts/usecase-contracts/deck.md`/`docs/contracts/usecase-contracts/flashcard.md` (delete + rename), `docs/contracts/usecase-contracts/bulk.md` (bulk-delete), `docs/contracts/usecase-contracts/history.md` (reset progress), `docs/contracts/usecase-contracts/account-sync.md` (restore-warning). UI behavior shaped by `docs/contracts/error-contract.md` recovery rules.
 
 **Code paths:**
-- `lib/core/widgets/dialogs/**` (each shared dialog as its own widget file)
+- Shared dialogs live under `lib/presentation/shared/dialogs/**` (each as its own widget file), built on `MxDialog` / `MxConfirmationDialog`.
 - Naming: `MxDialogResumeOrStartOver`, `MxDialogDiscardSession`, `MxDialogDiscardChanges`, `MxDialogExitSession`, `MxDialogDeleteConfirm`, `MxDialogBulkDelete`, `MxDialogResetProgress`, `MxDialogRename`, `MxDialogFolderCreate`, `MxDialogRestoreWarning`
-- Each takes typed result via Navigator.pop
+- Implemented so far: `MxDialogResumeOrStartOver` (`mx_dialog_resume_or_start_over.dart`, Prompt 05) returns typed `MxResumeChoice?`; §discard-session is composed from `MxConfirmationDialog` (danger tone) by the entry gate and Dashboard/Progress resume surfaces.
+- Each takes a typed result via Navigator.pop
 
 **Related wireframes:**
 - Used by virtually every screen; see "Used by:" list in each dialog section

@@ -94,7 +94,11 @@ class StudyEntryActionController extends _$StudyEntryActionController {
                 .execute(context, modes: modes)
           : await ref
                 .read(restartStudySessionUseCaseProvider)
-                .execute(sessionId: restartedFromSessionId, context: context);
+                .execute(
+                  sessionId: restartedFromSessionId,
+                  context: context,
+                  modes: modes,
+                );
       if (!ref.mounted) {
         return null;
       }

@@ -1808,6 +1808,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyContinueSessionAction => 'Tiếp tục';
 
   @override
+  String get studyResumeChoiceTitle => 'Tiếp tục phiên trước?';
+
+  @override
+  String get studyResumeChoiceMessage =>
+      'Bạn có một phiên học đang tạm dừng cho phạm vi này. Tiếp tục từ chỗ đang dở, hay học lại từ đầu?';
+
+  @override
+  String get studyResumeChoiceResumeAction => 'Tiếp tục';
+
+  @override
+  String get studyStartOverAction => 'Học lại từ đầu';
+
+  @override
   String get studyFlowTitle => 'Luồng học';
 
   @override

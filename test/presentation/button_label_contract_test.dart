@@ -55,6 +55,8 @@ const _visibleButtonLabelKeys = <String>{
   'studyStartNewSessionAction',
   'studyRestartAction',
   'studyResumeAction',
+  'studyResumeChoiceResumeAction',
+  'studyStartOverAction',
   'studyContinueSessionAction',
   'studyCancelAction',
   'studyFinalizeAction',

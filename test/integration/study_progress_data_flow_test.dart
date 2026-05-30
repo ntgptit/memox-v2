@@ -124,6 +124,8 @@ void main() {
       await harness.driver.startNewStudy();
 
       await harness.pumpApp(tester, _studyEntryLocation(StudyEntryType.deck));
+      await _pumpUntilFound(tester, find.text('Resume previous session?'));
+      await _tapText(tester, 'Resume');
       await _pumpUntilFound(tester, find.text('REVIEW'));
 
       expect(find.text(_alphaFront), findsOneWidget);
@@ -1286,6 +1288,9 @@ Future<void> _openStudyEntryAndContinue(
   _goToLocation(tester, _studyEntryLocation(StudyEntryType.deck));
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 100));
+  // The entry gate now offers Resume / Start over when a session is resumable.
+  await _pumpUntilFound(tester, find.text('Resume previous session?'));
+  await _tapText(tester, 'Resume');
   await _pumpUntilFound(tester, find.byIcon(Icons.close_rounded));
 }
 

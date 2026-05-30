@@ -3126,6 +3126,30 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get studyContinueSessionAction;
 
+  /// No description provided for @studyResumeChoiceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume previous session?'**
+  String get studyResumeChoiceTitle;
+
+  /// No description provided for @studyResumeChoiceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a paused study session for this scope. Resume where you left off, or start over?'**
+  String get studyResumeChoiceMessage;
+
+  /// No description provided for @studyResumeChoiceResumeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get studyResumeChoiceResumeAction;
+
+  /// No description provided for @studyStartOverAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start over'**
+  String get studyStartOverAction;
+
   /// No description provided for @studyFlowTitle.
   ///
   /// In en, this message translates to:

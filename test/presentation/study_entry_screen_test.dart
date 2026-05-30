@@ -98,7 +98,7 @@ void main() {
     expect(repo.startedModes, <StudyMode>[StudyMode.match]);
   });
 
-  testWidgets('DT3 onNavigate: resume candidate opens existing session', (
+  testWidgets('DT3 onNavigate: matching resume candidate shows choice dialog', (
     tester,
   ) async {
     final repo = _CapturingStudyRepo();
@@ -115,11 +115,129 @@ void main() {
         child: _TestRouterApp(initialLocation: _deckEntryLocation()),
       ),
     );
+    await _pumpDialogs(tester);
+
+    expect(find.text('Resume previous session?'), findsOneWidget);
+    expect(repo.startCount, 0);
+  });
+
+  testWidgets('DT3 onResume: Resume opens existing session, no new session', (
+    tester,
+  ) async {
+    final repo = _CapturingStudyRepo();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studyEntryStateProvider(
+            'deck',
+            'deck-001',
+          ).overrideWith((ref) => Future.value(_resumeEntryState)),
+        ],
+        child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+      ),
+    );
+    await _pumpDialogs(tester);
+
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Resume'));
     await tester.pumpAndSettle();
 
     expect(find.text('Session resume-session-001'), findsOneWidget);
     expect(repo.startCount, 0);
+    expect(repo.cancelledSessionId, isNull);
   });
+
+  testWidgets('DT3 onStartOver: discard confirm restarts into a new session', (
+    tester,
+  ) async {
+    final repo = _CapturingStudyRepo();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studyEntryStateProvider(
+            'deck',
+            'deck-001',
+          ).overrideWith((ref) => Future.value(_resumeEntryState)),
+        ],
+        child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+      ),
+    );
+    await _pumpDialogs(tester);
+
+    await tester.tap(find.text('Start over'));
+    await _pumpDialogs(tester);
+
+    // Second-tier discard confirmation.
+    expect(find.text('Start a new session?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Start over'));
+    await _pumpDialogs(tester);
+
+    expect(find.text('Session session-001'), findsOneWidget);
+    expect(repo.cancelledSessionId, 'resume-session-001');
+    expect(repo.startCount, 1);
+    expect(repo.startedFlow, StudyFlow.newFullCycle);
+  });
+
+  testWidgets('DT3 onCancel: dismissing the choice creates no session', (
+    tester,
+  ) async {
+    final repo = _CapturingStudyRepo();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studyRepoProvider.overrideWithValue(repo),
+          studyEntryStateProvider(
+            'deck',
+            'deck-001',
+          ).overrideWith((ref) => Future.value(_resumeEntryState)),
+        ],
+        child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+      ),
+    );
+    await _pumpDialogs(tester);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await _pumpDialogs(tester);
+
+    // Choice dismissed: no session is created and we never land on a session.
+    expect(find.text('Resume previous session?'), findsNothing);
+    expect(find.textContaining('Session '), findsNothing);
+    expect(repo.startCount, 0);
+    expect(repo.cancelledSessionId, isNull);
+  });
+
+  testWidgets(
+    'DT3 onModeMismatch: different mode flow skips resume and starts new',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_resumeEntryState)),
+          ],
+          // Resume candidate is full-cycle; entering with mode=match is a
+          // different flow → no resume sheet, fresh match-only session.
+          child: _TestRouterApp(
+            initialLocation: _deckEntryLocation(studyMode: StudyMode.match),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Resume previous session?'), findsNothing);
+      expect(find.text('Session session-001'), findsOneWidget);
+      expect(repo.startedFlow, StudyFlow.newMatchOnly);
+    },
+  );
 
   testWidgets('DT4 onNavigate: empty eligible batch shows recovery error', (
     tester,
@@ -170,6 +288,15 @@ void main() {
       expect(find.text('FlashcardCreate deck-001'), findsOneWidget);
     },
   );
+}
+
+/// Advances the dialog transition without waiting for `pumpAndSettle`: the
+/// study entry gate renders an indeterminate progress spinner behind the
+/// dialog, so the tree never fully settles while the gate is on screen.
+Future<void> _pumpDialogs(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
 }
 
 String _deckEntryLocation({StudyMode? studyMode}) {
@@ -247,6 +374,11 @@ class _TestRouterApp extends StatelessWidget {
       initialLocation: initialLocation,
       routes: [
         GoRoute(
+          path: '/home',
+          name: RouteNames.home,
+          builder: (_, _) => const Text('Home'),
+        ),
+        GoRoute(
           path: '/study/:entryType/:entryRefId',
           name: RouteNames.studyEntry,
           builder: (_, state) => StudyEntryScreen(
@@ -282,6 +414,7 @@ class _CapturingStudyRepo implements StudyRepo {
   StudyFlow? startedFlow;
   List<StudyMode>? startedModes;
   int deckFlashcardCount = 1;
+  String? cancelledSessionId;
 
   @override
   Future<int> countFlashcardsInDeck(String deckId) async => deckFlashcardCount;
@@ -360,9 +493,8 @@ class _CapturingStudyRepo implements StudyRepo {
       const <StudySessionSnapshot>[];
 
   @override
-  Future<StudySessionSnapshot> loadSession(String sessionId) {
-    throw UnimplementedError();
-  }
+  Future<StudySessionSnapshot> loadSession(String sessionId) async =>
+      _resumeSnapshot;
 
   @override
   Future<StudySessionSnapshot> answerCurrentItem({
@@ -388,8 +520,9 @@ class _CapturingStudyRepo implements StudyRepo {
   }
 
   @override
-  Future<StudySessionSnapshot> cancelSession(String sessionId) {
-    throw UnimplementedError();
+  Future<StudySessionSnapshot> cancelSession(String sessionId) async {
+    cancelledSessionId = sessionId;
+    return _resumeSnapshot;
   }
 
   @override

@@ -162,9 +162,13 @@ final class RestartStudySessionUseCase {
   final StudyRepo _repository;
   final StudyFlowStrategyFactory _strategyFactory;
 
+  /// Restarts [sessionId] for [context]. [modes] preserves the entry's selected
+  /// mode flow (e.g. a single-mode entry) when provided; it defaults to the
+  /// strategy's full flow so existing full-cycle / SRS callers are unchanged.
   Future<StudySessionSnapshot> execute({
     required String sessionId,
     required StudyContext context,
+    List<StudyMode>? modes,
   }) async {
     final previous = await _repository.loadSession(sessionId);
     _requireSameEntry(previous.session, context);
@@ -177,6 +181,8 @@ final class RestartStudySessionUseCase {
             '${context.studyType.name} does not support ${context.entryType.name}.',
       );
     }
+    final effectiveModes = modes ?? strategy.modes;
+    final flow = _flowForModes(context.studyType, effectiveModes);
     final batch = await strategy.loadBatch(context, _repository);
     if (batch.isEmpty) {
       throw const ValidationException(
@@ -193,11 +199,11 @@ final class RestartStudySessionUseCase {
         settings: context.settings,
         restartedFromSessionId: sessionId,
       ),
-      flow: strategy.flow,
-      modes: strategy.modes,
+      flow: flow,
+      modes: effectiveModes,
       batch: batch,
     );
-    return _withFlowPlan(snapshot, _flowPlan(context.studyType, strategy.flow));
+    return _withFlowPlan(snapshot, _flowPlan(context.studyType, flow));
   }
 
   void _requireSameEntry(StudySession session, StudyContext context) {

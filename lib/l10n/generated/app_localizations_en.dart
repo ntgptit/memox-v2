@@ -1919,6 +1919,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyContinueSessionAction => 'Continue';
 
   @override
+  String get studyResumeChoiceTitle => 'Resume previous session?';
+
+  @override
+  String get studyResumeChoiceMessage =>
+      'You have a paused study session for this scope. Resume where you left off, or start over?';
+
+  @override
+  String get studyResumeChoiceResumeAction => 'Resume';
+
+  @override
+  String get studyStartOverAction => 'Start over';
+
+  @override
   String get studyFlowTitle => 'Study flow';
 
   @override
