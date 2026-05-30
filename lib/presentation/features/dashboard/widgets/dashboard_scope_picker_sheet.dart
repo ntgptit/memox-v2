@@ -20,7 +20,7 @@ enum _StudyScopeKind { today, deck, folder }
 Future<void> showDashboardScopePicker(
   BuildContext context,
   WidgetRef ref, {
-  required int reviewCount,
+  int? reviewCount,
 }) async {
   final l10n = AppLocalizations.of(context);
   final kind = await MxBottomSheet.show<_StudyScopeKind>(
@@ -31,7 +31,9 @@ Future<void> showDashboardScopePicker(
         MxActionSheetItem(
           value: _StudyScopeKind.today,
           label: l10n.dashboardScopeToday,
-          subtitle: l10n.dashboardScopeTodaySubtitle(reviewCount),
+          subtitle: reviewCount == null
+              ? null
+              : l10n.dashboardScopeTodaySubtitle(reviewCount),
           icon: Icons.today_outlined,
         ),
         MxActionSheetItem(

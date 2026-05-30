@@ -6,6 +6,7 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
+import '../../../features/dashboard/widgets/dashboard_scope_picker_sheet.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
@@ -65,69 +66,55 @@ class StudyResultSection extends ConsumerWidget {
           message: studyErrorMessage(error),
           onRetry: () => ref.invalidate(studySessionStateProvider(sessionId)),
         ),
-        dataBuilder: (context, snapshot) => ListView(
-          children: [
-            MxText(l10n.studyResultHeading, role: MxTextRole.pageTitle),
-            const MxGap(MxSpace.sm),
-            MxText(
-              _statusLabel(l10n, snapshot.session.status),
-              role: MxTextRole.contentBody,
-            ),
-            const MxGap(MxSpace.xl),
-            _ResultProgressSummary(snapshot: snapshot),
-            const MxGap(MxSpace.lg),
-            MxCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _MetricRow(
-                    label: l10n.studyResultCards,
-                    value: '${snapshot.summary.totalCards}',
-                  ),
-                  _MetricRow(
-                    label: l10n.studyResultAttempts,
-                    value: '${snapshot.summary.completedAttempts}',
-                  ),
-                  _MetricRow(
-                    label: l10n.studyResultCorrect,
-                    value: '${snapshot.summary.correctAttempts}',
-                  ),
-                  _MetricRow(
-                    label: l10n.studyResultIncorrect,
-                    value: '${snapshot.summary.incorrectAttempts}',
-                  ),
-                  _MetricRow(
-                    label: l10n.studyResultBoxUp,
-                    value: '${snapshot.summary.increasedBoxCount}',
-                  ),
-                  _MetricRow(
-                    label: l10n.studyResultBoxDown,
-                    value: '${snapshot.summary.decreasedBoxCount}',
-                  ),
-                  _MetricRow(
-                    label: l10n.studyResultRemaining,
-                    value: '${snapshot.summary.remainingCount}',
-                  ),
-                ],
-              ),
-            ),
-            const MxGap(MxSpace.xl),
-            if (snapshot.session.status == SessionStatus.failedToFinalize)
-              MxPrimaryButton(
-                label: l10n.studyRetryFinalizeAction,
-                leadingIcon: Icons.refresh_rounded,
-                isLoading: actionState.isLoading,
-                onPressed: () => ref
-                    .read(
-                      studySessionActionControllerProvider(sessionId).notifier,
-                    )
-                    .finalizeSession(),
-              ),
-            if (snapshot.session.status != SessionStatus.failedToFinalize)
-              _ResultActions(snapshot: snapshot),
-          ],
-        ),
+        dataBuilder: (context, snapshot) =>
+            _StudyResultBody(snapshot: snapshot, actionState: actionState),
       ),
+    );
+  }
+}
+
+class _StudyResultBody extends ConsumerWidget {
+  const _StudyResultBody({required this.snapshot, required this.actionState});
+
+  final StudySessionSnapshot snapshot;
+  final AsyncValue<void> actionState;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final isFailedFinalize =
+        snapshot.session.status == SessionStatus.failedToFinalize;
+    final hasAnyResult = snapshot.resultBreakdown.totalResultCount > 0;
+
+    return ListView(
+      children: [
+        MxText(l10n.studyResultHeading, role: MxTextRole.pageTitle),
+        const MxGap(MxSpace.sm),
+        MxText(
+          _statusLabel(l10n, snapshot.session.status),
+          role: MxTextRole.contentBody,
+        ),
+        const MxGap(MxSpace.xl),
+        if (isFailedFinalize) ...[
+          _FailedFinalizeBanner(),
+          const MxGap(MxSpace.lg),
+        ],
+        if (!hasAnyResult)
+          _EmptyResultCard()
+        else ...[
+          _AccuracyCard(snapshot: snapshot),
+          const MxGap(MxSpace.lg),
+          _ResultBreakdownCard(snapshot: snapshot),
+          const MxGap(MxSpace.lg),
+          _BoxChangesCard(snapshot: snapshot),
+        ],
+        const MxGap(MxSpace.xl),
+        _ResultActions(
+          snapshot: snapshot,
+          actionState: actionState,
+          showRetry: isFailedFinalize,
+        ),
+      ],
     );
   }
 
@@ -142,114 +129,244 @@ class StudyResultSection extends ConsumerWidget {
       };
 }
 
-class _ResultProgressSummary extends StatelessWidget {
-  const _ResultProgressSummary({required this.snapshot});
-
-  final StudySessionSnapshot snapshot;
-
+class _FailedFinalizeBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final completed = snapshot.summary.completedAttempts;
-    final accuracy = _progressValue(
-      snapshot.summary.correctAttempts,
-      completed,
-    );
-    final cardsMastered = _progressValue(
-      snapshot.summary.masteredCardCount,
-      snapshot.summary.totalCards,
-    );
-
+    final scheme = Theme.of(context).colorScheme;
     return MxCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              MxProgressRing(value: accuracy),
-              const MxGap(MxSpace.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MxText(
-                      l10n.studyResultAttemptAccuracyLabel,
-                      role: MxTextRole.sectionTitle,
-                    ),
-                    const MxGap(MxSpace.xs),
-                    MxText(
-                      '${(accuracy * 100).round()}%',
-                      role: MxTextRole.pageTitle,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const MxGap(MxSpace.lg),
-          MxLinearProgress(
-            value: cardsMastered,
-            label: l10n.studyResultCardsMastered(
-              snapshot.summary.masteredCardCount,
-              snapshot.summary.totalCards,
-            ),
-          ),
+          Icon(Icons.error_outline_rounded, color: scheme.error),
           const MxGap(MxSpace.md),
-          _MetricRow(
-            label: l10n.studyResultRetryCardsLabel,
-            value: '${snapshot.summary.retryCardCount}',
+          Expanded(
+            child: MxText(
+              l10n.studyResultFailedFinalizeBanner,
+              role: MxTextRole.contentBody,
+              color: scheme.error,
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  double _progressValue(int value, int total) {
-    if (total <= 0) {
-      return 0;
-    }
-    return value / total;
+class _EmptyResultCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MxCard(
+      child: MxText(l10n.studyResultEmpty, role: MxTextRole.contentBody),
+    );
   }
 }
 
-class _ResultActions extends StatelessWidget {
-  const _ResultActions({required this.snapshot});
+class _AccuracyCard extends StatelessWidget {
+  const _AccuracyCard({required this.snapshot});
 
   final StudySessionSnapshot snapshot;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final entryRefId = snapshot.session.entryRefId;
-    final canStudyEntry =
-        entryRefId != null &&
-        (snapshot.session.entryType == StudyEntryType.deck ||
-            snapshot.session.entryType == StudyEntryType.folder);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        MxPrimaryButton(
-          label: l10n.studyResultReviewMoreAction,
-          leadingIcon: Icons.school_rounded,
-          onPressed: context.pushStudyToday,
-        ),
-        if (canStudyEntry) ...[
-          const MxGap(MxSpace.sm),
-          MxSecondaryButton(
-            label: l10n.studyResultStudyAgainAction,
-            leadingIcon: Icons.replay_rounded,
-            onPressed: () => context.goStudyEntry(
-              entryType: snapshot.session.entryType.storageValue,
-              entryRefId: entryRefId,
+    final total = snapshot.resultBreakdown.totalResultCount;
+    final passed = snapshot.resultBreakdown.passedCount;
+    final accuracy = total == 0 ? 0.0 : passed / total;
+    return MxCard(
+      child: Row(
+        children: [
+          MxProgressRing(value: accuracy),
+          const MxGap(MxSpace.lg),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MxText(
+                  l10n.studyResultAccuracyLabel,
+                  role: MxTextRole.sectionTitle,
+                ),
+                const MxGap(MxSpace.xs),
+                MxText(
+                  '${(accuracy * 100).round()}%',
+                  role: MxTextRole.pageTitle,
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ResultBreakdownCard extends StatelessWidget {
+  const _ResultBreakdownCard({required this.snapshot});
+
+  final StudySessionSnapshot snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final breakdown = snapshot.resultBreakdown;
+    final total = breakdown.totalResultCount;
+    return MxCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MxText(
+            l10n.studyResultBreakdownTitle,
+            role: MxTextRole.sectionTitle,
+          ),
+          const MxGap(MxSpace.md),
+          _ResultBar(
+            label: l10n.studyResultPerfect,
+            count: breakdown.perfectCount,
+            total: total,
+          ),
+          _ResultBar(
+            label: l10n.studyResultPassed,
+            count: breakdown.initialPassedCount,
+            total: total,
+          ),
+          _ResultBar(
+            label: l10n.studyResultRecovered,
+            count: breakdown.recoveredCount,
+            total: total,
+          ),
+          _ResultBar(
+            label: l10n.studyResultForgot,
+            count: breakdown.forgotCount,
+            total: total,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResultBar extends StatelessWidget {
+  const _ResultBar({
+    required this.label,
+    required this.count,
+    required this.total,
+  });
+
+  final String label;
+  final int count;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = total <= 0 ? 0.0 : count / total;
+    final countValue = count.toString();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: MxSpace.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(child: MxText(label, role: MxTextRole.contentBody)),
+              MxText(countValue, role: MxTextRole.tileTrailing),
+            ],
+          ),
+          const MxGap(MxSpace.xs),
+          MxLinearProgress(value: progress),
+        ],
+      ),
+    );
+  }
+}
+
+class _BoxChangesCard extends StatelessWidget {
+  const _BoxChangesCard({required this.snapshot});
+
+  final StudySessionSnapshot snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final box = snapshot.boxChangeBreakdown;
+    return MxCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MxText(
+            l10n.studyResultBoxChangesTitle,
+            role: MxTextRole.sectionTitle,
+          ),
+          const MxGap(MxSpace.md),
+          _MetricRow(
+            label: l10n.studyResultBoxAdvanced,
+            value: '${box.advancedCount}',
+          ),
+          _MetricRow(
+            label: l10n.studyResultBoxStayed,
+            value: '${box.stayedCount}',
+          ),
+          _MetricRow(
+            label: l10n.studyResultBoxReset,
+            value: '${box.resetCount}',
+          ),
+          _MetricRow(
+            label: l10n.studyResultBoxReachedMax,
+            value: '${box.reachedBox8Count}',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResultActions extends ConsumerWidget {
+  const _ResultActions({
+    required this.snapshot,
+    required this.actionState,
+    required this.showRetry,
+  });
+
+  final StudySessionSnapshot snapshot;
+  final AsyncValue<void> actionState;
+  final bool showRetry;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final entryRefId = snapshot.session.entryRefId;
+    final entryType = snapshot.session.entryType.storageValue;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (showRetry) ...[
+          MxPrimaryButton(
+            label: l10n.studyRetryFinalizeAction,
+            leadingIcon: Icons.refresh_rounded,
+            isLoading: actionState.isLoading,
+            onPressed: () => ref
+                .read(
+                  studySessionActionControllerProvider(
+                    snapshot.session.id,
+                  ).notifier,
+                )
+                .finalizeSession(),
+          ),
+          const MxGap(MxSpace.sm),
+        ],
+        MxPrimaryButton(
+          label: l10n.studyResultDoneAction,
+          leadingIcon: Icons.check_rounded,
+          onPressed: () => context.goStudyResultDone(
+            entryType: entryType,
+            entryRefId: entryRefId,
+          ),
+        ),
         const MxGap(MxSpace.sm),
         MxSecondaryButton(
-          label: l10n.commonBack,
-          leadingIcon: Icons.arrow_back_rounded,
-          onPressed: () => context.popRoute(fallback: context.goLibrary),
+          label: l10n.studyResultStudyMoreAction,
+          leadingIcon: Icons.school_rounded,
+          onPressed: () => showDashboardScopePicker(context, ref),
         ),
       ],
     );

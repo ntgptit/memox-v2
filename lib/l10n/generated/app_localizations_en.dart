@@ -2120,6 +2120,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyResultDraft => 'Draft';
 
   @override
+  String get studyResultDoneAction => 'Done';
+
+  @override
+  String get studyResultStudyMoreAction => 'Study more';
+
+  @override
+  String get studyResultBreakdownTitle => 'Results';
+
+  @override
+  String get studyResultPerfect => 'Perfect';
+
+  @override
+  String get studyResultPassed => 'Passed';
+
+  @override
+  String get studyResultRecovered => 'Recovered';
+
+  @override
+  String get studyResultForgot => 'Forgot';
+
+  @override
+  String get studyResultBoxChangesTitle => 'Box changes';
+
+  @override
+  String get studyResultBoxAdvanced => 'Advanced';
+
+  @override
+  String get studyResultBoxStayed => 'Stayed';
+
+  @override
+  String get studyResultBoxReset => 'Reset to box 1';
+
+  @override
+  String get studyResultBoxReachedMax => 'Reached box 8';
+
+  @override
+  String get studyResultFailedFinalizeBanner =>
+      'Some data couldn\'t be saved. Please retry.';
+
+  @override
+  String get studyResultEmpty => 'No cards answered';
+
+  @override
   String get studyModeReview => 'Review';
 
   @override

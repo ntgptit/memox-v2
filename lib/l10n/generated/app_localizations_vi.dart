@@ -2009,6 +2009,49 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyResultDraft => 'Bản nháp';
 
   @override
+  String get studyResultDoneAction => 'Xong';
+
+  @override
+  String get studyResultStudyMoreAction => 'Học thêm';
+
+  @override
+  String get studyResultBreakdownTitle => 'Kết quả';
+
+  @override
+  String get studyResultPerfect => 'Hoàn hảo';
+
+  @override
+  String get studyResultPassed => 'Qua';
+
+  @override
+  String get studyResultRecovered => 'Hồi phục';
+
+  @override
+  String get studyResultForgot => 'Quên';
+
+  @override
+  String get studyResultBoxChangesTitle => 'Thay đổi box';
+
+  @override
+  String get studyResultBoxAdvanced => 'Tăng box';
+
+  @override
+  String get studyResultBoxStayed => 'Giữ nguyên';
+
+  @override
+  String get studyResultBoxReset => 'Về box 1';
+
+  @override
+  String get studyResultBoxReachedMax => 'Đạt box 8';
+
+  @override
+  String get studyResultFailedFinalizeBanner =>
+      'Một số dữ liệu chưa lưu. Vui lòng thử lại.';
+
+  @override
+  String get studyResultEmpty => 'Chưa trả lời thẻ nào';
+
+  @override
   String get studyModeReview => 'Xem lại';
 
   @override

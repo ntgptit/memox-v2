@@ -69,6 +69,8 @@ const _visibleButtonLabelKeys = <String>{
   'studyViewResultAction',
   'studyResultReviewMoreAction',
   'studyResultStudyAgainAction',
+  'studyResultDoneAction',
+  'studyResultStudyMoreAction',
   'studyRetryFinalizeAction',
   'studyHelpAction',
   'studyCheckAnswerAction',

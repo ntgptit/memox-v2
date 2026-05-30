@@ -79,6 +79,24 @@ void registerStudyRepositoryTests() {
           everyElement(ReviewResult.initialPassed.storageValue),
         );
         expect(progressRows.map((row) => row.dueAt), everyElement(isNotNull));
+
+        // Result breakdown — every card on a passing New Study session is
+        // [ReviewResult.initialPassed] (not perfect). The studyType hint
+        // is what distinguishes initialPassed from a perfect SRS Review,
+        // because after finalize both buckets have populated oldBox/newBox.
+        // Spec: `docs/wireframes/18-study-result.md` §Components.
+        expect(snapshot.resultBreakdown.initialPassedCount, 2);
+        expect(snapshot.resultBreakdown.perfectCount, 0);
+        expect(snapshot.resultBreakdown.recoveredCount, 0);
+        expect(snapshot.resultBreakdown.forgotCount, 0);
+        expect(snapshot.resultBreakdown.totalResultCount, 2);
+        // Box changes are derived from attempt oldBox/newBox (NEVER from
+        // current_box). After finalize the New Study attempts are stamped
+        // oldBox=1/newBox=2, so each card is bucketed as advanced.
+        expect(snapshot.boxChangeBreakdown.advancedCount, 2);
+        expect(snapshot.boxChangeBreakdown.stayedCount, 0);
+        expect(snapshot.boxChangeBreakdown.resetCount, 0);
+        expect(snapshot.boxChangeBreakdown.reachedBox8Count, 0);
       },
     );
 

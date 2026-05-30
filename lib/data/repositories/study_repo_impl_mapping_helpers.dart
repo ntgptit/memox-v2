@@ -16,6 +16,7 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
     final attempts = await _studyAttemptDao.listAttempts(sessionId);
     final items = await _studySessionItemDao.listItems(sessionId);
     final flashcards = await _originalBatchFlashcards(sessionId);
+    final domainAttempts = attempts.map(_mapAttempt).toList(growable: false);
     return StudySessionSnapshot(
       session: _mapSession(session),
       currentItem: currentItem == null ? null : await _mapItem(currentItem),
@@ -25,8 +26,26 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
       canFinalize:
           session.status == SessionStatus.readyToFinalize.storageValue ||
           session.status == SessionStatus.failedToFinalize.storageValue,
+      resultBreakdown: computeStudyResultBreakdown(
+        domainAttempts,
+        studyType: DatabaseEnumCodecs.studyTypeFromStorage(session.studyType),
+      ),
+      boxChangeBreakdown: computeBoxChangeBreakdown(domainAttempts),
     );
   }
+
+  StudyAttempt _mapAttempt(local.StudyAttempt row) => StudyAttempt(
+    id: row.id,
+    sessionId: row.sessionId,
+    sessionItemId: row.sessionItemId,
+    flashcardId: row.flashcardId,
+    attemptNumber: row.attemptNumber,
+    grade: DatabaseEnumCodecs.attemptGradeFromStorage(row.result),
+    answeredAt: row.answeredAt,
+    oldBox: row.oldBox,
+    newBox: row.newBox,
+    nextDueAt: row.nextDueAt,
+  );
 
   StudySummary _summary({
     required local.StudySession session,

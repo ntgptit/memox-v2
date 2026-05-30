@@ -65,9 +65,14 @@ void main() {
       await harness.pumpApp(tester, _studyResultLocation(ready.session.id));
       await _pumpUntilFound(tester, find.text('Session summary'));
 
+      // V1 result layout per `docs/wireframes/18-study-result.md`:
+      // accuracy + 4-bucket breakdown (Perfect / Passed / Recovered / Forgot)
+      // + box-change card. No legacy Attempts/Correct/Incorrect rows.
       expect(find.text('Completed'), findsOneWidget);
-      expect(find.text('Attempts'), findsOneWidget);
-      expect(find.text('Correct'), findsOneWidget);
+      expect(find.text('Accuracy'), findsOneWidget);
+      expect(find.text('Perfect'), findsOneWidget);
+      expect(find.text('Recovered'), findsOneWidget);
+      expect(find.text('Box changes'), findsOneWidget);
     },
   );
 
@@ -193,7 +198,7 @@ void main() {
   );
 
   testWidgets(
-    'DT6 onNavigate: review back fallback returns to library overview',
+    'DT6 onNavigate: result Done leaves via go to the deck flashcard list',
     (tester) async {
       final harness = await _IntegrationHarness.create(tester);
       await harness.seedDeck();
@@ -203,21 +208,21 @@ void main() {
       await _pumpUntilFound(tester, find.text('REVIEW'));
 
       // Closing an active session opens the cancel-confirmation dialog;
-      // confirming routes to the result screen, whose Back action falls back
-      // to the library overview when there is no session route to pop.
+      // confirming routes to the result screen. Per Prompt 09 Done now uses
+      // `context.go(...)` (not pop/push) and the result screen is NOT kept in
+      // the back stack — Done leaves to the safest existing destination
+      // (deck flashcard list for a deck-entry session).
       await tester.tap(find.byIcon(Icons.close_rounded).first);
       await _pumpUntilFound(tester, find.text('Cancel this session?'));
       await _tapText(tester, 'Cancel');
-      await _pumpUntilFound(tester, find.text('Back'));
-      await _tapText(tester, 'Back');
-      await _pumpUntilFound(tester, find.text('Library'));
-
-      expect(find.text('Integration Folder'), findsOneWidget);
+      await _pumpUntilFound(tester, find.text('Done'));
+      await _tapText(tester, 'Done');
+      await _pumpUntilFound(tester, find.text(_alphaFront));
     },
   );
 
   testWidgets(
-    'DT7 onNavigate: result study again opens same deck study entry',
+    'DT7 onNavigate: result Study more opens the scope picker (Today/Deck/Folder, no Tag)',
     (tester) async {
       final harness = await _IntegrationHarness.create(tester);
       // Alpha is due (drives the SRS review); beta stays new so the deck's
@@ -227,10 +232,15 @@ void main() {
       await harness.driver.finalize(ready);
 
       await harness.pumpApp(tester, _studyResultLocation(ready.session.id));
-      await _pumpUntilFound(tester, find.text('Study'));
+      await _pumpUntilFound(tester, find.text('Study more'));
 
-      await _tapText(tester, 'Study');
-      await _pumpUntilFound(tester, find.text('REVIEW'));
+      await _tapText(tester, 'Study more');
+      await _pumpUntilFound(tester, find.text('Today'));
+
+      expect(find.text('Today'), findsOneWidget);
+      expect(find.text('Deck'), findsOneWidget);
+      expect(find.text('Folder'), findsOneWidget);
+      expect(find.text('Tag'), findsNothing);
     },
   );
 
@@ -998,8 +1008,10 @@ void main() {
       await harness.pumpApp(tester, _studyResultLocation(ready.session.id));
       await _pumpUntilFound(tester, find.text('Session summary'));
 
+      // V1 result screen surfaces the status label and the result-breakdown
+      // card even before finalize. There is no longer a "Remaining" row.
       expect(find.text('Ready to finalize'), findsOneWidget);
-      expect(find.text('Remaining'), findsOneWidget);
+      expect(find.text('Results'), findsOneWidget);
     },
   );
 

@@ -3492,6 +3492,90 @@ abstract class AppLocalizations {
   /// **'Draft'**
   String get studyResultDraft;
 
+  /// No description provided for @studyResultDoneAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get studyResultDoneAction;
+
+  /// No description provided for @studyResultStudyMoreAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Study more'**
+  String get studyResultStudyMoreAction;
+
+  /// No description provided for @studyResultBreakdownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Results'**
+  String get studyResultBreakdownTitle;
+
+  /// No description provided for @studyResultPerfect.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect'**
+  String get studyResultPerfect;
+
+  /// No description provided for @studyResultPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get studyResultPassed;
+
+  /// No description provided for @studyResultRecovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovered'**
+  String get studyResultRecovered;
+
+  /// No description provided for @studyResultForgot.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot'**
+  String get studyResultForgot;
+
+  /// No description provided for @studyResultBoxChangesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Box changes'**
+  String get studyResultBoxChangesTitle;
+
+  /// No description provided for @studyResultBoxAdvanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get studyResultBoxAdvanced;
+
+  /// No description provided for @studyResultBoxStayed.
+  ///
+  /// In en, this message translates to:
+  /// **'Stayed'**
+  String get studyResultBoxStayed;
+
+  /// No description provided for @studyResultBoxReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to box 1'**
+  String get studyResultBoxReset;
+
+  /// No description provided for @studyResultBoxReachedMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Reached box 8'**
+  String get studyResultBoxReachedMax;
+
+  /// No description provided for @studyResultFailedFinalizeBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Some data couldn\'t be saved. Please retry.'**
+  String get studyResultFailedFinalizeBanner;
+
+  /// No description provided for @studyResultEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No cards answered'**
+  String get studyResultEmpty;
+
   /// No description provided for @studyModeReview.
   ///
   /// In en, this message translates to:

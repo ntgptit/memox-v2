@@ -9,6 +9,7 @@ import '../../core/services/id_generator.dart';
 import '../../domain/enums/study_enums.dart';
 import '../../domain/study/entities/study_models.dart';
 import '../../domain/study/ports/study_repo.dart';
+import '../../domain/study/result_breakdown.dart';
 import '../datasources/local/app_database.dart' as local;
 import '../datasources/local/daos/folder_dao.dart';
 import '../datasources/local/daos/study_attempt_dao.dart';

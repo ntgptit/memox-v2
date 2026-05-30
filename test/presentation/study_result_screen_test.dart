@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:memox/app/router/app_navigation.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
+import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_result_screen.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 
 void main() {
-  testWidgets('DT1 onOpen: shows loading state while result loads', (
+  testWidgets('loading state shows skeleton while session loads', (
     tester,
   ) async {
     final completer = Completer<StudySessionSnapshot>();
@@ -42,7 +42,7 @@ void main() {
   });
 
   testWidgets(
-    'DT1 onDisplay: completed result separates card outcome and attempt accuracy',
+    'completed result shows accuracy, breakdown, box changes, and CTAs',
     (tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -60,29 +60,37 @@ void main() {
 
       expect(find.text('Session summary'), findsOneWidget);
       expect(find.text('Completed'), findsOneWidget);
-      expect(find.text('Cards mastered: 4/4'), findsOneWidget);
-      expect(find.text('Attempt accuracy'), findsOneWidget);
-      expect(find.text('83%'), findsWidgets);
-      expect(find.text('Retry cards'), findsOneWidget);
-      expect(find.text('2'), findsOneWidget);
-      expect(find.text('Accuracy'), findsNothing);
+      expect(find.text('Accuracy'), findsOneWidget);
+      expect(find.text('Results'), findsOneWidget);
+      expect(find.text('Perfect'), findsOneWidget);
+      expect(find.text('Passed'), findsOneWidget);
+      expect(find.text('Recovered'), findsOneWidget);
+      expect(find.text('Forgot'), findsOneWidget);
+      expect(find.text('Box changes'), findsOneWidget);
+      expect(find.text('Advanced'), findsOneWidget);
+      expect(find.text('Stayed'), findsOneWidget);
+      expect(find.text('Reset to box 1'), findsOneWidget);
+      expect(find.text('Reached box 8'), findsOneWidget);
 
-      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.drag(find.byType(ListView), const Offset(0, -800));
       await tester.pumpAndSettle();
-
-      expect(find.text('Review'), findsOneWidget);
-      expect(find.text('Study'), findsOneWidget);
+      expect(find.text('Done'), findsOneWidget);
+      expect(find.text('Study more'), findsOneWidget);
     },
   );
 
-  testWidgets('DT2 onDisplay: cancelled result keeps a distinct status label', (
-    tester,
-  ) async {
+  testWidgets('empty result shows defensive notice and Done', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           studySessionStateProvider('session-001').overrideWith(
-            (ref) => Future.value(_snapshot(SessionStatus.cancelled)),
+            (ref) => Future.value(
+              _snapshot(
+                SessionStatus.completed,
+                breakdown: const StudyResultBreakdown(),
+                box: const BoxChangeBreakdown(),
+              ),
+            ),
           ),
         ],
         child: const _TestApp(
@@ -91,12 +99,38 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -400));
+    await tester.pumpAndSettle();
 
-    expect(find.text('Cancelled'), findsOneWidget);
-    expect(find.text('Completed'), findsNothing);
+    expect(find.text('No cards answered'), findsOneWidget);
+    expect(find.text('Done'), findsOneWidget);
   });
 
-  testWidgets('DT1 onNavigate: Back returns to the previous route', (
+  testWidgets('failed finalize state shows banner with Retry AND Done', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider('session-001').overrideWith(
+            (ref) => Future.value(_snapshot(SessionStatus.failedToFinalize)),
+          ),
+        ],
+        child: const _TestApp(
+          child: StudyResultScreen(sessionId: 'session-001'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text("Some data couldn't be saved. Please retry."), findsOneWidget);
+
+    await tester.drag(find.byType(ListView), const Offset(0, -1200));
+    await tester.pumpAndSettle();
+    expect(find.text('Retry'), findsOneWidget);
+    expect(find.text('Done'), findsOneWidget);
+  });
+
+  testWidgets('Done for deck-entry uses go and leaves result out of stack', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -106,60 +140,139 @@ void main() {
             (ref) => Future.value(_snapshot(SessionStatus.completed)),
           ),
         ],
-        child: const _TestRouterApp(),
+        child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
       ),
     );
     await tester.pumpAndSettle();
-
     await tester.tap(find.text('Open result'));
     await tester.pumpAndSettle();
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.drag(find.byType(ListView), const Offset(0, -800));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Back'));
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Previous route'), findsOneWidget);
-    expect(find.text('Library'), findsNothing);
+    expect(find.text('FlashcardList deck-001'), findsOneWidget);
+    // Back from caller route MUST NOT return to Result.
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Session summary'), findsNothing);
   });
 
-  testWidgets('DT2 onNavigate: Review preserves the result route underneath', (
+  testWidgets('Done for folder-entry goes to folder detail', (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider('session-001').overrideWith(
+            (ref) => Future.value(
+              _snapshot(
+                SessionStatus.completed,
+                entry: StudyEntryType.folder,
+                refId: 'folder-007',
+              ),
+            ),
+          ),
+        ],
+        child: const _RouterTestApp(
+          entry: StudyEntryType.folder,
+          refId: 'folder-007',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open result'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -800));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('FolderDetail folder-007'), findsOneWidget);
+  });
+
+  testWidgets('Done for today-entry goes to Library (top-level)', (
     tester,
   ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           studySessionStateProvider('session-001').overrideWith(
-            (ref) => Future.value(_snapshot(SessionStatus.completed)),
+            (ref) => Future.value(
+              _snapshot(
+                SessionStatus.completed,
+                entry: StudyEntryType.today,
+                refId: null,
+              ),
+            ),
           ),
         ],
-        child: const _TestRouterApp(),
+        child: const _RouterTestApp(entry: StudyEntryType.today, refId: null),
       ),
     );
     await tester.pumpAndSettle();
-
     await tester.tap(find.text('Open result'));
     await tester.pumpAndSettle();
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.drag(find.byType(ListView), const Offset(0, -800));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Review'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Today back'));
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Study'), findsOneWidget);
-    expect(find.text('Library'), findsNothing);
+    expect(find.text('Library'), findsOneWidget);
+  });
+
+  testWidgets('Study more opens scope picker with Today/Deck/Folder (no Tag)',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          studySessionStateProvider('session-001').overrideWith(
+            (ref) => Future.value(_snapshot(SessionStatus.completed)),
+          ),
+          dashboardDeckScopeOptionsProvider.overrideWith((ref) async => []),
+          dashboardFolderScopeOptionsProvider.overrideWith((ref) async => []),
+        ],
+        child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open result'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -800));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Study more'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('Deck'), findsOneWidget);
+    expect(find.text('Folder'), findsOneWidget);
+    expect(find.text('Tag'), findsNothing);
   });
 }
 
-StudySessionSnapshot _snapshot(SessionStatus status) => StudySessionSnapshot(
+StudySessionSnapshot _snapshot(
+  SessionStatus status, {
+  StudyEntryType entry = StudyEntryType.deck,
+  String? refId = 'deck-001',
+  StudyResultBreakdown breakdown = const StudyResultBreakdown(
+    perfectCount: 3,
+    initialPassedCount: 1,
+    recoveredCount: 1,
+    forgotCount: 0,
+  ),
+  BoxChangeBreakdown box = const BoxChangeBreakdown(
+    advancedCount: 4,
+    stayedCount: 0,
+    resetCount: 1,
+    reachedBox8Count: 0,
+  ),
+}) => StudySessionSnapshot(
   session: StudySession(
     id: 'session-001',
-    entryType: StudyEntryType.deck,
-    entryRefId: 'deck-001',
+    entryType: entry,
+    entryRefId: refId,
     studyType: StudyType.srsReview,
     studyFlow: StudyFlow.srsFillReview,
     settings: const StudySettingsSnapshot(
-      batchSize: 4,
+      batchSize: 5,
       shuffleFlashcards: false,
       shuffleAnswers: false,
       prioritizeOverdue: true,
@@ -172,17 +285,19 @@ StudySessionSnapshot _snapshot(SessionStatus status) => StudySessionSnapshot(
   currentItem: null,
   sessionFlashcards: const <StudyFlashcardRef>[],
   summary: const StudySummary(
-    totalCards: 4,
+    totalCards: 5,
     masteredCardCount: 4,
-    retryCardCount: 2,
+    retryCardCount: 1,
     completedAttempts: 6,
     correctAttempts: 5,
     incorrectAttempts: 1,
-    increasedBoxCount: 1,
-    decreasedBoxCount: 0,
+    increasedBoxCount: 4,
+    decreasedBoxCount: 1,
     remainingCount: 0,
   ),
   canFinalize: false,
+  resultBreakdown: breakdown,
+  boxChangeBreakdown: box,
 );
 
 class _TestApp extends StatelessWidget {
@@ -198,55 +313,68 @@ class _TestApp extends StatelessWidget {
   );
 }
 
-class _TestRouterApp extends StatelessWidget {
-  const _TestRouterApp();
+class _RouterTestApp extends StatelessWidget {
+  const _RouterTestApp({required this.entry, required this.refId});
+
+  final StudyEntryType entry;
+  final String? refId;
 
   @override
   Widget build(BuildContext context) {
     final router = GoRouter(
-      initialLocation: '/previous',
+      initialLocation: '/origin',
       routes: [
         GoRoute(
-          path: '/previous',
-          builder: (context, state) => Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Previous route'),
-                  TextButton(
-                    onPressed: () =>
-                        context.push('/study/session/session-001/result'),
-                    child: const Text('Open result'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        GoRoute(
-          path: '/${RoutePaths.studyResultSegment}',
-          name: RouteNames.studyResult,
-          builder: (context, state) =>
-              const StudyResultScreen(sessionId: 'session-001'),
-        ),
-        GoRoute(
-          path: '/${RoutePaths.studyTodaySegment}',
-          name: RouteNames.studyToday,
+          path: '/origin',
           builder: (context, state) => Scaffold(
             body: Center(
               child: TextButton(
                 onPressed: () =>
-                    context.popRoute(fallback: () => context.go('/library')),
-                child: const Text('Today back'),
+                    context.push('/library/study/session/session-001/result'),
+                child: const Text('Open result'),
               ),
             ),
           ),
         ),
         GoRoute(
           path: '/library',
+          name: RouteNames.library,
           builder: (context, state) =>
               const Scaffold(body: Center(child: Text('Library'))),
+          routes: [
+            GoRoute(
+              path: 'folder/:id',
+              name: RouteNames.folderDetail,
+              builder: (context, state) => Scaffold(
+                body: Center(
+                  child: Text('FolderDetail ${state.pathParameters['id']}'),
+                ),
+              ),
+            ),
+            GoRoute(
+              path: 'deck/:deckId/flashcards',
+              name: RouteNames.flashcardList,
+              builder: (context, state) => Scaffold(
+                body: Center(
+                  child: Text(
+                    'FlashcardList ${state.pathParameters['deckId']}',
+                  ),
+                ),
+              ),
+            ),
+            GoRoute(
+              path: 'study/session/:sessionId/result',
+              name: RouteNames.studyResult,
+              builder: (context, state) =>
+                  const StudyResultScreen(sessionId: 'session-001'),
+            ),
+            GoRoute(
+              path: 'study/today',
+              name: RouteNames.studyToday,
+              builder: (context, state) =>
+                  const Scaffold(body: Center(child: Text('Study Today'))),
+            ),
+          ],
         ),
       ],
     );

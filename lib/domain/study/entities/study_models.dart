@@ -167,6 +167,45 @@ final class StudySummary {
   );
 }
 
+final class StudyResultBreakdown {
+  const StudyResultBreakdown({
+    this.perfectCount = 0,
+    this.initialPassedCount = 0,
+    this.recoveredCount = 0,
+    this.forgotCount = 0,
+  });
+
+  static const StudyResultBreakdown empty = StudyResultBreakdown();
+
+  final int perfectCount;
+  final int initialPassedCount;
+  final int recoveredCount;
+  final int forgotCount;
+
+  int get totalResultCount =>
+      perfectCount + initialPassedCount + recoveredCount + forgotCount;
+
+  int get passedCount => perfectCount + initialPassedCount;
+}
+
+final class BoxChangeBreakdown {
+  const BoxChangeBreakdown({
+    this.advancedCount = 0,
+    this.stayedCount = 0,
+    this.resetCount = 0,
+    this.reachedBox8Count = 0,
+  });
+
+  static const BoxChangeBreakdown empty = BoxChangeBreakdown();
+
+  final int advancedCount;
+  final int stayedCount;
+  final int resetCount;
+  final int reachedBox8Count;
+
+  int get totalChangeCount => advancedCount + stayedCount + resetCount;
+}
+
 final class StudySessionSnapshot {
   const StudySessionSnapshot({
     required this.session,
@@ -175,6 +214,8 @@ final class StudySessionSnapshot {
     required this.sessionFlashcards,
     required this.summary,
     required this.canFinalize,
+    this.resultBreakdown = StudyResultBreakdown.empty,
+    this.boxChangeBreakdown = BoxChangeBreakdown.empty,
   });
 
   final StudySession session;
@@ -183,6 +224,8 @@ final class StudySessionSnapshot {
   final List<StudyFlashcardRef> sessionFlashcards;
   final StudySummary summary;
   final bool canFinalize;
+  final StudyResultBreakdown resultBreakdown;
+  final BoxChangeBreakdown boxChangeBreakdown;
 
   StudySessionSnapshot copyWith({StudySummary? summary}) =>
       StudySessionSnapshot(
@@ -192,5 +235,7 @@ final class StudySessionSnapshot {
         sessionFlashcards: sessionFlashcards,
         summary: summary ?? this.summary,
         canFinalize: canFinalize,
+        resultBreakdown: resultBreakdown,
+        boxChangeBreakdown: boxChangeBreakdown,
       );
 }

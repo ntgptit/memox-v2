@@ -161,6 +161,28 @@ extension AppNavigation on BuildContext {
     );
   }
 
+  /// Leave the Study Result screen via `go` (per nav-flow contract): the
+  /// result screen MUST NOT remain in the back stack. Picks the safest
+  /// existing destination from the session's entry context:
+  ///
+  /// - deck entry with refId → deck flashcard list
+  /// - folder entry with refId → folder detail
+  /// - today / unknown / missing refId → library (top-level shell branch)
+  void goStudyResultDone({
+    required String entryType,
+    String? entryRefId,
+  }) {
+    if (entryType == 'deck' && entryRefId != null && entryRefId.isNotEmpty) {
+      goFlashcardList(entryRefId);
+      return;
+    }
+    if (entryType == 'folder' && entryRefId != null && entryRefId.isNotEmpty) {
+      goFolderDetail(entryRefId);
+      return;
+    }
+    goLibrary();
+  }
+
   // --- Back navigation -------------------------------------------------------
 
   /// Pops the current route if possible; otherwise runs [fallback].
