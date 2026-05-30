@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
-import '../../../shared/widgets/mx_button_size.dart';
+import '../../../shared/layouts/mx_gap.dart';
+import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/widgets/mx_action_button.dart';
 import '../../../shared/widgets/mx_due_summary_card.dart';
-import '../../../shared/widgets/mx_primary_button.dart';
-import '../../../shared/widgets/mx_secondary_button.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
+import 'dashboard_scope_picker_sheet.dart';
 
 const _dashboardSecondsPerReviewCard = 20;
 const _secondsPerMinute = 60;
@@ -46,34 +48,70 @@ class DashboardActionList extends StatelessWidget {
   }
 }
 
-class _DashboardDueAction extends StatelessWidget {
+/// Card-level actions for the due-now summary card. Density follows the action
+/// hierarchy contract: compact card actions, exactly one dominant primary,
+/// never full-width (`docs/ui-ux/action-hierarchy-contract.md`).
+class _DashboardDueAction extends ConsumerWidget {
   const _DashboardDueAction({required this.state});
 
   final DashboardOverviewState state;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
 
+    final startNewLearning = MxActionButton(
+      key: const ValueKey('dashboard_start_new_study_action'),
+      intent: state.hasReviewCards
+          ? MxActionIntent.cardSecondary
+          : MxActionIntent.cardPrimary,
+      label: l10n.dashboardStartNewLearningAction,
+      leadingIcon: Icons.tune_rounded,
+      onPressed: () => showDashboardScopePicker(
+        context,
+        ref,
+        reviewCount: state.reviewCount,
+      ),
+    );
+
     if (!state.hasReviewCards) {
-      return MxSecondaryButton(
-        key: const ValueKey('dashboard_start_new_study_action'),
-        label: l10n.dashboardOpenLibraryAction,
-        leadingIcon: Icons.folder_open_outlined,
-        size: MxButtonSize.small,
-        variant: MxSecondaryVariant.tonal,
-        fullWidth: true,
-        onPressed: () => context.goLibrary(),
+      // No review cards: "Start new learning" is the single primary; library
+      // is the lighter companion action.
+      return _stackedActions(
+        primary: startNewLearning,
+        secondary: MxActionButton(
+          key: const ValueKey('dashboard_open_library_action'),
+          intent: MxActionIntent.cardSecondary,
+          label: l10n.dashboardOpenLibraryAction,
+          leadingIcon: Icons.folder_open_outlined,
+          onPressed: () => context.goLibrary(),
+        ),
       );
     }
 
-    return MxPrimaryButton(
-      key: const ValueKey('dashboard_review_now_action'),
-      label: l10n.dashboardStartReviewAction,
-      trailingIcon: Icons.arrow_forward_rounded,
-      size: MxButtonSize.small,
-      fullWidth: true,
-      onPressed: () => context.goStudyToday(),
+    // Has review cards: "Start review" is the dominant primary; "Start new
+    // learning" is the lighter companion.
+    return _stackedActions(
+      primary: MxActionButton(
+        key: const ValueKey('dashboard_review_now_action'),
+        intent: MxActionIntent.cardPrimary,
+        label: l10n.dashboardStartReviewAction,
+        trailingIcon: Icons.arrow_forward_rounded,
+        onPressed: () => context.goStudyToday(),
+      ),
+      secondary: startNewLearning,
     );
   }
+
+  /// Stacks two compact card actions vertically, trailing-aligned, primary on
+  /// top. Avoids a row that would overflow with long CTA labels at narrow
+  /// widths / large text while keeping both actions compact (not full-width).
+  Widget _stackedActions({
+    required MxActionButton primary,
+    required MxActionButton secondary,
+  }) => Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.end,
+    children: [primary, const MxGap(MxSpace.sm), secondary],
+  );
 }

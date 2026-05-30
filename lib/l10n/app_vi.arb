@@ -129,6 +129,49 @@
     }
   },
   "dashboardContinueSessionAction": "Tiếp tục",
+  "dashboardResumeSectionTitle": "Tiếp tục học",
+  "dashboardDiscardAction": "Hủy phiên",
+  "dashboardMorePausedSessions": "{count, plural, =1{+ 1 phiên đang tạm dừng} other{+ {count} phiên đang tạm dừng}}",
+  "@dashboardMorePausedSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardPausedSessionsSheetTitle": "{count, plural, =1{1 phiên tạm dừng} other{{count} phiên tạm dừng}}",
+  "@dashboardPausedSessionsSheetTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDiscardSessionTitle": "Hủy phiên học này?",
+  "dashboardDiscardSessionMessage": "Tiến độ với các thẻ đã trả lời được giữ lại, nhưng các thẻ còn lại trong phiên này sẽ bị bỏ.",
+  "dashboardSessionDiscardedMessage": "Đã hủy phiên học.",
+  "dashboardSessionDiscardFailedMessage": "Không thể hủy phiên học. Hãy thử lại.",
+  "dashboardStartNewLearningAction": "Bắt đầu học mới",
+  "dashboardScopePickerTitle": "Bạn muốn học gì?",
+  "dashboardScopeToday": "Hôm nay",
+  "dashboardScopeTodaySubtitle": "{count, plural, =0{Không có thẻ đến hạn} =1{1 thẻ đến hạn} other{{count} thẻ đến hạn}}",
+  "@dashboardScopeTodaySubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardScopeDeck": "Bộ thẻ",
+  "dashboardScopeDeckSubtitle": "Chọn một bộ thẻ để học",
+  "dashboardScopeFolder": "Thư mục",
+  "dashboardScopeFolderSubtitle": "Chọn một thư mục để học",
+  "dashboardScopeDeckPickerTitle": "Chọn bộ thẻ",
+  "dashboardScopeFolderPickerTitle": "Chọn thư mục",
+  "dashboardScopeDeckSearchHint": "Tìm bộ thẻ",
+  "dashboardScopeFolderSearchHint": "Tìm thư mục",
+  "dashboardScopeDeckEmpty": "Chưa có bộ thẻ nào. Hãy tạo một bộ thẻ trước.",
+  "dashboardScopeFolderEmpty": "Chưa có thư mục nào.",
   "dashboardLibraryHealthTitle": "Sức khỏe thư viện",
   "dashboardLibraryHealthSummary": "{folderCount} thư mục · {deckCount} bộ thẻ · {cardCount} thẻ",
   "@dashboardLibraryHealthSummary": {

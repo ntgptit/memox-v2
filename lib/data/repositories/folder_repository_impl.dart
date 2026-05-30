@@ -231,6 +231,22 @@ final class FolderRepositoryImpl implements FolderRepository {
   }
 
   @override
+  Future<List<FolderScopeOption>> listAllFolders() async {
+    final folders = await _folderDao.listAllFolders();
+    final options = <FolderScopeOption>[];
+    for (final folder in folders) {
+      options.add(
+        FolderScopeOption(
+          id: folder.id,
+          name: folder.name,
+          breadcrumb: await _folderDao.getBreadcrumbNames(folder.id),
+        ),
+      );
+    }
+    return options;
+  }
+
+  @override
   Future<Result<FolderEntity>> createRootFolder(String name) =>
       runRepositoryAction(() async {
         final trimmedName = _normalizeName(name);

@@ -68,6 +68,26 @@ final class LibraryOverviewReadModel {
   }
 }
 
+/// Lightweight folder option used by scope pickers (e.g. Dashboard "Start new
+/// learning" → Folder scope). Pure read model: identifies a folder by [id] and
+/// [name] plus the ancestor [breadcrumb] (root → leaf, including the folder
+/// itself as the last segment) so duplicate names can be disambiguated.
+final class FolderScopeOption {
+  const FolderScopeOption({
+    required this.id,
+    required this.name,
+    required this.breadcrumb,
+  });
+
+  final String id;
+  final String name;
+  final List<String> breadcrumb;
+
+  /// Ancestor names without the folder itself, for showing parent context.
+  List<String> get parentBreadcrumb =>
+      breadcrumb.isEmpty ? const <String>[] : breadcrumb.sublist(0, breadcrumb.length - 1);
+}
+
 final class FolderDeckReadModel {
   const FolderDeckReadModel({
     required this.deck,

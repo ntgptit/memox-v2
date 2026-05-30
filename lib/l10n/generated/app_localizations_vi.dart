@@ -243,6 +243,100 @@ class AppLocalizationsVi extends AppLocalizations {
   String get dashboardContinueSessionAction => 'Tiếp tục';
 
   @override
+  String get dashboardResumeSectionTitle => 'Tiếp tục học';
+
+  @override
+  String get dashboardDiscardAction => 'Hủy phiên';
+
+  @override
+  String dashboardMorePausedSessions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+ $count phiên đang tạm dừng',
+      one: '+ 1 phiên đang tạm dừng',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dashboardPausedSessionsSheetTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count phiên tạm dừng',
+      one: '1 phiên tạm dừng',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dashboardDiscardSessionTitle => 'Hủy phiên học này?';
+
+  @override
+  String get dashboardDiscardSessionMessage =>
+      'Tiến độ với các thẻ đã trả lời được giữ lại, nhưng các thẻ còn lại trong phiên này sẽ bị bỏ.';
+
+  @override
+  String get dashboardSessionDiscardedMessage => 'Đã hủy phiên học.';
+
+  @override
+  String get dashboardSessionDiscardFailedMessage =>
+      'Không thể hủy phiên học. Hãy thử lại.';
+
+  @override
+  String get dashboardStartNewLearningAction => 'Bắt đầu học mới';
+
+  @override
+  String get dashboardScopePickerTitle => 'Bạn muốn học gì?';
+
+  @override
+  String get dashboardScopeToday => 'Hôm nay';
+
+  @override
+  String dashboardScopeTodaySubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ đến hạn',
+      one: '1 thẻ đến hạn',
+      zero: 'Không có thẻ đến hạn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dashboardScopeDeck => 'Bộ thẻ';
+
+  @override
+  String get dashboardScopeDeckSubtitle => 'Chọn một bộ thẻ để học';
+
+  @override
+  String get dashboardScopeFolder => 'Thư mục';
+
+  @override
+  String get dashboardScopeFolderSubtitle => 'Chọn một thư mục để học';
+
+  @override
+  String get dashboardScopeDeckPickerTitle => 'Chọn bộ thẻ';
+
+  @override
+  String get dashboardScopeFolderPickerTitle => 'Chọn thư mục';
+
+  @override
+  String get dashboardScopeDeckSearchHint => 'Tìm bộ thẻ';
+
+  @override
+  String get dashboardScopeFolderSearchHint => 'Tìm thư mục';
+
+  @override
+  String get dashboardScopeDeckEmpty =>
+      'Chưa có bộ thẻ nào. Hãy tạo một bộ thẻ trước.';
+
+  @override
+  String get dashboardScopeFolderEmpty => 'Chưa có thư mục nào.';
+
+  @override
   String get dashboardLibraryHealthTitle => 'Sức khỏe thư viện';
 
   @override

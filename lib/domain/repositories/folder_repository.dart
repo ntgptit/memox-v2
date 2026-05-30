@@ -14,6 +14,10 @@ abstract interface class FolderRepository {
 
   Future<List<FolderMoveTarget>> getFolderMoveTargets(String folderId);
 
+  /// Lists every folder as a flat scope option (read-only, no descendant
+  /// exclusion). Used by scope pickers; not a move-target query.
+  Future<List<FolderScopeOption>> listAllFolders();
+
   Future<Result<FolderEntity>> createRootFolder(String name);
 
   Future<Result<FolderEntity>> createSubfolder({

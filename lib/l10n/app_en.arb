@@ -129,6 +129,49 @@
     }
   },
   "dashboardContinueSessionAction": "Resume",
+  "dashboardResumeSectionTitle": "Continue studying",
+  "dashboardDiscardAction": "Discard",
+  "dashboardMorePausedSessions": "{count, plural, =1{+ 1 more paused session} other{+ {count} more paused sessions}}",
+  "@dashboardMorePausedSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardPausedSessionsSheetTitle": "{count, plural, =1{1 paused session} other{{count} paused sessions}}",
+  "@dashboardPausedSessionsSheetTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardDiscardSessionTitle": "Discard this session?",
+  "dashboardDiscardSessionMessage": "Your progress on answered cards is kept, but the remaining cards in this session will be abandoned.",
+  "dashboardSessionDiscardedMessage": "Session discarded.",
+  "dashboardSessionDiscardFailedMessage": "Couldn't discard the session. Try again.",
+  "dashboardStartNewLearningAction": "Start new learning",
+  "dashboardScopePickerTitle": "What do you want to study?",
+  "dashboardScopeToday": "Today",
+  "dashboardScopeTodaySubtitle": "{count, plural, =0{No cards due now} =1{1 card due now} other{{count} cards due now}}",
+  "@dashboardScopeTodaySubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboardScopeDeck": "Deck",
+  "dashboardScopeDeckSubtitle": "Pick a deck to study",
+  "dashboardScopeFolder": "Folder",
+  "dashboardScopeFolderSubtitle": "Pick a folder to study",
+  "dashboardScopeDeckPickerTitle": "Pick a deck",
+  "dashboardScopeFolderPickerTitle": "Pick a folder",
+  "dashboardScopeDeckSearchHint": "Search decks",
+  "dashboardScopeFolderSearchHint": "Search folders",
+  "dashboardScopeDeckEmpty": "No decks yet. Create a deck first.",
+  "dashboardScopeFolderEmpty": "No folders yet.",
   "dashboardLibraryHealthTitle": "Library health",
   "dashboardLibraryHealthSummary": "{folderCount, plural, =0{0 folders} =1{1 folder} other{{folderCount} folders}} · {deckCount, plural, =0{0 decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{0 cards} =1{1 card} other{{cardCount} cards}}",
   "@dashboardLibraryHealthSummary": {

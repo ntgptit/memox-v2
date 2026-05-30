@@ -262,6 +262,99 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardContinueSessionAction => 'Resume';
 
   @override
+  String get dashboardResumeSectionTitle => 'Continue studying';
+
+  @override
+  String get dashboardDiscardAction => 'Discard';
+
+  @override
+  String dashboardMorePausedSessions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+ $count more paused sessions',
+      one: '+ 1 more paused session',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String dashboardPausedSessionsSheetTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count paused sessions',
+      one: '1 paused session',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dashboardDiscardSessionTitle => 'Discard this session?';
+
+  @override
+  String get dashboardDiscardSessionMessage =>
+      'Your progress on answered cards is kept, but the remaining cards in this session will be abandoned.';
+
+  @override
+  String get dashboardSessionDiscardedMessage => 'Session discarded.';
+
+  @override
+  String get dashboardSessionDiscardFailedMessage =>
+      'Couldn\'t discard the session. Try again.';
+
+  @override
+  String get dashboardStartNewLearningAction => 'Start new learning';
+
+  @override
+  String get dashboardScopePickerTitle => 'What do you want to study?';
+
+  @override
+  String get dashboardScopeToday => 'Today';
+
+  @override
+  String dashboardScopeTodaySubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards due now',
+      one: '1 card due now',
+      zero: 'No cards due now',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dashboardScopeDeck => 'Deck';
+
+  @override
+  String get dashboardScopeDeckSubtitle => 'Pick a deck to study';
+
+  @override
+  String get dashboardScopeFolder => 'Folder';
+
+  @override
+  String get dashboardScopeFolderSubtitle => 'Pick a folder to study';
+
+  @override
+  String get dashboardScopeDeckPickerTitle => 'Pick a deck';
+
+  @override
+  String get dashboardScopeFolderPickerTitle => 'Pick a folder';
+
+  @override
+  String get dashboardScopeDeckSearchHint => 'Search decks';
+
+  @override
+  String get dashboardScopeFolderSearchHint => 'Search folders';
+
+  @override
+  String get dashboardScopeDeckEmpty => 'No decks yet. Create a deck first.';
+
+  @override
+  String get dashboardScopeFolderEmpty => 'No folders yet.';
+
+  @override
   String get dashboardLibraryHealthTitle => 'Library health';
 
   @override

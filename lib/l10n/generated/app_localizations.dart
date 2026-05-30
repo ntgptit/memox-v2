@@ -476,6 +476,138 @@ abstract class AppLocalizations {
   /// **'Resume'**
   String get dashboardContinueSessionAction;
 
+  /// No description provided for @dashboardResumeSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue studying'**
+  String get dashboardResumeSectionTitle;
+
+  /// No description provided for @dashboardDiscardAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get dashboardDiscardAction;
+
+  /// No description provided for @dashboardMorePausedSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{+ 1 more paused session} other{+ {count} more paused sessions}}'**
+  String dashboardMorePausedSessions(int count);
+
+  /// No description provided for @dashboardPausedSessionsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 paused session} other{{count} paused sessions}}'**
+  String dashboardPausedSessionsSheetTitle(int count);
+
+  /// No description provided for @dashboardDiscardSessionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this session?'**
+  String get dashboardDiscardSessionTitle;
+
+  /// No description provided for @dashboardDiscardSessionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress on answered cards is kept, but the remaining cards in this session will be abandoned.'**
+  String get dashboardDiscardSessionMessage;
+
+  /// No description provided for @dashboardSessionDiscardedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Session discarded.'**
+  String get dashboardSessionDiscardedMessage;
+
+  /// No description provided for @dashboardSessionDiscardFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t discard the session. Try again.'**
+  String get dashboardSessionDiscardFailedMessage;
+
+  /// No description provided for @dashboardStartNewLearningAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start new learning'**
+  String get dashboardStartNewLearningAction;
+
+  /// No description provided for @dashboardScopePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to study?'**
+  String get dashboardScopePickerTitle;
+
+  /// No description provided for @dashboardScopeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get dashboardScopeToday;
+
+  /// No description provided for @dashboardScopeTodaySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No cards due now} =1{1 card due now} other{{count} cards due now}}'**
+  String dashboardScopeTodaySubtitle(int count);
+
+  /// No description provided for @dashboardScopeDeck.
+  ///
+  /// In en, this message translates to:
+  /// **'Deck'**
+  String get dashboardScopeDeck;
+
+  /// No description provided for @dashboardScopeDeckSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a deck to study'**
+  String get dashboardScopeDeckSubtitle;
+
+  /// No description provided for @dashboardScopeFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get dashboardScopeFolder;
+
+  /// No description provided for @dashboardScopeFolderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a folder to study'**
+  String get dashboardScopeFolderSubtitle;
+
+  /// No description provided for @dashboardScopeDeckPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a deck'**
+  String get dashboardScopeDeckPickerTitle;
+
+  /// No description provided for @dashboardScopeFolderPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a folder'**
+  String get dashboardScopeFolderPickerTitle;
+
+  /// No description provided for @dashboardScopeDeckSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search decks'**
+  String get dashboardScopeDeckSearchHint;
+
+  /// No description provided for @dashboardScopeFolderSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search folders'**
+  String get dashboardScopeFolderSearchHint;
+
+  /// No description provided for @dashboardScopeDeckEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No decks yet. Create a deck first.'**
+  String get dashboardScopeDeckEmpty;
+
+  /// No description provided for @dashboardScopeFolderEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No folders yet.'**
+  String get dashboardScopeFolderEmpty;
+
   /// No description provided for @dashboardLibraryHealthTitle.
   ///
   /// In en, this message translates to:

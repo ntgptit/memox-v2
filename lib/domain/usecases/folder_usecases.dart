@@ -2,6 +2,7 @@ import '../../core/errors/result.dart';
 import '../entities/folder_entity.dart';
 import '../repositories/folder_repository.dart';
 import '../value_objects/content_actions.dart';
+import '../value_objects/content_read_models.dart';
 
 final class CreateFolderUseCase {
   const CreateFolderUseCase(this._repository);
@@ -35,6 +36,15 @@ final class GetFolderMoveTargetsUseCase {
 
   Future<List<FolderMoveTarget>> execute(String folderId) =>
       _repository.getFolderMoveTargets(folderId);
+}
+
+/// Lists every folder as a flat scope option for the study scope picker.
+final class ListAllFoldersUseCase {
+  const ListAllFoldersUseCase(this._repository);
+
+  final FolderRepository _repository;
+
+  Future<List<FolderScopeOption>> execute() => _repository.listAllFolders();
 }
 
 final class DeleteFolderUseCase {

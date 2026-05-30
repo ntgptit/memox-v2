@@ -6,10 +6,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/core/theme/tokens/app_spacing.dart';
+import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/value_objects/content_actions.dart';
+import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/dashboard/screens/dashboard_screen.dart';
 import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
 import 'package:memox/presentation/features/dashboard/widgets/dashboard_skeleton.dart';
+import 'package:memox/presentation/features/progress/providers/progress_session_notifier.dart';
 import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
 
 void main() {
@@ -97,22 +101,36 @@ void main() {
     },
   );
 
-  testWidgets('DT3 onDisplay: keeps the due CTA primary and full-width', (
+  testWidgets(
+    'DT3 onDisplay: keeps the due CTA primary and compact (not full-width)',
+    (tester) async {
+      await _pumpDashboard(tester, _studyReadyDashboardState);
+
+      const reviewKey = ValueKey('dashboard_review_now_action');
+      _expectDashboardActionLabel(reviewKey, 'Start review');
+      _expectPrimaryButtonSurface(reviewKey);
+      // UI-0: card actions must not be full-width hero blocks.
+      expect(_dashboardActionButtonSize(tester, reviewKey).width, lessThan(300));
+    },
+  );
+
+  testWidgets('DT3 onDisplay: secondary action is lighter than primary', (
     tester,
   ) async {
     await _pumpDashboard(tester, _studyReadyDashboardState);
 
-    const reviewKey = ValueKey('dashboard_review_now_action');
-    _expectDashboardActionLabel(reviewKey, 'Start review');
-    _expectPrimaryButtonSurface(reviewKey);
+    // "Start new learning" companion is secondary (tonal), not an ElevatedButton.
     expect(
-      _dashboardActionButtonSize(tester, reviewKey).width,
-      greaterThan(300),
+      find.descendant(
+        of: find.byKey(const ValueKey('dashboard_start_new_study_action')),
+        matching: find.byType(ElevatedButton),
+      ),
+      findsNothing,
     );
   });
 
   testWidgets(
-    'renders dashboard action buttons full-width in compact viewport',
+    'renders dashboard action buttons compact (not full-width) in compact viewport',
     (tester) async {
       await tester.binding.setSurfaceSize(const Size(390, 844));
       addTearDown(() async {
@@ -123,10 +141,7 @@ void main() {
 
       const reviewKey = ValueKey('dashboard_review_now_action');
       _expectDashboardActionLabel(reviewKey, 'Start review');
-      expect(
-        _dashboardActionButtonSize(tester, reviewKey).width,
-        greaterThan(300),
-      );
+      expect(_dashboardActionButtonSize(tester, reviewKey).width, lessThan(300));
     },
   );
 
@@ -198,6 +213,267 @@ void main() {
       expect(
         find.text('Add or import cards before starting a new study session.'),
         findsOneWidget,
+      );
+    },
+  );
+
+  // --- Resume flow ----------------------------------------------------------
+
+  testWidgets('Resume: resume card appears when a resumable session exists', (
+    tester,
+  ) async {
+    await _pumpDashboard(tester, _resumableDashboardState);
+
+    expect(
+      find.byKey(const ValueKey('dashboard_resume_section')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('dashboard_resume_card')), findsOneWidget);
+    expect(find.text('Continue studying'), findsOneWidget);
+  });
+
+  testWidgets('Resume: resume card hidden when no resumable session exists', (
+    tester,
+  ) async {
+    await _pumpDashboard(tester, _studyReadyDashboardState);
+
+    expect(find.byKey(const ValueKey('dashboard_resume_section')), findsNothing);
+    expect(find.byKey(const ValueKey('dashboard_resume_card')), findsNothing);
+  });
+
+  testWidgets('Resume: appears above the due-now action card', (tester) async {
+    await _pumpDashboard(tester, _resumableDashboardState);
+
+    final resumeY = tester
+        .getTopLeft(find.byKey(const ValueKey('dashboard_resume_section')))
+        .dy;
+    final dueY = tester
+        .getTopLeft(find.byKey(const ValueKey('dashboard_due_now_card')))
+        .dy;
+    expect(resumeY, lessThan(dueY));
+  });
+
+  testWidgets('Resume: Continue navigates to the existing session', (
+    tester,
+  ) async {
+    final router = _dashboardRouter();
+    addTearDown(router.dispose);
+    await _pumpDashboardRouter(tester, router, _resumableDashboardState);
+
+    await _tapDashboardButton(
+      tester,
+      const ValueKey('dashboard_resume_continue_action'),
+    );
+
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/library/study/session/session-001',
+    );
+  });
+
+  testWidgets(
+    'Resume: multiple paused sessions open the paused-sessions sheet',
+    (tester) async {
+      await _pumpDashboard(tester, _multiResumableDashboardState);
+
+      await _tapDashboardButton(
+        tester,
+        const ValueKey('dashboard_more_paused_sessions'),
+      );
+
+      expect(
+        find.byKey(const ValueKey('dashboard_paused_sessions_sheet')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('dashboard_paused_session_session-001')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('dashboard_paused_session_session-002')),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets('Resume: Discard shows a confirmation dialog', (tester) async {
+    await _pumpDashboard(tester, _resumableDashboardState);
+
+    await _tapDashboardButton(
+      tester,
+      const ValueKey('dashboard_resume_discard_action'),
+    );
+
+    expect(find.text('Discard this session?'), findsOneWidget);
+  });
+
+  testWidgets(
+    'Resume: confirming discard cancels the session through the use-case path',
+    (tester) async {
+      final stub = _StubProgressSessionActionController();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            dashboardOverviewProvider.overrideWith(
+              (ref) =>
+                  Future<DashboardOverviewState>.value(_resumableDashboardState),
+            ),
+            progressSessionActionControllerProvider.overrideWith(
+              () => stub,
+            ),
+          ],
+          child: const _TestApp(child: DashboardScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _tapDashboardButton(
+        tester,
+        const ValueKey('dashboard_resume_discard_action'),
+      );
+      // The dialog's confirm is the primary (ElevatedButton); the card's
+      // discard action is a lighter secondary, so target the primary.
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Discard'));
+      await tester.pumpAndSettle();
+
+      expect(stub.cancelledSessionId, 'session-001');
+      expect(find.text('Discard this session?'), findsNothing);
+      expect(find.text('Session discarded.'), findsOneWidget);
+    },
+  );
+
+  // --- Start new learning / scope picker ------------------------------------
+
+  testWidgets('Scope: Start new learning opens the scope picker', (
+    tester,
+  ) async {
+    await _pumpDashboard(tester, _studyReadyDashboardState);
+
+    await _tapDashboardButton(
+      tester,
+      const ValueKey('dashboard_start_new_study_action'),
+    );
+
+    expect(find.text('What do you want to study?'), findsOneWidget);
+    expect(find.text('Today'), findsWidgets);
+    expect(find.text('Deck'), findsWidgets);
+    expect(find.text('Folder'), findsWidgets);
+  });
+
+  testWidgets('Scope: Tag scope is not offered in V1', (tester) async {
+    await _pumpDashboard(tester, _studyReadyDashboardState);
+
+    await _tapDashboardButton(
+      tester,
+      const ValueKey('dashboard_start_new_study_action'),
+    );
+
+    expect(find.text('Tag'), findsNothing);
+  });
+
+  testWidgets(
+    'Scope: selecting deck scope navigates to the Study Entry Gate',
+    (tester) async {
+      final router = _dashboardRouter();
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            dashboardOverviewProvider.overrideWith(
+              (ref) =>
+                  Future<DashboardOverviewState>.value(_studyReadyDashboardState),
+            ),
+            dashboardDeckScopeOptionsProvider.overrideWith(
+              (ref) => Future<List<DeckMoveTarget>>.value(const [
+                DeckMoveTarget(
+                  id: 'deck-1',
+                  name: 'Korean N5',
+                  breadcrumb: <String>[],
+                ),
+              ]),
+            ),
+          ],
+          child: _TestRouterApp(router: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _tapDashboardButton(
+        tester,
+        const ValueKey('dashboard_start_new_study_action'),
+      );
+      await tester.tap(find.text('Deck'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Korean N5'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/library/study/deck/deck-1',
+      );
+    },
+  );
+
+  testWidgets(
+    'Scope: selecting folder scope navigates to the Study Entry Gate',
+    (tester) async {
+      final router = _dashboardRouter();
+      addTearDown(router.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            dashboardOverviewProvider.overrideWith(
+              (ref) =>
+                  Future<DashboardOverviewState>.value(_studyReadyDashboardState),
+            ),
+            dashboardFolderScopeOptionsProvider.overrideWith(
+              (ref) => Future<List<FolderScopeOption>>.value(const [
+                FolderScopeOption(
+                  id: 'folder-1',
+                  name: 'Grammar',
+                  breadcrumb: <String>['Grammar'],
+                ),
+              ]),
+            ),
+          ],
+          child: _TestRouterApp(router: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _tapDashboardButton(
+        tester,
+        const ValueKey('dashboard_start_new_study_action'),
+      );
+      await tester.tap(find.text('Folder'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Grammar'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/library/study/folder/folder-1',
+      );
+    },
+  );
+
+  testWidgets(
+    'Scope: selecting today scope navigates to today study entry',
+    (tester) async {
+      final router = _dashboardRouter();
+      addTearDown(router.dispose);
+      await _pumpDashboardRouter(tester, router, _studyReadyDashboardState);
+
+      await _tapDashboardButton(
+        tester,
+        const ValueKey('dashboard_start_new_study_action'),
+      );
+      await tester.tap(find.text('Today'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/library/study/today',
       );
     },
   );
@@ -292,19 +568,6 @@ void main() {
     },
   );
 
-  testWidgets('DT2 onNavigate: Start opens Library selection', (tester) async {
-    final router = _dashboardRouter();
-    addTearDown(router.dispose);
-    await _pumpDashboardRouter(tester, router, _studyReadyDashboardState);
-
-    await _tapDashboardButton(
-      tester,
-      const ValueKey('dashboard_start_new_study_action'),
-    );
-
-    expect(router.routeInformationProvider.value.uri.path, '/library');
-  });
-
   testWidgets(
     'DT5 onNavigate: tapping a recent deck row opens flashcards and preserves back stack',
     (tester) async {
@@ -384,12 +647,7 @@ Future<void> _pumpDashboardRouter(
           (ref) => Future<DashboardOverviewState>.value(state),
         ),
       ],
-      child: MaterialApp.router(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        routerConfig: router,
-      ),
+      child: _TestRouterApp(router: router),
     ),
   );
   await tester.pumpAndSettle();
@@ -490,16 +748,79 @@ class _TestApp extends StatelessWidget {
   );
 }
 
+class _TestRouterApp extends StatelessWidget {
+  const _TestRouterApp({required this.router});
+
+  final GoRouter router;
+
+  @override
+  Widget build(BuildContext context) => MaterialApp.router(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    locale: const Locale('en'),
+    routerConfig: router,
+  );
+}
+
+/// Captures the cancelled session id so the discard-confirm flow can be tested
+/// without binding the real study repository.
+class _StubProgressSessionActionController
+    extends ProgressSessionActionController {
+  String? cancelledSessionId;
+
+  @override
+  Future<bool> cancel(String sessionId) async {
+    cancelledSessionId = sessionId;
+    return true;
+  }
+}
+
+DashboardResumeSessionItem _resumeItem(String id) => DashboardResumeSessionItem(
+  sessionId: id,
+  studyType: StudyType.srsReview,
+  entryType: StudyEntryType.deck,
+  completedSteps: 12,
+  totalSteps: 24,
+  remainingCount: 12,
+  startedAt: 1000,
+);
+
 final _studyReadyDashboardState = DashboardOverviewState(
   overdueCount: 3,
   dueTodayCount: 2,
   newCardCount: 7,
-  activeSessionCount: 1,
+  resumeSessions: const <DashboardResumeSessionItem>[],
   folderCount: 2,
   deckCount: 3,
   cardCount: 20,
   masteryPercent: 30,
-  resumeSessionId: 'session-001',
+  deckHighlights: const <DashboardDeckHighlightItem>[],
+);
+
+final _resumableDashboardState = DashboardOverviewState(
+  overdueCount: 3,
+  dueTodayCount: 2,
+  newCardCount: 7,
+  resumeSessions: <DashboardResumeSessionItem>[_resumeItem('session-001')],
+  folderCount: 2,
+  deckCount: 3,
+  cardCount: 20,
+  masteryPercent: 30,
+  deckHighlights: const <DashboardDeckHighlightItem>[],
+);
+
+final _multiResumableDashboardState = DashboardOverviewState(
+  overdueCount: 3,
+  dueTodayCount: 2,
+  newCardCount: 7,
+  resumeSessions: <DashboardResumeSessionItem>[
+    _resumeItem('session-001'),
+    _resumeItem('session-002'),
+  ],
+  folderCount: 2,
+  deckCount: 3,
+  cardCount: 20,
+  masteryPercent: 30,
   deckHighlights: const <DashboardDeckHighlightItem>[],
 );
 
@@ -507,12 +828,11 @@ final _idleDashboardState = DashboardOverviewState(
   overdueCount: 0,
   dueTodayCount: 0,
   newCardCount: 0,
-  activeSessionCount: 0,
+  resumeSessions: const <DashboardResumeSessionItem>[],
   folderCount: 0,
   deckCount: 0,
   cardCount: 0,
   masteryPercent: 0,
-  resumeSessionId: null,
   deckHighlights: const <DashboardDeckHighlightItem>[],
 );
 
@@ -520,12 +840,11 @@ final _singleItemDashboardState = DashboardOverviewState(
   overdueCount: 0,
   dueTodayCount: 0,
   newCardCount: 0,
-  activeSessionCount: 0,
+  resumeSessions: const <DashboardResumeSessionItem>[],
   folderCount: 1,
   deckCount: 1,
   cardCount: 1,
   masteryPercent: 1,
-  resumeSessionId: null,
   deckHighlights: const <DashboardDeckHighlightItem>[],
 );
 
@@ -533,12 +852,11 @@ final _recentDecksDashboardState = DashboardOverviewState(
   overdueCount: 0,
   dueTodayCount: 0,
   newCardCount: 0,
-  activeSessionCount: 0,
+  resumeSessions: const <DashboardResumeSessionItem>[],
   folderCount: 1,
   deckCount: 4,
   cardCount: 32,
   masteryPercent: 25,
-  resumeSessionId: null,
   deckHighlights: const <DashboardDeckHighlightItem>[
     DashboardDeckHighlightItem(
       id: 'deck-grammar',
@@ -579,12 +897,11 @@ final _fallbackDecksDashboardState = DashboardOverviewState(
   overdueCount: 0,
   dueTodayCount: 0,
   newCardCount: 0,
-  activeSessionCount: 0,
+  resumeSessions: const <DashboardResumeSessionItem>[],
   folderCount: 1,
   deckCount: 1,
   cardCount: 1,
   masteryPercent: 0,
-  resumeSessionId: null,
   deckHighlights: const <DashboardDeckHighlightItem>[
     DashboardDeckHighlightItem(
       id: 'deck-starter',

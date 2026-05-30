@@ -36,6 +36,10 @@ GetFolderMoveTargetsUseCase getFolderMoveTargetsUseCase(Ref ref) =>
     GetFolderMoveTargetsUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
+ListAllFoldersUseCase listAllFoldersUseCase(Ref ref) =>
+    ListAllFoldersUseCase(ref.watch(folderRepositoryProvider));
+
+@riverpod
 UpdateFolderUseCase updateFolderUseCase(Ref ref) =>
     UpdateFolderUseCase(ref.watch(folderRepositoryProvider));
 

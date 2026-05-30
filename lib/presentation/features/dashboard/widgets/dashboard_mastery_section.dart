@@ -76,7 +76,7 @@ class DashboardEmptyDeckCard extends StatelessWidget {
           ),
           const MxGap(MxSpace.md),
           MxSecondaryButton(
-            key: const ValueKey('dashboard_start_new_study_action'),
+            key: const ValueKey('dashboard_empty_deck_library_action'),
             label: l10n.dashboardOpenLibraryAction,
             leadingIcon: Icons.folder_open_outlined,
             variant: MxSecondaryVariant.text,

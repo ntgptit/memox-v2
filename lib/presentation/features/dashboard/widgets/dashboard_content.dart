@@ -8,6 +8,7 @@ import '../viewmodels/dashboard_overview_viewmodel.dart';
 import 'dashboard_action_list.dart';
 import 'dashboard_header_section.dart';
 import 'dashboard_mastery_section.dart';
+import 'dashboard_resume_section.dart';
 import 'dashboard_stats_section.dart';
 
 class DashboardContent extends StatelessWidget {
@@ -22,6 +23,15 @@ class DashboardContent extends StatelessWidget {
     children: [
       const DashboardGreetingHeader(),
       const MxGap(MxSpace.lg),
+      // Resume section sits above all other content when a paused session
+      // exists (Dashboard rule: resume card appears above everything).
+      if (state.hasActiveSessions) ...[
+        DashboardResumeSection(
+          key: const ValueKey('dashboard_resume_section'),
+          sessions: state.resumeSessions,
+        ),
+        const MxGap(MxSpace.lg),
+      ],
       DashboardActionList(state: state),
       const MxGap(MxSpace.lg),
       DashboardHomeStatsSection(state: state),
