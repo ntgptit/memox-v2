@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:memox/core/utils/string_utils.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/study/fill/fill_answer_matcher.dart';
+import 'package:memox/domain/study/fill/fill_hint_policy.dart';
 import 'package:memox/domain/study/study_session_round.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
@@ -52,6 +54,7 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
   _FillAnswerState _answerState = _FillAnswerState.input;
   String? _submittedAnswer;
   bool _isLocalSubmitting = false;
+  int _hintRevealCount = 0;
 
   @override
   void initState() {
@@ -94,6 +97,11 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
     final currentOneBased = totalItems == 0
         ? 0
         : (_itemIndex + 1).clamp(0, totalItems);
+    final expectedFront = item?.flashcard.front ?? '';
+    final canRevealHint =
+        item != null &&
+        !_isBusy &&
+        FillHintPolicy.canRevealMore(expectedFront, _hintRevealCount);
     return StudyModeSessionScaffold(
       modeLabel: l10n.studyModeFill,
       accent: MxStudyTopBarAccent.mastery,
@@ -164,7 +172,8 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
                           key: const ValueKey<String>('fill-input-actions'),
                           canCheck: _canCheck,
                           isSubmitting: _isBusy,
-                          onHelp: _showHelp,
+                          canHint: canRevealHint,
+                          onHelp: _revealHint,
                           onCheck: _checkAnswer,
                         )
                       : FillResultActions(
@@ -193,19 +202,22 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
     if (!_canCheck) {
       return;
     }
-    final answer = StringUtils.trimmed(_controller.text);
     final current = _currentItem;
     if (current == null) {
       return;
     }
-    if (StringUtils.equalsNormalized(answer, current.flashcard.front)) {
+    final evaluation = FillAnswerMatcher.evaluate(
+      _controller.text,
+      current.flashcard.front,
+    );
+    if (evaluation.isExactMatch) {
       _focusNode.unfocus();
       unawaited(_submit(AttemptGrade.correct));
       return;
     }
     _focusNode.unfocus();
     setState(() {
-      _submittedAnswer = answer;
+      _submittedAnswer = evaluation.userAnswer;
       _answerState = _FillAnswerState.incorrect;
     });
   }
@@ -222,24 +234,29 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
     _focusAnswerInput();
   }
 
-  void _showHelp() {
-    if (_isBusy) {
-      return;
-    }
+  void _revealHint() {
+    if (_isBusy) return;
     final item = _currentItem;
-    if (item == null) {
+    if (item == null) return;
+    final expected = item.flashcard.front;
+    if (!FillHintPolicy.canRevealMore(expected, _hintRevealCount)) {
       return;
     }
-    _focusNode.unfocus();
+    final nextCount = FillHintPolicy.nextRevealCount(
+      expected,
+      _hintRevealCount,
+    );
+    if (nextCount == _hintRevealCount) return;
+    final revealed = FillHintPolicy.revealedPrefix(expected, nextCount);
     setState(() {
-      _stagedGrades = <String, AttemptGrade>{
-        ..._stagedGrades,
-        item.id: AttemptGrade.incorrect,
-      };
-      _submittedAnswer = null;
-      _answerState = _FillAnswerState.incorrect;
+      _hintRevealCount = nextCount;
+      _controller.value = TextEditingValue(
+        text: revealed,
+        selection: TextSelection.collapsed(offset: revealed.length),
+      );
     });
   }
+
 
   Future<void> _submit(AttemptGrade grade) async {
     if (_isBusy) {
@@ -299,6 +316,7 @@ class _FillModeSessionViewState extends State<FillModeSessionView> {
     _submittedAnswer = null;
     _answerState = _FillAnswerState.input;
     _isLocalSubmitting = false;
+    _hintRevealCount = 0;
   }
 
   void _focusAnswerInput() {

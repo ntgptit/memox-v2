@@ -1390,7 +1390,9 @@ void registerStudySessionScreenTests() {
 
       await _pumpFillScreen(tester, repo: repo);
 
-      await tester.enterText(find.byType(TextField), ' Front 1 ');
+      // Strict matcher: trim is OK but case-fold/diacritic stripping is not.
+      // Typing the trimmed-equal form of the front exact-matches.
+      await tester.enterText(find.byType(TextField), ' front 1 ');
       await tester.pump();
       await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
       await tester.pump();
@@ -1458,28 +1460,38 @@ void registerStudySessionScreenTests() {
     });
   });
 
-  testWidgets('DT25 onUpdate: fill help reveals the answer in result state', (
-    tester,
-  ) async {
-    final repo = _BatchAnswerStudyRepo();
+  testWidgets(
+    'DT25 onUpdate: fill hint reveals a character and keeps input state',
+    (tester) async {
+      // Per `docs/wireframes/17-study-session-fill.md` §Components/Actions:
+      // tapping Hint reveals ONE more character of the front (capped at
+      // floor(len/2)), stays in typing state, and does NOT submit an attempt
+      // or flip into the wrong/result state.
+      final repo = _BatchAnswerStudyRepo();
 
-    await _pumpFillScreen(tester, repo: repo);
-    await tester.tap(find.byKey(const ValueKey<String>('fill-help-action')));
-    await _pumpFillStateTransition(tester);
+      await _pumpFillScreen(tester, repo: repo);
+      await tester.tap(find.byKey(const ValueKey<String>('fill-help-action')));
+      await _pumpFillStateTransition(tester);
 
-    // Help reveals the answer (result card) without recording any attempt;
-    // the user resolves via Mark correct / Try again.
-    expect(repo.itemAnswerCount, 0);
-    expect(repo.modeItemBatchAnswerCount, 0);
-    expect(
-      find.byKey(const ValueKey<String>('fill-result-card')),
-      findsOneWidget,
-    );
-    expect(find.text('Correct'), findsNothing);
-    expect(find.text('Try again'), findsOneWidget);
-    expect(find.text('Mark correct'), findsOneWidget);
-    expect(_studyProgressCounter(), findsWidgets);
-  });
+      expect(repo.itemAnswerCount, 0);
+      expect(repo.modeItemBatchAnswerCount, 0);
+      // Still in typing state — input card present, result card absent.
+      expect(
+        find.byKey(const ValueKey<String>('fill-input-card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('fill-result-card')),
+        findsNothing,
+      );
+      // Controller now holds the revealed prefix ('f' for 'front 1').
+      final input = tester.widget<TextField>(find.byType(TextField));
+      expect(input.controller?.text, 'f');
+      expect(find.text('Hint'), findsOneWidget);
+      expect(find.text('Check'), findsOneWidget);
+      expect(_studyProgressCounter(), findsWidgets);
+    },
+  );
 
   testWidgets('DT26 onUpdate: fill item change resets input state', (
     tester,
@@ -1533,7 +1545,8 @@ void registerStudySessionScreenTests() {
 
       await _pumpFillScreen(tester, repo: repo, snapshot: _twoItemFillSnapshot);
 
-      await tester.enterText(find.byType(TextField), 'Front 1');
+      // Strict matcher: type the exact front (case-sensitive).
+      await tester.enterText(find.byType(TextField), 'front 1');
       await tester.pump();
       await tester.tap(find.byKey(const ValueKey<String>('fill-check-action')));
       await tester.pump();

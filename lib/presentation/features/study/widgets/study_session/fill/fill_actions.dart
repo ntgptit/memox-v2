@@ -13,11 +13,13 @@ class FillInputActions extends StatelessWidget {
     required this.isSubmitting,
     required this.onHelp,
     required this.onCheck,
+    this.canHint = true,
     super.key,
   });
 
   final bool canCheck;
   final bool isSubmitting;
+  final bool canHint;
   final VoidCallback onHelp;
   final VoidCallback onCheck;
 
@@ -33,7 +35,7 @@ class FillInputActions extends StatelessWidget {
             label: l10n.studyHintAction,
             size: MxButtonSize.compact,
             fullWidth: true,
-            onPressed: isSubmitting ? null : onHelp,
+            onPressed: (isSubmitting || !canHint) ? null : onHelp,
           ),
         ),
         const MxGap(MxSpace.sm),
