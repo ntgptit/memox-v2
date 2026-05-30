@@ -29,6 +29,7 @@ import 'package:memox/presentation/shared/layouts/mx_list_scaffold.dart';
 import 'package:memox/presentation/shared/layouts/mx_scaffold.dart';
 import 'package:memox/presentation/shared/layouts/mx_section.dart';
 import 'package:memox/presentation/shared/layouts/mx_study_scaffold.dart';
+import 'package:memox/presentation/shared/widgets/mx_action_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_animated_switcher.dart';
 import 'package:memox/presentation/shared/widgets/mx_answer_option_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_avatar.dart';
@@ -38,6 +39,7 @@ import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_bulk_action_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_button_size.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_card_actions.dart';
 import 'package:memox/presentation/shared/widgets/mx_card_breakdown_list.dart';
 import 'package:memox/presentation/shared/widgets/mx_chip.dart';
 import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
@@ -4836,6 +4838,47 @@ class _ScaffoldHost extends StatelessWidget {
 }
 
 final List<_SharedWidgetCase> _sharedWidgetCases = [
+  _SharedWidgetCase(
+    name: 'MxActionButton',
+    minimal: (key) => MxActionButton(
+      key: key,
+      intent: MxActionIntent.cardPrimary,
+      label: 'Study',
+      onPressed: _noop,
+    ),
+    full: (key) => MxActionButton(
+      key: key,
+      intent: MxActionIntent.cardPrimary,
+      label: 'Study now',
+      leadingIcon: Icons.play_arrow,
+      trailingIcon: Icons.arrow_forward,
+      onPressed: _noop,
+    ),
+  ),
+  _SharedWidgetCase(
+    name: 'MxCardActions',
+    minimal: (key) => MxCardActions(
+      key: key,
+      primary: const MxActionButton(
+        intent: MxActionIntent.cardPrimary,
+        label: 'Study',
+        onPressed: _noop,
+      ),
+    ),
+    full: (key) => MxCardActions(
+      key: key,
+      primary: const MxActionButton(
+        intent: MxActionIntent.cardPrimary,
+        label: 'Study',
+        onPressed: _noop,
+      ),
+      secondary: const MxActionButton(
+        intent: MxActionIntent.cardSecondary,
+        label: 'Edit',
+        onPressed: _noop,
+      ),
+    ),
+  ),
   _SharedWidgetCase(
     name: 'MxActionSheetList',
     minimal: (key) => MxActionSheetList<String>(key: key, items: const []),

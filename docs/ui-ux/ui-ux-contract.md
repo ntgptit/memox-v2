@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-30
 applies_to: all UI/UX, shared widgets, theme, l10n
 ---
 
@@ -54,8 +54,30 @@ Preferred primitives:
 - `MxErrorState`
 - `MxLoadingState`
 - `MxCard`
-- `MxPrimaryButton`
-- `MxSecondaryButton`
+- `MxActionButton` (semantic, intent-driven — prefer over raw buttons)
+- `MxCardActions` (card-level action layout)
+- `MxPrimaryButton` (low-level primitive)
+- `MxSecondaryButton` (low-level primitive)
+
+## Button and action density rule
+
+Action density is governed by `docs/ui-ux/action-hierarchy-contract.md`. Read it
+before adding any button, CTA, or card action.
+
+Mandatory minimums:
+
+- Prefer the semantic `MxActionButton` (intent-driven) and `MxCardActions` over
+  raw `MxPrimaryButton` / `MxSecondaryButton` `size` + `fullWidth`.
+- Card-level actions must not use `MxButtonSize.large` and must not be
+  full-width by default.
+- Full-width is allowed only for: bottom action area, form submit/footer,
+  full-screen empty state, onboarding/hero, and specified study submit/final
+  actions.
+- At most one visually dominant primary action per screen.
+- Secondary actions are visually lighter than the primary.
+- Compact visual height is fine only while the touch target stays ≥ 48dp.
+- "Quizlet-mobile energy" does not mean an oversized full-width CTA everywhere —
+  dashboard/library/settings cards use dense card actions.
 
 ## Theme rule
 

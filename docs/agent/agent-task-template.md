@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-30
 status: contract
 ---
 
@@ -83,6 +83,22 @@ python code-verification-guard/guard/run.py check --project . --ruleset memox   
 ```
 
 For UI-touching tasks, also run a profile-mode build on Pixel 6 emulator and verify the perf budget from `docs/quality/performance-contract.md`.
+
+---
+
+## UI Density Gate (required for UI tasks)
+
+Before finishing any task that adds or changes buttons, CTAs, or card actions,
+report against `docs/ui-ux/action-hierarchy-contract.md`:
+
+- [ ] **Compact mobile review** — checked at 360dp; no overflow, no hero block in cards.
+- [ ] **Dominant primary count** — exactly one visually dominant primary action per screen (state the count).
+- [ ] **Full-width buttons added** — list each, with the allowed context (bottom action / footer / empty state / onboarding / specified study submit) or a `// guard:full-width-action-reviewed <reason>` comment.
+- [ ] **Large buttons added** — list each `MxButtonSize.large`, with the allowed context.
+- [ ] **No card-level violation** — verified no card/list/dashboard widget uses `large` or `fullWidth` outside the allowed contexts.
+- [ ] **Semantic preference** — used `MxActionButton` / `MxCardActions` rather than raw `MxPrimaryButton` / `MxSecondaryButton` where applicable.
+
+If any box cannot be ticked, stop and explain why instead of shipping.
 
 ---
 

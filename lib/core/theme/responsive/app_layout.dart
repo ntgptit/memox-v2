@@ -89,6 +89,11 @@ abstract final class AppLayout {
   /// under the heading so compact/mobile copy keeps a readable line length.
   static const double _sectionActionInlineWidthFloor = 400;
 
+  /// guard:raw-size-reviewed local width where a card's primary + secondary
+  /// actions can sit side-by-side without crowding. Below this the actions
+  /// stack vertically (still intrinsic width, never a full-width hero block).
+  static const double _cardActionsInlineWidthFloor = 260;
+
   /// guard:raw-size-reviewed text scale where section actions stack even on a
   /// wider host because the title needs more vertical room.
   static const double _sectionActionLargeTextScale = 1.3;
@@ -233,6 +238,15 @@ abstract final class AppLayout {
     required bool hasBoundedWidth,
     required double maxWidth,
   }) => hasBoundedWidth && maxWidth < _studySetTileInlineTrailingWidthFloor;
+
+  /// Whether a card's primary + secondary actions should stack vertically
+  /// because the host is too narrow for a side-by-side row. Stacking keeps the
+  /// actions intrinsic-width and trailing-aligned — it never promotes them to a
+  /// full-width hero block.
+  static bool stacksCardActions({
+    required bool hasBoundedWidth,
+    required double maxWidth,
+  }) => hasBoundedWidth && maxWidth < _cardActionsInlineWidthFloor;
 
   /// Whether a section action should move below its heading on compact hosts.
   static bool stacksSectionAction({

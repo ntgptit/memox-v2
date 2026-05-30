@@ -27,7 +27,7 @@ class MxPrimaryButton extends StatelessWidget {
     this.shape = MxPrimaryButtonShape.rounded,
     this.isLoading = false,
     this.fullWidth = false,
-    this.stretchOnCompact = true,
+    this.stretchOnCompact = false,
     super.key,
   });
 
@@ -41,9 +41,15 @@ class MxPrimaryButton extends StatelessWidget {
   final bool isLoading;
   final bool fullWidth;
 
-  /// When the host is in compact-mobile density and [size] is
-  /// [MxButtonSize.large], force `fullWidth` so the CTA spans the gutter.
-  /// Defaults to true — Quizlet-style mobile primary actions never sit narrow.
+  /// Legacy opt-in: when `true` AND [size] is [MxButtonSize.large] AND the host
+  /// is compact-mobile, the button forces `fullWidth` so the CTA spans the
+  /// gutter.
+  ///
+  /// Defaults to `false`. Full-width must be an explicit layout decision
+  /// (`fullWidth: true`) or come from a semantic [MxActionButton] intent, not
+  /// an implicit side effect of size + screen width. See
+  /// `docs/ui-ux/action-hierarchy-contract.md`. Prefer leaving this `false`;
+  /// semantic action components never set it.
   final bool stretchOnCompact;
 
   @override
