@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/value_objects/content_actions.dart';
+import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
@@ -189,9 +191,7 @@ void main() {
     expect(find.text('FolderDetail folder-007'), findsOneWidget);
   });
 
-  testWidgets('Done for today-entry goes to Library (top-level)', (
-    tester,
-  ) async {
+  testWidgets('Done for today-entry goes to Dashboard (Home)', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -216,7 +216,12 @@ void main() {
     await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Library'), findsOneWidget);
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Library'), findsNothing);
+    // Back from Dashboard MUST NOT return to Study Result.
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Session summary'), findsNothing);
   });
 
   testWidgets('Study more opens scope picker with Today/Deck/Folder (no Tag)',
@@ -246,6 +251,122 @@ void main() {
     expect(find.text('Folder'), findsOneWidget);
     expect(find.text('Tag'), findsNothing);
   });
+
+  testWidgets(
+    'Study more → Today routes to Study Today and result is not preserved',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider('session-001').overrideWith(
+              (ref) => Future.value(_snapshot(SessionStatus.completed)),
+            ),
+            dashboardDeckScopeOptionsProvider.overrideWith((ref) async => []),
+            dashboardFolderScopeOptionsProvider.overrideWith((ref) async => []),
+          ],
+          child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Open result'));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(ListView), const Offset(0, -800));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Study more'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Today'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Study Today'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Session summary'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Study more → Deck routes to Study Entry deck and result is not preserved',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider('session-001').overrideWith(
+              (ref) => Future.value(_snapshot(SessionStatus.completed)),
+            ),
+            dashboardDeckScopeOptionsProvider.overrideWith(
+              (ref) async => const [
+                DeckMoveTarget(
+                  id: 'deck-zeta',
+                  name: 'Zeta deck',
+                  breadcrumb: <String>[],
+                ),
+              ],
+            ),
+            dashboardFolderScopeOptionsProvider.overrideWith((ref) async => []),
+          ],
+          child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Open result'));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(ListView), const Offset(0, -800));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Study more'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Deck'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Zeta deck'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('StudyEntry deck deck-zeta'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Session summary'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Study more → Folder routes to Study Entry folder and result is not preserved',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider('session-001').overrideWith(
+              (ref) => Future.value(_snapshot(SessionStatus.completed)),
+            ),
+            dashboardDeckScopeOptionsProvider.overrideWith((ref) async => []),
+            dashboardFolderScopeOptionsProvider.overrideWith(
+              (ref) async => const [
+                FolderScopeOption(
+                  id: 'folder-omega',
+                  name: 'Omega folder',
+                  breadcrumb: <String>['Omega folder'],
+                ),
+              ],
+            ),
+          ],
+          child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Open result'));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(ListView), const Offset(0, -800));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Study more'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Folder'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Omega folder'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('StudyEntry folder folder-omega'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Session summary'), findsNothing);
+    },
+  );
 }
 
 StudySessionSnapshot _snapshot(
@@ -335,6 +456,25 @@ class _RouterTestApp extends StatelessWidget {
               ),
             ),
           ),
+        ),
+        GoRoute(
+          path: '/home',
+          name: RouteNames.home,
+          builder: (context, state) =>
+              const Scaffold(body: Center(child: Text('Home'))),
+        ),
+        GoRoute(
+          path: '/study/:entryType/:entryRefId',
+          name: RouteNames.studyEntry,
+          builder: (context, state) {
+            final entryType = state.pathParameters['entryType'];
+            final entryRefId = state.pathParameters['entryRefId'];
+            return Scaffold(
+              body: Center(
+                child: Text('StudyEntry $entryType $entryRefId'),
+              ),
+            );
+          },
         ),
         GoRoute(
           path: '/library',

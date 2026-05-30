@@ -6,7 +6,7 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
-import '../../../features/dashboard/widgets/dashboard_scope_picker_sheet.dart';
+import '../../../shared/bottom_sheets/study_scope_picker_sheet.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
@@ -366,7 +366,7 @@ class _ResultActions extends ConsumerWidget {
         MxSecondaryButton(
           label: l10n.studyResultStudyMoreAction,
           leadingIcon: Icons.school_rounded,
-          onPressed: () => showDashboardScopePicker(context, ref),
+          onPressed: () => showStudyScopePicker(context, ref),
         ),
       ],
     );

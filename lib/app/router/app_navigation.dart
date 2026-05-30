@@ -167,7 +167,8 @@ extension AppNavigation on BuildContext {
   ///
   /// - deck entry with refId → deck flashcard list
   /// - folder entry with refId → folder detail
-  /// - today / unknown / missing refId → library (top-level shell branch)
+  /// - today entry → Home/Dashboard (Today sessions are launched from there)
+  /// - unknown / missing refId → library (top-level shell branch)
   void goStudyResultDone({
     required String entryType,
     String? entryRefId,
@@ -178,6 +179,10 @@ extension AppNavigation on BuildContext {
     }
     if (entryType == 'folder' && entryRefId != null && entryRefId.isNotEmpty) {
       goFolderDetail(entryRefId);
+      return;
+    }
+    if (entryType == 'today') {
+      goHome();
       return;
     }
     goLibrary();
