@@ -987,8 +987,73 @@ void main() {
     },
   );
 
+  testWidgets('DT4 onUpdate: speech preview failure shows safe feedback only', (
+    tester,
+  ) async {
+    const technicalDetail = 'PlatformException(tts_engine_secret)';
+    await _pumpSettings(
+      tester,
+      child: const AudioSpeechSettingsScreen(),
+      ttsService: _FakeTtsService(speakError: StateError(technicalDetail)),
+    );
+
+    await tester.tap(find.byKey(_speechVoiceSelectionRowKey));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(_speechPreviewButtonKey));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(_speechPreviewButtonKey));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Something went wrong.'), findsOneWidget);
+    expect(find.textContaining(technicalDetail), findsNothing);
+    expect(find.textContaining('PlatformException'), findsNothing);
+  });
+
   testWidgets(
-    'DT4 onUpdate: speech voice options stay collapsed until requested',
+    'DT5 onDisplay: speech primary voice summary hides raw platform voice id',
+    (tester) async {
+      const rawVoiceId = 'ko-kr-x-ism-local';
+      await _pumpSettings(
+        tester,
+        child: const AudioSpeechSettingsScreen(),
+        ttsSettingsRepositoryFuture: Future<TtsSettingsRepository>.value(
+          _FakeTtsSettingsRepository(
+            settings: const TtsSettings(
+              autoPlay: false,
+              frontLanguage: TtsLanguage.korean,
+              rate: TtsSettings.defaultRate,
+              pitch: TtsSettings.defaultPitch,
+              volume: TtsSettings.defaultVolume,
+              frontVoiceName: rawVoiceId,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Device voice'), findsOneWidget);
+      expect(find.text(rawVoiceId), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'DT6 onDisplay: audio settings excludes unrelated settings controls',
+    (tester) async {
+      await _pumpSettings(tester, child: const AudioSpeechSettingsScreen());
+
+      expect(find.text('Sign in & sync'), findsNothing);
+      expect(find.text('Drive sync'), findsNothing);
+      expect(find.text('Learning'), findsNothing);
+      expect(find.text('Manage tags'), findsNothing);
+      expect(find.text('Progress'), findsNothing);
+      expect(find.text('Global search'), findsNothing);
+      expect(find.text('Flashcard history'), findsNothing);
+      expect(find.byKey(_speechTextToSpeechToggleKey), findsOneWidget);
+      expect(find.byKey(_speechVoiceSelectionRowKey), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT7 onUpdate: speech voice options stay collapsed until requested',
     (tester) async {
       final harness = await _pumpSettings(
         tester,
@@ -1027,6 +1092,54 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Back voice'), findsNothing);
       expect(harness.tts.availableVoiceRequests, [TtsLanguage.korean]);
+    },
+  );
+
+  testWidgets(
+    'DT8 onUpdate: selected speech voice and custom preview text flow through',
+    (tester) async {
+      final harness = await _pumpSettings(
+        tester,
+        child: const AudioSpeechSettingsScreen(),
+      );
+
+      await tester.tap(find.byKey(_speechVoiceSelectionRowKey));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(_speechVoiceOptionsButtonKey));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byType(DropdownButtonFormField<String>).last,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(DropdownButtonFormField<String>).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Korean voice 1 · Device · Male'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, '  custom sample  ');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(_speechPreviewButtonKey));
+      await tester.pumpAndSettle();
+
+      expect(harness.tts.speakCalls, hasLength(1));
+      expect(harness.tts.speakCalls.single.text, 'custom sample');
+      expect(harness.tts.speakCalls.single.voiceName, 'ko-kr-x-ism-local');
+
+      final languageControls = tester
+          .widgetList<MxSegmentedControl<TtsLanguage>>(
+            find.byType(MxSegmentedControl<TtsLanguage>),
+          )
+          .toList();
+      languageControls.first.onChanged({TtsLanguage.english});
+      await tester.pumpAndSettle();
+
+      final settings = await harness.container.read(ttsSettingsProvider.future);
+      expect(settings.frontLanguage, TtsLanguage.english);
+      expect(settings.frontVoiceName, isNull);
+      expect(harness.tts.availableVoiceRequests, [
+        TtsLanguage.korean,
+        TtsLanguage.english,
+      ]);
     },
   );
 

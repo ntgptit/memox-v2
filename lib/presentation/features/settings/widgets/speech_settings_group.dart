@@ -206,7 +206,7 @@ class _SpeechDetailsSheetState extends ConsumerState<_SpeechDetailsSheet> {
           voiceOptionsLabel: _showVoiceOptions
               ? l10n.settingsSpeechHideVoiceOptions
               : l10n.settingsSpeechVoiceOptions,
-          onPreview: () => _previewSelected(settings, l10n),
+          onPreview: () => unawaited(_previewSelected(context, settings, l10n)),
           onToggleVoiceOptions: _toggleVoiceOptions,
         ),
         AnimatedSize(
@@ -238,20 +238,32 @@ class _SpeechDetailsSheetState extends ConsumerState<_SpeechDetailsSheet> {
     });
   }
 
-  void _previewSelected(TtsSettings settings, AppLocalizations l10n) {
+  Future<void> _previewSelected(
+    BuildContext context,
+    TtsSettings settings,
+    AppLocalizations l10n,
+  ) async {
     final custom = StringUtils.trimmed(widget.controller.text);
     final text = StringUtils.isBlank(custom)
         ? _previewText(l10n, settings.frontLanguage)
         : custom;
-    unawaited(
-      ref
-          .read(ttsControllerProvider.notifier)
-          .speakText(
-            text: text,
-            language: settings.frontLanguage,
-            side: TtsTextSide.front,
-          ),
-    );
+    final spoken = await ref
+        .read(ttsControllerProvider.notifier)
+        .speakText(
+          text: text,
+          language: settings.frontLanguage,
+          side: TtsTextSide.front,
+        );
+    if (!mounted) {
+      return;
+    }
+    if (!context.mounted) {
+      return;
+    }
+    if (spoken) {
+      return;
+    }
+    MxSnackbar.error(context, l10n.errorUnexpected);
   }
 
   String? _voiceNameFromValue(String value) {
@@ -543,7 +555,7 @@ String _languageLabel(AppLocalizations l10n, TtsLanguage language) =>
 String _voiceSelectionValue(AppLocalizations l10n, TtsSettings settings) {
   final voiceName = settings.frontVoiceName;
   if (StringUtils.isNotBlank(voiceName)) {
-    return voiceName!;
+    return l10n.settingsSpeechStoredVoice;
   }
   return l10n.settingsSpeechSystemVoice;
 }

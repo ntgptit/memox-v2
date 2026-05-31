@@ -1,11 +1,11 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-01
 applies_to: TTS settings, speech playback, audio settings screen
 ---
 
 # TTS Settings
 
-> **Status: Target — Migration Required (transitive).** TTS playback engine + per-language settings (rate, pitch, volume, voice) live in SharedPreferences and do not need DB migration. However, the per-deck TTS gating policy depends on `decks.target_language` from `docs/database/schema-contract.md` §Pending schema changes. Blocks (until `target_language` migration): per-deck TTS button enable/disable, auto-play gating, "Unsupported language" deck behavior.
+> **Status: Current V1 global/front-language settings; Target per-language independence.** Current settings persist as one Drift-backed row in the `tts_settings` table through `TtsSettingsDao` and `TtsSettingsRepositoryImpl`. Independent Korean/English setting sets remain Target/Future and must not be treated as Current. Per-deck TTS gating policy depends on `decks.target_language` from `docs/database/schema-contract.md` §Pending schema changes.
 
 ## Source files to inspect
 
@@ -26,11 +26,11 @@ applies_to: TTS settings, speech playback, audio settings screen
 
 ## Data
 
-Current V1 storage is the Drift `tts_settings_records` table through `TtsSettingsDao` and `TtsSettingsRepositoryImpl`.
+Current V1 storage is the Drift `tts_settings` table (Dart table class `TtsSettingsRecords`) through `TtsSettingsDao` and `TtsSettingsRepositoryImpl`.
 
-Target storage is `tts_settings` table (single row, id = `'default'`).
+The table is a single-row pattern with id = `'default'`.
 
-Status: Target / Migration Required if the current implementation still uses a different table name such as `tts_settings_records`. Do not rename storage in a normal feature task without an approved migration.
+Status: Current for the global/front-language settings row. Target/Future for independent per-language settings; do not add separate per-language storage in a normal parity task without an approved migration/product decision.
 
 Fields:
 
@@ -93,8 +93,10 @@ Source of truth: constants in `TtsSettings` (`minRate`, `maxRate`, `defaultRate`
 - Available voices come from the platform via `TtsService.availableVoices(language)`.
 - Voices are filtered by language tag.
 - `frontVoiceName` stores the platform-specific voice identifier.
-- Voice name persists per language. Changing `frontLanguage` MUST clear `frontVoiceName` (via `clearFrontVoice: true` in `copyWith`).
-- When stored voice name is no longer available on the device, fall back to platform default (do not crash).
+- Current V1 has one global/front-language `frontVoiceName`, not per-language voice storage.
+- Changing `frontLanguage` MUST clear `frontVoiceName` (via `clearFrontVoice: true` in `copyWith`) because the stored voice belongs to the previous front language.
+- When the stored voice name is no longer available on the device, the expanded selector falls back to System voice and does not crash. Eager validation/remediation on screen open is Target/Future.
+- Target/Future per-language voice storage may persist one voice per supported language after the independent settings migration exists.
 
 ## Playback policy
 
@@ -125,7 +127,7 @@ UI components (e.g., `MxSpeakButton`) react to this stream for play/stop state.
 
 ## Rules
 
-- TTS settings is a single global setting (no per-deck override yet).
+- TTS settings is a single global/front-language setting set (no independent Korean/English settings and no per-deck override yet).
 - All settings changes persist immediately on user interaction (no save button).
 - Blank text (whitespace-only) MUST NOT trigger speech (`StringUtils.isBlank` guard in `SpeakFlashcardUseCase.speakText`).
 - Text is trimmed before passing to platform TTS.
@@ -156,12 +158,12 @@ Loading/error states use shared `Mx*` widgets per UI/UX contract.
 
 ## Performance
 
-- Voice list query may be slow on first call per language. Cache result within session.
+- Voice list query may be slow on first call per language. Current Settings UI loads voices lazily when voice options are expanded.
 - Speak action: do not queue multiple speaks. Stop previous before starting next.
 
 ## Agent rule
 
-- Do not introduce a separate TTS settings table. Use the documented target `tts_settings` single-row pattern, or preserve current storage via mapper/migration until the target rename is approved.
+- Do not introduce a separate TTS settings table. Preserve the current `tts_settings` single-row pattern unless an approved migration/product decision explicitly changes it.
 - Do not bypass `TtsPlaybackPolicy` to speak back/note. If a new playable side is needed, update the policy first and document here.
 - Do not add per-deck TTS override without updating this doc and schema.
 - All slider write paths MUST go through `TtsSettings.normalize*` helpers.
@@ -171,13 +173,12 @@ Loading/error states use shared `Mx*` widgets per UI/UX contract.
 
 **Wireframes:**
 
-- `docs/wireframes/21-settings-audio-speech.md` — per-language TTS settings (Korean, English tabs; rate/pitch/volume sliders; preview)
+- `docs/wireframes/21-settings-audio-speech.md` — Current global/front-language TTS settings; Target per-language tabs/settings
 - `docs/wireframes/13-study-session-review.md` through `docs/wireframes/17-study-session-fill.md` — TTS button per mode (front only, never back)
 
 **Schema:**
 
-- Current V1 settings table: `tts_settings_records` via `lib/data/datasources/local/tables/tts_settings_records_table.dart`.
-- Target settings table: `tts_settings` single-row pattern after an approved migration/rename.
+- Current V1 settings table: `tts_settings` via `lib/data/datasources/local/tables/tts_settings_records_table.dart` (`TtsSettingsRecords` Dart class).
 - Schema: `decks.target_language` gates TTS when the deck-language migration is active.
 
 **Decision table:**

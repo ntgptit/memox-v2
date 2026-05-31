@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-01
 route: /settings/audio-speech
 source_specs:
   - docs/business/tts/tts-settings.md
@@ -21,8 +21,8 @@ Prompt 21 (2026-05-31) treats this screen as route-safe sub-screen coverage only
 | Route `/settings/audio-speech` | Current | Reachable from Settings Hub; hides shell navigation; back returns to hub when pushed from the hub. |
 | Auto-play | Current | Global auto-play preference. |
 | Front language | Current | One selected front language (`korean` or `english`). |
-| Voice/rate/pitch/volume | Current | One front voice/rate/pitch/volume setting set, normalized by `TtsSettings`. |
-| Preview | Current | Uses the same `TtsService` path as study speech. |
+| Voice/rate/pitch/volume | Current | One front voice/rate/pitch/volume setting set, normalized by `TtsSettings`. The primary row uses safe localized voice summary copy; platform voice ids are only storage values. |
+| Preview | Current | Uses the same `TtsService` path as study speech and maps failures to generic localized feedback. |
 | Per-language independent tabs/settings | Future/Target | Original tab layout remains target behavior; current V1 does not persist separate Korean and English setting sets. |
 | Play-after-grading toggle / reset / unsupported-language explainer | Future/Target | Not implemented in current V1. |
 
@@ -64,7 +64,7 @@ Target/reference layout. Current V1 is a single global/front-language TTS settin
 │ │ ◀── ━━━━●━━━━ ──▶  1.00          │  │  ← 0.7–1.5, step 0.05
 │ │                                  │  │
 │ │ Volume                           │  │
-│ │ ◀── ━━━━━━━●━ ──▶  0.85          │  │  ← 0.0–1.0, step 0.05
+│ │ ◀── ━━━━━━━━● ─▶  1.00          │  │  ← 0.0–1.0, step 0.05
 │ │                                  │  │
 │ │ ┌────────────────────────────┐   │  │
 │ │ │ 🔊 Preview: 안녕하세요       │   │  │  ← Speak with current settings
@@ -96,8 +96,8 @@ Target/reference layout. Current V1 is a single global/front-language TTS settin
 | Current: global auto-play | Current TTS settings repository/store | watch |
 | Current: front language | Current TTS settings repository/store | watch |
 | Current: voice/rate/pitch/volume setting set | Current TTS settings repository/store | watch |
-| Current: available voices for selected/front language | Platform TTS service path | on screen open / refresh |
-| Current: engine availability | Platform TTS engine status | once on screen |
+| Current: available voices for selected/front language | Platform TTS service path | lazily when Voice options is expanded |
+| Target/Future: engine availability explainer | Platform TTS engine status | once on screen when unsupported-language/engine guidance is expanded |
 | Target/Future: per-language settings (`tts.{lang}.voice/rate/pitch/volume`) | Target storage | watch when independent tabs are implemented |
 
 ## Forbidden
@@ -108,7 +108,7 @@ Target/reference layout. Current V1 is a single global/front-language TTS settin
 - ❌ Use a different TTS engine in preview vs study mode.
 - ❌ Hide "System default" voice. It is always first and always available.
 - ❌ Allow rate outside 0.3-0.7, pitch outside 0.7-1.5, volume outside 0.0-1.0.
-- ❌ Persist a deleted/uninstalled voice. Validate on screen open; fall back to System default.
+- ❌ Target/Future: persist a deleted/uninstalled voice after full voice validation exists. Current V1 falls back safely in the expanded selector but does not perform an eager screen-open remediation write.
 
 ## Components
 
@@ -116,10 +116,10 @@ Target/reference layout. Current V1 is a single global/front-language TTS settin
 | --- | --- |
 | Current: Auto-play toggle | Global default. Default off. |
 | Current: Front language selector | Chooses the single front language used by current V1 settings. |
-| Current: Voice selector | Selects a voice for the current global/front-language setting set. "System default" remains available. |
+| Current: Voice selector | Opens a detail sheet. Voice options are collapsed until requested; expanding loads voices for the current front language. "System default" remains available. |
 | Current: Speech rate slider | 0.3-0.7, step 0.05. Default 0.5. |
 | Current: Pitch slider | 0.7-1.5, step 0.05. Default 1.0. |
-| Current: Volume slider | 0.0-1.0, step 0.05. Default 0.85. |
+| Current: Volume slider | 0.0-1.0, step 0.05. Default 1.0. |
 | Current: Preview button | Speaks a fixed phrase using the current settings and the same TTS path as study mode. |
 | Target/Future: Play after grading toggle | Reserved for future; always off in V1 if rendered. |
 | Target/Future: Language tabs | Top-level tabs per supported language: Korean, English. New supported languages add new tabs. |
@@ -131,10 +131,11 @@ Target/reference layout. Current V1 is a single global/front-language TTS settin
 
 | State | Trigger | Behavior |
 | --- | --- | --- |
-| Current: Loading voices | First open / voice refresh | Show loading in the voice selector/list. |
+| Current: Loading voices | Voice options expanded / voice refresh | Show loading in the voice selector/list. |
 | Current: No voices available | Platform reports zero voices for selected/front language | Show empty/error guidance for installing device voices. |
 | Current: TTS engine error | Preview fails | Surface preview failure without changing settings. |
 | Current: Saving | Slider release, selector change, or auto-play change | Persist through the current settings repository/store. |
+| Current: Stored voice unavailable | Saved platform voice id no longer appears in the lazy-loaded voice list | Render System default as the selected option and keep the UI safe; full install/uninstall remediation remains Target/Future. |
 | Target/Future: Per-language tab switch | Tab switch | Load/cache voices for that language and render tab content. |
 
 ## Actions
@@ -145,7 +146,7 @@ Target/reference layout. Current V1 is a single global/front-language TTS settin
 | Change front language | Tap/select | Persist current V1 front language and update available voices/settings view. |
 | Select voice | Tap | Persist voice choice for the current global/front-language setting set. |
 | Drag rate / pitch / volume slider | Drag | Live value; persist on release. |
-| Tap Preview | Tap | Speak fixed phrase with current settings. |
+| Tap Preview | Tap | Speak fixed phrase with current settings; on failure, show generic localized feedback and never render raw platform exceptions. |
 | Target/Future: Tap language tab | Tap | Load voices for that language; render tab content. |
 | Target/Future: Tap per-language voice radio | Tap | Persist voice choice for that language. |
 | Target/Future: Tap Reset to defaults | Tap | Reset that tab's settings to defaults. Confirm via dialog. |
@@ -221,7 +222,7 @@ Target/reference layout. Current V1 is a single global/front-language TTS settin
 
 **Schema / storage:**
 
-- Current V1: current TTS settings repository/store (`tts_settings_records` per `docs/business/tts/tts-settings.md`).
+- Current V1: current TTS settings repository/store (`tts_settings` table per `docs/business/tts/tts-settings.md`).
 - Target/Future: per-language settings such as `tts.{lang}.voice`, `tts.{lang}.rate`, `tts.{lang}.pitch`, `tts.{lang}.volume`, plus global `tts.autoPlay`.
 
 **Contracts:** `docs/contracts/usecase-contracts/tts.md`

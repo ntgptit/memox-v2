@@ -179,6 +179,28 @@ void main() {
       expect(find.byType(NavigationRail), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'DT10 onNavigate: pushed audio settings back returns to settings hub',
+    (tester) async {
+      await _pumpRoute(tester, '/settings');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      await tester.tap(find.text('Audio & speech'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AudioSpeechSettingsScreen), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(NavigationRail), findsNothing);
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsScreen), findsOneWidget);
+      expect(find.byType(NavigationRail), findsOneWidget);
+    },
+  );
 }
 
 Future<void> _pumpRoute(

@@ -629,6 +629,7 @@
   },
   "settingsSpeechFrontVoiceLabel": "Front voice",
   "settingsSpeechSystemVoice": "System voice",
+  "settingsSpeechStoredVoice": "Device voice",
   "settingsSpeechKoreanVoiceLabel": "Korean voice {index}",
   "@settingsSpeechKoreanVoiceLabel": {
     "placeholders": {

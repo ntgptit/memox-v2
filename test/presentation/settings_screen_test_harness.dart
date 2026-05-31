@@ -10,9 +10,10 @@ Future<_SettingsHarness> _pumpSettings(
   GoogleOAuthConfig? googleConfig,
   GoogleAccountAuthService? googleAuth,
   DriveSyncRepository? driveSyncRepository,
+  _FakeTtsService? ttsService,
   bool settle = true,
 }) async {
-  final fakeTts = _FakeTtsService();
+  final fakeTts = ttsService ?? _FakeTtsService();
   final database = AppDatabase(executor: NativeDatabase.memory());
   final effectiveGoogleAuth = googleAuth ?? _FakeGoogleAccountAuthService();
   final effectiveDriveSyncRepository =
@@ -400,9 +401,12 @@ final class _SpeakCall {
 }
 
 final class _FakeTtsService implements TtsService {
+  _FakeTtsService({this.speakError});
+
   final StreamController<TtsState> _states =
       StreamController<TtsState>.broadcast();
 
+  final Object? speakError;
   final List<TtsLanguage> availableVoiceRequests = <TtsLanguage>[];
   final List<_SpeakCall> speakCalls = <_SpeakCall>[];
   int stopCount = 0;
@@ -435,6 +439,10 @@ final class _FakeTtsService implements TtsService {
     required double volume,
     String? voiceName,
   }) async {
+    final error = speakError;
+    if (error != null) {
+      throw error;
+    }
     speakCalls.add(
       _SpeakCall(
         text: text,

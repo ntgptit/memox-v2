@@ -629,6 +629,7 @@
   },
   "settingsSpeechFrontVoiceLabel": "Giọng mặt trước",
   "settingsSpeechSystemVoice": "Giọng hệ thống",
+  "settingsSpeechStoredVoice": "Giọng thiết bị",
   "settingsSpeechKoreanVoiceLabel": "Giọng tiếng Hàn {index}",
   "@settingsSpeechKoreanVoiceLabel": {
     "placeholders": {

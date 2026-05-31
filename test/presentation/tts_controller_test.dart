@@ -146,6 +146,61 @@ void main() {
     },
   );
 
+  test(
+    'DT5 autoPlayTextSide: honors enabled auto-play for front text',
+    () async {
+      final fake = _FakeTtsService();
+      final container = ProviderContainer(
+        overrides: [
+          ttsServiceProvider.overrideWithValue(fake),
+          ttsSettingsRepositoryProvider.overrideWith(
+            (ref) async => _FakeTtsSettingsRepository(
+              settings: const TtsSettings(
+                autoPlay: true,
+                frontLanguage: TtsLanguage.english,
+                rate: 0.6,
+                pitch: 1.2,
+                volume: 0.8,
+              ),
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      addTearDown(fake.dispose);
+
+      final result = await container
+          .read(ttsControllerProvider.notifier)
+          .autoPlayTextSide(text: 'hello', side: TtsTextSide.front);
+
+      expect(result, isTrue);
+      expect(fake.speakCalls, hasLength(1));
+      expect(fake.speakCalls.single.text, 'hello');
+      expect(fake.speakCalls.single.language, TtsLanguage.english);
+    },
+  );
+
+  test('DT6 autoPlayTextSide: skips disabled auto-play', () async {
+    final fake = _FakeTtsService();
+    final container = ProviderContainer(
+      overrides: [
+        ttsServiceProvider.overrideWithValue(fake),
+        ttsSettingsRepositoryProvider.overrideWith(
+          (ref) async => _FakeTtsSettingsRepository(),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    addTearDown(fake.dispose);
+
+    final result = await container
+        .read(ttsControllerProvider.notifier)
+        .autoPlayTextSide(text: 'hello', side: TtsTextSide.front);
+
+    expect(result, isFalse);
+    expect(fake.speakCalls, isEmpty);
+  });
+
   test('DT1 stop: stops service and resets state to idle', () async {
     final fake = _FakeTtsService();
     final container = ProviderContainer(

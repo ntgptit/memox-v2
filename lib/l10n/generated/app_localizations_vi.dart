@@ -1183,6 +1183,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsSpeechSystemVoice => 'Giọng hệ thống';
 
   @override
+  String get settingsSpeechStoredVoice => 'Giọng thiết bị';
+
+  @override
   String settingsSpeechKoreanVoiceLabel(Object index) {
     return 'Giọng tiếng Hàn $index';
   }

@@ -1992,6 +1992,12 @@ abstract class AppLocalizations {
   /// **'System voice'**
   String get settingsSpeechSystemVoice;
 
+  /// No description provided for @settingsSpeechStoredVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Device voice'**
+  String get settingsSpeechStoredVoice;
+
   /// No description provided for @settingsSpeechKoreanVoiceLabel.
   ///
   /// In en, this message translates to:
