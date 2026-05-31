@@ -35,6 +35,69 @@ verified + docs aligned), `Partial`, `NotStarted`, `Blocked`, `Future`.
 | 2026-05-31 | Prompt 10 — Guess option builder + countdown constant parity | `lib/domain/study/guess/guess_option_builder.dart` (new), `lib/core/theme/tokens/app_motion.dart`, `lib/presentation/shared/motion/mx_motion.dart`, `lib/presentation/features/study/widgets/study_session/guess/guess_motion.dart`, `lib/presentation/features/study/widgets/study_session/guess/guess_mode_session_view.dart`, `lib/presentation/features/study/widgets/study_session/guess/guess_option_tile.dart`, `lib/presentation/features/study/providers/study_session_notifier.dart`, `test/domain/study/guess/guess_option_builder_test.dart` (new), `test/presentation/guess_mode_session_view_test.dart` (new), `test_support/presentation/study_session_screen_contract.dart`, `docs/wireframes/15-study-session-guess.md`, `docs/checklist/screen-function-task-matrix.md`, `docs/checklist/wireframe-code-parity-assessment.md` | Current | Promoted Guess option generation to domain `GuessOptionBuilder.build` (deterministic seeded shuffle, `kGuessDecoyLimit = 4`, correct exactly once, dedup by id + normalized back, blank back filter, safe fallback when fewer than 4 decoys). Presentation view delegates to the builder; removed inline `dart:math` shuffle from the view. Added named timing tokens `AppDurations.guessCorrectAdvanceDelay = 800ms` and `AppDurations.guessWrongFeedbackDelay = 1500ms` surfaced via `MxDurations` and aliased in `guess_motion.dart`; view uses per-grade delay for both staged-grade timing and footer countdown progress bar. `GuessOptionTile` now binds to `GuessOption`. Domain tests (11) + widget tests with 799/800 and 1499/1500 boundary pumps; `study_session_screen_contract.dart` DT8/DT9/DT10/DT27 updated to per-grade durations. Full suite (907 tests) + analyzer green. Resolves §3.13 item 4 (Guess) and P2-4. No schema/model/enum changes. |
 | 2026-05-30 | Prompt 05 — tests + l10n + docs parity | `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb`, `test/presentation/study_entry_screen_test.dart`, `test/integration/study_progress_data_flow_test.dart`, matrix/parity/wireframe-12/wireframe-24 docs | Current | 4 new entry-gate tests (shows-choice / Resume / Start over / Cancel / mode-mismatch); integration resume + multi-mode-continue updated to tap Resume; 4 new l10n keys (en+vi). Confirmed today=SRS/fill-only/due-only, deck/folder=newStudy/5-mode, folder recursion via `getSubtreeIds` (not move-target `getDescendantIds`) already Current. |
 | 2026-05-31 | Prompt 12 — Core Learning Loop P0/P1 audit + SRS finalize recovered-path fix | `lib/data/repositories/study_repo_impl_helpers.dart`, `test_support/data/repositories/study_repository_contract.dart`, `docs/business/srs/srs-review.md`, `docs/checklist/wireframe-code-parity-assessment.md`, `docs/checklist/product-decisions-pending-2026-05-29.md`, `docs/checklist/screen-function-task-matrix.md` | Current | Preflight PASS: Study Entry no longer fails (error-preservation + keepAlive controller verified by `study_entry_screen_test.dart` S26/DT7, all 5 single-mode flows DT2, full-cycle DT1). **P1 fixed:** `_reviewOutcome` SRS finalize now matches the authoritative `srs-review.md` box-transition table for the recovered path — a card that passes after a wrong attempt (`incorrect → correct`) keeps its box and records no lapse (was incorrectly box−1 + lapse +1). Classification unified with `computeStudyResultBreakdown`: no-passing→`forgot`(box→1, lapse+1), passing-not-all-correct→`recovered`(box stays), all-correct→`perfect`(box+1). Contract tests `DT3`/`DT1 onRefreshRetry` updated to box-stable/lapse-0; redundant perfect-case test dropped (covered by existing `DT4`). Doc `srs-review.md` corrected to point at the real finalize implementation. **Pending (no code change):** `forgot` unreachable via re-queue-until-passed flow; SRS interval-table doc≠code; `CLAUDE.md` trigger map refs non-existent `box_*` files — all logged in `product-decisions-pending-2026-05-29.md`. No schema change. Full suite + analyzer green. |
+| 2026-05-31 | Prompt 13 — Core Learning Loop source-of-truth freeze (docs + regression-lock only; no code change) | `CLAUDE.md`, `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/study.md`, `docs/wireframes/13-study-session-review.md`, `docs/checklist/implementation-ledger.md`, `docs/checklist/wireframe-code-parity-assessment.md`, `docs/checklist/screen-function-task-matrix.md`, `docs/checklist/c-greater-than-d-cleanup-2026-05-28.md`, `docs/checklist/product-decisions-pending-2026-05-29.md` | Current | Froze the Core Learning Loop source-of-truth after re-auditing entry/session/result/navigation code against the listed docs. No production code, schema, route, SRS interval, or terminal-`forgot` behavior changed. Manual Chrome preflight (Mix/Review/Match/Guess/Recall/Fill all enter StudySession) re-confirmed by user before this prompt; automated regression coverage retained and re-run. Remaining non-blocking gaps recorded as P2/P3/Future/Blocked in the freeze section below. `CLAUDE.md` and SRS docs now point at the real runtime owners (`_reviewOutcome` and `_intervalForBox`) instead of non-existent `box_*` files. Two product decisions still pending (terminal `forgot` path; canonical interval ladder) — unchanged from Prompt 12, logged in `docs/checklist/product-decisions-pending-2026-05-29.md`. |
+
+## Prompt 13 — Core Learning Loop Source-of-Truth Freeze (2026-05-31)
+
+> **Scope of this freeze**: Core Learning Loop ONLY (Study Entry Gate, Resume/Start-over,
+> New Study full cycle, single-mode entries, the five study modes, attempt grading, SRS
+> finalization, Study Result + per-card review, study navigation/back-stack). This is **not**
+> a production-readiness claim for the whole app — Library / Progress / Settings / engagement /
+> History / Search / Drive sync remain out of scope and are tracked elsewhere.
+
+**Freeze result: PASS** (for current Core Learning Loop behavior).
+
+**Manual Chrome preflight (user-confirmed before Prompt 13, no code behavior changed since):**
+
+- Mix (deck default) → opens StudySession ✓
+- Review-only → opens StudySession ✓
+- Match-only → opens StudySession ✓
+- Guess-only → opens StudySession ✓
+- Recall-only → opens StudySession ✓
+- Fill-only → opens StudySession ✓
+
+Per Prompt 13 §12, no new manual Chrome run is required because no runtime behavior changed.
+
+**Automated regression coverage (re-run for this freeze):**
+
+`test/domain/study/**` (fill_answer_matcher, fill_hint_policy, guess/guess_option_builder,
+result_breakdown, result_card_review, attempt_grade_codec), `test/presentation/`
+study_entry_screen, study_entry_notifier, study_session_screen, study_session_notifier,
+guess + fill `*_mode_session_view_test.dart` (dedicated), study_result_screen;
+`test/data/repositories/study_repository_test.dart`;
+`test/data/datasources/local/app_database_migration_test.dart`; shared contract
+`test_support/data/repositories/study_repository_contract.dart`.
+
+**Core Freeze Summary**
+
+| Core area | Status | Evidence | Remaining |
+| --- | --- | --- | --- |
+| Study Entry | Frozen for V1 | `study_entry_screen.dart` (resume gate, EmptyScopeException→`EmptyScopeScreen`, no "not started" placeholder), `study_entry_notifier.dart` (`@Riverpod(keepAlive)` `StudyEntryActionController.start` always returns typed `StudyEntryStartResult`, never null, preserves root error+stack); `study_usecases.dart` `_rejectEmptyScope` typed reasons; tests `study_entry_screen_test.dart`, `study_entry_notifier_test.dart` | Tier 2 tag-scope empty states Blocked on `StudyEntryType.tag` |
+| Resume / Start over | Frozen for V1 | `study_entry_screen.dart` `_resolveResume`/`_confirmStartOver` (Resume→`replaceStudySession`, Start over→discard confirm→`RestartStudySessionUseCase` with `restartedFromSessionId` preserving selected modes, Cancel→`popRoute` no session); tests in `study_entry_screen_test.dart` | none (optional P3 copy polish) |
+| Full cycle | Frozen for V1 | `_defaultModes` Review→Match→Guess→Recall→Fill; `study_usecases.dart` flow/finalize; `study_repository_test.dart` DT1, `study_repository_contract.dart` | none |
+| Single-mode entries | Frozen for V1 | `_selectedModes`/`StudyFlow.new{Review,Match,Guess,Recall,Fill}Only`; no silent fallback to full cycle; repo/widget tests DT2 | none |
+| Review | Frozen for V1 | manual correct/incorrect via `answerCurrentReviewModeAsCorrect` / item-grades batch (`study_session_notifier.dart`); exercised by `study_session_screen_test.dart`, `study_session_notifier_test.dart`, `study_repository_test.dart`. **No dedicated `review_mode_session_view_test.dart`** (see test-gap note below) | long-press shortcut P3; dedicated mode-view test P3 |
+| Match | Frozen for V1 | `matchVisiblePairLimit = 5` (10 cells), seeded pairing (`match_seed.dart` / `match_batching.dart`); exercised by `study_session_screen_test.dart` + `study_repository_test.dart`. **No dedicated `match_mode_session_view_test.dart`** | long-press shortcut P3; dedicated mode-view test P3 |
+| Guess | Frozen for V1 | domain `GuessOptionBuilder` (full-pool seeded shuffle then limit 4, correct exactly once, dedup), timing 800ms/1500ms; `guess_option_builder_test.dart`, `guess_mode_session_view_test.dart` (dedicated) | long-press shortcut P3 |
+| Recall | Frozen for V1 | reveal/self-grade + 20s timeout auto-reveal; exercised by `study_session_screen_test.dart` + `study_session_notifier_test.dart`. **No dedicated `recall_mode_session_view_test.dart`** | long-press P3; mock timed-out variant P3; dedicated mode-view test P3 |
+| Fill | Frozen for V1 | domain `fill_answer_matcher`/`fill_hint_policy`; exact-no-hint→`correct`, exact-after-hint / Mark-correct→`recovered`, Try-again preserves taint, new card resets, TTS manual-only; `fill_*_test.dart`, `attempt_grade_codec_test.dart` | none |
+| SRS finalize | Frozen for current behavior | `_reviewOutcome` (`study_repo_impl_helpers.dart`): no-passing→`forgot`(box→1,lapse+1), passing-not-all-correct→`recovered`(box stays,no lapse), all-correct→`perfect`(box+1); New Study→`initialPassed`(box 2); oldBox/newBox/nextDueAt persisted via `updateAttemptSrsSummary`; `study_repository_test.dart` DT3/DT15, `attempt_grade_codec_test.dart`, `app_database_migration_test.dart` (schema v13 `recovered`) | **Product decision**: terminal `forgot` path (currently unreachable, branch defensive); **Product decision**: canonical interval ladder (doc≠code, code owns runtime) |
+| Study Result | Frozen for V1 | `study_result_screen.dart` (Done→`goStudyResultDone` go-semantics, Study more→`showStudyScopePicker` Today/Deck/Folder no Tag, failed-finalize banner+Retry+Done, breakdown Perfect/Passed/Recovered/Forgot, per-card review recovered/forgot only); `result_breakdown.dart` shared classifier; `study_result_screen_test.dart`, `result_breakdown_test.dart`, `result_card_review_test.dart` | streak/daily-goal Future/Blocked; filtered tough-cards route Future; History route Future |
+| Navigation | Frozen for core | `app_navigation.dart` `replaceStudySession` (replace), `goStudyResult` (replace), `goStudyResultDone` (go; deck→list, folder→detail, today→home, else library — result not kept underneath); cancel→`goStudyResult`, failed-finalize never traps (Done available); `study_result_screen_test.dart` | Web browser-back caveat documented only |
+
+**Remaining non-blocking gaps (P2/P3/Future/Blocked):**
+
+- P2 (product/docs): SRS interval ladder doc (`srs-review.md`: box1=1d…box5=5d,box6=12d,box7=30d,box8=60d) ≠ code (`_intervalForBox`: box1=0,box2=1d,box3=3d,box4=7d,box5=14d,box6=30d,box7=60d,box8=120d). Code owns runtime; future prompt must pick the canonical ladder and update the losing side in one PR. Not changed here.
+- Resolved in Prompt 13 (docs/agent rule): `CLAUDE.md` trigger map no longer references non-existent `lib/domain/srs/box_intervals.dart` / `box_transition.dart`; it now points to `_intervalForBox` in `study_repo_impl_mapping_helpers.dart` and `_reviewOutcome` in `study_repo_impl_helpers.dart`.
+- P3 (test gap): Review / Match / Recall have **no dedicated `*_mode_session_view_test.dart`** (Guess and Fill do). Their behavior is currently covered indirectly via `study_session_screen_test.dart`, `study_session_notifier_test.dart`, and `study_repository_test.dart`, so this is not a P0/P1 correctness gap — no new tests were fabricated this prompt. Adding focused per-mode view tests for these three is recommended future polish.
+- P3: long-press card-actions shortcut for Review/Match/Guess/Recall (overflow trigger already reachable via `MxStudyTopBar`); not implemented this prompt.
+- P3: Recall mock timed-out variant (`09c`); Guess/others mock visual gaps.
+- Future/Blocked: streak, daily goal, engagement, Card History route, Global Search, Drive sync, tag-scoped study (`StudyEntryType.tag`), filtered tough-cards route — all intentionally absent in V1.
+
+**Product decisions still needed (unchanged from Prompt 12 — no resolution introduced here):**
+
+1. Terminal `forgot` path — `forgot` is unreachable in the normal flow because failed cards re-queue until passed within a mode. The branch exists defensively in both `_reviewOutcome` and `computeStudyResultBreakdown`. Decide whether V1 needs a retry-cap / "I don't know" terminal path, or mark `forgot` explicitly defensive/Future in `srs-review.md`.
+2. Canonical SRS interval ladder (see P2 above).
 
 ## Follow-ups (open)
 

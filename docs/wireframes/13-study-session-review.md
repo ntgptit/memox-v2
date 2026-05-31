@@ -218,7 +218,7 @@ When `autoPlay = true` AND `deck.target_language` is supported, the engine still
 - Mode view: `lib/presentation/features/study/widgets/study_session/review/review_mode_session_view.dart` + `review_mode_card.dart` + `review_mode_panel.dart`.
 - Swipe gesture: `lib/presentation/features/study/widgets/study_session/review/review_page_scroll_behavior.dart` (no standalone `swipe_to_grade.dart`; behavior is embedded in the page scroll behaviour widget).
 - Grading: `lib/domain/study/usecases/study_usecases.dart` → `AnswerFlashcardUseCase` (single attempt), `AnswerCurrentModeBatchUseCase` / `AnswerCurrentModeItemGradesBatchUseCase` (batch). **No standalone `grade_attempt_usecase.dart` exists** — grading is the responsibility of these classes in the study use-case module.
-- SRS transitions: integrated into the same study use case module; the doc-implied `lib/domain/srs/box_transition.dart` is NOT present at that path. Inspect `study_usecases.dart` for the active mapping.
+- SRS transitions: no standalone `lib/domain/srs/box_transition.dart` exists. Runtime finalization uses `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart`; in-session study use cases record attempts and re-queue failed cards.
 - TTS: see `lib/presentation/features/study/widgets/study_session/study_speak_button.dart` for the in-mode button; engine lives behind `lib/presentation/features/tts/providers/`.
 
 **Related wireframes:**

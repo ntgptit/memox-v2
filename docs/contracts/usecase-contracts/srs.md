@@ -5,7 +5,7 @@ status: contract
 
 # SRS Use Cases Contract
 
-Pure domain logic for box transitions and due-date computation. These are NOT use cases in the orchestration sense — they are deterministic pure functions / services consumed by `GradeAttemptUseCase`. Documented here for AI agent reference.
+Pure SRS transition and due-date contracts. The target architecture is deterministic domain functions/services, but the current runtime owners are repository finalization helpers. Documented here for AI agent reference so future extraction does not change behavior accidentally.
 
 > No `fpdart` / `Either<Failure, T>` disclaimer in this file. All functions here are pure synchronous logic that returns plain values or throws `AssertionError` on programmer error. They do not perform IO and therefore never return `Either`. Error/result wrapping concerns apply at the calling layer (`GradeAttemptUseCase`), not here. If a future change introduces IO into this layer, add the disclaimer per `docs/contracts/error-contract.md` and update this note.
 
@@ -33,8 +33,8 @@ class BoxIntervals {
 - Returns Duration for a given box (1-8 inclusive).
 - Asserts box in 1..8. Out-of-range = programmer error.
 
-**Source (target):** `lib/domain/srs/box_intervals.dart`.
-**Source (current):** not yet extracted into a dedicated file. Logic is inlined in `lib/domain/study/usecases/study_usecases.dart` and is a candidate for extraction. The contract above is still authoritative; implementations must satisfy it wherever they live today.
+**Source (target):** a future extracted domain helper if approved.
+**Source (current):** `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`. Prompt 12/13 identified a P2 product/docs mismatch between this table and runtime values; code owns runtime behavior until the canonical interval ladder is chosen.
 
 ## BoxTransition
 
@@ -53,8 +53,8 @@ class BoxTransition {
 | 1..8 | recovered | current (no change) |
 | 1..8 | forgot | 1 |
 
-**Source (target):** `lib/domain/srs/box_transition.dart`.
-**Source (current):** not yet extracted; transition logic is inlined in `lib/domain/study/usecases/study_usecases.dart` (`Answer*UseCase` family). Same contract applies wherever the function lives.
+**Source (target):** a future extracted domain helper if approved.
+**Source (current):** `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart`, reached through `FinalizeStudySessionUseCase` -> `StudyRepository.finalizeSession` -> `_commitSrs`. The `Answer*UseCase` family records attempts and re-queues failed cards; it does not own final box transitions.
 
 ## DueDateComputer
 
@@ -122,4 +122,4 @@ class LifetimeStatsComputer {
 **Caller:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase
 **Wireframes:** `docs/wireframes/13-study-session-review.md` through `docs/wireframes/17-study-session-fill.md`
 **Decision table:** rows under "SRS"
-**Code paths:** `lib/domain/srs/**`
+**Code paths:** current runtime lives in `lib/data/repositories/study_repo_impl_helpers.dart` and `lib/data/repositories/study_repo_impl_mapping_helpers.dart`; target extracted domain paths may be added by a future refactor.

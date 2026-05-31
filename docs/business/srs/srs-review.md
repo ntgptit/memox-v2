@@ -20,7 +20,9 @@ applies_to: SRS algorithm, flashcard_progress, review session finalization
 - `lib/data/**study**`
 - `lib/data/datasources/local/tables/flashcard_progress_table.dart`
 - `lib/data/datasources/local/tables/study_attempts_table.dart`
-- `lib/domain/study/usecases/study_usecases.dart` (canonical owner of box transitions today; the legacy `lib/domain/srs/box_intervals.dart` and `lib/domain/srs/box_transition.dart` files do NOT exist — see drift note at end of file).
+- `lib/data/repositories/study_repo_impl_helpers.dart` (`_reviewOutcome`, canonical owner of box transitions at finalization).
+- `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`, current runtime owner of interval values).
+- `lib/domain/study/usecases/study_usecases.dart` (session creation, empty-scope checks, and in-session answer orchestration; the legacy `lib/domain/srs/box_intervals.dart` and `lib/domain/srs/box_transition.dart` files do NOT exist).
 
 ## Data
 
@@ -75,7 +77,7 @@ Per-card result classification (`forgot` / `recovered` / `perfect`) is shared wi
 
 ## Interval table
 
-Intervals are currently defined inline within the study use-case module (`lib/domain/study/usecases/study_usecases.dart`) where `due_at` is computed. The doc-level table below remains the contract; if a future refactor extracts intervals into a dedicated file (e.g., `lib/domain/srs/box_intervals.dart`), update both this section and the `CLAUDE.md` trigger map in the same commit.
+Intervals are currently defined by `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`, and finalization applies them from `lib/data/repositories/study_repo_impl_helpers.dart`. The doc-level table below remains a pending product/docs contract; Prompt 12/13 identified that it differs from runtime. Until the interval-ladder product decision is made, **code owns runtime behavior** and this table must not be silently rewritten as resolved.
 
 | Box | Interval | Approx | Rationale |
 | --- | --- | --- | --- |
@@ -90,7 +92,7 @@ Intervals are currently defined inline within the study use-case module (`lib/do
 
 Design intent: avoid overwhelming the user. Box 1 → 5 increases linearly by one day, so each successive review feels like a small step. Larger jumps reserved for boxes 6+ where the card is already stable.
 
-When implementation differs from this table, the source file wins, but this doc must be updated in the same commit.
+When implementation differs from this table, record the mismatch as a product/docs decision and update whichever side is chosen in the same commit. The current mismatch is tracked in `docs/checklist/product-decisions-pending-2026-05-29.md`.
 
 ## Counter rules
 
@@ -129,7 +131,7 @@ The due query must:
 
 Any SRS behavior change must update:
 
-- `lib/domain/srs/**` implementation
+- `lib/data/repositories/study_repo_impl_helpers.dart` (`_reviewOutcome`) and/or `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`)
 - This doc (transition table and/or interval table)
 - `docs/business/study/study-flow.md` if flow changes
 - Decision table S6-S10
@@ -164,11 +166,11 @@ Any SRS behavior change must update:
 
 **Source files to inspect (verified 2026-05-28):**
 
-- `lib/domain/study/usecases/study_usecases.dart` — owns the grading path (`AnswerFlashcardUseCase`, `AnswerCurrentModeBatchUseCase`, `AnswerCurrentModeItemGradesBatchUseCase`, `AnswerCurrentMatchModeBatchUseCase`). Box transitions and `box_after` calculation live here today.
+- `lib/domain/study/usecases/study_usecases.dart` — owns session creation, empty-scope checks, and in-session answer orchestration (`AnswerFlashcardUseCase`, `AnswerCurrentModeBatchUseCase`, `AnswerCurrentModeItemGradesBatchUseCase`, `AnswerCurrentMatchModeBatchUseCase`). It records attempts and re-queues failed cards; final SRS transition is committed later by the data repository.
 - `lib/domain/study/strategy/study_strategy.dart` + `study_mode_strategy.dart` + `study_strategy_factory.dart` — per-mode behavior including transition rules.
 - `lib/domain/study/study_session_round.dart` — round model used by grading flow.
 - `lib/data/datasources/local/tables/study_attempts_table.dart` — persistence of each attempt with `box_before`, `box_after`, `result`, `study_mode`, `attempted_at`.
 - `lib/data/datasources/local/tables/flashcard_progress_table.dart` — per-card SRS state (`current_box`, `lapse_count`, `due_at`, `last_result`, `last_studied_at`).
-- `lib/data/repositories/study_repo_impl.dart` + helpers (`study_repo_impl_helpers.dart`, `study_repo_impl_mapping_helpers.dart`, `study_repo_impl_models.dart`) — write path.
+- `lib/data/repositories/study_repo_impl.dart` + helpers (`study_repo_impl_helpers.dart`, `study_repo_impl_mapping_helpers.dart`, `study_repo_impl_models.dart`) — finalization write path; `_reviewOutcome` computes final per-card result/box transition and `_intervalForBox` computes runtime due intervals.
 
-> **Drift note**: earlier revisions of this doc referenced `lib/domain/srs/box_intervals.dart`, `lib/domain/srs/box_transition.dart`, `lib/domain/srs/srs_service.dart`, `lib/data/repositories/srs_repository.dart`, and `lib/domain/usecases/study/grade_attempt_usecase.dart`. **None of those paths exist** in the current codebase (verified by `find lib/domain -name "box_*"` returning empty). SRS logic was consolidated into the study use-case module above. If a future refactor extracts intervals/transitions back into dedicated files, update this list AND `CLAUDE.md` §"Code change → required docs" trigger map together — the trigger map still references the old paths.
+> **Drift note**: earlier revisions of this doc referenced `lib/domain/srs/box_intervals.dart`, `lib/domain/srs/box_transition.dart`, `lib/domain/srs/srs_service.dart`, `lib/data/repositories/srs_repository.dart`, and `lib/domain/usecases/study/grade_attempt_usecase.dart`. **None of those paths exist** in the current codebase (verified by `find lib/domain -name "box_*"` returning empty). Prompt 13 aligned this doc and the `CLAUDE.md` trigger map to the current owners: `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart` and `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`. If a future refactor extracts intervals/transitions into dedicated domain files, update this list and `CLAUDE.md` in the same commit.

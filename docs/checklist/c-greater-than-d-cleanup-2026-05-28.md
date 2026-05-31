@@ -75,7 +75,9 @@ Trong lúc review, phát hiện một số drift cấp meta (root cause) — bá
 
 ### §3.1 `CLAUDE.md` trigger map tham chiếu file không tồn tại
 
-Project-root `CLAUDE.md` có dòng:
+> Prompt 13 update (2026-05-31): resolved. `CLAUDE.md` now points SRS interval changes to `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart` and transition changes to `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart`. The original finding is kept below as audit history.
+
+Project-root `CLAUDE.md` had:
 
 ```
 | `lib/domain/srs/box_intervals.dart` | `docs/business/srs/srs-review.md` (interval table) |
@@ -84,14 +86,14 @@ Project-root `CLAUDE.md` có dòng:
 
 Nhưng 2 file đó **không tồn tại** trong codebase. Đây là drift cấp meta-doc: trigger map (meta-rule cho parity) chính nó đã out-of-date. Nếu không sửa, hard rule "KHÔNG sửa generated files" sẽ không bao giờ trigger cho 2 dòng này; ngược lại, nếu dev tạo lại 2 file đó trong tương lai, không có ai nhắc họ cập nhật doc.
 
-**Đề xuất**: trong cleanup tiếp theo, hoặc (a) xoá 2 dòng này khỏi trigger map (nếu quyết định giữ logic inline mãi mãi), hoặc (b) giữ và mark là "target" — clarify khi nào dev kỳ vọng có 2 file đó.
+**Resolution**: closed by Prompt 13 docs alignment. The canonical interval ladder remains a separate P2 product/docs decision.
 
 ### §3.2 Có sự pattern "doc spec target file, code làm inline"
 
 Tổng cộng phát hiện ít nhất 8 case dạng này:
 
-1. `box_intervals.dart` → inline trong `study_usecases.dart`.
-2. `box_transition.dart` → inline trong `study_usecases.dart`.
+1. `box_intervals.dart` → **Prompt 13 resolved as target-only**; runtime owner is `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`.
+2. `box_transition.dart` → **Prompt 13 resolved as target-only**; runtime owner is `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart`.
 3. `flow_validator.dart` → inline trong `study_strategy.dart`.
 4. `distractor_sampler.dart` → inline trong `study_session_notifier.dart` (presentation layer — Clean Architecture violation).
 5. `option_description_builder.dart` → inline trong `guess_option_models.dart`.
@@ -106,8 +108,8 @@ Pattern này phản ánh **code đã hoặc đi tắt (presentation chứa logic
 Khi doc đề cập một file dự kiến có (target) vs file hiện đang tồn tại (current), không có format thống nhất. Trong đợt này, tôi áp dụng tạm format:
 
 ```
-**Source (target):** `lib/domain/srs/box_intervals.dart`.
-**Source (current):** not yet extracted; logic inlined in `lib/domain/study/usecases/study_usecases.dart`.
+**Source (target):** future extracted domain helper if approved.
+**Source (current):** `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`; canonical ladder still P2 product/docs decision.
 ```
 
 **Đề xuất**: convention hoá format này vào `docs/contracts/code-style.md` để áp dụng đồng nhất cho future refactor docs.

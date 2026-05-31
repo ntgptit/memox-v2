@@ -97,7 +97,7 @@ Future<Either<Failure, FlashcardProgress>> call({
   - `perfect` / `initialPassed` → `min(current+1, 8)`
   - `recovered` → `current` (stay)
   - `forgot` → `1`
-- Compute `due_at` from the box-interval table for `box_after` (target file: `lib/domain/srs/box_intervals.dart`; currently inlined in `lib/domain/study/usecases/study_usecases.dart` — see `docs/business/srs/srs-review.md` §Interval table).
+- Compute `due_at` from the box-interval table for `box_after` (current runtime helper: `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`; see `docs/business/srs/srs-review.md` §Interval table for the pending ladder decision).
 - Atomic: insert `study_attempts` (sessionId, flashcardId, result, studyMode, box_before, box_after, attempted_at=now, optional userInput) + update `flashcard_progress` (current_box=box_after, due_at, review_count++, lapse_count++ if forgot, last_studied_at=now, last_result=result) + advance session status `draft → in_progress` if needed. See `docs/contracts/repository-contracts/progress-repository.md`.
 
 **Errors:** `NotFoundFailure`, `UnsupportedActionFailure` (session completed), `StorageFailure`.

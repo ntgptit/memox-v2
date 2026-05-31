@@ -19,6 +19,15 @@ companion_docs:
 > - Rev 3 — refresh sau C>D cleanup pass đã commit; 4 cross-cutting items resolved, 3 cross-cutting items mới phát hiện qua recursive review.
 > - Rev 4 (CURRENT) — scope-resolution update: #09 Card History, #11 Global Search, and full #23 Onboarding are no longer V1 blockers; they are Future Proposal except V1 thin zero-content guidance.
 
+> **Core Learning Loop freeze (2026-05-31, Prompt 13)**: the Core Learning Loop
+> source-of-truth (rows #12–#18 + §2 study routes + SRS §3.10/finalize) is **frozen for V1 /
+> current behavior**. The authoritative Core Freeze Summary table, frozen-status per area,
+> manual Chrome preflight confirmation, retained automated coverage, the Review/Match/Recall
+> dedicated-mode-view test gap (P3), and the two still-open product decisions (terminal
+> `forgot` path; canonical interval ladder) live in
+> `docs/checklist/implementation-ledger.md` §"Prompt 13 — Core Learning Loop Source-of-Truth
+> Freeze". No code/schema/route/SRS-interval behavior changed in Prompt 13.
+
 ---
 
 ## §0. Methodology
@@ -218,23 +227,21 @@ Hai vị trí cho domain use cases:
 
 → Reviewer/onboarder phải biết cả hai pattern. Đề xuất chuẩn hoá một trong hai (cleanup doc cho phần này sẽ phụ thuộc refactor code).
 
-### §3.12 CLAUDE.md trigger map references non-existent files — **NEW P2** (phát hiện 2026-05-28)
+### §3.12 CLAUDE.md trigger map references non-existent files — **RESOLVED 2026-05-31 (Prompt 13 docs alignment)**
 
-Trong project-root `CLAUDE.md` §"Code change → required docs":
+Earlier project-root `CLAUDE.md` §"Code change → required docs" mapped SRS changes to non-existent target files:
 
 ```
 | `lib/domain/srs/box_intervals.dart` | `docs/business/srs/srs-review.md` (interval table) |
 | `lib/domain/srs/box_transition.dart` | `docs/business/srs/srs-review.md` (transition table) |
 ```
 
-Cả 2 file đó **không tồn tại** (`find lib/domain -name "box_*"` returns empty). Trigger map — quy tắc meta để duy trì parity — **chính nó đang drift**. Nếu dev edit `study_usecases.dart` để đổi interval, trigger map không catch → doc không buộc update.
+Cả 2 file đó **không tồn tại** (`find lib/domain -name "box_*"` returns empty). Prompt 13 updated `CLAUDE.md` to point at the real runtime owners:
 
-**Đề xuất**: PR riêng sửa CLAUDE.md với 2 option:
+- `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`) → `docs/business/srs/srs-review.md` interval table.
+- `lib/data/repositories/study_repo_impl_helpers.dart` (`_reviewOutcome`) → `docs/business/srs/srs-review.md` transition table.
 
-(a) **Xoá 2 dòng** + thay bằng row chỉ `lib/domain/study/usecases/study_usecases.dart` → `docs/business/srs/srs-review.md` (mapping hiện tại).
-(b) **Giữ + mark "target file"** + thêm row mới mapping current location.
-
-→ Cần user decision vì sửa CLAUDE.md ảnh hưởng Hard Rule.
+The canonical interval ladder is still a separate P2 product/docs decision; the trigger-map drift itself is closed.
 
 ### §3.13 "Doc target, code inline" anti-pattern — **NEW P2 backlog** (phát hiện 2026-05-28)
 
@@ -242,8 +249,8 @@ Có ít nhất **8 case** doc spec một file riêng nhưng code làm inline tro
 
 | # | Doc target file | Code thực tế | Layer issue? |
 | --- | --- | --- | --- |
-| 1 | `lib/domain/srs/box_intervals.dart` | Inline trong `study_usecases.dart` | No (cùng domain) |
-| 2 | `lib/domain/srs/box_transition.dart` | Inline trong `study_usecases.dart` | No |
+| 1 | `lib/domain/srs/box_intervals.dart` | **Resolved as target-only**: runtime owner is `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`; extraction deferred until product/architecture decision | No runtime blocker |
+| 2 | `lib/domain/srs/box_transition.dart` | **Resolved as target-only**: runtime owner is `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart`; extraction deferred until product/architecture decision | No runtime blocker |
 | 3 | `lib/domain/study/flow_validator.dart` | Inline trong `study_strategy.dart` | No |
 | 4 | `lib/domain/study/distractor_sampler.dart` | **Resolved 2026-05-31** (Prompt 10B): extracted as `lib/domain/study/guess/guess_option_builder.dart`. `GuessOptionBuilder.build` is the single source for Guess option generation; it samples from the full valid decoy pool before limiting to 4. `guess_mode_session_view.dart` delegates to it directly; the presentation notifier no longer contains Guess sampling helpers. | ✅ Domain (Guess) |
 | 5 | `lib/domain/study/option_description_builder.dart` | Inline trong `guess_option_models.dart` (presentation) | **YES — presentation** |
@@ -260,8 +267,8 @@ Item 4-7 là Clean Architecture violations (business logic ở presentation). It
 Khi doc đề cập file dự kiến tồn tại (target) vs file đang tồn tại (current), không có convention. Trong cleanup pass đã áp dụng tạm:
 
 ```
-**Source (target):** `lib/domain/srs/box_intervals.dart`.
-**Source (current):** not yet extracted; inlined in `lib/domain/study/usecases/study_usecases.dart`.
+**Source (target):** future extracted domain helper if approved.
+**Source (current):** `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`; canonical ladder still P2 product/docs decision.
 ```
 
 **Đề xuất**: chuẩn hoá format này vào `docs/contracts/code-style.md` để future docs dùng đồng nhất.
