@@ -33,7 +33,7 @@ class BoxIntervals {
 - Returns Duration for a given box (1-8 inclusive).
 - Asserts box in 1..8. Out-of-range = programmer error.
 
-**Source (target):** a future extracted domain helper if approved.
+**Source (target/future extraction):** a future extracted domain helper if approved; no current `lib/domain/srs/box_intervals.dart` file exists.
 **Source (current):** `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`. Prompt 12/13 identified a P2 product/docs mismatch between this table and runtime values; code owns runtime behavior until the canonical interval ladder is chosen.
 
 ## BoxTransition
@@ -53,7 +53,7 @@ class BoxTransition {
 | 1..8 | recovered | current (no change) |
 | 1..8 | forgot | 1 |
 
-**Source (target):** a future extracted domain helper if approved.
+**Source (target/future extraction):** a future extracted domain helper if approved; no current `lib/domain/srs/box_transition.dart` file exists.
 **Source (current):** `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart`, reached through `FinalizeStudySessionUseCase` -> `StudyRepository.finalizeSession` -> `_commitSrs`. The `Answer*UseCase` family records attempts and re-queues failed cards; it does not own final box transitions.
 
 ## DueDateComputer
@@ -72,7 +72,8 @@ class DueDateComputer {
 - `computeFromBox(box) = clock.now() + BoxIntervals.forBox(box)`.
 - Uses injected `Clock` for testability.
 
-**Source:** `lib/domain/srs/due_date_computer.dart`.
+**Source (target/future extraction):** a future extracted domain helper if approved.
+**Source (current):** no dedicated `DueDateComputer` implementation exists. Runtime due dates are computed during study finalization by `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart`, using `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`.
 
 ## NextCardSelector
 
@@ -84,11 +85,12 @@ class NextCardSelector {
 
 **Rules:**
 
-- For `srsReview`: order by `due_at ASC`, then `current_box ASC` (oldest-due first, lowest box first as tiebreak).
-- For `newCards`: order by `flashcards.created_at ASC` among cards in box 1 with no attempts.
-- Stable sort.
+- Target `srsReview`: order due candidates deterministically, with oldest-due cards first.
+- Target `newCards`: order new candidates deterministically before applying any configured shuffle.
+- Stable sort unless study settings explicitly shuffle.
 
-**Source:** `lib/domain/srs/next_card_selector.dart`.
+**Source (target/future extraction):** a future extracted domain helper if approved.
+**Source (current):** no dedicated `NextCardSelector` implementation exists. Runtime selection is implemented by `StudyRepoImpl.loadNewCards` and `StudyRepoImpl.loadDueCards` in `lib/data/repositories/study_repo_impl.dart`, backed by `_eligibleFlashcards` in `lib/data/repositories/study_repo_impl_helpers.dart`. Current due-card SQL orders by `p.due_at ASC, f.sort_order ASC`; new-card SQL orders by `f.sort_order ASC`; repository settings may then shuffle the loaded batch.
 
 ## LifetimeStatsComputer
 
@@ -103,11 +105,12 @@ class LifetimeStatsComputer {
 - `accuracy = (review_count - lapse_count) / review_count` if review_count > 0, else 0.0.
 - Uses counters on `flashcard_progress` directly. Does NOT scan `study_attempts`.
 
-**Source:** `lib/domain/srs/lifetime_stats_computer.dart`.
+**Source (target/future extraction):** a future extracted domain helper if approved.
+**Source (current):** no dedicated `LifetimeStatsComputer` implementation exists. Current runtime does not expose this standalone lifetime-stats abstraction; existing SRS counters are persisted on `flashcard_progress`, while result-screen accuracy is session-scoped rather than lifetime-scoped.
 
 ## Forbidden patterns
 
-- ❌ Hardcode interval days outside `BoxIntervals`.
+- ❌ Hardcode interval days outside the current runtime owner (`_intervalForBox`) or a future approved `BoxIntervals` extraction.
 - ❌ Box transition computed inline in a notifier or widget.
 - ❌ Different transition rules per study mode (mode does NOT affect transition).
 - ❌ Use `DateTime.now()` directly. Always via injected `Clock`.
@@ -116,10 +119,10 @@ class LifetimeStatsComputer {
 
 **Base contracts:** `docs/contracts/error-contract.md` (Failure types), `docs/contracts/types-catalog.md` (enums and value objects), `docs/contracts/code-style.md` (naming)
 
-**Repositories used:** None (pure domain logic). Consumed by `docs/contracts/repository-contracts/progress-repository.md` (which writes the box transition results).
+**Repositories used:** Target/future extracted helpers would be pure domain logic. Current runtime behavior is inside `StudyRepoImpl` finalization and query/load helpers.
 
 **Business spec:** `docs/business/srs/srs-review.md`
 **Caller:** `docs/contracts/usecase-contracts/study.md` §GradeAttemptUseCase
 **Wireframes:** `docs/wireframes/13-study-session-review.md` through `docs/wireframes/17-study-session-fill.md`
 **Decision table:** rows under "SRS"
-**Code paths:** current runtime lives in `lib/data/repositories/study_repo_impl_helpers.dart` and `lib/data/repositories/study_repo_impl_mapping_helpers.dart`; target extracted domain paths may be added by a future refactor.
+**Code paths:** current SRS finalization lives in `lib/data/repositories/study_repo_impl_helpers.dart`, interval mapping lives in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`, and due/new selection lives in `lib/data/repositories/study_repo_impl.dart` plus `lib/data/repositories/study_repo_impl_helpers.dart`. Target extracted domain paths may be added by a future refactor.
