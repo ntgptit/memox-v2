@@ -140,12 +140,14 @@ List<Widget> _buildFolderListSlivers(
   required bool hasSearchTerm,
   required VoidCallback onClearSearch,
 }) {
-  if (state.isEmpty) {
+  if (state.isVisibleEmpty) {
     // A scope-local search that matches nothing is distinct from a genuinely
     // empty library: the former offers "clear search", the latter offers
-    // "create folder". Conflating them would mislead the user into thinking
-    // their library is empty.
-    if (hasSearchTerm) {
+    // "create folder". The library is only truly empty when it holds zero
+    // folders (`totalFolderCount == 0`) — typing a search term over a
+    // populated library must never be mistaken for an empty library.
+    final isSearchNoResult = hasSearchTerm && state.hasAnyFolder;
+    if (isSearchNoResult) {
       return [
         SliverToBoxAdapter(
           child: MxAnimatedSwitcher(

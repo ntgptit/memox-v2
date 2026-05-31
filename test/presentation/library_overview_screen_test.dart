@@ -289,7 +289,7 @@ void main() {
   );
 
   testWidgets(
-    'DT4 onSearch: empty search result shows no-results state distinct from empty library',
+    'DT4 onSearch: truly empty library keeps the empty state even with an active search term',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
@@ -303,32 +303,76 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Open inline search and type a term that matches no folder.
+      // Type a term over a library that holds zero folders.
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'zzz-nope');
       await tester.pumpAndSettle();
 
-      // No-results surface, NOT the misleading empty-library copy/CTA.
+      // totalFolderCount == 0 → still truly empty, NOT no-results.
+      expect(find.text('No folders yet'), findsOneWidget);
+      expect(find.text('Create folder'), findsWidgets);
+      expect(
+        find.byKey(const ValueKey('library_search_no_results')),
+        findsNothing,
+      );
+      expect(find.text('No matching items'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'DT4b onSearch: populated library with a non-matching term shows no-results, not empty',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) =>
+                  Future<LibraryOverviewState>.value(_searchNoResultLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.search_rounded));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'zzz-nope');
+      await tester.pumpAndSettle();
+
+      // folders.isEmpty && searchTerm && totalFolderCount > 0 → no-results.
+      expect(
+        find.byKey(const ValueKey('library_search_no_results')),
+        findsOneWidget,
+      );
       expect(find.text('No matching items'), findsOneWidget);
       expect(find.text('No folders yet'), findsNothing);
     },
   );
 
   testWidgets(
-    'DT5 onSearch: clearing the no-results search restores the library state',
+    'DT5 onSearch: clearing the no-results search restores the populated folder rows',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            libraryOverviewQueryProvider.overrideWith(
-              (ref) => Future<LibraryOverviewState>.value(_emptyLibraryState),
-            ),
+            // Mirror the real query: filtered-empty while a term is active,
+            // populated once the term is cleared.
+            libraryOverviewQueryProvider.overrideWith((ref) {
+              final query = ref.watch(libraryToolbarStateProvider);
+              return Future<LibraryOverviewState>.value(
+                query.hasSearchTerm
+                    ? _searchNoResultLibraryState
+                    : _sampleLibraryState,
+              );
+            }),
           ],
           child: const _TestApp(child: LibraryOverviewView()),
         ),
       );
       await tester.pumpAndSettle();
+      expect(find.text('Korean1'), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.search_rounded));
       await tester.pumpAndSettle();
@@ -341,7 +385,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No matching items'), findsNothing);
-      expect(find.text('No folders yet'), findsOneWidget);
+      expect(find.text('Korean1'), findsOneWidget);
     },
   );
 
@@ -420,6 +464,19 @@ const _emptyLibraryState = LibraryOverviewState(
     userName: 'Lan',
   ),
   dueToday: 0,
+  totalFolderCount: 0,
+  folders: <LibraryFolder>[],
+);
+
+// Library that holds folders, but the active scope-local search filtered them
+// all out: no visible rows yet `totalFolderCount > 0`.
+const _searchNoResultLibraryState = LibraryOverviewState(
+  greeting: LibraryOverviewGreeting(
+    salutation: 'Good morning',
+    userName: 'Lan',
+  ),
+  dueToday: 0,
+  totalFolderCount: 3,
   folders: <LibraryFolder>[],
 );
 

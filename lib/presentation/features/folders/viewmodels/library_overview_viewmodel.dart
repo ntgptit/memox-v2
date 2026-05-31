@@ -35,13 +35,23 @@ class LibraryOverviewState {
     required this.greeting,
     required this.dueToday,
     required this.folders,
+    this.totalFolderCount = 0,
   });
 
   final LibraryOverviewGreeting greeting;
   final int dueToday;
   final List<LibraryFolder> folders;
 
-  bool get isEmpty => folders.isEmpty;
+  /// Total unfiltered folder count across the whole tree. Used to tell a truly
+  /// empty library (`totalFolderCount == 0`) apart from a scope-local search
+  /// that simply matched nothing (`folders.isEmpty && totalFolderCount > 0`).
+  final int totalFolderCount;
+
+  /// True when no row is currently visible (after any active search filter).
+  bool get isVisibleEmpty => folders.isEmpty;
+
+  /// True when the library actually holds at least one folder.
+  bool get hasAnyFolder => totalFolderCount > 0;
 }
 
 @riverpod
@@ -76,6 +86,7 @@ Future<LibraryOverviewState> libraryOverviewQuery(Ref ref) async {
   return LibraryOverviewState(
     greeting: _buildGreeting(clock),
     dueToday: data.dueTodayCount,
+    totalFolderCount: data.totalFolderCount,
     folders: data.folders
         .map(
           (item) => LibraryFolder(
