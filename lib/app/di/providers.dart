@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../core/logging/app_logger.dart';
 import '../../core/network/connectivity_service.dart';
 import '../../core/network/network_info.dart';
 import '../../core/services/app_info_service.dart';
@@ -33,6 +34,9 @@ Talker talker(Ref ref) {
   final config = ref.watch(appConfigProvider);
   return createAppTalker(config);
 }
+
+@Riverpod(keepAlive: true)
+AppLogger appLogger(Ref ref) => TalkerAppLogger(ref.watch(talkerProvider));
 
 @Riverpod(keepAlive: true)
 ConnectivityService connectivityService(Ref ref) {

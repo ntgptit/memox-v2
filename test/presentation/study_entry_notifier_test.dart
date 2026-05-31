@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/core/errors/app_exception.dart';
+import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
@@ -73,11 +77,51 @@ void main() {
   );
 
   test(
+    'S24 start: disposed controller still returns created session id',
+    () async {
+      final repo = _ControlledStartStudyRepo();
+      final container = ProviderContainer(
+        overrides: [studyRepoProvider.overrideWithValue(repo)],
+      );
+      var disposed = false;
+      addTearDown(() {
+        if (!disposed) {
+          container.dispose();
+        }
+      });
+
+      final startFuture = container
+          .read(studyEntryActionControllerProvider('deck', 'deck-1').notifier)
+          .start(
+            studyType: StudyType.newStudy,
+            settings: const StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          );
+
+      await repo.startRequested.future;
+      container.dispose();
+      disposed = true;
+      repo.completeStart();
+
+      final result = await startFuture;
+
+      expect(result?.sessionId, 'session-1');
+      expect(result?.error, isNull);
+    },
+  );
+
+  test(
     'DT3 onExternalChange: unexpected AppException is preserved as rejected result and AsyncError',
     () async {
       const error = StorageException(message: 'Could not create session.');
+      final logger = _RecordingAppLogger();
       final container = ProviderContainer(
         overrides: [
+          appLoggerProvider.overrideWithValue(logger),
           studyRepoProvider.overrideWithValue(_FailingStartStudyRepo(error)),
         ],
       );
@@ -103,8 +147,40 @@ void main() {
       expect(result?.error, same(error));
       expect(actionState.hasError, isTrue);
       expect(actionState.error, same(error));
+      expect(logger.errors, hasLength(1));
+      expect(
+        logger.errors.single.message,
+        contains('Study entry start action failed.'),
+      );
+      expect(logger.errors.single.message, contains('entryType=deck'));
+      expect(logger.errors.single.message, contains('entryRefId=deck-1'));
+      expect(logger.errors.single.error, same(error));
+      expect(logger.errors.single.stackTrace.toString(), isNotEmpty);
     },
   );
+}
+
+final class _RecordingAppLogger implements AppLogger {
+  final errors = <_RecordedLogError>[];
+
+  @override
+  void error(String message, Object error, StackTrace stackTrace) {
+    errors.add(
+      _RecordedLogError(message: message, error: error, stackTrace: stackTrace),
+    );
+  }
+}
+
+final class _RecordedLogError {
+  const _RecordedLogError({
+    required this.message,
+    required this.error,
+    required this.stackTrace,
+  });
+
+  final String message;
+  final Object error;
+  final StackTrace stackTrace;
 }
 
 final class _SuccessfulStudyRepo implements StudyRepo {
@@ -369,6 +445,26 @@ final class _FailingStartStudyRepo extends _SuccessfulStudyRepo {
     required List<StudyFlashcardRef> batch,
   }) async {
     throw error;
+  }
+}
+
+final class _ControlledStartStudyRepo extends _SuccessfulStudyRepo {
+  final startRequested = Completer<void>();
+  final _startResult = Completer<StudySessionSnapshot>();
+
+  void completeStart() {
+    _startResult.complete(_snapshot());
+  }
+
+  @override
+  Future<StudySessionSnapshot> startSession({
+    required StudyContext context,
+    required StudyFlow flow,
+    required List<StudyMode> modes,
+    required List<StudyFlashcardRef> batch,
+  }) {
+    startRequested.complete();
+    return _startResult.future;
   }
 }
 

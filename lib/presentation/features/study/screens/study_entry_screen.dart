@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:memox/app/di/providers.dart';
+import 'package:memox/app/di/study/study_entry_diagnostic_providers.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
@@ -18,6 +20,15 @@ import '../../../shared/widgets/mx_loading_state.dart';
 import '../providers/study_entry_notifier.dart';
 import '../providers/study_session_notifier.dart';
 import '../widgets/empty_scope_screen.dart';
+
+const String _directStartFailedLogMessage = 'Study entry direct start failed.';
+const String _startResultRejectedLogMessage =
+    'Study entry start result was rejected.';
+const String _startNoResultNoErrorLogMessage =
+    'Study entry start returned no result and no action error.';
+const String _startNoResultAfterErrorLogMessage =
+    'Study entry start returned no result after action error.';
+const String _diagnosticsFailedLogMessage = 'Study entry diagnostics failed.';
 
 class StudyEntryScreen extends ConsumerStatefulWidget {
   const StudyEntryScreen({
@@ -37,6 +48,8 @@ class StudyEntryScreen extends ConsumerStatefulWidget {
 
 class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
   Object? _error;
+  StackTrace? _errorStackTrace;
+  String? _errorDiagnostics;
 
   @override
   void initState() {
@@ -67,6 +80,9 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
     }
     if (_error != null) {
       final l10n = AppLocalizations.of(context);
+      final details = _debugDetails(
+        ref.watch(appConfigProvider).exposeInternalErrorDetails,
+      );
       return MxScaffold(
         title: l10n.studyEntryTitle,
         body: MxContentShell(
@@ -74,6 +90,7 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
           child: MxErrorState(
             title: l10n.sharedErrorTitle,
             message: studyErrorMessage(_error),
+            details: details,
             onRetry: _startDirectly,
           ),
         ),
@@ -89,6 +106,8 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
     }
     setState(() {
       _error = null;
+      _errorStackTrace = null;
+      _errorDiagnostics = null;
     });
 
     try {
@@ -119,12 +138,23 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
       }
 
       await _startNew(studyType: studyType, modes: modes, settings: settings);
-    } catch (error) {
+    } catch (error, stackTrace) {
+      _logFailure(
+        message: _directStartFailedLogMessage,
+        error: error,
+        stackTrace: stackTrace,
+      );
+      if (!mounted) {
+        return;
+      }
+      final diagnostics = await _loadDiagnostics();
       if (!mounted) {
         return;
       }
       setState(() {
         _error = error;
+        _errorStackTrace = stackTrace;
+        _errorDiagnostics = diagnostics;
       });
     }
   }
@@ -227,8 +257,23 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
 
     final error = result?.error;
     if (error != null) {
+      final actionState = ref.read(
+        studyEntryActionControllerProvider(widget.entryType, widget.entryRefId),
+      );
+      final stackTrace = actionState.stackTrace ?? StackTrace.current;
+      _logFailure(
+        message: _startResultRejectedLogMessage,
+        error: error,
+        stackTrace: stackTrace,
+      );
+      final diagnostics = await _loadDiagnostics();
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _error = error;
+        _errorStackTrace = stackTrace;
+        _errorDiagnostics = diagnostics;
       });
       return;
     }
@@ -238,9 +283,21 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
       final actionState = ref.read(
         studyEntryActionControllerProvider(widget.entryType, widget.entryRefId),
       );
+      final error =
+          actionState.error ?? StateError('Study session was not started.');
+      final stackTrace = actionState.stackTrace ?? StackTrace.current;
+      final message = actionState.error == null
+          ? _startNoResultNoErrorLogMessage
+          : _startNoResultAfterErrorLogMessage;
+      _logFailure(message: message, error: error, stackTrace: stackTrace);
+      final diagnostics = await _loadDiagnostics();
+      if (!mounted) {
+        return;
+      }
       setState(() {
-        _error =
-            actionState.error ?? StateError('Study session was not started.');
+        _error = error;
+        _errorStackTrace = stackTrace;
+        _errorDiagnostics = diagnostics;
       });
       return;
     }
@@ -259,6 +316,84 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
   ) => studyType == StudyType.newStudy
       ? state.newStudyDefaults
       : state.reviewDefaults;
+
+  void _logFailure({
+    required String message,
+    required Object error,
+    required StackTrace stackTrace,
+  }) {
+    ref
+        .read(appLoggerProvider)
+        .error(
+          '$message entryType=${widget.entryType} '
+          'entryRefId=${widget.entryRefId ?? '<null>'} '
+          'studyMode=${widget.studyMode ?? '<default>'}',
+          error,
+          stackTrace,
+        );
+
+    if (!ref.read(appConfigProvider).exposeInternalErrorDetails) {
+      return;
+    }
+    final localDebugPrint = debugPrint;
+    localDebugPrint(
+      '[StudyEntry] direct start failed\n'
+      'entryType=${widget.entryType}\n'
+      'entryRefId=${widget.entryRefId ?? '<null>'}\n'
+      'studyMode=${widget.studyMode ?? '<default>'}\n'
+      'errorType=${error.runtimeType}\n'
+      'error=$error\n'
+      'stackTrace=$stackTrace',
+    );
+  }
+
+  Future<String?> _loadDiagnostics() async {
+    final config = ref.read(appConfigProvider);
+    if (!config.exposeInternalErrorDetails) {
+      return null;
+    }
+    try {
+      return await ref
+          .read(studyEntryDiagnosticServiceProvider)
+          .buildFailureBlock(
+            config: config,
+            entryType: widget.entryType,
+            entryRefId: widget.entryRefId,
+            studyMode: widget.studyMode,
+          );
+    } catch (error, stackTrace) {
+      ref
+          .read(appLoggerProvider)
+          .error(_diagnosticsFailedLogMessage, error, stackTrace);
+      return 'Study Entry diagnostics failed: ${error.runtimeType}: $error';
+    }
+  }
+
+  String? _debugDetails(bool exposeInternalErrorDetails) {
+    if (!exposeInternalErrorDetails) {
+      return null;
+    }
+    final error = _error;
+    if (error == null) {
+      return null;
+    }
+    final stackTrace = _errorStackTrace
+        ?.toString()
+        .split('\n')
+        .take(20)
+        .join('\n');
+    return [
+      'errorType=${error.runtimeType}',
+      'error=$error',
+      'entryType=${widget.entryType}',
+      'entryRefId=${widget.entryRefId ?? '<null>'}',
+      'studyMode=${widget.studyMode ?? '<default>'}',
+      if (stackTrace != null && stackTrace.isNotEmpty)
+        'stackTrace:\n$stackTrace',
+      if (_errorDiagnostics != null && _errorDiagnostics!.isNotEmpty)
+        _errorDiagnostics!,
+    ].join('\n');
+  }
 }
 
 StudyType _defaultStudyType(StudyEntryType entryType) => switch (entryType) {

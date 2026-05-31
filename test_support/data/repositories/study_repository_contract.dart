@@ -370,7 +370,7 @@ void registerStudyRepositoryTests() {
     );
 
     test(
-      'DT4 loadBatch: New Study requires a progress row with no due date',
+      'S23 loadBatch: New Study treats missing progress rows as new cards',
       () async {
         await harness.seedDeckWithCards(cardCount: 1);
         await harness.database
@@ -403,6 +403,7 @@ void registerStudyRepositoryTests() {
 
         expect(snapshot.sessionFlashcards.map((card) => card.id), <String>[
           'card-1',
+          'card-without-progress',
         ]);
       },
     );

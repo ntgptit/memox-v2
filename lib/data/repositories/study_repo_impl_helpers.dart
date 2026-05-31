@@ -17,7 +17,7 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
       SELECT f.id, f.deck_id, f.front, f.back, p.due_at
       FROM flashcards f
       INNER JOIN decks d ON d.id = f.deck_id
-      INNER JOIN flashcard_progress p ON p.flashcard_id = f.id
+      LEFT JOIN flashcard_progress p ON p.flashcard_id = f.id
       WHERE ${scope.whereClause}
         AND $whereProgress
         AND $_eligibilityClause

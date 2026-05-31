@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../app/di/providers.dart';
 import '../../../../app/di/study/study_settings_providers.dart';
 import '../../../../app/di/study/study_usecase_providers.dart';
 import '../../../../core/errors/app_exception.dart';
@@ -99,13 +100,14 @@ class StudyEntryActionController extends _$StudyEntryActionController {
                   context: context,
                   modes: modes,
                 );
+      final sessionId = snapshot.session.id;
       if (!ref.mounted) {
-        return null;
+        return StudyEntryStartResult.started(sessionId);
       }
       ref.invalidate(studyEntryStateProvider(entryType, entryRefId));
       ref.read(studySessionDataRevisionProvider.notifier).bump();
       state = const AsyncData<void>(null);
-      return StudyEntryStartResult.started(snapshot.session.id);
+      return StudyEntryStartResult.started(sessionId);
     } on EmptyScopeException catch (error) {
       if (!ref.mounted) {
         return null;
@@ -122,6 +124,18 @@ class StudyEntryActionController extends _$StudyEntryActionController {
       if (!ref.mounted) {
         return null;
       }
+      ref
+          .read(appLoggerProvider)
+          .error(
+            'Study entry start action failed. '
+            'entryType=$entryType '
+            'entryRefId=${entryRefId ?? '<null>'} '
+            'studyType=${studyType.storageValue} '
+            'modes=${modes?.map((mode) => mode.storageValue).join(',') ?? '<default>'} '
+            'restartedFromSessionId=${restartedFromSessionId ?? '<null>'}',
+            error,
+            stackTrace,
+          );
       state = AsyncError<void>(error, stackTrace);
       return StudyEntryStartResult.rejected(error);
     }

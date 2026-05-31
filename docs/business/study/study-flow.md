@@ -102,6 +102,8 @@ stateDiagram-v2
 
 - Study session must be persisted.
 - Empty scope must not create session (see "Empty scope matrix" below for all cases).
+- A missing `flashcard_progress` row must not block New Study. Treat the
+  flashcard as a new active card and repair/upsert progress on finalization.
 - Deck entry requires deck id.
 - Folder entry requires folder id.
 - Today entry does not require entry ref id.

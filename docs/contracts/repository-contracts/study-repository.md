@@ -70,6 +70,10 @@ strict and must surface the corruption instead of hiding it.
   - `in_progress` → `failed_to_finalize` (partial finalize)
   - `failed_to_finalize` → `completed` (on retry)
 - Any other transition is `UnsupportedActionFailure` at use case layer.
+- New Study batch loading treats flashcards with missing `flashcard_progress`
+  rows as new active cards. This keeps repaired or legacy local databases from
+  failing Study Entry after the scope count has already found cards; progress is
+  upserted when the session finalizes.
 
 ## Forbidden
 

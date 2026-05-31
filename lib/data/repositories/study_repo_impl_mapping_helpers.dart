@@ -360,7 +360,11 @@ String _studyRepoPlaceholders(int count) =>
     List<String>.filled(count, '?').join(', ');
 
 /// SQL fragment excluding suspended and currently-buried cards from study
-/// eligibility. Binds one trailing positional `?` = current epoch ms (now).
-/// Spec: `docs/business/study-actions/bury-suspend.md` §Auto-unbury.
+/// eligibility. Missing progress rows are treated as new active cards so old
+/// or repaired local databases do not block Study Entry forever; finalization
+/// upserts the missing progress row. Binds one trailing positional `?` =
+/// current epoch ms (now). Spec:
+/// `docs/business/study-actions/bury-suspend.md` §Auto-unbury.
 const String _eligibilityClause =
-    'p.is_suspended = 0 AND (p.buried_until IS NULL OR p.buried_until <= ?)';
+    'COALESCE(p.is_suspended, 0) = 0 '
+    'AND (p.buried_until IS NULL OR p.buried_until <= ?)';

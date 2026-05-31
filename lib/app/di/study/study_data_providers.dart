@@ -7,7 +7,6 @@ import '../../../data/datasources/local/daos/study_session_dao.dart';
 import '../../../data/datasources/local/daos/study_session_item_dao.dart';
 import '../../../data/repositories/study_repo_impl.dart';
 import '../../../domain/study/ports/study_repo.dart';
-import '../../logging/app_talker.dart';
 import '../content/content_core_providers.dart';
 import '../content/content_data_providers.dart';
 import '../providers.dart';
@@ -40,5 +39,5 @@ StudyRepo studyRepo(Ref ref) => StudyRepoImpl(
   clock: ref.watch(clockProvider),
   idGenerator: ref.watch(idGeneratorProvider),
   shuffleRandom: ref.watch(studyShuffleRandomProvider),
-  logger: TalkerAppLogger(ref.watch(talkerProvider)),
+  logger: ref.watch(appLoggerProvider),
 );

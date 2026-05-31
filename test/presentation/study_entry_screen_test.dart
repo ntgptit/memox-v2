@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memox/app/config/app_config.dart';
+import 'package:memox/app/config/env.dart';
+import 'package:memox/app/di/providers.dart';
 import 'package:memox/app/di/study/study_data_providers.dart';
+import 'package:memox/app/di/study/study_entry_diagnostic_providers.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/core/errors/app_exception.dart';
+import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
@@ -109,6 +114,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appConfigProvider.overrideWithValue(_releaseLikeConfig),
             studyRepoProvider.overrideWithValue(
               _FailingStartStudyRepo(
                 const StorageException(message: 'Database unavailable.'),
@@ -127,6 +133,50 @@ void main() {
       expect(find.byType(MxErrorState), findsOneWidget);
       expect(find.text('Database unavailable.'), findsOneWidget);
       expect(find.text('Study action failed.'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'S22 onNavigate: provider failure logs stacktrace and shows local details',
+    (tester) async {
+      final logger = _RecordingAppLogger();
+      final error = StateError('Drift-like open failed.');
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            appLoggerProvider.overrideWithValue(logger),
+            appConfigProvider.overrideWithValue(_localConfig),
+            studyEntryDiagnosticServiceProvider.overrideWithValue(
+              const _FakeStudyEntryDiagnosticService(),
+            ),
+            studyEntryStateProvider('deck', 'deck-001').overrideWith(
+              (ref) => Future<StudyEntryState>.error(error, StackTrace.current),
+            ),
+          ],
+          child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MxErrorState), findsOneWidget);
+      expect(find.text('Study action failed.'), findsOneWidget);
+      expect(logger.errors, hasLength(1));
+      expect(
+        logger.errors.single.message,
+        contains('Study entry direct start failed.'),
+      );
+      expect(logger.errors.single.error, same(error));
+      expect(logger.errors.single.stackTrace.toString(), isNotEmpty);
+
+      await tester.tap(find.text('Show details'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('StateError'), findsWidgets);
+      expect(find.textContaining('Drift-like open failed.'), findsWidgets);
+      expect(find.textContaining('stackTrace:'), findsOneWidget);
+      expect(find.textContaining('entryType=deck'), findsOneWidget);
+      expect(find.textContaining('entryRefId=deck-001'), findsOneWidget);
     },
   );
 
@@ -393,6 +443,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appConfigProvider.overrideWithValue(_releaseLikeConfig),
           studyRepoProvider.overrideWithValue(_EmptyStudyRepo()),
           studyEntryStateProvider(
             'deck',
@@ -416,6 +467,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appConfigProvider.overrideWithValue(_releaseLikeConfig),
             studyRepoProvider.overrideWithValue(repo),
             studyEntryStateProvider(
               'deck',
@@ -466,6 +518,28 @@ const _reviewDefaults = StudySettingsSnapshot(
   shuffleFlashcards: false,
   shuffleAnswers: false,
   prioritizeOverdue: true,
+);
+
+const _localConfig = AppConfig(
+  env: AppEnv.local,
+  initialLocation: '/home',
+  showDebugBanner: false,
+  enableRouterDiagnostics: false,
+  enableTalkerConsoleLogs: false,
+  enableTalkerRouteLogging: false,
+  enableRiverpodDiagnostics: false,
+  exposeInternalErrorDetails: true,
+);
+
+const _releaseLikeConfig = AppConfig(
+  env: AppEnv.production,
+  initialLocation: '/home',
+  showDebugBanner: false,
+  enableRouterDiagnostics: false,
+  enableTalkerConsoleLogs: false,
+  enableTalkerRouteLogging: false,
+  enableRiverpodDiagnostics: false,
+  exposeInternalErrorDetails: false,
 );
 
 const _singleModeFlowCases = <StudyMode, StudyFlow>{
@@ -563,6 +637,48 @@ class _TestRouterApp extends StatelessWidget {
       routerConfig: router,
     );
   }
+}
+
+final class _RecordingAppLogger implements AppLogger {
+  final errors = <_RecordedLogError>[];
+
+  @override
+  void error(String message, Object error, StackTrace stackTrace) {
+    errors.add(
+      _RecordedLogError(message: message, error: error, stackTrace: stackTrace),
+    );
+  }
+}
+
+final class _FakeStudyEntryDiagnosticService
+    extends StudyEntryDiagnosticService {
+  const _FakeStudyEntryDiagnosticService() : super(null);
+
+  @override
+  Future<String> buildFailureBlock({
+    required AppConfig config,
+    required String entryType,
+    required String? entryRefId,
+    required String? studyMode,
+  }) async => [
+    'Study Entry diagnostics',
+    'entryType=$entryType',
+    'entryRefId=${entryRefId ?? '<null>'}',
+    'studyMode=${studyMode ?? '<default>'}',
+    'missingProgressRowsInScope=0',
+  ].join('\n');
+}
+
+final class _RecordedLogError {
+  const _RecordedLogError({
+    required this.message,
+    required this.error,
+    required this.stackTrace,
+  });
+
+  final String message;
+  final Object error;
+  final StackTrace stackTrace;
 }
 
 class _CapturingStudyRepo implements StudyRepo {
