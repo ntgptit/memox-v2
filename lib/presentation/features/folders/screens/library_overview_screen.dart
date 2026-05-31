@@ -118,7 +118,13 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
                 ),
               ],
               const MxSliverGap(MxSpace.md),
-              ..._buildFolderListSlivers(context, ref, state),
+              ..._buildFolderListSlivers(
+                context,
+                ref,
+                state,
+                hasSearchTerm: StringUtils.isNotBlank(toolbarState.searchTerm),
+                onClearSearch: () => toolbarNotifier.setSearchTerm(''),
+              ),
             ],
           ),
         ),
@@ -130,9 +136,27 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
 List<Widget> _buildFolderListSlivers(
   BuildContext context,
   WidgetRef ref,
-  LibraryOverviewState state,
-) {
+  LibraryOverviewState state, {
+  required bool hasSearchTerm,
+  required VoidCallback onClearSearch,
+}) {
   if (state.isEmpty) {
+    // A scope-local search that matches nothing is distinct from a genuinely
+    // empty library: the former offers "clear search", the latter offers
+    // "create folder". Conflating them would mislead the user into thinking
+    // their library is empty.
+    if (hasSearchTerm) {
+      return [
+        SliverToBoxAdapter(
+          child: MxAnimatedSwitcher(
+            child: KeyedSubtree(
+              key: const ValueKey('library_search_no_results'),
+              child: LibrarySearchNoResultsSection(onClearSearch: onClearSearch),
+            ),
+          ),
+        ),
+      ];
+    }
     return [
       SliverToBoxAdapter(
         child: MxAnimatedSwitcher(

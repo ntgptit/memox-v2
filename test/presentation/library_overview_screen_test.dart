@@ -268,6 +268,84 @@ void main() {
   );
 
   testWidgets(
+    'DT3 onDisplay: truly empty library shows the create-folder empty state',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_emptyLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('No folders yet'), findsOneWidget);
+      expect(find.text('Create folder'), findsWidgets);
+      expect(find.text('No matching items'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'DT4 onSearch: empty search result shows no-results state distinct from empty library',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_emptyLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Open inline search and type a term that matches no folder.
+      await tester.tap(find.byIcon(Icons.search_rounded));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'zzz-nope');
+      await tester.pumpAndSettle();
+
+      // No-results surface, NOT the misleading empty-library copy/CTA.
+      expect(find.text('No matching items'), findsOneWidget);
+      expect(find.text('No folders yet'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'DT5 onSearch: clearing the no-results search restores the library state',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_emptyLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.search_rounded));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'zzz-nope');
+      await tester.pumpAndSettle();
+      expect(find.text('No matching items'), findsOneWidget);
+
+      // The no-results CTA clears the scope-local search term.
+      await tester.tap(find.text('Clear'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('No matching items'), findsNothing);
+      expect(find.text('No folders yet'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'DT1 onDispose: dialog action using dialog context closes only the dialog',
     (WidgetTester tester) async {
       await tester.pumpWidget(
@@ -334,6 +412,15 @@ const _sampleLibraryState = LibraryOverviewState(
       canImportFlashcards: true,
     ),
   ],
+);
+
+const _emptyLibraryState = LibraryOverviewState(
+  greeting: LibraryOverviewGreeting(
+    salutation: 'Good morning',
+    userName: 'Lan',
+  ),
+  dueToday: 0,
+  folders: <LibraryFolder>[],
 );
 
 const _legacyLibraryState = LibraryOverviewState(

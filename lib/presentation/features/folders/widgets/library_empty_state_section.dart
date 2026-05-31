@@ -21,3 +21,25 @@ class LibraryEmptyStateSection extends StatelessWidget {
     );
   }
 }
+
+/// Shown when a scope-local Library search matches no top-level folder. Kept
+/// visually distinct from [LibraryEmptyStateSection] so a non-empty library is
+/// never mistaken for an empty one. Mirrors Folder Detail's no-results surface.
+class LibrarySearchNoResultsSection extends StatelessWidget {
+  const LibrarySearchNoResultsSection({required this.onClearSearch, super.key});
+
+  final VoidCallback onClearSearch;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MxEmptyState(
+      icon: Icons.search_off_outlined,
+      title: l10n.foldersNoResultsTitle,
+      message: l10n.foldersNoResultsMessage,
+      actionLabel: l10n.foldersClearSearchAction,
+      actionLeadingIcon: Icons.search_off_outlined,
+      onAction: onClearSearch,
+    );
+  }
+}

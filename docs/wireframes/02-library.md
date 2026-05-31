@@ -9,6 +9,29 @@ source_specs:
 
 # 02 — Library
 
+## V1 verification status (2026-05-31, Prompt 18)
+
+This screen is **partially Current**. The recursive folder counts (verified Prompt 14) plus the aspects below are verified by code and tests; the remainder is **Future** and intentionally not exposed in V1. Do NOT mark the whole screen Current. The §Layout / §Components / §Actions / §Sort options blocks below describe the **target** design; where they conflict with this section, this section is the current truth.
+
+**Verified Current (behaviour + tests):**
+
+- Route `/library` opens `LibraryOverviewView` (also `initialLocation`). Folder row → `pushFolderDetail` → `/library/folder/:id`. No `/library/search` route exists; the search icon opens an inline field, it does not navigate.
+- Renders **top-level folders only**. Recursive subtree counts per folder (subfolders · decks · cards · due) are Current from Prompt 14 and isolated between sibling roots.
+- States: Loading (`MxRetainedAsyncState` → `MxLoadingState`), error (retained-async error surface, no raw exception text), **true empty library** (`folders.isEmpty`, no search term → `LibraryEmptyStateSection` "Create folder" CTA), and **search no-results** (`folders.isEmpty && searchTerm` active → `LibrarySearchNoResultsSection`, `ValueKey('library_search_no_results')`, "Clear" CTA). Distinct (Prompt 18).
+- Inline search: scope-local within Library. When a term is active the query broadens to match **any folder by name across the tree** (`listAllFolders` + normalized contains); empty term restores top-level folders. Never routes to Global Search; does not mutate persisted `sort_order`.
+- Create folder: FAB (single `Icons.add`) and empty-state CTA both open `MxNameDialog` → `createFolderUseCase.createRoot`. Blank name rejected by dialog; failures map to a localized error snackbar; success refreshes via `contentDataRevision`.
+- Folder row long-press → folder actions sheet (Edit / Move / Import flashcards / Delete); Import hidden for subfolder-mode folders.
+- Sort (`ContentSortMode`: manual/name/newest/lastStudied) is implemented and tested at the **repository + use-case** layer (`folder_repository_impl`, `content_repository_test`). The viewmodel exposes `setSortMode`.
+
+**Future / not exposed in V1:**
+
+- **Root-level decks are NOT rendered.** `LibraryOverviewReadModel` carries `folders` only; decks whose `folder_id` is null are not surfaced here. The §Layout "Top-level deck" rows and the "Tap deck row → /library/deck/:deckId/flashcards" action are target, not current.
+- FAB action sheet (New folder / New deck / Import) — V1 FAB creates a folder directly; there is no New deck or Import entry on Library Overview. Deck creation/import remain owned by Folder Detail / Flashcard List / Deck Import.
+- Filter chips (All / Folders / Decks) — only a static "All" chip is rendered; it is non-functional.
+- No sort **UI control** on Library Overview (no overflow sort menu / sort chip). Sort exists only in the data/use-case layer.
+- Drag-to-reorder of root items, pull-to-refresh, and grid/multi-column responsive layout.
+- Global Search screen / `/library/search` route (Global Search remains Future).
+
 ## Purpose
 
 Root content browser. Shows top-level folders and decks (those whose `folder_id` is the root). Entry point for content management and a launch point for study.
@@ -218,12 +241,14 @@ Sort preference persists per user via SharedPreferences (key `library.sort`).
 
 **Contracts:** `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/usecase-contracts/deck.md`, `docs/contracts/repository-contracts/folder-repository.md`, `docs/contracts/repository-contracts/deck-repository.md`
 
-**Code paths:**
+**Code paths (verified Prompt 18):**
 
-- `lib/presentation/features/library/screens/library_screen.dart`
-- `lib/presentation/features/library/notifiers/library_notifier.dart`
-- `lib/presentation/features/library/widgets/library_row.dart`
-- `lib/domain/usecases/library/get_root_items_usecase.dart`
+- `lib/presentation/features/folders/screens/library_overview_screen.dart`
+- `lib/presentation/features/folders/viewmodels/library_overview_viewmodel.dart` (`libraryOverviewQuery`, `LibraryToolbarState`, `LibraryOverviewActionController`)
+- `lib/presentation/features/folders/widgets/library_folder_list.dart`, `library_app_bar.dart`, `library_empty_state_section.dart` (`LibraryEmptyStateSection`, `LibrarySearchNoResultsSection`)
+- `lib/presentation/features/folders/routes/folder_routes.dart` (`libraryBranchRoutes`)
+- `lib/domain/usecases/content_query_usecases.dart` → `WatchLibraryOverviewUseCase`
+- `lib/data/repositories/folder_repository_impl.dart` → `getLibraryOverview`
 - `lib/app/router/route_names.dart` → `RouteNames.library`
 
 **Related wireframes:**
