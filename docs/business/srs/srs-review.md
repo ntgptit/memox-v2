@@ -60,7 +60,9 @@ See `docs/business/glossary.md` for result definitions.
 
 ## Box transition table
 
-This is the authoritative transition contract. Implementation lives in `lib/domain/study/usecases/study_usecases.dart` (within the `Answer*UseCase` family) and must match this table. There is no standalone `box_transition.dart` file at present.
+This is the authoritative transition contract. The box transition is computed at session finalization by `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart` (reached via `FinalizeStudySessionUseCase` → `StudyRepository.finalizeSession` → `_commitSrs`); the in-session `Answer*UseCase` family in `lib/domain/study/usecases/study_usecases.dart` only records attempts and re-queues failed cards. Implementation must match this table. There is no standalone `box_transition.dart` file at present.
+
+Per-card result classification (`forgot` / `recovered` / `perfect`) is shared with the Study Result breakdown: `forgot` = no passing attempt this session (box → 1, lapse +1); `recovered` = at least one passing attempt but not all `correct` (box stays, no lapse); `perfect` = every attempt `correct` (box + 1). Note: because failed cards are re-queued until passed within a mode, a normally-completed session never finalizes a card with zero passing attempts, so `forgot` is currently unreachable through the standard study flow (see `docs/checklist/wireframe-code-parity-assessment.md`).
 
 | Current box | Result | Next box | Next due |
 | --- | --- | --- | --- |

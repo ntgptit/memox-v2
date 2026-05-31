@@ -354,16 +354,22 @@ extension _StudyRepoImplQueryHelpers on StudyRepoImpl {
               DatabaseEnumCodecs.attemptGradeFromStorage(attempt.result),
         )
         .toList(growable: false);
-    if (grades.any((grade) => grade.isFailing)) {
-      final newBox = max(1, oldBox - 1);
+    // forgot (srs-review.md box transition table, row `forgot`): the card has
+    // no passing attempt this session — reset to box 1 and count a lapse. This
+    // mirrors the no-passing branch of computeStudyResultBreakdown so the
+    // persisted last_result agrees with the Study Result breakdown.
+    if (!grades.any((grade) => grade.isPassing)) {
+      const newBox = 1;
       return _SrsOutcome(
-        result: ReviewResult.recovered,
+        result: ReviewResult.forgot,
         oldBox: oldBox,
         newBox: newBox,
         nextDueAt: now + _intervalForBox(newBox).inMilliseconds,
         lapseDelta: 1,
       );
     }
+    // recovered (transition table, row `recovered`): passed, but with at least
+    // one incorrect/recovered attempt — box stays.
     if (grades.any((grade) => !grade.isPerfectEligible)) {
       return _SrsOutcome(
         result: ReviewResult.recovered,

@@ -1593,7 +1593,7 @@ void registerStudyRepositoryTests() {
     );
 
     test(
-      'DT3 repositoryFlow: recovered SRS Review decreases box once after retry pass',
+      'DT3 repositoryFlow: recovered SRS Review keeps box stable after retry pass',
       () async {
         await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
 
@@ -1636,9 +1636,14 @@ void registerStudyRepositoryTests() {
           harness.database.flashcardProgress,
         )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
 
-        expect(progress.currentBox, 3);
+        // srs-review.md box transition table, row `recovered`: a card that
+        // passes after a retry keeps its box (4 -> 4) and counts no lapse
+        // (lapse_count only increments on `forgot`). The prior expectation
+        // (box 3, lapse 1) penalized recovered cards like a lapse, which the
+        // authoritative table does not.
+        expect(progress.currentBox, 4);
         expect(progress.lastResult, ReviewResult.recovered.storageValue);
-        expect(progress.lapseCount, 1);
+        expect(progress.lapseCount, 0);
       },
     );
 
@@ -2360,8 +2365,10 @@ void registerStudyRepositoryTests() {
         final progress = await (harness.database.select(
           harness.database.flashcardProgress,
         )..where((table) => table.flashcardId.equals('card-1'))).getSingle();
-        expect(progress.currentBox, 3);
+        // srs-review.md transition table, row `recovered`: box stays (4 -> 4).
+        expect(progress.currentBox, 4);
         expect(progress.lastResult, ReviewResult.recovered.storageValue);
+        expect(progress.lapseCount, 0);
       },
     );
 

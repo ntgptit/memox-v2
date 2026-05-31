@@ -93,3 +93,13 @@ Promotion requirement:
 ## Side note: root agent files
 
 `CLAUDE.md` and `AGENTS.md` are project-root files, not docs-subtree files. Their absence from this docs archive is intentional. `docs/MANIFEST.md` now states this explicitly.
+
+## Prompt 12 audit — Core Learning Loop findings needing a product decision (2026-05-31)
+
+These are **not implemented changes**; they are open questions surfaced by the Prompt 12 Core Learning Loop audit. The SRS finalize box-transition correctness fix (recovered path) was applied and is documented in `docs/checklist/wireframe-code-parity-assessment.md` row 17. The items below remain pending because they require a product/design decision, not a bug fix.
+
+| Finding | Current behavior | Spec expectation | Pending decision |
+| --- | --- | --- | --- |
+| `forgot` result is unreachable in the normal study flow | Failed cards are re-queued (`study_repo_impl.dart` mode batch) until passed within a mode, so every finalized card has ≥1 passing attempt. `_reviewOutcome` and `computeStudyResultBreakdown` both have a correct `forgot` branch (no-passing → box reset to 1, lapse +1), but it never triggers. | `srs-review.md` defines `forgot` = "Failed (used up retries or explicit I don't know)", implying a terminal-failure path (retry cap or explicit give-up). | Decide whether V1 needs a terminal `forgot` path (retry cap or "I don't know" that ends the card unrecovered). If yes → new behavior + tests. If no → mark `forgot` explicitly as defensive/Future in `srs-review.md`. |
+| SRS interval table doc ≠ code | Code `_intervalForBox` (`study_repo_impl_mapping_helpers.dart`): box1=0, box2=1d, box3=3d, box4=7d, box5=14d, box6=30d, box7=60d, box8=120d. | `srs-review.md` interval table: box1=1d … box5=5d, box6=12d, box7=30d, box8=60d. The doc itself says "source file wins" for intervals but must be updated in the same commit when they diverge. | Decide the canonical interval ladder, then update whichever side is wrong in one PR. Not changed in Prompt 12 (pre-existing drift, no code change to intervals). |
+| `CLAUDE.md` trigger map references non-existent `lib/domain/srs/box_intervals.dart` / `box_transition.dart` | Those files do not exist; the box transition lives in `_reviewOutcome` (`study_repo_impl_helpers.dart`). | Trigger map should point to the real implementation. | Already noted as P2-6/P2-7 backlog in the parity assessment; fix in a docs/agent-rules PR. |
