@@ -359,13 +359,13 @@ Parity audit: row #19 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 Mock refs: variants `14a`–`14e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.5.
 
-Parity audit: row #20 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 21 clarified current V1 as study-defaults settings. Daily-goal/streak/reminder UI remains Future/Target and linked to engagement scope.
+Parity audit: row #20 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 23 verified current V1 as study-defaults settings plus a read-only runtime interval table and Manage tags route entry. Daily-goal/streak/reminder UI remains Future/Target and linked to engagement scope.
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Current | Settings/Learning | New-study defaults editor | `StudySettingsStore.saveNewStudyDefaults` | `lib/presentation/features/settings/screens/learning_settings_screen.dart`, `lib/app/di/study/study_settings_providers.dart` | `docs/state/state-management-contract.md` §Per-notifier, `docs/business/study/study-flow.md` | `docs/wireframes/20-settings-learning.md` | Covered by settings notifier tests. |
 | Current | Settings/Learning | SRS-review defaults editor | `StudySettingsStore.saveReviewDefaults` | `lib/presentation/features/settings/screens/learning_settings_screen.dart`, `lib/app/di/study/study_settings_providers.dart` | `docs/state/state-management-contract.md` §Per-notifier, `docs/business/study/study-flow.md` | `docs/wireframes/20-settings-learning.md` | Covered by settings notifier tests. |
-| Current | Settings/Learning | Interval table view (read-only) | `_intervalForBox` runtime source | `lib/data/repositories/study_repo_impl_mapping_helpers.dart`, `lib/presentation/features/settings/screens/learning_settings_screen.dart` | `docs/business/srs/srs-review.md` | `docs/wireframes/20-settings-learning.md` | Read-only render; covered by widget render tests. Canonical interval ladder remains a P2 product/docs decision. |
+| Current | Settings/Learning | Interval table view (read-only) | `SrsIntervalPolicy` runtime source via `_intervalForBox` | `lib/domain/study/srs_interval_policy.dart`, `lib/data/repositories/study_repo_impl_mapping_helpers.dart`, `lib/presentation/features/settings/screens/learning_settings_screen.dart` | `docs/business/srs/srs-review.md` | `docs/wireframes/20-settings-learning.md` | Read-only render; covered by widget render tests. Canonical interval ladder remains a P2 product/docs decision. |
 | Current | Settings/Learning | Tags sub-screen entry | Push `RouteNames.settingsLearningTags` | `lib/app/router/app_navigation.dart`, `lib/presentation/features/settings/screens/learning_settings_screen.dart` | `docs/business/tags/tag-system.md` | `docs/wireframes/22-settings-tag-management.md` | Navigation covered by router tests. |
 
 ## 21. Settings — Audio / Speech

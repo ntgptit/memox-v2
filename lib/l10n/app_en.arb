@@ -498,6 +498,27 @@
       }
     }
   },
+  "settingsSrsIntervalsTitle": "SRS intervals",
+  "settingsSrsIntervalsSubtitle": "Current runtime schedule",
+  "settingsSrsIntervalBoxLabel": "Box {box}",
+  "@settingsSrsIntervalBoxLabel": {
+    "placeholders": {
+      "box": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSrsIntervalToday": "Today",
+  "settingsSrsIntervalDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@settingsSrsIntervalDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsTagsSectionTitle": "Tags",
+  "settingsManageTagsLearningSubtitle": "Open tag management",
   "settingsManageTagsTitle": "Manage tags",
   "settingsManageTagsOverviewSubtitle": "14 tags",
   "tagHashLabel": "#{tag}",

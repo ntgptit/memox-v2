@@ -946,6 +946,36 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get settingsSrsIntervalsTitle => 'Khoảng ôn SRS';
+
+  @override
+  String get settingsSrsIntervalsSubtitle => 'Lịch hiện tại của runtime';
+
+  @override
+  String settingsSrsIntervalBoxLabel(int box) {
+    return 'Box $box';
+  }
+
+  @override
+  String get settingsSrsIntervalToday => 'Hôm nay';
+
+  @override
+  String settingsSrsIntervalDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ngày',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsTagsSectionTitle => 'Tag';
+
+  @override
+  String get settingsManageTagsLearningSubtitle => 'Mở quản lý tag';
+
+  @override
   String get settingsManageTagsTitle => 'Quản lý tag';
 
   @override

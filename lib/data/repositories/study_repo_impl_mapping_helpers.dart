@@ -333,17 +333,12 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
     ).toUtc().millisecondsSinceEpoch;
   }
 
-  Duration _intervalForBox(int box) => switch (box) {
-    1 => Duration.zero,
-    2 => const Duration(days: 1),
-    3 => const Duration(days: 3),
-    4 => const Duration(days: 7),
-    5 => const Duration(days: 14),
-    6 => const Duration(days: 30),
-    7 => const Duration(days: 60),
-    8 => const Duration(days: 120),
-    _ => throw ValidationException(message: 'Unsupported SRS box: $box.'),
-  };
+  Duration _intervalForBox(int box) {
+    if (box < SrsIntervalPolicy.minBox || box > SrsIntervalPolicy.maxBox) {
+      throw ValidationException(message: 'Unsupported SRS box: $box.');
+    }
+    return SrsIntervalPolicy.intervalForBox(box);
+  }
 
   String _requireEntryRef(StudyContext context) {
     final refId = context.entryRefId;

@@ -1020,6 +1020,37 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsSrsIntervalsTitle => 'SRS intervals';
+
+  @override
+  String get settingsSrsIntervalsSubtitle => 'Current runtime schedule';
+
+  @override
+  String settingsSrsIntervalBoxLabel(int box) {
+    return 'Box $box';
+  }
+
+  @override
+  String get settingsSrsIntervalToday => 'Today';
+
+  @override
+  String settingsSrsIntervalDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsTagsSectionTitle => 'Tags';
+
+  @override
+  String get settingsManageTagsLearningSubtitle => 'Open tag management';
+
+  @override
   String get settingsManageTagsTitle => 'Manage tags';
 
   @override

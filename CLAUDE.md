@@ -52,7 +52,7 @@ Bảng này map giữa loại thay đổi code và các file docs BẮT BUỘC k
 | `lib/data/datasources/local/tables/**` | `docs/database/schema-contract.md`, `docs/database/migration-contract.md`, `docs/decision-tables/memox-core-decision-table.md` |
 | `lib/domain/entities/**` | Business doc của entity đó + `docs/business/glossary.md` (nếu thêm thuật ngữ) |
 | `lib/domain/usecases/**` (new use case hoặc behavior thay đổi) | Business doc liên quan + decision table |
-| `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`) | `docs/business/srs/srs-review.md` (interval table) |
+| `lib/domain/study/srs_interval_policy.dart` / `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`) | `docs/business/srs/srs-review.md` (interval table) |
 | `lib/data/repositories/study_repo_impl_helpers.dart` (`_reviewOutcome`) | `docs/business/srs/srs-review.md` (transition table) |
 | `lib/app/router/route_names.dart` / `route_paths.dart` | `docs/business/navigation/navigation-flow.md` |
 | `lib/presentation/features/**/screens/*.dart` | Wireframe tương ứng trong `docs/wireframes/*.md` |

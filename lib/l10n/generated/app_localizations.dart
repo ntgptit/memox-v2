@@ -1608,6 +1608,48 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 card} other{{count} cards}}'**
   String settingsCardsCountValue(int count);
 
+  /// No description provided for @settingsSrsIntervalsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SRS intervals'**
+  String get settingsSrsIntervalsTitle;
+
+  /// No description provided for @settingsSrsIntervalsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current runtime schedule'**
+  String get settingsSrsIntervalsSubtitle;
+
+  /// No description provided for @settingsSrsIntervalBoxLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Box {box}'**
+  String settingsSrsIntervalBoxLabel(int box);
+
+  /// No description provided for @settingsSrsIntervalToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get settingsSrsIntervalToday;
+
+  /// No description provided for @settingsSrsIntervalDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String settingsSrsIntervalDays(int count);
+
+  /// No description provided for @settingsTagsSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get settingsTagsSectionTitle;
+
+  /// No description provided for @settingsManageTagsLearningSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open tag management'**
+  String get settingsManageTagsLearningSubtitle;
+
   /// No description provided for @settingsManageTagsTitle.
   ///
   /// In en, this message translates to:

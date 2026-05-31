@@ -21,7 +21,8 @@ applies_to: SRS algorithm, flashcard_progress, review session finalization
 - `lib/data/datasources/local/tables/flashcard_progress_table.dart`
 - `lib/data/datasources/local/tables/study_attempts_table.dart`
 - `lib/data/repositories/study_repo_impl_helpers.dart` (`_reviewOutcome`, canonical owner of box transitions at finalization).
-- `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`, current runtime owner of interval values).
+- `lib/domain/study/srs_interval_policy.dart` (`SrsIntervalPolicy`, current runtime owner of interval values).
+- `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`, repository adapter to `SrsIntervalPolicy`).
 - `lib/domain/study/usecases/study_usecases.dart` (session creation, empty-scope checks, and in-session answer orchestration; the legacy `lib/domain/srs/box_intervals.dart` and `lib/domain/srs/box_transition.dart` files do NOT exist).
 
 ## Data
@@ -77,7 +78,7 @@ Per-card result classification (`forgot` / `recovered` / `perfect`) is shared wi
 
 ## Interval table
 
-Intervals are currently defined by `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`, and finalization applies them from `lib/data/repositories/study_repo_impl_helpers.dart`. The doc-level table below remains a pending product/docs contract; Prompt 12/13 identified that it differs from runtime. Until the interval-ladder product decision is made, **code owns runtime behavior** and this table must not be silently rewritten as resolved.
+Intervals are currently defined by `SrsIntervalPolicy` in `lib/domain/study/srs_interval_policy.dart`; finalization reaches the same source through `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`, and Learning Settings renders that same runtime source. The doc-level table below remains a pending product/docs contract; Prompt 12/13 identified that it differs from runtime. Until the interval-ladder product decision is made, **code owns runtime behavior** and this table must not be silently rewritten as resolved.
 
 | Box | Interval | Approx | Rationale |
 | --- | --- | --- | --- |
@@ -131,7 +132,7 @@ The due query must:
 
 Any SRS behavior change must update:
 
-- `lib/data/repositories/study_repo_impl_helpers.dart` (`_reviewOutcome`) and/or `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`)
+- `lib/data/repositories/study_repo_impl_helpers.dart` (`_reviewOutcome`) and/or `lib/domain/study/srs_interval_policy.dart` (`SrsIntervalPolicy`) plus its repository adapter `lib/data/repositories/study_repo_impl_mapping_helpers.dart` (`_intervalForBox`)
 - This doc (transition table and/or interval table)
 - `docs/business/study/study-flow.md` if flow changes
 - Decision table S6-S10
@@ -171,6 +172,7 @@ Any SRS behavior change must update:
 - `lib/domain/study/study_session_round.dart` — round model used by grading flow.
 - `lib/data/datasources/local/tables/study_attempts_table.dart` — persistence of each attempt with `box_before`, `box_after`, `result`, `study_mode`, `attempted_at`.
 - `lib/data/datasources/local/tables/flashcard_progress_table.dart` — per-card SRS state (`current_box`, `lapse_count`, `due_at`, `last_result`, `last_studied_at`).
-- `lib/data/repositories/study_repo_impl.dart` + helpers (`study_repo_impl_helpers.dart`, `study_repo_impl_mapping_helpers.dart`, `study_repo_impl_models.dart`) — finalization write path; `_reviewOutcome` computes final per-card result/box transition and `_intervalForBox` computes runtime due intervals.
+- `lib/domain/study/srs_interval_policy.dart` — current runtime SRS interval ladder.
+- `lib/data/repositories/study_repo_impl.dart` + helpers (`study_repo_impl_helpers.dart`, `study_repo_impl_mapping_helpers.dart`, `study_repo_impl_models.dart`) — finalization write path; `_reviewOutcome` computes final per-card result/box transition and `_intervalForBox` delegates runtime due intervals to `SrsIntervalPolicy`.
 
-> **Drift note**: earlier revisions of this doc referenced `lib/domain/srs/box_intervals.dart`, `lib/domain/srs/box_transition.dart`, `lib/domain/srs/srs_service.dart`, `lib/data/repositories/srs_repository.dart`, and `lib/domain/usecases/study/grade_attempt_usecase.dart`. **None of those paths exist** in the current codebase (verified by `find lib/domain -name "box_*"` returning empty). Prompt 13 aligned this doc and the `CLAUDE.md` trigger map to the current owners: `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart` and `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart`. If a future refactor extracts intervals/transitions into dedicated domain files, update this list and `CLAUDE.md` in the same commit.
+> **Drift note**: earlier revisions of this doc referenced `lib/domain/srs/box_intervals.dart`, `lib/domain/srs/box_transition.dart`, `lib/domain/srs/srs_service.dart`, `lib/data/repositories/srs_repository.dart`, and `lib/domain/usecases/study/grade_attempt_usecase.dart`. **None of those paths exist** in the current codebase (verified by `find lib/domain -name "box_*"` returning empty). Prompt 23 keeps `_reviewOutcome` in `lib/data/repositories/study_repo_impl_helpers.dart` as the current transition owner and uses `SrsIntervalPolicy` in `lib/domain/study/srs_interval_policy.dart` as the current interval owner, with `_intervalForBox` in `lib/data/repositories/study_repo_impl_mapping_helpers.dart` as the repository adapter. If a future refactor extracts transitions into dedicated domain files, update this list and `CLAUDE.md` in the same commit.

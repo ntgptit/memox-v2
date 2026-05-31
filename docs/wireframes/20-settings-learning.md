@@ -14,14 +14,14 @@ Current V1 configures study defaults and provides the Manage tags route. Daily g
 
 ## V1 verification status
 
-Prompt 21 (2026-05-31) treats this screen as route-safe sub-screen coverage only. Current code implements study defaults, not the full engagement settings target shown in the original layout.
+Prompt 23 (2026-05-31) verifies this screen as Current for study defaults, the read-only runtime interval table, and the Manage tags route entry. Current code does not implement the full engagement settings target shown in the original layout.
 
 | Aspect | V1 status | Notes |
 | --- | --- | --- |
 | Route `/settings/learning` | Current | Reachable from Settings Hub; hides shell navigation; back returns to hub when pushed from the hub. |
 | New-study defaults | Current | Edits new-study batch size and shared study defaults through `StudyDefaultsSettings`. |
 | SRS-review defaults | Current | Edits review batch size and shared study defaults through `StudyDefaultsSettings`. |
-| Interval table | Current | Read-only display based on current runtime interval source. |
+| Interval table | Current | Read-only display based on `SrsIntervalPolicy`, the current runtime interval source also used by SRS finalization through `_intervalForBox`. |
 | Manage tags entry | Current | Pushes `/settings/learning/tags`. |
 | Daily goal / streak / reminder controls | Future/Target | Not implemented in this screen's current V1 code. Do not add in a Settings Hub parity task. |
 
@@ -215,12 +215,12 @@ Target/reference layout. Current V1 renders study defaults, the interval table, 
 
 **Decision rows:**
 
-- Current V1: settings route/action coverage and study defaults tests.
+- Current V1: settings route/action coverage, study defaults tests, runtime interval-table render tests, and Manage tags route-entry tests.
 - Target/Future engagement: goal range 5-200 step 5, single reminder, goal-off freezes streak.
 
 **Schema / storage:**
 
-- Current V1: study defaults store and providers listed in Code paths.
+- Current V1: study defaults store and providers listed in Code paths; interval values from `lib/domain/study/srs_interval_policy.dart`.
 - Target/Future SharedPreferences keys: `goalEnabled`, `dailyGoal`, `streakEnabled`, `reminderEnabled`, `reminderTime`
 - Target/Future: `study.showSwipeHint`, `study.autoAdvanceCorrect`, `study.autoAdvanceWrong`
 
@@ -232,6 +232,7 @@ Target/reference layout. Current V1 renders study defaults, the interval table, 
 - `lib/presentation/features/settings/widgets/study_settings_group.dart`
 - `lib/presentation/features/settings/viewmodels/study_settings_defaults_viewmodel.dart`
 - `lib/app/di/study/study_settings_providers.dart`
+- `lib/domain/study/srs_interval_policy.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.settingsLearning`
 
 **Related wireframes:**

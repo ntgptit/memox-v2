@@ -498,6 +498,27 @@
       }
     }
   },
+  "settingsSrsIntervalsTitle": "Khoảng ôn SRS",
+  "settingsSrsIntervalsSubtitle": "Lịch hiện tại của runtime",
+  "settingsSrsIntervalBoxLabel": "Box {box}",
+  "@settingsSrsIntervalBoxLabel": {
+    "placeholders": {
+      "box": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSrsIntervalToday": "Hôm nay",
+  "settingsSrsIntervalDays": "{count, plural, other{{count} ngày}}",
+  "@settingsSrsIntervalDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsTagsSectionTitle": "Tag",
+  "settingsManageTagsLearningSubtitle": "Mở quản lý tag",
   "settingsManageTagsTitle": "Quản lý tag",
   "settingsManageTagsOverviewSubtitle": "14 tag",
   "tagHashLabel": "#{tag}",

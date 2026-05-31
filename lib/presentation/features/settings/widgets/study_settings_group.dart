@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../app/router/app_navigation.dart';
 import '../../../../domain/enums/study_enums.dart';
+import '../../../../domain/study/srs_interval_policy.dart';
 import '../../../../domain/study/study_settings_policy.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
@@ -35,6 +37,7 @@ const _reviewBatchIncreaseKey = ValueKey<String>(
 const _reviewBatchDecreaseKey = ValueKey<String>(
   'settings-study-review-batch-decrease',
 );
+const _manageTagsRowKey = ValueKey<String>('settings-learning-manage-tags-row');
 
 class StudySettingsGroup extends ConsumerWidget {
   const StudySettingsGroup({super.key});
@@ -60,7 +63,15 @@ class StudySettingsGroup extends ConsumerWidget {
         subtitle: l10n.sharedErrorTitle,
         child: MxText(l10n.errorUnexpected, role: MxTextRole.formHelper),
       ),
-      dataBuilder: (_, state) => _StudySettingsContent(state: state),
+      dataBuilder: (_, state) => Column(
+        children: [
+          _StudySettingsContent(state: state),
+          const MxGap(MxSpace.lg),
+          const _SrsIntervalGroup(),
+          const MxGap(MxSpace.lg),
+          const _LearningTagsGroup(),
+        ],
+      ),
     );
   }
 }
@@ -240,6 +251,66 @@ class _StudyMetric extends StatelessWidget {
   );
 }
 
+class _SrsIntervalGroup extends StatelessWidget {
+  const _SrsIntervalGroup();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    const boxes = SrsIntervalPolicy.boxes;
+
+    return SettingsGroup(
+      title: l10n.settingsSrsIntervalsTitle,
+      subtitle: l10n.settingsSrsIntervalsSubtitle,
+      child: Column(
+        children: [
+          for (var index = 0; index < boxes.length; index++) ...[
+            _SrsIntervalRow(box: boxes[index]),
+            if (index != boxes.length - 1) const MxDivider(),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _SrsIntervalRow extends StatelessWidget {
+  const _SrsIntervalRow({required this.box});
+
+  final int box;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SettingsRow(
+      icon: Icons.event_repeat_rounded,
+      title: l10n.settingsSrsIntervalBoxLabel(box),
+      value: _formatInterval(context, SrsIntervalPolicy.intervalForBox(box)),
+      showChevron: false,
+    );
+  }
+}
+
+class _LearningTagsGroup extends StatelessWidget {
+  const _LearningTagsGroup();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return SettingsGroup(
+      title: l10n.settingsTagsSectionTitle,
+      child: SettingsRow(
+        key: _manageTagsRowKey,
+        icon: Icons.sell_outlined,
+        title: l10n.settingsManageTagsTitle,
+        subtitle: l10n.settingsManageTagsLearningSubtitle,
+        onTap: context.pushSettingsLearningTags,
+        preserveSubtitleOnCompact: true,
+      ),
+    );
+  }
+}
+
 class _BatchSizeSheet extends ConsumerWidget {
   const _BatchSizeSheet({required this.studyType});
 
@@ -371,4 +442,12 @@ void _persistSetting(
           }
         }),
   );
+}
+
+String _formatInterval(BuildContext context, Duration interval) {
+  final l10n = AppLocalizations.of(context);
+  if (interval == Duration.zero) {
+    return l10n.settingsSrsIntervalToday;
+  }
+  return l10n.settingsSrsIntervalDays(interval.inDays);
 }
