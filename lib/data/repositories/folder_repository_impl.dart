@@ -183,11 +183,22 @@ final class FolderRepositoryImpl implements FolderRepository {
       );
     }
 
+    final hasFilteredChildren =
+        subfolderItems.isNotEmpty || deckItems.isNotEmpty;
+    // Only probe the unfiltered store when the search filtered everything out;
+    // otherwise the visible rows already prove the folder has children.
+    final hasUnfilteredChildren =
+        hasFilteredChildren ||
+        (query.searchTerm.isNotEmpty &&
+            (await _folderDao.hasSubfolders(folderId) ||
+                await _folderDao.hasDecks(folderId)));
+
     return FolderDetailReadModel(
       folder: folder.toDomain(),
       breadcrumb: await _folderDao.getBreadcrumbSegments(folderId),
       subfolders: subfolderItems,
       decks: deckItems,
+      hasUnfilteredChildren: hasUnfilteredChildren,
     );
   }
 

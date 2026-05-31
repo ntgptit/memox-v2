@@ -146,12 +146,18 @@ final class FolderDetailReadModel {
     required this.breadcrumb,
     required this.subfolders,
     required this.decks,
+    required this.hasUnfilteredChildren,
   });
 
   final FolderEntity folder;
   final List<FolderSubfolderReadModel> subfolders;
   final List<FolderDeckReadModel> decks;
   final List<BreadcrumbSegmentReadModel> breadcrumb;
+
+  /// Whether this folder has any direct child (subfolder or deck) ignoring the
+  /// active search filter. Lets the UI tell a genuinely empty folder apart from
+  /// a search that filtered every row out (true empty vs search no-results).
+  final bool hasUnfilteredChildren;
 
   FolderContentMode get effectiveContentMode {
     if (folder.contentMode != FolderContentMode.unlocked) {

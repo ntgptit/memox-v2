@@ -15,6 +15,7 @@ import 'package:memox/presentation/features/folders/screens/folder_detail_screen
 import 'package:memox/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart';
 import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_icon_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_indicator.dart';
@@ -712,6 +713,72 @@ void main() {
   );
 
   testWidgets(
+    'DT2b onSearchFilterSort: genuinely empty folder with active search stays true empty',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) =>
+                Future<FolderDetailState>.value(_emptyDeckWithSearchState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // True-empty CTA, not the search no-results surface.
+      expect(find.text('No decks yet'), findsOneWidget);
+      expect(find.text('No matching items'), findsNothing);
+      expect(find.text('Clear'), findsNothing);
+      // FAB stays available so the user can still create a deck.
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'States onError: missing/invalid folder shows safe error surface with retry',
+    (WidgetTester tester) async {
+      const folderId = 'missing-folder';
+      final container = ProviderContainer(
+        // Disable Riverpod's automatic error-retry backoff timer so the test
+        // can settle on the error surface without a pending retry Timer.
+        retry: (_, _) => null,
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.error(
+              const NotFoundException(message: 'Folder not found.'),
+              StackTrace.empty,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MxErrorState), findsOneWidget);
+      expect(find.text('Try again'), findsOneWidget);
+      // No FAB and no raw exception text leak into the error surface.
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(find.textContaining('NotFoundException'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'DT2 onNavigate: falls back to zero progress for legacy subfolder data',
     (WidgetTester tester) async {
       const folderId = 'folder-001';
@@ -1305,6 +1372,26 @@ const _searchNoResultState = FolderDetailState(
   searchTerm: 'biology',
   subfolders: <FolderSubfolderItem>[],
   decks: <FolderDeckItem>[],
+  // Folder has decks; the search just filtered them all out.
+  hasUnfilteredChildren: true,
+);
+
+// Locked deck-mode folder that is genuinely empty (e.g. all decks deleted) but
+// still carries an active search term. Must stay "true empty", not no-results.
+const _emptyDeckWithSearchState = FolderDetailState(
+  header: FolderDetailHeader(
+    id: 'folder-001',
+    name: 'Korean',
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
+    ],
+  ),
+  mode: FolderDetailMode.decks,
+  sortMode: ContentSortMode.manual,
+  searchTerm: 'biology',
+  subfolders: <FolderSubfolderItem>[],
+  decks: <FolderDeckItem>[],
+  hasUnfilteredChildren: false,
 );
 
 class _FutureController<T> extends ChangeNotifier {

@@ -312,7 +312,10 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
   bool _isSearchNoResult(FolderDetailState state) =>
       !state.isUnlocked &&
       state.searchTerm.isNotEmpty &&
-      !_hasActiveItems(state);
+      !_hasActiveItems(state) &&
+      // A genuinely empty folder stays "true empty" regardless of the search
+      // term — no-results only applies when the search hid existing children.
+      state.hasUnfilteredChildren;
 
   bool _hasActiveItems(FolderDetailState state) {
     if (state.isSubfolderMode) {

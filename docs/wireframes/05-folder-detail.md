@@ -250,9 +250,33 @@ Browse a folder's children: either subfolders or decks (never both, per `content
 
 **Code paths:**
 
-- `lib/presentation/features/library/screens/folder_detail_screen.dart`
-- `lib/presentation/features/library/notifiers/folder_detail_notifier.dart`
+- `lib/presentation/features/folders/screens/folder_detail_screen.dart`
+- `lib/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart`
+- `lib/presentation/features/folders/routes/folder_routes.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.folderDetail`
+
+## V1 verification status (Prompt 19, 2026-05-31)
+
+Honest split between what is implemented + tested (`Current`) and what this
+wireframe specs but the screen does **not** yet expose (`Future`):
+
+| Section | Status | Notes |
+| --- | --- | --- |
+| Route `/library/folder/:id` + invalid-id safety | Current | `folder_routes.dart`; missing folder → `NotFoundException` → `MxErrorState` with Retry (no crash, no raw exception). Tested. |
+| Breadcrumb (Library → … → current) + segment tap | Current | `FolderHeaderSection` + `MxBreadcrumbBar`; ancestor tap navigates. Tested. |
+| Content-mode rendering (subfolders / decks / unlocked) | Current | `effectiveContentMode` drives a single body; never mixed. Tested. |
+| Inline scope-local search (`MxSearchSortToolbar`) | Current | Filters only the visible child type; never navigates to Global Search; does not mutate persisted order. Tested. |
+| True-empty vs search no-results | Current | Gated by `FolderDetailState.hasUnfilteredChildren` (from `FolderDetailReadModel`). Genuinely empty folder stays true-empty for any search term; no-results ("Clear" CTA) only when children exist but are filtered out. Tested (Prompt 19). |
+| Sort (`ContentSortMode`: manual/name/newest/lastStudied) | Current | Applied at repository/use-case layer; selected sort shown in `MxSortMenuChip`; manual = persisted order. Repo-tested. |
+| Create subfolder / deck + lock-mode typed snackbar | Current | Shared `MxNameDialog`; unlocked FAB shows 2-choice sheet; stale invalid action → typed localized snackbar (`folder_contains_decks` / `folder_contains_subfolders`, Prompt 14). Tested. |
+| Row actions (subfolder/deck Edit / Move / Delete / Import / Duplicate / Export) | Current | Long-press + overflow open `showFolderActions` / `showDeckActions`; deck import routes to Deck Import. Tested. |
+| Manual reorder (drag) | Current | Enter via overflow when `sortMode.allowsManualReorder`; Save/Cancel. Tested at repo/use-case layer. |
+| **Study folder CTA / Today (n) CTA** | **Future** | The screen exposes **no** folder-level study CTA. `AppNavigation` has folder-scope study helpers, but Folder Detail does not call them. Belongs to study-entry-gate work (§12), not Folder Detail V1. |
+| **Resume banner** | **Future** | Not rendered on this screen. Tracked under `docs/business/resume/resume-session.md`. |
+
+Out of Folder Detail V1 scope (remain Future, not exposed here): Global Search
+screen/route, Flashcard History, Drive sync, Progress/Settings, tag-scoped
+study, root-level deck rendering in Library Overview, Library FAB action sheet.
 
 **Related wireframes:**
 

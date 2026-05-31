@@ -97,6 +97,7 @@ class FolderDetailState {
     required this.searchTerm,
     required this.subfolders,
     required this.decks,
+    this.hasUnfilteredChildren = false,
   });
 
   final FolderDetailHeader header;
@@ -105,6 +106,10 @@ class FolderDetailState {
   final String searchTerm;
   final List<FolderSubfolderItem> subfolders;
   final List<FolderDeckItem> decks;
+
+  /// Whether the folder has any direct child ignoring the active search term.
+  /// Distinguishes a genuinely empty folder from a search that hid every row.
+  final bool hasUnfilteredChildren;
 
   bool get isUnlocked => mode == FolderDetailMode.unlocked;
   bool get isSubfolderMode => mode == FolderDetailMode.subfolders;
@@ -245,6 +250,7 @@ FolderDetailState _mapFolderDetailState(
       )
       .toList(growable: false),
   decks: readModel.decks.map(_mapFolderDeckItem).toList(growable: false),
+  hasUnfilteredChildren: readModel.hasUnfilteredChildren,
 );
 
 FolderDeckItem _mapFolderDeckItem(FolderDeckReadModel item) => FolderDeckItem(
