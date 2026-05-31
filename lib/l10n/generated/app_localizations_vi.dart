@@ -1620,6 +1620,16 @@ class AppLocalizationsVi extends AppLocalizations {
       'Hãy thêm thẻ thủ công hoặc nhập chúng vào bộ thẻ này.';
 
   @override
+  String get flashcardsNoResultsTitle => 'Không có flashcard phù hợp';
+
+  @override
+  String get flashcardsNoResultsMessage =>
+      'Không có flashcard nào trong bộ thẻ này khớp với tìm kiếm của bạn.';
+
+  @override
+  String get flashcardsClearSearchAction => 'Xóa';
+
+  @override
   String get flashcardsMoveTitle => 'Di chuyển flashcard';
 
   @override

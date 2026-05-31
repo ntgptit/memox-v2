@@ -1731,6 +1731,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add cards manually or import them into this deck.';
 
   @override
+  String get flashcardsNoResultsTitle => 'No matching flashcards';
+
+  @override
+  String get flashcardsNoResultsMessage =>
+      'No flashcards in this deck match your search.';
+
+  @override
+  String get flashcardsClearSearchAction => 'Clear';
+
+  @override
   String get flashcardsMoveTitle => 'Move flashcards';
 
   @override

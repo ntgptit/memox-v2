@@ -203,6 +203,77 @@ void main() {
   );
 
   testWidgets(
+    'DT2b onSearch: query matching no cards shows no-results state, not empty deck',
+    (WidgetTester tester) async {
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) => Future<FlashcardListState>.value(_noMatchFlashcardState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _scrollUntilAny(
+        tester,
+        find.byKey(const ValueKey('flashcard_no_results')),
+      );
+      expect(
+        find.byKey(const ValueKey('flashcard_no_results')),
+        findsOneWidget,
+      );
+      expect(find.text('No matching flashcards'), findsOneWidget);
+      expect(find.text('Clear'), findsOneWidget);
+      // Distinct from the empty-deck CTA.
+      expect(find.text('No flashcards yet'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'DT2c onSearch: clearing search from no-results restores the toolbar query',
+    (WidgetTester tester) async {
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) => Future<FlashcardListState>.value(_noMatchFlashcardState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      container
+          .read(flashcardToolbarStateProvider(deckId).notifier)
+          .setSearchTerm('zzz-no-match');
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _scrollUntilAny(tester, find.text('Clear'));
+      await tester.tap(find.text('Clear'));
+      await tester.pumpAndSettle();
+
+      expect(
+        container.read(flashcardToolbarStateProvider(deckId)).searchTerm,
+        isEmpty,
+      );
+    },
+  );
+
+  testWidgets(
     'DT4 onDisplay: compact layout renders study, progress, and toolbar sections',
     (WidgetTester tester) async {
       tester.view.devicePixelRatio = 1;
@@ -968,6 +1039,27 @@ final _sampleFlashcardState = FlashcardListState(
       lastStudiedAt: null,
     ),
   ],
+);
+
+// Deck that has cards (non-zero progress counts) but whose active search term
+// filters every row out -> no-results state, distinct from an empty deck.
+final _noMatchFlashcardState = FlashcardListState(
+  deckId: 'deck-001',
+  folderId: 'folder-001',
+  deckName: 'Korean deck',
+  breadcrumb: const <BreadcrumbSegmentReadModel>[
+    BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
+    BreadcrumbSegmentReadModel(label: 'Korean deck', folderId: null),
+  ],
+  sortMode: ContentSortMode.manual,
+  searchTerm: 'zzz-no-match',
+  progress: const FlashcardDeckProgressState(
+    newCount: 1,
+    learningCount: 1,
+    masteredCount: 0,
+    masteryPercent: 7,
+  ),
+  items: const <FlashcardListItemState>[],
 );
 
 final _emptyFlashcardState = FlashcardListState(

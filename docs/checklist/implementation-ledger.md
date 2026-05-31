@@ -41,6 +41,45 @@ verified + docs aligned), `Partial`, `NotStarted`, `Blocked`, `Future`.
 | 2026-05-31 | Prompt 15 — Flashcard Editor create/edit doc-code unification | `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/08-flashcard-edit.md`, `docs/business/flashcard/flashcard-management.md`, `docs/contracts/usecase-contracts/flashcard.md`, checklist/navigation docs, focused editor/list/router tests | Current | Preflight found create/edit routes already share `FlashcardEditorScreen`; code does not expose `flashcardHistory`, History remains Future, and Bury/Suspend live in study-session card-actions. Docs now keep 07/08 as route-specific wireframes with a shared-editor contract table; editor owns content/tag create/update and learned-content Keep/Reset progress policy only. Move/delete/export are documented as flashcard list row/bulk owners; standalone History reset remains Future/migration-required. No schema, route, History screen, Global Search, Drive sync, Progress/Settings, or visual redesign scope added. |
 | 2026-05-31 | Prompt 15B — Flashcard Editor dirty exit + destination save navigation | `flashcard_editor_viewmodel.dart`, `flashcard_editor_screen.dart`, l10n sources/generated, `flashcard_editor_screen_test.dart`, flashcard wireframe/business/checklist docs | Current | Added explicit `hasUnsavedChanges` over create/edit drafts: create checks trimmed content, tags, non-default starting status, and destination changes; edit compares trimmed content, optional fields, tags, and starting status against loaded originals without treating preloaded optional fields/tags as dirty. Header close and browser/system back use `MxConfirmationDialog` danger discard copy when dirty. Create normal Save navigates to the actual selected destination deck; Save and add another stays in the editor, keeps the selected deck, and resets to a clean draft. No schema, route, History, delete/move/export-in-editor, Search, Drive sync, Progress/Settings, or visual redesign scope added. |
 
+## Prompt 16 — Flashcard List V1 parity (Rules / States / Forbidden) (2026-05-31)
+
+> **Scope**: Flashcard List (wireframe 06) aspect-by-aspect parity for rules, states,
+> forbidden behaviour, row/bulk action ownership, search/sort/reorder, empty/loading/error/
+> no-result states, and route/action safety. NOT in scope and intentionally untouched:
+> Flashcard History, Global Search, Drive sync, Progress/Settings, tag-scoped study, engagement,
+> import parser/preview internals (Prompt 17), schema, visual redesign.
+
+**Result: PASS (partial-Current screen, honestly scoped).** Wireframe 06 is **not** marked
+whole-screen Current; a new "V1 verification status" section splits verified-Current from Future.
+
+**Code change (one in-scope P1 fix):**
+
+- **No-results state distinct from empty-deck.** Previously a search that filtered every row out
+  rendered the empty-deck CTA ("No flashcards yet" + Add). Added `FlashcardNoResultsSection`
+  (`ValueKey('flashcard_no_results')`) shown when `items.isEmpty && searchTerm.isNotEmpty`, with a
+  "Clear" CTA resetting the toolbar search term. New l10n keys `flashcardsNoResultsTitle`,
+  `flashcardsNoResultsMessage`, `flashcardsClearSearchAction` (EN + VI), classified in
+  `button_label_contract_test.dart`.
+
+**Verified already-correct (no code change):**
+
+- Route safety: invalid/missing `deckId` → typed `NotFoundException` surfaced via
+  `MxRetainedAsyncState` (error + Retry), no crash / no raw exception text.
+- Loading skeleton, error+retry, empty-deck states.
+- Search scope-local (toolbar → `ContentQuery`, never global search); sort via `ContentSortMode`;
+  manual reorder persists `sort_order`.
+- Row + bulk action ownership: Delete (confirm) / Move (picker, progress kept) / Export. No History,
+  no Bury/Suspend in the list. Study modes route through the Study Entry gate; disabled on empty deck.
+- Import action → `deckImport` route (ownership only).
+
+**Documented Future (not exposed in V1):** resume banner, status/tag filter chips +
+`?filter=`/`?tag=` round-trip, per-row state badges + `CardStateComputer`, bulk
+suspend/unsuspend/reset/tag, long-press→selection-mode.
+
+**Tests:** `test/presentation/flashcard_list_screen_test.dart` +2 (DT2b no-results distinct from
+empty deck; DT2c clear-search resets toolbar query). Full suite: 960 passed. `flutter analyze`:
+clean. Guard `memox` ruleset: passed.
+
 ## Prompt 13 — Core Learning Loop Source-of-Truth Freeze (2026-05-31)
 
 > **Scope of this freeze**: Core Learning Loop ONLY (Study Entry Gate, Resume/Start-over,

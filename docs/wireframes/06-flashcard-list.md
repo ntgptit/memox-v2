@@ -12,6 +12,30 @@ source_specs:
 
 # 06 — Flashcard List
 
+## V1 verification status (2026-05-31, Prompt 16)
+
+This screen is **partially Current**. The §Components 1-1 mapping (verified 2026-05-28) plus the aspects below are verified by code and tests; the remainder is **Future** and intentionally not exposed in V1. Do NOT mark the whole screen Current.
+
+**Verified Current (behaviour + tests):**
+
+- Route `/library/deck/:deckId/flashcards` opens the list. Invalid/missing `deckId` → `NotFoundException` surfaced through `MxRetainedAsyncState` (error + Retry), no crash, no raw exception text.
+- States: Loading skeleton, error+retry, **empty deck**, and **no-results-on-search** (distinct, Prompt 16).
+- Search: scope-local within the deck (toolbar search term → `ContentQuery`), never routes to global search. Clearing restores cards.
+- Sort: `ContentSortMode` via toolbar; manual sort enables reorder; reorder persists `sort_order`.
+- Row actions (long-press / overflow sheet): Edit → `flashcardEdit`, Move (destination picker, progress kept), Export, Select, Delete (confirm). **No History. No Bury/Suspend.**
+- Bulk actions (selection mode): Delete (confirm), Move, Export only.
+- Study modes route through the Study Entry gate; disabled on empty deck.
+- Import CTA → `deckImport` route (route ownership only; parser/preview verified in Prompt 17).
+
+**Future (not exposed in V1):**
+
+- Resume banner (resume-session epic).
+- Status filter dropdown + multi-tag chip filter (`?filter=`/`?tag=` round-trip).
+- State badges (Suspended / Buried / Due) per row, and the shared `CardStateComputer`.
+- Bulk suspend / unsuspend / reset / tag± (block on bury/suspend epic).
+- Long-press → enter selection mode. **V1 selection is triggered by the row "Select" action and the per-row star toggle, not by long-press** (long-press opens the row action sheet). The §Forbidden / §Agent-rule item requiring long-press-to-select describes the Future target, not current behaviour.
+- Flashcard History context action (Future Proposal, screen 09 — no live V1 route).
+
 ## Purpose
 
 Manage flashcards in one deck: browse, filter, edit, multi-select for bulk operations. Primary launch point for deck-level study.
@@ -147,7 +171,7 @@ Manage flashcards in one deck: browse, filter, edit, multi-select for bulk opera
 
 - ❌ Show note/example/pronunciation/hint inline in row.
 - ❌ Remove the resume banner after one view. It persists until session resumed or discarded.
-- ❌ Long-press → open context sheet directly. Long-press MUST enter selection mode.
+- ❌ Long-press → open context sheet directly. Long-press MUST enter selection mode. **(Future target — see V1 verification status. V1 long-press opens the row action sheet; selection is entered via the "Select" action or the per-row star toggle.)**
 - ❌ Bulk action applies to filtered-out cards. Snapshot selected IDs at confirmation time.
 - ❌ "Select all" select beyond filtered set.
 - ❌ Persist selection across navigation. Selection is ephemeral.
@@ -186,8 +210,9 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 | --- | --- | --- |
 | Loading | Initial fetch | Skeleton rows. |
 | Populated | Normal | List visible. |
-| Empty (zero cards in deck) | No cards | Show empty layout with "Add" and "Import" CTAs. |
-| Filtered empty | Filters applied, no match | Show filtered empty with "Clear filters" CTA. |
+| Empty (zero cards in deck) | No cards | Show empty layout with "Add" CTA (`FlashcardEmptyStateSection`). Import CTA lives in the cards toolbar above. **Current.** |
+| No results (search filters every row) | Deck has cards but active search term matches none | Show `FlashcardNoResultsSection` (`ValueKey('flashcard_no_results')`) with "Clear" CTA that resets the toolbar search term. Distinct from empty-deck. **Current (Prompt 16).** |
+| Filtered empty (status/tag filters) | Status/tag filters applied, no match | Show filtered empty with "Clear filters" CTA. **Future** — status/tag filter chips are not yet implemented (see V1 verification status). |
 | Selection mode | Long-press OR Select tapped | App bar swaps; checkboxes show; bulk bar appears. |
 | Resume present | Resumable session for deck | Show banner above CTAs. |
 | Loading bulk action | After confirm | Disable bulk bar; show progress indicator if > 1s. |
@@ -303,7 +328,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 
 - Do NOT show note/example/pronunciation/hint inline in row.
 - Do NOT remove the resume banner after one view; it persists until session is resumed or discarded.
-- Long-press card MUST default to entering selection mode, NOT opening a context sheet. (Context sheet is accessible via card edit screen overflow or alternative gesture.)
+- Long-press card MUST default to entering selection mode, NOT opening a context sheet. **(Future target — V1 long-press opens the row action sheet; see V1 verification status.)**
 - Bulk operation snapshots selected IDs at action confirmation time, not action execution time (per bulk spec).
 
 ## Implementation refs

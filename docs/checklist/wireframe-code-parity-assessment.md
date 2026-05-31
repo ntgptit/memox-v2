@@ -347,7 +347,7 @@ Items resolved trong cleanup pass đã xoá. Items mới từ §3.12-3.14 thêm.
 | **P3-1** | Design system widget catalog update (orphan `MxStreakCard` + shared toolbars) | §3.2 | XS |
 | **P3-2** | **NEW** Convention doc cho target/current file refs | §3.14 | XS |
 | **P3-3** | Wireframe 19 UI flow pass tiếp (sau khi data layer ✅ ở Rev 3) | #19 | S |
-| **P3-4** | Wireframe 06 §Rules / §States / §Forbidden pass tiếp | #06 | S |
+| **P3-4** | ✅ DONE (2026-05-31, Prompt 16) Wireframe 06 §Rules / §States / §Forbidden aspect-by-aspect pass. Verified Current: route safety (invalid `deckId` → typed `NotFoundException` + retry), loading/error/empty-deck states, **new no-results-on-search state** (`FlashcardNoResultsSection`), scope-local search, sort + manual reorder, row/bulk Delete-Move-Export ownership, study-modes via Study Entry gate, Import route ownership. Documented Future (not exposed): resume banner, status/tag filter chips, state badges + `CardStateComputer`, bulk suspend/unsuspend/reset/tag, long-press→select. Wireframe 06 gained a "V1 verification status" section; long-press §Forbidden/§Agent items annotated as Future target. | #06 | S |
 | **P3-5** | Wireframe 10 decision-table import rows cross-verify | #10 | XS |
 | **P3-6** | **NEW** Mock-mapping `docs/architecture/**` glob narrow → `clean-architecture-contract.md` | §3.15.2 #1 | XS |
 | **P3-7** | **NEW** Mock-mapping: add recall timed-out variant `09c` hoặc note in §10 | §3.15.2 #2, #16 | XS |
@@ -437,7 +437,7 @@ Tôi (senior) cũng có blind-spot. Honest disclosure:
 | §3.8 Excel import C>D | RESOLVED — doc updated | [10-deck-import.md](docs/wireframes/10-deck-import.md), [c-greater-than-d-cleanup-2026-05-28.md](docs/checklist/c-greater-than-d-cleanup-2026-05-28.md) §1 row #2 |
 | §3.9 Recall timer C>D | RESOLVED — doc updated | [16-study-session-recall.md](docs/wireframes/16-study-session-recall.md) §Layout/Components/States/Rules, [cleanup log](docs/checklist/c-greater-than-d-cleanup-2026-05-28.md) §1 row #1 |
 | #02 Library toolbar C>D (small) | RECLASSIFIED — issue actually at #05 | [05-folder-detail.md](docs/wireframes/05-folder-detail.md) §Components |
-| #06 Flashcard list C>D (sections) | PARTIALLY RESOLVED — §Components scope | [06-flashcard-list.md](docs/wireframes/06-flashcard-list.md) §Components 13-row table |
+| #06 Flashcard list C>D (sections) | RESOLVED for §Components + §Rules/§States/§Forbidden (Prompt 16). Verified-Current vs Future split documented; Future aspects (resume banner, filter chips, state badges, bulk suspend/reset/tag, long-press-select) explicitly not exposed. | [06-flashcard-list.md](docs/wireframes/06-flashcard-list.md) §V1 verification status, §States, §Components 13-row table |
 | #19 Account sync C>D (platform variants) | PARTIALLY RESOLVED — gateway data-layer scope | [account-sync.md](docs/business/account-sync/account-sync.md) §Platform snapshot gateways |
 | §3.11 Architecture inconsistency P2 | REFINED — same severity, better evidence | §3.11 above |
 | Stale code paths in 13/14/15/16/17 wireframes (grade_attempt_usecase.dart etc.) | RESOLVED — all 5 wireframes refreshed §Code paths | Cleanup log §1 rows #6-9 |

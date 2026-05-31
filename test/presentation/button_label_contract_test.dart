@@ -29,6 +29,7 @@ const _visibleButtonLabelKeys = <String>{
   'dashboardDiscardAction',
   'bulkAddFileChooseAction',
   'foldersClearSearchAction',
+  'flashcardsClearSearchAction',
   'foldersImportCreateDeckAction',
   'foldersImportExistingDeckAction',
   'importCommitCardsAction',

@@ -426,6 +426,19 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
       ];
     }
     if (state.items.isEmpty) {
+      // Distinguish a true empty deck from a search that filtered everything
+      // out: progress counts cover the whole deck regardless of the query.
+      if (state.searchTerm.isNotEmpty) {
+        return [
+          SliverToBoxAdapter(
+            child: FlashcardNoResultsSection(
+              onClearSearch: () => ref
+                  .read(flashcardToolbarStateProvider(widget.deckId).notifier)
+                  .setSearchTerm(''),
+            ),
+          ),
+        ];
+      }
       return [
         SliverToBoxAdapter(
           child: FlashcardEmptyStateSection(deckId: widget.deckId),

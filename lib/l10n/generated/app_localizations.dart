@@ -2772,6 +2772,24 @@ abstract class AppLocalizations {
   /// **'Add cards manually or import them into this deck.'**
   String get flashcardsEmptyMessage;
 
+  /// No description provided for @flashcardsNoResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching flashcards'**
+  String get flashcardsNoResultsTitle;
+
+  /// No description provided for @flashcardsNoResultsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No flashcards in this deck match your search.'**
+  String get flashcardsNoResultsMessage;
+
+  /// No description provided for @flashcardsClearSearchAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get flashcardsClearSearchAction;
+
   /// No description provided for @flashcardsMoveTitle.
   ///
   /// In en, this message translates to:
