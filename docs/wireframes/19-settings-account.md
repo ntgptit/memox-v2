@@ -23,6 +23,8 @@ Prompt 21 (2026-05-31) verifies this screen only as a reachable Settings Hub sub
 | Pre-restore local safety snapshot + Upload local first + second destructive confirmation | Target/Partial | Required target behavior in this wireframe/business doc; not promoted by Prompt 21. Do not expand it in a Settings Hub parity task. |
 | Account removal strong confirmation | Target | Not part of Prompt 21. |
 
+The restore-safety layout/states/rules below remain the target protection design unless the V1 verification table explicitly marks a row as Current.
+
 ## Layout — signed out
 
 ```
@@ -121,7 +123,7 @@ When user taps Restore and the Drive manifest's `device_label` / fingerprint dif
 └───────────────────────────────────────┘
 ```
 
-This is `docs/wireframes/24-shared-dialogs.md` §restore-warning. The 2nd-tap confirmation requirement is enforced even when "Restore anyway" is tapped — see dialog spec.
+Target/Partial: this is `docs/wireframes/24-shared-dialogs.md` §restore-warning. The 2nd-tap confirmation requirement is enforced when the full restore-protection target is implemented.
 
 ## Layout — pre-restore snapshot notice
 
@@ -143,7 +145,7 @@ This is `docs/wireframes/24-shared-dialogs.md` §restore-warning. The 2nd-tap co
 └───────────────────────────────────────┘
 ```
 
-Snapshot is mandatory. If snapshot fails for any reason, the entire restore aborts; original data untouched.
+Target/Partial: snapshot is mandatory in the full restore-protection design. If snapshot fails for any reason, the entire restore aborts; original data untouched.
 
 ## Inputs
 
@@ -166,9 +168,9 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 
 - ❌ Auto-restore on sign-in. Restore is always manual.
 - ❌ Auto-upload on data change without an explicit user setting.
-- ❌ Skip pre-restore snapshot. Snapshot is mandatory.
-- ❌ Continue restore if snapshot fails. Abort.
-- ❌ Trigger restore on a single "Restore anyway" tap when fingerprint differs. Require second tap with 5s timeout.
+- ❌ Target/Partial restore protection: skip pre-restore snapshot. Snapshot is mandatory in the target flow.
+- ❌ Target/Partial restore protection: continue restore if snapshot fails. Abort.
+- ❌ Target/Partial restore protection: trigger restore on a single "Restore anyway" tap when fingerprint differs. Require second tap with 5s timeout.
 - ❌ Wipe local data on sign-out. Only "Switch / remove account" does that.
 - ❌ Store OAuth tokens in SharedPreferences. Use `flutter_secure_storage`.
 - ❌ Log access tokens, refresh tokens, or fingerprints to console/file logs.
@@ -197,9 +199,9 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 | Signed in, backup matches | Manifest fingerprint matches local | Show ✓. Restore button enabled but triggers warning. |
 | Signed in, backup differs | Manifest fingerprint differs OR newer | Show ⚠. Restore triggers full warning dialog. |
 | Uploading | Manual upload in flight | Inline progress in Upload row. |
-| Restoring (snapshot phase) | After user confirms restore | Show snapshot notice modal. |
-| Restoring (download/replace phase) | After snapshot succeeded | Show progress; app effectively offline until done. |
-| Restore aborted | Snapshot failed | Show error toast "Snapshot failed — restore cancelled." Local data untouched. |
+| Target/Partial: Restoring (snapshot phase) | After user confirms restore | Show snapshot notice modal. |
+| Target/Partial: Restoring (download/replace phase) | After snapshot succeeded | Show progress; app effectively offline until done. |
+| Target/Partial: Restore aborted | Snapshot failed | Show error toast "Snapshot failed — restore cancelled." Local data untouched. |
 | Sign in failed | OAuth error | Show inline error; keep signed-out layout. |
 | Token expired | Background refresh failed | Show banner top: "Sign in expired. Tap to reconnect." |
 
@@ -211,7 +213,7 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 | Tap account row | Tap | No-op (read-only). |
 | Tap Edit device label | Tap | Open rename dialog (`docs/wireframes/24-shared-dialogs.md` §rename). |
 | Tap "Upload to Drive" | Tap | Run upload use case; show progress inline. |
-| Tap "Restore from Drive" | Tap | Fetch manifest; show restore warning dialog. On confirm → snapshot phase → replace phase. |
+| Tap "Restore from Drive" | Tap | Current V1 runs the existing manual restore flow. Target/Partial restore protection adds warning → snapshot phase → replace phase. |
 | Tap "Sign out" | Tap | Confirm dialog: "Sign out? Your local data stays on this device." On confirm: clear tokens, return to signed-out layout. |
 | Tap "Switch / remove account" | Tap | Strong destructive dialog: "Remove this account and erase all data on this device?" On confirm: wipe local DB, return to signed-out. |
 | Tap overflow ⋮ | Tap | Menu: View Drive folder (web link), Refresh manifest, Help. |
@@ -219,7 +221,7 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 ## Dialogs and bottom-sheets used
 
 - Restore warning dialog — `docs/wireframes/24-shared-dialogs.md` §restore-warning.
-- Pre-restore snapshot notice (modal progress) — inline above, defined here.
+- Target/Partial: Pre-restore snapshot notice (modal progress) — inline above, defined here.
 - Rename device label — `docs/wireframes/24-shared-dialogs.md` §rename.
 - Sign out confirm — generic confirm.
 - Switch/remove account confirm — `docs/wireframes/24-shared-dialogs.md` §delete-confirm (destructive variant with typed confirmation).
@@ -243,7 +245,7 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 
 - Manifest fetch on screen open; cached for 60s.
 - Upload progress streamed via use case state.
-- Snapshot file written before any destructive op; on failure, restore aborts immediately.
+- Target/Partial restore protection: snapshot file written before any destructive op; on failure, restore aborts immediately.
 
 ## Accessibility
 
@@ -254,16 +256,16 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 
 - Account is account-scoped: switching account swaps the SQLite database file path.
 - Backup stored in Drive App Folder (only this app sees it).
-- Pre-restore snapshot MUST succeed before any data replacement.
-- "Upload local first" MUST be the primary button on restore warning when fingerprint differs.
-- "Restore anyway" requires a second tap; cannot be a single tap.
+- Target/Partial restore protection: pre-restore snapshot MUST succeed before any data replacement.
+- Target/Partial restore protection: "Upload local first" MUST be the primary button on restore warning when fingerprint differs.
+- Target/Partial restore protection: "Restore anyway" requires a second tap; cannot be a single tap.
 - Sign out keeps local data; only Switch / remove account wipes data.
 
 ## Agent rule
 
 - Do NOT auto-restore on sign-in. Restore is manual only.
 - Do NOT auto-upload on data change without explicit user setting (this is opt-in via future setting; for now manual only).
-- Pre-restore snapshot creation MUST be atomic. If app dies mid-snapshot, no destructive op has happened.
+- Target/Partial restore protection: pre-restore snapshot creation MUST be atomic. If app dies mid-snapshot, no destructive op has happened.
 - Drive manifest schema MUST include `device_label`, `fingerprint`, `uploaded_at`, `size_bytes`, `schema_version`.
 - Token refresh failures MUST surface as a banner, not silently expire.
 
@@ -275,7 +277,8 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 
 **Decision rows:**
 
-- Account/Sync: pre-snapshot abort, fingerprint mismatch warning, two-tier confirm, token refresh
+- Current V1: account route/action coverage, sign-in/sign-out, and manual Drive upload/restore behavior.
+- Target/Partial restore protection: pre-snapshot abort, fingerprint mismatch warning, two-tier confirm, token refresh.
 
 **Schema / storage:**
 
