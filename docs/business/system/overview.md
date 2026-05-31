@@ -101,9 +101,9 @@ Settings sub-areas:
 | Sub-area | Responsibility | Spec |
 | --- | --- | --- |
 | Account | Google account linking + Drive sync | `docs/business/account-sync/account-sync.md` |
-| Learning | Study defaults | `docs/business/study/study-flow.md` |
-| Audio/Speech | TTS settings | `docs/business/tts/tts-settings.md` |
-| Appearance/Locale | Theme mode + language | (covered in code; no separate spec) |
+| Learning | Current V1 study defaults; daily-goal/streak/reminder controls remain Target/Future | `docs/business/study/study-flow.md`, `docs/wireframes/20-settings-learning.md` |
+| Audio/Speech | Current V1 global/front-language TTS settings; independent per-language tabs remain Target/Future | `docs/business/tts/tts-settings.md`, `docs/wireframes/21-settings-audio-speech.md` |
+| Appearance/Locale | Disabled Future rows on Settings Hub | `docs/wireframes/04-settings-hub.md` |
 
 ## Study modes
 

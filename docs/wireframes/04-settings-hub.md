@@ -12,6 +12,20 @@ source_specs:
 
 Entry point to all settings sub-screens. Plain list, no settings live here directly except a few status indicators.
 
+## V1 verification status
+
+Prompt 21 (2026-05-31) verified Settings Hub as a navigation owner, not a settings mutation owner.
+
+| Aspect | V1 status | Notes |
+| --- | --- | --- |
+| `/settings` route + shell navigation | Current | `/settings` renders `SettingsScreen` inside the app shell. |
+| Account, Learning, Audio/Speech, Tags navigation | Current | Rows push named settings sub-routes; sub-screens hide shell navigation; back returns to the hub when entered from the hub. |
+| Appearance / Language rows | Current (disabled Future rows) | Render as disabled rows with a Soon badge; no route is exposed. |
+| About row | Current (dialog) / Target (bottom-sheet) | Current code opens Flutter's `AboutDialog`. The About bottom-sheet remains release-polish target behavior. |
+| Hub-owned mutation | Current absent | Hub rows navigate only. Account/Drive, study defaults, TTS, and tag mutation live in their sub-screens/viewmodels. |
+| Subtitle source | Partial | Account status uses account/sync state. Learning, Audio/Speech, and Tags overview subtitles are V1 summaries, not full live aggregates. |
+| Async state | Current | Provider-backed rows keep rows visible and use row-level skeleton/error states; the hub has no full-screen empty state. |
+
 ## Layout
 
 ```
@@ -91,9 +105,9 @@ Subtitles populate independently; rows render immediately, subtitles fill in.
 | Section header | All caps, small font, theme-secondary color. |
 | Row | Icon + title + dynamic subtitle + chevron. Whole row tappable. |
 | Account row subtitle | Reflects sign-in + sync state: "Not signed in" / "Signed in as {email}" + sync status. |
-| Learning row subtitle | "Daily goal: {n} cards" if goal enabled; "Goal off" if disabled. |
-| Audio row subtitle | "{Korean|English} voice (default)". |
-| Tags row subtitle | "{n} tags" total across user data. |
+| Learning row subtitle | Target: "Daily goal: {n} cards" if goal enabled; "Goal off" if disabled. Current V1: study-defaults summary. |
+| Audio row subtitle | Target: "{Korean|English} voice (default)". Current V1: global front-language / speech summary. |
+| Tags row subtitle | Target: "{n} tags" total across user data. Current V1: static management summary; live count belongs to the Tags sub-screen. |
 
 ## States
 
@@ -109,11 +123,12 @@ Subtitles populate independently; rows render immediately, subtitles fill in.
 | Action | Trigger | Result |
 | --- | --- | --- |
 | Tap any row | Tap | `push` to corresponding sub-screen. |
-| Tap About | Tap | Open About bottom-sheet (`docs/wireframes/25-shared-bottom-sheets.md` §about) showing version, licenses, links. |
+| Tap About | Tap | Current V1: open app About dialog with version/legal copy. Target: About bottom-sheet (`docs/wireframes/25-shared-bottom-sheets.md` §about) showing version, licenses, links. |
 
 ## Dialogs and bottom-sheets used
 
-- About bottom-sheet (`docs/wireframes/25-shared-bottom-sheets.md` §about).
+- Current V1: Flutter About dialog.
+- Target/release polish: About bottom-sheet (`docs/wireframes/25-shared-bottom-sheets.md` §about).
 
 ## Navigation in
 
@@ -168,8 +183,9 @@ Subtitles populate independently; rows render immediately, subtitles fill in.
 
 **Code paths:**
 
-- `lib/presentation/features/settings/screens/settings_hub_screen.dart`
-- `lib/presentation/features/settings/notifiers/settings_hub_notifier.dart`
+- `lib/presentation/features/settings/screens/settings_screen.dart`
+- `lib/presentation/features/settings/widgets/settings_overview_groups.dart`
+- `lib/presentation/features/settings/widgets/settings_group.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.settings`
 
 **Related wireframes:**

@@ -313,6 +313,35 @@ void main() {
     expect(find.byType(SettingsLoadingRow), findsWidgets);
   });
 
+  testWidgets('DT21 onDisplay: hub hosts navigation rows only', (tester) async {
+    await _pumpSettings(tester);
+
+    expect(find.byType(Switch), findsNothing);
+    expect(find.byType(Slider), findsNothing);
+    expect(find.byType(TextField), findsNothing);
+    expect(find.byType(DropdownButtonFormField<String>), findsNothing);
+    expect(find.byType(MxSegmentedControl), findsNothing);
+  });
+
+  testWidgets('DT22 onDisplay: row semantics include subtitle context', (
+    tester,
+  ) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      await _pumpSettings(tester);
+
+      final label = tester
+          .getSemantics(
+            find.byKey(const ValueKey<String>('settings-overview-account-row')),
+          )
+          .label;
+      expect(label, contains('Sign in & sync'));
+      expect(label, contains('Save your progress across devices'));
+    } finally {
+      semanticsHandle.dispose();
+    }
+  });
+
   testWidgets(
     'DT5 onDisplay: settings overview hides Google sign-in when OAuth config is missing',
     (tester) async {

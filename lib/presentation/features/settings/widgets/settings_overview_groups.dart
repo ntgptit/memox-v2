@@ -60,10 +60,10 @@ class AccountSettingsOverviewGroup extends ConsumerWidget {
         title: l10n.settingsAccountTitle,
         contentPadding: EdgeInsets.zero,
         style: SettingsGroupStyle.hub,
+        onTap: context.pushSettingsAccount,
         child: SettingsRow(
           icon: Icons.error_outline,
           title: l10n.errorUnexpected,
-          showChevron: false,
           iconTone: MxIconTileTone.warning,
           style: SettingsRowStyle.hub,
         ),

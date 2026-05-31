@@ -11,6 +11,18 @@ source_specs:
 
 Manage Google account link and Google Drive backup. Single source of truth for sync status, manual upload/restore controls, and account switching. Account is account-scoped (per `docs/business/account-sync/account-sync.md`); all data lives in the active account's database.
 
+## V1 verification status
+
+Prompt 21 (2026-05-31) verifies this screen only as a reachable Settings Hub sub-screen. Current code already owns account sign-in and manual Drive sync detail behavior here; the Settings Hub must not duplicate those actions.
+
+| Aspect | V1 status | Notes |
+| --- | --- | --- |
+| Route `/settings/account` | Current | Reachable from Settings Hub; hides shell navigation; back returns to hub when pushed from the hub. |
+| Account sign-in/sign-out | Partial/Current implementation | Implemented through account use cases and `AccountSettingsController`; full account-flow parity remains owned by an Account prompt. |
+| Manual Drive upload/restore | Partial/Current implementation | Implemented through Drive sync use cases and `DriveSyncSettingsController`. |
+| Pre-restore local safety snapshot + Upload local first + second destructive confirmation | Target/Partial | Required target behavior in this wireframe/business doc; not promoted by Prompt 21. Do not expand it in a Settings Hub parity task. |
+| Account removal strong confirmation | Target | Not part of Prompt 21. |
+
 ## Layout — signed out
 
 ```
@@ -275,13 +287,15 @@ Snapshot is mandatory. If snapshot fails for any reason, the entire restore abor
 
 **Code paths:**
 
-- `lib/presentation/features/settings/account/screens/account_settings_screen.dart`
-- `lib/presentation/features/settings/account/notifiers/account_settings_notifier.dart`
-- `lib/data/sync/drive_upload_service.dart`
-- `lib/data/sync/drive_restore_service.dart`
-- `lib/data/sync/local_snapshot_service.dart` (pre-restore snapshot)
-- `lib/data/sync/manifest.dart`
-- `lib/core/auth/google_auth.dart`
+- `lib/presentation/features/settings/screens/account_settings_screen.dart`
+- `lib/presentation/features/settings/widgets/account_settings_group.dart`
+- `lib/presentation/features/settings/widgets/drive_sync_settings_group.dart`
+- `lib/presentation/features/settings/viewmodels/account_settings_viewmodel.dart`
+- `lib/presentation/features/settings/viewmodels/drive_sync_settings_viewmodel.dart`
+- `lib/domain/usecases/cloud_account_usecases.dart`
+- `lib/domain/usecases/drive_sync_usecases.dart`
+- `lib/data/repositories/google_drive_sync_repository.dart`
+- `lib/data/sync/local_database_snapshot_gateway_contract.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.settingsAccount`
 
 **Related wireframes:**

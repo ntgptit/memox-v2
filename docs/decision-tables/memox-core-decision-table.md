@@ -231,7 +231,7 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | N4 | Push vs Go | Form → list | Use push, return on pop | C1 | `test/features/flashcards/navigation_test.dart::N4` |
 | N5 | Push vs Go | Session → result | Use pushReplacement | C1 | `test/features/study/navigation_test.dart::N5` |
 | N6 | Deep link | Private route | Redirect to safe ancestor | C1 | `test/app/router/deep_link_test.dart::N6` |
-| N7 | Settings hub → sub-screen | Tap row | Push to sub-screen, back returns to hub | C0+C1 | `test/features/settings/navigation_test.dart::N7` |
+| N7 | Settings hub → sub-screen | Tap row | Push to sub-screen, back returns to hub | C0+C1 | `test/presentation/settings_screen_test.dart::DT1-DT7 onNavigate`, `test/app/router/app_router_test.dart::DT8-DT9 onNavigate` |
 | U1 | Load | Loading | Show shared loading/retained state | C0 | `test/presentation/shared/loading_state_test.dart::U1` |
 | U2 | Load | Empty | Show shared empty state | C0+C1 | `test/presentation/shared/empty_state_test.dart::U2` |
 | U3 | Load | Error | Show shared error state | C0+C1 | `test/presentation/shared/error_state_test.dart::U3` |

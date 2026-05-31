@@ -12,6 +12,19 @@ source_specs:
 
 Configure study defaults: daily goal, streak/reminder behavior, and future learning preferences. Goal and reminder are the only specified ones for now; other rows reserved for future.
 
+## V1 verification status
+
+Prompt 21 (2026-05-31) treats this screen as route-safe sub-screen coverage only. Current code implements study defaults, not the full engagement settings target shown in the original layout.
+
+| Aspect | V1 status | Notes |
+| --- | --- | --- |
+| Route `/settings/learning` | Current | Reachable from Settings Hub; hides shell navigation; back returns to hub when pushed from the hub. |
+| New-study defaults | Current | Edits new-study batch size and shared study defaults through `StudyDefaultsSettings`. |
+| SRS-review defaults | Current | Edits review batch size and shared study defaults through `StudyDefaultsSettings`. |
+| Interval table | Current | Read-only display based on current runtime interval source. |
+| Manage tags entry | Current | Pushes `/settings/learning/tags`. |
+| Daily goal / streak / reminder controls | Future/Target | Not implemented in this screen's current V1 code. Do not add in a Settings Hub parity task. |
+
 ## Layout
 
 ```
@@ -194,10 +207,10 @@ Configure study defaults: daily goal, streak/reminder behavior, and future learn
 
 **Code paths:**
 
-- `lib/presentation/features/settings/learning/screens/learning_settings_screen.dart`
-- `lib/presentation/features/settings/learning/notifiers/learning_settings_notifier.dart`
-- `lib/data/datasources/local/preferences/engagement_preferences.dart`
-- `lib/core/notifications/reminder_scheduler.dart`
+- `lib/presentation/features/settings/screens/learning_settings_screen.dart`
+- `lib/presentation/features/settings/widgets/study_settings_group.dart`
+- `lib/presentation/features/settings/viewmodels/study_settings_defaults_viewmodel.dart`
+- `lib/app/di/study/study_settings_providers.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.settingsLearning`
 
 **Related wireframes:**

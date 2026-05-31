@@ -252,6 +252,8 @@ Three user-triggered operations, all returning `DriveSyncRunResult`:
 
 Restore is destructive: it replaces the local database entirely. The user MUST be protected from accidental data loss when local has unsynced changes.
 
+**Implementation status (Prompt 21, 2026-05-31):** current V1 code has manual Drive upload/restore use cases and confirmation UI, but the full target restore-protection surface below (local pre-restore snapshot notice/path, "Upload local first" primary branch, and second destructive confirmation) remains Partial/Target and is not promoted by the Settings Hub parity task.
+
 ### Pre-restore checks
 
 Before invoking restore, the use case (or its presentation-layer wrapper) MUST:
@@ -493,6 +495,12 @@ Has a separate sign-in button (`google_account_web_button_web.dart`). `requiresP
 
 **Source files to inspect:**
 
-- `lib/data/sync/**` (upload, restore, snapshot, manifest)
-- `lib/core/auth/google_auth.dart`
-- `lib/presentation/features/settings/account/**`
+- `lib/domain/usecases/cloud_account_usecases.dart`
+- `lib/domain/usecases/drive_sync_usecases.dart`
+- `lib/data/repositories/google_drive_sync_repository.dart`
+- `lib/data/sync/**` (snapshot codec, snapshot gateways, metadata, manifest JSON)
+- `lib/presentation/features/settings/screens/account_settings_screen.dart`
+- `lib/presentation/features/settings/widgets/account_settings_group.dart`
+- `lib/presentation/features/settings/widgets/drive_sync_settings_group.dart`
+- `lib/presentation/features/settings/viewmodels/account_settings_viewmodel.dart`
+- `lib/presentation/features/settings/viewmodels/drive_sync_settings_viewmodel.dart`

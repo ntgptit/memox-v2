@@ -26,7 +26,9 @@ applies_to: TTS settings, speech playback, audio settings screen
 
 ## Data
 
-TTS settings target storage is `tts_settings` table (single row, id = `'default'`).
+Current V1 storage is the Drift `tts_settings_records` table through `TtsSettingsDao` and `TtsSettingsRepositoryImpl`.
+
+Target storage is `tts_settings` table (single row, id = `'default'`).
 
 Status: Target / Migration Required if the current implementation still uses a different table name such as `tts_settings_records`. Do not rename storage in a normal feature task without an approved migration.
 
@@ -174,8 +176,9 @@ Loading/error states use shared `Mx*` widgets per UI/UX contract.
 
 **Schema:**
 
-- SharedPreferences keys (see `docs/database/storage-boundaries.md`): `tts.autoPlay`, `tts.korean.voice`, `tts.korean.rate`, `tts.korean.pitch`, `tts.korean.volume`, `tts.english.*`
-- Schema: `decks.target_language` (one of 6 pending migrations) gates TTS
+- Current V1 settings table: `tts_settings_records` via `lib/data/datasources/local/tables/tts_settings_records_table.dart`.
+- Target settings table: `tts_settings` single-row pattern after an approved migration/rename.
+- Schema: `decks.target_language` gates TTS when the deck-language migration is active.
 
 **Decision table:**
 
@@ -192,6 +195,7 @@ Loading/error states use shared `Mx*` widgets per UI/UX contract.
 
 **Source files to inspect:**
 
-- `lib/core/tts/tts_engine.dart`
-- `lib/data/datasources/local/preferences/tts_preferences.dart`
-- `lib/presentation/features/settings/audio_speech/**`
+- `lib/domain/services/tts_service.dart`
+- `lib/domain/services/tts_playback_policy.dart`
+- `lib/presentation/features/settings/screens/audio_speech_settings_screen.dart`
+- `lib/presentation/features/settings/widgets/speech_settings_group.dart`

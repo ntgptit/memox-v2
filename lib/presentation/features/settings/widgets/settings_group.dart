@@ -202,7 +202,6 @@ class SettingsRow extends StatelessWidget {
 
     return MxTappable(
       shape: const RoundedRectangleBorder(),
-      semanticsLabel: title,
       onTap: onTap,
       showOverlay: false,
       child: content,

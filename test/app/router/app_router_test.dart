@@ -14,14 +14,17 @@ import 'package:memox/domain/repositories/drive_sync_repository.dart';
 import 'package:memox/domain/services/google_account_auth_service.dart';
 import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
+import 'package:memox/domain/value_objects/tag_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/deck_import_screen.dart';
 import 'package:memox/presentation/features/progress/providers/progress_session_notifier.dart';
 import 'package:memox/presentation/features/progress/screens/progress_screen.dart';
+import 'package:memox/presentation/features/settings/providers/tag_management_notifier.dart';
 import 'package:memox/presentation/features/settings/screens/account_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/audio_speech_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/learning_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/settings_screen.dart';
+import 'package:memox/presentation/features/settings/screens/tag_management_screen.dart';
 import 'package:memox/presentation/features/settings/viewmodels/account_settings_viewmodel.dart';
 import 'package:memox/presentation/features/settings/viewmodels/study_settings_defaults_viewmodel.dart';
 import 'package:memox/presentation/features/study/providers/study_entry_notifier.dart';
@@ -143,6 +146,39 @@ void main() {
     expect(find.byType(NavigationBar), findsNothing);
     expect(find.byType(NavigationRail), findsNothing);
   });
+
+  testWidgets('DT8 onNavigate: settings tags route hides shell navigation', (
+    tester,
+  ) async {
+    await _pumpRoute(tester, '/settings/learning/tags');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SettingsTagManagementScreen), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byType(NavigationRail), findsNothing);
+  });
+
+  testWidgets(
+    'DT9 onNavigate: pushed settings sub-screen back returns to hub',
+    (tester) async {
+      await _pumpRoute(tester, '/settings');
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      await tester.tap(find.text('Sign in & sync'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AccountSettingsScreen), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(NavigationRail), findsNothing);
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SettingsScreen), findsOneWidget);
+      expect(find.byType(NavigationRail), findsOneWidget);
+    },
+  );
 }
 
 Future<void> _pumpRoute(
@@ -176,6 +212,9 @@ Future<void> _pumpRoute(
           _FakeStudyDefaultsSettings.new,
         ),
         ttsSettingsProvider.overrideWith(_FakeTtsSettingsNotifier.new),
+        tagListProvider.overrideWith(
+          (_) => Stream<List<TagWithCount>>.value(const <TagWithCount>[]),
+        ),
         appVersionLabelProvider.overrideWith((ref) async => '1.0.0-test'),
         ?progressOverride,
       ],

@@ -12,6 +12,20 @@ source_specs:
 
 Configure Text-to-Speech (TTS) per supported language. TTS is gated by `deck.target_language` at the deck level; this screen sets per-language defaults that decks use.
 
+## V1 verification status
+
+Prompt 21 (2026-05-31) treats this screen as route-safe sub-screen coverage only. Current code implements global/front-language TTS settings, not independent per-language tabs.
+
+| Aspect | V1 status | Notes |
+| --- | --- | --- |
+| Route `/settings/audio-speech` | Current | Reachable from Settings Hub; hides shell navigation; back returns to hub when pushed from the hub. |
+| Auto-play | Current | Global auto-play preference. |
+| Front language | Current | One selected front language (`korean` or `english`). |
+| Voice/rate/pitch/volume | Current | One front voice/rate/pitch/volume setting set, normalized by `TtsSettings`. |
+| Preview | Current | Uses the same `TtsService` path as study speech. |
+| Per-language independent tabs/settings | Future/Target | Original tab layout remains target behavior; current V1 does not persist separate Korean and English setting sets. |
+| Play-after-grading toggle / reset / unsupported-language explainer | Future/Target | Not implemented in current V1. |
+
 ## Layout
 
 ```
@@ -195,11 +209,12 @@ Configure Text-to-Speech (TTS) per supported language. TTS is gated by `deck.tar
 
 **Code paths:**
 
-- `lib/presentation/features/settings/audio_speech/screens/audio_speech_settings_screen.dart`
-- `lib/presentation/features/settings/audio_speech/notifiers/audio_speech_notifier.dart`
-- `lib/core/tts/tts_engine.dart`
-- `lib/core/tts/voice_lister.dart`
-- `lib/data/datasources/local/preferences/tts_preferences.dart`
+- `lib/presentation/features/settings/screens/audio_speech_settings_screen.dart`
+- `lib/presentation/features/settings/widgets/speech_settings_group.dart`
+- `lib/presentation/features/settings/widgets/speech_audio_sliders.dart`
+- `lib/presentation/features/tts/providers/tts_settings_notifier.dart`
+- `lib/domain/services/tts_service.dart`
+- `lib/data/repositories/tts_settings_repository_impl.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.settingsAudioSpeech`
 
 **Related wireframes:**

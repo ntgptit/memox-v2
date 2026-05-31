@@ -133,12 +133,12 @@ Parity audit: row #03 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 Mock refs: variants `12a`–`12e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.3.
 
-Parity audit: row #04 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned (`✅ =`). 4 sub-routes match `RouteNames`; only minor doc gap on tag-mgmt hierarchy under Learning.
+Parity audit: row #04 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 21 verified route/action parity for the hub. 4 sub-routes match `RouteNames`; tag management is nested under Learning; hub subtitles remain Partial where they are V1 summaries instead of live aggregates.
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Current | Settings hub | Navigation list to sub-screens | Static rows pushing named routes | `lib/presentation/features/settings/screens/settings_screen.dart`, `lib/app/router/app_navigation.dart` | `docs/business/system/overview.md` | `docs/wireframes/04-settings-hub.md` | Covered by router tests. |
-| Partial | Settings hub | Account status row | `AccountStateNotifier` summary row | `lib/presentation/features/settings/screens/settings_screen.dart`, `lib/presentation/features/settings/**` | `docs/business/account-sync/account-sync.md` | `docs/wireframes/04-settings-hub.md`, `docs/wireframes/19-settings-account.md` | Depends on Account sub-screen state (see §19). |
+| Current | Settings hub | Navigation list to sub-screens | Static rows pushing named routes | `lib/presentation/features/settings/screens/settings_screen.dart`, `lib/presentation/features/settings/widgets/settings_overview_groups.dart`, `lib/app/router/app_navigation.dart` | `docs/business/system/overview.md` | `docs/wireframes/04-settings-hub.md` | [Verified 2026-05-31, Prompt 21]: `/settings` keeps shell nav; account/learning/audio/tags routes resolve, hide shell, and pushed account back returns to hub. |
+| Partial | Settings hub | Overview subtitles + About | Account row state, V1 study/TTS/tag summaries, About dialog | `lib/presentation/features/settings/widgets/settings_overview_groups.dart`, `lib/presentation/features/settings/widgets/settings_group.dart` | `docs/business/account-sync/account-sync.md` | `docs/wireframes/04-settings-hub.md`, `docs/wireframes/19-settings-account.md` | [Prompt 21]: hub is navigation-only and uses shared rows. Account error row remains navigable and row semantics include subtitle. Learning/audio/tags subtitles are V1 summaries, not full live aggregates; About bottom-sheet remains Target/release polish (current is `AboutDialog`). |
 
 ## 05. Folder detail (`/library/folder/:id`)
 
@@ -351,15 +351,15 @@ Parity audit: row #19 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Partial | Settings/Account | Sign in / out (Google) | `SignInUseCase`, `SignOutUseCase` | `lib/domain/usecases/**` (account use case paths TBD), `lib/presentation/features/settings/screens/account_settings_screen.dart` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` | `docs/wireframes/19-settings-account.md` | Confirm whether the contract use case names exist before treating as `Current`. |
-| Target | Settings/Account | Drive sync toggle + push/pull | `EnableSyncUseCase`, `PushSyncUseCase`, `PullSyncUseCase` | `lib/data/sync/**` (path TBD), `lib/domain/usecases/**` (sync use case paths TBD), `lib/presentation/features/settings/screens/account_settings_screen.dart` | `docs/business/account-sync/account-sync.md`, `docs/contracts/repository-contracts/sync-repository.md` | `docs/wireframes/19-settings-account.md` | Target spec only. Do not implement until product decision and sync repository contract are approved. |
+| Partial | Settings/Account | Sign in / out (Google) | Cloud account use cases + `AccountSettingsController` | `lib/domain/usecases/cloud_account_usecases.dart`, `lib/presentation/features/settings/screens/account_settings_screen.dart`, `lib/presentation/features/settings/viewmodels/account_settings_viewmodel.dart` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` | `docs/wireframes/19-settings-account.md` | Implemented and covered in folded settings tests, but full account-flow parity remains outside Prompt 21. |
+| Partial | Settings/Account | Manual Drive upload/restore | Drive sync use cases + `DriveSyncSettingsController` | `lib/domain/usecases/drive_sync_usecases.dart`, `lib/data/repositories/google_drive_sync_repository.dart`, `lib/presentation/features/settings/widgets/drive_sync_settings_group.dart`, `lib/presentation/features/settings/viewmodels/drive_sync_settings_viewmodel.dart` | `docs/business/account-sync/account-sync.md`, `docs/contracts/repository-contracts/sync-repository.md` | `docs/wireframes/19-settings-account.md` | Manual upload/restore exists. Full target restore protection (local pre-restore snapshot notice/path, Upload local first primary branch, second destructive confirmation) remains Partial/Target. |
 | Target | Settings/Account | Remove account (strong confirm) | `RemoveAccountUseCase` with strong-confirm dialog variant | `lib/domain/usecases/**` (account use case paths TBD), `lib/presentation/shared/dialogs/mx_confirmation_dialog.dart` (strong variant TBD), `lib/presentation/features/settings/screens/account_settings_screen.dart` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` | `docs/wireframes/19-settings-account.md`, `docs/wireframes/24-shared-dialogs.md` §Strong variant | Target spec only. Strong-confirm variant may not yet exist in `mx_confirmation_dialog.dart`. |
 
 ## 20. Settings — Learning
 
 Mock refs: variants `14a`–`14e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.5.
 
-Parity audit: row #20 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code), P1. `study_settings_policy.dart` exists. Bury/suspend foundation done (§3.1); exposing bury/suspend default-behavior settings here is a separate follow-up. Daily-goal field not present — linked to row #01 streak gap. Cross-cutting: §3.2 streak/engagement.
+Parity audit: row #20 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 21 clarified current V1 as study-defaults settings. Daily-goal/streak/reminder UI remains Future/Target and linked to engagement scope.
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -372,7 +372,7 @@ Parity audit: row #20 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 Mock refs: variants `15a`–`15g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.6.
 
-Parity audit: row #21 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code). `tts_settings_records_table.dart` persistence verified. Engine fallback (Android/iOS unavailable) + voice picker UI pending verification. P2.
+Parity audit: row #21 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 21 clarified current V1 as global/front-language TTS settings. Independent per-language tabs/settings, reset, and unsupported-language explainer remain Future/Target.
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
