@@ -40,14 +40,17 @@ ORDER BY a.attempted_at DESC;
 
 No new table required.
 
-## Surfaces
+## Future surfaces
+
+These are proposal entry points only. V1 must keep these triggers hidden or
+disabled until Card History is promoted and the required migration is approved.
 
 | Surface | Trigger |
 | --- | --- |
-| Card detail (within flashcard list editor) | "View history" action |
-| Suspended/buried card list | "View history" action |
-| Search result (flashcard) | Long-press → "View history" |
-| Study session (current card) | Action menu → "View history of this card" (opens overlay, does not exit session) |
+| Card detail or flashcard editor | Future "View history" action |
+| Suspended/buried card list | Future "View history" action |
+| Search result (flashcard) | Future long-press → "View history" |
+| Study session (current card) | Future action menu → "View history of this card" (opens overlay, does not exit session) |
 
 ## Card history screen
 
@@ -184,7 +187,7 @@ Lifetime stats remain cumulative across resets (preserve "total times reviewed" 
 **Wireframes:**
 
 - `docs/wireframes/09-flashcard-history.md` — full timeline screen with divider row and lifetime stats
-- `docs/wireframes/08-flashcard-edit.md` — "View history" action launches this screen
+- `docs/wireframes/08-flashcard-edit.md` — V1 editor explicitly does not expose a live "View history" action
 - `docs/wireframes/24-shared-dialogs.md` §reset-progress (single + bulk variants)
 
 **Schema:**

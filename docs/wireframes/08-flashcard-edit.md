@@ -1,27 +1,38 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-31
 route: /library/deck/:deckId/flashcards/:flashcardId/edit
 source_specs:
   - docs/business/flashcard/flashcard-management.md
   - docs/business/tags/tag-system.md
-  - docs/business/study-actions/bury-suspend.md
   - docs/business/history/card-history.md
 ---
 
 # 08 — Flashcard Edit
 
+> **Shared implementation note (V1).** This route is implemented by the shared
+> Flashcard Editor surface at
+> `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart`.
+> Edit mode is selected by the presence of `flashcardId`. The V1 editor is an
+> edit-and-save form only; card deletion/move/export live on the flashcard list
+> row/bulk action surfaces, and bury/suspend live on the study-session
+> card-actions sheet.
+
 ## Purpose
 
-Edit an existing flashcard. Same structure as create but with single-card actions (delete, suspend, view history) and pre-populated values.
+Edit an existing flashcard. Same shared form structure as create, with
+pre-populated values and an explicit progress-policy dialog only when learned
+front/back content changes.
 
 ## Layout
 
-```
+```text
 ┌───────────────────────────────────────┐
-│ ←   Edit flashcard         [Save] ⋮   │  ← Save enabled only when dirty
+│ ←   Edit card              [Save]     │
 ├───────────────────────────────────────┤
-│ Korean N5 · Box 3 · Due in 2 days     │  ← SRS state badge strip
+│ Library / ... / Deck / Edit card      │
 ├───────────────────────────────────────┤
+│                                       │
+│ [Deck pill: read-only in edit mode]   │
 │                                       │
 │ Front *                               │
 │ ┌───────────────────────────────────┐ │
@@ -33,22 +44,10 @@ Edit an existing flashcard. Same structure as create but with single-card action
 │ │  Hello                            │ │
 │ └───────────────────────────────────┘ │
 │                                       │
-│ Tags                                  │
-│ ┌───────────────────────────────────┐ │
-│ │ #greet  #N5  + Add tag            │ │
-│ └───────────────────────────────────┘ │
-│                                       │
-│ ▾ More fields                         │
-│   (note / example / pronunciation /   │
-│    hint as in create screen)          │
-│                                       │
-│ ─── Card actions ───                  │
-│                                       │
-│ [ View history ▸ ]                    │  ← → /flashcards/:id/history
-│ [ Suspend card ⏸ ]                    │  ← Toggle (Unsuspend if suspended)
-│ [ Reset progress ↻ ]                  │
-│ [ Move to deck 📦 ]                   │
-│ [ Delete 🗑 ]                          │  ← Destructive (themed red)
+│ Example sentence · optional           │
+│ Tags · optional                       │
+│ ▾ Show advanced fields                │
+│   Pronunciation / Hint / Note         │
 │                                       │
 └───────────────────────────────────────┘
 ```
@@ -57,126 +56,134 @@ Edit an existing flashcard. Same structure as create but with single-card action
 
 | Param | Source | Notes |
 | --- | --- | --- |
-| `deckId` (required path param) | URL | parent deck |
+| `deckId` (required path param) | URL | parent deck context |
 | `flashcardId` (required path param) | URL | card to edit |
 
 ## Data to load
 
 | Data | Source | Refresh trigger |
 | --- | --- | --- |
-| Flashcard detail (front, back, note, example, pronunciation, hint) | `flashcards` lookup | once |
-| Tag list for this card | `flashcard_tags WHERE flashcard_id = :id` | once |
-| SRS state strip (deck name, current_box, due_at or Suspended/Buried label) | `flashcard_progress` joined | watch |
-| Tag autocomplete suggestions | as create screen | live |
+| Deck context (name + breadcrumb) | `decks` / folder breadcrumb lookup | once on screen open |
+| Flashcard detail (front, back, note, example, pronunciation, hint, tags) | `flashcards` + `flashcard_tags` lookup | once on screen open |
+| Tag validation | `TagValidator` | on add-tag input / save boundary |
+
+## Shared Flashcard Editor contract (V1)
+
+| Aspect | Create route | Edit route |
+| --- | --- | --- |
+| Runtime widget | `FlashcardEditorScreen(deckId: ..., flashcardId: null)` | `FlashcardEditorScreen(deckId: ..., flashcardId: ...)` |
+| Route input | `deckId` required | `deckId` + `flashcardId` required |
+| Initial content | Blank front/back/note/example/pronunciation/hint; empty tags | Loaded from the existing card |
+| Destination deck | Deck pill can open a destination picker before first save | Read-only |
+| Save action | Creates one card in the selected deck | Updates the same card |
+| Save and add another | Available only in create mode | Hidden |
+| Starting status | Available only in create mode and maps to initial SRS box | Hidden |
+| Delete/history/suspend/bury actions | Not shown | Not shown in the editor in V1 |
 
 ## Forbidden
 
-- ❌ Save while dirty=false. Save button MUST be disabled.
+- ❌ Save while required front/back content is invalid.
 - ❌ Skip discard-confirm dialog on back when form is dirty.
-- ❌ Show only "Suspend" when card is suspended; toggle to "Unsuspend".
-- ❌ Hide card actions when card is suspended or buried; show appropriate inverse actions.
-- ❌ Reset progress without setting `last_reset_at = now`.
-- ❌ Move card to a deck in subfolders mode; picker MUST filter destinations.
-- ❌ Lose tag list on save failure.
-- ❌ Delete card without confirmation dialog.
+- ❌ Lose tag list or typed content on save failure.
+- ❌ Expose a live `View history` action in V1.
+- ❌ Add bury/suspend/delete/move actions inside the editor unless this wireframe and the matrix are promoted first.
+- ❌ Update progress from UI directly; the editor only passes `FlashcardProgressEditPolicy` through the use case/repository path.
 
 ## Components
 
 | Component | Spec |
 | --- | --- |
-| App bar | Back, title "Edit flashcard", Save (disabled until dirty), overflow ⋮. |
-| SRS state strip | "{deckName} · Box {n} · Due {relativeTime}" (or "Suspended" / "Buried until tomorrow"). Read-only. |
-| Front/Back/Tags/More fields | Same as create screen. Pre-populated. |
-| Card actions section | Always visible at bottom. Each is a button row. |
-| View history | Tap → navigate to history screen. |
-| Suspend card | Toggle button (text swaps Suspend / Unsuspend). |
-| Reset progress | Confirm dialog → reset `flashcard_progress` and set `last_reset_at`. |
-| Move to deck | Open deck picker; on pick, change card's `deck_id`. |
-| Delete | Confirm dialog → cascade delete. |
+| Header | Back/close, title "Edit card", no live History action. |
+| Breadcrumb | Shows Library → folder trail → deck → edit context. |
+| Deck pill | Read-only in edit mode; no move picker chevron. |
+| Front / Back fields | Pre-populated; required after trim. |
+| Example / Tags / Advanced fields | Shared editor fields. Note can be cleared; empty optional fields persist as null. |
+| Progress policy dialog | Appears only after Save when a card with learning progress has changed front/back content. Options: Keep progress or Reset. |
+| Save bar | Single primary "Save changes" button. |
 
 ## States
 
 | State | Trigger | Behavior |
 | --- | --- | --- |
-| Loading | Fetching card | Skeleton form. |
-| Loaded | Fetch success | Form pre-populated. Save disabled. |
-| Dirty | User edits any field | Save enabled. |
-| Saving | Save tapped | Spinner; fields disabled. |
-| Saved | Success | Toast "Saved." Pop back to list. |
-| Suspended | Card `is_suspended = true` | Strip shows "Suspended"; action button shows "Unsuspend". |
-| Buried | Card `buried_until > now` | Strip shows "Buried until tomorrow". No special action button (bury is study-session action only here). |
-| Reset done | After reset | Toast "Progress reset." Strip updates to "Box 1 · Due now". |
-| Move done | After move | Pop back; if target deck was different, new flashcard list opens. |
-| Delete done | After delete | Pop back to list. |
-| Not found | Card deleted by another flow | Show error "This card no longer exists." Back button. |
+| Loading | Fetching deck/card context | Retained async loading shell. |
+| Loaded | Fetch success | Form pre-populated. |
+| Dirty | User edits any field or tag list | Save can run when front/back are non-empty after trim. |
+| Saving | Save tapped | Action state prevents double submit. |
+| Learned content changed | User edits front/back on a card with learning progress | Save asks Keep vs Reset before repository update. |
+| Saved | Success | Toast "Flashcard updated." and return to flashcard list. |
+| Save error | Repository/use case failure | Error snackbar; form content remains intact. |
+| Not found | Card deleted by another flow | Shared error state; back goes to a safe ancestor. |
 
 ## Actions
 
 | Action | Trigger | Result |
 | --- | --- | --- |
-| Tap back/← | Back | If dirty, show discard dialog. Else pop. |
-| Tap Save | Tap | Validate (same rules as create) → save → toast → pop. |
-| Tap View history | Tap | Navigate to flashcard history. |
-| Tap Suspend / Unsuspend | Tap | Toggle `is_suspended`. Toast with 5s undo. |
-| Tap Reset progress | Tap | Show "Reset progress?" dialog (`docs/wireframes/24-shared-dialogs.md` §reset-progress). On confirm, reset + set `last_reset_at = now`. |
-| Tap Move to deck | Tap | Open deck picker bottom-sheet. On pick, transaction-update `deck_id`, recompute `sort_order`. |
-| Tap Delete | Tap | Show delete confirm dialog. On confirm, cascade delete. |
-| Tap overflow ⋮ | Tap | Same card actions in menu for quick access; redundant but expected. |
+| Tap back/close | Tap | If dirty, show discard dialog. Else pop or go to the deck flashcard list fallback. |
+| Tap Save changes | Tap | Validate → maybe ask progress policy → update → toast → pop. |
+| Choose Keep in progress-policy dialog | Save after learned front/back content changed | Update content and keep existing SRS progress. |
+| Choose Reset in progress-policy dialog | Save after learned front/back content changed | Update content and reset the card's learning progress to the V1 fresh-card state. |
+| Add/remove tag | Tag input sheet / chip remove | Mutates draft only; persisted on Save. |
+
+## Current V1 action owners
+
+| Action | V1 owner | Notes |
+| --- | --- | --- |
+| Move card | Flashcard list row/bulk actions | Preserves progress and tags. |
+| Delete card | Flashcard list row/bulk actions | Requires confirmation and cascades through persistence. |
+| Export card | Flashcard list row/bulk actions | Selection/single-row export surface. |
+| Bury/Suspend | Study-session card-actions sheet | See `docs/wireframes/25-shared-bottom-sheets.md` §card-actions. |
+| View history | Future Proposal | Do not expose live in V1. Requires promotion of `docs/wireframes/09-flashcard-history.md`. |
 
 ## Dialogs and bottom-sheets used
 
 - Discard changes dialog — `docs/wireframes/24-shared-dialogs.md` §discard-changes.
-- Reset progress dialog — `docs/wireframes/24-shared-dialogs.md` §reset-progress.
-- Delete card dialog — `docs/wireframes/24-shared-dialogs.md` §delete-confirm.
-- Deck picker (for Move) — `docs/wireframes/25-shared-bottom-sheets.md` §deck-picker.
+- Progress policy dialog — inline `MxDialog` composition in the editor.
+- Tag input sheet — shared tag input sheet from `MxTagInput`.
 
 ## Validation rules
 
-Same as create (front/back required, tag rules). Apply on Save.
+Same as create (front/back required, tag rules). Apply on Save and at the
+repository boundary.
 
 ## Navigation in
 
 - Tap card row in flashcard list.
-- Tap "Edit card" action from card history.
-- Tap "Edit" from card context sheet.
+- Tap Edit from the flashcard list row action sheet.
 
 ## Navigation out
 
 - Back → flashcard list (with confirm if dirty).
 - Save → flashcard list with toast.
-- View history → flashcard history screen.
-- Delete → flashcard list (card removed).
-- Move → flashcard list of NEW deck.
 
 ## Responsive
 
-- ≥600dp: side-by-side layout. Front/Back in left column; tags + more fields + actions in right.
+- ≥600dp: form content may use the shared editor responsive constraints, but no
+  separate action rail is shown in V1 edit mode.
 
 ## Performance
 
 - Single fetch on open.
-- Save = single transaction (UPDATE flashcards + flashcard_tags).
-- Move = single transaction (UPDATE flashcards.deck_id, recompute sort_order in target).
+- Save = single transaction for `flashcards` + `flashcard_tags`, with optional
+  `flashcard_progress` reset when the explicit policy is chosen.
 
 ## Accessibility
 
-- SRS strip announced as supplementary info.
-- Destructive action ("Delete") visually distinguished with theme error color.
-- Reset progress button announces "Reset SRS progress, keeps history".
+- Required fields announced with "Required" in label.
+- Progress policy dialog actions announce whether progress will be kept or reset.
+- No live Future action is announced for History.
 
 ## Rules
 
-- Save MUST be disabled when no changes detected (dirty=false).
+- Save MUST be gated by required front/back content after trim.
 - Discard confirmation triggered by any change including tag list edits.
-- Suspend toggle MUST show 5s undo toast (per bury-suspend spec).
-- Reset progress MUST set `last_reset_at = now` and MUST NOT delete attempts.
+- Normal edit MUST keep progress unless the user explicitly chooses Reset in the learned-content policy dialog.
+- V1 editor MUST NOT expose a live History route/action.
 
 ## Agent rule
 
 - Do NOT clear the form on Save if save fails. Keep dirty state.
-- Do NOT hide the card actions section when card is suspended/buried; show appropriate inverse actions.
-- Move card MUST validate target deck mode (decks/unlocked) — picker should pre-filter destinations to valid decks.
-- "Move to deck" MUST preserve `flashcard_progress` and tags (SRS state and tags transfer with card).
+- Do NOT add History, Bury/Suspend, Move, or Delete inside the editor unless this wireframe and the matrix are promoted first.
+- Do NOT implement standalone reset-progress/history semantics that require `last_reset_at` unless the migration task is explicitly approved.
 
 ## Implementation refs
 
@@ -184,33 +191,32 @@ Same as create (front/back required, tag rules). Apply on Save.
 
 - `docs/business/flashcard/flashcard-management.md`
 - `docs/business/tags/tag-system.md`
-- `docs/business/study-actions/bury-suspend.md` (suspend toggle)
-- `docs/business/history/card-history.md` (View history action; reset progress sets `last_reset_at`)
+- `docs/business/history/card-history.md` (Future Proposal; no live V1 editor action)
 
 **Decision rows:**
 
-- Flashcard edit, validation, reset progress, suspend toggle
+- Flashcard edit, validation, learned-content progress policy
 
 **Schema / storage:**
 
-- UPDATE `flashcards`, `flashcard_progress`, `flashcard_tags` (atomic)
-- Reset → `box=1`, `due_at=now`, `last_reset_at=now`
-- Move → UPDATE `flashcards.deck_id`, recompute `sort_order`
+- UPDATE `flashcards` + `flashcard_tags` atomically.
+- If the user chooses Reset in the learned-content policy dialog, reset `flashcard_progress` to the current V1 fresh-card state.
+- Standalone reset-progress/history semantics that require `last_reset_at` remain Future Proposal.
 
-**Contracts:** `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/usecase-contracts/study.md` §SuspendCardUseCase, `docs/contracts/usecase-contracts/tag.md`
+**Contracts:** `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/usecase-contracts/tag.md`
 
 **Code paths:**
 
-- `lib/presentation/features/flashcard_form/screens/flashcard_edit_screen.dart`
-- `lib/presentation/features/flashcard_form/notifiers/flashcard_edit_notifier.dart`
-- `lib/domain/usecases/flashcard/update_flashcard_usecase.dart`
-- `lib/domain/usecases/flashcard/move_flashcard_usecase.dart`
-- `lib/domain/usecases/history/reset_progress_usecase.dart`
-- `lib/domain/usecases/study/suspend_card_usecase.dart`
+- `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart`
+- `lib/presentation/features/flashcards/viewmodels/flashcard_editor_viewmodel.dart`
+- `lib/presentation/features/flashcards/widgets/flashcard_editor_form.dart`
+- `lib/domain/usecases/flashcard_usecases.dart` → `UpdateFlashcardUseCase`
 - `lib/app/router/route_names.dart` → `RouteNames.flashcardEdit`
 
 **Related wireframes:**
 
-- `docs/wireframes/06-flashcard-list.md` (caller), `docs/wireframes/09-flashcard-history.md` (action target)
-- `docs/wireframes/24-shared-dialogs.md` §discard-changes, §reset-progress, §delete-confirm
-- `docs/wireframes/25-shared-bottom-sheets.md` §deck-picker, §undo-toast
+- `docs/wireframes/06-flashcard-list.md` (caller and row/bulk action owner)
+- `docs/wireframes/07-flashcard-create.md` (same shared editor surface)
+- `docs/wireframes/09-flashcard-history.md` (Future Proposal; no live V1 action)
+- `docs/wireframes/24-shared-dialogs.md` §discard-changes, §delete-confirm
+- `docs/wireframes/25-shared-bottom-sheets.md` §card-actions

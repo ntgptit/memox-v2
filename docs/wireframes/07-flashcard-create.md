@@ -8,6 +8,13 @@ source_specs:
 
 # 07 — Flashcard Create
 
+> **Shared implementation note (V1).** This route is implemented by the shared
+> Flashcard Editor surface at
+> `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart`.
+> Create mode is selected by the presence of `deckId` and the absence of
+> `flashcardId`; edit mode is documented separately in
+> `docs/wireframes/08-flashcard-edit.md`.
+
 ## Purpose
 
 Create a single flashcard in the current deck. Optimized for repeated entry — common path is "add many cards in a row".
@@ -68,6 +75,19 @@ Create a single flashcard in the current deck. Optimized for repeated entry — 
 | Deck detail (name, target_language) | `decks` lookup | once on screen open |
 | Tag autocomplete suggestions | top tags from `flashcard_tags` matching input prefix | live, debounced 200ms |
 | "Save and add another" toggle | session memory (NotifierState) | local |
+
+## Shared Flashcard Editor contract (V1)
+
+| Aspect | Create route | Edit route |
+| --- | --- | --- |
+| Runtime widget | `FlashcardEditorScreen(deckId: ..., flashcardId: null)` | `FlashcardEditorScreen(deckId: ..., flashcardId: ...)` |
+| Route input | `deckId` required | `deckId` + `flashcardId` required |
+| Initial content | Blank front/back/note/example/pronunciation/hint; empty tags | Loaded from the existing card |
+| Destination deck | Deck pill can open a destination picker before first save | Read-only; moving a saved card belongs to flashcard list row/bulk actions |
+| Save action | Creates one card in the selected deck | Updates the same card |
+| Save and add another | Available only in create mode | Hidden |
+| Starting status | Available only in create mode and maps to initial SRS box | Hidden; normal edit keeps current progress unless the explicit learning-content policy dialog resets it |
+| Delete/history/suspend/bury actions | Not shown | Not shown in the editor in V1; see `docs/wireframes/08-flashcard-edit.md` for current owners |
 
 ## Forbidden
 
@@ -198,10 +218,10 @@ Create a single flashcard in the current deck. Optimized for repeated entry — 
 
 **Code paths:**
 
-- `lib/presentation/features/flashcard_form/screens/flashcard_create_screen.dart`
-- `lib/presentation/features/flashcard_form/notifiers/flashcard_form_notifier.dart`
-- `lib/presentation/features/flashcard_form/widgets/tag_chip_input.dart`
-- `lib/domain/usecases/flashcard/create_flashcard_usecase.dart`
+- `lib/presentation/features/flashcards/screens/flashcard_editor_screen.dart`
+- `lib/presentation/features/flashcards/viewmodels/flashcard_editor_viewmodel.dart`
+- `lib/presentation/features/flashcards/widgets/flashcard_editor_form.dart`
+- `lib/domain/usecases/flashcard_usecases.dart` → `CreateFlashcardUseCase`
 - `lib/app/router/route_names.dart` → `RouteNames.flashcardCreate`
 
 **Related wireframes:**

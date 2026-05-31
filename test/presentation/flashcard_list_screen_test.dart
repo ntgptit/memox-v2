@@ -518,72 +518,71 @@ void main() {
     expect(find.text('study-entry-deck-$deckId'), findsOneWidget);
   });
 
-  testWidgets(
-    'DT4 onNavigate: starts deck study from the study-flow Mix card',
-    (WidgetTester tester) async {
-      const deckId = 'deck-001';
-      final container = ProviderContainer(
-        overrides: [
-          flashcardListQueryProvider(deckId).overrideWith(
-            (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
-          ),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      final router = GoRouter(
-        initialLocation: '/library/deck/$deckId/flashcards',
-        routes: [
-          GoRoute(
-            path: '/library',
-            builder: (context, state) => const SizedBox.shrink(),
-            routes: [
-              GoRoute(
-                path: RoutePaths.flashcardListSegment,
-                name: RouteNames.flashcardList,
-                builder: (context, state) => FlashcardListScreen(
-                  deckId: state.pathParameters[RoutePaths.deckIdParam]!,
-                ),
-              ),
-              GoRoute(
-                path: RoutePaths.studyEntrySegment,
-                name: RouteNames.studyEntry,
-                builder: (context, state) => Text(
-                  'study-entry-${state.pathParameters[RoutePaths.studyEntryTypeParam]}'
-                  '-${state.pathParameters[RoutePaths.studyEntryRefIdParam]}',
-                ),
-              ),
-            ],
-          ),
-        ],
-      );
-      addTearDown(router.dispose);
-
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp.router(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            routerConfig: router,
-          ),
+  testWidgets('DT4 onNavigate: starts deck study from the study-flow Mix card', (
+    WidgetTester tester,
+  ) async {
+    const deckId = 'deck-001';
+    final container = ProviderContainer(
+      overrides: [
+        flashcardListQueryProvider(deckId).overrideWith(
+          (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
-      );
-      await tester.pumpAndSettle();
+      ],
+    );
+    addTearDown(container.dispose);
 
-      final mixCard = find.byKey(const ValueKey('study_mode_mix'));
-      await tester.scrollUntilVisible(
-        mixCard,
-        300,
-        scrollable: _verticalScrollable(),
-      );
-      await tester.tap(mixCard);
-      await tester.pumpAndSettle();
+    final router = GoRouter(
+      initialLocation: '/library/deck/$deckId/flashcards',
+      routes: [
+        GoRoute(
+          path: '/library',
+          builder: (context, state) => const SizedBox.shrink(),
+          routes: [
+            GoRoute(
+              path: RoutePaths.flashcardListSegment,
+              name: RouteNames.flashcardList,
+              builder: (context, state) => FlashcardListScreen(
+                deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+              ),
+            ),
+            GoRoute(
+              path: RoutePaths.studyEntrySegment,
+              name: RouteNames.studyEntry,
+              builder: (context, state) => Text(
+                'study-entry-${state.pathParameters[RoutePaths.studyEntryTypeParam]}'
+                '-${state.pathParameters[RoutePaths.studyEntryRefIdParam]}',
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
 
-      // Mix card pushes the study-entry route (preserving the flashcard stack).
-      expect(find.text('study-entry-deck-$deckId'), findsOneWidget);
-    },
-  );
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final mixCard = find.byKey(const ValueKey('study_mode_mix'));
+    await tester.scrollUntilVisible(
+      mixCard,
+      300,
+      scrollable: _verticalScrollable(),
+    );
+    await tester.tap(mixCard);
+    await tester.pumpAndSettle();
+
+    // Mix card pushes the study-entry route (preserving the flashcard stack).
+    expect(find.text('study-entry-deck-$deckId'), findsOneWidget);
+  });
 
   testWidgets(
     'DT2 onNavigate: header more opens deck actions from flashcard management',
@@ -717,6 +716,8 @@ void main() {
     expect(find.text('Export'), findsOneWidget);
     expect(find.text('Select'), findsOneWidget);
     expect(find.text('Delete'), findsOneWidget);
+    expect(find.textContaining('History'), findsNothing);
+    expect(find.textContaining('history'), findsNothing);
   });
 
   testWidgets('DT1 onSelect: flashcard select action enables bulk mode', (
@@ -1046,7 +1047,6 @@ Finder _verticalScrollable() => find
           widget is Scrollable && widget.axisDirection == AxisDirection.down,
     )
     .first;
-
 
 Future<void> _scrollToText(WidgetTester tester, String text) async {
   await _scrollUntilAny(tester, find.text(text));

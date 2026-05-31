@@ -46,6 +46,11 @@ Future<Either<Failure, Flashcard>> call({
 
 - Same validation as create for provided fields.
 - Tag list (if provided) replaces; old tags removed, new tags inserted, dedup applied. Atomic. See `docs/contracts/repository-contracts/flashcard-repository.md`.
+- V1 editor passes `FlashcardProgressEditPolicy.keepProgress` by default.
+- If learned front/back content changes on a card with learning progress, the editor must ask for an explicit policy before saving:
+  - `keepProgress` preserves existing `flashcard_progress`.
+  - `resetProgress` resets `flashcard_progress` to the current V1 fresh-card state through the repository update path.
+- This policy dialog is not the Future standalone Card History reset flow and does not require a live History route.
 
 **Errors:** `NotFoundFailure`, `ValidationFailure`, `StorageFailure`.
 
@@ -88,7 +93,7 @@ Future<Either<Failure, Unit>> call({required FlashcardId id});
 
 **Test refs:** FC7.
 
-## ResetFlashcardProgressUseCase
+## ResetFlashcardProgressUseCase (Future / migration-required standalone action)
 
 ```dart
 Future<Either<Failure, FlashcardProgress>> call({required FlashcardId id});
@@ -98,6 +103,7 @@ Future<Either<Failure, FlashcardProgress>> call({required FlashcardId id});
 
 - UPDATE `flashcard_progress`: `current_box = 1`, `due_at = now`, `last_reset_at = now`. `review_count` and `lapse_count` UNCHANGED.
 - Do NOT delete `study_attempts`. History preserved.
+- Not V1 editor scope. Do not expose this standalone action until `docs/business/history/card-history.md` is promoted and its migration dependencies are approved.
 
 **Errors:** `NotFoundFailure`, `StorageFailure`.
 

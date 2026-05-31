@@ -182,6 +182,16 @@ Flashcard list/editor/import should support:
 - Delete confirmation.
 - Safe return to deck flashcard list.
 
+V1 create/edit note:
+
+- Flashcard create and edit routes share `FlashcardEditorScreen`.
+- Create mode is selected by `deckId` with no `flashcardId`; edit mode is selected by `deckId` + `flashcardId`.
+- The editor owns content/tag create and update only.
+- Single-card move/delete/export actions live on the flashcard list row/bulk action surfaces.
+- Bury/Suspend live on the study-session card-actions sheet.
+- Flashcard History is Future Proposal and must not be exposed as a live editor/list action in V1.
+- Learned front/back edits keep SRS progress unless the explicit progress-policy dialog chooses Reset.
+
 Deck import screen (`/library/deck/:deckId/import`):
 
 - Format picker (CSV / Excel / Structured text).

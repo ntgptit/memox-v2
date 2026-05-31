@@ -32,6 +32,83 @@ void main() {
     expect(find.text('Save card'), findsOneWidget);
   });
 
+  testWidgets('DT2 onInsert: empty front keeps create save actions disabled', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildCreateApp());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).at(1), 'Back only');
+    await tester.pump();
+
+    final saveAndAdd = tester.widget<MxSecondaryButton>(
+      find.widgetWithText(MxSecondaryButton, 'Save & add another'),
+    );
+    final save = tester.widget<MxPrimaryButton>(
+      find.widgetWithText(MxPrimaryButton, 'Save card'),
+    );
+
+    expect(saveAndAdd.onPressed, isNull);
+    expect(save.onPressed, isNull);
+  });
+
+  testWidgets('DT3 onInsert: empty back keeps create save actions disabled', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_buildCreateApp());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).at(0), 'Front only');
+    await tester.pump();
+
+    final saveAndAdd = tester.widget<MxSecondaryButton>(
+      find.widgetWithText(MxSecondaryButton, 'Save & add another'),
+    );
+    final save = tester.widget<MxPrimaryButton>(
+      find.widgetWithText(MxPrimaryButton, 'Save card'),
+    );
+
+    expect(saveAndAdd.onPressed, isNull);
+    expect(save.onPressed, isNull);
+  });
+
+  testWidgets(
+    'DT1 onOpen: edit route uses shared editor without live Future actions',
+    (tester) async {
+      const deckId = 'deck-001';
+      const flashcardId = 'card-001';
+      final repository = _EditorFlashcardRepository(
+        flashcard: _flashcard(hasLearningProgress: true),
+      );
+      final container = _editorContainer(repository);
+      final router = _editorRouter(deckId: deckId, flashcardId: flashcardId);
+      addTearDown(container.dispose);
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FlashcardEditorScreen), findsOneWidget);
+      expect(find.text('Edit card'), findsWidgets);
+      expect(find.text('Original front'), findsOneWidget);
+      expect(find.text('Original back'), findsOneWidget);
+      expect(find.textContaining('history'), findsNothing);
+      expect(find.textContaining('History'), findsNothing);
+      expect(find.text('Delete'), findsNothing);
+      expect(find.textContaining('Suspend'), findsNothing);
+      expect(find.text('Save & add another'), findsNothing);
+    },
+  );
+
   testWidgets(
     'DT1 onDisplay: renders front back example tags fields + advanced toggle',
     (tester) async {

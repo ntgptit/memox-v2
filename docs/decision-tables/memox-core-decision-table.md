@@ -43,12 +43,12 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 
 | ID | Event | Condition | Expected | Coverage | Test |
 | --- | --- | --- | --- | --- | --- |
-| C1 | Create card | Valid front/back | Persist card | C0+C1 | `test/features/flashcards/create_flashcard_test.dart::C1` |
-| C2 | Create card | Empty front | Reject | C1 | `test/features/flashcards/create_flashcard_test.dart::C2` |
-| C3 | Create card | Empty back | Reject | C1 | `test/features/flashcards/create_flashcard_test.dart::C3` |
-| C4 | Edit card | Belongs to deck | Update card | C0+C1 | `test/features/flashcards/edit_flashcard_test.dart::C4` |
-| C5 | Edit card | Missing/wrong deck | Reject or show error | C1 | `test/features/flashcards/edit_flashcard_test.dart::C5` |
-| C6 | Delete card | Confirmed | Delete card and dependent data | C0+C1 | `test/features/flashcards/delete_flashcard_test.dart::C6` |
+| C1 | Create card | Valid front/back | Persist card through shared Flashcard Editor create mode | C0+C1 | `test/data/repositories/content_repository_test.dart::DT6 onInsert`, `test/presentation/flashcard_editor_screen_test.dart::DT1 onOpen` |
+| C2 | Create card | Empty front | Reject / keep Save disabled | C1 | `test/presentation/flashcard_editor_screen_test.dart::DT2 onInsert` |
+| C3 | Create card | Empty back | Reject / keep Save disabled | C1 | `test/presentation/flashcard_editor_screen_test.dart::DT3 onInsert` |
+| C4 | Edit card | Existing card opens through shared editor | Load existing content and update same card | C0+C1 | `test/presentation/flashcard_editor_screen_test.dart::DT1 onOpen`, `test/data/repositories/content_repository_test.dart::DT1 onUpdate` |
+| C5 | Edit card | Learned front/back changed on a progressed card | Ask explicit Keep / Reset progress policy before save | C1 | `test/presentation/flashcard_editor_screen_test.dart::DT1 onUpdate`, `test/presentation/flashcard_editor_screen_test.dart::DT2 onUpdate` |
+| C6 | Delete card | Confirmed from flashcard list row/bulk action | Delete card and dependent data | C0+C1 | `test/data/repositories/content_repository_test.dart::DT4 onDelete`, `test/presentation/flashcard_list_screen_test.dart::DT1 onDelete` |
 | C7 | Import | Mixed rows | Save valid, report invalid | C1 | `test/features/flashcards/import_flashcards_test.dart::C7` |
 | C8 | Create card | Whitespace-only front | Reject (trim then validate) | C1 | `test/features/flashcards/create_flashcard_test.dart::C8` |
 
@@ -175,7 +175,7 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | --- | --- | --- | --- | --- | --- |
 | H1 | Open history | Card with attempts | Show timeline newest-first | C0+C1 | `test/features/history/card_history_test.dart::H1` |
 | H2 | Open history | Card with zero attempts | Show empty state with "Start study" CTA | C1 | `test/features/history/card_history_test.dart::H2` |
-| H3 | Reset progress | From history | Reset SRS, set `last_reset_at=now`, retain attempts | C0+C1 | `test/features/history/card_history_test.dart::H3` |
+| H3 | Reset progress | From future history screen | Reset SRS, set `last_reset_at=now`, retain attempts | Future | Future Proposal; do not implement in V1 |
 | H4 | Lifetime stats | Accuracy calculation | (reviewCount - lapseCount) / reviewCount | C0 | `test/domain/services/lifetime_stats_test.dart::H4` |
 | H5 | Timeline | Card with `last_reset_at` set | Show divider row at the correct timestamp position | C0+C1 | `test/features/history/card_history_test.dart::H5` |
 | H6 | Timeline | `box_before=0` (pre-migration row) | Render "—" for box transition, not "Box 0" | C1 | `test/features/history/card_history_test.dart::H6` |

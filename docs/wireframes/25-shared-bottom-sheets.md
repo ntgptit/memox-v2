@@ -343,6 +343,10 @@ For decks, add:
 
 Used by: flashcard row long-press alternative (when not in selection mode), card menu in study session.
 
+> **V1 scope note.** Card History and standalone Reset Progress are Future
+> Proposal / migration-required items. Do not expose `View history` or a
+> standalone reset action in V1 sheets until those specs are promoted.
+
 ```
 ┌───────────────────────────────────────┐
 │         ─────                         │
@@ -350,19 +354,19 @@ Used by: flashcard row long-press alternative (when not in selection mode), card
 │ {front truncated}                     │
 │ {back truncated}                      │
 │                                       │
-│ ✏ Edit                                 │
-│ 📊 View history                       │
-│ ⏸ Suspend / ⏯ Unsuspend                │
-│ 🌙 Bury until tomorrow                │
-│ ↻ Reset progress                      │
-│ 📦 Move to deck                       │
-│ 🗑 Delete                              │
+│ Edit                                  │
+│ Suspend / Unsuspend                   │
+│ Bury until tomorrow                   │
+│ Move to deck                          │
+│ Delete                                │
 │ ─────────────────────────────────     │
 │ ✕ Cancel                              │
 └───────────────────────────────────────┘
 ```
 
-In study session, omit Edit (already in study context) and add "End session here".
+In the current V1 implementation, the study-session card-actions sheet exposes
+only Edit, Bury until tomorrow, and Suspend/Unsuspend. Flashcard list row actions
+own Move, Export, Select, and Delete.
 
 ---
 

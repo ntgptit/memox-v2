@@ -61,5 +61,6 @@ The following features are not safe to implement until the schema migration is i
 - Do not treat a complete wireframe as implementation approval.
 - Do not create routes for Future Proposal screens.
 - Do not wire dead links to Future Proposal screens.
+- For Flashcard Editor V1, do not add a live `View history` action, standalone reset-progress action, or history route. The editor may only show the existing learned-content Keep/Reset progress-policy dialog when saving front/back changes on a progressed card.
 - Do not implement migration-required behavior without the migration task being explicit.
 - When promoting `Future` or `Target` rows to implementable work, update this file, the matrix, the parity audit, and related business/wireframe docs in the same docs PR.

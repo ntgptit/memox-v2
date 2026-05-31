@@ -49,7 +49,7 @@ Route name constants (from `lib/app/router/route_names.dart`): `RouteNames.setti
 | Flashcard list (filtered) | `/library/deck/:deckId/flashcards?filter={active\|suspended\|buried\|due}&tag={t1,t2}` | Yes |
 | Flashcard create | `/library/deck/:deckId/flashcards/new` | No |
 | Flashcard edit | `/library/deck/:deckId/flashcards/:flashcardId/edit` | No |
-| Flashcard history | `/library/deck/:deckId/flashcards/:flashcardId/history` | No |
+| Flashcard history | Future Proposal; no live V1 route | No |
 | Deck import | `/library/deck/:deckId/import` | No |
 | Library search | `/library/search?q={query}` | Yes |
 | Study entry | `/library/study/:entryType/:entryRefId` (entryType: `deck` \| `folder` \| `tag`) | No |
@@ -60,7 +60,7 @@ Route name constants (from `lib/app/router/route_names.dart`): `RouteNames.setti
 Notes:
 
 - Query-string filters on the flashcard list are application conventions; verify GoRouter declarations in `lib/presentation/features/**/routes/*.dart`.
-- The `tag` entry type, history route, and library search route are new. Add route constants in `RouteNames` / `RoutePaths` and wire them up when implementing.
+- The `tag` entry type, flashcard history route, and library search route are Future/Target items. Add route constants in `RouteNames` / `RoutePaths` and wire them up only when the related scope guard promotes them.
 
 ## Push vs Go rules
 

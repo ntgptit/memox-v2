@@ -261,7 +261,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 - Tap deck row in Library or Folder detail.
 - Search result tap on deck.
 - Deep link from notification (rare).
-- Back from Flashcard create/edit/import/history.
+- Back from Flashcard create/edit/import. Flashcard History is Future Proposal and has no live V1 route.
 
 ## Navigation out
 
@@ -270,7 +270,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 - "Today" → study entry gate (deck-scoped review).
 - Resume → session.
 - FAB → create or import.
-- Card history (from context sheet) → flashcard history screen.
+- Card history remains Future Proposal; no live V1 context-sheet action.
 
 ## Responsive
 
@@ -337,6 +337,6 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 
 **Related wireframes:**
 
-- `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/08-flashcard-edit.md`, `docs/wireframes/09-flashcard-history.md`, `docs/wireframes/10-deck-import.md`
+- `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/08-flashcard-edit.md`, `docs/wireframes/09-flashcard-history.md` (Future Proposal), `docs/wireframes/10-deck-import.md`
 - `docs/wireframes/24-shared-dialogs.md` §bulk-delete, §reset-progress, §discard-session
 - `docs/wireframes/25-shared-bottom-sheets.md` §tag-picker, §deck-picker, §filter-status, §undo-toast, §card-context
