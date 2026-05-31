@@ -146,5 +146,8 @@ String studyErrorMessage(Object? error) {
   if (error is ValidationException) {
     return error.message;
   }
+  if (error is AppException) {
+    return error.message;
+  }
   return 'Study action failed.';
 }

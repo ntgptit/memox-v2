@@ -123,7 +123,7 @@ class StudyEntryActionController extends _$StudyEntryActionController {
         return null;
       }
       state = AsyncError<void>(error, stackTrace);
-      return null;
+      return StudyEntryStartResult.rejected(error);
     }
   }
 }

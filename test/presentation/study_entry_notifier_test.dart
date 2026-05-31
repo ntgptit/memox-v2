@@ -71,6 +71,40 @@ void main() {
       expect(repo.activeSessionLoadCount, 2);
     },
   );
+
+  test(
+    'DT3 onExternalChange: unexpected AppException is preserved as rejected result and AsyncError',
+    () async {
+      const error = StorageException(message: 'Could not create session.');
+      final container = ProviderContainer(
+        overrides: [
+          studyRepoProvider.overrideWithValue(_FailingStartStudyRepo(error)),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final result = await container
+          .read(studyEntryActionControllerProvider('deck', 'deck-1').notifier)
+          .start(
+            studyType: StudyType.newStudy,
+            settings: const StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          );
+
+      final actionState = container.read(
+        studyEntryActionControllerProvider('deck', 'deck-1'),
+      );
+
+      expect(result?.sessionId, isNull);
+      expect(result?.error, same(error));
+      expect(actionState.hasError, isTrue);
+      expect(actionState.error, same(error));
+    },
+  );
 }
 
 final class _SuccessfulStudyRepo implements StudyRepo {
@@ -319,6 +353,22 @@ final class _EmptyStudyRepo implements StudyRepo {
     required StudyFinalizePolicy finalizePolicy,
   }) {
     throw UnimplementedError();
+  }
+}
+
+final class _FailingStartStudyRepo extends _SuccessfulStudyRepo {
+  _FailingStartStudyRepo(this.error);
+
+  final Object error;
+
+  @override
+  Future<StudySessionSnapshot> startSession({
+    required StudyContext context,
+    required StudyFlow flow,
+    required List<StudyMode> modes,
+    required List<StudyFlashcardRef> batch,
+  }) async {
+    throw error;
   }
 }
 

@@ -86,6 +86,7 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | S19 | Attempt grade codec | result=`recovered` | Codec accepts `recovered`; grade is passing but not perfect-eligible | C0+C1 | `test/domain/study/attempt_grade_codec_test.dart::DT15` |
 | S20 | SRS Review finalize | All persisted attempts pass, at least one `recovered` | `ReviewResult.recovered`, current box unchanged, no lapse, no retry | C0+C1 | `test/data/repositories/study_repository_test.dart::DT15` |
 | S21 | Schema migration | Existing DB reports `user_version=12` but `study_attempts.result` CHECK still allows only `correct`/`incorrect` | Schema v13 rebuilds `study_attempts`; inserting `recovered` succeeds | C1 | `test/data/datasources/local/app_database_migration_test.dart::DT6` |
+| S22 | Start study | Start use case throws an unexpected `AppException` | Preserve the original error as the rejected result, set action `AsyncError`, and show the exception message instead of generic "Study action failed." | C1 | `test/presentation/study_entry_notifier_test.dart::DT3` + `test/presentation/study_entry_screen_test.dart::DT7` |
 
 ## Bury / Suspend
 
@@ -117,6 +118,8 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | R10 | Restart session | Previous session belongs to a different entry scope | Reject before loading a new batch; do not cancel or create | C1 | `test/domain/study/restart_study_session_usecase_test.dart::R10` |
 | R11 | Restart session | Previous session is not restartable | Reject before loading a new batch; do not cancel or create | C1 | `test/domain/study/restart_study_session_usecase_test.dart::R11` |
 | R12 | Restart session | Eligible batch is empty | Reject; do not cancel previous session or create a new session | C1 | `test/domain/study/restart_study_session_usecase_test.dart::R12` |
+| R13 | Resume candidate lookup | Most recent active scope candidate references missing flashcard data | Log candidate snapshot failure, ignore the corrupt candidate, and allow start-new to create a valid session | C1 | `test/data/repositories/study_repository_test.dart::DT4 onUpdate` |
+| R14 | Explicit resume/load | Caller opens the corrupt session by id | Surface the load failure; do not hide corruption outside candidate discovery | C1 | `test/data/repositories/study_repository_test.dart::DT5 onUpdate` |
 
 ## Tags
 

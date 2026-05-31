@@ -932,6 +932,37 @@ void registerStudyRepositoryTests() {
       },
     );
 
+    for (final entry in _singleModeFlowCases.entries) {
+      test(
+        'DT17 repositoryFlow: ${entry.key.name} mode starts ${entry.value.name}',
+        () async {
+          await harness.seedDeckWithCards(cardCount: 1);
+
+          final snapshot = await harness.start.execute(
+            const StudyContext(
+              entryType: StudyEntryType.deck,
+              entryRefId: 'deck-1',
+              studyType: StudyType.newStudy,
+              settings: StudySettingsSnapshot(
+                batchSize: 1,
+                shuffleFlashcards: false,
+                shuffleAnswers: false,
+                prioritizeOverdue: true,
+              ),
+            ),
+            modes: <StudyMode>[entry.key],
+          );
+
+          expect(snapshot.session.studyFlow, entry.value);
+          expect(snapshot.currentItem?.studyMode, entry.key);
+          expect(snapshot.currentItem?.modeOrder, 1);
+          expect(snapshot.sessionFlashcards.map((card) => card.id), <String>[
+            'card-1',
+          ]);
+        },
+      );
+    }
+
     test(
       'DT6 repositoryFlow: batch review submit fails fast outside Review mode',
       () async {
@@ -1903,6 +1934,97 @@ void registerStudyRepositoryTests() {
     );
 
     test(
+      'DT4 onUpdate: corrupt resume candidate is ignored and start-new still works',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 2);
+
+        final stale = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.deleteFlashcardWithoutCascading('card-1');
+
+        final candidate = await harness.resume.findCandidate(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.srsReview,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        expect(candidate, isNull);
+        expect(harness.logger.errors, hasLength(1));
+        expect(
+          harness.logger.errors.single.message,
+          'Failed to load resume candidate; ignoring stale study session.',
+        );
+
+        final started = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+
+        expect(started.session.id, isNot(stale.session.id));
+        expect(started.session.status, SessionStatus.inProgress);
+        expect(started.sessionFlashcards.map((card) => card.id), <String>[
+          'card-2',
+        ]);
+      },
+    );
+
+    test(
+      'DT5 onUpdate: explicit load of corrupt session still throws',
+      () async {
+        await harness.seedDeckWithCards(cardCount: 1);
+
+        final stale = await harness.start.execute(
+          const StudyContext(
+            entryType: StudyEntryType.deck,
+            entryRefId: 'deck-1',
+            studyType: StudyType.newStudy,
+            settings: StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          ),
+        );
+        await harness.deleteFlashcardWithoutCascading('card-1');
+
+        await expectLater(
+          () => harness.resume.execute(stale.session.id),
+          throwsA(anything),
+        );
+        expect(harness.logger.errors, isEmpty);
+      },
+    );
+
+    test(
       'DT4 onUpdate: perfect SRS Review increases box and schedules the next interval',
       () async {
         await harness.seedDeckWithCards(cardCount: 1, due: true, currentBox: 4);
@@ -2303,6 +2425,13 @@ void registerStudyRepositoryTests() {
 final _studyNow = DateTime.utc(2026, 4, 24, 9).millisecondsSinceEpoch;
 const int _sqliteMaxInt = 9223372036854775807;
 const String _finalizeFailureLogMessage = 'Failed to finalize study session.';
+const _singleModeFlowCases = <StudyMode, StudyFlow>{
+  StudyMode.review: StudyFlow.newReviewOnly,
+  StudyMode.match: StudyFlow.newMatchOnly,
+  StudyMode.guess: StudyFlow.newGuessOnly,
+  StudyMode.recall: StudyFlow.newRecallOnly,
+  StudyMode.fill: StudyFlow.newFillOnly,
+};
 
 Future<void> _expectSessionRow(
   _StudyHarness harness, {
@@ -2645,6 +2774,14 @@ final class _StudyHarness {
           endedAt: Value(clock.nowEpochMillis()),
         ),
       );
+
+  Future<void> deleteFlashcardWithoutCascading(String flashcardId) async {
+    await database.customStatement('PRAGMA foreign_keys = OFF');
+    await (database.delete(
+      database.flashcards,
+    )..where((table) => table.id.equals(flashcardId))).go();
+    await database.customStatement('PRAGMA foreign_keys = ON');
+  }
 
   Future<void> dispose() => database.close();
 }

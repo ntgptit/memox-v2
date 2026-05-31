@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/di/study/study_data_providers.dart';
 import 'package:memox/app/router/route_names.dart';
+import 'package:memox/core/errors/app_exception.dart';
 import 'package:memox/domain/enums/study_enums.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/study/ports/study_repo.dart';
@@ -72,31 +73,62 @@ void main() {
     ]);
   });
 
-  testWidgets('DT2 onNavigate: selected mode starts that mode directly', (
-    tester,
-  ) async {
-    final repo = _CapturingStudyRepo();
+  for (final entry in _singleModeFlowCases.entries) {
+    testWidgets(
+      'DT2 onNavigate: ${entry.key.name} starts ${entry.value.name} directly',
+      (tester) async {
+        final repo = _CapturingStudyRepo();
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          studyRepoProvider.overrideWithValue(repo),
-          studyEntryStateProvider(
-            'deck',
-            'deck-001',
-          ).overrideWith((ref) => Future.value(_deckEntryState)),
-        ],
-        child: _TestRouterApp(
-          initialLocation: _deckEntryLocation(studyMode: StudyMode.match),
-        ),
-      ),
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              studyRepoProvider.overrideWithValue(repo),
+              studyEntryStateProvider(
+                'deck',
+                'deck-001',
+              ).overrideWith((ref) => Future.value(_deckEntryState)),
+            ],
+            child: _TestRouterApp(
+              initialLocation: _deckEntryLocation(studyMode: entry.key),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Session session-001'), findsOneWidget);
+        expect(find.text('Study action failed.'), findsNothing);
+        expect(repo.startedFlow, entry.value);
+        expect(repo.startedModes, <StudyMode>[entry.key]);
+      },
     );
-    await tester.pumpAndSettle();
+  }
 
-    expect(find.text('Session session-001'), findsOneWidget);
-    expect(repo.startedFlow, StudyFlow.newMatchOnly);
-    expect(repo.startedModes, <StudyMode>[StudyMode.match]);
-  });
+  testWidgets(
+    'DT7 onNavigate: start failure shows original storage error message',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(
+              _FailingStartStudyRepo(
+                const StorageException(message: 'Database unavailable.'),
+              ),
+            ),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_deckEntryState)),
+          ],
+          child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MxErrorState), findsOneWidget);
+      expect(find.text('Database unavailable.'), findsOneWidget);
+      expect(find.text('Study action failed.'), findsNothing);
+    },
+  );
 
   testWidgets('DT3 onNavigate: matching resume candidate shows choice dialog', (
     tester,
@@ -436,6 +468,14 @@ const _reviewDefaults = StudySettingsSnapshot(
   prioritizeOverdue: true,
 );
 
+const _singleModeFlowCases = <StudyMode, StudyFlow>{
+  StudyMode.review: StudyFlow.newReviewOnly,
+  StudyMode.match: StudyFlow.newMatchOnly,
+  StudyMode.guess: StudyFlow.newGuessOnly,
+  StudyMode.recall: StudyFlow.newRecallOnly,
+  StudyMode.fill: StudyFlow.newFillOnly,
+};
+
 const _deckEntryState = StudyEntryState(
   entryType: StudyEntryType.deck,
   entryRefId: 'deck-001',
@@ -670,6 +710,22 @@ final class _EmptyStudyRepo extends _CapturingStudyRepo {
   @override
   Future<List<StudyFlashcardRef>> loadDueCards(StudyContext context) async =>
       const <StudyFlashcardRef>[];
+}
+
+final class _FailingStartStudyRepo extends _CapturingStudyRepo {
+  _FailingStartStudyRepo(this.error);
+
+  final Object error;
+
+  @override
+  Future<StudySessionSnapshot> startSession({
+    required StudyContext context,
+    required StudyFlow flow,
+    required List<StudyMode> modes,
+    required List<StudyFlashcardRef> batch,
+  }) async {
+    throw error;
+  }
 }
 
 StudySessionSnapshot _snapshot({

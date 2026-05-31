@@ -191,7 +191,16 @@ final class StudyRepoImpl implements StudyRepo {
     if (row == null) {
       return null;
     }
-    return _loadSnapshot(row.id);
+    try {
+      return await _loadSnapshot(row.id);
+    } catch (error, stackTrace) {
+      _logger.error(
+        'Failed to load resume candidate; ignoring stale study session.',
+        error,
+        stackTrace,
+      );
+      return null;
+    }
   }
 
   @override

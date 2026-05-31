@@ -47,11 +47,19 @@ Future<Either<Failure, int>> expireOldSessions();  // cancel sessions > 30 days 
 
 - `entry_type` equals scope.entryType
 - `entry_ref_id` equals scope.entryRefId (NULL-safe)
-- `study_type` equals scope.studyType
-- `status` IN (`draft`, `in_progress`)
+- `status` is resumable/active according to the DAO query
 - `started_at` > now - 30 days
 
 Order by `started_at DESC`, return first.
+
+Study type and flow are not part of the conflict key. A paused session for the
+same scope blocks starting another session even when the requested mode/flow is
+different; the Study Entry gate must offer Resume or Start over.
+
+If loading the resume-candidate snapshot fails because the stored session is
+stale or corrupt, candidate discovery logs the failure and returns null so the
+user can start a new valid session. Explicit `loadSession(sessionId)` remains
+strict and must surface the corruption instead of hiding it.
 
 ## Constraints
 
@@ -86,7 +94,7 @@ Order by `started_at DESC`, return first.
 **Schema:** `docs/database/schema-contract.md` `study_sessions`, `study_session_items`
 **Code paths:**
 
-- `lib/domain/repositories/study_session_repository.dart`
-- `lib/data/repositories/study_session_repository_impl.dart`
+- `lib/domain/study/ports/study_repo.dart`
+- `lib/data/repositories/study_repo_impl.dart`
 - `lib/data/datasources/local/daos/study_session_dao.dart`
 - `lib/data/datasources/local/daos/study_session_item_dao.dart`

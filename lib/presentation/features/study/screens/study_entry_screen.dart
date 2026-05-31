@@ -235,8 +235,12 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
 
     final sessionId = result?.sessionId;
     if (sessionId == null) {
+      final actionState = ref.read(
+        studyEntryActionControllerProvider(widget.entryType, widget.entryRefId),
+      );
       setState(() {
-        _error = StateError('Study session was not started.');
+        _error =
+            actionState.error ?? StateError('Study session was not started.');
       });
       return;
     }
