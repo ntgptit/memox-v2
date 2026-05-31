@@ -38,14 +38,13 @@ final class DriveSyncSettingsState {
       !isBusy &&
       (kind == DriveSyncStatusKind.ready ||
           kind == DriveSyncStatusKind.noRemoteSnapshot ||
-          kind == DriveSyncStatusKind.synced ||
           kind == DriveSyncStatusKind.localChanges ||
           kind == DriveSyncStatusKind.remoteChanges ||
           kind == DriveSyncStatusKind.failure);
 
   bool get canUploadLocal => canSync;
 
-  bool get canRestoreDrive => !isBusy && status.remote != null;
+  bool get canRestoreDrive => canSync && status.remote != null;
 
   DriveSyncSettingsState copyWith({
     DriveSyncStatus? status,

@@ -96,6 +96,31 @@ void main() {
     expect(state.kind, DriveSyncStatusKind.noRemoteSnapshot);
   });
 
+  test('restoreDriveToLocal: disabled when already synced', () async {
+    final remote = _remoteSnapshot();
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: DriveSyncStatus(
+        kind: DriveSyncStatusKind.synced,
+        remote: remote,
+      ),
+    );
+    final container = _container(repository: repository);
+    addTearDown(container.dispose);
+
+    final initialState = await container.read(
+      driveSyncSettingsControllerProvider.future,
+    );
+    await container
+        .read(driveSyncSettingsControllerProvider.notifier)
+        .restoreDriveToLocal();
+
+    final state = container.read(driveSyncSettingsControllerProvider).value!;
+    expect(initialState.canSync, isFalse);
+    expect(initialState.canRestoreDrive, isFalse);
+    expect(repository.restoreDriveCount, 0);
+    expect(state.kind, DriveSyncStatusKind.synced);
+  });
+
   test('uploadLocalToDrive: blocked when needs reauthorization', () async {
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: const DriveSyncStatus.needsDriveAuthorization(),
@@ -168,6 +193,26 @@ void main() {
     expect(state.kind, DriveSyncStatusKind.failure);
     expect(state.canSync, isTrue);
     expect(state.technicalMessage, 'Google Drive API is disabled.');
+  });
+
+  test('loading: unsupported schema blocks manual sync', () async {
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: DriveSyncStatus(
+        kind: DriveSyncStatusKind.unsupportedSchema,
+        remote: _remoteSnapshot(),
+      ),
+    );
+    final container = _container(repository: repository);
+    addTearDown(container.dispose);
+
+    final state = await container.read(
+      driveSyncSettingsControllerProvider.future,
+    );
+
+    expect(state.kind, DriveSyncStatusKind.unsupportedSchema);
+    expect(state.canSync, isFalse);
+    expect(state.canUploadLocal, isFalse);
+    expect(state.canRestoreDrive, isFalse);
   });
 
   test('loading: unexpected error becomes retryable failure state', () async {

@@ -85,6 +85,22 @@ void main() {
     },
   );
 
+  test('DT4 onOpen: unsupported auth service disables sign-in', () async {
+    final container = _createContainer(
+      auth: _FakeGoogleAccountAuthService(
+        restoreResult: const GoogleAccountAuthResult.unsupported(),
+      ),
+    );
+    addTearDown(container.dispose);
+
+    final state = await container.read(
+      accountSettingsControllerProvider.future,
+    );
+
+    expect(state.status, AccountLinkStatus.unsupported);
+    expect(state.canSignIn, isFalse);
+  });
+
   test(
     'DT1 onUpdate: sign-in success stores Drive-ready Google account',
     () async {
@@ -667,6 +683,41 @@ void main() {
       );
     },
   );
+
+  test(
+    'DT17 onUpdate: disconnect clears account link and preserves local settings',
+    () async {
+      final preferences = await SharedPreferences.getInstance();
+      await CloudAccountStore(preferences).save(_driveReadyLink);
+      await preferences.setInt(
+        AppConstants.sharedPrefsDefaultNewBatchSizeKey,
+        12,
+      );
+      final auth = _FakeGoogleAccountAuthService();
+      final container = _createContainer(auth: auth);
+      addTearDown(container.dispose);
+
+      await container.read(accountSettingsControllerProvider.future);
+      await container
+          .read(accountSettingsControllerProvider.notifier)
+          .disconnect();
+      final state = container
+          .read(accountSettingsControllerProvider)
+          .requireValue;
+      final repository = await container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+
+      expect(state.status, AccountLinkStatus.signedOut);
+      expect(state.message, AccountSettingsMessage.disconnected);
+      expect(await repository.load(), isNull);
+      expect(auth.disconnectCount, 1);
+      expect(
+        preferences.getInt(AppConstants.sharedPrefsDefaultNewBatchSizeKey),
+        12,
+      );
+    },
+  );
 }
 
 ProviderContainer _createContainer({
@@ -737,6 +788,7 @@ GoogleAccountAuthSession _session({
 
 final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   _FakeGoogleAccountAuthService({
+    this.restoreResult = const GoogleAccountAuthResult.signedOut(),
     this.signInResult = const GoogleAccountAuthResult.signedOut(),
     this.authorizeResult,
     this.accessTokenResult =
@@ -756,13 +808,13 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   late final StreamController<GoogleAccountAuthResult> _events;
 
-  GoogleAccountAuthResult restoreResult =
-      const GoogleAccountAuthResult.signedOut();
+  GoogleAccountAuthResult restoreResult;
   GoogleAccountAuthResult signInResult;
   GoogleAccountAuthResult? authorizeResult;
   DriveAccessTokenResult accessTokenResult;
   final bool pauseSignIn;
   int signInCount = 0;
+  int disconnectCount = 0;
   int listenCount = 0;
   int cancelCount = 0;
   final Completer<void> signInStarted = Completer<void>();
@@ -814,7 +866,9 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   Future<void> signOutLocal() async {}
 
   @override
-  Future<void> disconnect() async {}
+  Future<void> disconnect() async {
+    disconnectCount += 1;
+  }
 
   void emit(GoogleAccountAuthResult result) {
     _events.add(result);

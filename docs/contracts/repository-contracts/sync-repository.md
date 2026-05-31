@@ -44,6 +44,8 @@ abstract class SyncRepository {
 5. `replaceLocalDatabase()` — atomic rename: temp → main DB path. Old DB discarded (snapshot still in safe path).
 6. Invalidate all Riverpod providers (caller responsibility, signaled via return).
 
+Target retention note: exact pre-restore snapshot cleanup policy is not Current V1. Keep this contract aligned with `docs/business/account-sync/account-sync.md` before implementing the full restore-protection target.
+
 ### Restore (in onboarding, skip snapshot)
 
 Only when DB is verifiably empty (no decks, no flashcards). Skip step 1-2 above.
@@ -57,7 +59,7 @@ OAuth access/refresh tokens stored ONLY in `flutter_secure_storage`. Never Share
 - Drive App Folder ONLY (other apps cannot see).
 - Manifest is canonical source of remote state. If manifest absent, no backup exists.
 - Fingerprint = SHA-256 over canonical DB content (deterministic ordering of tables, rows).
-- Snapshot path: `{appSupportDir}/snapshots/snapshot-{timestamp}.db`. Cleaned up after successful restore (keep last 1 for safety).
+- Target snapshot path: `{appSupportDir}/snapshots/snapshot-{timestamp}.db`. Cleanup/retention policy must be finalized with the business restore-protection section before implementation.
 
 ## Forbidden
 

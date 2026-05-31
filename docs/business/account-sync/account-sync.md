@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-28
+last_updated: 2026-05-31
 applies_to: Google account linking, Google Drive AppData sync, per-account database isolation
 ---
 
@@ -252,7 +252,7 @@ Three user-triggered operations, all returning `DriveSyncRunResult`:
 
 Restore is destructive: it replaces the local database entirely. The user MUST be protected from accidental data loss when local has unsynced changes.
 
-**Implementation status (Prompt 21, 2026-05-31):** current V1 code has manual Drive upload/restore use cases and confirmation UI, but the full target restore-protection surface below (local pre-restore snapshot notice/path, "Upload local first" primary branch, and second destructive confirmation) remains Partial/Target and is not promoted by the Settings Hub parity task.
+**Implementation status (Prompt 22, 2026-05-31):** current V1 code has manual Drive upload/restore use cases and Account-detail confirmation UI. `synced` disables manual sync actions; `noRemoteSnapshot` permits upload but not restore. The full target restore-protection surface below (local pre-restore snapshot notice/path, "Upload local first" primary branch, and second destructive confirmation) remains Partial/Target and is not promoted by Prompt 22.
 
 ### Pre-restore checks
 
@@ -281,7 +281,7 @@ When local has unsynced changes:
 | Body | "You have changes on this device that haven't been synced. Restoring from Drive will discard these changes." |
 | Sub-body (when cross-device) | "The remote backup was created on a different device ({deviceLabel})." |
 | Recommended action | Outline button: "Upload local first" (closes dialog, triggers upload flow) |
-| Destructive action | Filled red button: "Restore anyway" — requires a second confirmation tap or hold gesture |
+| Destructive action | Filled red button: "Restore anyway" — Target requires a second confirmation tap with a 5s timeout |
 | Cancel | Standard cancel |
 
 The destructive button must be visually de-emphasized vs. "Upload local first" so the default safe path is the primary affordance.
@@ -293,7 +293,7 @@ In addition to the warning, the app MUST create a **local snapshot file** as a s
 1. Build a snapshot identical to what would be uploaded.
 2. Write it to the platform's temporary directory with name `memox-pre-restore-{timestamp}.zip` (timestamp = ISO local time).
 3. Surface the path to the user after restore completes via a non-modal notice: "Your previous data was backed up to {path}. You can import it manually if needed."
-4. The pre-restore snapshot is NOT automatically cleaned up. User is responsible for managing local backups.
+4. Target retention policy: the pre-restore snapshot is kept long enough to recover from a failed/undesired restore; exact cleanup/retention is not Current V1 and must be finalized with `docs/contracts/repository-contracts/sync-repository.md` before implementation.
 
 If the snapshot save fails for any reason, the restore MUST abort. Do not proceed with a destructive operation while the safety net is missing.
 
@@ -423,11 +423,11 @@ Account section:
 - Signed-out state: sign-in button.
 - Signed-in without Drive scope: profile info + "Authorize Drive" button.
 - Signed-in with Drive scope: profile info + sign-out + disconnect actions.
-- Unconfigured: explanation, no actions.
-- Unsupported: explanation, no actions.
+- Unconfigured: explanation plus disabled sign-in affordance; no enabled sign-in action.
+- Unsupported: explanation plus disabled sign-in affordance; no enabled sign-in action.
 - Error: error feedback + retry.
 
-Drive sync section (only visible/enabled when account is `signedIn` with Drive authorized):
+Drive sync section (current V1 is always present as status guidance; actions are enabled only when the account is `signedIn` with Drive authorized and the status allows a manual operation):
 
 - Load status on screen open and after each action.
 - Show last synced time.
@@ -464,9 +464,9 @@ Has a separate sign-in button (`google_account_web_button_web.dart`). `requiresP
 - Restore effect (`DriveSyncRestoreEffect`) MUST be observed by the presentation layer. Skipping it leaves UI bound to a stale `AppDatabase`.
 - Manifest version, snapshot format version, and account link schema version are independent integers. Bump only the relevant one when changing format.
 - All sync errors must funnel through `DriveSyncRunResult.failed` with a user-safe message. No raw network/HTTP exceptions in UI.
-- Restore MUST run the pre-restore safety checks: fingerprint comparison, strong warning when needed, and local snapshot to temp dir before any destructive operation.
-- Restore MUST NOT proceed if the pre-restore snapshot fails to save. Treat snapshot failure as a hard abort.
-- "Upload local first" MUST be the visually emphasized option in the warning dialog. The destructive "Restore anyway" path requires a second tap.
+- Target/Partial restore protection: restore MUST run the pre-restore safety checks: fingerprint comparison, strong warning when needed, and local snapshot to temp dir before any destructive operation.
+- Target/Partial restore protection: restore MUST NOT proceed if the pre-restore snapshot fails to save. Treat snapshot failure as a hard abort.
+- Target/Partial restore protection: "Upload local first" MUST be the visually emphasized option in the warning dialog. The destructive "Restore anyway" path requires a second tap.
 
 ## Related
 

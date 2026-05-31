@@ -33,6 +33,11 @@ const _visibleButtonLabelKeys = <String>{
   'foldersImportCreateDeckAction',
   'foldersImportExistingDeckAction',
   'importCommitCardsAction',
+  'settingsAccountDisconnect',
+  'settingsAccountReconnectDrive',
+  'settingsAccountSignIn',
+  'settingsAccountSignOut',
+  'settingsAccountSkipDrive',
   'settingsDriveSyncAction',
   'settingsDriveSyncRestoreConfirmAction',
   'settingsDriveSyncRestoreDriveAction',
@@ -110,6 +115,9 @@ const _conciseActionLabelExemptKeys = <String>{
   'foldersImportExistingDeckAction',
   'settingsDriveSyncRestoreDriveAction',
   'settingsDriveSyncUploadLocalAction',
+  'settingsAccountSignIn',
+  'settingsAccountSkipDrive',
+  'settingsAccountReconnectDrive',
   'studyStartNewWithCountAction',
 };
 

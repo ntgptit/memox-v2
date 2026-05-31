@@ -620,6 +620,7 @@ void main() {
 
     expect(find.text('Google Drive is up to date.'), findsOneWidget);
     expect(find.textContaining('Last synced:'), findsOneWidget);
+    expect(find.byTooltip('Sync now'), findsNothing);
   });
 
   testWidgets('DT16 onDisplay: overview hides detail-only actions', (
@@ -1157,6 +1158,61 @@ void main() {
   );
 
   testWidgets(
+    'DT8b onDisplay: Account detail renders unsupported state safely',
+    (tester) async {
+      await _pumpSettings(
+        tester,
+        child: const AccountSettingsScreen(),
+        googleConfig: _configuredGoogle,
+        googleAuth: _FakeGoogleAccountAuthService(
+          restoreResult: const GoogleAccountAuthResult.unsupported(),
+        ),
+      );
+
+      expect(
+        find.text('Use Android, iOS, or web to link Google account.'),
+        findsOneWidget,
+      );
+      expect(find.text('Sign in with Google'), findsOneWidget);
+      final signInButton = tester.widget<ElevatedButton>(
+        find.ancestor(
+          of: find.text('Sign in with Google'),
+          matching: find.byType(ElevatedButton),
+        ),
+      );
+      expect(signInButton.onPressed, isNull);
+    },
+  );
+
+  testWidgets(
+    'DT7b onUpdate: failed Google sign-in hides technical auth detail',
+    (tester) async {
+      const technicalDetail = 'accessToken=secret-token\nStackTrace: auth';
+      final harness = await _pumpSettings(
+        tester,
+        child: const AccountSettingsScreen(),
+        googleConfig: _configuredGoogle,
+        googleAuth: _FakeGoogleAccountAuthService(
+          signInResult: const GoogleAccountAuthResult.failure(technicalDetail),
+        ),
+      );
+
+      await tester.tap(find.text('Sign in with Google'));
+      await tester.pumpAndSettle();
+
+      final repository = await harness.container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+
+      expect(await repository.load(), isNull);
+      expect(find.text('Google sign-in failed. Try again.'), findsWidgets);
+      expect(find.text(technicalDetail), findsNothing);
+      expect(find.textContaining('secret-token'), findsNothing);
+      expect(find.textContaining('StackTrace'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'DT8 onUpdate: denied Drive scope stores account and asks reconnect',
     (tester) async {
       final harness = await _pumpSettings(
@@ -1235,6 +1291,55 @@ void main() {
       expect(studyStore.loadNewStudyDefaults().batchSize, 12);
       expect(
         find.text('Signed out. Local flashcards stay on this device.'),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'DT9b onUpdate: disconnect clears account and preserves local data',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({
+        AppConstants.sharedPrefsDefaultNewBatchSizeKey: 12,
+      });
+      final preferences = await SharedPreferences.getInstance();
+      final store = CloudAccountStore(preferences);
+      await store.save(_driveReadyLink);
+      final googleAuth = _FakeGoogleAccountAuthService(
+        restoreResult: GoogleAccountAuthResult.success(
+          _session(
+            grantedScopes: const <String>{googleDriveAppDataScope},
+            driveAuthorizationState: DriveAuthorizationState.authorized,
+          ),
+        ),
+      );
+      final harness = await _pumpSettings(
+        tester,
+        child: const AccountSettingsScreen(),
+        googleConfig: _configuredGoogle,
+        googleAuth: googleAuth,
+      );
+
+      await tester.tap(find.text('Disconnect Google'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(ElevatedButton, 'Disconnect Google'),
+      );
+      await tester.pumpAndSettle();
+
+      final repository = await harness.container.read(
+        cloudAccountRepositoryProvider.future,
+      );
+      final studyStore = await harness.container.read(
+        studySettingsStoreProvider.future,
+      );
+
+      expect(await repository.load(), isNull);
+      expect(googleAuth.disconnectCount, 1);
+      expect(googleAuth.signOutCount, 0);
+      expect(studyStore.loadNewStudyDefaults().batchSize, 12);
+      expect(
+        find.text('Google account disconnected. Drive access tokens revoked.'),
         findsOneWidget,
       );
     },

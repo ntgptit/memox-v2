@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-31
 route: /settings/account
 source_specs:
   - docs/business/account-sync/account-sync.md
@@ -9,19 +9,20 @@ source_specs:
 
 ## Purpose
 
-Manage Google account link and Google Drive backup. Single source of truth for sync status, manual upload/restore controls, and account switching. Account is account-scoped (per `docs/business/account-sync/account-sync.md`); all data lives in the active account's database.
+Manage Google account link and Google Drive backup. Single source of truth for sync status, manual upload/restore controls, and Target/Future account switching. Account is account-scoped (per `docs/business/account-sync/account-sync.md`); all data lives in the active account's database.
 
 ## V1 verification status
 
-Prompt 21 (2026-05-31) verifies this screen only as a reachable Settings Hub sub-screen. Current code already owns account sign-in and manual Drive sync detail behavior here; the Settings Hub must not duplicate those actions.
+Prompt 22 (2026-05-31) verifies the Account Settings V1 route/action contract. Current code owns account sign-in/sign-out/disconnect and manual Drive sync detail behavior here; the Settings Hub must not duplicate those actions.
 
 | Aspect | V1 status | Notes |
 | --- | --- | --- |
 | Route `/settings/account` | Current | Reachable from Settings Hub; hides shell navigation; back returns to hub when pushed from the hub. |
-| Account sign-in/sign-out | Partial/Current implementation | Implemented through account use cases and `AccountSettingsController`; full account-flow parity remains owned by an Account prompt. |
-| Manual Drive upload/restore | Partial/Current implementation | Implemented through Drive sync use cases and `DriveSyncSettingsController`. |
-| Pre-restore local safety snapshot + Upload local first + second destructive confirmation | Target/Partial | Required target behavior in this wireframe/business doc; not promoted by Prompt 21. Do not expand it in a Settings Hub parity task. |
-| Account removal strong confirmation | Target | Not part of Prompt 21. |
+| Account sign-in/sign-out/disconnect | Current V1 | Implemented through account use cases and `AccountSettingsController`; sign-in failure uses safe localized copy and does not render auth technical detail. |
+| Manual Drive upload/restore | Current V1 manual flow | Implemented through Drive sync use cases and `DriveSyncSettingsController`; upload/restore run from Account detail only, with direction and confirmation sheets. |
+| Pre-restore local safety snapshot + Upload local first + second destructive confirmation | Target/Partial | Required target behavior in this wireframe/business doc; not promoted by Prompt 22. Current V1 restore is replacement-only with a single restore confirmation. |
+| Account removal / switch account strong confirmation | Target/Future | Not exposed in current V1 Account Settings. Do not implement in Prompt 22 unless a dedicated account-removal task adds code + tests + docs. |
+| Token-expired reconnect banner | Target/Partial | Current V1 maps Drive reauthorization to reconnect-required account/sync states; the explicit top banner remains Target. |
 
 The restore-safety layout/states/rules below remain the target protection design unless the V1 verification table explicitly marks a row as Current.
 
@@ -88,7 +89,7 @@ The restore-safety layout/states/rules below remain the target protection design
 │ ┌───────────────────────────────────┐ │
 │ │ 🚪 Sign out                       │ │  ← Local data preserved
 │ ├───────────────────────────────────┤ │
-│ │ 🗑 Switch / remove account        │ │  ← Wipes local DB after confirm
+│ │ 🗑 Switch / remove account        │ │  ← Target/Future: wipes local DB after confirm
 │ └───────────────────────────────────┘ │
 │                                       │
 └───────────────────────────────────────┘
@@ -181,13 +182,14 @@ Target/Partial: snapshot is mandatory in the full restore-protection design. If 
 | --- | --- |
 | Signed-out empty state | Icon + heading + explanation + Sign in button + privacy reassurance. |
 | Account row | Email, provider. Read-only. |
+| Disconnect Google action | Current V1 secondary account-detail action. Revokes app Drive consent/tokens, preserves local data and Drive backup. |
 | Device label row | Editable. Tap → rename dialog. Default = OS device name. |
 | Local fingerprint row | Read-only. Shows hash prefix + last modified timestamp. |
 | Last upload row | Shows device that uploaded, time, size. Fingerprint match indicator (✓ matches / ⚠ differs / — no backup). |
 | Upload button | Primary action. Disabled during in-flight upload. |
 | Restore button | Triggers restore warning dialog first. |
 | Sign out button | Preserves local DB; clears tokens. |
-| Switch / remove account | Destructive. Wipes local DB after confirm. |
+| Target/Future: Switch / remove account | Destructive. Wipes local DB after confirm. |
 
 ## States
 
@@ -214,8 +216,9 @@ Target/Partial: snapshot is mandatory in the full restore-protection design. If 
 | Tap Edit device label | Tap | Open rename dialog (`docs/wireframes/24-shared-dialogs.md` §rename). |
 | Tap "Upload to Drive" | Tap | Run upload use case; show progress inline. |
 | Tap "Restore from Drive" | Tap | Current V1 runs the existing manual restore flow. Target/Partial restore protection adds warning → snapshot phase → replace phase. |
-| Tap "Sign out" | Tap | Confirm dialog: "Sign out? Your local data stays on this device." On confirm: clear tokens, return to signed-out layout. |
-| Tap "Switch / remove account" | Tap | Strong destructive dialog: "Remove this account and erase all data on this device?" On confirm: wipe local DB, return to signed-out. |
+| Tap "Sign out" | Tap | Confirm dialog. On confirm: clear local session/link, preserve local data, return to signed-out layout. |
+| Tap "Disconnect Google" | Tap | Current V1 account-detail action. Confirm dialog; on confirm revoke Drive consent/tokens for this app, preserve Drive backup and local data, return to signed-out layout. |
+| Tap "Switch / remove account" | Tap | Target/Future only. Strong destructive dialog: "Remove this account and erase all data on this device?" On confirm: wipe local DB, return to signed-out. |
 | Tap overflow ⋮ | Tap | Menu: View Drive folder (web link), Refresh manifest, Help. |
 
 ## Dialogs and bottom-sheets used
@@ -224,7 +227,8 @@ Target/Partial: snapshot is mandatory in the full restore-protection design. If 
 - Target/Partial: Pre-restore snapshot notice (modal progress) — inline above, defined here.
 - Rename device label — `docs/wireframes/24-shared-dialogs.md` §rename.
 - Sign out confirm — generic confirm.
-- Switch/remove account confirm — `docs/wireframes/24-shared-dialogs.md` §delete-confirm (destructive variant with typed confirmation).
+- Disconnect Google confirm — generic destructive confirm.
+- Target/Future: Switch/remove account confirm — `docs/wireframes/24-shared-dialogs.md` §delete-confirm (destructive variant with typed confirmation).
 
 ## Navigation in
 
@@ -235,7 +239,7 @@ Target/Partial: snapshot is mandatory in the full restore-protection design. If 
 
 - Back → Settings hub.
 - After sign-out → stays here in signed-out state.
-- After switch/remove → returns to Settings hub with rebuilt DB (empty).
+- Target/Future: After switch/remove → returns to Settings hub with rebuilt DB (empty).
 
 ## Responsive
 
@@ -259,7 +263,7 @@ Target/Partial: snapshot is mandatory in the full restore-protection design. If 
 - Target/Partial restore protection: pre-restore snapshot MUST succeed before any data replacement.
 - Target/Partial restore protection: "Upload local first" MUST be the primary button on restore warning when fingerprint differs.
 - Target/Partial restore protection: "Restore anyway" requires a second tap; cannot be a single tap.
-- Sign out keeps local data; only Switch / remove account wipes data.
+- Sign out and Disconnect Google keep local data; only Target/Future Switch / remove account wipes data.
 
 ## Agent rule
 

@@ -331,6 +331,7 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
   @override
   final bool requiresPlatformSignInButton;
   int signOutCount = 0;
+  int disconnectCount = 0;
 
   @override
   Stream<GoogleAccountAuthResult> get authenticationEvents => _events.stream;
@@ -370,7 +371,7 @@ final class _FakeGoogleAccountAuthService implements GoogleAccountAuthService {
 
   @override
   Future<void> disconnect() async {
-    signOutCount += 1;
+    disconnectCount += 1;
   }
 
   void emit(GoogleAccountAuthResult result) {

@@ -93,12 +93,6 @@ class _AccountSettingsContent extends ConsumerWidget {
             const MxGap(MxSpace.sm),
             MxText(message, role: MxTextRole.formHelper),
           ],
-          if (state.status == AccountLinkStatus.error &&
-              state.technicalMessage != null &&
-              state.technicalMessage!.isNotEmpty) ...[
-            const MxGap(MxSpace.xs),
-            MxText(state.technicalMessage!, role: MxTextRole.formHelper),
-          ],
           if (state.status == AccountLinkStatus.signedIn ||
               (state.status == AccountLinkStatus.needsDriveAuthorization &&
                   !state.requiresRuntimeReconnect)) ...[
