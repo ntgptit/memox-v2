@@ -153,6 +153,11 @@ This convention applies to **backtick references** in markdown body text and tab
 - KHÔNG implement từ giả định khi docs đã có contract.
 - KHÔNG sửa generated files (`*.g.dart`, `*.freezed.dart`, Drift generated, `lib/l10n/generated/**`).
 - KHÔNG hardcode route strings, colors, text styles, durations, user-facing strings.
+- KHÔNG bypass MemoX design tokens/theme. UI phải dùng token/shared component hiện có trong MemoX Design System; nếu token thiếu, report gap hoặc update token theo task được duyệt.
+- KHÔNG tạo shared widget mới khi widget hiện có giải quyết được. Chỉ tạo shared widget mới khi có nhu cầu lặp lại thật, có naming/contract rõ, và task yêu cầu hoặc user approve.
+- KHÔNG dùng raw `Card`, raw `Button`, raw action layout nếu MemoX đã có component tương ứng như `MxCard`, `MxActionButton`, `MxCardActions`, `MxContentShell`. Nếu phải dùng raw Material widget, giải thích lý do trong report.
+- KHÔNG sửa schema/persistence nếu không có migration, schema docs, migration docs, và test tương ứng trong cùng commit.
+- KHÔNG đánh dấu item trong docs từ `Future`/`Target`/`Specified` sang `Current`/`Implemented` nếu code chưa implement thật và chưa có verification/test tương ứng.
 - KHÔNG giữ persistent data chỉ trong provider memory.
 - KHÔNG bypass UseCase → Repository → DAO flow.
 - KHÔNG import ngược chiều dependency: domain MUST NOT import data or presentation; presentation MUST NOT import data directly. Allowed imports: presentation → domain; data → domain (data implements domain interfaces). Dependencies point inward: domain has no outward imports.
@@ -160,6 +165,7 @@ This convention applies to **backtick references** in markdown body text and tab
 - KHÔNG thêm route mới mà không update route constants AND `docs/business/navigation/navigation-flow.md` trong cùng commit.
 - KHÔNG để docs reference đến term/route/field cũ sau khi rename.
 - KHÔNG đánh dấu task "done" nếu chưa pass Pre-commit parity check.
+- KHÔNG báo cáo complete nếu `code-verification-guard` tồn tại trong repo mà chưa chạy pass. Nếu tool không tồn tại, ghi rõ: `guard: skipped (tool not present)`.
 
 ## Mandatory workflow
 
@@ -171,8 +177,9 @@ This convention applies to **backtick references** in markdown body text and tab
 6. **Pre-commit parity check**: chạy 8-step checklist ở trên trước khi finish.
 7. Update related docs nếu behavior thay đổi (mandatory, cùng commit).
 8. Update decision table nếu thêm/sửa behavior branch.
-9. Chạy verification theo `docs/checklist/implementation-checklist.md`.
-10. Báo cáo theo format trong checklist, **bao gồm section "Docs updated"** liệt kê file docs đã sửa và lý do.
+9. Check MemoX Design System compliance nếu có thay đổi UI: token usage, shared component usage, no raw component bypass.
+10. Chạy verification theo `docs/checklist/implementation-checklist.md`.
+11. Báo cáo theo format trong checklist, **bao gồm section "Docs updated"** liệt kê file docs đã sửa và lý do, section `Guard status`, và lý do nếu bỏ qua command nào.
 
 ## Stack reference
 

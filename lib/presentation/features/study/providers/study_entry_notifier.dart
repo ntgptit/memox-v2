@@ -28,15 +28,17 @@ final class StudyEntryState {
 }
 
 final class StudyEntryStartResult {
-  const StudyEntryStartResult._({this.sessionId, this.error});
+  const StudyEntryStartResult._({this.sessionId, this.error, this.stackTrace});
 
   const StudyEntryStartResult.started(String sessionId)
     : this._(sessionId: sessionId);
 
-  const StudyEntryStartResult.rejected(Object error) : this._(error: error);
+  const StudyEntryStartResult.rejected(Object error, StackTrace stackTrace)
+    : this._(error: error, stackTrace: stackTrace);
 
   final String? sessionId;
   final Object? error;
+  final StackTrace? stackTrace;
 }
 
 @Riverpod(keepAlive: true)
@@ -70,12 +72,19 @@ Future<StudyEntryState> studyEntryState(
   );
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 class StudyEntryActionController extends _$StudyEntryActionController {
   @override
   FutureOr<void> build(String entryType, String? entryRefId) {}
 
-  Future<StudyEntryStartResult?> start({
+  /// Starts (or restarts) a study session for this entry. Always resolves to a
+  /// [StudyEntryStartResult]: [StudyEntryStartResult.started] on success or
+  /// [StudyEntryStartResult.rejected] (carrying the original error and stack
+  /// trace) on any failure. It never returns null, so the presentation layer
+  /// can surface the real root cause instead of synthesizing a placeholder
+  /// "session was not started" error. The controller is `keepAlive` so an
+  /// in-flight start is not disposed mid-await.
+  Future<StudyEntryStartResult> start({
     required StudyType studyType,
     required StudySettingsSnapshot settings,
     List<StudyMode>? modes,
@@ -108,36 +117,33 @@ class StudyEntryActionController extends _$StudyEntryActionController {
       ref.read(studySessionDataRevisionProvider.notifier).bump();
       state = const AsyncData<void>(null);
       return StudyEntryStartResult.started(sessionId);
-    } on EmptyScopeException catch (error) {
-      if (!ref.mounted) {
-        return null;
+    } on EmptyScopeException catch (error, stackTrace) {
+      if (ref.mounted) {
+        state = const AsyncData<void>(null);
       }
-      state = const AsyncData<void>(null);
-      return StudyEntryStartResult.rejected(error);
-    } on ValidationException catch (error) {
-      if (!ref.mounted) {
-        return null;
+      return StudyEntryStartResult.rejected(error, stackTrace);
+    } on ValidationException catch (error, stackTrace) {
+      if (ref.mounted) {
+        state = const AsyncData<void>(null);
       }
-      state = const AsyncData<void>(null);
-      return StudyEntryStartResult.rejected(error);
+      return StudyEntryStartResult.rejected(error, stackTrace);
     } catch (error, stackTrace) {
-      if (!ref.mounted) {
-        return null;
+      if (ref.mounted) {
+        ref
+            .read(appLoggerProvider)
+            .error(
+              'Study entry start action failed. '
+              'entryType=$entryType '
+              'entryRefId=${entryRefId ?? '<null>'} '
+              'studyType=${studyType.storageValue} '
+              'modes=${modes?.map((mode) => mode.storageValue).join(',') ?? '<default>'} '
+              'restartedFromSessionId=${restartedFromSessionId ?? '<null>'}',
+              error,
+              stackTrace,
+            );
+        state = AsyncError<void>(error, stackTrace);
       }
-      ref
-          .read(appLoggerProvider)
-          .error(
-            'Study entry start action failed. '
-            'entryType=$entryType '
-            'entryRefId=${entryRefId ?? '<null>'} '
-            'studyType=${studyType.storageValue} '
-            'modes=${modes?.map((mode) => mode.storageValue).join(',') ?? '<default>'} '
-            'restartedFromSessionId=${restartedFromSessionId ?? '<null>'}',
-            error,
-            stackTrace,
-          );
-      state = AsyncError<void>(error, stackTrace);
-      return StudyEntryStartResult.rejected(error);
+      return StudyEntryStartResult.rejected(error, stackTrace);
     }
   }
 }

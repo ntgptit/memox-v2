@@ -39,8 +39,8 @@ void main() {
         studyEntryActionControllerProvider('deck', 'deck-1'),
       );
 
-      expect(result?.sessionId, isNull);
-      expect(result?.error, isA<ValidationException>());
+      expect(result.sessionId, isNull);
+      expect(result.error, isA<ValidationException>());
       expect(actionState.hasError, isFalse);
       expect(actionState.hasValue, isTrue);
     },
@@ -71,7 +71,7 @@ void main() {
           );
       await container.read(progressStudySessionsProvider.future);
 
-      expect(result?.sessionId, 'session-1');
+      expect(result.sessionId, 'session-1');
       expect(repo.activeSessionLoadCount, 2);
     },
   );
@@ -109,8 +109,8 @@ void main() {
 
       final result = await startFuture;
 
-      expect(result?.sessionId, 'session-1');
-      expect(result?.error, isNull);
+      expect(result.sessionId, 'session-1');
+      expect(result.error, isNull);
     },
   );
 
@@ -143,8 +143,13 @@ void main() {
         studyEntryActionControllerProvider('deck', 'deck-1'),
       );
 
-      expect(result?.sessionId, isNull);
-      expect(result?.error, same(error));
+      // start() must never return null on an unexpected failure: it always
+      // resolves to a rejected result carrying the original error + stack.
+      expect(result, isA<StudyEntryStartResult>());
+      expect(result.sessionId, isNull);
+      expect(result.error, same(error));
+      expect(result.stackTrace, isNotNull);
+      expect(result.stackTrace.toString(), isNotEmpty);
       expect(actionState.hasError, isTrue);
       expect(actionState.error, same(error));
       expect(logger.errors, hasLength(1));
@@ -156,6 +161,37 @@ void main() {
       expect(logger.errors.single.message, contains('entryRefId=deck-1'));
       expect(logger.errors.single.error, same(error));
       expect(logger.errors.single.stackTrace.toString(), isNotEmpty);
+    },
+  );
+
+  test(
+    'S25 start: unexpected failure resolves to rejected result, never null',
+    () async {
+      const error = StorageException(message: 'snapshot mapping failed');
+      final container = ProviderContainer(
+        overrides: [
+          appLoggerProvider.overrideWithValue(_RecordingAppLogger()),
+          studyRepoProvider.overrideWithValue(_FailingStartStudyRepo(error)),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final StudyEntryStartResult result = await container
+          .read(studyEntryActionControllerProvider('deck', 'deck-1').notifier)
+          .start(
+            studyType: StudyType.newStudy,
+            settings: const StudySettingsSnapshot(
+              batchSize: 1,
+              shuffleFlashcards: false,
+              shuffleAnswers: false,
+              prioritizeOverdue: true,
+            ),
+          );
+
+      expect(result.sessionId, isNull);
+      expect(result.error, same(error));
+      expect(result.stackTrace, isNotNull);
+      expect(result.stackTrace.toString(), isNotEmpty);
     },
   );
 }

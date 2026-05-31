@@ -28,6 +28,8 @@ const String _startNoResultNoErrorLogMessage =
     'Study entry start returned no result and no action error.';
 const String _startNoResultAfterErrorLogMessage =
     'Study entry start returned no result after action error.';
+const String _startNoResultErrorMessage =
+    'Study entry action returned null unexpectedly.';
 const String _diagnosticsFailedLogMessage = 'Study entry diagnostics failed.';
 
 class StudyEntryScreen extends ConsumerStatefulWidget {
@@ -255,12 +257,16 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
       return;
     }
 
-    final error = result?.error;
+    // A rejected start carries the original root error + stack trace. Preserve
+    // it verbatim (controller stack trace first, then the action AsyncError
+    // stack trace) instead of replacing it with a synthesized error.
+    final error = result.error;
     if (error != null) {
       final actionState = ref.read(
         studyEntryActionControllerProvider(widget.entryType, widget.entryRefId),
       );
-      final stackTrace = actionState.stackTrace ?? StackTrace.current;
+      final stackTrace =
+          result.stackTrace ?? actionState.stackTrace ?? StackTrace.current;
       _logFailure(
         message: _startResultRejectedLogMessage,
         error: error,
@@ -278,24 +284,33 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
       return;
     }
 
-    final sessionId = result?.sessionId;
+    final sessionId = result.sessionId;
     if (sessionId == null) {
+      // Impossible lifecycle: start() returned neither a session id nor an
+      // error. The keepAlive controller + always-resolving start() contract
+      // mean this branch should never be reached during a normal failure; it
+      // exists only to surface a genuinely impossible state instead of
+      // navigating with a null session id.
       final actionState = ref.read(
         studyEntryActionControllerProvider(widget.entryType, widget.entryRefId),
       );
-      final error =
-          actionState.error ?? StateError('Study session was not started.');
+      final lifecycleError =
+          actionState.error ?? StateError(_startNoResultErrorMessage);
       final stackTrace = actionState.stackTrace ?? StackTrace.current;
       final message = actionState.error == null
           ? _startNoResultNoErrorLogMessage
           : _startNoResultAfterErrorLogMessage;
-      _logFailure(message: message, error: error, stackTrace: stackTrace);
+      _logFailure(
+        message: message,
+        error: lifecycleError,
+        stackTrace: stackTrace,
+      );
       final diagnostics = await _loadDiagnostics();
       if (!mounted) {
         return;
       }
       setState(() {
-        _error = error;
+        _error = lifecycleError;
         _errorStackTrace = stackTrace;
         _errorDiagnostics = diagnostics;
       });
@@ -337,7 +352,7 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
     }
     final localDebugPrint = debugPrint;
     localDebugPrint(
-      '[StudyEntry] direct start failed\n'
+      '[StudyEntry] $message\n'
       'entryType=${widget.entryType}\n'
       'entryRefId=${widget.entryRefId ?? '<null>'}\n'
       'studyMode=${widget.studyMode ?? '<default>'}\n'

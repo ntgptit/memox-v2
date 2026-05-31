@@ -180,6 +180,57 @@ void main() {
     },
   );
 
+  testWidgets(
+    'S26 onNavigate: start failure preserves real root error, not a placeholder',
+    (tester) async {
+      final logger = _RecordingAppLogger();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            appLoggerProvider.overrideWithValue(logger),
+            appConfigProvider.overrideWithValue(_localConfig),
+            studyEntryDiagnosticServiceProvider.overrideWithValue(
+              const _FakeStudyEntryDiagnosticService(),
+            ),
+            studyRepoProvider.overrideWithValue(
+              _FailingStartStudyRepo(StateError('real root cause')),
+            ),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_deckEntryState)),
+          ],
+          child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MxErrorState), findsOneWidget);
+
+      // The logger received the original StateError, never the synthesized
+      // "Study session was not started." placeholder.
+      expect(logger.errors, isNotEmpty);
+      final logged = logger.errors.last;
+      expect(logged.error, isA<StateError>());
+      expect(logged.error.toString(), contains('real root cause'));
+      expect(
+        logger.errors.map((e) => e.error.toString()),
+        everyElement(isNot(contains('Study session was not started.'))),
+      );
+
+      await tester.tap(find.text('Show details'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('errorType=StateError'), findsWidgets);
+      expect(find.textContaining('Bad state: real root cause'), findsWidgets);
+      expect(
+        find.textContaining('Study session was not started.'),
+        findsNothing,
+      );
+    },
+  );
+
   testWidgets('DT3 onNavigate: matching resume candidate shows choice dialog', (
     tester,
   ) async {
