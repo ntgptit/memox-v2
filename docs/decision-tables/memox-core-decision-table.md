@@ -136,6 +136,18 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | R13 | Resume candidate lookup | Most recent active scope candidate references missing flashcard data | Log candidate snapshot failure, ignore the corrupt candidate, and allow start-new to create a valid session | C1 | `test/data/repositories/study_repository_test.dart::DT4 onUpdate` |
 | R14 | Explicit resume/load | Caller opens the corrupt session by id | Surface the load failure; do not hide corruption outside candidate discovery | C1 | `test/data/repositories/study_repository_test.dart::DT5 onUpdate` |
 
+## Progress Overview
+
+| ID | Event | Condition | Expected | Coverage | Test |
+| --- | --- | --- | --- | --- | --- |
+| P1 | Open progress route | Direct `/progress` route | Render `ProgressScreen` inside the shell; do not open Study Session, History, Search, Settings, or sync surfaces | C0+C1 | `test/app/router/app_router_test.dart::DT7 onNavigate` |
+| P2 | Load overview | Provider pending on initial open | Show shared loading state; do not show stale or fake summary content | C0 | `test/presentation/progress_screen_test.dart::DT6 onDisplay` |
+| P3 | Load overview | Provider fails before data exists | Show shared retryable error state; do not show raw exception/stack text | C1 | `test/presentation/progress_screen_test.dart::DT7 onDisplay` |
+| P4 | Display overview | No active sessions | Show learning summary metrics plus active-session empty state with Library CTA; do not invent analytics history | C0+C1 | `test/presentation/progress_screen_test.dart::DT1 onDisplay` |
+| P5 | Display overview | Active/ready/failed sessions exist | Show session recovery overview, status labels, Continue/Finalize/Retry/Cancel actions | C0+C1 | `test/presentation/progress_screen_test.dart::DT2 onDisplay`, `test/presentation/progress_session_notifier_test.dart::DT2 onDisplay` |
+| P6 | Display overview | New-study session spans multiple modes | Compute per-session progress from total study steps, not only card count | C1 | `test/presentation/progress_screen_test.dart::DT4 onDisplay` |
+| P7 | Cancel session | User taps Cancel on Progress card | Require confirmation before mutating; successful cancel refreshes study-session data | C1 | `test/presentation/progress_screen_test.dart::DT1 onSelect`, `test/presentation/progress_session_notifier_test.dart::DT1 onUpdate` |
+
 ## Tags
 
 | ID | Event | Condition | Expected | Coverage | Test |

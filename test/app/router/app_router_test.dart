@@ -16,6 +16,8 @@ import 'package:memox/domain/services/tts_service.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/deck_import_screen.dart';
+import 'package:memox/presentation/features/progress/providers/progress_session_notifier.dart';
+import 'package:memox/presentation/features/progress/screens/progress_screen.dart';
 import 'package:memox/presentation/features/settings/screens/account_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/audio_speech_settings_screen.dart';
 import 'package:memox/presentation/features/settings/screens/learning_settings_screen.dart';
@@ -84,6 +86,29 @@ void main() {
     expect(find.byType(NavigationRail), findsOneWidget);
   });
 
+  testWidgets('DT7 onNavigate: progress route keeps shell navigation', (
+    tester,
+  ) async {
+    await _pumpRoute(
+      tester,
+      '/progress',
+      progressOverviewState: const ProgressOverviewState(
+        sessions: [],
+        overdueCount: 0,
+        dueTodayCount: 0,
+        newCardCount: 0,
+        cardCount: 0,
+        masteryPercent: 0,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ProgressScreen), findsOneWidget);
+    expect(find.text('Progress'), findsWidgets);
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byType(StudySessionScreen), findsNothing);
+  });
+
   testWidgets('DT4 onNavigate: settings account route hides shell navigation', (
     tester,
   ) async {
@@ -120,7 +145,17 @@ void main() {
   });
 }
 
-Future<void> _pumpRoute(WidgetTester tester, String initialLocation) async {
+Future<void> _pumpRoute(
+  WidgetTester tester,
+  String initialLocation, {
+  ProgressOverviewState? progressOverviewState,
+}) async {
+  final progressOverride = progressOverviewState == null
+      ? null
+      : progressOverviewProvider.overrideWith(
+          (ref) => Future.value(progressOverviewState),
+        );
+
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -142,6 +177,7 @@ Future<void> _pumpRoute(WidgetTester tester, String initialLocation) async {
         ),
         ttsSettingsProvider.overrideWith(_FakeTtsSettingsNotifier.new),
         appVersionLabelProvider.overrideWith((ref) async => '1.0.0-test'),
+        ?progressOverride,
       ],
       child: const _RouterApp(),
     ),

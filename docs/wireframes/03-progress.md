@@ -13,7 +13,40 @@ source_specs:
 
 Long-form analytics surface. Dashboard shows "today"; Progress shows trends and totals. Read-only.
 
-Status in `docs/business/system/overview.md`: "Progress tracking — Partially specified (data only)". This wireframe is the visual contract for what we render from existing tables.
+Status in `docs/business/system/overview.md`: "Progress tracking — Partially specified (data only)". As of Prompt 20 (2026-05-31), the shipped V1 screen is a read-only Progress Overview focused on library summary metrics and active session recovery. The chart-heavy analytics layout below remains a target/Future analytics specification unless explicitly listed as Current in the V1 table.
+
+## V1 verification status
+
+| Section / behavior | Status | Current owner | Notes |
+| --- | --- | --- | --- |
+| `/progress` route | Current | `RouteNames.progress` / `RoutePaths.progress` in `lib/app/router/route_names.dart`; `progressBranchRoutes()` | Direct route opens `ProgressScreen` inside the shell. No new top-level route was added. |
+| Bottom/app navigation to Progress | Current | `AppNavigation.goProgress()` + shell branch | Covered by router tests; shell navigation stays visible on `/progress`. |
+| Read-only screen | Current | `lib/presentation/features/progress/screens/progress_screen.dart` | No edit actions, no Flashcard History, no Global Search, no Drive sync, no Settings mutation, no tag-scoped study. |
+| Initial loading | Current | `MxRetainedAsyncState` in `ProgressOverviewSection` | First load shows shared loading UI, not a blank screen. |
+| Error / retry | Current | `MxRetainedAsyncState` + `MxErrorState` | Repository/provider failure maps to safe shared error state with Try again; raw exception text is not shown by default. |
+| Empty state | Current | `ActiveSessionsEmptyState` | Empty means no active/resumable study sessions. It does not invent fake analytics data. CTA opens Library. |
+| Due/new/mastery summary | Current | `progressOverviewProvider` → `WatchLibraryOverviewUseCase.execute(ContentQuery())` | Renders Due now, New cards available, and Mastery from the same library overview read model used by the app's content layer. |
+| Total cards | Current (data loaded), not directly labeled | `ProgressOverviewState.cardCount` | Loaded from `LibraryOverviewReadModel.cardCount`; V1 UI uses it indirectly through library/mastery context and does not display a separate "Total cards" stat. |
+| Active / ready / failed session counts | Current | `ResumeStudySessionUseCase.listActiveSessions()` | Renders active session summary plus per-session cards. |
+| Recent active session list | Current | `StudySessionCard` | Shows active/ready/failed sessions ordered by repository result, with localized status, current card when present, formatted started date/time, progress steps, Continue/Finalize/Retry/Cancel actions. This is not historical completed-session analytics. |
+| Cards-studied chart | Future | Not implemented | No daily attempt aggregate use case/repository exists in V1. |
+| Accuracy chart / review accuracy | Future | Not implemented | No range accuracy aggregate is rendered. |
+| Box distribution | Future | Not implemented | `flashcard_progress.current_box` exists for SRS, but Progress does not render the 1-8 distribution yet. |
+| Streak / daily goal / engagement widgets | Future | Not implemented | Engagement remains out of Prompt 20 scope. Do not implement from this wireframe target block. |
+| Suspended / buried links | Future | Not implemented | No `/library/search?filter=...` Global Search route is available in V1. |
+| Flashcard History / study history list | Future | Not implemented | Flashcard History remains Future Proposal and must not be exposed from Progress. |
+
+## V1 metric semantics
+
+| Metric | Empty value | Calculation / source | Test coverage |
+| --- | --- | --- | --- |
+| Due now | `0` | `overdueCount + dueTodayCount` from `LibraryOverviewReadModel` | `test/presentation/progress_session_notifier_test.dart`, `test/presentation/progress_screen_test.dart` |
+| New cards available | `0` | `newCardCount` from `LibraryOverviewReadModel` | Same as above |
+| Mastery | `0%` | `masteryPercent` from `LibraryOverviewReadModel` | Same as above |
+| Active sessions | `0` | `sessions.length` from `ResumeStudySessionUseCase.listActiveSessions()` | Same as above + integration flow tests |
+| Ready sessions | `0` | Count of `SessionStatus.readyToFinalize` snapshots | Same as above |
+| Failed sessions | `0` | Count of `SessionStatus.failedToFinalize` snapshots | Same as above |
+| Per-session progress | `0` when total steps are `0` | `completedAttempts / max(summary.totalCards, sessionFlashcards.length) * totalModeCount`, clamped to `0..1` | `test/presentation/progress_screen_test.dart` |
 
 ## Layout
 
@@ -75,7 +108,9 @@ Status in `docs/business/system/overview.md`: "Progress tracking — Partially s
 | --- | --- | --- |
 | `range` (optional query param) | URL or in-memory | `week` / `month` / `all`; default `week` |
 
-## Data to load
+## Target analytics data to load (Future)
+
+The following table describes the analytics target, not the current V1 data path. V1 currently loads `LibraryOverviewReadModel` for due/new/mastery/card counts and `StudySessionSnapshot` rows for active session recovery.
 
 | Data | Source | Refresh trigger |
 | --- | --- | --- |
@@ -122,14 +157,17 @@ All queries are independent providers; UI fills in progressively.
 
 | Action | Trigger | Result |
 | --- | --- | --- |
-| Tap time range chip | Tap | Re-fetch and re-render charts. |
-| Tap suspended link | Tap | Navigate to flashcard list filtered to "suspended" — but suspended is global; route convention: `/library/search?filter=suspended` OR if not implemented, go to library with hint. |
-| Tap buried link | Tap | Same pattern, filter=buried. |
-| Tap any chart bar/point | Tap | Optional: show that day's detail toast. Skip if implementation effort is high. |
+| Tap time range chip | Tap | Future analytics target. Not rendered in V1. |
+| Tap suspended link | Tap | Future target. Not rendered in V1 because Global Search / global filtered list is Future. |
+| Tap buried link | Tap | Future target. Not rendered in V1 because Global Search / global filtered list is Future. |
+| Tap any chart bar/point | Tap | Future/optional target. Not rendered in V1. |
+| Tap View library empty-state CTA | Tap | Current V1: navigate to Library via `AppNavigation.goLibrary()`. |
+| Tap Continue on active session | Tap | Current V1: push study session route for the selected session. |
+| Tap Finalize / Retry / Cancel | Tap | Current V1: call study use case through `ProgressSessionActionController`, then refresh study-session revision. Cancel requires confirmation. |
 
 ## Dialogs and bottom-sheets used
 
-None native to this screen. Read-only.
+Current V1 uses `MxConfirmationDialog` for cancelling an active/ready/failed study session from a Progress session card. No bottom sheet is native to this screen. Future analytics chart interactions do not add dialogs unless promoted by a later scope decision.
 
 ## Navigation in
 
@@ -179,21 +217,25 @@ None native to this screen. Read-only.
 
 **Decision rows:**
 
-- Engagement section, SRS section
+- Progress Overview section, Resume sessions section, shared UI loading/error rows, Engagement section for Future streak/daily-goal, SRS section for Future box distribution.
 
 **Schema / storage:**
 
-- `study_attempts` (range aggregates)
-- `flashcard_progress` (box distribution snapshot, `is_suspended`, `buried_until`)
+- Current V1: library overview counts are read through existing content queries; active-session recovery reads persisted `study_sessions`, `study_session_items`, and related flashcard data through `ResumeStudySessionUseCase`.
+- Future analytics: `study_attempts` (range aggregates) and `flashcard_progress` (box distribution snapshot, `is_suspended`, `buried_until`).
 
-**Contracts:** `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/engagement.md`, `docs/contracts/repository-contracts/progress-repository.md`
+**Contracts:** `docs/contracts/usecase-contracts/srs.md`, `docs/contracts/usecase-contracts/engagement.md`. A dedicated progress repository/use-case contract does not exist in V1; current summary metrics are owned by `WatchLibraryOverviewUseCase` and active-session recovery is owned by `ResumeStudySessionUseCase`.
 
 **Code paths:**
 
 - `lib/presentation/features/progress/screens/progress_screen.dart`
-- `lib/presentation/features/progress/notifiers/progress_notifier.dart`
-- `lib/domain/usecases/progress/get_range_aggregates_usecase.dart`
-- `lib/domain/usecases/progress/get_box_distribution_usecase.dart`
+- `lib/presentation/features/progress/providers/progress_session_notifier.dart`
+- `lib/presentation/features/progress/widgets/progress_content.dart`
+- `lib/presentation/features/progress/widgets/progress_overview_section.dart`
+- `lib/presentation/features/progress/widgets/active_session_section.dart`
+- `lib/presentation/features/progress/widgets/study_session_card.dart`
+- `lib/domain/usecases/content_query_usecases.dart` (`WatchLibraryOverviewUseCase`)
+- `lib/domain/study/usecases/study_usecases.dart` (`ResumeStudySessionUseCase`, finalize/cancel/retry use cases)
 - `lib/app/router/route_names.dart` → `RouteNames.progress`
 
 **Related wireframes:**

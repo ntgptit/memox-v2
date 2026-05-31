@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +13,56 @@ import 'package:memox/presentation/features/progress/screens/progress_screen.dar
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
 void main() {
+  testWidgets('DT6 onDisplay: initial load shows shared loading state', (
+    tester,
+  ) async {
+    final completer = Completer<ProgressOverviewState>();
+    addTearDown(() {
+      if (!completer.isCompleted) {
+        completer.complete(_overview(sessions: const []));
+      }
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressOverviewProvider.overrideWith((ref) => completer.future),
+        ],
+        child: const _TestApp(child: ProgressScreen()),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('Learning overview'), findsNothing);
+    expect(find.text('No active study sessions'), findsNothing);
+  });
+
+  testWidgets('DT7 onDisplay: load failure shows safe retryable error state', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          progressOverviewProvider.overrideWith(
+            (ref) => Future<ProgressOverviewState>.error(
+              StateError('database exploded'),
+              StackTrace.current,
+            ),
+          ),
+        ],
+        child: const _TestApp(child: ProgressScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Something went wrong'), findsWidgets);
+    expect(find.text('Try again'), findsOneWidget);
+    expect(find.textContaining('StateError'), findsNothing);
+    expect(find.textContaining('database exploded'), findsNothing);
+    expect(find.text('Learning overview'), findsNothing);
+  });
+
   testWidgets('DT1 onDisplay: empty active sessions shows empty state', (
     tester,
   ) async {
