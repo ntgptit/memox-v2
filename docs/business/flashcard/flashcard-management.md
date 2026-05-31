@@ -187,6 +187,8 @@ V1 create/edit note:
 - Flashcard create and edit routes share `FlashcardEditorScreen`.
 - Create mode is selected by `deckId` with no `flashcardId`; edit mode is selected by `deckId` + `flashcardId`.
 - The editor owns content/tag create and update only.
+- Create mode may retarget the destination deck before first save; normal Save returns to the selected destination deck's flashcard list, while "Save and add another" keeps the selected destination and stays in the editor with a clean blank draft.
+- Create/edit dirty close and browser/system back require a discard confirmation when unsaved content, optional fields, tags, starting status, or create destination changes exist. Preloaded edit optional fields/tags are not dirty until changed.
 - Single-card move/delete/export actions live on the flashcard list row/bulk action surfaces.
 - Bury/Suspend live on the study-session card-actions sheet.
 - Flashcard History is Future Proposal and must not be exposed as a live editor/list action in V1.
@@ -207,7 +209,7 @@ Deck import screen (`/library/deck/:deckId/import`):
 - Save button disabled until required fields valid.
 - Save action shows saving state, disables form.
 - Save success returns to list with refreshed data.
-- Dirty form requires confirm on back.
+- Dirty form requires confirm on close/back, including browser/system back when supported by Flutter.
 
 ## Performance
 

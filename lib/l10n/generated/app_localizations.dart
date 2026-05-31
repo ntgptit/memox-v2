@@ -3072,6 +3072,30 @@ abstract class AppLocalizations {
   /// **'Flashcard created.'**
   String get flashcardsCreatedMessage;
 
+  /// No description provided for @flashcardsDiscardChangesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get flashcardsDiscardChangesTitle;
+
+  /// No description provided for @flashcardsDiscardChangesMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your unsaved flashcard changes will be lost.'**
+  String get flashcardsDiscardChangesMessage;
+
+  /// No description provided for @flashcardsDiscardChangesAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get flashcardsDiscardChangesAction;
+
+  /// No description provided for @flashcardsKeepEditingAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get flashcardsKeepEditingAction;
+
   /// No description provided for @studyEntryTitle.
   ///
   /// In en, this message translates to:

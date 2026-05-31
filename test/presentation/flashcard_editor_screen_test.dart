@@ -11,12 +11,14 @@ import 'package:memox/domain/entities/flashcard_entity.dart';
 import 'package:memox/domain/repositories/deck_repository.dart';
 import 'package:memox/domain/repositories/flashcard_repository.dart';
 import 'package:memox/domain/usecases/content_query_usecases.dart';
+import 'package:memox/domain/usecases/deck_usecases.dart';
 import 'package:memox/domain/usecases/flashcard_usecases.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
 import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/flashcard_editor_screen.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_editor_viewmodel.dart';
+import 'package:memox/presentation/shared/widgets/mx_deck_pill.dart';
 import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
@@ -73,6 +75,115 @@ void main() {
   });
 
   testWidgets(
+    'C9 onNavigate: create close with blank form leaves without dialog',
+    (tester) async {
+      const deckId = 'deck-001';
+      final repository = _EditorFlashcardRepository(
+        flashcard: _flashcard(hasLearningProgress: false),
+      );
+      final container = _editorContainer(repository);
+      final router = _editorRouter(deckId: deckId);
+      addTearDown(container.dispose);
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(_routedEditorApp(container, router));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Discard changes?'), findsNothing);
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/deck/$deckId/flashcards',
+      );
+    },
+  );
+
+  testWidgets(
+    'C10 onNavigate: create close with typed front shows discard dialog',
+    (tester) async {
+      const deckId = 'deck-001';
+      final repository = _EditorFlashcardRepository(
+        flashcard: _flashcard(hasLearningProgress: false),
+      );
+      final container = _editorContainer(repository);
+      final router = _editorRouter(deckId: deckId);
+      addTearDown(container.dispose);
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(_routedEditorApp(container, router));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextFormField).at(0), 'Draft front');
+      await tester.pump();
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Discard changes?'), findsOneWidget);
+      expect(
+        find.text('Your unsaved flashcard changes will be lost.'),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets('C11 onNavigate: cancelling discard keeps typed create input', (
+    tester,
+  ) async {
+    const deckId = 'deck-001';
+    final repository = _EditorFlashcardRepository(
+      flashcard: _flashcard(hasLearningProgress: false),
+    );
+    final container = _editorContainer(repository);
+    final router = _editorRouter(deckId: deckId);
+    addTearDown(container.dispose);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(_routedEditorApp(container, router));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).at(0), 'Draft front');
+    await tester.pump();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(MxSecondaryButton, 'Keep editing'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsNothing);
+    expect(find.text('Draft front'), findsOneWidget);
+    expect(find.byType(FlashcardEditorScreen), findsOneWidget);
+  });
+
+  testWidgets('C12 onNavigate: confirming discard leaves dirty create editor', (
+    tester,
+  ) async {
+    const deckId = 'deck-001';
+    final repository = _EditorFlashcardRepository(
+      flashcard: _flashcard(hasLearningProgress: false),
+    );
+    final container = _editorContainer(repository);
+    final router = _editorRouter(deckId: deckId);
+    addTearDown(container.dispose);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(_routedEditorApp(container, router));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).at(0), 'Draft front');
+    await tester.pump();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(MxPrimaryButton, 'Discard'));
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/deck/$deckId/flashcards',
+    );
+  });
+
+  testWidgets(
     'DT1 onOpen: edit route uses shared editor without live Future actions',
     (tester) async {
       const deckId = 'deck-001';
@@ -106,6 +217,159 @@ void main() {
       expect(find.text('Delete'), findsNothing);
       expect(find.textContaining('Suspend'), findsNothing);
       expect(find.text('Save & add another'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'C13 onNavigate: edit close without changes leaves without dialog',
+    (tester) async {
+      const deckId = 'deck-001';
+      const flashcardId = 'card-001';
+      final repository = _EditorFlashcardRepository(
+        flashcard: _flashcard(hasLearningProgress: true),
+      );
+      final container = _editorContainer(repository);
+      final router = _editorRouter(deckId: deckId, flashcardId: flashcardId);
+      addTearDown(container.dispose);
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(_routedEditorApp(container, router));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Discard changes?'), findsNothing);
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/deck/$deckId/flashcards',
+      );
+    },
+  );
+
+  testWidgets('C14 onNavigate: edit close after changing front asks discard', (
+    tester,
+  ) async {
+    const deckId = 'deck-001';
+    const flashcardId = 'card-001';
+    final repository = _EditorFlashcardRepository(
+      flashcard: _flashcard(hasLearningProgress: true),
+    );
+    final container = _editorContainer(repository);
+    final router = _editorRouter(deckId: deckId, flashcardId: flashcardId);
+    addTearDown(container.dispose);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(_routedEditorApp(container, router));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).at(0), 'Changed front');
+    await tester.pump();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsOneWidget);
+  });
+
+  testWidgets('C15 onNavigate: edit close after changing note asks discard', (
+    tester,
+  ) async {
+    const deckId = 'deck-001';
+    const flashcardId = 'card-001';
+    final repository = _EditorFlashcardRepository(
+      flashcard: _flashcard(hasLearningProgress: true),
+    );
+    final container = _editorContainer(repository);
+    final router = _editorRouter(deckId: deckId, flashcardId: flashcardId);
+    addTearDown(container.dispose);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(_routedEditorApp(container, router));
+    await tester.pumpAndSettle();
+
+    final advancedToggle = find.widgetWithText(
+      MxSecondaryButton,
+      'Show advanced fields',
+    );
+    await tester.ensureVisible(advancedToggle);
+    await tester.pumpAndSettle();
+    await tester.tap(advancedToggle);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byType(TextFormField).last);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).last, 'Changed note');
+    await tester.pump();
+    await tester.ensureVisible(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsOneWidget);
+  });
+
+  testWidgets('C16 onNavigate: edit close after changing tag asks discard', (
+    tester,
+  ) async {
+    const deckId = 'deck-001';
+    const flashcardId = 'card-001';
+    final repository = _EditorFlashcardRepository(
+      flashcard: _flashcard(hasLearningProgress: true),
+    );
+    final container = _editorContainer(repository);
+    final router = _editorRouter(deckId: deckId, flashcardId: flashcardId);
+    addTearDown(container.dispose);
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(_routedEditorApp(container, router));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Add tag'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).last, 'noun');
+    await tester.pump();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsOneWidget);
+  });
+
+  testWidgets(
+    'C17 onNavigate: edit loaded with note and tags closes clean until changed',
+    (tester) async {
+      const deckId = 'deck-001';
+      const flashcardId = 'card-001';
+      final repository = _EditorFlashcardRepository(
+        flashcard: const FlashcardEntity(
+          id: flashcardId,
+          deckId: deckId,
+          front: 'Front',
+          back: 'Back',
+          note: 'Existing note',
+          sortOrder: 0,
+          createdAt: 1,
+          updatedAt: 1,
+          tags: <String>['verb'],
+        ),
+      );
+      final container = _editorContainer(repository);
+      final router = _editorRouter(deckId: deckId, flashcardId: flashcardId);
+      addTearDown(container.dispose);
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(_routedEditorApp(container, router));
+      await tester.pumpAndSettle();
+
+      expect(find.text('verb'), findsOneWidget);
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Discard changes?'), findsNothing);
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/deck/$deckId/flashcards',
+      );
     },
   );
 
@@ -315,6 +579,82 @@ void main() {
     expect(find.text('noun'), findsOneWidget);
     expect(find.text('verb'), findsOneWidget);
   });
+
+  testWidgets(
+    'C18 onInsert: create save after changing destination opens selected deck list',
+    (tester) async {
+      const routeDeckId = 'deck-001';
+      const selectedDeckId = 'deck-002';
+      final repository = _EditorFlashcardRepository(
+        flashcard: _flashcard(hasLearningProgress: false),
+      );
+      final container = _editorContainer(repository);
+      final router = _editorRouter(deckId: routeDeckId);
+      addTearDown(container.dispose);
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(_routedEditorApp(container, router));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(MxDeckPill));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Other deck'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(0), 'Front');
+      await tester.enterText(find.byType(TextFormField).at(1), 'Back');
+      await tester.pump();
+      await tester.tap(find.widgetWithText(MxPrimaryButton, 'Save card'));
+      await tester.pumpAndSettle();
+
+      expect(repository.lastCreatedDeckId, selectedDeckId);
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/deck/$selectedDeckId/flashcards',
+      );
+    },
+  );
+
+  testWidgets(
+    'C19 onInsert: save and add another stays clean in selected destination',
+    (tester) async {
+      const routeDeckId = 'deck-001';
+      final repository = _EditorFlashcardRepository(
+        flashcard: _flashcard(hasLearningProgress: false),
+      );
+      final container = _editorContainer(repository);
+      final router = _editorRouter(deckId: routeDeckId);
+      addTearDown(container.dispose);
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(_routedEditorApp(container, router));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(MxDeckPill));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Other deck'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(0), 'Front');
+      await tester.enterText(find.byType(TextFormField).at(1), 'Back');
+      await tester.pump();
+      await tester.tap(
+        find.widgetWithText(MxSecondaryButton, 'Save & add another'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FlashcardEditorScreen), findsOneWidget);
+      expect(find.text('Other deck'), findsOneWidget);
+      expect(find.text('Front'), findsNothing);
+
+      await tester.tap(find.byTooltip('Close'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Discard changes?'), findsNothing);
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        '/deck/deck-002/flashcards',
+      );
+    },
+  );
 }
 
 Widget _buildCreateApp() {
@@ -348,13 +688,35 @@ ProviderContainer _editorContainer(_EditorFlashcardRepository repository) =>
         getDeckActionContextUseCaseProvider.overrideWithValue(
           GetDeckActionContextUseCase(_StubDeckRepository()),
         ),
+        listDeckDestinationsUseCaseProvider.overrideWithValue(
+          ListDeckDestinationsUseCase(_StubDeckRepository()),
+        ),
       ],
     );
 
-GoRouter _editorRouter({required String deckId, required String flashcardId}) =>
+Widget _routedEditorApp(ProviderContainer container, GoRouter router) =>
+    UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
+      ),
+    );
+
+GoRouter _editorRouter({required String deckId, String? flashcardId}) =>
     GoRouter(
-      initialLocation: '/deck/$deckId/flashcards/$flashcardId/edit',
+      initialLocation: flashcardId == null
+          ? '/deck/$deckId/flashcards/new'
+          : '/deck/$deckId/flashcards/$flashcardId/edit',
       routes: [
+        GoRoute(
+          path: '/${RoutePaths.flashcardCreateSegment}',
+          name: RouteNames.flashcardCreate,
+          builder: (context, state) => FlashcardEditorScreen(
+            deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+          ),
+        ),
         GoRoute(
           path: '/${RoutePaths.flashcardEditSegment}',
           name: RouteNames.flashcardEdit,
@@ -391,6 +753,7 @@ final class _EditorFlashcardRepository implements FlashcardRepository {
 
   FlashcardEntity _flashcard;
   FlashcardDraft? lastDraft;
+  String? lastCreatedDeckId;
   FlashcardProgressEditPolicy? lastProgressPolicy;
 
   @override
@@ -401,6 +764,7 @@ final class _EditorFlashcardRepository implements FlashcardRepository {
     required String deckId,
     required FlashcardDraft draft,
   }) async {
+    lastCreatedDeckId = deckId;
     lastDraft = draft;
     return Success(
       FlashcardEntity(
@@ -453,16 +817,35 @@ final class _StubDeckRepository implements DeckRepository {
     deck: DeckEntity(
       id: deckId,
       folderId: 'folder-001',
-      name: 'Sample deck',
+      name: deckId == 'deck-002' ? 'Other deck' : 'Sample deck',
       sortOrder: 0,
       createdAt: 1,
       updatedAt: 1,
     ),
-    breadcrumb: const <BreadcrumbSegmentReadModel>[
-      BreadcrumbSegmentReadModel(label: 'Sample folder'),
-      BreadcrumbSegmentReadModel(label: 'Sample deck'),
+    breadcrumb: <BreadcrumbSegmentReadModel>[
+      BreadcrumbSegmentReadModel(
+        label: deckId == 'deck-002' ? 'Other folder' : 'Sample folder',
+      ),
+      BreadcrumbSegmentReadModel(
+        label: deckId == 'deck-002' ? 'Other deck' : 'Sample deck',
+      ),
     ],
   );
+
+  @override
+  Future<List<DeckMoveTarget>> getDeckDestinations() async =>
+      const <DeckMoveTarget>[
+        DeckMoveTarget(
+          id: 'deck-001',
+          name: 'Sample deck',
+          breadcrumb: <String>['Sample folder', 'Sample deck'],
+        ),
+        DeckMoveTarget(
+          id: 'deck-002',
+          name: 'Other deck',
+          breadcrumb: <String>['Other folder', 'Other deck'],
+        ),
+      ];
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

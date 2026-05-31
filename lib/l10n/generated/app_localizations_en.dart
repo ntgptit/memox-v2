@@ -1892,6 +1892,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get flashcardsCreatedMessage => 'Flashcard created.';
 
   @override
+  String get flashcardsDiscardChangesTitle => 'Discard changes?';
+
+  @override
+  String get flashcardsDiscardChangesMessage =>
+      'Your unsaved flashcard changes will be lost.';
+
+  @override
+  String get flashcardsDiscardChangesAction => 'Discard';
+
+  @override
+  String get flashcardsKeepEditingAction => 'Keep editing';
+
+  @override
   String get studyEntryTitle => 'Study';
 
   @override

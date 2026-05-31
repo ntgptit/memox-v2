@@ -8,6 +8,7 @@ import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
+import '../../../shared/dialogs/mx_confirmation_dialog.dart';
 import '../../../shared/dialogs/mx_dialog.dart';
 import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/feedback/mx_tag_failure_text.dart';
@@ -51,6 +52,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
       TextEditingController();
   late final TextEditingController _hintController = TextEditingController();
   bool _didSeedControllers = false;
+  bool _allowPop = false;
 
   @override
   void dispose() {
@@ -99,35 +101,51 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
     final draft = draftState.value;
     final canSave = (draft?.canSave ?? false) && !actionState.isLoading;
 
-    return MxFormScaffold(
-      contentWidth: MxContentWidth.reading,
-      bottomAction: draft == null
-          ? null
-          : FlashcardEditorSaveBar(
-              isEditing: draft.isEditing,
-              canSave: canSave,
-              onSave: () => _save(
-                draft: draft,
-                actionController: actionController,
-                l10n: l10n,
+    return PopScope<Object?>(
+      canPop: _allowPop || !(draft?.hasUnsavedChanges ?? false),
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final currentDraft = ref
+            .read(flashcardEditorDraftProvider(widget.args))
+            .value;
+        if (currentDraft == null) {
+          await context.popRoute(
+            fallback: () => context.goFlashcardList(widget.deckId),
+          );
+          return;
+        }
+        await _closeEditor(draft: currentDraft, l10n: l10n);
+      },
+      child: MxFormScaffold(
+        contentWidth: MxContentWidth.reading,
+        bottomAction: draft == null
+            ? null
+            : FlashcardEditorSaveBar(
+                isEditing: draft.isEditing,
+                canSave: canSave,
+                onSave: () => _save(
+                  draft: draft,
+                  actionController: actionController,
+                  l10n: l10n,
+                ),
+                onSaveAndAddNext: () => _saveAndAddNext(
+                  actionController: actionController,
+                  l10n: l10n,
+                ),
               ),
-              onSaveAndAddNext: () => _saveAndAddNext(
-                actionController: actionController,
-                l10n: l10n,
-              ),
-            ),
-      body: MxRetainedAsyncState<FlashcardEditorDraftState>(
-        data: draftState.value,
-        isLoading: draftState.isLoading,
-        error: draftState.hasError ? draftState.error : null,
-        stackTrace: draftState.hasError ? draftState.stackTrace : null,
-        dataBuilder: (context, draft) => _buildEditorBody(
-          context: context,
-          draft: draft,
-          canSave: canSave,
-          draftNotifier: draftNotifier,
-          actionController: actionController,
-          l10n: l10n,
+        body: MxRetainedAsyncState<FlashcardEditorDraftState>(
+          data: draftState.value,
+          isLoading: draftState.isLoading,
+          error: draftState.hasError ? draftState.error : null,
+          stackTrace: draftState.hasError ? draftState.stackTrace : null,
+          dataBuilder: (context, draft) => _buildEditorBody(
+            context: context,
+            draft: draft,
+            canSave: canSave,
+            draftNotifier: draftNotifier,
+            actionController: actionController,
+            l10n: l10n,
+          ),
         ),
       ),
     );
@@ -166,9 +184,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
       children: [
         FlashcardEditorHeaderSection(
           title: title,
-          onBack: () => context.popRoute(
-            fallback: () => context.goFlashcardList(widget.deckId),
-          ),
+          onBack: () => _closeEditor(draft: draft, l10n: l10n),
           onQuickSave: !draft.isEditing && canSave
               ? () => _saveAndAddNext(
                   actionController: actionController,
@@ -223,7 +239,11 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
   /// Adds a tag to the draft after normalizing it through [TagValidator]
   /// (lowercased storage form). Create and edit modes share this path; tags are
   /// persisted with the card on save, never written directly from the UI.
-  void _addTag(String raw, FlashcardEditorDraft draftNotifier, AppLocalizations l10n) {
+  void _addTag(
+    String raw,
+    FlashcardEditorDraft draftNotifier,
+    AppLocalizations l10n,
+  ) {
     final result = ref.read(tagValidatorProvider).validate(raw);
     final normalized = result.valueOrNull;
     if (normalized == null) {
@@ -234,6 +254,37 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
       return;
     }
     draftNotifier.addTag(normalized);
+  }
+
+  Future<void> _closeEditor({
+    required FlashcardEditorDraftState draft,
+    required AppLocalizations l10n,
+  }) async {
+    if (draft.hasUnsavedChanges) {
+      final shouldDiscard = await MxConfirmationDialog.show(
+        context: context,
+        title: l10n.flashcardsDiscardChangesTitle,
+        message: l10n.flashcardsDiscardChangesMessage,
+        confirmLabel: l10n.flashcardsDiscardChangesAction,
+        cancelLabel: l10n.flashcardsKeepEditingAction,
+        icon: Icons.warning_amber_rounded,
+        tone: MxConfirmationTone.danger,
+      );
+      if (!mounted) return;
+      if (!shouldDiscard) return;
+    }
+
+    await _leaveEditor(draft.deckId);
+  }
+
+  Future<void> _leaveEditor(String deckId) async {
+    if (!_allowPop) {
+      if (!mounted) return;
+      setState(() => _allowPop = true);
+      await WidgetsBinding.instance.endOfFrame;
+    }
+    if (!mounted) return;
+    await context.popRoute(fallback: () => context.goFlashcardList(deckId));
   }
 
   Future<void> _pickDestination({
@@ -317,9 +368,7 @@ class _FlashcardEditorScreenState extends ConsumerState<FlashcardEditorScreen> {
           ? l10n.flashcardsUpdatedMessage
           : l10n.flashcardsCreatedMessage,
     );
-    await context.popRoute(
-      fallback: () => context.goFlashcardList(widget.deckId),
-    );
+    await _leaveEditor(draft.deckId);
     WidgetsBinding.instance.addPostFrameCallback((_) => showSavedMessage());
   }
 

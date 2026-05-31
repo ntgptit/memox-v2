@@ -120,7 +120,7 @@ Create a single flashcard in the current deck. Optimized for repeated entry — 
 | Validation error | Tap save with bad data | Inline error under offending field. Save remains enabled to allow retry. |
 | Saving | Save tapped | Save button shows spinner; fields disabled. |
 | Saved (save-and-add ON) | Success | Toast "Card added"; form resets; focus returns to Front. |
-| Saved (save-and-add OFF) | Success | Pop back to flashcard list with toast "Card added". |
+| Saved (save-and-add OFF) | Success | Return to the selected destination deck's flashcard list with toast "Card added". |
 | Tag comma error | User types comma in tag input | Inline error "Tags cannot contain commas." Comma not accepted. |
 | Tag too long | > 50 chars after trim | Inline error "Tag too long (max 50 chars)." |
 | Save error | Repository failure | Error banner at top with retry. Form NOT reset. |
@@ -129,7 +129,8 @@ Create a single flashcard in the current deck. Optimized for repeated entry — 
 
 | Action | Trigger | Result |
 | --- | --- | --- |
-| Tap ✕ close | Tap | If unsaved changes, show "Discard changes?" dialog. Else pop. |
+| Tap ✕ close | Tap | If unsaved changes, show "Discard changes?" dialog. Else pop or fall back to the selected destination deck's flashcard list. |
+| Browser/system back | Back gesture / browser back | Same discard-confirm behavior as ✕ close when unsaved changes exist. |
 | Tap Save | Tap | Validate → save → behave per "Save and add another" toggle. |
 | Tap deck context | Tap | Open deck picker bottom-sheet (`docs/wireframes/25-shared-bottom-sheets.md` §deck-picker). |
 | Tap "Add tag" | Tap | Tag input becomes editable; show keyboard. |
@@ -164,9 +165,9 @@ Create a single flashcard in the current deck. Optimized for repeated entry — 
 
 ## Navigation out
 
-- ✕ or back → flashcard list (with confirm if unsaved).
-- Save (with save-and-add OFF) → flashcard list.
-- Save (with save-and-add ON) → stays here with blank form.
+- ✕ or back → selected destination deck's flashcard list (with confirm if unsaved).
+- Save (with save-and-add OFF) → selected destination deck's flashcard list.
+- Save (with save-and-add ON) → stays here with blank form and keeps the selected destination deck.
 
 ## Responsive
 
@@ -188,8 +189,8 @@ Create a single flashcard in the current deck. Optimized for repeated entry — 
 
 - Save MUST be disabled until required fields valid. Don't allow tap-and-show-error pattern.
 - Tag comma rejection MUST be inline and prevent the comma being added — not strip silently.
-- "Save and add another" toggle MUST reset front/back/tags after save, but keep More fields collapsed.
-- Discard confirmation MUST trigger on any non-empty field, not just "dirty" flag pollution.
+- "Save and add another" toggle MUST reset front/back/tags after save, keep More fields collapsed, and keep the selected destination deck for the next card.
+- Discard confirmation MUST trigger on any non-empty field, tag, non-default starting status, or destination deck change, not just "dirty" flag pollution.
 
 ## Agent rule
 

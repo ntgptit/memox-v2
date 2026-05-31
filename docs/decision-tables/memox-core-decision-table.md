@@ -51,6 +51,17 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | C6 | Delete card | Confirmed from flashcard list row/bulk action | Delete card and dependent data | C0+C1 | `test/data/repositories/content_repository_test.dart::DT4 onDelete`, `test/presentation/flashcard_list_screen_test.dart::DT1 onDelete` |
 | C7 | Import | Mixed rows | Save valid, report invalid | C1 | `test/features/flashcards/import_flashcards_test.dart::C7` |
 | C8 | Create card | Whitespace-only front | Reject (trim then validate) | C1 | `test/features/flashcards/create_flashcard_test.dart::C8` |
+| C9 | Create editor close | Blank draft | Leave without discard dialog | C1 | `test/presentation/flashcard_editor_screen_test.dart::C9 onNavigate` |
+| C10 | Create editor close | Front typed but unsaved | Show discard dialog | C1 | `test/presentation/flashcard_editor_screen_test.dart::C10 onNavigate` |
+| C11 | Create editor discard | User cancels discard | Stay on editor and keep typed input | C1 | `test/presentation/flashcard_editor_screen_test.dart::C11 onNavigate` |
+| C12 | Create editor discard | User confirms discard | Leave editor for deck flashcard list | C1 | `test/presentation/flashcard_editor_screen_test.dart::C12 onNavigate` |
+| C13 | Edit editor close | Loaded draft unchanged | Leave without discard dialog | C1 | `test/presentation/flashcard_editor_screen_test.dart::C13 onNavigate` |
+| C14 | Edit editor close | Front changed | Show discard dialog | C1 | `test/presentation/flashcard_editor_screen_test.dart::C14 onNavigate` |
+| C15 | Edit editor close | Optional note changed | Show discard dialog | C1 | `test/presentation/flashcard_editor_screen_test.dart::C15 onNavigate` |
+| C16 | Edit editor close | Tag list changed | Show discard dialog | C1 | `test/presentation/flashcard_editor_screen_test.dart::C16 onNavigate` |
+| C17 | Edit editor close | Existing optional note/tags loaded but unchanged | Leave without discard dialog | C1 | `test/presentation/flashcard_editor_screen_test.dart::C17 onNavigate` |
+| C18 | Create card save | Destination deck changed before normal Save | Create in selected deck and open selected deck's flashcard list | C0+C1 | `test/presentation/flashcard_editor_screen_test.dart::C18 onInsert` |
+| C19 | Create card save-and-add | Destination deck changed before Save and add another | Stay in editor with clean blank draft and selected deck retained | C0+C1 | `test/presentation/flashcard_editor_screen_test.dart::C19 onInsert` |
 
 ## Study/SRS
 

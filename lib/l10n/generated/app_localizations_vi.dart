@@ -1781,6 +1781,19 @@ class AppLocalizationsVi extends AppLocalizations {
   String get flashcardsCreatedMessage => 'Đã tạo flashcard.';
 
   @override
+  String get flashcardsDiscardChangesTitle => 'Hủy thay đổi?';
+
+  @override
+  String get flashcardsDiscardChangesMessage =>
+      'Các thay đổi flashcard chưa lưu sẽ bị mất.';
+
+  @override
+  String get flashcardsDiscardChangesAction => 'Hủy thay đổi';
+
+  @override
+  String get flashcardsKeepEditingAction => 'Tiếp tục sửa';
+
+  @override
   String get studyEntryTitle => 'Học';
 
   @override

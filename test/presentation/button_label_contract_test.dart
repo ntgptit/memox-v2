@@ -51,6 +51,8 @@ const _visibleButtonLabelKeys = <String>{
   'flashcardsSaveAction',
   'flashcardsKeepProgressAction',
   'flashcardsResetProgressAction',
+  'flashcardsDiscardChangesAction',
+  'flashcardsKeepEditingAction',
   'studyStartAction',
   'studyStartNewSessionAction',
   'studyRestartAction',

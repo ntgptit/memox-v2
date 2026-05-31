@@ -49,8 +49,15 @@ class FlashcardEditorDraftState {
     required String hint,
     required List<String> tags,
     required FlashcardStartingStatus startingStatus,
+    required String originalDeckId,
     required String originalFront,
     required String originalBack,
+    required String originalNote,
+    required String originalExample,
+    required String originalPronunciation,
+    required String originalHint,
+    required List<String> originalTags,
+    required FlashcardStartingStatus originalStartingStatus,
     required this.hasLearningProgress,
   }) : deckContext = FlashcardEditorDeckContext(
          deckId: deckId,
@@ -68,8 +75,15 @@ class FlashcardEditorDraftState {
          startingStatus: startingStatus,
        ),
        originalContent = FlashcardEditorOriginalContent(
+         deckId: originalDeckId,
          front: originalFront,
          back: originalBack,
+         note: originalNote,
+         example: originalExample,
+         pronunciation: originalPronunciation,
+         hint: originalHint,
+         tags: originalTags,
+         startingStatus: originalStartingStatus,
        );
 
   final FlashcardEditorDeckContext deckContext;
@@ -89,8 +103,16 @@ class FlashcardEditorDraftState {
   String get hint => content.hint;
   List<String> get tags => content.tags;
   FlashcardStartingStatus get startingStatus => content.startingStatus;
+  String get originalDeckId => originalContent.deckId;
   String get originalFront => originalContent.front;
   String get originalBack => originalContent.back;
+  String get originalNote => originalContent.note;
+  String get originalExample => originalContent.example;
+  String get originalPronunciation => originalContent.pronunciation;
+  String get originalHint => originalContent.hint;
+  List<String> get originalTags => originalContent.tags;
+  FlashcardStartingStatus get originalStartingStatus =>
+      originalContent.startingStatus;
   bool get isEditing => flashcardId != null;
 
   bool get canSave =>
@@ -100,6 +122,30 @@ class FlashcardEditorDraftState {
   bool get hasChangedLearningContent =>
       StringUtils.trimmed(front) != StringUtils.trimmed(originalFront) ||
       StringUtils.trimmed(back) != StringUtils.trimmed(originalBack);
+
+  bool get hasUnsavedChanges {
+    if (!isEditing) {
+      return _normalizedOptional(front).isNotEmpty ||
+          _normalizedOptional(back).isNotEmpty ||
+          _normalizedOptional(note).isNotEmpty ||
+          _normalizedOptional(example).isNotEmpty ||
+          _normalizedOptional(pronunciation).isNotEmpty ||
+          _normalizedOptional(hint).isNotEmpty ||
+          tags.isNotEmpty ||
+          startingStatus != FlashcardStartingStatus.newCard ||
+          deckId != originalDeckId;
+    }
+
+    return _normalizedOptional(front) != _normalizedOptional(originalFront) ||
+        _normalizedOptional(back) != _normalizedOptional(originalBack) ||
+        _normalizedOptional(note) != _normalizedOptional(originalNote) ||
+        _normalizedOptional(example) != _normalizedOptional(originalExample) ||
+        _normalizedOptional(pronunciation) !=
+            _normalizedOptional(originalPronunciation) ||
+        _normalizedOptional(hint) != _normalizedOptional(originalHint) ||
+        !listEquals(tags, originalTags) ||
+        startingStatus != originalStartingStatus;
+  }
 
   bool get requiresLearningProgressPolicy =>
       isEditing && hasLearningProgress && hasChangedLearningContent;
@@ -140,10 +186,19 @@ class FlashcardEditorDraftState {
     hint: hint ?? this.hint,
     tags: tags ?? this.tags,
     startingStatus: startingStatus ?? this.startingStatus,
+    originalDeckId: originalDeckId,
     originalFront: originalFront,
     originalBack: originalBack,
+    originalNote: originalNote,
+    originalExample: originalExample,
+    originalPronunciation: originalPronunciation,
+    originalHint: originalHint,
+    originalTags: originalTags,
+    originalStartingStatus: originalStartingStatus,
     hasLearningProgress: hasLearningProgress,
   );
+
+  static String _normalizedOptional(String value) => StringUtils.trimmed(value);
 }
 
 @immutable
@@ -185,12 +240,26 @@ class FlashcardEditorContentDraft {
 @immutable
 class FlashcardEditorOriginalContent {
   const FlashcardEditorOriginalContent({
+    required this.deckId,
     required this.front,
     required this.back,
+    required this.note,
+    required this.example,
+    required this.pronunciation,
+    required this.hint,
+    required this.tags,
+    required this.startingStatus,
   });
 
+  final String deckId;
   final String front;
   final String back;
+  final String note;
+  final String example;
+  final String pronunciation;
+  final String hint;
+  final List<String> tags;
+  final FlashcardStartingStatus startingStatus;
 }
 
 @riverpod
@@ -218,8 +287,15 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
         hint: '',
         tags: const <String>[],
         startingStatus: FlashcardStartingStatus.newCard,
+        originalDeckId: args.deckId,
         originalFront: '',
         originalBack: '',
+        originalNote: '',
+        originalExample: '',
+        originalPronunciation: '',
+        originalHint: '',
+        originalTags: const <String>[],
+        originalStartingStatus: FlashcardStartingStatus.newCard,
         hasLearningProgress: false,
       );
     }
@@ -240,8 +316,15 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
       hint: flashcard.hint ?? '',
       tags: List<String>.unmodifiable(flashcard.tags),
       startingStatus: flashcard.startingStatus,
+      originalDeckId: flashcard.deckId,
       originalFront: flashcard.front,
       originalBack: flashcard.back,
+      originalNote: flashcard.note ?? '',
+      originalExample: flashcard.example ?? '',
+      originalPronunciation: flashcard.pronunciation ?? '',
+      originalHint: flashcard.hint ?? '',
+      originalTags: List<String>.unmodifiable(flashcard.tags),
+      originalStartingStatus: flashcard.startingStatus,
       hasLearningProgress: flashcard.hasLearningProgress,
     );
   }
@@ -317,8 +400,15 @@ class FlashcardEditorDraft extends _$FlashcardEditorDraft {
         hint: '',
         tags: const <String>[],
         startingStatus: current.startingStatus,
+        originalDeckId: current.deckId,
         originalFront: '',
         originalBack: '',
+        originalNote: '',
+        originalExample: '',
+        originalPronunciation: '',
+        originalHint: '',
+        originalTags: const <String>[],
+        originalStartingStatus: current.startingStatus,
         hasLearningProgress: false,
       ),
     );

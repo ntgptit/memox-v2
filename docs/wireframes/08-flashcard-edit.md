@@ -119,6 +119,7 @@ front/back content changes.
 | Action | Trigger | Result |
 | --- | --- | --- |
 | Tap back/close | Tap | If dirty, show discard dialog. Else pop or go to the deck flashcard list fallback. |
+| Browser/system back | Back gesture / browser back | Same discard-confirm behavior as back/close when dirty. |
 | Tap Save changes | Tap | Validate → maybe ask progress policy → update → toast → pop. |
 | Choose Keep in progress-policy dialog | Save after learned front/back content changed | Update content and keep existing SRS progress. |
 | Choose Reset in progress-policy dialog | Save after learned front/back content changed | Update content and reset the card's learning progress to the V1 fresh-card state. |
@@ -152,8 +153,8 @@ repository boundary.
 
 ## Navigation out
 
-- Back → flashcard list (with confirm if dirty).
-- Save → flashcard list with toast.
+- Back → card's deck flashcard list (with confirm if dirty).
+- Save → card's deck flashcard list with toast.
 
 ## Responsive
 
@@ -175,7 +176,7 @@ repository boundary.
 ## Rules
 
 - Save MUST be gated by required front/back content after trim.
-- Discard confirmation triggered by any change including tag list edits.
+- Discard confirmation triggered by any change including optional field and tag list edits; preloaded optional fields/tags are not dirty until changed.
 - Normal edit MUST keep progress unless the user explicitly chooses Reset in the learned-content policy dialog.
 - V1 editor MUST NOT expose a live History route/action.
 
