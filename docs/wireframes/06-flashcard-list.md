@@ -19,7 +19,7 @@ This screen is **partially Current**. The §Components 1-1 mapping (verified 202
 **Verified Current (behaviour + tests):**
 
 - Route `/library/deck/:deckId/flashcards` opens the list. Invalid/missing `deckId` → `NotFoundException` surfaced through `MxRetainedAsyncState` (error + Retry), no crash, no raw exception text.
-- States: Loading skeleton, error+retry, **empty deck**, and **no-results-on-search** (distinct, Prompt 16).
+- States: Loading skeleton, error+retry, **empty deck** (`totalCount == 0`, regardless of search term), and **no-results-on-search** (`items.isEmpty && searchTerm.isNotEmpty && totalCount > 0`) — distinct (Prompt 16, classification corrected Prompt 16B).
 - Search: scope-local within the deck (toolbar search term → `ContentQuery`), never routes to global search. Clearing restores cards.
 - Sort: `ContentSortMode` via toolbar; manual sort enables reorder; reorder persists `sort_order`.
 - Row actions (long-press / overflow sheet): Edit → `flashcardEdit`, Move (destination picker, progress kept), Export, Select, Delete (confirm). **No History. No Bury/Suspend.**
@@ -210,8 +210,8 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 | --- | --- | --- |
 | Loading | Initial fetch | Skeleton rows. |
 | Populated | Normal | List visible. |
-| Empty (zero cards in deck) | No cards | Show empty layout with "Add" CTA (`FlashcardEmptyStateSection`). Import CTA lives in the cards toolbar above. **Current.** |
-| No results (search filters every row) | Deck has cards but active search term matches none | Show `FlashcardNoResultsSection` (`ValueKey('flashcard_no_results')`) with "Clear" CTA that resets the toolbar search term. Distinct from empty-deck. **Current (Prompt 16).** |
+| Empty (zero cards in deck) | `totalCount == 0` (deck holds no cards, **regardless of any active search term**) | Show empty layout with "Add" CTA (`FlashcardEmptyStateSection`). Import CTA lives in the cards toolbar above. **Current.** |
+| No results (search filters every row) | **Deck has cards** (`totalCount > 0`) but the active search term matches none (`items.isEmpty && searchTerm.isNotEmpty`) | Show `FlashcardNoResultsSection` (`ValueKey('flashcard_no_results')`) with "Clear" CTA that resets the toolbar search term. Distinct from empty-deck. **Current (Prompt 16, classification corrected Prompt 16B).** |
 | Filtered empty (status/tag filters) | Status/tag filters applied, no match | Show filtered empty with "Clear filters" CTA. **Future** — status/tag filter chips are not yet implemented (see V1 verification status). |
 | Selection mode | Long-press OR Select tapped | App bar swaps; checkboxes show; bulk bar appears. |
 | Resume present | Resumable session for deck | Show banner above CTAs. |

@@ -427,8 +427,9 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     }
     if (state.items.isEmpty) {
       // Distinguish a true empty deck from a search that filtered everything
-      // out: progress counts cover the whole deck regardless of the query.
-      if (state.searchTerm.isNotEmpty) {
+      // out: progress counts cover the whole deck regardless of the query, so
+      // no-results requires the deck to actually hold cards (totalCount > 0).
+      if (state.searchTerm.isNotEmpty && state.totalCount > 0) {
         return [
           SliverToBoxAdapter(
             child: FlashcardNoResultsSection(

@@ -274,6 +274,40 @@ void main() {
   );
 
   testWidgets(
+    'DT2d onSearch: empty deck with a search term still shows empty-deck state',
+    (WidgetTester tester) async {
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) =>
+                Future<FlashcardListState>.value(_emptyDeckSearchingState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      container
+          .read(flashcardToolbarStateProvider(deckId).notifier)
+          .setSearchTerm('abc');
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _scrollToText(tester, 'No flashcards yet');
+      expect(find.text('No flashcards yet'), findsOneWidget);
+      expect(find.text('Add'), findsOneWidget);
+      // A zero-card deck is never a "no results" state, even while searching.
+      expect(find.byKey(const ValueKey('flashcard_no_results')), findsNothing);
+      expect(find.text('No matching flashcards'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'DT4 onDisplay: compact layout renders study, progress, and toolbar sections',
     (WidgetTester tester) async {
       tester.view.devicePixelRatio = 1;
@@ -1058,6 +1092,27 @@ final _noMatchFlashcardState = FlashcardListState(
     learningCount: 1,
     masteredCount: 0,
     masteryPercent: 7,
+  ),
+  items: const <FlashcardListItemState>[],
+);
+
+// Truly empty deck (zero total cards) while a search term is active: this is
+// an empty deck, NOT a no-results state, because the deck holds no cards at all.
+final _emptyDeckSearchingState = FlashcardListState(
+  deckId: 'deck-001',
+  folderId: 'folder-001',
+  deckName: 'Korean deck',
+  breadcrumb: const <BreadcrumbSegmentReadModel>[
+    BreadcrumbSegmentReadModel(label: 'Korean', folderId: 'folder-001'),
+    BreadcrumbSegmentReadModel(label: 'Korean deck', folderId: null),
+  ],
+  sortMode: ContentSortMode.manual,
+  searchTerm: 'abc',
+  progress: const FlashcardDeckProgressState(
+    newCount: 0,
+    learningCount: 0,
+    masteredCount: 0,
+    masteryPercent: 0,
   ),
   items: const <FlashcardListItemState>[],
 );

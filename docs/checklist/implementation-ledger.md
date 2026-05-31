@@ -41,6 +41,24 @@ verified + docs aligned), `Partial`, `NotStarted`, `Blocked`, `Future`.
 | 2026-05-31 | Prompt 15 — Flashcard Editor create/edit doc-code unification | `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/08-flashcard-edit.md`, `docs/business/flashcard/flashcard-management.md`, `docs/contracts/usecase-contracts/flashcard.md`, checklist/navigation docs, focused editor/list/router tests | Current | Preflight found create/edit routes already share `FlashcardEditorScreen`; code does not expose `flashcardHistory`, History remains Future, and Bury/Suspend live in study-session card-actions. Docs now keep 07/08 as route-specific wireframes with a shared-editor contract table; editor owns content/tag create/update and learned-content Keep/Reset progress policy only. Move/delete/export are documented as flashcard list row/bulk owners; standalone History reset remains Future/migration-required. No schema, route, History screen, Global Search, Drive sync, Progress/Settings, or visual redesign scope added. |
 | 2026-05-31 | Prompt 15B — Flashcard Editor dirty exit + destination save navigation | `flashcard_editor_viewmodel.dart`, `flashcard_editor_screen.dart`, l10n sources/generated, `flashcard_editor_screen_test.dart`, flashcard wireframe/business/checklist docs | Current | Added explicit `hasUnsavedChanges` over create/edit drafts: create checks trimmed content, tags, non-default starting status, and destination changes; edit compares trimmed content, optional fields, tags, and starting status against loaded originals without treating preloaded optional fields/tags as dirty. Header close and browser/system back use `MxConfirmationDialog` danger discard copy when dirty. Create normal Save navigates to the actual selected destination deck; Save and add another stays in the editor, keeps the selected deck, and resets to a clean draft. No schema, route, History, delete/move/export-in-editor, Search, Drive sync, Progress/Settings, or visual redesign scope added. |
 
+## Prompt 16B — Flashcard List empty-deck-while-searching fix (2026-05-31)
+
+> **Scope**: classification-only fix for the no-results vs empty-deck distinction. No new behaviour.
+
+**Bug:** Prompt 16 showed `FlashcardNoResultsSection` whenever `items.isEmpty && searchTerm.isNotEmpty`,
+which misclassified a **truly empty deck** (zero cards) as "no results" once the user typed a search term.
+
+**Fix:** the body branch now requires `state.totalCount > 0` as well. Exact rule:
+
+- **No-results** = deck has cards but the active local search returns zero visible rows
+  (`items.isEmpty && searchTerm.isNotEmpty && totalCount > 0`).
+- **Empty deck** = total deck card count is zero (`totalCount == 0`), regardless of search term.
+
+**Test:** `flashcard_list_screen_test.dart` +1 (DT2d: empty deck + search term `'abc'` + all-zero progress
+→ "No flashcards yet", no `flashcard_no_results`). DT2b/DT2c unchanged and still passing.
+
+**Verification:** `build_runner` ✓ · `flutter analyze` clean · full suite **961 passed** · guard `memox` passed.
+
 ## Prompt 16 — Flashcard List V1 parity (Rules / States / Forbidden) (2026-05-31)
 
 > **Scope**: Flashcard List (wireframe 06) aspect-by-aspect parity for rules, states,
@@ -56,7 +74,8 @@ whole-screen Current; a new "V1 verification status" section splits verified-Cur
 
 - **No-results state distinct from empty-deck.** Previously a search that filtered every row out
   rendered the empty-deck CTA ("No flashcards yet" + Add). Added `FlashcardNoResultsSection`
-  (`ValueKey('flashcard_no_results')`) shown when `items.isEmpty && searchTerm.isNotEmpty`, with a
+  (`ValueKey('flashcard_no_results')`) shown when `items.isEmpty && searchTerm.isNotEmpty && totalCount > 0`
+  (condition corrected in Prompt 16B — see below), with a
   "Clear" CTA resetting the toolbar search term. New l10n keys `flashcardsNoResultsTitle`,
   `flashcardsNoResultsMessage`, `flashcardsClearSearchAction` (EN + VI), classified in
   `button_label_contract_test.dart`.
