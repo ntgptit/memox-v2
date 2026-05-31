@@ -105,7 +105,7 @@ flowchart TD
 | --- | --- | --- |
 | Summary | "Will import: N cards. Skipped: M duplicates. Issues: K." | Always |
 | Valid rows list | First 50 rows of `previewItems` with `front` / `back` / `note` columns. "Show all" if more. | Always |
-| Skipped duplicates | Each `FlashcardImportSkippedDuplicate` with badge ("In file" / "In deck") | When `skippedDuplicates.isNotEmpty` |
+| Skipped duplicates | Each `FlashcardImportSkippedDuplicate` with badge ("In file" / "In deck") | When `skippedDuplicates.isNotEmpty` — **Future**: V1 surfaces an aggregate "N duplicates skipped" count badge only, not a per-row list (see `docs/wireframes/10-deck-import.md` §V1 verification status). |
 | Validation issues | Each `ImportValidationIssue` with `lineNumber` + `message` | When `issues.isNotEmpty` |
 | Commit CTA | Primary button "Import N cards" | Enabled only when `canCommit == true` |
 | Cancel CTA | Secondary button | Always |
@@ -150,6 +150,8 @@ On commit:
 If transaction fails: surface failure feedback, retain preview state so user can retry.
 
 ### Result screen
+
+> **Future (not in V1).** The standalone result screen below is the target. V1 does not render a separate result step: on a successful commit the screen shows a deferred success snackbar (`importSuccessMessage(count)`) and pops back to the Flashcard List. The committed/skipped counts are computed in `FlashcardImportPreparation` but only the imported count is surfaced (via the snackbar). See `docs/wireframes/10-deck-import.md` §V1 verification status.
 
 After commit:
 

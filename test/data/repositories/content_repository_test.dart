@@ -351,6 +351,49 @@ void main() {
     );
 
     test(
+      'DT10 onInsert: preparing an import for an unknown deck fails safely without crashing',
+      () async {
+        final preparation = await harness.flashcardRepository.prepareImport(
+          deckId: 'missing-deck',
+          format: ImportSourceFormat.csv,
+          rawContent: 'front,back\nhello,xin chao',
+        );
+
+        expect(preparation.isFailure, isTrue);
+        expect(preparation.failureOrNull?.type, FailureType.notFound);
+      },
+    );
+
+    test(
+      'DT11 onInsert: committing an import for an unknown deck fails safely and writes nothing',
+      () async {
+        const preparation = FlashcardImportPreparation(
+          format: ImportSourceFormat.csv,
+          previewItems: <FlashcardImportPreviewItem>[
+            FlashcardImportPreviewItem(
+              sourceLabel: 'Line 2',
+              draft: FlashcardDraft(front: 'hello', back: 'xin chao'),
+            ),
+          ],
+          issues: <ImportValidationIssue>[],
+        );
+
+        final commit = await harness.flashcardRepository.commitImport(
+          deckId: 'missing-deck',
+          preparation: preparation,
+        );
+
+        expect(commit.isFailure, isTrue);
+        expect(commit.failureOrNull?.type, FailureType.notFound);
+
+        final flashcards = await harness.database
+            .select(harness.database.flashcards)
+            .get();
+        expect(flashcards, isEmpty);
+      },
+    );
+
+    test(
       'DT1 onDelete: deleting the last subfolder resets parent folder mode to unlocked',
       () async {
         final root = await harness.folderRepository.createRootFolder(

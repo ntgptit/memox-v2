@@ -119,6 +119,12 @@ Future<Either<Failure, ImportResult>> call({
 });
 ```
 
+> **Current implementation (verified 2026-05-31, Prompt 17).** The single `ImportFlashcardsUseCase` / `Either<Failure, …>` signature above is the **Target** style. The shipped code splits this into two `Result`-based use cases in `lib/domain/usecases/flashcard_usecases.dart`:
+> - `PrepareFlashcardImportUseCase.execute(...) → Future<Result<FlashcardImportPreparation>>` — parse + validate + dedupe-against-deck (phases 1–5).
+> - `CommitFlashcardImportUseCase.execute({deckId, preparation}) → Future<Result<int>>` — re-applies the duplicate policy, rejects when `!canCommit`, then chunk-inserts in a single transaction (phase 6). Returns the committed count.
+>
+> Preview is in-line (no preview-only flag); `FlashcardImportPreparation.canCommit` gates the commit. Migration to the `Either`/single-call form is deferred to the approved `fpdart` migration.
+
 **Phases:**
 
 1. Parse source → list of (front, back) candidates.
