@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-31
 route: /settings/learning
 source_specs:
   - docs/business/engagement/dashboard-engagement.md
@@ -29,7 +29,9 @@ The layout/data/components/states sections below describe the target engagement 
 
 ## Layout
 
-Target/reference layout. Current V1 renders study defaults, the interval table, and Manage tags; the daily-goal/reminder blocks below are not shipped Current controls.
+Target/reference layout. Current V1 renders study defaults (batch-size rows with `MxBottomSheet` editor, shared study toggles), the interval table, and Manage tags; the daily-goal/reminder blocks and the advanced study-defaults block below are not shipped Current controls.
+
+> **Current V1 study defaults are NOT shown in this target layout diagram.** The implemented V1 controls are: new-study batch-size row (opens `MxBottomSheet` stepper on tap), review batch-size row (opens `MxBottomSheet` stepper on tap), and three inline shared-study toggles (shuffle flashcards, shuffle answers, prioritise overdue). These live above the DAILY GOAL block at runtime. The layout below is the target engagement design for reference only.
 
 ```
 ┌───────────────────────────────────────┐
@@ -64,7 +66,7 @@ Target/reference layout. Current V1 renders study defaults, the interval table, 
 │ │ 🏷  Manage tags          42  ▸    │ │  → /settings/learning/tags
 │ └───────────────────────────────────┘ │
 │                                       │
-│ STUDY DEFAULTS  (future)              │
+│ ADDITIONAL STUDY DEFAULTS (Target/Future) │
 │ ┌───────────────────────────────────┐ │
 │ │ Show swipe hint footer    [●━━]   │ │  ← Toggle: show "» Swipe left for the next
 │ │                                   │ │     card" footer in Review mode
@@ -150,7 +152,7 @@ Target/reference layout. Current V1 renders study defaults, the interval table, 
 
 ## Dialogs and bottom-sheets used
 
-- Current V1: none required for the study defaults controls.
+- Current V1: batch-size editing uses `MxBottomSheet` (see `_showBatchSizeSheet` in `study_settings_group.dart`); shared study toggles are inline and do not need a dialog or sheet.
 - Target/Future: Time picker (platform-native or `docs/wireframes/25-shared-bottom-sheets.md` §reminder-time).
 
 ## Validation
