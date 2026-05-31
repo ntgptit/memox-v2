@@ -3,8 +3,9 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import 'package:memox/presentation/shared/layouts/mx_gap.dart';
 import 'package:memox/presentation/shared/layouts/mx_space.dart';
+import 'package:memox/presentation/shared/widgets/mx_action_button.dart';
 import 'package:memox/presentation/shared/widgets/mx_card.dart';
-import 'package:memox/presentation/shared/widgets/mx_primary_button.dart';
+import 'package:memox/presentation/shared/widgets/mx_card_actions.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
 import 'answer_feedback_panel.dart';
 import 'study_answer_models.dart';
@@ -53,12 +54,14 @@ class PromptCard extends StatelessWidget {
               onMarkCorrect: isSubmitting ? null : onMarkCorrect,
             ),
             const MxGap(MxSpace.md),
-            MxPrimaryButton(
-              label: l10n.studyContinueAction,
-              trailingIcon: Icons.arrow_forward_rounded,
-              isLoading: isSubmitting,
-              fullWidth: true,
-              onPressed: isSubmitting ? null : onContinue,
+            MxCardActions(
+              primary: MxActionButton(
+                intent: MxActionIntent.cardPrimary,
+                label: l10n.studyContinueAction,
+                trailingIcon: Icons.arrow_forward_rounded,
+                isLoading: isSubmitting,
+                onPressed: isSubmitting ? null : onContinue,
+              ),
             ),
           ],
           if (feedback == null)
