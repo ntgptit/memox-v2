@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/core/errors/failures.dart';
 import 'package:memox/data/datasources/local/app_database.dart';
 import 'package:memox/domain/enums/content_sort_mode.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
@@ -98,6 +99,11 @@ void main() {
         );
 
         expect(deck.isFailure, isTrue);
+        expect(deck.failureOrNull?.code, FailureCodes.folderContainsSubfolders);
+        expect(
+          deck.failureOrNull?.message,
+          'The target folder is locked for subfolders.',
+        );
 
         final storedRoot = await (harness.database.select(
           harness.database.folders,
@@ -129,6 +135,11 @@ void main() {
         );
 
         expect(child.isFailure, isTrue);
+        expect(child.failureOrNull?.code, FailureCodes.folderContainsDecks);
+        expect(
+          child.failureOrNull?.message,
+          'The target folder is locked for decks.',
+        );
 
         final storedRoot = await (harness.database.select(
           harness.database.folders,
@@ -1017,6 +1028,89 @@ void main() {
         expect(folder.itemCount, 4);
         expect(folder.dueCardCount, 2);
         expect(folder.newCardCount, 1);
+      },
+    );
+
+    test(
+      'DT3 getLibraryOverview: keeps recursive counts isolated between sibling folder trees',
+      () async {
+        final languages = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        final travel = await harness.folderRepository.createRootFolder(
+          'Travel',
+        );
+        final japanese = await harness.folderRepository.createSubfolder(
+          parentFolderId: languages.valueOrNull!.id,
+          name: 'Japanese',
+        );
+        final itinerary = await harness.folderRepository.createSubfolder(
+          parentFolderId: travel.valueOrNull!.id,
+          name: 'Itinerary',
+        );
+        final n5Deck = await harness.deckRepository.createDeck(
+          folderId: japanese.valueOrNull!.id,
+          name: 'N5 Core',
+        );
+        final tripDeck = await harness.deckRepository.createDeck(
+          folderId: itinerary.valueOrNull!.id,
+          name: 'Trip phrases',
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: n5Deck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'one', back: 'ichi'),
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: tripDeck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'hotel', back: 'khach san'),
+        );
+        await harness.flashcardRepository.createFlashcard(
+          deckId: tripDeck.valueOrNull!.id,
+          draft: const FlashcardDraft(front: 'station', back: 'ga'),
+        );
+
+        final overview = await harness.folderRepository.getLibraryOverview(
+          const ContentQuery(),
+        );
+        final languagesRow = overview.folders.singleWhere(
+          (item) => item.folder.id == languages.valueOrNull!.id,
+        );
+        final travelRow = overview.folders.singleWhere(
+          (item) => item.folder.id == travel.valueOrNull!.id,
+        );
+
+        expect(languagesRow.subfolderCount, 1);
+        expect(languagesRow.deckCount, 1);
+        expect(languagesRow.itemCount, 1);
+        expect(travelRow.subfolderCount, 1);
+        expect(travelRow.deckCount, 1);
+        expect(travelRow.itemCount, 2);
+      },
+    );
+
+    test(
+      'DT4 getLibraryOverview: empty nested folders contribute zero deck and card counts',
+      () async {
+        final root = await harness.folderRepository.createRootFolder(
+          'Languages',
+        );
+        await harness.folderRepository.createSubfolder(
+          parentFolderId: root.valueOrNull!.id,
+          name: 'Empty branch',
+        );
+
+        final overview = await harness.folderRepository.getLibraryOverview(
+          const ContentQuery(),
+        );
+        final folder = overview.folders.singleWhere(
+          (item) => item.folder.id == root.valueOrNull!.id,
+        );
+
+        expect(folder.subfolderCount, 1);
+        expect(folder.deckCount, 0);
+        expect(folder.itemCount, 0);
+        expect(folder.dueCardCount, 0);
+        expect(folder.newCardCount, 0);
       },
     );
 

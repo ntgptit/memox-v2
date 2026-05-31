@@ -2154,6 +2154,18 @@ abstract class AppLocalizations {
   /// **'Something went wrong.'**
   String get errorUnexpected;
 
+  /// No description provided for @errorFolderContainsDecks.
+  ///
+  /// In en, this message translates to:
+  /// **'This folder already contains decks. Create a deck here or choose another folder for subfolders.'**
+  String get errorFolderContainsDecks;
+
+  /// No description provided for @errorFolderContainsSubfolders.
+  ///
+  /// In en, this message translates to:
+  /// **'This folder already contains subfolders. Create a subfolder here or choose another folder for decks.'**
+  String get errorFolderContainsSubfolders;
+
   /// No description provided for @foldersNewSubfolderTooltip.
   ///
   /// In en, this message translates to:

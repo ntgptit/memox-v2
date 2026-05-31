@@ -662,6 +662,8 @@
   "errorStorage": "Đã xảy ra sự cố lưu trữ cục bộ.",
   "errorNotFound": "Không tìm thấy tài nguyên được yêu cầu.",
   "errorUnexpected": "Đã xảy ra lỗi.",
+  "errorFolderContainsDecks": "Thư mục này đã có bộ thẻ. Hãy tạo bộ thẻ tại đây hoặc chọn thư mục khác để tạo thư mục con.",
+  "errorFolderContainsSubfolders": "Thư mục này đã có thư mục con. Hãy tạo thư mục con tại đây hoặc chọn thư mục khác để tạo bộ thẻ.",
   "foldersNewSubfolderTooltip": "Thư mục con mới",
   "foldersNewDeckTooltip": "Bộ thẻ mới",
   "foldersCreateChoiceTitle": "Bạn muốn tạo gì?",

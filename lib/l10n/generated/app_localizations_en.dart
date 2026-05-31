@@ -1343,6 +1343,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorUnexpected => 'Something went wrong.';
 
   @override
+  String get errorFolderContainsDecks =>
+      'This folder already contains decks. Create a deck here or choose another folder for subfolders.';
+
+  @override
+  String get errorFolderContainsSubfolders =>
+      'This folder already contains subfolders. Create a subfolder here or choose another folder for decks.';
+
+  @override
   String get foldersNewSubfolderTooltip => 'New subfolder';
 
   @override

@@ -8,6 +8,8 @@ abstract final class FailureCodes {
   static const String invalidData = 'invalid_data';
   static const String unsupportedAction = 'unsupported_action';
   static const String unknown = 'unknown';
+  static const String folderContainsDecks = 'folder_contains_decks';
+  static const String folderContainsSubfolders = 'folder_contains_subfolders';
 
   // Tag domain (docs/contracts/usecase-contracts/tag.md §TagValidator).
   static const String tagEmpty = 'tag_empty';

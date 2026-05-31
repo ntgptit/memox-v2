@@ -60,6 +60,7 @@ stateDiagram-v2
 - Creating deck locks parent to `decks`.
 - Folder with `subfolders` cannot create deck.
 - Folder with `decks` cannot create subfolder.
+- Lock-mode rejection is typed: deck-locked parents use `folder_contains_decks`, subfolder-locked parents use `folder_contains_subfolders`. Folder Detail maps these to localized snackbar copy and must not show the generic unexpected-error message for this case.
 - Moving folder must not create cycle.
 - Deleting last child returns folder to `unlocked`.
 - Deleting folder deletes nested content according to persistence rules.

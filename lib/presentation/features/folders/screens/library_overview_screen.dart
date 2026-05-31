@@ -67,7 +67,7 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
       ) {
         final failure = folderActionError(next);
         if (failure != null) {
-          MxSnackbar.error(context, folderActionErrorMessage(failure));
+          MxSnackbar.error(context, folderActionErrorMessage(l10n, failure));
         }
       });
     }

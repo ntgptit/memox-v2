@@ -662,6 +662,8 @@
   "errorStorage": "A local storage problem occurred.",
   "errorNotFound": "The requested resource could not be found.",
   "errorUnexpected": "Something went wrong.",
+  "errorFolderContainsDecks": "This folder already contains decks. Create a deck here or choose another folder for subfolders.",
+  "errorFolderContainsSubfolders": "This folder already contains subfolders. Create a subfolder here or choose another folder for decks.",
   "foldersNewSubfolderTooltip": "New subfolder",
   "foldersNewDeckTooltip": "New deck",
   "foldersCreateChoiceTitle": "What do you want to create?",

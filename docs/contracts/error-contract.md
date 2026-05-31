@@ -160,6 +160,8 @@ Reserved for **data corruption** — should never happen in normal operation. Wh
 
 l10n keys live in `lib/l10n/app_en.arb` under prefix `error_`. Per-field validation keys: `error_validation_{field}_{code}`. Per-action keys: `error_action_{verb}`.
 
+Current implementation note for folder lock-mode: MemoX's existing `Result<T>`/`AppFailure` path uses validation failure codes `folder_contains_decks` and `folder_contains_subfolders` (constants in `FailureCodes`) rather than the target `ValidationCode.parentModeLocked` enum. Folder Detail maps these codes to `errorFolderContainsDecks` / `errorFolderContainsSubfolders` ARB keys so the user sees typed localized copy instead of a generic error.
+
 ## Forbidden patterns
 
 - ❌ Empty catch block (`catch (_) {}`). Must at minimum log.

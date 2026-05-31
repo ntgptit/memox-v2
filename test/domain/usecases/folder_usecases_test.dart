@@ -1,9 +1,77 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/core/errors/app_exception.dart';
+import 'package:memox/core/errors/failures.dart';
+import 'package:memox/domain/enums/folder_content_mode.dart';
 import 'package:memox/domain/repositories/folder_repository.dart';
+import 'package:memox/domain/services/folder_structure_service.dart';
 import 'package:memox/domain/usecases/folder_usecases.dart';
 import 'package:memox/domain/value_objects/content_read_models.dart';
 
 void main() {
+  group('FolderStructureService', () {
+    const service = FolderStructureService();
+
+    test(
+      'F4 onInsert: folder containing decks rejects subfolder creation with typed code',
+      () {
+        expect(
+          () =>
+              service.resolveModeAfterAddingSubfolder(FolderContentMode.decks),
+          throwsA(
+            isA<ValidationException>()
+                .having(
+                  (error) => error.code,
+                  'code',
+                  FailureCodes.folderContainsDecks,
+                )
+                .having(
+                  (error) => error.message,
+                  'message',
+                  'The target folder is locked for decks.',
+                ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'F6 onInsert: folder containing subfolders rejects deck creation with typed code',
+      () {
+        expect(
+          () =>
+              service.resolveModeAfterAddingDeck(FolderContentMode.subfolders),
+          throwsA(
+            isA<ValidationException>()
+                .having(
+                  (error) => error.code,
+                  'code',
+                  FailureCodes.folderContainsSubfolders,
+                )
+                .having(
+                  (error) => error.message,
+                  'message',
+                  'The target folder is locked for subfolders.',
+                ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'F3 onInsert: empty folder allows first subfolder and first deck mode paths independently',
+      () {
+        expect(
+          service.resolveModeAfterAddingSubfolder(FolderContentMode.unlocked),
+          FolderContentMode.subfolders,
+        );
+        expect(
+          service.resolveModeAfterAddingDeck(FolderContentMode.unlocked),
+          FolderContentMode.decks,
+        );
+      },
+    );
+  });
+
   group('ListAllFoldersUseCase', () {
     test('returns all folders, including nested folders', () async {
       const options = <FolderScopeOption>[
@@ -114,6 +182,5 @@ class _StubFolderRepository implements FolderRepository {
   }
 
   @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      super.noSuchMethod(invocation);
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

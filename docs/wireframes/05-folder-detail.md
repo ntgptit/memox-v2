@@ -214,7 +214,10 @@ Browse a folder's children: either subfolders or decks (never both, per `content
 - Folder shows EITHER subfolders OR decks based on `content_mode`. Never mixed.
 - FAB action constrained by `content_mode`.
 - Creating the first child in `unlocked` mode locks the folder to the corresponding mode.
-- Deleting the last child can unlock back to `unlocked` (per folder-management.md state diagram).
+- If a stale UI path or concurrent update attempts the incompatible action, the operation is rejected and the screen shows a localized snackbar, not a generic error:
+  - folder already containing decks + create-subfolder attempt → "This folder already contains decks. Create a deck here or choose another folder for subfolders."
+  - folder already containing subfolders + create-deck attempt → "This folder already contains subfolders. Create a subfolder here or choose another folder for decks."
+- Deleting the last child can unlock back to `unlocked` (per `docs/business/folder/folder-management.md` state diagram).
 - Empty folder in `unlocked` mode MUST show mode-choice empty state (not generic empty).
 - Resume banner MUST appear above all other CTAs when present.
 

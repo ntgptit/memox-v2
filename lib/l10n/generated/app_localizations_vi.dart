@@ -1266,6 +1266,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get errorUnexpected => 'Đã xảy ra lỗi.';
 
   @override
+  String get errorFolderContainsDecks =>
+      'Thư mục này đã có bộ thẻ. Hãy tạo bộ thẻ tại đây hoặc chọn thư mục khác để tạo thư mục con.';
+
+  @override
+  String get errorFolderContainsSubfolders =>
+      'Thư mục này đã có thư mục con. Hãy tạo thư mục con tại đây hoặc chọn thư mục khác để tạo bộ thẻ.';
+
+  @override
   String get foldersNewSubfolderTooltip => 'Thư mục con mới';
 
   @override

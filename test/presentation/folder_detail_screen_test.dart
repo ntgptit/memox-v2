@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/app/router/route_names.dart';
+import 'package:memox/core/errors/app_exception.dart';
+import 'package:memox/core/errors/failures.dart';
 import 'package:memox/domain/enums/content_sort_mode.dart';
 import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
@@ -417,6 +419,216 @@ void main() {
       expect(find.text('Deck name'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'F4 onInsert: stale create-subfolder path shows typed folder-contains-decks message',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      var createSubfolderCalls = 0;
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+          ),
+          folderActionControllerProvider(folderId).overrideWith(
+            () => _FakeFolderActionController(
+              onCreateSubfolder: (name) async {
+                createSubfolderCalls++;
+                return const AppFailure(
+                  type: FailureType.validation,
+                  message: 'The target folder is locked for decks.',
+                  code: FailureCodes.folderContainsDecks,
+                  cause: ValidationException(
+                    message: 'The target folder is locked for decks.',
+                    code: FailureCodes.folderContainsDecks,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('New subfolder').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'Japanese');
+      await tester.pump();
+      await tester.tap(find.text('Create').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(createSubfolderCalls, 1);
+      expect(
+        find.text(
+          'This folder already contains decks. Create a deck here or choose another folder for subfolders.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Something went wrong.'), findsNothing);
+      expect(find.text('Something went wrong'), findsNothing);
+      expect(find.text('Subfolder created.'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'F6 onInsert: stale create-deck path shows typed folder-contains-subfolders message',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      var createDeckCalls = 0;
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+          ),
+          folderActionControllerProvider(folderId).overrideWith(
+            () => _FakeFolderActionController(
+              onCreateDeckFailure: (name) async {
+                createDeckCalls++;
+                return const AppFailure(
+                  type: FailureType.validation,
+                  message: 'The target folder is locked for subfolders.',
+                  code: FailureCodes.folderContainsSubfolders,
+                  cause: ValidationException(
+                    message: 'The target folder is locked for subfolders.',
+                    code: FailureCodes.folderContainsSubfolders,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('New deck').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'N5 Core');
+      await tester.pump();
+      await tester.tap(find.text('Create').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(createDeckCalls, 1);
+      expect(
+        find.text(
+          'This folder already contains subfolders. Create a subfolder here or choose another folder for decks.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Something went wrong.'), findsNothing);
+      expect(find.text('Something went wrong'), findsNothing);
+      expect(find.text('Deck created.'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'F3 onInsert: valid subfolder creation in empty folder succeeds',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final createdNames = <String>[];
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+          ),
+          folderActionControllerProvider(folderId).overrideWith(
+            () => _FakeFolderActionController(
+              onCreateSubfolderSuccess: (name) {
+                createdNames.add(name);
+              },
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('New subfolder').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'Japanese');
+      await tester.pump();
+      await tester.tap(find.text('Create').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(createdNames, <String>['Japanese']);
+      expect(find.text('Subfolder created.'), findsOneWidget);
+    },
+  );
+
+  testWidgets('F5 onInsert: valid deck creation in empty folder succeeds', (
+    WidgetTester tester,
+  ) async {
+    const folderId = 'folder-001';
+    final createdNames = <String>[];
+    final container = ProviderContainer(
+      overrides: [
+        folderDetailQueryProvider(folderId).overrideWith(
+          (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
+        ),
+        folderActionControllerProvider(folderId).overrideWith(
+          () => _FakeFolderActionController(
+            onCreateDeck: (name) {
+              createdNames.add(name);
+              return 'deck-new';
+            },
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('New deck').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, 'N5 Core');
+    await tester.pump();
+    await tester.tap(find.text('Create').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(createdNames, <String>['N5 Core']);
+    expect(find.text('Deck created.'), findsOneWidget);
+  });
 
   testWidgets(
     'DT2 onDisplay: empty subfolder mode renders only subfolder CTA',
@@ -943,7 +1155,10 @@ const _subfolderDetailState = FolderDetailState(
     breadcrumb: <BreadcrumbSegmentReadModel>[
       BreadcrumbSegmentReadModel(label: 'Japanese', folderId: 'folder-000'),
       BreadcrumbSegmentReadModel(label: 'Japanese N5', folderId: 'folder-001'),
-      BreadcrumbSegmentReadModel(label: 'N5 Vocabulary', folderId: 'folder-002'),
+      BreadcrumbSegmentReadModel(
+        label: 'N5 Vocabulary',
+        folderId: 'folder-002',
+      ),
     ],
   ),
   mode: FolderDetailMode.subfolders,
@@ -1106,15 +1321,26 @@ class _FutureController<T> extends ChangeNotifier {
 }
 
 typedef _CreateDeckCallback = FutureOr<String?> Function(String name);
+typedef _CreateSubfolderFailureCallback =
+    FutureOr<AppFailure?> Function(String name);
+typedef _CreateSubfolderSuccessCallback = FutureOr<void> Function(String name);
+typedef _CreateDeckFailureCallback =
+    FutureOr<AppFailure?> Function(String name);
 
 class _FakeFolderActionController extends FolderActionController {
   _FakeFolderActionController({
     this.importTargets = const <FolderDeckItem>[],
     this.onCreateDeck,
+    this.onCreateSubfolder,
+    this.onCreateSubfolderSuccess,
+    this.onCreateDeckFailure,
   });
 
   final List<FolderDeckItem> importTargets;
   final _CreateDeckCallback? onCreateDeck;
+  final _CreateSubfolderFailureCallback? onCreateSubfolder;
+  final _CreateSubfolderSuccessCallback? onCreateSubfolderSuccess;
+  final _CreateDeckFailureCallback? onCreateDeckFailure;
 
   @override
   FutureOr<void> build(String folderId) {}
@@ -1123,7 +1349,26 @@ class _FakeFolderActionController extends FolderActionController {
   Future<List<FolderDeckItem>> loadImportDeckTargets() async => importTargets;
 
   @override
-  Future<String?> createDeck(String name) async => onCreateDeck?.call(name);
+  Future<bool> createSubfolder(String name) async {
+    final failure = await onCreateSubfolder?.call(name);
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return false;
+    }
+    await onCreateSubfolderSuccess?.call(name);
+    state = const AsyncData<void>(null);
+    return true;
+  }
+
+  @override
+  Future<String?> createDeck(String name) async {
+    final failure = await onCreateDeckFailure?.call(name);
+    if (failure != null) {
+      state = AsyncError<void>(failure, StackTrace.current);
+      return null;
+    }
+    return onCreateDeck?.call(name);
+  }
 }
 
 class _TestApp extends StatelessWidget {

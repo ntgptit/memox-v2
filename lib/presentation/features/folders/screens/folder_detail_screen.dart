@@ -61,7 +61,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       (_, next) {
         final failure = folderActionError(next);
         if (failure != null) {
-          MxSnackbar.error(context, folderActionErrorMessage(failure));
+          MxSnackbar.error(context, folderActionErrorMessage(l10n, failure));
         }
       },
     );
@@ -75,7 +75,10 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
           (_, next) {
             final failure = folderActionError(next);
             if (failure != null) {
-              MxSnackbar.error(context, folderActionErrorMessage(failure));
+              MxSnackbar.error(
+                context,
+                folderActionErrorMessage(l10n, failure),
+              );
             }
           },
         );

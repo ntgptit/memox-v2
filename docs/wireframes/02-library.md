@@ -104,6 +104,13 @@ Root content browser. Shows top-level folders and decks (those whose `folder_id`
 | Deck subtitle | "{n} cards" (total) and optional "{m} due" badge in theme color. |
 | FAB | Plus button (bottom-right). Tap → action sheet: New folder / New deck / Import. |
 
+### Count semantics
+
+- Folder-row counts are recursive over the folder subtree: descendant subfolders, decks in any descendant folder, and flashcards inside those decks are included.
+- Root-level sibling folder trees are isolated; counts from one root folder do not leak into another.
+- Empty nested folders contribute `0` deck/card/due/new-card counts.
+- Deck/card counts are derived from deck and flashcard rows in the subtree and are not recomputed in presentation.
+
 ## States
 
 | State | Trigger | Behavior |

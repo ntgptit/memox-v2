@@ -1,4 +1,5 @@
 import '../../core/errors/app_exception.dart';
+import '../../core/errors/failures.dart';
 import '../enums/folder_content_mode.dart';
 
 final class FolderStructureService {
@@ -8,6 +9,7 @@ final class FolderStructureService {
     if (current == FolderContentMode.decks) {
       throw const ValidationException(
         message: 'The target folder is locked for decks.',
+        code: FailureCodes.folderContainsDecks,
       );
     }
 
@@ -18,6 +20,7 @@ final class FolderStructureService {
     if (current == FolderContentMode.subfolders) {
       throw const ValidationException(
         message: 'The target folder is locked for subfolders.',
+        code: FailureCodes.folderContainsSubfolders,
       );
     }
 
@@ -64,6 +67,7 @@ final class FolderStructureService {
     if (targetParentMode == FolderContentMode.decks) {
       throw const ValidationException(
         message: 'The target folder is locked for decks.',
+        code: FailureCodes.folderContainsDecks,
       );
     }
   }
@@ -72,6 +76,7 @@ final class FolderStructureService {
     if (targetParentMode == FolderContentMode.subfolders) {
       throw const ValidationException(
         message: 'The target folder is locked for subfolders.',
+        code: FailureCodes.folderContainsSubfolders,
       );
     }
   }

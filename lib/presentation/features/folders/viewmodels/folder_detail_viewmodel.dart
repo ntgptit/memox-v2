@@ -13,6 +13,7 @@ import '../../../../domain/enums/folder_content_mode.dart';
 import '../../../../domain/value_objects/content_actions.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
+import '../../../../l10n/generated/app_localizations.dart';
 import '../../../shared/viewmodels/mx_action_errors.dart';
 import '../../../shared/viewmodels/mx_async_action_runner.dart';
 
@@ -267,5 +268,10 @@ FolderDetailMode _toDetailMode(FolderContentMode mode) => switch (mode) {
 AppFailure? folderActionError(AsyncValue<void> actionState) =>
     MxActionErrors.failureOf(actionState);
 
-String folderActionErrorMessage(AppFailure? failure) =>
-    MxActionErrors.messageOf(failure);
+String folderActionErrorMessage(AppLocalizations l10n, AppFailure? failure) =>
+    switch (failure?.code) {
+      FailureCodes.folderContainsDecks => l10n.errorFolderContainsDecks,
+      FailureCodes.folderContainsSubfolders =>
+        l10n.errorFolderContainsSubfolders,
+      _ => MxActionErrors.messageOf(failure),
+    };

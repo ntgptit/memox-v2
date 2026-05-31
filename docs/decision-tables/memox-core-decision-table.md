@@ -22,9 +22,9 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | F1 | Create root | Valid name | Create unlocked root folder | C0+C1 | `test/features/folders/create_folder_test.dart::F1` |
 | F2 | Create root | Empty name | Reject | C1 | `test/features/folders/create_folder_test.dart::F2` |
 | F3 | Create subfolder | Parent unlocked/subfolders | Create child, parent becomes/stays subfolders | C0+C1 | `test/features/folders/create_folder_test.dart::F3` |
-| F4 | Create subfolder | Parent decks | Reject | C1 | `test/features/folders/create_folder_test.dart::F4` |
-| F5 | Create deck | Parent unlocked/decks | Create deck, parent becomes/stays decks | C0+C1 | `test/features/decks/create_deck_test.dart::F5` |
-| F6 | Create deck | Parent subfolders | Reject | C1 | `test/features/decks/create_deck_test.dart::F6` |
+| F4 | Create subfolder | Parent decks | Reject with typed `folder_contains_decks`; Folder Detail stale path shows localized snackbar and creates no subfolder | C1 | `test/domain/usecases/folder_usecases_test.dart::F4`, `test/data/repositories/content_repository_test.dart::DT5`, `test/presentation/folder_detail_screen_test.dart::F4` |
+| F5 | Create deck | Parent unlocked/decks | Create deck, parent becomes/stays decks | C0+C1 | `test/data/repositories/content_repository_test.dart::DT2`, `test/presentation/folder_detail_screen_test.dart::F5` |
+| F6 | Create deck | Parent subfolders | Reject with typed `folder_contains_subfolders`; Folder Detail stale path shows localized snackbar and creates no deck | C1 | `test/domain/usecases/folder_usecases_test.dart::F6`, `test/data/repositories/content_repository_test.dart::DT4`, `test/presentation/folder_detail_screen_test.dart::F6` |
 | F7 | Move folder | Target self/descendant | Reject | C1 | `test/features/folders/move_folder_test.dart::F7` |
 | F8 | Delete folder | Confirmed | Delete nested content safely | C0+C1 | `test/features/folders/delete_folder_test.dart::F8` |
 | F9 | Delete last child | Folder becomes unlocked | Mode returns to unlocked | C1 | `test/features/folders/delete_folder_test.dart::F9` |
