@@ -97,6 +97,8 @@ void registerStudyRepositoryTests() {
         expect(snapshot.boxChangeBreakdown.stayedCount, 0);
         expect(snapshot.boxChangeBreakdown.resetCount, 0);
         expect(snapshot.boxChangeBreakdown.reachedBox8Count, 0);
+        // V1 per-card review excludes initialPassed/perfect cards entirely.
+        expect(snapshot.resultCardReviewItems, isEmpty);
       },
     );
 
@@ -2027,10 +2029,23 @@ void registerStudyRepositoryTests() {
         expect(snapshot.session.status, SessionStatus.readyToFinalize);
         expect(snapshot.currentItem, isNull);
 
-        await harness.finalize.execute(
+        snapshot = await harness.finalize.execute(
           sessionId: snapshot.session.id,
           studyType: snapshot.session.studyType,
         );
+
+        // Per-card review section V1: recovered attempt surfaces a
+        // recovered row; counts must match the breakdown.
+        expect(snapshot.resultBreakdown.recoveredCount, 1);
+        expect(snapshot.resultBreakdown.forgotCount, 0);
+        expect(snapshot.resultCardReviewItems, hasLength(1));
+        expect(
+          snapshot.resultCardReviewItems.single.resultType,
+          StudyResultCardReviewType.recovered,
+        );
+        expect(snapshot.resultCardReviewItems.single.flashcardId, 'card-1');
+        expect(snapshot.resultCardReviewItems.single.oldBox, 4);
+        expect(snapshot.resultCardReviewItems.single.newBox, 4);
 
         final expectedDueAt = DateTime.utc(
           2026,

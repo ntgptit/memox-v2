@@ -1059,6 +1059,17 @@
   "studyResultBoxReachedMax": "Đạt box 8",
   "studyResultFailedFinalizeBanner": "Một số dữ liệu chưa lưu. Vui lòng thử lại.",
   "studyResultEmpty": "Chưa trả lời thẻ nào",
+  "studyResultCardsToReviewTitle": "Thẻ cần ôn lại",
+  "studyResultCardsToReviewEmpty": "Không có thẻ nào cần ôn thêm.",
+  "studyResultRecoveredLabel": "Hồi phục",
+  "studyResultForgotLabel": "Quên",
+  "studyResultBoxChangedLabel": "Box {oldBox} → {newBox}",
+  "@studyResultBoxChangedLabel": {
+    "placeholders": {
+      "oldBox": { "type": "int" },
+      "newBox": { "type": "int" }
+    }
+  },
   "studyModeReview": "Xem lại",
   "studyModeMatch": "Ghép đôi",
   "studyModeGuess": "Đoán",

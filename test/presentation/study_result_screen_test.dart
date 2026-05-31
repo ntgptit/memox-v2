@@ -78,6 +78,72 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Done'), findsOneWidget);
       expect(find.text('Study more'), findsOneWidget);
+      expect(find.text('Cards to review'), findsOneWidget);
+      expect(find.text('No cards need extra review.'), findsOneWidget);
+      // V1 must NOT surface a separate History/Tough Cards route.
+      expect(find.text('View all history'), findsNothing);
+      expect(find.text('Tough cards'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'completed result with recovered/forgot cards shows Cards to review rows',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studySessionStateProvider('session-001').overrideWith(
+              (ref) => Future.value(
+                _snapshot(
+                  SessionStatus.completed,
+                  cardReviewItems: const <StudyResultCardReviewItem>[
+                    StudyResultCardReviewItem(
+                      flashcardId: 'card-forgot',
+                      front: 'forgot-front',
+                      back: 'forgot-back',
+                      resultType: StudyResultCardReviewType.forgot,
+                      attemptCount: 2,
+                      lastAnsweredAt: 200,
+                      oldBox: 4,
+                      newBox: 1,
+                      nextDueAt: null,
+                    ),
+                    StudyResultCardReviewItem(
+                      flashcardId: 'card-recovered',
+                      front: 'recovered-front',
+                      back: 'recovered-back',
+                      resultType: StudyResultCardReviewType.recovered,
+                      attemptCount: 2,
+                      lastAnsweredAt: 100,
+                      oldBox: 3,
+                      newBox: 3,
+                      nextDueAt: null,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          child: const _TestApp(
+            child: StudyResultScreen(sessionId: 'session-001'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cards to review'), findsOneWidget);
+      expect(find.text('forgot-front'), findsOneWidget);
+      expect(find.text('forgot-back'), findsOneWidget);
+      expect(find.text('Forgot'), findsWidgets);
+      expect(find.text('recovered-front'), findsOneWidget);
+      expect(find.text('recovered-back'), findsOneWidget);
+      expect(find.text('Recovered'), findsWidgets);
+      expect(find.text('No cards need extra review.'), findsNothing);
+      // No fake navigation to History or filtered Tough Cards screen.
+      expect(find.text('View all history'), findsNothing);
+      expect(find.text('Tough cards'), findsNothing);
     },
   );
 
@@ -385,6 +451,8 @@ StudySessionSnapshot _snapshot(
     resetCount: 1,
     reachedBox8Count: 0,
   ),
+  List<StudyResultCardReviewItem> cardReviewItems =
+      const <StudyResultCardReviewItem>[],
 }) => StudySessionSnapshot(
   session: StudySession(
     id: 'session-001',
@@ -419,6 +487,7 @@ StudySessionSnapshot _snapshot(
   canFinalize: false,
   resultBreakdown: breakdown,
   boxChangeBreakdown: box,
+  resultCardReviewItems: cardReviewItems,
 );
 
 class _TestApp extends StatelessWidget {

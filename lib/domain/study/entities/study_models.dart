@@ -206,6 +206,38 @@ final class BoxChangeBreakdown {
   int get totalChangeCount => advancedCount + stayedCount + resetCount;
 }
 
+/// Result type for a card surfaced in the Study Result per-card review
+/// section (`docs/wireframes/18-study-result.md`). V1 only ever surfaces
+/// recovered and forgot cards.
+enum StudyResultCardReviewType { recovered, forgot }
+
+final class StudyResultCardReviewItem {
+  const StudyResultCardReviewItem({
+    required this.flashcardId,
+    required this.front,
+    required this.back,
+    required this.resultType,
+    required this.attemptCount,
+    required this.lastAnsweredAt,
+    required this.oldBox,
+    required this.newBox,
+    required this.nextDueAt,
+  });
+
+  final String flashcardId;
+  final String front;
+  final String back;
+  final StudyResultCardReviewType resultType;
+  final int attemptCount;
+  final int lastAnsweredAt;
+  final int? oldBox;
+  final int? newBox;
+  final int? nextDueAt;
+
+  bool get isRecovered => resultType == StudyResultCardReviewType.recovered;
+  bool get isForgot => resultType == StudyResultCardReviewType.forgot;
+}
+
 final class StudySessionSnapshot {
   const StudySessionSnapshot({
     required this.session,
@@ -216,6 +248,7 @@ final class StudySessionSnapshot {
     required this.canFinalize,
     this.resultBreakdown = StudyResultBreakdown.empty,
     this.boxChangeBreakdown = BoxChangeBreakdown.empty,
+    this.resultCardReviewItems = const <StudyResultCardReviewItem>[],
   });
 
   final StudySession session;
@@ -226,6 +259,7 @@ final class StudySessionSnapshot {
   final bool canFinalize;
   final StudyResultBreakdown resultBreakdown;
   final BoxChangeBreakdown boxChangeBreakdown;
+  final List<StudyResultCardReviewItem> resultCardReviewItems;
 
   StudySessionSnapshot copyWith({StudySummary? summary}) =>
       StudySessionSnapshot(
@@ -237,5 +271,6 @@ final class StudySessionSnapshot {
         canFinalize: canFinalize,
         resultBreakdown: resultBreakdown,
         boxChangeBreakdown: boxChangeBreakdown,
+        resultCardReviewItems: resultCardReviewItems,
       );
 }

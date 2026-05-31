@@ -1059,6 +1059,17 @@
   "studyResultBoxReachedMax": "Reached box 8",
   "studyResultFailedFinalizeBanner": "Some data couldn't be saved. Please retry.",
   "studyResultEmpty": "No cards answered",
+  "studyResultCardsToReviewTitle": "Cards to review",
+  "studyResultCardsToReviewEmpty": "No cards need extra review.",
+  "studyResultRecoveredLabel": "Recovered",
+  "studyResultForgotLabel": "Forgot",
+  "studyResultBoxChangedLabel": "Box {oldBox} → {newBox}",
+  "@studyResultBoxChangedLabel": {
+    "placeholders": {
+      "oldBox": { "type": "int" },
+      "newBox": { "type": "int" }
+    }
+  },
   "studyModeReview": "Review",
   "studyModeMatch": "Match",
   "studyModeGuess": "Guess",

@@ -107,6 +107,10 @@ class _StudyResultBody extends ConsumerWidget {
           _ResultBreakdownCard(snapshot: snapshot),
           const MxGap(MxSpace.lg),
           _BoxChangesCard(snapshot: snapshot),
+          const MxGap(MxSpace.lg),
+          _StudyResultCardReviewSection(
+            items: snapshot.resultCardReviewItems,
+          ),
         ],
         const MxGap(MxSpace.xl),
         _ResultActions(
@@ -378,6 +382,92 @@ class _StudyResultLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const MxLoadingState();
+}
+
+class _StudyResultCardReviewSection extends StatelessWidget {
+  const _StudyResultCardReviewSection({required this.items});
+
+  final List<StudyResultCardReviewItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MxCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          MxText(
+            l10n.studyResultCardsToReviewTitle,
+            role: MxTextRole.sectionTitle,
+          ),
+          const MxGap(MxSpace.md),
+          ..._buildContent(l10n),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildContent(AppLocalizations l10n) {
+    if (items.isEmpty) {
+      return <Widget>[
+        MxText(
+          l10n.studyResultCardsToReviewEmpty,
+          role: MxTextRole.contentBody,
+        ),
+      ];
+    }
+    final children = <Widget>[];
+    for (var index = 0; index < items.length; index++) {
+      if (index > 0) {
+        children.add(const MxGap(MxSpace.md));
+      }
+      children.add(_StudyResultCardReviewRow(item: items[index]));
+    }
+    return children;
+  }
+}
+
+class _StudyResultCardReviewRow extends StatelessWidget {
+  const _StudyResultCardReviewRow({required this.item});
+
+  final StudyResultCardReviewItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final label = item.isForgot
+        ? l10n.studyResultForgotLabel
+        : l10n.studyResultRecoveredLabel;
+    final labelColor = item.isForgot ? scheme.error : scheme.tertiary;
+    final oldBox = item.oldBox;
+    final newBox = item.newBox;
+    final showBoxChange = oldBox != null && newBox != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: MxText(item.front, role: MxTextRole.tileTitle),
+            ),
+            const MxGap(MxSpace.md),
+            MxText(label, role: MxTextRole.tileTrailing, color: labelColor),
+          ],
+        ),
+        const MxGap(MxSpace.xs),
+        MxText(item.back, role: MxTextRole.contentBody),
+        if (showBoxChange) ...[
+          const MxGap(MxSpace.xs),
+          MxText(
+            l10n.studyResultBoxChangedLabel(oldBox, newBox),
+            role: MxTextRole.tileMeta,
+          ),
+        ],
+      ],
+    );
+  }
 }
 
 class _MetricRow extends StatelessWidget {

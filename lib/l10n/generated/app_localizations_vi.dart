@@ -2052,6 +2052,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyResultEmpty => 'Chưa trả lời thẻ nào';
 
   @override
+  String get studyResultCardsToReviewTitle => 'Thẻ cần ôn lại';
+
+  @override
+  String get studyResultCardsToReviewEmpty => 'Không có thẻ nào cần ôn thêm.';
+
+  @override
+  String get studyResultRecoveredLabel => 'Hồi phục';
+
+  @override
+  String get studyResultForgotLabel => 'Quên';
+
+  @override
+  String studyResultBoxChangedLabel(int oldBox, int newBox) {
+    return 'Box $oldBox → $newBox';
+  }
+
+  @override
   String get studyModeReview => 'Xem lại';
 
   @override

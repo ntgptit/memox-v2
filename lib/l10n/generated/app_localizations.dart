@@ -3576,6 +3576,36 @@ abstract class AppLocalizations {
   /// **'No cards answered'**
   String get studyResultEmpty;
 
+  /// No description provided for @studyResultCardsToReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cards to review'**
+  String get studyResultCardsToReviewTitle;
+
+  /// No description provided for @studyResultCardsToReviewEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No cards need extra review.'**
+  String get studyResultCardsToReviewEmpty;
+
+  /// No description provided for @studyResultRecoveredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovered'**
+  String get studyResultRecoveredLabel;
+
+  /// No description provided for @studyResultForgotLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot'**
+  String get studyResultForgotLabel;
+
+  /// No description provided for @studyResultBoxChangedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Box {oldBox} → {newBox}'**
+  String studyResultBoxChangedLabel(int oldBox, int newBox);
+
   /// No description provided for @studyModeReview.
   ///
   /// In en, this message translates to:

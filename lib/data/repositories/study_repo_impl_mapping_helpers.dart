@@ -31,6 +31,11 @@ extension _StudyRepoImplMappingHelpers on StudyRepoImpl {
         studyType: DatabaseEnumCodecs.studyTypeFromStorage(session.studyType),
       ),
       boxChangeBreakdown: computeBoxChangeBreakdown(domainAttempts),
+      resultCardReviewItems: computeStudyResultCardReviewItems(
+        attempts: domainAttempts,
+        flashcards: flashcards,
+        studyType: DatabaseEnumCodecs.studyTypeFromStorage(session.studyType),
+      ),
     );
   }
 

@@ -2163,6 +2163,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyResultEmpty => 'No cards answered';
 
   @override
+  String get studyResultCardsToReviewTitle => 'Cards to review';
+
+  @override
+  String get studyResultCardsToReviewEmpty => 'No cards need extra review.';
+
+  @override
+  String get studyResultRecoveredLabel => 'Recovered';
+
+  @override
+  String get studyResultForgotLabel => 'Forgot';
+
+  @override
+  String studyResultBoxChangedLabel(int oldBox, int newBox) {
+    return 'Box $oldBox → $newBox';
+  }
+
+  @override
   String get studyModeReview => 'Review';
 
   @override
