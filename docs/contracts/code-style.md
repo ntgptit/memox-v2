@@ -18,8 +18,8 @@ lib/presentation/features/{feature}/
 ├── screens/                  # full-screen widgets, one per route
 │   └── {feature}_screen.dart
 ├── widgets/                  # feature-private widgets
-├── notifiers/                # Riverpod notifiers/controllers
-├── providers/                # query providers
+├── viewmodels/               # screen state, query providers, Riverpod action controllers
+├── providers/                # feature-scoped providers when not owned by a viewmodel file
 └── models/                   # presentation-layer view-models (rare; prefer freezed in shared)
 ```
 
