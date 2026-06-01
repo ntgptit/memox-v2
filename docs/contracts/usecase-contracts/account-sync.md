@@ -111,12 +111,13 @@ Future<Either<Failure, SnapshotInfo>> call();
 ```dart
 Future<Either<Failure, RestoreResult>> call({
   required DriveManifest manifest,
-  required bool skipSnapshot,  // true only when DB empty (onboarding)
+  required bool skipSnapshot,  // Future empty-DB restore handoff only
 });
 ```
 
 **Rules:**
 
+- `skipSnapshot` is not exposed by current V1 Account Settings restore. It is reserved for a future full onboarding / empty-DB restore prompt and is valid only when the local DB is verifiably empty.
 - If `!skipSnapshot`:
   - Call `CreatePreRestoreSnapshotUseCase`. If fails → return `StorageFailure`, abort, original DB UNCHANGED.
 - Download DB from Drive.

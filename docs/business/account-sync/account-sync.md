@@ -473,7 +473,7 @@ Has a separate sign-in button (`google_account_web_button_web.dart`). `requiresP
 **Wireframes:**
 
 - `docs/wireframes/19-settings-account.md` — signed-in/out states, fingerprint match indicator, upload/restore controls, pre-snapshot notice
-- `docs/wireframes/23-onboarding.md` — "Sign in to restore" path during onboarding
+- `docs/wireframes/23-onboarding.md` — Future full onboarding may delegate restore entry to this Account Settings flow; V1 has no standalone onboarding route or restore wizard
 - `docs/wireframes/24-shared-dialogs.md` §restore-warning (two-tier with 5s timeout), §delete-confirm (strong variant for account removal with typed ERASE confirmation)
 
 **Schema:**

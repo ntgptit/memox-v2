@@ -203,6 +203,73 @@ void main() {
   );
 
   testWidgets(
+    'DT2e onNavigate: empty deck Add CTA opens existing flashcard-create route',
+    (WidgetTester tester) async {
+      const deckId = 'deck-001';
+      final container = ProviderContainer(
+        overrides: [
+          flashcardListQueryProvider(deckId).overrideWith(
+            (ref) => Future<FlashcardListState>.value(_emptyFlashcardState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final router = GoRouter(
+        initialLocation: '/library/deck/$deckId/flashcards',
+        routes: [
+          GoRoute(
+            path: '/library',
+            builder: (context, state) => const SizedBox.shrink(),
+            routes: [
+              GoRoute(
+                path: RoutePaths.flashcardListSegment,
+                name: RouteNames.flashcardList,
+                builder: (context, state) => FlashcardListScreen(
+                  deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+                ),
+              ),
+              GoRoute(
+                path: RoutePaths.flashcardCreateSegment,
+                name: RouteNames.flashcardCreate,
+                builder: (context, state) => SizedBox(
+                  key: ValueKey(
+                    'flashcard_create_'
+                    '${state.pathParameters[RoutePaths.deckIdParam]}',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await _scrollToText(tester, 'No flashcards yet');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('flashcard_create_$deckId')),
+        findsOneWidget,
+      );
+      expect(find.textContaining('onboarding'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'DT2b onSearch: query matching no cards shows no-results state, not empty deck',
     (WidgetTester tester) async {
       const deckId = 'deck-001';
@@ -280,8 +347,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           flashcardListQueryProvider(deckId).overrideWith(
-            (ref) =>
-                Future<FlashcardListState>.value(_emptyDeckSearchingState),
+            (ref) => Future<FlashcardListState>.value(_emptyDeckSearchingState),
           ),
         ],
       );

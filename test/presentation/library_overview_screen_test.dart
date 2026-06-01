@@ -289,6 +289,46 @@ void main() {
   );
 
   testWidgets(
+    'DT3b onInsert: empty library create CTA opens existing folder-create flow',
+    (WidgetTester tester) async {
+      final createdNames = <String>[];
+      final container = ProviderContainer(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith(
+            (ref) => Future<LibraryOverviewState>.value(_emptyLibraryState),
+          ),
+          libraryOverviewActionControllerProvider.overrideWith(
+            () => _FakeLibraryOverviewActionController(
+              onCreateFolder: createdNames.add,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Create folder').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'Korean');
+      await tester.pump();
+      await tester.tap(find.text('Create').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(createdNames, <String>['Korean']);
+      expect(find.text('Folder created.'), findsOneWidget);
+      expect(find.textContaining('onboarding'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'DT4 onSearch: truly empty library keeps the empty state even with an active search term',
     (WidgetTester tester) async {
       await tester.pumpWidget(
@@ -327,8 +367,9 @@ void main() {
         ProviderScope(
           overrides: [
             libraryOverviewQueryProvider.overrideWith(
-              (ref) =>
-                  Future<LibraryOverviewState>.value(_searchNoResultLibraryState),
+              (ref) => Future<LibraryOverviewState>.value(
+                _searchNoResultLibraryState,
+              ),
             ),
           ],
           child: const _TestApp(child: LibraryOverviewView()),
@@ -535,4 +576,21 @@ class _TestApp extends StatelessWidget {
     supportedLocales: AppLocalizations.supportedLocales,
     home: child,
   );
+}
+
+class _FakeLibraryOverviewActionController
+    extends LibraryOverviewActionController {
+  _FakeLibraryOverviewActionController({required this.onCreateFolder});
+
+  final void Function(String name) onCreateFolder;
+
+  @override
+  FutureOr<void> build() {}
+
+  @override
+  Future<bool> createFolder(String name) async {
+    onCreateFolder(name);
+    state = const AsyncData<void>(null);
+    return true;
+  }
 }

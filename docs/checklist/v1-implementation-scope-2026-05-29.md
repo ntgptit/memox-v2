@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-29
+last_updated: 2026-06-01
 author: technical lead
 status: approved v1 scope guard
 purpose: Lock v1 implementation scope so AI coding agents do not implement downgraded target/future specs by accident.
@@ -34,7 +34,7 @@ If any condition fails, do not code. Update docs or ask for scope clarification 
 | P0 | Bury / suspend foundation | Migration + domain/repository/use case + UI wiring after migration approval | `docs/business/study-actions/bury-suspend.md`, `docs/database/schema-contract.md` |
 | P1 | Tag domain cleanup | Repository interface + use cases before settings UI actions | `docs/business/tags/tag-system.md`, `docs/contracts/usecase-contracts/tag.md` |
 | P1 | Dashboard engagement | Streak/daily goal only after concrete source-of-truth use cases are implemented | `docs/business/engagement/dashboard-engagement.md` |
-| P1 | Thin zero-content guidance | Improve Library/Dashboard empty states and add explicit restore CTA path | `docs/wireframes/23-onboarding.md`, `docs/wireframes/01-dashboard.md`, `docs/wireframes/02-library.md` |
+| P1 | Thin zero-content guidance | Prompt 26 verified owner-split V1: Library/Folder/Flashcard local create/import CTAs and Account Settings restore ownership. Dashboard zero-content onboarding remains Target/Future until a dedicated Dashboard task implements it. | `docs/wireframes/23-onboarding.md`, `docs/wireframes/02-library.md`, `docs/wireframes/05-folder-detail.md`, `docs/wireframes/06-flashcard-list.md`, `docs/wireframes/19-settings-account.md` |
 
 ## Downgraded from V1
 

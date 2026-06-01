@@ -46,9 +46,9 @@ abstract class SyncRepository {
 
 Target retention note: exact pre-restore snapshot cleanup policy is not Current V1. Keep this contract aligned with `docs/business/account-sync/account-sync.md` before implementing the full restore-protection target.
 
-### Restore (in onboarding, skip snapshot)
+### Restore (Future empty-DB restore handoff, skip snapshot)
 
-Only when DB is verifiably empty (no decks, no flashcards). Skip step 1-2 above.
+Target-only handoff for a future full onboarding / empty-DB restore prompt. Allowed only when DB is verifiably empty (no decks, no flashcards). Current V1 restore remains Account Settings ownership and does not expose a standalone onboarding restore wizard. Skip step 1-2 above only in that future empty-DB path.
 
 ## Token storage
 
@@ -78,7 +78,7 @@ OAuth access/refresh tokens stored ONLY in `flutter_secure_storage`. Never Share
 - Snapshot creation success/failure.
 - Restore with snapshot success.
 - Restore with snapshot failure → abort, DB unchanged.
-- Restore with skipSnapshot (onboarding).
+- Restore with skipSnapshot (Future empty-DB restore handoff only).
 - Schema version mismatch → `IntegrityFailure`.
 - Token refresh failure → `AuthFailure`.
 

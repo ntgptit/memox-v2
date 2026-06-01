@@ -18,6 +18,10 @@ void main() {
       },
     );
 
+    test('DT1 onOpen: default entry remains Library, not onboarding', () {
+      expect(RouteDefaults.initialLocation, RoutePaths.library);
+    });
+
     test('DT1 onNavigate: does not redirect non-root paths', () {
       expect(guards.redirectLocationFor(Uri.parse(RoutePaths.library)), isNull);
     });

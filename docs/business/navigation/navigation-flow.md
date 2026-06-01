@@ -29,6 +29,8 @@ applies_to: routing, navigation, deep links
 | `/progress` | Progress | Yes |
 | `/settings` | Settings hub | Yes |
 
+Current V1 app boot redirects `/` to `RouteDefaults.initialLocation = RoutePaths.library`. This is the existing app entry and must not be replaced by an onboarding wizard in V1. Dashboard remains a top-level destination, but changing the default entry to `/home` requires a dedicated navigation task with route tests and doc updates.
+
 ## Settings routes
 
 | Path | Responsibility | Shell visible |

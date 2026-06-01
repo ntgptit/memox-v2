@@ -50,8 +50,8 @@ This overview lists product capabilities. The detailed contract for each lives i
 | Card history view | Future Proposal — Migration Required | `docs/business/history/card-history.md` |
 | Inline/scope-local search | V1 guideline | `docs/business/search/global-search.md` |
 | Global search screen | Future Proposal | `docs/business/search/global-search.md`, `docs/wireframes/11-library-search.md` |
-| Zero-content guidance / thin onboarding | V1 guideline | `docs/wireframes/23-onboarding.md`, `docs/wireframes/01-dashboard.md`, `docs/wireframes/02-library.md` |
-| Full onboarding flow | Future Proposal | `docs/wireframes/23-onboarding.md` |
+| Zero-content guidance / thin onboarding | V1 guideline — owner-split across current empty states and Account Settings restore | `docs/wireframes/23-onboarding.md`, `docs/wireframes/01-dashboard.md`, `docs/wireframes/02-library.md`, `docs/wireframes/19-settings-account.md` |
+| Full onboarding flow | Future Proposal — no standalone route/feature/first-launch wizard in V1 | `docs/wireframes/23-onboarding.md` |
 | Daily goal + streak + reminders | Specified | `docs/business/engagement/dashboard-engagement.md` |
 | Progress tracking | Partially specified | `docs/business/srs/srs-review.md` (data only) |
 | TTS / audio settings | Specified | `docs/business/tts/tts-settings.md` |

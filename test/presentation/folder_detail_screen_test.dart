@@ -658,6 +658,47 @@ void main() {
     },
   );
 
+  testWidgets(
+    'DT2b onInsert: empty subfolder-mode CTA creates through existing folder flow',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final createdNames = <String>[];
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_emptySubfolderState),
+          ),
+          folderActionControllerProvider(folderId).overrideWith(
+            () => _FakeFolderActionController(
+              onCreateSubfolderSuccess: createdNames.add,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('New subfolder').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'Kana');
+      await tester.pump();
+      await tester.tap(find.text('Create').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(createdNames, <String>['Kana']);
+      expect(find.text('Subfolder created.'), findsOneWidget);
+      expect(find.textContaining('onboarding'), findsNothing);
+    },
+  );
+
   testWidgets('DT3 onDisplay: empty deck mode renders only deck CTA', (
     WidgetTester tester,
   ) async {
@@ -683,6 +724,50 @@ void main() {
     expect(find.text('New deck'), findsAtLeastNWidgets(1));
     expect(find.text('New subfolder'), findsNothing);
   });
+
+  testWidgets(
+    'DT3b onInsert: empty deck-mode CTA creates through existing deck flow',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final createdNames = <String>[];
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_emptyDeckFolderState),
+          ),
+          folderActionControllerProvider(folderId).overrideWith(
+            () => _FakeFolderActionController(
+              onCreateDeck: (name) {
+                createdNames.add(name);
+                return 'deck-new';
+              },
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('New deck').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'TOPIK');
+      await tester.pump();
+      await tester.tap(find.text('Create').last);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(createdNames, <String>['TOPIK']);
+      expect(find.text('Deck created.'), findsOneWidget);
+      expect(find.textContaining('onboarding'), findsNothing);
+    },
+  );
 
   testWidgets(
     'DT2 onSearchFilterSort: search with no results renders clear search action',
@@ -713,14 +798,47 @@ void main() {
   );
 
   testWidgets(
+    'DT2c onSearchFilterSort: no-results clear CTA clears scope-local search',
+    (WidgetTester tester) async {
+      const folderId = 'folder-001';
+      final container = ProviderContainer(
+        overrides: [
+          folderDetailQueryProvider(folderId).overrideWith(
+            (ref) => Future<FolderDetailState>.value(_searchNoResultState),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      container
+          .read(folderChildrenToolbarStateProvider(folderId).notifier)
+          .setSearchTerm('biology');
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Clear'));
+      await tester.pumpAndSettle();
+
+      expect(
+        container.read(folderChildrenToolbarStateProvider(folderId)).searchTerm,
+        isEmpty,
+      );
+    },
+  );
+
+  testWidgets(
     'DT2b onSearchFilterSort: genuinely empty folder with active search stays true empty',
     (WidgetTester tester) async {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
           folderDetailQueryProvider(folderId).overrideWith(
-            (ref) =>
-                Future<FolderDetailState>.value(_emptyDeckWithSearchState),
+            (ref) => Future<FolderDetailState>.value(_emptyDeckWithSearchState),
           ),
         ],
       );

@@ -17,6 +17,13 @@ V1 does **not** implement a dedicated onboarding feature folder, first-launch we
 
 V1 onboarding means: **strong empty states when the app has zero content**, with clear CTAs to create, import, or restore data.
 
+## Prompt 26 V1 honesty sweep — 2026-06-01
+
+- Full onboarding is still **Future Proposal**: no `/onboarding` route, no `lib/presentation/features/onboarding/**`, no first-launch preference gate, and no multi-step wizard.
+- Current V1 uses existing owner surfaces only. Library true-empty owns its local Create folder CTA; Folder Detail owns mode-appropriate New subfolder / New deck CTAs; Flashcard List owns Add flashcard and deck Import entry points; Account Settings owns sign-in, manual Drive upload, and manual Drive restore.
+- Restore guidance must navigate or point to Account Settings. It must not imply a standalone onboarding restore wizard, auto-restore after sign-in, or the full restore-protection target as Current.
+- Dashboard zero-content onboarding remains Target/Future unless a dedicated Dashboard task implements code, tests, and docs.
+
 ## V1 purpose
 
 A new or freshly restored user should immediately understand the next useful action:

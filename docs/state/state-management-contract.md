@@ -133,7 +133,7 @@ Each table row defines a notifier's role, what it loads from DB/preferences, wha
 
 | Notifier | Loads | Mutates via | Forbidden |
 | --- | --- | --- | --- |
-| `OnboardingNotifier` | firstLaunchCompletedAt flag, content count | `MarkFirstLaunchCompletedUseCase`, `CreateDeckUseCase` (inline), `RestoreFromDriveUseCase` (skip snapshot) | Multi-step tutorial; show welcome twice; auto-restore on sign-in |
+| `OnboardingNotifier` | Future proposal only: firstLaunchCompletedAt flag, content count | Future full onboarding only; V1 must reuse existing create/import/account restore flows without adding this notifier | Multi-step tutorial; show welcome twice; auto-restore on sign-in; exposing a standalone onboarding route in V1 |
 | `UndoToastController` | in-flight undo timer (5s) | inverse-op use case bound at undo registration | Allow undo for destructive ops; queue with stacking; tweak duration per action |
 
 ## Refresh and invalidation rules

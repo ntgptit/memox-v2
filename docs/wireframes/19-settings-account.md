@@ -233,7 +233,7 @@ Target/Partial: snapshot is mandatory in the full restore-protection design. If 
 ## Navigation in
 
 - Settings hub → Account & Sync.
-- Onboarding "Sign in to restore from Drive" flow.
+- Future full onboarding / zero-content guidance may link here for sign-in or restore. Current V1 owns restore only on this Account Settings route; there is no standalone onboarding route or restore wizard.
 
 ## Navigation out
 
@@ -307,5 +307,5 @@ Target/Partial: snapshot is mandatory in the full restore-protection design. If 
 
 **Related wireframes:**
 
-- `docs/wireframes/04-settings-hub.md` (entry), `docs/wireframes/23-onboarding.md` (sign-in path)
+- `docs/wireframes/04-settings-hub.md` (entry), `docs/wireframes/23-onboarding.md` (Future full onboarding / V1 zero-content guidance delegates restore to Account Settings)
 - `docs/wireframes/24-shared-dialogs.md` §restore-warning, §rename (device label), §delete-confirm (strong variant)
