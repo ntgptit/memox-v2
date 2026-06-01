@@ -38,7 +38,7 @@ applies_to: routing, navigation, deep links
 | `/settings/learning/tags` | Tag management (new; see `docs/business/tags/tag-system.md` and wireframe `docs/wireframes/22-settings-tag-management.md`) | No |
 | `/settings/audio-speech` | TTS settings | No |
 
-Route name constants (from `lib/app/router/route_names.dart`): `RouteNames.settings`, `RouteNames.settingsAccount`, `RouteNames.settingsLearning`, `RouteNames.settingsAudioSpeech`. Path segment constants: `RoutePaths.settingsAccountSegment`, `RoutePaths.settingsLearningSegment`, `RoutePaths.settingsAudioSpeechSegment`. Tag management route constants (`RouteNames.settingsLearningTags`, `RoutePaths.settingsLearningTagsSegment`) are new and MUST be added when the route is wired.
+Route name constants (from `lib/app/router/route_names.dart`): `RouteNames.settings`, `RouteNames.settingsAccount`, `RouteNames.settingsLearning`, `RouteNames.settingsLearningTags`, `RouteNames.settingsAudioSpeech`. Path segment constants: `RoutePaths.settingsAccountSegment`, `RoutePaths.settingsLearningSegment`, `RoutePaths.settingsLearningTagsSegment`, `RoutePaths.settingsAudioSpeechSegment`.
 
 ## Library routes
 
@@ -51,8 +51,8 @@ Route name constants (from `lib/app/router/route_names.dart`): `RouteNames.setti
 | Flashcard edit | `/library/deck/:deckId/flashcards/:flashcardId/edit` | No |
 | Flashcard history | Future Proposal; no live V1 route | No |
 | Deck import | `/library/deck/:deckId/import` | No |
-| Library search | `/library/search?q={query}` | Yes |
-| Study entry | `/library/study/:entryType/:entryRefId` (entryType: `deck` \| `folder` \| `tag`) | No |
+| Library search | Future Proposal; no live V1 route | Yes |
+| Study entry | `/library/study/:entryType/:entryRefId` (Current entryType: `deck` \| `folder`; `tag` is Target/Future) | No |
 | Today study | `/library/study/today` | No |
 | Study session | `/library/study/session/:sessionId` | No |
 | Study result | `/library/study/session/:sessionId/result` | No |

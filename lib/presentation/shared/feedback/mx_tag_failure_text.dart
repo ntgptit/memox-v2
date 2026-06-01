@@ -10,5 +10,12 @@ String tagValidationMessage(AppLocalizations l10n, AppFailure failure) =>
       FailureCodes.tagEmpty => l10n.flashcardsTagErrorEmpty,
       FailureCodes.tagInvalidCharacter => l10n.flashcardsTagErrorComma,
       FailureCodes.tagTooLong => l10n.flashcardsTagErrorTooLong,
-      _ => failure.message,
+      _ => switch (failure.type) {
+        FailureType.storage => l10n.errorStorage,
+        FailureType.network => l10n.errorNetwork,
+        FailureType.notFound => l10n.errorNotFound,
+        FailureType.configuration => l10n.errorConfiguration,
+        FailureType.validation => l10n.errorInvalidData,
+        FailureType.unknown => l10n.errorUnexpected,
+      },
     };

@@ -9,7 +9,23 @@ source_specs:
 
 ## Purpose
 
-Global view of all tags across all decks. Inspect usage, rename, merge, delete, or jump to study/view cards for a tag.
+Global view of all tags across all decks. Current V1 inspects usage and supports rename, merge, and delete. Tag-scoped study remains Blocked on `StudyEntryType.tag`; global tag-filtered card lists remain Future / Global Search ownership.
+
+## V1 status
+
+| Area | Current V1 status |
+| --- | --- |
+| Route | Current: `/settings/learning/tags` opens `SettingsTagManagementScreen`; direct route hides shell navigation. |
+| Learning Settings entry | Current: Learning Settings only routes to this screen; it does not own tag CRUD. |
+| List / count | Current: all distinct lowercased tags with card usage counts. |
+| Empty / loading / error | Current: loading surface, true-empty state with Library CTA, and safe generic load error surface. |
+| Search | Current: local in-memory substring filter only; no global search route/use case. |
+| Sort | Current: in-memory `Most cards`, `A→Z`, `Z→A`; `Recently used` is Future because `flashcard_tags` has no last-used signal. Sort is screen-local UI state, not persisted. |
+| Rename | Current: shared name dialog; validation and normalization happen in `RenameTagUseCase`; collision prompts merge confirmation. |
+| Merge | Current: destination picker + confirmation; repository transaction dedupes per-card rows and removes source tag. |
+| Delete | Current: confirmation required; removes tag rows only and keeps flashcards. |
+| Study cards with this tag | Blocked: requires `StudyEntryType.tag` and tag-scope study query. Not exposed in V1 context sheet. |
+| View cards | Future: belongs to a future global tag-filtered list / Global Search surface. Not exposed in V1 context sheet. |
 
 ## Layout — populated
 
@@ -65,8 +81,6 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 │  #verb                                │
 │  80 cards across 5 decks              │
 ├───────────────────────────────────────┤
-│  ▶ Study cards with this tag          │
-│  📚 View cards                        │
 │  ✏ Rename                              │
 │  🔗 Merge into another tag             │
 │  🗑 Delete tag (keeps cards)          │
@@ -87,13 +101,11 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 │  └─────────────────────────────────┘  │
 │  Renames the tag on all 80 cards.     │
 │                                       │
-│  ⚠ A tag named "#verbs" already       │  ← Conflict warning if exists
-│    exists. Renaming will MERGE the    │
-│    two tags. 80 + 22 = 102 cards.     │
-│                                       │
 │  [ Cancel ]              [ Rename ]   │
 └───────────────────────────────────────┘
 ```
+
+Current V1 uses the shared name dialog. If the submitted name collides with an existing tag, the rename use case returns a conflict and the screen opens the merge confirmation dialog before mutating data. The live inline collision warning/count preview is Target.
 
 ## Layout — merge into another tag
 
@@ -136,8 +148,8 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 | --- | --- | --- |
 | All tags with usage count | `SELECT LOWER(tag), COUNT(DISTINCT flashcard_id) FROM flashcard_tags GROUP BY LOWER(tag)` | watch |
 | Filtered list (when search active) | in-memory filter | live |
-| Sort preference | SharedPreferences `tags.sort` | watch |
-| Merge collision suggestions (when typing in rename/merge) | tag-prefix matcher | live debounced |
+| Sort mode | screen-local provider state | user changes sort |
+| Merge destination candidates | watched tag list excluding source tag | when merge sheet opens |
 
 ## Forbidden
 
@@ -145,19 +157,19 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 - ❌ Silently merge on rename collision. Require explicit confirmation in dialog.
 - ❌ Merge without deduping per card. A card already tagged with both source and destination keeps one row.
 - ❌ Delete tag rows by tag NAME only without case-normalization (tag is global case-insensitive).
-- ❌ "View cards" navigates to a per-deck list. It MUST navigate to a global tag-filtered list.
-- ❌ "Study cards with this tag" uses anything other than the canonical `entry_ref_id` format (sorted, lowercased, comma-joined).
+- ❌ Expose "View cards" in Current V1. It belongs to a future global tag-filtered list / Global Search surface.
+- ❌ Expose "Study cards with this tag" in Current V1. It is blocked until `StudyEntryType.tag` and the canonical `entry_ref_id` path are implemented.
 
 ## Components
 
 | Component | Spec |
 | --- | --- |
 | Search bar | Filters tag list live. Same min-2-char rule as global search not applied — tag count is small enough for live filter. |
-| Total + sort | "42 tags" left; sort dropdown right (Most cards / A→Z / Z→A / Recently used). |
+| Total + sort | "42 tags" left; sort dropdown right (Current: Most cards / A→Z / Z→A). Recently used is Future. |
 | Tag row | Tag name with `#` prefix + usage count + overflow ⋮. Whole row tappable → opens context sheet. |
-| Tag context sheet | 5 actions per tag + cancel. |
-| Rename dialog | Text input + conflict warning + Rename CTA. |
-| Merge sheet | Destination tag picker (radio) + search + merge CTA. |
+| Tag context sheet | Current V1: Rename / Merge / Delete + cancel. Study/View actions are not exposed. |
+| Rename dialog | Current: shared text input + Rename CTA; collision opens merge confirmation after submit. Live conflict warning/count preview is Target. |
+| Merge sheet | Current: destination picker list + local search; selecting a destination opens merge confirmation. |
 
 ## States
 
@@ -167,10 +179,10 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 | Empty | Zero tags across all decks | Empty state layout. |
 | Populated | Tags exist | List visible. |
 | Search active | Search non-empty | Filtered list; "No matching tags" inline state when zero results. |
-| Renaming | Rename dialog submit | Disable inputs; show spinner; transaction runs. |
+| Renaming | Rename dialog submit | Current: dialog closes, transaction runs, success/error snackbar follows watched list refresh. Inline saving spinner is Target. |
 | Rename conflict resolved (merge) | Confirm merged rename | Transaction merges tags; both rows update. |
-| Deleting | Delete confirmed | Show progress; row disappears on success. |
-| Merging | Merge confirmed | Spinner; transaction runs. |
+| Deleting | Delete confirmed | Current: confirmed transaction runs, success/error snackbar follows watched list refresh. Inline row progress is Target. |
+| Merging | Merge confirmed | Current: confirmed transaction runs, success/error snackbar follows watched list refresh. Inline spinner is Target. |
 | Error | Transaction failure | Toast + revert UI. |
 
 ## Actions
@@ -178,10 +190,10 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 | Action | Trigger | Result |
 | --- | --- | --- |
 | Type in search | Type | Filter live. |
-| Tap sort dropdown | Tap | Pick sort; persist preference. |
+| Tap sort dropdown | Tap | Pick screen-local sort mode. Persistence is Future if product needs it. |
 | Tap tag row | Tap | Open context sheet. |
-| Tap "Study cards with this tag" | Tap | Navigate to `/library/study/tag/{lowercased,comma-joined}` (for single tag this is just the tag itself). |
-| Tap "View cards" | Tap | Navigate to a global tag-filtered flashcard list view. |
+| Tap "Study cards with this tag" | Future/Blocked | Not exposed in V1. When promoted, navigate to tag-scoped study through the canonical tag entry path. |
+| Tap "View cards" | Future | Not exposed in V1. When promoted, navigate to a global tag-filtered flashcard list / Global Search-owned surface. |
 | Tap "Rename" | Tap | Open rename dialog. |
 | Tap "Merge" | Tap | Open merge sheet. |
 | Tap "Delete tag" | Tap | Confirm dialog: "Delete tag #verb? Cards keep their other tags." On confirm: remove `flashcard_tags` rows for this tag. |
@@ -213,8 +225,8 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 ## Navigation out
 
 - Back → caller.
-- Study cards with tag → study entry gate.
-- View cards → flashcard list (tag-filtered, global).
+- Study cards with tag → Blocked/Future, not exposed in V1.
+- View cards → Future global tag-filtered list, not exposed in V1.
 
 ## Responsive
 
@@ -245,7 +257,7 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 - Do NOT allow renames that bypass validation rules.
 - Do NOT silently merge on rename collision — require explicit user confirmation in dialog.
 - Merge MUST be atomic and dedupe per card (a card already tagged with both source and destination keeps a single dest row).
-- "View cards" for a tag opens a GLOBAL filtered list, not a per-deck one (tag is account-scoped).
+- Do NOT expose Study/View tag actions in Current V1. Study remains blocked on `StudyEntryType.tag`; View cards belongs to a future global tag-filtered list / Global Search surface.
 
 ## Implementation refs
 
@@ -267,13 +279,11 @@ Global view of all tags across all decks. Inspect usage, rename, merge, delete, 
 
 **Code paths:**
 
-- `lib/presentation/features/settings/tag_management/screens/tag_management_screen.dart`
-- `lib/presentation/features/settings/tag_management/notifiers/tag_management_notifier.dart`
-- `lib/domain/usecases/tag/rename_tag_usecase.dart`
-- `lib/domain/usecases/tag/merge_tag_usecase.dart`
-- `lib/domain/usecases/tag/delete_tag_usecase.dart`
-- `lib/data/repositories/tag_repository.dart`
-- `lib/app/router/route_names.dart` → `RouteNames.settingsLearningTags` (NEW, see navigation-flow.md)
+- `lib/presentation/features/settings/screens/tag_management_screen.dart`
+- `lib/presentation/features/settings/providers/tag_management_notifier.dart`
+- `lib/domain/usecases/tag_usecases.dart`
+- `lib/data/repositories/tag_repository_impl.dart`
+- `lib/app/router/route_names.dart` → `RouteNames.settingsLearningTags`
 
 **Related wireframes:**
 

@@ -103,6 +103,8 @@ Future<Either<Failure, int>> call({required String tag});  // returns affected c
 
 ## BuildStudyByTagRefIdUseCase
 
+**Status:** Target / Blocked for Current V1. Do not expose tag-scoped study until `StudyEntryType.tag`, tag-scope resolution, and executable tests are implemented.
+
 ```dart
 String call(List<String> selectedTags);
 ```
@@ -120,7 +122,7 @@ Example: `["Weak", "grammar"]` → `"grammar,weak"`.
 
 **Test refs:** TG11.
 
-**Source:** `lib/domain/tag/build_study_by_tag_ref_id.dart`.
+**Source:** Target only; no Current V1 source file.
 
 ## WatchAllTagsWithCountUseCase
 

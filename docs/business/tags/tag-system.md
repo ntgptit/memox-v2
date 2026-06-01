@@ -58,6 +58,8 @@ Combination with other filters (see `docs/business/study-actions/bury-suspend.md
 
 ## Study by tag
 
+**Status:** Blocked / Future for Current V1. The rules below define the target contract, but the current app must not expose tag-scoped study until `StudyEntryType.tag`, tag-scope resolution, and tests are implemented.
+
 A new tag-scoped study entry exists alongside deck/folder/today entries.
 
 ### Entry shape
@@ -105,7 +107,7 @@ The HAVING clause enforces AND semantics across multiple tags.
 
 Settings → Learning → "Manage tags" (new sub-screen, or inline within Learning Settings depending on layout).
 
-Route: TBD by router contract; suggested `/settings/learning/tags` (verify in router and update `docs/business/navigation/navigation-flow.md`).
+Route: `/settings/learning/tags`. Learning Settings owns only the navigation entry; Tag Management owns tag list/search/sort plus rename/merge/delete actions.
 
 ### Functionality
 
@@ -116,8 +118,8 @@ Route: TBD by router contract; suggested `/settings/learning/tags` (verify in ro
 | Rename | Inline edit; updates all `flashcard_tags` rows in a transaction |
 | Merge | Select 2+ tags → "Merge into..." → pick target; all cards re-tagged to target, source tags removed |
 | Delete | Removes the tag from all cards. Confirmation required. |
-| Study | Opens study-by-tag for this tag |
-| View cards | Opens flashcard list filtered to this tag (scope = all decks) |
+| Study | Blocked/Future: requires `StudyEntryType.tag`; not exposed in Current V1 |
+| View cards | Future: belongs to global tag-filtered list / Global Search ownership; not exposed in Current V1 |
 
 ### Rename rules
 
@@ -150,7 +152,7 @@ All bulk operations are transactional.
 
 ## Rules
 
-- Tag identity is case-insensitive for matching. Display preserves original case.
+- Tag identity is case-insensitive for matching. Current V1 stores and renders lowercased tags because `flashcard_tags` has no separate display-name column.
 - Tags are global by name (cross-deck). There are no scoped/namespaced tags.
 - A tag with zero cards no longer exists (rows in `flashcard_tags` are the only source of tag list; no separate tag entity table).
 - Tag input must trim, validate non-empty, dedupe case-insensitively within the same card.
@@ -180,7 +182,7 @@ All bulk operations are transactional.
 
 - Tag filter row: hidden when deck has zero tags; visible otherwise.
 - Empty filter result: shared empty state.
-- Tag management: loading, empty (no tags), error, normal.
+- Tag management: loading, empty (no tags), local-search no-results, error, normal.
 - Rename/merge/delete: confirmation dialogs.
 
 ## Performance
@@ -188,7 +190,7 @@ All bulk operations are transactional.
 - Tag list per deck: stream from `flashcard_tags` with COUNT GROUP BY.
 - Global tag list (management screen): stream same query without deck filter.
 - Tag filter query: add compound index on `flashcard_tags(tag, flashcard_id)` if not present.
-- Study-by-tag resolution: single SQL query, return flashcard IDs.
+- Study-by-tag resolution: single SQL query, return flashcard IDs. Future/Blocked until the tag study entry type is promoted.
 
 ## Agent rule
 
@@ -235,5 +237,6 @@ All bulk operations are transactional.
 **Source files to inspect:**
 
 - `lib/data/datasources/local/tables/flashcard_tags_table.dart`
-- `lib/domain/usecases/tag/**` (rename, merge, delete, study-by-tag)
-- `lib/presentation/features/settings/tag_management/**`
+- `lib/domain/usecases/tag_usecases.dart` (watch/add/remove/rename/merge/delete)
+- `lib/presentation/features/settings/screens/tag_management_screen.dart`
+- `lib/presentation/features/settings/providers/tag_management_notifier.dart`
