@@ -68,8 +68,8 @@ must not be counted as blockers unless a current V1 route/action breaks.
 
 | Candidate | Why it is low-risk | Suggested owner |
 | --- | --- | --- |
-| Dashboard streak placeholder wording/status audit | Dashboard renders a static `0 days` stat, while full streak engagement remains Future. This is not a blocker, but it is worth deciding whether to keep, soften, or document as a simple display placeholder before release. | Codex |
-| Add or refresh one focused router smoke test for unknown/private route safety if coverage is missing | Route scan found no Future routes exposed. A focused test can lock that boundary without redesigning navigation. | Codex |
+| Dashboard streak placeholder wording/status audit | Completed by Prompt 32: keep the static `0 days` UI unchanged as a simple visual/stat placeholder, with docs clarifying it is not full engagement. | Codex |
+| Add or refresh one focused router smoke test for unknown/private route safety if coverage is missing | Completed by Prompt 32: router smoke tests lock Future/Blocked paths to the router error state and check no Future route constants/navigation helpers were promoted. | Codex |
 | Metadata refresh for docs touched during release | Several docs are intentionally living trackers. Keeping `last_updated` and lineage current reduces agent confusion. | Codex |
 | Settings Hub About polish decision | Current behavior is `AboutDialog`; target bottom sheet remains Future. This can stay as-is or be documented as release polish. | Codex |
 | Mock-mapping README cleanup | Mobile kit README is known stale relative to the 129-variant mock file. This is docs-only and should not affect V1 behavior. | Claude Code or Codex |
@@ -139,3 +139,14 @@ Prompt 31 status: PASS.
 
 The V1 release candidate can proceed with the scoped cutline above. Prompt 32 is
 safe to start as a low-risk route/docs/copy polish task, not a feature expansion.
+
+## Prompt 32 Decision
+
+Prompt 32 status: PASS.
+
+Future-route smoke coverage now locks Global Search, Flashcard History,
+onboarding, reminder/daily-goal settings paths, and related Future route
+registry/navigation helpers out of the live V1 route surface. Dashboard keeps
+the static `0 days` streak stat as Option A: a simple visual/stat placeholder
+only. No production code, ARB/l10n, schema, dependency, route, SRS, or visual
+redesign change was made.

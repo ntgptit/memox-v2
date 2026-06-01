@@ -1,9 +1,22 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-02
 applies_to: daily goal, streak, study reminders, landing screen, Dashboard motivation surfaces
 ---
 
 # Daily Engagement
+
+## V1 release status
+
+This document is a target engagement spec. For the current V1 release cutline,
+daily goal, computed streaks, reminders, engagement settings, streak history,
+daily-goal sheets, notification permissions, and engagement persistence remain
+Future/Target.
+
+Current V1 Dashboard code may render a simple static streak-like stat such as
+`0 days` as a visual summary placeholder. That placeholder is not a Current
+engagement feature: it has no streak computation, no `study_attempts` aggregate,
+no SharedPreferences engagement keys, no settings controls, no reminders, and
+no streak/daily-goal bottom sheet.
 
 ## Purpose
 
@@ -232,6 +245,10 @@ All queries SHOULD be cheap (indexed on `attempted_at`, `due_at`, `status`). If 
 
 ## Agent rule
 
+- For V1 release-polish tasks, do not treat the static Dashboard `0 days`
+  placeholder as implementation of this target spec. Keep it documented as a
+  visual/stat placeholder unless a dedicated engagement implementation task
+  promotes the feature with code, tests, persistence, and docs.
 - Do NOT add a second daily reminder time. Single time only.
 - Do NOT auto-enable notifications. Always require explicit user toggle and permission flow.
 - Do NOT switch landing screen from Dashboard without explicit user setting and updated doc.

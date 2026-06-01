@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-29
+last_updated: 2026-06-02
 applies_to: product scope
 ---
 
@@ -15,13 +15,12 @@ It helps users:
 - Manage decks (create, rename, move, delete, reorder, import, export). Each deck declares a target language.
 - Manage flashcards (create, edit, delete, reorder, tag, import, export selected, bulk operations).
 - Organize content hierarchically through folders.
-- Tag cards and filter/study by tag.
+- Tag cards and filter inside current card/tag-management surfaces. Study-by-tag remains Blocked/Future in V1.
 - Study cards through multiple modes.
 - Review due cards via spaced repetition (Leitner 8-box).
 - Bury cards until tomorrow or suspend them indefinitely.
 - Resume paused sessions from Dashboard.
-- Set a daily goal and build a streak.
-- Receive optional daily study reminders.
+- See a simple Dashboard streak stat placeholder in V1; full daily goal/streak/reminder engagement remains Future/Target.
 - Search/filter inside the current screen scope in V1; full global search is Future Proposal.
 - View per-card history is Future Proposal, not V1 scope.
 - Configure audio/speech (TTS) preferences for Korean and English.
@@ -52,7 +51,7 @@ This overview lists product capabilities. The detailed contract for each lives i
 | Global search screen | Future Proposal | `docs/business/search/global-search.md`, `docs/wireframes/11-library-search.md` |
 | Zero-content guidance / thin onboarding | V1 guideline — owner-split across current empty states and Account Settings restore | `docs/wireframes/23-onboarding.md`, `docs/wireframes/01-dashboard.md`, `docs/wireframes/02-library.md`, `docs/wireframes/19-settings-account.md` |
 | Full onboarding flow | Future Proposal — no standalone route/feature/first-launch wizard in V1 | `docs/wireframes/23-onboarding.md` |
-| Daily goal + streak + reminders | Specified | `docs/business/engagement/dashboard-engagement.md` |
+| Daily goal + streak + reminders | Future/Target for V1; target spec only. Current code has a simple Dashboard `0 days` visual/stat placeholder with no engagement persistence, settings, reminders, or sheets. | `docs/business/engagement/dashboard-engagement.md`, `docs/wireframes/01-dashboard.md` |
 | Progress tracking | Partially specified | `docs/business/srs/srs-review.md` (data only) |
 | TTS / audio settings | Specified | `docs/business/tts/tts-settings.md` |
 | Account linking (Google) | Specified | `docs/business/account-sync/account-sync.md` |

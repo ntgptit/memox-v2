@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,6 +34,7 @@ import 'package:memox/presentation/features/study/providers/study_session_notifi
 import 'package:memox/presentation/features/study/screens/study_entry_screen.dart';
 import 'package:memox/presentation/features/study/screens/study_session_screen.dart';
 import 'package:memox/presentation/features/tts/providers/tts_settings_notifier.dart';
+import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -201,7 +204,84 @@ void main() {
       expect(find.byType(NavigationRail), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'DT11 onNavigate: Future routes resolve to router error, not live V1 screens',
+    (tester) async {
+      const futureRoutes = [
+        '/search',
+        '/global-search',
+        '/library/search',
+        '/onboarding',
+        '/library/deck/deck-001/flashcards/card-001/history',
+        '/settings/reminders',
+        '/settings/learning/daily-goal',
+      ];
+
+      for (final path in futureRoutes) {
+        await _pumpRoute(tester, path);
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byType(MxErrorState),
+          findsOneWidget,
+          reason: '$path must not resolve to a live V1 route',
+        );
+        expect(find.byType(SettingsScreen), findsNothing);
+        expect(find.byType(LearningSettingsScreen), findsNothing);
+        expect(find.byType(StudyEntryScreen), findsNothing);
+        expect(find.byType(AccountSettingsScreen), findsNothing);
+      }
+    },
+  );
+
+  test(
+    'DT12 onNavigate: route registry contains no Future route constants',
+    () {
+      final routeNamesSource = File(
+        'lib/app/router/route_names.dart',
+      ).readAsStringSync();
+      final navigationSource = File(
+        'lib/app/router/app_navigation.dart',
+      ).readAsStringSync();
+
+      for (final forbiddenToken in _forbiddenFutureRouteTokens) {
+        expect(
+          routeNamesSource,
+          isNot(contains(forbiddenToken)),
+          reason:
+              '$forbiddenToken must not be promoted to RouteNames/RoutePaths',
+        );
+        expect(
+          navigationSource,
+          isNot(contains(forbiddenToken)),
+          reason: '$forbiddenToken must not get an AppNavigation action',
+        );
+      }
+    },
+  );
+
+  test('DT13 onNavigate: no standalone onboarding feature folder exists', () {
+    expect(
+      Directory('lib/presentation/features/onboarding').existsSync(),
+      isFalse,
+    );
+  });
 }
+
+const _forbiddenFutureRouteTokens = [
+  'globalSearch',
+  'global-search',
+  '/search',
+  '/global-search',
+  'onboarding',
+  '/onboarding',
+  'history',
+  'dailyGoal',
+  'daily-goal',
+  'reminder',
+  'reminders',
+];
 
 Future<void> _pumpRoute(
   WidgetTester tester,

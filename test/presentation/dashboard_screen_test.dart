@@ -83,6 +83,21 @@ void main() {
   });
 
   testWidgets(
+    'DT8 onDisplay: static streak stat exposes no engagement actions',
+    (tester) async {
+      await _pumpDashboard(tester, _studyReadyDashboardState);
+
+      expect(find.text('Streak'), findsOneWidget);
+      expect(find.text('0 days'), findsOneWidget);
+      expect(find.text('Daily goal'), findsNothing);
+      expect(find.text('Reminders'), findsNothing);
+      expect(find.text('View streak'), findsNothing);
+      expect(find.text('Streak history'), findsNothing);
+      expect(find.text('Global search'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'DT2 onDisplay: renders caught-up Home state when no review cards exist',
     (tester) async {
       await _pumpDashboard(tester, _idleDashboardState);
@@ -110,7 +125,10 @@ void main() {
       _expectDashboardActionLabel(reviewKey, 'Start review');
       _expectPrimaryButtonSurface(reviewKey);
       // UI-0: card actions must not be full-width hero blocks.
-      expect(_dashboardActionButtonSize(tester, reviewKey).width, lessThan(300));
+      expect(
+        _dashboardActionButtonSize(tester, reviewKey).width,
+        lessThan(300),
+      );
     },
   );
 
@@ -141,7 +159,10 @@ void main() {
 
       const reviewKey = ValueKey('dashboard_review_now_action');
       _expectDashboardActionLabel(reviewKey, 'Start review');
-      expect(_dashboardActionButtonSize(tester, reviewKey).width, lessThan(300));
+      expect(
+        _dashboardActionButtonSize(tester, reviewKey).width,
+        lessThan(300),
+      );
     },
   );
 
@@ -237,7 +258,10 @@ void main() {
   ) async {
     await _pumpDashboard(tester, _studyReadyDashboardState);
 
-    expect(find.byKey(const ValueKey('dashboard_resume_section')), findsNothing);
+    expect(
+      find.byKey(const ValueKey('dashboard_resume_section')),
+      findsNothing,
+    );
     expect(find.byKey(const ValueKey('dashboard_resume_card')), findsNothing);
   });
 
@@ -317,12 +341,11 @@ void main() {
         ProviderScope(
           overrides: [
             dashboardOverviewProvider.overrideWith(
-              (ref) =>
-                  Future<DashboardOverviewState>.value(_resumableDashboardState),
+              (ref) => Future<DashboardOverviewState>.value(
+                _resumableDashboardState,
+              ),
             ),
-            progressSessionActionControllerProvider.overrideWith(
-              () => stub,
-            ),
+            progressSessionActionControllerProvider.overrideWith(() => stub),
           ],
           child: const _TestApp(child: DashboardScreen()),
         ),
@@ -373,48 +396,47 @@ void main() {
     expect(find.text('Tag'), findsNothing);
   });
 
-  testWidgets(
-    'Scope: selecting deck scope navigates to the Study Entry Gate',
-    (tester) async {
-      final router = _dashboardRouter();
-      addTearDown(router.dispose);
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            dashboardOverviewProvider.overrideWith(
-              (ref) =>
-                  Future<DashboardOverviewState>.value(_studyReadyDashboardState),
-            ),
-            dashboardDeckScopeOptionsProvider.overrideWith(
-              (ref) => Future<List<DeckMoveTarget>>.value(const [
-                DeckMoveTarget(
-                  id: 'deck-1',
-                  name: 'Korean N5',
-                  breadcrumb: <String>[],
-                ),
-              ]),
-            ),
-          ],
-          child: _TestRouterApp(router: router),
-        ),
-      );
-      await tester.pumpAndSettle();
+  testWidgets('Scope: selecting deck scope navigates to the Study Entry Gate', (
+    tester,
+  ) async {
+    final router = _dashboardRouter();
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          dashboardOverviewProvider.overrideWith(
+            (ref) =>
+                Future<DashboardOverviewState>.value(_studyReadyDashboardState),
+          ),
+          dashboardDeckScopeOptionsProvider.overrideWith(
+            (ref) => Future<List<DeckMoveTarget>>.value(const [
+              DeckMoveTarget(
+                id: 'deck-1',
+                name: 'Korean N5',
+                breadcrumb: <String>[],
+              ),
+            ]),
+          ),
+        ],
+        child: _TestRouterApp(router: router),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      await _tapDashboardButton(
-        tester,
-        const ValueKey('dashboard_start_new_study_action'),
-      );
-      await tester.tap(find.text('Pick a deck to study'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Korean N5'));
-      await tester.pumpAndSettle();
+    await _tapDashboardButton(
+      tester,
+      const ValueKey('dashboard_start_new_study_action'),
+    );
+    await tester.tap(find.text('Pick a deck to study'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Korean N5'));
+    await tester.pumpAndSettle();
 
-      expect(
-        router.routeInformationProvider.value.uri.path,
-        '/library/study/deck/deck-1',
-      );
-    },
-  );
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/library/study/deck/deck-1',
+    );
+  });
 
   testWidgets(
     'Scope: selecting folder scope navigates to the Study Entry Gate',
@@ -425,8 +447,9 @@ void main() {
         ProviderScope(
           overrides: [
             dashboardOverviewProvider.overrideWith(
-              (ref) =>
-                  Future<DashboardOverviewState>.value(_studyReadyDashboardState),
+              (ref) => Future<DashboardOverviewState>.value(
+                _studyReadyDashboardState,
+              ),
             ),
             dashboardFolderScopeOptionsProvider.overrideWith(
               (ref) => Future<List<FolderScopeOption>>.value(const [
@@ -459,27 +482,26 @@ void main() {
     },
   );
 
-  testWidgets(
-    'Scope: selecting today scope navigates to today study entry',
-    (tester) async {
-      final router = _dashboardRouter();
-      addTearDown(router.dispose);
-      await _pumpDashboardRouter(tester, router, _studyReadyDashboardState);
+  testWidgets('Scope: selecting today scope navigates to today study entry', (
+    tester,
+  ) async {
+    final router = _dashboardRouter();
+    addTearDown(router.dispose);
+    await _pumpDashboardRouter(tester, router, _studyReadyDashboardState);
 
-      await _tapDashboardButton(
-        tester,
-        const ValueKey('dashboard_start_new_study_action'),
-      );
-      // Tap the Today scope option via its unique due-count subtitle.
-      await tester.tap(find.text('5 cards due now'));
-      await tester.pumpAndSettle();
+    await _tapDashboardButton(
+      tester,
+      const ValueKey('dashboard_start_new_study_action'),
+    );
+    // Tap the Today scope option via its unique due-count subtitle.
+    await tester.tap(find.text('5 cards due now'));
+    await tester.pumpAndSettle();
 
-      expect(
-        router.routeInformationProvider.value.uri.path,
-        '/library/study/today',
-      );
-    },
-  );
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/library/study/today',
+    );
+  });
 
   testWidgets('shows skeleton layout while dashboard data is loading', (
     tester,

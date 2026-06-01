@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-02
 route: /home
 source_specs:
   - docs/business/engagement/dashboard-engagement.md
@@ -11,7 +11,14 @@ source_specs:
 
 ## Purpose
 
-Default landing screen on app launch. Surfaces motivation (streak, daily goal), continues paused sessions, and points to the next study action. Not a content browser — that's Library.
+Dashboard top-level screen. Current V1 continues paused sessions and points to the next study action. Full motivation surfaces (computed streak, daily goal, reminders, streak history, and goal sheets) remain Target/Future.
+
+## V1 release status
+
+- Current V1: due/new/mastery summary, recent decks, resume card, paused-sessions sheet, Today CTA, and Start new learning for Today/Deck/Folder.
+- Current V1 placeholder: the stats row may show `Streak` / `0 days` as a simple visual/stat placeholder only. It has no streak computation, no engagement persistence, no settings, no reminder, and no streak-history or daily-goal sheet action.
+- Target/Future: full streak chip/history, daily-goal ring/settings, reminders/notification permissions, Dashboard zero-content onboarding layout, Global Search route/action, and search icon navigation.
+- Current app boot still redirects `/` to `RouteDefaults.initialLocation = RoutePaths.library`; changing launch default to Dashboard requires a dedicated navigation task.
 
 ## Layout — populated state
 
@@ -19,7 +26,7 @@ Default landing screen on app launch. Surfaces motivation (streak, daily goal), 
 ┌───────────────────────────────────────┐
 │ STATUS BAR                            │
 ├───────────────────────────────────────┤
-│  Good evening, Giap          🔍  ⚙️    │  ← App bar; search → /library/search
+│  Good evening, Giap          🔍  ⚙️    │  ← Target app bar; Global Search is not live in V1
 ├───────────────────────────────────────┤
 │                                       │
 │ ┌───────────────────────────────────┐ │
@@ -147,8 +154,9 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 - **Resume card, recent decks, Today CTA, and "Start new learning"** are implemented and tested (`test/presentation/dashboard_screen_test.dart`).
 - **Action density** follows `docs/ui-ux/action-hierarchy-contract.md`: the due/next-action card uses **compact, trailing-aligned, stacked** card actions (`MxActionButton` `cardPrimary`/`cardSecondary`) — not full-width hero CTAs. Exactly one dominant primary per card ("Start review" when due, otherwise "Start new learning"); the companion is a lighter secondary. The resume card uses `MxCardActions` (Continue primary / Discard secondary).
 - **"Start new learning"** opens a two-step scope picker (Today / Deck / Folder); see `docs/wireframes/25-shared-bottom-sheets.md` §scope-picker V1 note. **Tag scope is excluded in V1.**
-- **Streak chip, daily-goal ring, and streak-broken banner remain `Target`/Future** (blocked on the engagement product decision). The stats row shows a streak placeholder only; no streak/goal source-of-truth use case is wired yet.
+- **Streak chip, daily-goal ring, reminders, streak-history sheet, daily-goal sheet, and streak-broken banner remain `Target`/Future** (blocked on the engagement product decision). The stats row shows a static `0 days` streak placeholder only; no streak/goal source-of-truth use case, persistence, settings control, reminder, or engagement sheet is wired yet.
 - **Onboarding (zero-content) layout** is not a dedicated route/screen in V1; thin empty-deck guidance is surfaced by the existing deck empty state (Prompt 01). No onboarding carousel/route is created.
+- **Global Search** is not reachable from Dashboard in V1. Inline search remains scope-local on owner screens only.
 
 ## States
 
@@ -169,12 +177,12 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 | Tap resume card "Continue" | Tap | Navigate to `/library/study/session/{sessionId}` (`pushReplacement` from Dashboard not needed — `push` is fine because Dashboard remains in nav stack). |
 | Tap resume card "Discard" | Tap | Show "Discard paused session?" dialog (`docs/wireframes/24-shared-dialogs.md` §discard-session). On confirm: `study_sessions.status = cancelled`. |
 | Tap "{n-1} more paused sessions" | Tap | Open bottom-sheet listing all resumable sessions (`docs/wireframes/25-shared-bottom-sheets.md` §paused-sessions). |
-| Tap streak chip | Tap | Open streak history bottom-sheet. |
-| Tap goal ring | Tap | Open daily-goal slider modal (`docs/wireframes/25-shared-bottom-sheets.md` §daily-goal). |
+| Tap streak chip | Target/Future | Open streak history bottom-sheet only after full engagement is promoted. Current V1 static stat has no tap action. |
+| Tap goal ring | Target/Future | Open daily-goal slider modal only after full engagement is promoted. Current V1 has no live goal ring. |
 | Tap "Start today's review" | Tap | Navigate to `/library/study/today` → routes through study entry gate. |
 | Tap "Start new learning" | Tap | Open scope picker bottom-sheet. |
 | Tap recent deck row | Tap | Navigate to `/library/deck/:deckId/flashcards`. |
-| Tap search icon | Tap | Navigate to `/library/search`. |
+| Tap search icon | Target/Future | Navigate to Global Search only after that route is promoted. Current V1 exposes no Dashboard Global Search action. |
 | Tap settings icon | Tap | Navigate to `/settings`. |
 | Pull to refresh | Pull down | Re-run all queries; replace skeletons in place. |
 
@@ -182,8 +190,8 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 
 - Discard paused session dialog — see `docs/wireframes/24-shared-dialogs.md` §discard-session.
 - Paused sessions list bottom-sheet — see `docs/wireframes/25-shared-bottom-sheets.md` §paused-sessions.
-- Streak history bottom-sheet — see `docs/wireframes/25-shared-bottom-sheets.md` §streak-history.
-- Daily-goal slider — see `docs/wireframes/25-shared-bottom-sheets.md` §daily-goal.
+- Streak history bottom-sheet — Target/Future only; see `docs/wireframes/25-shared-bottom-sheets.md` §streak-history.
+- Daily-goal slider — Target/Future only; see `docs/wireframes/25-shared-bottom-sheets.md` §daily-goal.
 - Scope picker — see `docs/wireframes/25-shared-bottom-sheets.md` §scope-picker.
 
 ## Navigation in
@@ -198,7 +206,7 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 - "Start today's review" → study entry gate.
 - "Start new learning" → scope picker → study entry gate.
 - Recent deck → flashcard list.
-- Search icon → library search.
+- Search icon → Target/Future Global Search only; no live V1 action.
 - Settings icon → settings hub.
 
 ## Responsive

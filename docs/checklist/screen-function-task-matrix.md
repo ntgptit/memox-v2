@@ -81,7 +81,7 @@ Parity audit: routes-vs-navigation tracked in `docs/checklist/wireframe-code-par
 
 Mock refs: variants `25a`–`25h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.16 + §5.
 
-Parity audit: row #01 in `docs/checklist/wireframe-code-parity-assessment.md` §1. Prompt 04 (2026-05-30) landed resume card + multi-resume paused-sessions sheet + discard dialog + Start-new-learning scope picker (Today/Deck/Folder) + recent decks (verified by `test/presentation/dashboard_screen_test.dart`). Remaining drift is engagement-only: streak chip/`MxStreakCard` and daily-goal ring stay `Target` (blocked on §3.2 streak/engagement product decision).
+Parity audit: row #01 in `docs/checklist/wireframe-code-parity-assessment.md` §1. Prompt 04 (2026-05-30) landed resume card + multi-resume paused-sessions sheet + discard dialog + Start-new-learning scope picker (Today/Deck/Folder) + recent decks (verified by `test/presentation/dashboard_screen_test.dart`). Prompt 32 (2026-06-02) locked the static `Streak` / `0 days` stats row as a visual/stat placeholder only: no engagement persistence, settings, reminder, sheet, or streak-history action. Remaining drift is engagement-only: streak chip/`MxStreakCard` and daily-goal ring stay `Target` (blocked on §3.2 streak/engagement product decision).
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |

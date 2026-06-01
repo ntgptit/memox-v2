@@ -220,6 +220,7 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | EN9 | Landing screen | App launch | Dashboard, not Library | C0 | `test/features/app_shell/landing_test.dart::EN9` |
 | EN10 | Onboarding | Zero content | Show onboarding state on Dashboard | C0+C1 | `test/features/dashboard/onboarding_test.dart::EN10` |
 | EN11 | Day boundary | Local timezone midnight | Day rollover at local midnight | C1 | `test/features/engagement/day_boundary_test.dart::EN11` |
+| EN12 | Dashboard V1 placeholder | Static streak stat is rendered before full engagement is implemented | Show simple `0 days` stat only; expose no daily-goal, reminder, streak-history, or global-search action | C1 | `test/presentation/dashboard_screen_test.dart::DT8 onDisplay` |
 
 ## Navigation/UI
 
@@ -232,6 +233,9 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | N5 | Push vs Go | Session → result | Use pushReplacement | C1 | `test/features/study/navigation_test.dart::N5` |
 | N6 | Deep link | Private route | Redirect to safe ancestor | C1 | `test/app/router/deep_link_test.dart::N6` |
 | N7 | Settings hub → sub-screen | Tap row | Push to sub-screen, back returns to hub | C0+C1 | `test/presentation/settings_screen_test.dart::DT1-DT7 onNavigate`, `test/app/router/app_router_test.dart::DT8-DT9 onNavigate` |
+| N8 | Future route smoke lock | Direct Future/Blocked paths requested (`/search`, `/global-search`, `/library/search`, `/onboarding`, flashcard history, reminder/daily-goal settings paths) | Resolve to router error state, not to a live V1 screen/action | C1 | `test/app/router/app_router_test.dart::DT11 onNavigate` |
+| N9 | Future route registry lock | Route constants/navigation helpers inspected | No Global Search, onboarding, flashcard history, daily-goal, reminder, or similar Future route constant/action is promoted | C1 | `test/app/router/app_router_test.dart::DT12 onNavigate` |
+| N10 | Onboarding feature lock | Feature folder inspected | No standalone onboarding presentation feature folder exists in V1 | C1 | `test/app/router/app_router_test.dart::DT13 onNavigate` |
 | U1 | Load | Loading | Show shared loading/retained state | C0 | `test/presentation/shared/loading_state_test.dart::U1` |
 | U2 | Load | Empty | Show shared empty state | C0+C1 | `test/presentation/shared/empty_state_test.dart::U2` |
 | U3 | Load | Error | Show shared error state | C0+C1 | `test/presentation/shared/error_state_test.dart::U3` |
