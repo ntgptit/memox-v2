@@ -55,6 +55,7 @@ These items are intentionally outside the V1 release candidate:
 | Strong-confirm account removal | Target/Future | Shared strong-confirm typed input and account removal flow are not V1. |
 | Dedicated `SortOptionsSheet` | NotStarted / Target | Current sort UI is chip/menu based. |
 | Active-session undo reinsert | Future polish | Current card-action undo reverts progress only; it does not reinsert dropped cards into the active session. |
+| Dashboard-as-landing default boot behavior | Target/Future | Current V1 boot redirects `/` to Library; changing default boot to Dashboard requires a dedicated navigation task. |
 
 ## C. True Release Blockers
 
@@ -132,6 +133,7 @@ must not be counted as blockers unless a current V1 route/action breaks.
 | Account removal strong-confirm | No strong-confirm account removal flow found. Existing sign-out/disconnect confirmations are normal current account actions. | not present |
 | TTS per-language tabs | No independent per-language tabs/settings found. Current V1 is global/front-language settings. | not present |
 | Root-level decks | No Library root-deck read-model/channel or route exposure found. Folder-owned deck flows remain current. | not present as Library root feature |
+| Dashboard-as-landing default boot behavior | Current boot remains Library; Dashboard is a top-level destination only. | not present as default boot |
 
 ## Prompt 31 Decision
 

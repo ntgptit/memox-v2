@@ -144,6 +144,7 @@ It intentionally excludes Future features listed in this document and in
 - strong-confirm account removal
 - dedicated `SortOptionsSheet`
 - active-session undo reinsert
+- Dashboard-as-landing default boot behavior
 
 ## E. User-Facing Caveats
 
@@ -151,6 +152,7 @@ It intentionally excludes Future features listed in this document and in
 - Streak is shown as a simple placeholder, not a full engagement system.
 - Tags can be managed, but studying by tag is not included.
 - Drive sync is basic/manual; advanced restore protection is not complete.
+- The app currently opens Library by default; Dashboard remains available from the Home tab.
 
 ## F. Internal Release Classification
 

@@ -13,7 +13,7 @@ not a Future feature checklist.
 
 Verify manually or via tests that these current routes open safely:
 
-- `/`
+- `/` redirects to the current V1 Library boot surface
 - `/library`
 - `/progress`
 - `/settings`
@@ -76,6 +76,7 @@ Confirm no visible entry for:
 - account removal strong-confirm
 - TTS per-language tabs
 - root-level deck creation
+- Dashboard-as-landing default boot behavior
 
 ## F. Regression Command Gate
 
