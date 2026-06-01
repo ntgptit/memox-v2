@@ -167,6 +167,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(SettingsTagManagementScreen), findsOneWidget);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LearningSettingsScreen), findsOneWidget);
+    expect(find.byType(SettingsTagManagementScreen), findsNothing);
   });
 }
 
