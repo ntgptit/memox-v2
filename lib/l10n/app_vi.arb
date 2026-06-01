@@ -5,6 +5,10 @@
   "commonOk": "Đồng ý",
   "commonCancel": "Hủy",
   "commonClose": "Đóng",
+  "bottomSheetDragHandleLabel": "Đóng bottom sheet",
+  "@bottomSheetDragHandleLabel": {
+    "description": "Accessibility label for the drag handle at the top of a modal bottom sheet."
+  },
   "commonCreate": "Tạo",
   "commonEdit": "Chỉnh sửa",
   "commonDelete": "Xóa",
@@ -1001,6 +1005,7 @@
   },
   "studySessionTitle": "Phiên học",
   "studyCancelAction": "Hủy",
+  "studyActionFailed": "Không thể thực hiện thao tác học.",
   "studyFinalizeAction": "Finalize",
   "studySkipAction": "Bỏ qua",
   "studyTextSettingsTooltip": "Tùy chỉnh chữ",

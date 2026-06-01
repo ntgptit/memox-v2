@@ -5,6 +5,10 @@
   "commonOk": "OK",
   "commonCancel": "Cancel",
   "commonClose": "Close",
+  "bottomSheetDragHandleLabel": "Dismiss bottom sheet",
+  "@bottomSheetDragHandleLabel": {
+    "description": "Accessibility label for the drag handle at the top of a modal bottom sheet."
+  },
   "commonCreate": "Create",
   "commonEdit": "Edit",
   "commonDelete": "Delete",
@@ -1001,6 +1005,7 @@
   },
   "studySessionTitle": "Study session",
   "studyCancelAction": "Cancel",
+  "studyActionFailed": "Study action failed.",
   "studyFinalizeAction": "Finalize",
   "studySkipAction": "Skip",
   "studyTextSettingsTooltip": "Text settings",

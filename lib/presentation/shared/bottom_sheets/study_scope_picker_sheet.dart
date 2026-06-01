@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../app/router/app_navigation.dart';
 import '../../../domain/enums/study_enums.dart';
-import '../../features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
 import '../dialogs/mx_action_sheet_list.dart';
 import '../dialogs/mx_bottom_sheet.dart';
 import '../dialogs/mx_destination_picker_sheet.dart';
+
+typedef StudyScopeDestinationLoader =
+    Future<List<MxDestinationOption<String>>> Function();
 
 /// Study scope picked from the shared "Start new learning" sheet. Tag scope
 /// is intentionally excluded in V1 — see
@@ -24,8 +25,9 @@ enum _StudyScopeKind { today, deck, folder }
 /// with the "N cards due" subtitle the Dashboard surfaces. Callers
 /// without a count (e.g. Study Result) can omit it.
 Future<void> showStudyScopePicker(
-  BuildContext context,
-  WidgetRef ref, {
+  BuildContext context, {
+  required StudyScopeDestinationLoader loadDeckDestinations,
+  required StudyScopeDestinationLoader loadFolderDestinations,
   int? reviewCount,
 }) async {
   final l10n = AppLocalizations.of(context);
@@ -65,30 +67,25 @@ Future<void> showStudyScopePicker(
     case _StudyScopeKind.today:
       context.goStudyToday();
     case _StudyScopeKind.deck:
-      await _pickDeckScope(context, ref);
+      await _pickDeckScope(context, loadDeckDestinations);
     case _StudyScopeKind.folder:
-      await _pickFolderScope(context, ref);
+      await _pickFolderScope(context, loadFolderDestinations);
   }
 }
 
-Future<void> _pickDeckScope(BuildContext context, WidgetRef ref) async {
+Future<void> _pickDeckScope(
+  BuildContext context,
+  StudyScopeDestinationLoader loadDeckDestinations,
+) async {
   final l10n = AppLocalizations.of(context);
-  final decks = await ref.read(dashboardDeckScopeOptionsProvider.future);
+  final destinations = await loadDeckDestinations();
   if (!context.mounted) return;
   final deckId = await MxDestinationPickerSheet.show<String>(
     context: context,
     title: l10n.dashboardScopeDeckPickerTitle,
     searchHintText: l10n.dashboardScopeDeckSearchHint,
     emptyLabel: l10n.dashboardScopeDeckEmpty,
-    destinations: [
-      for (final deck in decks)
-        MxDestinationOption<String>(
-          value: deck.id,
-          title: deck.name,
-          subtitle: deck.breadcrumb.isEmpty ? null : deck.breadcrumb.join(' / '),
-          icon: Icons.menu_book_outlined,
-        ),
-    ],
+    destinations: destinations,
   );
   if (!context.mounted) return;
   if (deckId == null) return;
@@ -99,26 +96,19 @@ Future<void> _pickDeckScope(BuildContext context, WidgetRef ref) async {
   );
 }
 
-Future<void> _pickFolderScope(BuildContext context, WidgetRef ref) async {
+Future<void> _pickFolderScope(
+  BuildContext context,
+  StudyScopeDestinationLoader loadFolderDestinations,
+) async {
   final l10n = AppLocalizations.of(context);
-  final folders = await ref.read(dashboardFolderScopeOptionsProvider.future);
+  final destinations = await loadFolderDestinations();
   if (!context.mounted) return;
   final folderId = await MxDestinationPickerSheet.show<String>(
     context: context,
     title: l10n.dashboardScopeFolderPickerTitle,
     searchHintText: l10n.dashboardScopeFolderSearchHint,
     emptyLabel: l10n.dashboardScopeFolderEmpty,
-    destinations: [
-      for (final folder in folders)
-        MxDestinationOption<String>(
-          value: folder.id,
-          title: folder.name,
-          subtitle: folder.parentBreadcrumb.isEmpty
-              ? null
-              : folder.parentBreadcrumb.join(' / '),
-          icon: Icons.folder_outlined,
-        ),
-    ],
+    destinations: destinations,
   );
   if (!context.mounted) return;
   if (folderId == null) return;

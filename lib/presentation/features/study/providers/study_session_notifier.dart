@@ -1,3 +1,4 @@
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../app/di/study/study_usecase_providers.dart';
@@ -139,7 +140,7 @@ class StudySessionActionController extends _$StudySessionActionController {
 AppFailure? studyActionError(AsyncValue<void> actionState) =>
     MxActionErrors.failureOf(actionState);
 
-String studyErrorMessage(Object? error) {
+String studyErrorMessage(Object? error, AppLocalizations l10n) {
   if (error is AppFailure) {
     return MxActionErrors.messageOf(error);
   }
@@ -149,5 +150,5 @@ String studyErrorMessage(Object? error) {
   if (error is AppException) {
     return error.message;
   }
-  return 'Study action failed.';
+  return l10n.studyActionFailed;
 }

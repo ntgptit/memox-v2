@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/shared/dialogs/mx_bottom_sheet.dart';
 import 'package:memox/presentation/shared/widgets/mx_text.dart';
 
@@ -54,6 +55,46 @@ void main() {
       expect(find.text('Sheet content'), findsOneWidget);
     },
   );
+
+  testWidgets(
+    'DT1 onAccessibility: MxBottomSheet renders a tappable dismiss handle',
+    (tester) async {
+      var resolved = false;
+
+      await tester.pumpWidget(
+        _TestApp(
+          child: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () async {
+                await MxBottomSheet.show<void>(
+                  context: context,
+                  title: 'Import cards',
+                  child: const SizedBox(
+                    height: 80,
+                    child: Text('Sheet content'),
+                  ),
+                );
+                resolved = true;
+              },
+              child: const Text('Open'),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final handle = find.bySemanticsLabel('Dismiss bottom sheet');
+
+      expect(handle, findsOneWidget);
+
+      await tester.tap(handle);
+      await tester.pumpAndSettle();
+
+      expect(resolved, isTrue);
+    },
+  );
 }
 
 class _TestApp extends StatelessWidget {
@@ -64,6 +105,8 @@ class _TestApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     home: MediaQuery(
       data: MediaQueryData(viewInsets: viewInsets),
       child: Material(child: child),

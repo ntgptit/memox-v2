@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 
+import '../../../../app/di/content/deck_providers.dart';
+import '../../../../app/di/content/folder_providers.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/study/entities/study_models.dart';
 import '../../../shared/bottom_sheets/study_scope_picker_sheet.dart';
+import '../../../shared/dialogs/mx_destination_picker_sheet.dart';
 import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
@@ -63,7 +66,7 @@ class StudyResultSection extends ConsumerWidget {
         skeletonBuilder: (_) => const _StudyResultLoadingView(),
         errorBuilder: (_, error, _) => MxErrorState(
           title: l10n.sharedErrorTitle,
-          message: studyErrorMessage(error),
+          message: studyErrorMessage(error, l10n),
           onRetry: () => ref.invalidate(studySessionStateProvider(sessionId)),
         ),
         dataBuilder: (context, snapshot) =>
@@ -108,9 +111,7 @@ class _StudyResultBody extends ConsumerWidget {
           const MxGap(MxSpace.lg),
           _BoxChangesCard(snapshot: snapshot),
           const MxGap(MxSpace.lg),
-          _StudyResultCardReviewSection(
-            items: snapshot.resultCardReviewItems,
-          ),
+          _StudyResultCardReviewSection(items: snapshot.resultCardReviewItems),
         ],
         const MxGap(MxSpace.xl),
         _ResultActions(
@@ -219,10 +220,7 @@ class _ResultBreakdownCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          MxText(
-            l10n.studyResultBreakdownTitle,
-            role: MxTextRole.sectionTitle,
-          ),
+          MxText(l10n.studyResultBreakdownTitle, role: MxTextRole.sectionTitle),
           const MxGap(MxSpace.md),
           _ResultBar(
             label: l10n.studyResultPerfect,
@@ -370,7 +368,41 @@ class _ResultActions extends ConsumerWidget {
         MxSecondaryButton(
           label: l10n.studyResultStudyMoreAction,
           leadingIcon: Icons.school_rounded,
-          onPressed: () => showStudyScopePicker(context, ref),
+          onPressed: () => showStudyScopePicker(
+            context,
+            loadDeckDestinations: () async {
+              final decks = await ref
+                  .read(listDeckDestinationsUseCaseProvider)
+                  .execute();
+              return [
+                for (final deck in decks)
+                  MxDestinationOption<String>(
+                    value: deck.id,
+                    title: deck.name,
+                    subtitle: deck.breadcrumb.isEmpty
+                        ? null
+                        : deck.breadcrumb.join(' / '),
+                    icon: Icons.menu_book_outlined,
+                  ),
+              ];
+            },
+            loadFolderDestinations: () async {
+              final folders = await ref
+                  .read(listAllFoldersUseCaseProvider)
+                  .execute();
+              return [
+                for (final folder in folders)
+                  MxDestinationOption<String>(
+                    value: folder.id,
+                    title: folder.name,
+                    subtitle: folder.parentBreadcrumb.isEmpty
+                        ? null
+                        : folder.parentBreadcrumb.join(' / '),
+                    icon: Icons.folder_outlined,
+                  ),
+              ];
+            },
+          ),
         ),
       ],
     );
@@ -449,9 +481,7 @@ class _StudyResultCardReviewRow extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: MxText(item.front, role: MxTextRole.tileTitle),
-            ),
+            Expanded(child: MxText(item.front, role: MxTextRole.tileTitle)),
             const MxGap(MxSpace.md),
             MxText(label, role: MxTextRole.tileTrailing, color: labelColor),
           ],
