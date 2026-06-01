@@ -20,10 +20,12 @@ class MxConfirmationDialog {
     MxConfirmationTone tone = MxConfirmationTone.primary,
   }) async {
     final localizations = MaterialLocalizations.of(context);
+    final isDestructive = tone == MxConfirmationTone.danger;
     final result = await MxDialog.show<bool>(
       context: context,
       title: title,
       icon: icon,
+      barrierDismissible: !isDestructive,
       child: Text(message),
       actions: [
         Builder(
@@ -36,7 +38,7 @@ class MxConfirmationDialog {
         Builder(
           builder: (ctx) => MxPrimaryButton(
             label: confirmLabel ?? localizations.okButtonLabel,
-            tone: tone == MxConfirmationTone.danger
+            tone: isDestructive
                 ? MxPrimaryButtonTone.danger
                 : MxPrimaryButtonTone.primary,
             onPressed: () => Navigator.of(ctx).pop(true),

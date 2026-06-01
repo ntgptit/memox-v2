@@ -1588,6 +1588,38 @@ void main() {
     expect(find.text('Local data backed up to Google Drive.'), findsNothing);
   });
 
+  testWidgets(
+    'DT15b onUpdate: canceling restore confirmation does not restore',
+    (tester) async {
+      final remote = _remoteSnapshot();
+      final repository = _FakeDriveSyncRepository(
+        loadStatusResult: DriveSyncStatus(
+          kind: DriveSyncStatusKind.ready,
+          remote: remote,
+        ),
+        restoreResult: DriveSyncRunResult.restoredRemote(
+          DriveSyncStatus(kind: DriveSyncStatusKind.synced, remote: remote),
+          DriveSyncRestoreEffect.refreshDatabaseProvider,
+        ),
+      );
+      await _pumpSettings(
+        tester,
+        child: const AccountSettingsScreen(),
+        driveSyncRepository: repository,
+      );
+
+      await tester.tap(find.byTooltip('Sync now'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Download Drive data to this device'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(repository.restoreDriveCount, 0);
+      expect(find.text('Drive copy restored.'), findsNothing);
+    },
+  );
+
   testWidgets('DT12 onUpdate: web Drive scope reconnect enables Drive sync', (
     tester,
   ) async {

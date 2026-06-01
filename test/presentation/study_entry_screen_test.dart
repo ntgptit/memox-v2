@@ -343,6 +343,38 @@ void main() {
     expect(repo.restartedFromSessionId, isNull);
   });
 
+  testWidgets(
+    'DT3 onStartOverCancel: second confirmation cancel returns to choice',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_resumeEntryState)),
+          ],
+          child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+        ),
+      );
+      await _pumpDialogs(tester);
+
+      await tester.tap(find.text('Start over'));
+      await _pumpDialogs(tester);
+      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await _pumpDialogs(tester);
+
+      expect(find.text('Resume previous session?'), findsOneWidget);
+      expect(find.textContaining('Session '), findsNothing);
+      expect(repo.startCount, 0);
+      expect(repo.cancelledSessionId, isNull);
+      expect(repo.restartedFromSessionId, isNull);
+    },
+  );
+
   testWidgets('DT3 onCancel: dismissing the choice creates no session', (
     tester,
   ) async {

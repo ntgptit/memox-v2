@@ -138,6 +138,7 @@ Destructive actions require confirmation dialog:
 - Discard unsaved form changes.
 
 Confirmation dialog must use `MxConfirmDialog` or equivalent shared widget.
+Current V1 implementation uses `MxConfirmationDialog`; destructive confirmations are not barrier-dismissible and must provide an explicit Cancel path.
 
 ## Loading state rule
 

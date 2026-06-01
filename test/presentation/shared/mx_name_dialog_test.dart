@@ -187,6 +187,44 @@ void main() {
     expect(find.byType(Dialog), findsOneWidget);
     expect(find.text('Create folder'), findsOneWidget);
   });
+
+  testWidgets('DT1 onCancel: cancel closes dialog without returning a name', (
+    WidgetTester tester,
+  ) async {
+    String? result = 'unchanged';
+
+    await tester.pumpWidget(
+      _TestApp(
+        child: Builder(
+          builder: (context) => TextButton(
+            onPressed: () async {
+              result = await MxNameDialog.show(
+                context: context,
+                title: 'Create folder',
+                label: 'Folder name',
+                hintText: 'e.g. Listening practice',
+                confirmLabel: 'Create',
+              );
+            },
+            child: const Text('Open dialog'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open dialog'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField), 'Grammar');
+    await tester.pump();
+
+    expect(find.widgetWithText(TextButton, 'Cancel'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Dialog), findsNothing);
+    expect(result, isNull);
+  });
 }
 
 class _TestApp extends StatelessWidget {

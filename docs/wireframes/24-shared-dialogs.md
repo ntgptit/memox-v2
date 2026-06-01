@@ -16,6 +16,14 @@ source_specs:
 
 Reusable dialog patterns referenced across screens. Each dialog is identified by anchor (`§name`) and used by multiple screens. Defining them here once prevents drift.
 
+## V1 implementation status — Prompt 27, 2026-06-01
+
+Current V1 shared primitives are `MxDialog`, `MxConfirmationDialog`, `MxNameDialog`, and `MxDialogResumeOrStartOver`.
+
+Current composed usages include destructive confirmations for flashcard/folder/deck/tag deletion, tag merge, study-session cancel/discard, account sign-out/disconnect, manual Drive upload/restore confirmation, dirty-editor discard, and resume/start-over conflict handling. These reuse existing owner screens and use cases; there is no standalone dialog gallery.
+
+Target/Partial catalog items remain documented below but are not Current unless named in the Current list above. Strong-confirm typed input for account removal is Target only. The full restore-warning two-tier flow, Upload local first branch, second destructive confirmation, and pre-restore snapshot flow remain Partial/Target per `docs/business/account-sync/account-sync.md` and `docs/wireframes/19-settings-account.md`. V1 has no onboarding dialog or wizard flow.
+
 ## Invocation inputs
 
 Shared dialogs and bottom-sheets receive only prepared view data and callbacks from the caller screen/notifier.
@@ -182,6 +190,8 @@ Generic shape:
 
 ### Strong variant (account removal)
 
+**Target only.** This typed-confirm variant is not implemented in V1 and must not be exposed until account removal/switch-account scope is promoted with code, tests, and docs.
+
 ```
 ┌───────────────────────────────────────┐
 │  ⚠ Remove account and erase data?     │
@@ -304,7 +314,7 @@ Rename button disabled until name is valid AND different from current.
 
 ## §folder-create
 
-Used by: Library FAB, folder detail FAB, onboarding.
+Used by: Library FAB and folder detail FAB. Future full onboarding or zero-content guidance may reuse this flow, but V1 has no standalone onboarding dialog or wizard.
 
 ```
 ┌───────────────────────────────────────┐
@@ -334,6 +344,8 @@ Used by: Library FAB, folder detail FAB, onboarding.
 ## §restore-warning
 
 Used by: settings account (19) Restore button when fingerprint differs.
+
+**Partial/Target only.** Current V1 Account Settings has manual Drive upload/restore confirmation and a busy progress dialog, but it does not implement this two-tier restore-warning, Upload local first branch, second destructive confirmation, or pre-restore snapshot path.
 
 Two-tier confirmation: primary "Upload local first" CTA + secondary "Restore anyway" requires second tap.
 
@@ -402,12 +414,12 @@ When fingerprints match, this dialog still appears but the warning is softer and
 - Default focus: safe action when dialog opens (so screen-reader users don't accidentally fire destructive).
 - System back gesture MUST trigger Cancel, not the destructive action.
 - For strong-variant destructive (typed confirmation): the input field MUST be focused after title is announced, with hint "Type ERASE to confirm".
-- For §restore-warning two-tier confirmation: the "Tap again to confirm" state MUST be announced via live region when it appears.
+- For §restore-warning two-tier confirmation, when that Target flow is implemented: the "Tap again to confirm" state MUST be announced via live region when it appears.
 
 ## Forbidden (catalog-level)
 
 - ❌ Introduce a new dialog pattern without adding it to this catalog first.
-- ❌ Bypass the two-tier confirmation for §restore-warning. The 5s timeout MUST be implemented.
+- ❌ Promote §restore-warning to Current without the two-tier confirmation and 5s timeout.
 - ❌ Use generic "Are you sure?" copy. Each dialog states the specific consequence.
 - ❌ Apply strong-variant destructive (typed confirmation) outside account removal without a spec update.
 - ❌ Hardcode dialog copy in widget. All strings from ARB (`error_*`, `dialog_*`).
@@ -425,7 +437,7 @@ When fingerprints match, this dialog still appears but the warning is softer and
 ## Agent rule
 
 - Do NOT introduce new dialog patterns without adding them to this catalog first.
-- Do NOT bypass the two-tier confirmation for §restore-warning. The 5s timeout MUST be implemented.
+- Do NOT promote §restore-warning to Current without the two-tier confirmation and 5s timeout.
 - Do NOT use generic "Are you sure?" copy. Each dialog states the specific consequence.
 - Strong-variant destructive (typed confirmation) is reserved for account removal. Don't apply it elsewhere without spec update.
 
