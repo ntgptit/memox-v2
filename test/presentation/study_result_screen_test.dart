@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memox/app/di/content/deck_providers.dart';
+import 'package:memox/app/di/content/folder_providers.dart';
 import 'package:memox/app/router/route_names.dart';
 import 'package:memox/domain/enums/study_enums.dart';
+import 'package:memox/domain/repositories/deck_repository.dart';
+import 'package:memox/domain/repositories/folder_repository.dart';
 import 'package:memox/domain/study/entities/study_models.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
 import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
-import 'package:memox/presentation/features/dashboard/viewmodels/dashboard_overview_viewmodel.dart';
 import 'package:memox/presentation/features/study/providers/study_session_notifier.dart';
 import 'package:memox/presentation/features/study/screens/study_result_screen.dart';
 import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
@@ -190,7 +193,10 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text("Some data couldn't be saved. Please retry."), findsOneWidget);
+    expect(
+      find.text("Some data couldn't be saved. Please retry."),
+      findsOneWidget,
+    );
 
     await tester.drag(find.byType(ListView), const Offset(0, -1200));
     await tester.pumpAndSettle();
@@ -208,7 +214,10 @@ void main() {
             (ref) => Future.value(_snapshot(SessionStatus.completed)),
           ),
         ],
-        child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+        child: const _RouterTestApp(
+          entry: StudyEntryType.deck,
+          refId: 'deck-001',
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -290,18 +299,24 @@ void main() {
     expect(find.text('Session summary'), findsNothing);
   });
 
-  testWidgets('Study more opens scope picker with Today/Deck/Folder (no Tag)',
-      (tester) async {
+  testWidgets('Study more opens scope picker with Today/Deck/Folder (no Tag)', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           studySessionStateProvider('session-001').overrideWith(
             (ref) => Future.value(_snapshot(SessionStatus.completed)),
           ),
-          dashboardDeckScopeOptionsProvider.overrideWith((ref) async => []),
-          dashboardFolderScopeOptionsProvider.overrideWith((ref) async => []),
+          deckRepositoryProvider.overrideWithValue(const _FakeDeckRepository()),
+          folderRepositoryProvider.overrideWithValue(
+            const _FakeFolderRepository(),
+          ),
         ],
-        child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+        child: const _RouterTestApp(
+          entry: StudyEntryType.deck,
+          refId: 'deck-001',
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -327,10 +342,17 @@ void main() {
             studySessionStateProvider('session-001').overrideWith(
               (ref) => Future.value(_snapshot(SessionStatus.completed)),
             ),
-            dashboardDeckScopeOptionsProvider.overrideWith((ref) async => []),
-            dashboardFolderScopeOptionsProvider.overrideWith((ref) async => []),
+            deckRepositoryProvider.overrideWithValue(
+              const _FakeDeckRepository(),
+            ),
+            folderRepositoryProvider.overrideWithValue(
+              const _FakeFolderRepository(),
+            ),
           ],
-          child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+          child: const _RouterTestApp(
+            entry: StudyEntryType.deck,
+            refId: 'deck-001',
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -359,18 +381,25 @@ void main() {
             studySessionStateProvider('session-001').overrideWith(
               (ref) => Future.value(_snapshot(SessionStatus.completed)),
             ),
-            dashboardDeckScopeOptionsProvider.overrideWith(
-              (ref) async => const [
-                DeckMoveTarget(
-                  id: 'deck-zeta',
-                  name: 'Zeta deck',
-                  breadcrumb: <String>[],
-                ),
-              ],
+            deckRepositoryProvider.overrideWithValue(
+              const _FakeDeckRepository(
+                destinations: [
+                  DeckMoveTarget(
+                    id: 'deck-zeta',
+                    name: 'Zeta deck',
+                    breadcrumb: <String>[],
+                  ),
+                ],
+              ),
             ),
-            dashboardFolderScopeOptionsProvider.overrideWith((ref) async => []),
+            folderRepositoryProvider.overrideWithValue(
+              const _FakeFolderRepository(),
+            ),
           ],
-          child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+          child: const _RouterTestApp(
+            entry: StudyEntryType.deck,
+            refId: 'deck-001',
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -401,18 +430,25 @@ void main() {
             studySessionStateProvider('session-001').overrideWith(
               (ref) => Future.value(_snapshot(SessionStatus.completed)),
             ),
-            dashboardDeckScopeOptionsProvider.overrideWith((ref) async => []),
-            dashboardFolderScopeOptionsProvider.overrideWith(
-              (ref) async => const [
-                FolderScopeOption(
-                  id: 'folder-omega',
-                  name: 'Omega folder',
-                  breadcrumb: <String>['Omega folder'],
-                ),
-              ],
+            deckRepositoryProvider.overrideWithValue(
+              const _FakeDeckRepository(),
+            ),
+            folderRepositoryProvider.overrideWithValue(
+              const _FakeFolderRepository(
+                folders: [
+                  FolderScopeOption(
+                    id: 'folder-omega',
+                    name: 'Omega folder',
+                    breadcrumb: <String>['Omega folder'],
+                  ),
+                ],
+              ),
             ),
           ],
-          child: const _RouterTestApp(entry: StudyEntryType.deck, refId: 'deck-001'),
+          child: const _RouterTestApp(
+            entry: StudyEntryType.deck,
+            refId: 'deck-001',
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -433,6 +469,30 @@ void main() {
       expect(find.text('Session summary'), findsNothing);
     },
   );
+}
+
+class _FakeDeckRepository implements DeckRepository {
+  const _FakeDeckRepository({this.destinations = const <DeckMoveTarget>[]});
+
+  final List<DeckMoveTarget> destinations;
+
+  @override
+  Future<List<DeckMoveTarget>> getDeckDestinations() async => destinations;
+
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeFolderRepository implements FolderRepository {
+  const _FakeFolderRepository({this.folders = const <FolderScopeOption>[]});
+
+  final List<FolderScopeOption> folders;
+
+  @override
+  Future<List<FolderScopeOption>> listAllFolders() async => folders;
+
+  @override
+  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 StudySessionSnapshot _snapshot(
@@ -539,9 +599,7 @@ class _RouterTestApp extends StatelessWidget {
             final entryType = state.pathParameters['entryType'];
             final entryRefId = state.pathParameters['entryRefId'];
             return Scaffold(
-              body: Center(
-                child: Text('StudyEntry $entryType $entryRefId'),
-              ),
+              body: Center(child: Text('StudyEntry $entryType $entryRefId')),
             );
           },
         ),

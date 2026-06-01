@@ -24,6 +24,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonClose => 'Close';
 
   @override
+  String get bottomSheetDragHandleLabel => 'Dismiss bottom sheet';
+
+  @override
   String get commonCreate => 'Create';
 
   @override
@@ -2055,6 +2058,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get studyCancelAction => 'Cancel';
+
+  @override
+  String get studyActionFailed => 'Study action failed.';
 
   @override
   String get studyFinalizeAction => 'Finalize';

@@ -24,6 +24,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get commonClose => 'Đóng';
 
   @override
+  String get bottomSheetDragHandleLabel => 'Đóng bottom sheet';
+
+  @override
   String get commonCreate => 'Tạo';
 
   @override
@@ -1943,6 +1946,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get studyCancelAction => 'Hủy';
+
+  @override
+  String get studyActionFailed => 'Không thể thực hiện thao tác học.';
 
   @override
   String get studyFinalizeAction => 'Finalize';

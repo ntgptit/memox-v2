@@ -11,6 +11,26 @@ source_specs:
 
 # 25 — Shared Bottom-Sheets Catalog
 
+## V1 implementation status (Prompt 28, 2026-06-01)
+
+**Current primitives:**
+
+- `MxBottomSheet` (`lib/presentation/shared/dialogs/mx_bottom_sheet.dart`) is the shared modal host. It is tokenized, uses generated localization for the drag-handle accessibility label, shows a visible tappable drag handle, handles keyboard insets, and receives prepared child content.
+- `MxActionSheetList` (`lib/presentation/shared/dialogs/mx_action_sheet_list.dart`) is the shared action-row/list primitive. It renders neutral/destructive/disabled rows and returns typed values to the caller.
+- `MxDestinationPickerSheet` (`lib/presentation/shared/dialogs/mx_destination_picker_sheet.dart`) is the shared searchable destination picker. It receives immutable destination view data and callbacks from the owner; disabled destinations stay visible and non-selectable.
+- `MxCardActionsSheet` (`lib/presentation/shared/dialogs/mx_card_actions_sheet.dart`) is Current for study-session card actions: Edit / Bury until tomorrow / Suspend card. Flashcard History is intentionally absent.
+
+**Current composed usages:**
+
+- Dashboard paused sessions use a feature-local sheet (`lib/presentation/features/dashboard/widgets/dashboard_paused_sessions_sheet.dart`) consumed only by Dashboard in V1. It lists live resumable sessions, resumes via the caller callback, and delegates discard to the shared confirmation dialog/use-case path.
+- Dashboard "Start new learning" and Study Result "Study more" use the shared two-step scope picker (`lib/presentation/shared/bottom_sheets/study_scope_picker_sheet.dart`): Today / Deck / Folder only. Deck and Folder options are loaded by the caller and passed to the shared sheet as callbacks; Tag scope remains Blocked/Future.
+- Folder/deck/card move flows reuse `MxDestinationPickerSheet`; owner screens perform mutations after selection.
+
+**Still Partial / Target / Future:**
+
+- Dedicated `SortOptionsSheet` is NotStarted/Target. Current sort UI is chip/menu based (`MxSortMenuChip` / `MxSearchSortToolbar`) rather than a bottom sheet.
+- `DailyGoalSheet`, `StreakHistorySheet`, reminder/notification sheets, engagement dashboard sheets, tag-scoped study, Global Search, and Flashcard History remain Target/Future/Blocked. Do not mark them Current without code + tests + docs.
+
 ## Purpose
 
 Reusable bottom-sheet patterns. Identified by anchor (`§name`). Bottom-sheets are preferred over dialogs when:
@@ -239,9 +259,13 @@ Used by: Dashboard "Start new learning" CTA, study result "Study more" CTA.
 > the target, then routes through the Study Entry Gate. **Tag scope is
 > intentionally excluded in V1** (tag-scoped study is Future). Today routes via
 > `goStudyToday`; Deck/Folder via `goStudyEntry(entryType: deck|folder)`. The
-> Folder list is sourced from the read-only `ListAllFoldersUseCase`. Code:
-> `lib/presentation/features/dashboard/widgets/dashboard_scope_picker_sheet.dart`.
-> The tabbed layout remains the target for the study-result "Study more" caller.
+> Dashboard caller lives at
+> `lib/presentation/features/dashboard/widgets/dashboard_scope_picker_sheet.dart`;
+> the shared two-step sheet lives at
+> `lib/presentation/shared/bottom_sheets/study_scope_picker_sheet.dart` and is
+> also used by Study Result "Study more". Deck/Folder options are loaded by the
+> caller and passed as callbacks, so the shared sheet does not own persistent
+> data loading.
 
 ---
 
@@ -623,9 +647,12 @@ Each link opens browser or in-app web view.
 **Contracts:** Sheets are dispatched from screens to invoke use cases per anchor. Primary refs across the catalog: `docs/contracts/usecase-contracts/study.md` (paused-sessions, scope-picker), `docs/contracts/usecase-contracts/engagement.md` (streak-history, daily-goal, reminder-time), `docs/contracts/usecase-contracts/folder.md`/`docs/contracts/usecase-contracts/deck.md` (library-fab, deck-create, item-context, folder-picker, deck-picker), `docs/contracts/usecase-contracts/tag.md` (tag-picker), `docs/contracts/usecase-contracts/bulk.md` + `docs/contracts/usecase-contracts/study.md` §bury/suspend (undo-toast).
 
 **Code paths:**
-- `lib/core/widgets/sheets/**`
-- Naming: `MxSheetPausedSessions`, `MxSheetStreakHistory`, `MxSheetDailyGoal`, `MxSheetReminderTime`, `MxSheetScopePicker`, `MxSheetLibraryFab`, `MxSheetDeckCreate`, `MxSheetItemContext`, `MxSheetCardContext`, `MxSheetFolderPicker`, `MxSheetDeckPicker`, `MxSheetFilterStatus`, `MxSheetTagPicker`, `MxSheetAbout`
-- Undo toast: `MxUndoToast` widget + `UndoToastController` provider with 5s timer
+- Current host/list/picker primitives: `lib/presentation/shared/dialogs/mx_bottom_sheet.dart`, `lib/presentation/shared/dialogs/mx_action_sheet_list.dart`, `lib/presentation/shared/dialogs/mx_destination_picker_sheet.dart`, `lib/presentation/shared/dialogs/mx_card_actions_sheet.dart`
+- Current shared scope picker: `lib/presentation/shared/bottom_sheets/study_scope_picker_sheet.dart`
+- Current Dashboard paused sessions feature sheet: `lib/presentation/features/dashboard/widgets/dashboard_paused_sessions_sheet.dart`
+- Current sort control is not a sheet: `lib/presentation/shared/widgets/mx_sort_menu_chip.dart`, `lib/presentation/shared/widgets/mx_search_sort_toolbar.dart`
+- Target naming for future dedicated sheets: `MxSheetPausedSessions`, `MxSheetStreakHistory`, `MxSheetDailyGoal`, `MxSheetReminderTime`, `MxSheetScopePicker`, `MxSheetLibraryFab`, `MxSheetDeckCreate`, `MxSheetItemContext`, `MxSheetCardContext`, `MxSheetFolderPicker`, `MxSheetDeckPicker`, `MxSheetFilterStatus`, `MxSheetTagPicker`, `MxSheetAbout`
+- Undo toast target: `MxUndoToast` widget + `UndoToastController` provider with 5s timer. Current study-session bury/suspend undo reverts progress state only; active-session reinsert remains follow-up.
 
 **Related wireframes:**
 - Used by virtually every screen; see "Used by:" list in each sheet section

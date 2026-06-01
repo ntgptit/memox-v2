@@ -91,7 +91,7 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
           width: MxContentWidth.reading,
           child: MxErrorState(
             title: l10n.sharedErrorTitle,
-            message: studyErrorMessage(_error),
+            message: studyErrorMessage(_error, l10n),
             details: details,
             onRetry: _startDirectly,
           ),

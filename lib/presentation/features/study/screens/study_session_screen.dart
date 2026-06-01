@@ -57,7 +57,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
       studySessionActionControllerProvider(widget.sessionId),
       (_, next) {
         if (next.hasError) {
-          MxSnackbar.error(context, studyErrorMessage(next.error));
+          MxSnackbar.error(context, studyErrorMessage(next.error, l10n));
         }
       },
     );
@@ -83,7 +83,7 @@ class _StudySessionScreenState extends ConsumerState<StudySessionScreen> {
         actionState: actionState,
         child: MxErrorState(
           title: l10n.sharedErrorTitle,
-          message: studyErrorMessage(error),
+          message: studyErrorMessage(error, l10n),
           onRetry: () =>
               ref.invalidate(studySessionStateProvider(widget.sessionId)),
         ),

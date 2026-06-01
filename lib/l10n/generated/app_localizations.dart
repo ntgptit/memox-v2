@@ -128,6 +128,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get commonClose;
 
+  /// Accessibility label for the drag handle at the top of a modal bottom sheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss bottom sheet'**
+  String get bottomSheetDragHandleLabel;
+
   /// No description provided for @commonCreate.
   ///
   /// In en, this message translates to:
@@ -3353,6 +3359,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get studyCancelAction;
+
+  /// No description provided for @studyActionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Study action failed.'**
+  String get studyActionFailed;
 
   /// No description provided for @studyFinalizeAction.
   ///
