@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-31
 route: /library
 source_specs:
   - docs/business/folder/folder-management.md
@@ -9,7 +9,7 @@ source_specs:
 
 # 02 — Library
 
-## V1 verification status (2026-05-31, Prompt 18)
+## V1 verification status (2026-05-31, Prompt 18/18B)
 
 This screen is **partially Current**. The recursive folder counts (verified Prompt 14) plus the aspects below are verified by code and tests; the remainder is **Future** and intentionally not exposed in V1. Do NOT mark the whole screen Current. The §Layout / §Components / §Actions / §Sort options blocks below describe the **target** design; where they conflict with this section, this section is the current truth.
 
@@ -34,7 +34,7 @@ This screen is **partially Current**. The recursive folder counts (verified Prom
 
 ## Purpose
 
-Root content browser. Shows top-level folders and decks (those whose `folder_id` is the root). Entry point for content management and a launch point for study.
+Root content browser. Current V1 shows top-level folders only. Top-level deck rows (decks whose `folder_id` is the root) remain Future/Target and are not rendered in the current app. Entry point for content management and a launch point for study.
 
 ## Layout
 

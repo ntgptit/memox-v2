@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-30
+last_updated: 2026-06-01
 author: technical lead
 status: living tracker (update each PR)
 purpose: Master coordination table for AI coding agents — one row per (screen × function). Use this to scope work, avoid duplicate effort, and ensure each task touches the right code + doc + wireframe.
@@ -33,13 +33,13 @@ Do not use emoji as status values. Do not embed status markers inside the `Funct
   - `Future` → DO NOT implement in V1. Promotion requires updating the V1 scope guard, matrix, parity audit and related docs.
   - `NotStarted` → safe to pick up; verify nothing else in the matrix already covers the same code path.
   - `Blocked` → DO NOT implement until the `Notes` blocker is resolved. Picking up a `Blocked` row without resolving the blocker breaks downstream work.
-- If the code disagrees with the referenced docs while you are reading them, stop and report drift (per Doc-code parity rule in ../../CLAUDE.md §"Drift detection") before coding.
+- If the code disagrees with the referenced docs while you are reading them, stop and report drift (per Doc-code parity rule in `CLAUDE.md` §"Drift detection") before coding.
 - For any screen row, before coding, also read the matching **mock variants** listed under each screen section. The mapping doc `docs/system-design/mock-design-doc-mapping.md` enumerates the mobile mock variants per screen group and defines the conflict-resolution rule between mock visuals, wireframes, business specs, and contracts. The mock is a **visual reference only** — do not copy CSS, JSX, demo data, or mock-only states into Flutter code (see §12 of the mapping doc).
-- Cross-check the **parity audit** before trusting a row's `Status`. `docs/checklist/wireframe-code-parity-assessment.md` (Revision 3) holds the empirical evidence base — §1 per-screen rows (#01–#25), §2 routes-vs-navigation, §3 cross-cutting drift items (bury/suspend §3.1, streak/engagement §3.2, tag domain §3.3, card history §3.4, global search §3.5, onboarding §3.6, empty-scope matrix §3.7, strict matcher / hint taint §3.10, "doc target, code inline" anti-pattern §3.13). Each screen section in this matrix points to the matching parity row. If parity audit and this matrix disagree, the parity audit usually wins — re-verify status in the same PR.
+- Cross-check the **parity audit** before trusting a row's `Status`. `docs/checklist/wireframe-code-parity-assessment.md` holds the empirical evidence base — §1 per-screen rows (#01–#25), §2 routes-vs-navigation, §3 cross-cutting drift items (bury/suspend §3.1, streak/engagement §3.2, tag domain §3.3, card history §3.4, global search §3.5, onboarding §3.6, empty-scope matrix §3.7, strict matcher / hint taint §3.10, "doc target, code inline" anti-pattern §3.13). Each screen section in this matrix points to the matching parity row. If parity audit and this matrix disagree, the parity audit usually wins — re-verify status in the same PR.
 - Update this matrix in the **same PR** that changes implementation status. Stale status here misleads future agents.
 - This matrix does not replace business docs, wireframes, contracts, the decision table, the mock-design mapping, or the parity audit. It indexes them.
 
-Path convention for cross-references follows ../../CLAUDE.md §"Path convention for cross-references": repo-root absolute, no leading slash.
+Path convention for cross-references follows `CLAUDE.md` §"Path convention for cross-references": repo-root absolute, no leading slash.
 
 ## Testing expectation
 
@@ -74,7 +74,7 @@ Parity audit: routes-vs-navigation tracked in `docs/checklist/wireframe-code-par
 | Current | _foundation_ | Code style / naming | Repo-wide style contract | Repo-wide (no single owner) | `docs/contracts/code-style.md` | — | Enforced by `flutter analyze` + reviewer judgment; no dedicated tests. |
 | Current | _foundation_ | Route registry | `RouteNames`, `RoutePaths`, `RouteDefaults`, `AppNavigation` | `lib/app/router/route_names.dart`, `lib/app/router/app_navigation.dart`, `lib/app/router/app_router.dart` | `docs/business/navigation/navigation-flow.md` | — | Covered by router/navigation tests under `test/app/router/`. |
 | Current | _foundation_ | Theme tokens + design system | `AppSpacing`, `AppRadius`, `AppIconSizes`, color scheme | `lib/core/theme/**` | `docs/ui-ux/ui-ux-contract.md`, `docs/system-design/MemoX Design System/README.md` | — | Foundation; coverage via consumer widget tests. |
-| Current | _foundation_ | Localization keys | EN/VI ARB sources + generated delegates | `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/ui-ux/l10n-copy-contract.md` | — | Generated `lib/l10n/generated/**` MUST NOT be hand-edited (per ../../CLAUDE.md hard rules). |
+| Current | _foundation_ | Localization keys | EN/VI ARB sources + generated delegates | `lib/l10n/app_en.arb`, `lib/l10n/app_vi.arb` | `docs/ui-ux/l10n-copy-contract.md` | — | Generated `lib/l10n/generated/**` MUST NOT be hand-edited (per `CLAUDE.md` hard rules). |
 | Current | _foundation_ | Decision-table rows | `S*`, `D*`, `F*`, `SY*` row IDs | `docs/decision-tables/memox-core-decision-table.md` | self | — | Tests cite row IDs in description strings. |
 
 ## 01. Dashboard (`/home`)
@@ -208,7 +208,7 @@ Parity audit: row #08 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 Mock refs: variants `22a`–`22e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.13. Note: variant `22e` (partial history) hints at the migration dependency tracked in the `Blocked` status of these rows.
 
-Parity audit: row #09 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — missing in code (D>C, the parity audit's "MISSING" tier), P1. `grep "*history*" lib/` empty; `study_attempts_table` data exists but no `getAttemptsByFlashcard` query. Cross-cutting: §3.4 card history — schema present, domain empty, screen empty. Product decision resolved 2026-05-29: downgraded to Future Proposal for V1.
+Parity audit: row #09 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — intentionally absent in V1 after the 2026-05-29 product decision. `study_attempts_table` data exists, but the history screen/use cases and required `last_reset_at` / `box_before` / `box_after` migration remain Future Proposal / Migration Required. Cross-cutting: §3.4 card history.
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -234,7 +234,7 @@ Parity audit: row #10 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 Mock refs: variants `24a`–`24e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.15. The mapping doc now treats this group as a future visual reference; matrix status is `Future` because the full global search screen was downgraded out of V1.
 
-Parity audit: row #11 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — full global search is missing in code by design after the 2026-05-29 decision. V1 keeps inline/scope-local search only. Do not add `SearchScreen`, `GlobalSearchUseCase`, `/library/search`, or `search.recent` until the Future Proposal is promoted.
+Parity audit: row #11 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — full global search is intentionally absent in V1 after the 2026-05-29 decision. V1 keeps inline/scope-local search only. Do not add `SearchScreen`, `GlobalSearchUseCase`, `/library/search`, or `search.recent` until the Future Proposal is promoted.
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -447,4 +447,4 @@ Parity audit: row #25 in `docs/checklist/wireframe-code-parity-assessment.md` §
 2. Adding a function row: confirm the row maps to exactly one feature; if it spans many, split it. If a `Blocked` row's blocker is also tracked under a §3 cross-cutting item in the parity audit, cite the §3.N reference in `Notes`.
 3. Status changes happen in the same PR that lands the corresponding code or doc change. Stale status here misleads future agents.
 4. Removing a row: only when the feature is removed from the spec. Otherwise change the status to `NotStarted` or `Blocked` with a note explaining why.
-5. Doc-code parity: this file is a navigator, not a source of truth. If a doc cell disagrees with reality, update the underlying doc first, then mirror here. See Doc-code parity rule in ../../CLAUDE.md.
+5. Doc-code parity: this file is a navigator, not a source of truth. If a doc cell disagrees with reality, update the underlying doc first, then mirror here. See Doc-code parity rule in `CLAUDE.md`.

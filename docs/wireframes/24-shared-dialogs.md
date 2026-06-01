@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-01
 source_specs:
   - docs/business/resume/resume-session.md
   - docs/business/account-sync/account-sync.md

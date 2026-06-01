@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-01
 applies_to: routing, navigation, deep links
 ---
 
@@ -54,7 +54,7 @@ Route name constants (from `lib/app/router/route_names.dart`): `RouteNames.setti
 | Flashcard history | Future Proposal; no live V1 route | No |
 | Deck import | `/library/deck/:deckId/import` | No |
 | Library search | Future Proposal; no live V1 route | Yes |
-| Study entry | `/library/study/:entryType/:entryRefId` (Current entryType: `deck` \| `folder`; `tag` is Target/Future) | No |
+| Study entry | `/library/study/:entryType/:entryRefId` (Current entryType: `deck` \| `folder`; `tag` is Blocked/Future) | No |
 | Today study | `/library/study/today` | No |
 | Study session | `/library/study/session/:sessionId` | No |
 | Study result | `/library/study/session/:sessionId/result` | No |
@@ -62,7 +62,7 @@ Route name constants (from `lib/app/router/route_names.dart`): `RouteNames.setti
 Notes:
 
 - Query-string filters on the flashcard list are application conventions; verify GoRouter declarations in `lib/presentation/features/**/routes/*.dart`.
-- The `tag` entry type, flashcard history route, and library search route are Future/Target items. Add route constants in `RouteNames` / `RoutePaths` and wire them up only when the related scope guard promotes them.
+- The `tag` entry type is Blocked/Future until `StudyEntryType.tag` and tag-scope queries are promoted. Flashcard history and library search routes are Future Proposal. Add route constants in `RouteNames` / `RoutePaths` and wire any of these only when the related scope guard promotes them.
 
 ## Push vs Go rules
 

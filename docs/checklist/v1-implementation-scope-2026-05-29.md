@@ -45,6 +45,12 @@ These specs remain documented for future planning, but must not be implemented d
 | Flashcard history screen | Future Proposal | Schema migration for `last_reset_at`, `box_before`, `box_after`; route/link approval; history use case/repository contract confirmation |
 | Global search screen | Future Proposal | Product approval for cross-scope search, recent search persistence, route, and result grouping |
 | Full onboarding flow | Future Proposal | Product approval for welcome screen, onboarding feature folder, restore prompt branch, and first-launch gating |
+| Library root-level decks | Future / Target | Product decision for root-deck UX, read-model support for root decks, navigation tests, and updated Library wireframe/matrix/parity rows |
+| Folder Detail study/today/resume banners | Future / Target | Folder-scoped study CTA/resume ownership decision, recursive count/read-model support, route tests, and updated Folder Detail wireframe/matrix/parity rows |
+| Full Drive restore-protection flow | Partial / Target | Pre-restore local snapshot path, Upload local first branch, second destructive confirmation, and restore-abort-on-snapshot-failure tests |
+| Learning engagement controls | Future / Target | Daily-goal/streak/reminder use cases, persistence/notification decisions, settings UI tests, and engagement docs update |
+| Audio/Speech independent per-language tabs | Future / Target | Approved per-language storage/API migration, deck-language gating tests, and TTS docs update |
+| Shared dialog/bottom-sheet catalog expansion | Partial / Target | Dedicated implementation tasks for strong-confirm account removal, SortOptionsSheet, daily-goal/streak/reminder sheets, and any promoted shared primitives |
 
 ## Migration blockers
 
@@ -55,6 +61,12 @@ The following features are not safe to implement until the schema migration is i
 | Bury / suspend | `flashcard_progress.buried_until`, `flashcard_progress.is_suspended` |
 | Card history | `flashcard_progress.last_reset_at`, `study_attempts.box_before`, `study_attempts.box_after` |
 | TTS per deck target language | `decks.target_language` |
+
+Additional blockers:
+
+| Blocked area | Blocker |
+| --- | --- |
+| Tag-scoped study | `StudyEntryType.tag`, canonical tag `entry_ref_id` encoding, tag-scope query, empty-scope rows, route/navigation tests |
 
 ## Agent rules
 

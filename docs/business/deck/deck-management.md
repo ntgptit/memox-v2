@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-01
 applies_to: deck entity and deck management feature
 ---
 
@@ -101,7 +101,7 @@ Do not add a separate deck detail route unless route contract and navigation doc
 
 **Wireframes:**
 
-- `docs/wireframes/02-library.md` — Library shows top-level decks
+- `docs/wireframes/02-library.md` — Current V1 Library does not render root-level decks; top-level deck rows are Future/Target
 - `docs/wireframes/05-folder-detail.md` — decks listed inside a folder (decks mode)
 - `docs/wireframes/06-flashcard-list.md` — deck content view + deck-level CTAs
 - `docs/wireframes/10-deck-import.md` — import flow into a deck

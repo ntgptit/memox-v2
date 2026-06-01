@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-05-31
 route: /progress
 source_specs:
   - docs/business/engagement/dashboard-engagement.md

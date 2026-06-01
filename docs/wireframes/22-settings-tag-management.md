@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-01
 route: /settings/learning/tags
 source_specs:
   - docs/business/tags/tag-system.md
