@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-01
 status: contract
 ---
 
@@ -28,12 +28,19 @@ lib/presentation/features/{feature}/
 ```
 lib/domain/
 ├── entities/                 # pure entity classes (freezed)
+├── enums/                    # current enum owners
 ├── repositories/             # repository INTERFACES (abstract)
-├── usecases/{feature}/       # use case classes
-├── types/                    # enums, typedefs, value objects (see types-catalog.md)
-├── srs/                      # SRS pure logic
-└── study/                    # mode helpers (strict_matcher, distractor_sampler, match_board_composer, flow_validator, swipe_to_grade)
+├── services/                 # domain service interfaces/policies
+├── usecases/                 # use case classes grouped by feature file
+├── value_objects/            # cross-feature read models and query objects
+├── tag/                      # tag validation logic
+└── study/                    # study entities, SRS policy, strategies, mode helpers, repo port
 ```
+
+`docs/contracts/types-catalog.md` remains the semantic registry for domain
+types. The current code owners are `lib/domain/enums/**`,
+`lib/domain/value_objects/**`, and selected `lib/domain/study/**` files; a
+future consolidation into `lib/domain/types/**` requires an explicit migration.
 
 ### Data (layer-first)
 
@@ -50,22 +57,23 @@ lib/data/
 └── sync/                     # Drive sync, snapshot, manifest
 ```
 
-### Core (shared infrastructure)
+### Core + presentation shared infrastructure
 
 ```
 lib/core/
-├── theme/
-├── widgets/                  # Mx* shared widgets
-│   ├── dialogs/
-│   ├── sheets/
-│   ├── states/               # MxLoadingState, MxEmptyState, MxErrorState
-│   └── buttons/
-├── error/                    # Failure base, validation messages
-├── tts/
-├── auth/
-├── notifications/
-├── logging/
-└── utils/                    # pure helpers
+├── theme/                    # tokens, schemes, component themes, responsive helpers
+└── ...
+
+lib/presentation/shared/
+├── bottom_sheets/            # shared composed sheet entrypoints
+├── dialogs/                  # Mx* dialogs and sheet primitives
+├── feedback/                 # snackbars, banners, failure text
+├── layouts/                  # shell/layout primitives
+├── motion/                   # shared durations/transition helpers
+├── options/                  # shared option models
+├── providers/                # cross-feature presentation providers
+├── viewmodels/               # shared presentation action helpers
+└── widgets/                  # Mx* buttons, cards, chips, inputs, navigation, states
 ```
 
 ### App (boot)
@@ -82,8 +90,8 @@ lib/app/
 ```
 lib/l10n/
 ├── app_en.arb                # source of truth (English)
-├── app_vi.arb                # Vietnamese (planned)
-├── app_ko.arb                # Korean (planned)
+├── app_vi.arb                # Vietnamese
+├── app_ko.arb                # Korean (planned; not present until added with l10n generation)
 └── generated/                # codegen output; DO NOT EDIT
 ```
 
