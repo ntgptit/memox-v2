@@ -20,6 +20,13 @@ Reusable dialog patterns referenced across screens. Each dialog is identified by
 
 Current V1 shared primitives are `MxDialog`, `MxConfirmationDialog`, `MxNameDialog`, and `MxDialogResumeOrStartOver`.
 
+Current V1 return contracts are intentionally mixed:
+- `MxConfirmationDialog.show(...)` returns `Future<bool>` where `true` means confirmed and `false` means Cancel/system dismissal.
+- `MxNameDialog.show(...)` returns `Future<String?>` where a trimmed name means confirmed and `null` means Cancel/system dismissal.
+- `MxDialogResumeOrStartOver.show(...)` returns typed `Future<MxResumeChoice?>` for the current multi-branch resume choice.
+
+Future/Target complex multi-branch dialogs should prefer typed result classes or sealed variants instead of ambiguous raw primitives.
+
 Current composed usages include destructive confirmations for flashcard/folder/deck/tag deletion, tag merge, study-session cancel/discard, account sign-out/disconnect, manual Drive upload/restore confirmation, dirty-editor discard, and resume/start-over conflict handling. These reuse existing owner screens and use cases; there is no standalone dialog gallery.
 
 Target/Partial catalog items remain documented below but are not Current unless named in the Current list above. Strong-confirm typed input for account removal is Target only. The full restore-warning two-tier flow, Upload local first branch, second destructive confirmation, and pre-restore snapshot flow remain Partial/Target per `docs/business/account-sync/account-sync.md` and `docs/wireframes/19-settings-account.md`. V1 has no onboarding dialog or wizard flow.
@@ -424,7 +431,7 @@ When fingerprints match, this dialog still appears but the warning is softer and
 - ❌ Apply strong-variant destructive (typed confirmation) outside account removal without a spec update.
 - ❌ Hardcode dialog copy in widget. All strings from ARB (`error_*`, `dialog_*`).
 - ❌ Show dialog from build method. Always from callback.
-- ❌ Return raw `String` or `bool` from dialog. Use typed result class with sealed variants.
+- ❌ Change Current V1 return contracts for catalog purity: `MxConfirmationDialog` returns `bool`, `MxNameDialog` returns `String?`, and `MxDialogResumeOrStartOver` returns typed `MxResumeChoice?`. For new complex dialogs, avoid ambiguous raw primitives when a typed result class or sealed variant is needed.
 
 ## Cross-cutting rules
 
@@ -440,6 +447,7 @@ When fingerprints match, this dialog still appears but the warning is softer and
 - Do NOT promote §restore-warning to Current without the two-tier confirmation and 5s timeout.
 - Do NOT use generic "Are you sure?" copy. Each dialog states the specific consequence.
 - Strong-variant destructive (typed confirmation) is reserved for account removal. Don't apply it elsewhere without spec update.
+- Keep Current V1 shared dialog return contracts as documented above. For new complex multi-branch dialogs, prefer typed result classes or sealed variants when a primitive would be ambiguous.
 
 ## Implementation refs
 
@@ -464,7 +472,7 @@ When fingerprints match, this dialog still appears but the warning is softer and
 - Shared dialogs live under `lib/presentation/shared/dialogs/**` (each as its own widget file), built on `MxDialog` / `MxConfirmationDialog`.
 - Naming: `MxDialogResumeOrStartOver`, `MxDialogDiscardSession`, `MxDialogDiscardChanges`, `MxDialogExitSession`, `MxDialogDeleteConfirm`, `MxDialogBulkDelete`, `MxDialogResetProgress`, `MxDialogRename`, `MxDialogFolderCreate`, `MxDialogRestoreWarning`
 - Implemented so far: `MxDialogResumeOrStartOver` (`mx_dialog_resume_or_start_over.dart`, Prompt 05) returns typed `MxResumeChoice?`; §discard-session is composed from `MxConfirmationDialog` (danger tone) by the entry gate and Dashboard/Progress resume surfaces.
-- Each takes a typed result via Navigator.pop
+- Return contracts follow the Current V1 list above: confirmation dialogs use `bool`, name dialogs use `String?`, and resume/start-over uses typed `MxResumeChoice?`.
 
 **Related wireframes:**
 - Used by virtually every screen; see "Used by:" list in each dialog section
