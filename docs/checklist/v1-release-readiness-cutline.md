@@ -150,3 +150,13 @@ registry/navigation helpers out of the live V1 route surface. Dashboard keeps
 the static `0 days` streak stat as Option A: a simple visual/stat placeholder
 only. No production code, ARB/l10n, schema, dependency, route, SRS, or visual
 redesign change was made.
+
+## Prompt 33 Decision
+
+Prompt 33 status: PASS.
+
+Release-note-ready docs now live in
+`docs/checklist/v1-release-notes-input.md`, and the manual QA smoke package now
+lives in `docs/checklist/v1-release-qa-smoke-plan.md`. The V1 cutline above is
+unchanged: Current and Partial scopes remain shippable as named, while
+Future/Target/Blocked items remain excluded from V1.

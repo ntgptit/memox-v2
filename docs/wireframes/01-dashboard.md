@@ -109,7 +109,7 @@ Onboarding state replaces the entire body when `decks = 0 AND flashcards = 0`. R
 
 | Param | Source | Notes |
 | --- | --- | --- |
-| (none) | route | Dashboard is the landing route with no params |
+| (none) | route | Dashboard is a top-level route with no params |
 
 ## Data to load
 
@@ -132,7 +132,8 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 - ❌ Call repositories or DAOs directly from `DashboardScreen` widget. Go through `DashboardNotifier`.
 - ❌ Show "Streak: 0" label. Hide streak chip when streak is 0.
 - ❌ Show goal ring when `goalEnabled == false`. Hide entirely.
-- ❌ Replace landing screen with Library. Dashboard is the landing route.
+- ❌ Change the current V1 launch default or promote Dashboard as the launch
+  default without a dedicated navigation task.
 - ❌ Cache resume card more than 30 seconds; it must refresh on session state changes.
 - ❌ Refresh entire Dashboard on a single section change (e.g., goal update shouldn't trigger streak query).
 - ❌ Compute due count inside widget build; use a provider.
@@ -196,8 +197,10 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 
 ## Navigation in
 
-- App launch (default).
 - Bottom nav tap "Home".
+- Deep link to `/home`.
+- Target/Future launch default after a dedicated navigation task. Current V1 app
+  boot still redirects `/` to Library.
 - Deep link from notification when no resumable session exists.
 
 ## Navigation out
@@ -230,7 +233,9 @@ All queries fire in parallel via separate providers; UI shows skeletons per card
 
 ## Rules
 
-- Dashboard MUST be the landing screen, not Library.
+- Target/Future: Dashboard is the intended learning-first landing screen.
+  Current V1 app boot still redirects `/` to Library; do not change that in a
+  release-docs task.
 - Resume card MUST appear above everything else when present.
 - Onboarding state MUST replace ALL other Dashboard content when triggered.
 - Goal ring MUST be hidden (not greyed) when goal disabled.

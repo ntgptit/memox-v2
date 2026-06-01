@@ -165,7 +165,10 @@ If app fires a reminder but permission has been revoked, fail silently. Periodic
 
 ## Landing screen
 
-The default screen on app launch is **Dashboard** with a strong "Today" focus.
+Target/Future engagement behavior: the default screen on app launch is
+**Dashboard** with a strong "Today" focus. Current V1 app boot still redirects
+`/` to `RouteDefaults.initialLocation = RoutePaths.library`; changing that
+default requires a dedicated navigation task with route tests and docs updates.
 
 Order of Dashboard content (top to bottom):
 
@@ -185,9 +188,13 @@ If user has zero content (no decks, no flashcards), Dashboard shows onboarding s
 
 ### Why Dashboard, not Library, as landing
 
-Library is a content-management screen. For a learning app, the default action is "study", not "browse". Library remains one tap away in bottom nav.
+Target rationale: Library is a content-management screen. For a learning app,
+the default action is "study", not "browse". Library remains one tap away in
+bottom nav.
 
-This decision is explicit. Do not switch the default tab to Library.
+This target decision is explicit, but it is not the current V1 boot behavior.
+Do not change the default tab during V1 release-polish work without an explicit
+navigation task.
 
 ## Data sources
 
@@ -224,7 +231,7 @@ All queries SHOULD be cheap (indexed on `attempted_at`, `due_at`, `status`). If 
 - Notification fires at most once per day.
 - Reminder body MUST personalize based on session state (resume vs new vs goal already met).
 - Goal already met → suppress reminder.
-- Landing screen MUST be Dashboard. Library is NOT the landing.
+- Target/Future: landing screen is Dashboard. Current V1 still boots `/` to Library.
 - Onboarding state replaces Dashboard only when zero decks AND zero flashcards exist.
 
 ## Required UI states
@@ -251,7 +258,8 @@ All queries SHOULD be cheap (indexed on `attempted_at`, `due_at`, `status`). If 
   promotes the feature with code, tests, persistence, and docs.
 - Do NOT add a second daily reminder time. Single time only.
 - Do NOT auto-enable notifications. Always require explicit user toggle and permission flow.
-- Do NOT switch landing screen from Dashboard without explicit user setting and updated doc.
+- Do NOT change the current V1 boot default or promote the target Dashboard
+  landing behavior without an explicit navigation task and updated docs.
 - Do NOT add streak freezes, leaderboards, social features. Out of scope for personal-use phase.
 - Streak break notice fires once per break event. Do not repeat.
 - Day boundary calculation MUST use local timezone. Do not use UTC.
@@ -282,7 +290,7 @@ All queries SHOULD be cheap (indexed on `attempted_at`, `due_at`, `status`). If 
 
 - `docs/business/study/study-flow.md` — `today` entry creates global SRS review session
 - `docs/business/resume/resume-session.md` — Dashboard surfaces resumable sessions
-- `docs/business/navigation/navigation-flow.md` — `/home` is the landing route (NOT Library)
+- `docs/business/navigation/navigation-flow.md` — current V1 boot redirects `/` to Library; Dashboard remains a top-level destination
 
 **Source files to inspect:**
 
