@@ -1525,13 +1525,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Google Drive is up to date.'), findsOneWidget);
-    expect(find.text('Local data backed up to Google Drive.'), findsNothing);
+    expect(find.text('Local data backed up to Google Drive.'), findsOneWidget);
     expect(repository.uploadLocalCount, 1);
   });
 
-  testWidgets('DT14 onUpdate: Drive sync restore requires confirmation', (
-    tester,
-  ) async {
+  testWidgets(
+    'DT14 onUpdate: Drive sync restore opens destructive warning before restore',
+    (tester) async {
     final remote = _remoteSnapshot();
     final repository = _FakeDriveSyncRepository(
       loadStatusResult: DriveSyncStatus(
@@ -1554,13 +1554,19 @@ void main() {
     await tester.tap(find.text('Download Drive data to this device'));
     await tester.pumpAndSettle();
     expect(find.text('Restore Drive copy?'), findsOneWidget);
+    expect(
+      find.textContaining('Recent local changes that were not uploaded may be lost'),
+      findsOneWidget,
+    );
+    expect(repository.restoreDriveCount, 0);
     await tester.tap(find.text('Restore from Drive'));
     await tester.pumpAndSettle();
 
     expect(find.text('Google Drive is up to date.'), findsOneWidget);
-    expect(find.text('Drive copy restored.'), findsNothing);
+    expect(find.text('Drive copy restored.'), findsOneWidget);
     expect(repository.restoreDriveCount, 1);
-  });
+    },
+  );
 
   testWidgets('DT15 onUpdate: canceling sync confirmation does not upload', (
     tester,
@@ -1619,6 +1625,39 @@ void main() {
       expect(find.text('Drive copy restored.'), findsNothing);
     },
   );
+
+  testWidgets('DT14b onUpdate: Drive sync restore failure shows safe feedback', (
+    tester,
+  ) async {
+    const diagnostic = 'Restore snapshot failed.';
+    final remote = _remoteSnapshot();
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: DriveSyncStatus(
+        kind: DriveSyncStatusKind.ready,
+        remote: remote,
+      ),
+      restoreResult: const DriveSyncRunResult.failed(
+        DriveSyncStatus.failure(diagnostic),
+        diagnostic,
+      ),
+    );
+    await _pumpSettings(
+      tester,
+      child: const AccountSettingsScreen(),
+      driveSyncRepository: repository,
+    );
+
+    await tester.tap(find.byTooltip('Sync now'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Download Drive data to this device'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restore from Drive'));
+    await tester.pumpAndSettle();
+
+    expect(repository.restoreDriveCount, 1);
+    expect(find.text('Drive sync failed. Try again.'), findsOneWidget);
+    expect(find.text(diagnostic), findsOneWidget);
+  });
 
   testWidgets('DT12 onUpdate: web Drive scope reconnect enables Drive sync', (
     tester,

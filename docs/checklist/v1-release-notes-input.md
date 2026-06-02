@@ -95,8 +95,8 @@ It intentionally excludes Future features listed in this document and in
 ### Account Settings
 
 - Supports Google sign-in, sign-out, disconnect, and safe auth error handling.
-- Supports manual Drive upload and manual Drive restore basics.
-- Keeps full restore-protection and account-removal strong-confirm out of V1.
+- Supports manual Drive upload and manual Drive restore basics with destructive restore warning, cancel/confirm protection, duplicate-running guard, and visible restore success/failure feedback.
+- Keeps full restore-protection features such as pre-restore snapshots, restore history, cloud comparison/conflict resolution, Upload local first, second destructive confirmation, and account-removal strong-confirm out of V1.
 
 ### Learning Settings
 
@@ -127,7 +127,7 @@ It intentionally excludes Future features listed in this document and in
 - Library is folders-first; root-level decks remain Future.
 - Dashboard has a static `0 days` streak stat placeholder only.
 - Settings Hub has current rows and routes; some dynamic subtitles and the About sheet remain Target.
-- Account manual Drive upload/restore exists; full restore-protection remains Target.
+- Account manual Drive upload/restore exists with Prompt 41 current restore warning/guard/feedback; full restore-protection remains Target.
 - Learning Settings has current study defaults; daily goal, streak, and reminders remain Future.
 - Shared Dialogs/Bottom Sheets have current primitives; the full target catalog remains Future/Target.
 
@@ -151,7 +151,7 @@ It intentionally excludes Future features listed in this document and in
 - Search is local to the current screen.
 - Streak is shown as a simple placeholder, not a full engagement system.
 - Tags can be managed, but studying by tag is not included.
-- Drive sync is basic/manual; advanced restore protection is not complete.
+- Drive sync is basic/manual; current restore warning/guard/feedback exists, but advanced restore protection is not complete.
 - The app currently opens Library by default; Dashboard remains available from the Home tab.
 
 ## F. Internal Release Classification

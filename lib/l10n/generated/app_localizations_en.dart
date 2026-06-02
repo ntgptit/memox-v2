@@ -866,7 +866,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsDriveSyncRestoreConfirmMessage =>
-      'This will replace this device\'s local database and settings with the Google Drive snapshot.';
+      'Restoring from Drive will replace this device\'s local database and settings with backup data. Recent local changes that were not uploaded may be lost. Upload local data first if you are unsure, and continue only if you trust this Drive backup.';
 
   @override
   String get settingsDriveSyncRestoreConfirmAction => 'Restore from Drive';

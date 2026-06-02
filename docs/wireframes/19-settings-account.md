@@ -19,8 +19,8 @@ Prompt 22 (2026-05-31) verifies the Account Settings V1 route/action contract. C
 | --- | --- | --- |
 | Route `/settings/account` | Current | Reachable from Settings Hub; hides shell navigation; back returns to hub when pushed from the hub. |
 | Account sign-in/sign-out/disconnect | Current V1 | Implemented through account use cases and `AccountSettingsController`; sign-in failure uses safe localized copy and does not render auth technical detail. |
-| Manual Drive upload/restore | Current V1 manual flow | Implemented through Drive sync use cases and `DriveSyncSettingsController`; upload/restore run from Account detail only, with direction and confirmation sheets. |
-| Pre-restore local safety snapshot + Upload local first + second destructive confirmation | Target/Partial | Required target behavior in this wireframe/business doc; not promoted by Prompt 22. Current V1 restore is replacement-only with a single restore confirmation. |
+| Manual Drive upload/restore | Current V1 manual flow + Prompt 41 hardening | Implemented through Drive sync use cases and `DriveSyncSettingsController`; upload/restore run from Account detail only, with direction and confirmation sheets. Restore shows destructive warning copy before replacement, Cancel is a no-op, Continue restores once, duplicate restore while running is ignored, and success/failure feedback is visible. |
+| Pre-restore local safety snapshot + Upload local first + second destructive confirmation | Target/Partial | Required target behavior in this wireframe/business doc; not promoted by Prompt 41. Current post-RC restore protection is replacement-only with a single destructive restore confirmation and running-action guard. |
 | Account removal / switch account strong confirmation | Target/Future | Not exposed in current V1 Account Settings. Do not implement in Prompt 22 unless a dedicated account-removal task adds code + tests + docs. |
 | Token-expired reconnect banner | Target/Partial | Current V1 maps Drive reauthorization to reconnect-required account/sync states; the explicit top banner remains Target. |
 
@@ -215,7 +215,7 @@ Target/Partial: snapshot is mandatory in the full restore-protection design. If 
 | Tap account row | Tap | No-op (read-only). |
 | Tap Edit device label | Tap | Open rename dialog (`docs/wireframes/24-shared-dialogs.md` §rename). |
 | Tap "Upload to Drive" | Tap | Run upload use case; show progress inline. |
-| Tap "Restore from Drive" | Tap | Current V1 runs the existing manual restore flow. Target/Partial restore protection adds warning → snapshot phase → replace phase. |
+| Tap "Restore from Drive" | Tap | Current post-RC flow opens a destructive restore warning before running replacement-only restore; Cancel does not restore and Continue restore restores once. Target/Partial full restore protection adds Upload local first → second warning → snapshot phase → replace phase. |
 | Tap "Sign out" | Tap | Confirm dialog. On confirm: clear local session/link, preserve local data, return to signed-out layout. |
 | Tap "Disconnect Google" | Tap | Current V1 account-detail action. Confirm dialog; on confirm revoke Drive consent/tokens for this app, preserve Drive backup and local data, return to signed-out layout. |
 | Tap "Switch / remove account" | Tap | Target/Future only. Strong destructive dialog: "Remove this account and erase all data on this device?" On confirm: wipe local DB, return to signed-out. |

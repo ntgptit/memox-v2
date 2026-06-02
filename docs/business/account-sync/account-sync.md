@@ -252,6 +252,8 @@ Three user-triggered operations, all returning `DriveSyncRunResult`:
 
 Restore is destructive: it replaces the local database entirely. The user MUST be protected from accidental data loss when local has unsynced changes.
 
+**Implementation status (Prompt 41, 2026-06-02):** Current post-RC hardening adds a destructive restore warning before the replacement-only restore use case runs. The warning states that local data/settings will be replaced, recent local changes that were not uploaded may be lost, the user should upload local data first if unsure, and the user should continue only when they trust the Drive backup. Cancel is a no-op, Continue restore calls the restore action once, duplicate restore calls while a restore is running are ignored by the controller, restore success is shown through Drive sync feedback, and restore failure shows safe failure feedback with retry available. This batch does not add schema, dependencies, pre-restore local snapshot files, restore history, cloud version comparison, or conflict resolution.
+
 **Implementation status (Prompt 22, 2026-05-31):** current V1 code has manual Drive upload/restore use cases and Account-detail confirmation UI. `synced` disables manual sync actions; `noRemoteSnapshot` permits upload but not restore. The full target restore-protection surface below (local pre-restore snapshot notice/path, "Upload local first" primary branch, and second destructive confirmation) remains Partial/Target and is not promoted by Prompt 22.
 
 ### Pre-restore checks
@@ -436,6 +438,7 @@ Drive sync section (current V1 is always present as status guidance; actions are
 - Restore button: disabled when `noRemoteSnapshot` or `synced` or in flight.
 - Show progress indicator during action.
 - Show result via shared feedback (success or failure message).
+- Current post-RC restore hardening: before restore runs, show destructive warning copy that local data/settings will be replaced and unsynced local changes may be lost; Cancel does not restore and Continue restore restores once.
 
 ### Web platform
 

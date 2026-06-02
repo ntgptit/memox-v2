@@ -27,7 +27,7 @@ Current V1 return contracts are intentionally mixed:
 
 Future/Target complex multi-branch dialogs should prefer typed result classes or sealed variants instead of ambiguous raw primitives.
 
-Current composed usages include destructive confirmations for flashcard/folder/deck/tag deletion, tag merge, study-session cancel/discard, account sign-out/disconnect, manual Drive upload/restore confirmation, dirty-editor discard, and resume/start-over conflict handling. These reuse existing owner screens and use cases; there is no standalone dialog gallery.
+Current composed usages include destructive confirmations for flashcard/folder/deck/tag deletion, tag merge, study-session cancel/discard, account sign-out/disconnect, manual Drive upload/restore confirmation, Prompt 41 destructive Drive restore warning copy, dirty-editor discard, and resume/start-over conflict handling. These reuse existing owner screens and use cases; there is no standalone dialog gallery.
 
 Target/Partial catalog items remain documented below but are not Current unless named in the Current list above. Strong-confirm typed input for account removal is Target only. The full restore-warning two-tier flow, Upload local first branch, second destructive confirmation, and pre-restore snapshot flow remain Partial/Target per `docs/business/account-sync/account-sync.md` and `docs/wireframes/19-settings-account.md`. V1 has no onboarding dialog or wizard flow.
 
@@ -352,7 +352,7 @@ Used by: Library FAB and folder detail FAB. Future full onboarding or zero-conte
 
 Used by: settings account (19) Restore button when fingerprint differs.
 
-**Partial/Target only.** Current V1 Account Settings has manual Drive upload/restore confirmation and a busy progress dialog, but it does not implement this two-tier restore-warning, Upload local first branch, second destructive confirmation, or pre-restore snapshot path.
+**Partial/Target only.** Current V1 Account Settings has manual Drive upload/restore confirmation and a busy progress dialog. Prompt 41 adds stronger destructive restore warning copy, cancel/confirm protection, duplicate-running guard, and visible success/failure feedback, but it does not implement this two-tier restore-warning, Upload local first branch, second destructive confirmation, or pre-restore snapshot path.
 
 Two-tier confirmation: primary "Upload local first" CTA + secondary "Restore anyway" requires second tap.
 

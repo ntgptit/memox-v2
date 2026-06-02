@@ -302,10 +302,15 @@ Agents may split into feature-specific decision tables when a feature grows beyo
 | SY10 | Metadata | Loaded for different account | Return null (account mismatch) | C1 | `test/data/sync/drive_sync_metadata_store_test.dart::SY10` |
 | SY11 | Device id | First call | Generate + persist via `IdGenerator` | C0+C1 | `test/data/sync/drive_sync_metadata_store_test.dart::SY11` |
 | SY12 | Cross-device | Remote `deviceId` differs from local | `remoteIsFromOtherDevice` = true | C1 | `test/domain/entities/drive_sync_status_test.dart::SY12` |
-| SY13 | Restore safety | Local fingerprint != last-synced fingerprint | Show strong warning dialog with "Upload local first" primary | C0+C1 | `test/features/sync/restore_safety_test.dart::SY13` |
-| SY14 | Restore safety | Pre-restore snapshot save fails | Abort restore; do not proceed | C1 | `test/features/sync/restore_safety_test.dart::SY14` |
-| SY15 | Restore safety | Pre-restore snapshot saved | Surface path notice after restore | C0+C1 | `test/features/sync/restore_safety_test.dart::SY15` |
-| SY16 | Restore safety | "Restore anyway" path | Requires second confirmation tap | C1 | `test/features/sync/restore_safety_test.dart::SY16` |
+| SY13 | Current restore protection | Restore selected from Account Settings | Show destructive warning before restore; restore has not executed yet | C0+C1 | `test/presentation/settings_screen_test.dart::DT14` |
+| SY14 | Current restore protection | Restore warning canceled | Do not call restore | C1 | `test/presentation/settings_screen_test.dart::DT15b` |
+| SY15 | Current restore protection | Restore warning confirmed | Call restore once and show success feedback on success | C0+C1 | `test/presentation/settings_screen_test.dart::DT14` |
+| SY16 | Current restore protection | Duplicate restore call while first restore is running | Ignore the duplicate call; restore repository runs once | C1 | `test/presentation/drive_sync_viewmodel_test.dart::restoreDriveToLocal: duplicate call while busy is ignored` |
+| SY17 | Current restore protection | Restore returns failed result | Show safe failure feedback and keep retry available | C1 | `test/presentation/settings_screen_test.dart::DT14b` |
+| SY18 | Full restore protection target | Local fingerprint != last-synced fingerprint | Show strong warning dialog with "Upload local first" primary | C0+C1 | Future |
+| SY19 | Full restore protection target | Pre-restore snapshot save fails | Abort restore; do not proceed | C1 | Future |
+| SY20 | Full restore protection target | Pre-restore snapshot saved | Surface path notice after restore | C0+C1 | Future |
+| SY21 | Full restore protection target | "Restore anyway" path after fingerprint mismatch | Requires second confirmation tap | C1 | Future |
 
 ## Update rule
 

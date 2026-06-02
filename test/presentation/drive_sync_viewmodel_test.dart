@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app/di/sync_providers.dart';
@@ -73,6 +75,47 @@ void main() {
       DriveSyncRestoreEffect.refreshDatabaseProvider,
     ]);
     expect(state.kind, DriveSyncStatusKind.synced);
+    expect(state.message, DriveSyncSettingsMessage.restored);
+  });
+
+  test('restoreDriveToLocal: duplicate call while busy is ignored', () async {
+    final remote = _remoteSnapshot();
+    final restoreCompleter = Completer<DriveSyncRunResult>();
+    final repository = _FakeDriveSyncRepository(
+      loadStatusResult: DriveSyncStatus(
+        kind: DriveSyncStatusKind.ready,
+        remote: remote,
+      ),
+      restoreFuture: restoreCompleter.future,
+    );
+    final container = _container(repository: repository);
+    addTearDown(container.dispose);
+    final subscription = container.listen(
+      driveSyncSettingsControllerProvider,
+      (_, _) {},
+      fireImmediately: true,
+    );
+    addTearDown(subscription.close);
+
+    await container.read(driveSyncSettingsControllerProvider.future);
+    final controller = container.read(
+      driveSyncSettingsControllerProvider.notifier,
+    );
+    final firstRun = controller.restoreDriveToLocal();
+    await Future<void>.delayed(Duration.zero);
+    await controller.restoreDriveToLocal();
+
+    expect(repository.restoreDriveCount, 1);
+
+    restoreCompleter.complete(
+      DriveSyncRunResult.restoredRemote(
+        DriveSyncStatus(kind: DriveSyncStatusKind.synced, remote: remote),
+        DriveSyncRestoreEffect.refreshDatabaseProvider,
+      ),
+    );
+    await firstRun;
+
+    final state = container.read(driveSyncSettingsControllerProvider).value!;
     expect(state.message, DriveSyncSettingsMessage.restored);
   });
 
@@ -249,6 +292,7 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
     List<DriveSyncStatus>? loadStatusResults,
     DriveSyncRunResult? uploadResult,
     DriveSyncRunResult? restoreResult,
+    this.restoreFuture,
     this.loadStatusError,
   }) : loadStatusResult = loadStatusResult ?? const DriveSyncStatus.signedOut(),
        _loadStatusResults = loadStatusResults?.toList() ?? <DriveSyncStatus>[],
@@ -263,6 +307,7 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   final List<DriveSyncStatus> _loadStatusResults;
   final DriveSyncRunResult uploadResult;
   final DriveSyncRunResult restoreResult;
+  final Future<DriveSyncRunResult>? restoreFuture;
   Object? loadStatusError;
   int uploadLocalCount = 0;
   int restoreDriveCount = 0;
@@ -288,6 +333,10 @@ final class _FakeDriveSyncRepository implements DriveSyncRepository {
   @override
   Future<DriveSyncRunResult> restoreDriveSnapshot() async {
     restoreDriveCount += 1;
+    final future = restoreFuture;
+    if (future != null) {
+      return future;
+    }
     return restoreResult;
   }
 }

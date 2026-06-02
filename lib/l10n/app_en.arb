@@ -440,7 +440,7 @@
   "settingsDriveSyncUploadConfirmMessage": "This will replace the Google Drive snapshot with this device's current database and settings.",
   "settingsDriveSyncUploadConfirmAction": "Upload to Drive",
   "settingsDriveSyncRestoreConfirmTitle": "Restore Drive copy?",
-  "settingsDriveSyncRestoreConfirmMessage": "This will replace this device's local database and settings with the Google Drive snapshot.",
+  "settingsDriveSyncRestoreConfirmMessage": "Restoring from Drive will replace this device's local database and settings with backup data. Recent local changes that were not uploaded may be lost. Upload local data first if you are unsure, and continue only if you trust this Drive backup.",
   "settingsDriveSyncRestoreConfirmAction": "Restore from Drive",
   "settingsDriveSyncBackupSource": "Backup from {device} • {when}",
   "@settingsDriveSyncBackupSource": {

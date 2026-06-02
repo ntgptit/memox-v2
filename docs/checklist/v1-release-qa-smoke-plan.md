@@ -59,6 +59,7 @@ Verify invalid Future paths show a safe error and do not expose live V1 screens:
 
 - Account screen opens safely.
 - Manual sync actions behave according to current state.
+- Drive restore opens a destructive warning before restore, Cancel does not restore, Continue restore runs once, and success/failure feedback is visible.
 - Learning settings read/write current defaults.
 - Audio/speech settings preview handles errors safely.
 - Tag management rename/merge/delete current flows.

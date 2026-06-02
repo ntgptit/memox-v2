@@ -1353,7 +1353,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDriveSyncRestoreConfirmMessage.
   ///
   /// In en, this message translates to:
-  /// **'This will replace this device\'s local database and settings with the Google Drive snapshot.'**
+  /// **'Restoring from Drive will replace this device\'s local database and settings with backup data. Recent local changes that were not uploaded may be lost. Upload local data first if you are unsure, and continue only if you trust this Drive backup.'**
   String get settingsDriveSyncRestoreConfirmMessage;
 
   /// No description provided for @settingsDriveSyncRestoreConfirmAction.

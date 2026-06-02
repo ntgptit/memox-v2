@@ -248,10 +248,10 @@ class _DriveSyncContent extends ConsumerWidget {
       state.kind == DriveSyncStatusKind.failure
           ? _technicalMessage(l10n)
           : null,
-    DriveSyncSettingsMessage.uploaded ||
-    DriveSyncSettingsMessage.restored ||
-    DriveSyncSettingsMessage.noChanges ||
-    DriveSyncSettingsMessage.canceled => null,
+    DriveSyncSettingsMessage.uploaded => l10n.settingsDriveSyncUploaded,
+    DriveSyncSettingsMessage.restored => l10n.settingsDriveSyncRestored,
+    DriveSyncSettingsMessage.noChanges => l10n.settingsDriveSyncNoChanges,
+    DriveSyncSettingsMessage.canceled => l10n.settingsDriveSyncCanceled,
     DriveSyncSettingsMessage.failed =>
       state.kind == DriveSyncStatusKind.failure ||
               state.kind == DriveSyncStatusKind.unsupportedSchema

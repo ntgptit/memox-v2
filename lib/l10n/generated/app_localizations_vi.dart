@@ -793,7 +793,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get settingsDriveSyncRestoreConfirmMessage =>
-      'Thao tác này sẽ thay DB và cài đặt cục bộ trên thiết bị này bằng snapshot Google Drive.';
+      'Khôi phục từ Drive sẽ thay DB và cài đặt cục bộ trên thiết bị này bằng dữ liệu backup. Những thay đổi cục bộ gần đây chưa tải lên có thể bị mất. Hãy tải dữ liệu cục bộ lên trước nếu bạn chưa chắc, và chỉ tiếp tục khi bạn tin tưởng bản backup Drive này.';
 
   @override
   String get settingsDriveSyncRestoreConfirmAction => 'Khôi phục từ Drive';

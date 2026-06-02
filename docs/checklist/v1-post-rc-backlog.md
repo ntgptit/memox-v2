@@ -28,7 +28,7 @@ Only reopen V1 RC if a real runtime blocker, data-loss bug, build failure, or se
 - tag-scoped study
 - onboarding
 - root-level decks
-- full restore-protection
+- full restore-protection beyond Prompt 41 current hardening (pre-restore snapshot, Upload local first, second destructive confirmation, restore history, cloud comparison/conflict resolution)
 - engagement/streak/daily goal/reminders
 - independent per-language TTS settings
 - strong-confirm account removal
@@ -50,7 +50,7 @@ Only reopen V1 RC if a real runtime blocker, data-loss bug, build failure, or se
 
 ### P1 — recommended next product work
 
-- full restore-protection
+- full restore-protection follow-up beyond Prompt 41 current hardening
 - root-level deck support
 - Dashboard-as-landing decision
 - Folder Detail Study/Today/Resume banners
@@ -80,6 +80,11 @@ Reason:
 - It fits post-RC hardening.
 - It does not require visual redesign.
 - It is closer to release safety than new feature expansion.
+
+Prompt 41 result note:
+
+- Current post-RC restore protection hardening adds destructive restore warning copy, cancel/confirm protection, duplicate-running guard, and visible restore success/failure feedback.
+- Still Future: pre-restore snapshot, restore history, cloud version comparison, conflict resolution, Upload local first branch, second destructive confirmation, automatic background sync, and typed strong-confirm account removal.
 
 Alternative prompts:
 
