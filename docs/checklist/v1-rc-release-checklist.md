@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-06-02
-status: rc tag target ready
+status: rc tagged
 source: docs/checklist/v1-rc-release-notes.md
 ---
 
@@ -11,8 +11,8 @@ source: docs/checklist/v1-rc-release-notes.md
 - [x] Confirm release notes generated in `docs/checklist/v1-rc-release-notes.md`.
 - [x] Confirm release-prep commit hash: `ce60f64068ee9cac06e9694a16fedcfe48743c88`.
 - [x] Confirm no existing duplicate tag for `v1.0.0-rc.*` or `v1.0.0*`.
-- [ ] Create annotated tag.
-- [ ] Push tag.
+- [x] Create annotated tag.
+- [x] Push tag.
 - [ ] Create GitHub Release draft if desired.
 - [ ] Paste release notes from `docs/checklist/v1-rc-release-notes.md`.
 - [ ] Attach artifacts only if project has build artifact workflow.
@@ -25,3 +25,10 @@ source: docs/checklist/v1-rc-release-notes.md
 ## Tag policy note
 
 This repository workflow did not explicitly allow automatic tag creation or push during Prompt 36. Prompt 37 may create and push the tag only after the tag-target docs commit is current, the working tree is clean, verification passes, and no local or remote duplicate tag exists.
+
+## Tag evidence
+
+- Tag name: `v1.0.0-rc.1`
+- Local tag object: `a725b5b7f3815d9b3c4627093e1d93762d89a203`
+- Tagged commit: `92fdf6d2f11c809791b54d5c4f92223f6cc417d6`
+- Remote push: succeeded to `origin`

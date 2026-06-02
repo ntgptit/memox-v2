@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-06-02
-status: rc tag target ready
+status: rc tagged
 source: docs/checklist/implementation-ledger.md
 ---
 
@@ -10,7 +10,7 @@ source: docs/checklist/implementation-ledger.md
 
 - RC tag candidate: `v1.0.0-rc.1`
 - Date: 2026-06-02
-- Commit to tag: Prompt 37 docs-only tag-target commit containing this release-note update. Preflight release-prep commit: `ce60f64068ee9cac06e9694a16fedcfe48743c88`.
+- Commit tagged: `92fdf6d2f11c809791b54d5c4f92223f6cc417d6`
 - Status: `RC_READY_WITH_KNOWN_FUTURE_GAPS`
 
 ## B. What is included
@@ -66,11 +66,17 @@ Prompt 35 confirmed the final V1 RC regression gate:
 
 ## F. Tag command
 
-No existing `v1.0.0-rc.*` or `v1.0.0*` tag was found during preflight, so the selected tag remains `v1.0.0-rc.1`.
+No existing `v1.0.0-rc.*` or `v1.0.0*` tag was found during preflight, so the selected tag remained `v1.0.0-rc.1`.
 
-Run these commands after confirming the Prompt 37 tag-target commit is current and the working tree is clean:
+Prompt 37 created and pushed the annotated tag:
 
 ```text
 git tag -a v1.0.0-rc.1 -m "MemoX V1.0.0 RC1"
 git push origin v1.0.0-rc.1
 ```
+
+Tag evidence:
+
+- Local tag object: `a725b5b7f3815d9b3c4627093e1d93762d89a203`
+- Tagged commit: `92fdf6d2f11c809791b54d5c4f92223f6cc417d6`
+- Remote tag: `origin/v1.0.0-rc.1`
