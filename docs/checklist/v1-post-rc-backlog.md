@@ -51,8 +51,9 @@ Only reopen V1 RC if a real runtime blocker, data-loss bug, build failure, or se
 ### P1 — recommended next product work
 
 - full restore-protection follow-up beyond Prompt 41 current hardening
-- root-level deck support migration/design (Prompt 42 found current schema/API
-  requires concrete folder ids)
+- root-level deck support implementation (Prompt 42B design is ready; Prompt 43
+  should implement nullable deck parent migration plus data/domain/repository
+  tests)
 - Dashboard-as-landing decision
 - Folder Detail Study/Today/Resume banners
 - active-session undo reinsert
@@ -102,14 +103,31 @@ Prompt 42 — Post-RC Product Batch 02: Root-level Deck Support
   root deck regression tests.
 - Recommended next batch: Prompt 42B — nullable deck parent migration design.
 
+## G. Prompt 42B result note
+
+Prompt 42B — Post-RC Migration Design Batch: Nullable Deck Parent for Root-level Decks
+
+- Status: Nullable deck parent migration design ready.
+- Design doc:
+  `docs/database/migrations/nullable-deck-parent-migration.md`.
+- Production code changed: no.
+- Schema/migration changed: no implementation; design only.
+- Generated files changed: no.
+- Tests changed: no.
+- Migration direction: make `decks.folder_id` nullable, preserve existing
+  folder-owned decks, keep non-null FK cascade, add root-safe sibling uniqueness,
+  and update domain/API/DAO/read models/UI/tests in follow-up prompts.
+- Recommended next batch: Prompt 43 — implement nullable deck parent migration
+  plus data/domain/repository tests.
+
 Alternative prompts:
 
-- Prompt 42B — Nullable Deck Parent Migration Design
+- Prompt 43 — Nullable Deck Parent Migration Implementation
 - Prompt 41B — Dashboard-as-Landing Decision
 - Prompt 41C — Flashcard History Discovery
 - Prompt 41D — Global Search Discovery
 
-## G. Guardrails for post-RC work
+## H. Guardrails for post-RC work
 
 - Do not mix multiple Future features in one prompt.
 - Do not implement Global Search and Flashcard History together.

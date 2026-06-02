@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-31
+last_updated: 2026-06-02
 route: /library
 source_specs:
   - docs/business/folder/folder-management.md
@@ -39,6 +39,12 @@ keeps `DeckEntity.folderId` as `String`; `DeckRepository` create/move/reorder
 operations also require concrete folder ids. Root deck rows, root deck create,
 and move deck to root require a coordinated migration/design batch before this
 wireframe can promote them to Current.
+
+**Prompt 42B migration design (2026-06-02):** nullable deck parent design is
+ready in `docs/database/migrations/nullable-deck-parent-migration.md`. Current
+production remains unchanged: no root deck read-model channel, root deck UI,
+schema migration, generated Drift output, or root deck tests were implemented in
+Prompt 42B.
 
 ## Purpose
 

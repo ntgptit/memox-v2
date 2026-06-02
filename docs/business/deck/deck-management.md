@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-06-01
+last_updated: 2026-06-02
 applies_to: deck entity and deck management feature
 ---
 
@@ -17,6 +17,10 @@ applies_to: deck entity and deck management feature
 > APIs require a concrete folder id. Root-level decks remain Target until a
 > dedicated migration batch makes `folder_id` nullable and updates the repository,
 > read models, UI, tests, and docs together.
+>
+> Prompt 42B added the implementation-ready migration design at
+> `docs/database/migrations/nullable-deck-parent-migration.md`. It did not change
+> production code, schema, generated Drift output, or tests.
 
 ## Source files to inspect
 
@@ -71,7 +75,10 @@ Existing decks (pre-feature) get `target_language = korean` as default during mi
 
 - Current production deck belongs to exactly one folder.
 - Target root-level deck support allows `folder_id = null`, but this is blocked
-  until the dedicated nullable-`folder_id` migration batch.
+  until Prompt 43 implements the dedicated nullable-`folder_id` migration batch.
+- Root deck sibling-name uniqueness requires root-safe validation/index design;
+  a plain SQLite unique constraint over `(folder_id, name)` is not enough for
+  root decks because `NULL` values are distinct.
 - Deck name is required after trim.
 - Deck name max length follows schema constraint.
 - Deck target language is required (default `korean`).
@@ -119,6 +126,8 @@ Do not add a separate deck detail route unless route contract and navigation doc
 **Schema:**
 
 - `docs/database/schema-contract.md` → `decks` table (`id`, `folder_id`, `name`, `target_language`, `sort_order`, timestamps). `target_language` is one of the 6 pending migrations.
+- `docs/database/migrations/nullable-deck-parent-migration.md` → Prompt 42B
+  design for nullable `decks.folder_id` and root-level deck rollout.
 
 **Decision table:**
 

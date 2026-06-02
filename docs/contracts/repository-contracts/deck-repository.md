@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-26
+last_updated: 2026-06-02
 status: contract
 ---
 
@@ -12,6 +12,11 @@ status: contract
 > require concrete folder ids). Do not implement root-level deck UI against this
 > contract until a dedicated schema/API migration updates code, generated Drift
 > output, docs, and tests together.
+>
+> **Prompt 42B design note (2026-06-02):** implementation guidance for that
+> migration now lives in
+> `docs/database/migrations/nullable-deck-parent-migration.md`. Prompt 42B did
+> not change production code, schema, generated files, or tests.
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
@@ -52,6 +57,9 @@ Future<Either<Failure, Unit>> reorder(FolderId? parentId, List<DeckId> orderedId
 - `target_language` ∈ TargetLanguage enum.
 - Target: `folder_id` nullable (root deck) or references existing folder allowing decks.
 - Current: `folder_id` is non-null; root-level decks are blocked pending migration.
+- Root sibling uniqueness must not rely only on a plain `(folder_id, name)`
+  unique constraint because SQLite treats `NULL` values as distinct. Use
+  root-safe repository validation and/or partial unique indexes in the migration.
 
 ## Forbidden
 
@@ -74,4 +82,5 @@ Future<Either<Failure, Unit>> reorder(FolderId? parentId, List<DeckId> orderedId
 **Business spec:** `docs/business/deck/deck-management.md`
 **Use cases:** `docs/contracts/usecase-contracts/deck.md`
 **Schema:** `docs/database/schema-contract.md` `decks` table
+**Migration design:** `docs/database/migrations/nullable-deck-parent-migration.md`
 **Code paths:** `lib/domain/repositories/deck_repository.dart`, `lib/data/repositories/deck_repository_impl.dart`, `lib/data/datasources/local/daos/deck_dao.dart`
