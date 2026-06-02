@@ -5,11 +5,18 @@ applies_to: deck entity and deck management feature
 
 # Deck Management
 
-> **Status: Partial Target — Migration Required for `target_language`.** Deck CRUD itself is implementable today. However, the `target_language` field (referenced throughout this spec) is a pending column from `docs/database/schema-contract.md` §Pending schema changes:
+> **Status: Partial Target — Migration Required for `target_language` and root-level decks.** Folder-owned deck CRUD itself is implementable today. However, the `target_language` field (referenced throughout this spec) is a pending column from `docs/database/schema-contract.md` §Pending schema changes:
 >
 > - `decks.target_language TEXT NOT NULL DEFAULT 'korean'`
 >
 > Migration backfills existing decks to `'korean'`; user adjusts per-deck after. Blocks (until migration): TTS gating in study modes 13-17, settings audio-speech screen, target-language picker in deck create/edit flows.
+>
+> Prompt 42 rechecked root-level deck support on 2026-06-02 and found it blocked
+> by the current production schema/API shape: `decks.folder_id` is non-null in
+> Drift, `DeckEntity.folderId` is non-null, and deck create/move/reorder/duplicate
+> APIs require a concrete folder id. Root-level decks remain Target until a
+> dedicated migration batch makes `folder_id` nullable and updates the repository,
+> read models, UI, tests, and docs together.
 
 ## Source files to inspect
 
@@ -62,7 +69,9 @@ Existing decks (pre-feature) get `target_language = korean` as default during mi
 
 ## Rules
 
-- Deck belongs to exactly one folder.
+- Current production deck belongs to exactly one folder.
+- Target root-level deck support allows `folder_id = null`, but this is blocked
+  until the dedicated nullable-`folder_id` migration batch.
 - Deck name is required after trim.
 - Deck name max length follows schema constraint.
 - Deck target language is required (default `korean`).

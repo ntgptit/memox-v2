@@ -51,7 +51,8 @@ Only reopen V1 RC if a real runtime blocker, data-loss bug, build failure, or se
 ### P1 — recommended next product work
 
 - full restore-protection follow-up beyond Prompt 41 current hardening
-- root-level deck support
+- root-level deck support migration/design (Prompt 42 found current schema/API
+  requires concrete folder ids)
 - Dashboard-as-landing decision
 - Folder Detail Study/Today/Resume banners
 - active-session undo reinsert
@@ -86,14 +87,29 @@ Prompt 41 result note:
 - Current post-RC restore protection hardening adds destructive restore warning copy, cancel/confirm protection, duplicate-running guard, and visible restore success/failure feedback.
 - Still Future: pre-restore snapshot, restore history, cloud version comparison, conflict resolution, Upload local first branch, second destructive confirmation, automatic background sync, and typed strong-confirm account removal.
 
+## F. Prompt 42 result note
+
+Prompt 42 — Post-RC Product Batch 02: Root-level Deck Support
+
+- Status: Blocked root-level deck support.
+- Reason: current production schema and APIs require every deck to have a
+  concrete folder id (`decks.folder_id` non-null, `DeckEntity.folderId` non-null,
+  deck create/move/reorder/duplicate APIs folder-bound).
+- Production code changed: no.
+- Schema/migration changed: no.
+- Still Future: nullable `decks.folder_id` migration, root deck create/display,
+  root deck row actions, move deck to/from root, root-aware ordering/search, and
+  root deck regression tests.
+- Recommended next batch: Prompt 42B — nullable deck parent migration design.
+
 Alternative prompts:
 
-- Prompt 41A — Root-level Deck Support Planning
+- Prompt 42B — Nullable Deck Parent Migration Design
 - Prompt 41B — Dashboard-as-Landing Decision
 - Prompt 41C — Flashcard History Discovery
 - Prompt 41D — Global Search Discovery
 
-## F. Guardrails for post-RC work
+## G. Guardrails for post-RC work
 
 - Do not mix multiple Future features in one prompt.
 - Do not implement Global Search and Flashcard History together.

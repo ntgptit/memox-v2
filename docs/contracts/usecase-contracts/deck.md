@@ -5,6 +5,12 @@ status: contract
 
 # Deck Use Cases Contract
 
+> **Current implementation note (Prompt 42, 2026-06-02):** nullable
+> `parentFolderId` / root-deck signatures in this contract are target shape only.
+> Current production use cases require concrete folder ids and the Drift
+> `decks.folder_id` column is non-null. Root-level deck create/move/reorder must
+> wait for a dedicated nullable-`folder_id` schema/API migration batch.
+
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
 ## CreateDeckUseCase

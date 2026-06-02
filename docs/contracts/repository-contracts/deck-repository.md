@@ -5,6 +5,14 @@ status: contract
 
 # Deck Repository Contract
 
+> **Current implementation note (Prompt 42, 2026-06-02):** the signatures below
+> are target contracts for nullable parent/root deck support. Current production
+> code still requires a non-null folder id (`decks.folder_id` is non-null,
+> `DeckEntity.folderId` is `String`, and `createDeck`/`moveDeck`/`reorderDecks`
+> require concrete folder ids). Do not implement root-level deck UI against this
+> contract until a dedicated schema/API migration updates code, generated Drift
+> output, docs, and tests together.
+
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
 `abstract class DeckRepository`. Implementation in `lib/data/repositories/deck_repository_impl.dart`.
@@ -42,7 +50,8 @@ Future<Either<Failure, Unit>> reorder(FolderId? parentId, List<DeckId> orderedId
 
 - Sibling name unique (case-insensitive) within same `folder_id`.
 - `target_language` ∈ TargetLanguage enum.
-- `folder_id` nullable (root deck) or references existing folder allowing decks.
+- Target: `folder_id` nullable (root deck) or references existing folder allowing decks.
+- Current: `folder_id` is non-null; root-level decks are blocked pending migration.
 
 ## Forbidden
 

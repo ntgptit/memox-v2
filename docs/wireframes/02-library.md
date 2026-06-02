@@ -9,7 +9,7 @@ source_specs:
 
 # 02 — Library
 
-## V1 verification status (2026-05-31, Prompt 18/18B)
+## V1 verification status (2026-05-31, Prompt 18/18B; blocker rechecked 2026-06-02, Prompt 42)
 
 This screen is **partially Current**. The recursive folder counts (verified Prompt 14) plus the aspects below are verified by code and tests; the remainder is **Future** and intentionally not exposed in V1. Do NOT mark the whole screen Current. The §Layout / §Components / §Actions / §Sort options blocks below describe the **target** design; where they conflict with this section, this section is the current truth.
 
@@ -31,6 +31,14 @@ This screen is **partially Current**. The recursive folder counts (verified Prom
 - No sort **UI control** on Library Overview (no overflow sort menu / sort chip). Sort exists only in the data/use-case layer.
 - Drag-to-reorder of root items, pull-to-refresh, and grid/multi-column responsive layout.
 - Global Search screen / `/library/search` route (Global Search remains Future).
+
+**Prompt 42 blocker (2026-06-02):** root-level deck support remains blocked by
+the current production schema/API shape. `lib/data/datasources/local/tables/decks_table.dart`
+defines `decks.folder_id` as non-null and `lib/domain/entities/deck_entity.dart`
+keeps `DeckEntity.folderId` as `String`; `DeckRepository` create/move/reorder
+operations also require concrete folder ids. Root deck rows, root deck create,
+and move deck to root require a coordinated migration/design batch before this
+wireframe can promote them to Current.
 
 ## Purpose
 
