@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-06-02
-status: rc release prep ready
+status: rc tag target ready
 source: docs/checklist/implementation-ledger.md
 ---
 
@@ -10,7 +10,7 @@ source: docs/checklist/implementation-ledger.md
 
 - RC tag candidate: `v1.0.0-rc.1`
 - Date: 2026-06-02
-- Commit to tag: pending release-prep commit containing this file; preflight base commit `48e0476b817165ee6441619cc2e957264210966c`
+- Commit to tag: Prompt 37 docs-only tag-target commit containing this release-note update. Preflight release-prep commit: `ce60f64068ee9cac06e9694a16fedcfe48743c88`.
 - Status: `RC_READY_WITH_KNOWN_FUTURE_GAPS`
 
 ## B. What is included
@@ -68,7 +68,7 @@ Prompt 35 confirmed the final V1 RC regression gate:
 
 No existing `v1.0.0-rc.*` or `v1.0.0*` tag was found during preflight, so the selected tag remains `v1.0.0-rc.1`.
 
-Run these commands after committing the release-prep docs and confirming the working tree is clean:
+Run these commands after confirming the Prompt 37 tag-target commit is current and the working tree is clean:
 
 ```text
 git tag -a v1.0.0-rc.1 -m "MemoX V1.0.0 RC1"

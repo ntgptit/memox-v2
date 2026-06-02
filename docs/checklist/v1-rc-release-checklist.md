@@ -1,6 +1,6 @@
 ---
 last_updated: 2026-06-02
-status: rc release prep ready
+status: rc tag target ready
 source: docs/checklist/v1-rc-release-notes.md
 ---
 
@@ -9,7 +9,7 @@ source: docs/checklist/v1-rc-release-notes.md
 - [x] Confirm clean working tree before release-prep edits.
 - [x] Confirm Prompt 35 ledger status is `RC_READY_WITH_KNOWN_FUTURE_GAPS`.
 - [x] Confirm release notes generated in `docs/checklist/v1-rc-release-notes.md`.
-- [x] Confirm current commit hash: `48e0476b817165ee6441619cc2e957264210966c`.
+- [x] Confirm release-prep commit hash: `ce60f64068ee9cac06e9694a16fedcfe48743c88`.
 - [x] Confirm no existing duplicate tag for `v1.0.0-rc.*` or `v1.0.0*`.
 - [ ] Create annotated tag.
 - [ ] Push tag.
@@ -24,4 +24,4 @@ source: docs/checklist/v1-rc-release-notes.md
 
 ## Tag policy note
 
-This repository workflow did not explicitly allow automatic tag creation or push during Prompt 36. Keep the tag unchecked until the release-prep docs are committed, the working tree is clean, and the release owner runs the tag commands from `docs/checklist/v1-rc-release-notes.md`.
+This repository workflow did not explicitly allow automatic tag creation or push during Prompt 36. Prompt 37 may create and push the tag only after the tag-target docs commit is current, the working tree is clean, verification passes, and no local or remote duplicate tag exists.
