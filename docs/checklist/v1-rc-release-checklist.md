@@ -32,3 +32,13 @@ This repository workflow did not explicitly allow automatic tag creation or push
 - Local tag object: `a725b5b7f3815d9b3c4627093e1d93762d89a203`
 - Tagged commit: `92fdf6d2f11c809791b54d5c4f92223f6cc417d6`
 - Remote push: succeeded to `origin`
+
+## GitHub Release Draft Decision
+
+GitHub Release draft verification is intentionally skipped for this free/personal repository workflow.
+
+The pushed tag `v1.0.0-rc.1` is the V1 RC milestone.
+
+GitHub Release draft can be created manually later if needed.
+
+Do not treat missing GitHub Release draft as an RC blocker.
