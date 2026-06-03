@@ -40,7 +40,7 @@ The mock HTML must be used as a visual reference only. Do not copy inline styles
 | Area | File / folder | Role |
 | --- | --- | --- |
 | Mobile mock gallery | `docs/system-design/MemoX Design System/ui_kits/mobile/index.html` | Main visual mock file. Contains 129 rendered screen variants in the gallery. |
-| Mobile mock notes | `docs/system-design/MemoX Design System/ui_kits/mobile/README.md` | Current README for the mobile kit. It appears stale because it still describes only the older 5-screen kit. |
+| Mobile mock notes | `docs/system-design/MemoX Design System/ui_kits/mobile/README.md` | Current README for the mobile kit. It defines screen order, visual-only scope, and Current / Partial / Future / Rejected / Visual-only target labels. |
 | Design foundation | `docs/system-design/MemoX Design System/README.md` | Brand, theme, component, and implementation guidance. |
 | Token CSS | `docs/system-design/MemoX Design System/colors_and_type.css` | Color, typography, spacing, radius, elevation, opacity, and motion tokens used by the HTML mock. |
 | Component previews | `docs/system-design/MemoX Design System/preview/*.html` | Visual references for reusable components and token groups. |
@@ -86,29 +86,30 @@ The agent must not start from the HTML mock alone.
 
 | Mock group | Mock source | Primary wireframe | Primary business docs | Primary contract/state docs | Implementation status note |
 | --- | --- | --- | --- | --- | --- |
-| Dashboard | `25a`-`25h` in `ui_kits/mobile/index.html` | `docs/wireframes/01-dashboard.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/resume/resume-session.md`, `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/engagement.md`, `docs/state/state-management-contract.md` | Current target. Prefer this over legacy `HomeScreen`. |
-| Library overview | `17a`-`17f` | `docs/wireframes/02-library.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md`, `docs/business/flashcard/flashcard-management.md` | `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/repository-contracts/folder-repository.md` | Current V1 is folders-only. Root-level deck rows in mocks are Future/Target visual reference until promoted. |
-| Progress | `26a`-`26g` | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/srs/srs-review.md`, `docs/business/history/card-history.md` | `docs/contracts/usecase-contracts/engagement.md`, `docs/contracts/repository-contracts/progress-repository.md` | Current V1 is read-only overview + active-session recovery. Analytics charts, streak/daily goal, Global Search links, and Flashcard History remain Future/Target. Prefer this over legacy `StatsScreen`. |
-| Settings hub | `12a`-`12e` | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md`, `docs/business/tts/tts-settings.md`, `docs/business/tags/tag-system.md` | `docs/state/state-management-contract.md`, `docs/contracts/usecase-contracts/account-sync.md` | Current target. |
-| Folder detail | `18a`-`18h` | `docs/wireframes/05-folder-detail.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` | `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/repository-contracts/folder-repository.md` | Current target. |
-| Flashcard list | `19a`-`19h` | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/deck/deck-management.md`, `docs/business/study-actions/bury-suspend.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current target. |
-| Flashcard create | `20a`-`20f` | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/tags/tag-system.md`, `docs/business/tts/tts-settings.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current target. |
-| Flashcard edit | `21a`-`21g` | `docs/wireframes/08-flashcard-edit.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/tags/tag-system.md`, `docs/business/study-actions/bury-suspend.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current target. |
-| Flashcard history | `22a`-`22e` | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/history.md`, `docs/contracts/repository-contracts/progress-repository.md` | Future Proposal for V1; visual reference only until promoted. Requires schema migration. |
-| Deck import | `23a`-`23i` | `docs/wireframes/10-deck-import.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/bulk/bulk-operations.md`, `docs/business/deck/deck-management.md` | `docs/contracts/usecase-contracts/bulk.md`, `docs/contracts/usecase-contracts/flashcard.md` | Current target. Import must be transactional/chunked as required by docs. |
-| Library search | `24a`-`24e` | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` | `docs/contracts/usecase-contracts/search.md`, `docs/contracts/repository-contracts/*` | Full global screen is Future Proposal; V1 uses inline/scope-local search guidelines. |
+| Onboarding | `01a`-`01i` in `ui_kits/mobile/index.html` | `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md`, `docs/business/account-sync/account-sync.md`, `docs/business/deck/deck-management.md`, `docs/business/flashcard/flashcard-management.md` | `docs/contracts/usecase-contracts/account-sync.md`, `docs/state/state-management-contract.md` | Future / Visual-only target. V1 implements only owner-split zero-content guidance; do not add a route or feature folder from this mock. |
+| Dashboard | `02a`-`02h` | `docs/wireframes/01-dashboard.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/resume/resume-session.md`, `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/engagement.md`, `docs/state/state-management-contract.md` | Partial. Current resume/scope/recent-deck pieces exist; streak/goal/engagement/onboarding states are Future / Visual-only target except the documented static placeholder. Prefer Dashboard naming over legacy `HomeScreen`. |
+| Library overview | `03a`-`03f` | `docs/wireframes/02-library.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md`, `docs/business/flashcard/flashcard-management.md` | `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/repository-contracts/folder-repository.md` | Current for folders-only Library root. Root-level decks are Rejected / Out of Scope and must not be promoted from mock rows. |
+| Folder detail | `04a`-`04h` | `docs/wireframes/05-folder-detail.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` | `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/repository-contracts/folder-repository.md` | Current for folder-owned decks. |
+| Library search | `05a`-`05e` | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` | `docs/contracts/usecase-contracts/search.md`, `docs/contracts/repository-contracts/*` | Full global/root search screen is Future Proposal; V1 uses inline/scope-local search in the owner screen. |
+| Flashcard list | `06a`-`06h` | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/deck/deck-management.md`, `docs/business/study-actions/bury-suspend.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current for verified V1 deck-owned list scope. |
+| Flashcard create | `07a`-`07f` | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/tags/tag-system.md`, `docs/business/tts/tts-settings.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current for shared editor create scope. |
+| Flashcard edit | `08a`-`08g` | `docs/wireframes/08-flashcard-edit.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/tags/tag-system.md`, `docs/business/study-actions/bury-suspend.md` | `docs/contracts/usecase-contracts/flashcard.md`, `docs/contracts/repository-contracts/flashcard-repository.md` | Current for shared editor edit scope; Flashcard History remains Future. |
+| Flashcard history | `09a`-`09e` | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/history.md`, `docs/contracts/repository-contracts/progress-repository.md` | Future / Visual-only target. Requires a separate promoted migration/scope task. |
+| Deck import | `10a`-`10i` | `docs/wireframes/10-deck-import.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/bulk/bulk-operations.md`, `docs/business/deck/deck-management.md` | `docs/contracts/usecase-contracts/bulk.md`, `docs/contracts/usecase-contracts/flashcard.md` | Current for V1 inline import scope; richer multi-step/result states are visual targets. |
+| Tag management | `11a`-`11k` | `docs/wireframes/22-settings-tag-management.md` | `docs/business/tags/tag-system.md`, `docs/business/search/global-search.md` | `docs/contracts/usecase-contracts/tag.md`, `docs/contracts/repository-contracts/tag-repository.md` | Current for tag list/rename/merge/delete. Tag-scoped study remains Future/Blocked; global tag-filtered card lists belong to Future Global Search. |
 | Study entry gate | Not directly rendered as a named gallery group | `docs/wireframes/12-study-entry-gate.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/business/resume/resume-session.md` | `docs/contracts/usecase-contracts/study.md`, `docs/contracts/repository-contracts/study-repository.md` | Missing explicit mock variant. Use wireframe as source of truth. |
-| Study review | `06` | `docs/wireframes/13-study-session-review.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/study.md`, `docs/state/state-management-contract.md` | Confirm final SRS review behavior before implementation. |
-| Study match | `07` | `docs/wireframes/14-study-session-match.md` | `docs/business/study/study-flow.md` | `docs/contracts/usecase-contracts/study.md` | Current target. |
-| Study guess | `08` | `docs/wireframes/15-study-session-guess.md` | `docs/business/study/study-flow.md` | `docs/contracts/usecase-contracts/study.md` | Current target. |
-| Study recall | `09a`-`09b` | `docs/wireframes/16-study-session-recall.md` | `docs/business/study/study-flow.md` | `docs/contracts/usecase-contracts/study.md` | Current target. |
-| Study fill | `10a`-`10b` | `docs/wireframes/17-study-session-fill.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/study.md`, `docs/contracts/usecase-contracts/srs.md` | Current target. |
-| Study result | `27a`-`27f` | `docs/wireframes/18-study-result.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/business/engagement/dashboard-engagement.md` | `docs/contracts/usecase-contracts/study.md`, `docs/contracts/usecase-contracts/engagement.md` | Current target. |
-| Account sync | `13a`-`13i` | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md` | `docs/contracts/usecase-contracts/account-sync.md`, `docs/contracts/repository-contracts/sync-repository.md` | Current target. |
-| Learning settings | `14a`-`14e` | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/resume/resume-session.md` | `docs/contracts/usecase-contracts/engagement.md`, `docs/state/state-management-contract.md` | Current V1 owns study defaults and a read-only interval table. Daily-goal/streak/reminder controls remain Future/Target engagement scope. |
-| Audio/Speech settings | `15a`-`15g` | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` | `docs/contracts/usecase-contracts/tts.md` | Current V1 is one global/front-language TTS settings set. Independent per-language tabs/settings remain Future/Target and may depend on approved storage/API migration. |
-| Tag management | `16a`-`16k` | `docs/wireframes/22-settings-tag-management.md` | `docs/business/tags/tag-system.md`, `docs/business/search/global-search.md` | `docs/contracts/usecase-contracts/tag.md`, `docs/contracts/repository-contracts/tag-repository.md` | Current V1 owns tag list/rename/merge/delete. Tag-scoped study is Blocked/Future; global tag-filtered card lists belong to Future Global Search. |
-| Onboarding | `28a`-`28i` | `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md`, `docs/business/account-sync/account-sync.md`, `docs/business/deck/deck-management.md`, `docs/business/flashcard/flashcard-management.md` | `docs/contracts/usecase-contracts/account-sync.md`, `docs/state/state-management-contract.md` | Full onboarding mock set is Future Proposal; V1 implements only zero-content empty-state CTAs. |
+| Study review | `12` | `docs/wireframes/13-study-session-review.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/study.md`, `docs/state/state-management-contract.md` | Current for core learning loop. |
+| Study match | `13` | `docs/wireframes/14-study-session-match.md` | `docs/business/study/study-flow.md` | `docs/contracts/usecase-contracts/study.md` | Current for core learning loop. |
+| Study guess | `14` | `docs/wireframes/15-study-session-guess.md` | `docs/business/study/study-flow.md` | `docs/contracts/usecase-contracts/study.md` | Current for core learning loop. |
+| Study recall | `15a`-`15b` | `docs/wireframes/16-study-session-recall.md` | `docs/business/study/study-flow.md` | `docs/contracts/usecase-contracts/study.md` | Current for core learning loop. |
+| Study fill | `16a`-`16b` | `docs/wireframes/17-study-session-fill.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/study.md`, `docs/contracts/usecase-contracts/srs.md` | Current for core learning loop. |
+| Study result | `17a`-`17f` | `docs/wireframes/18-study-result.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/business/engagement/dashboard-engagement.md` | `docs/contracts/usecase-contracts/study.md`, `docs/contracts/usecase-contracts/engagement.md` | Current for V1 result scope; goal/tough-card engagement states are Future / Visual-only target. |
+| Stats | `18` | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/srs/srs-review.md` | `docs/contracts/usecase-contracts/engagement.md` | Legacy visual-only target. Production route/docs use Progress for current V1. |
+| Progress | `19a`-`19g` | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/srs/srs-review.md`, `docs/business/history/card-history.md` | `docs/contracts/usecase-contracts/engagement.md`, `docs/contracts/repository-contracts/progress-repository.md` | Current for V1 overview + active-session recovery. Analytics charts, streak/daily goal, Global Search links, and Flashcard History remain Future/Target. |
+| Settings hub | `20a`-`20e` | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md`, `docs/business/tts/tts-settings.md`, `docs/business/tags/tag-system.md` | `docs/state/state-management-contract.md`, `docs/contracts/usecase-contracts/account-sync.md` | Partial / Current for route-action-safe hub. |
+| Account sync | `21a`-`21i` | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md` | `docs/contracts/usecase-contracts/account-sync.md`, `docs/contracts/repository-contracts/sync-repository.md` | Current for Prompt 41 restore warning and current sync actions. |
+| Learning settings | `22a`-`22e` | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/resume/resume-session.md` | `docs/contracts/usecase-contracts/engagement.md`, `docs/state/state-management-contract.md` | Partial. Current V1 owns study defaults/read-only interval table; daily-goal/streak/reminder controls remain Future / Visual-only target. |
+| Audio/Speech settings | `23a`-`23g` | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` | `docs/contracts/usecase-contracts/tts.md` | Current V1 is one global/front-language TTS settings set. Independent per-language tabs/settings remain Future/Target. |
 | Shared dialogs | Several overlay states across groups | `docs/wireframes/24-shared-dialogs.md` | Feature-specific docs | `docs/contracts/error-contract.md`, `docs/ui-ux/l10n-copy-contract.md` | Current V1 primitives are shared; catalog-only strong-confirm/account-removal/restore-warning/onboarding dialogs remain Target/Future. Do not recreate per screen. |
 | Shared bottom sheets | Several sheet states across groups | `docs/wireframes/25-shared-bottom-sheets.md` | Feature-specific docs | `docs/contracts/code-style.md`, `docs/ui-ux/ui-ux-contract.md` | Current V1 primitives/usages are shared; dedicated SortOptions, engagement sheets, tag-scoped study, Global Search, and Flashcard History remain Target/Future/Blocked. Do not recreate per screen. |
 
@@ -118,141 +119,141 @@ The agent must not start from the HTML mock alone.
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `06 · Study · Review` | Review session card/rating state | `docs/wireframes/13-study-session-review.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/study.md`, `docs/contracts/usecase-contracts/srs.md` |
-| `07 · Study · Match` | Match mode active state | `docs/wireframes/14-study-session-match.md` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` |
-| `08 · Study · Guess` | Guess mode active state | `docs/wireframes/15-study-session-guess.md` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` |
-| `09a · Study · Recall (hidden)` | Recall prompt before answer reveal | `docs/wireframes/16-study-session-recall.md` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` |
-| `09b · Study · Recall (revealed)` | Recall answer revealed | `docs/wireframes/16-study-session-recall.md` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` |
-| `10a · Study · Fill (input)` | Fill mode input state | `docs/wireframes/17-study-session-fill.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/study.md` |
-| `10b · Study · Fill (wrong)` | Fill mode incorrect-answer feedback | `docs/wireframes/17-study-session-fill.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/study.md` |
+| `12 · Study · Review` | Review session card/rating state | `docs/wireframes/13-study-session-review.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/study.md`, `docs/contracts/usecase-contracts/srs.md` |
+| `13 · Study · Match` | Match mode active state | `docs/wireframes/14-study-session-match.md` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` |
+| `14 · Study · Guess` | Guess mode active state | `docs/wireframes/15-study-session-guess.md` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` |
+| `15a · Study · Recall (hidden)` | Recall prompt before answer reveal | `docs/wireframes/16-study-session-recall.md` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` |
+| `15b · Study · Recall (revealed)` | Recall answer revealed | `docs/wireframes/16-study-session-recall.md` | `docs/business/study/study-flow.md`, `docs/contracts/usecase-contracts/study.md` |
+| `16a · Study · Fill (input)` | Fill mode input state | `docs/wireframes/17-study-session-fill.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/study.md` |
+| `16b · Study · Fill (wrong)` | Fill mode incorrect-answer feedback | `docs/wireframes/17-study-session-fill.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md`, `docs/contracts/usecase-contracts/study.md` |
 
 ### 6.2 Legacy stats variant
 
 | Mock variant | Visual state | Mapping | Decision |
 | --- | --- | --- | --- |
-| `11 · Stats` | Older stats/progress view | `docs/wireframes/03-progress.md` | Treat as legacy visual reference. Production target should use `Progress`, not `Stats`, unless product leadership explicitly restores the old naming. |
+| `18 · Stats` | Older stats/progress view | `docs/wireframes/03-progress.md` | Treat as legacy visual reference. Production target should use `Progress`, not `Stats`, unless product leadership explicitly restores the old naming. |
 
 ### 6.3 Settings hub variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `12a · Settings (populated)` | Normal settings hub with account/status rows | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md`, `docs/business/tts/tts-settings.md`, `docs/business/tags/tag-system.md` |
-| `12b · Settings (loading)` | Settings hub loading state | `docs/wireframes/04-settings-hub.md` | `docs/state/state-management-contract.md` |
-| `12c · Settings (signed out)` | Settings hub when no Google account is linked | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md` |
-| `12d · Settings (signing in)` | Settings hub while sign-in is in progress | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` |
-| `12e · Settings (sync error)` | Settings hub with sync/account error | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
+| `20a · Settings (populated)` | Normal settings hub with account/status rows | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md`, `docs/business/tts/tts-settings.md`, `docs/business/tags/tag-system.md` |
+| `20b · Settings (loading)` | Settings hub loading state | `docs/wireframes/04-settings-hub.md` | `docs/state/state-management-contract.md` |
+| `20c · Settings (signed out)` | Settings hub when no Google account is linked | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md` |
+| `20d · Settings (signing in)` | Settings hub while sign-in is in progress | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` |
+| `20e · Settings (sync error)` | Settings hub with sync/account error | `docs/wireframes/04-settings-hub.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
 
 ### 6.4 Account sync variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `13a · Account sync (signed out)` | Account sync page before sign-in | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md` |
-| `13b · Account sync (signing in)` | Google sign-in in progress | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` |
-| `13c · Account sync (sign-in failed)` | Sign-in failure | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
-| `13d · Account sync (no backup yet)` | Signed in with no backup available | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md` |
-| `13e · Account sync (ready)` | Signed in and sync-ready | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/repository-contracts/sync-repository.md` |
-| `13f · Account sync (uploading)` | Backup/upload in progress | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` |
-| `13g · Account sync (restore warn)` | Restore confirmation warning | `docs/wireframes/19-settings-account.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
-| `13h · Account sync (restoring)` | Restore in progress | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/database/storage-boundaries.md` |
-| `13i · Account sync (token expired)` | Expired token / re-auth required | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
+| `21a · Account sync (signed out)` | Account sync page before sign-in | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md` |
+| `21b · Account sync (signing in)` | Google sign-in in progress | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` |
+| `21c · Account sync (sign-in failed)` | Sign-in failure | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
+| `21d · Account sync (no backup yet)` | Signed in with no backup available | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md` |
+| `21e · Account sync (ready)` | Signed in and sync-ready | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/repository-contracts/sync-repository.md` |
+| `21f · Account sync (uploading)` | Backup/upload in progress | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/usecase-contracts/account-sync.md` |
+| `21g · Account sync (restore warn)` | Restore confirmation warning | `docs/wireframes/19-settings-account.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
+| `21h · Account sync (restoring)` | Restore in progress | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/database/storage-boundaries.md` |
+| `21i · Account sync (token expired)` | Expired token / re-auth required | `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
 
 ### 6.5 Learning settings variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `14a · Learning (goal on)` | Daily goal enabled | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md` |
-| `14b · Learning (goal off)` | Daily goal disabled | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md` |
-| `14c · Learning (reminder on)` | Reminder enabled | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/resume/resume-session.md` |
-| `14d · Learning (perm denied)` | Notification permission denied | `docs/wireframes/20-settings-learning.md` | `docs/contracts/error-contract.md`, `docs/ui-ux/l10n-copy-contract.md` |
-| `14e · Learning (saving)` | Saving settings | `docs/wireframes/20-settings-learning.md` | `docs/state/state-management-contract.md` |
+| `22a · Learning (goal on)` | Daily goal enabled | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md` |
+| `22b · Learning (goal off)` | Daily goal disabled | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md` |
+| `22c · Learning (reminder on)` | Reminder enabled | `docs/wireframes/20-settings-learning.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/resume/resume-session.md` |
+| `22d · Learning (perm denied)` | Notification permission denied | `docs/wireframes/20-settings-learning.md` | `docs/contracts/error-contract.md`, `docs/ui-ux/l10n-copy-contract.md` |
+| `22e · Learning (saving)` | Saving settings | `docs/wireframes/20-settings-learning.md` | `docs/state/state-management-contract.md` |
 
 ### 6.6 Audio/Speech variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `15a · Audio (Korean loaded)` | Korean voice list loaded | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` |
-| `15b · Audio (English tab)` | English voice tab active | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` |
-| `15c · Audio (loading voices)` | Voice loading state | `docs/wireframes/21-settings-audio-speech.md` | `docs/state/state-management-contract.md` |
-| `15d · Audio (no voices)` | Empty voices state | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md`, `docs/contracts/error-contract.md` |
-| `15e · Audio (engine error)` | TTS engine error | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md`, `docs/contracts/error-contract.md` |
-| `15f · Audio (preview playing)` | Voice preview playing | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` |
-| `15g · Audio (saving)` | Saving audio settings | `docs/wireframes/21-settings-audio-speech.md` | `docs/state/state-management-contract.md` |
+| `23a · Audio (Korean loaded)` | Korean voice list loaded | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` |
+| `23b · Audio (English tab)` | English voice tab active | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` |
+| `23c · Audio (loading voices)` | Voice loading state | `docs/wireframes/21-settings-audio-speech.md` | `docs/state/state-management-contract.md` |
+| `23d · Audio (no voices)` | Empty voices state | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md`, `docs/contracts/error-contract.md` |
+| `23e · Audio (engine error)` | TTS engine error | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md`, `docs/contracts/error-contract.md` |
+| `23f · Audio (preview playing)` | Voice preview playing | `docs/wireframes/21-settings-audio-speech.md` | `docs/business/tts/tts-settings.md` |
+| `23g · Audio (saving)` | Saving audio settings | `docs/wireframes/21-settings-audio-speech.md` | `docs/state/state-management-contract.md` |
 
 ### 6.7 Tag management variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `16a · Tags (loaded)` | Loaded tag list | `docs/wireframes/22-settings-tag-management.md` | `docs/business/tags/tag-system.md`, `docs/contracts/usecase-contracts/tag.md` |
-| `16b · Tags (loading)` | Loading tag list | `docs/wireframes/22-settings-tag-management.md` | `docs/state/state-management-contract.md` |
-| `16c · Tags (empty)` | No tags yet | `docs/wireframes/22-settings-tag-management.md` | `docs/business/tags/tag-system.md` |
-| `16d · Tags (search empty)` | No search results | `docs/wireframes/22-settings-tag-management.md` | `docs/business/search/global-search.md`, `docs/business/tags/tag-system.md` |
-| `16e · Tags (action sheet)` | Tag action bottom sheet | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/tags/tag-system.md` |
-| `16f · Tags (rename)` | Rename dialog | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/tags/tag-system.md` |
-| `16g · Tags (rename → merge)` | Rename conflict leading to merge | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/tags/tag-system.md`, `docs/contracts/error-contract.md` |
-| `16h · Tags (merge sheet)` | Merge sheet | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/tags/tag-system.md` |
-| `16i · Tags (delete confirm)` | Delete confirmation | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/tags/tag-system.md` |
-| `16j · Tags (busy row)` | Row-level busy state | `docs/wireframes/22-settings-tag-management.md` | `docs/state/state-management-contract.md` |
-| `16k · Tags (op error)` | Operation error | `docs/wireframes/22-settings-tag-management.md` | `docs/contracts/error-contract.md`, `docs/business/tags/tag-system.md` |
+| `11a · Tags (loaded)` | Loaded tag list | `docs/wireframes/22-settings-tag-management.md` | `docs/business/tags/tag-system.md`, `docs/contracts/usecase-contracts/tag.md` |
+| `11b · Tags (loading)` | Loading tag list | `docs/wireframes/22-settings-tag-management.md` | `docs/state/state-management-contract.md` |
+| `11c · Tags (empty)` | No tags yet | `docs/wireframes/22-settings-tag-management.md` | `docs/business/tags/tag-system.md` |
+| `11d · Tags (search empty)` | No search results | `docs/wireframes/22-settings-tag-management.md` | `docs/business/search/global-search.md`, `docs/business/tags/tag-system.md` |
+| `11e · Tags (action sheet)` | Tag action bottom sheet | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/tags/tag-system.md` |
+| `11f · Tags (rename)` | Rename dialog | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/tags/tag-system.md` |
+| `11g · Tags (rename → merge)` | Rename conflict leading to merge | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/tags/tag-system.md`, `docs/contracts/error-contract.md` |
+| `11h · Tags (merge sheet)` | Merge sheet | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/tags/tag-system.md` |
+| `11i · Tags (delete confirm)` | Delete confirmation | `docs/wireframes/22-settings-tag-management.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/tags/tag-system.md` |
+| `11j · Tags (busy row)` | Row-level busy state | `docs/wireframes/22-settings-tag-management.md` | `docs/state/state-management-contract.md` |
+| `11k · Tags (op error)` | Operation error | `docs/wireframes/22-settings-tag-management.md` | `docs/contracts/error-contract.md`, `docs/business/tags/tag-system.md` |
 
 ### 6.8 Library overview variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `17a · Library overview (loaded)` | Loaded root/library overview | `docs/wireframes/02-library.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` |
-| `17b · Library overview (loading)` | Loading library | `docs/wireframes/02-library.md` | `docs/state/state-management-contract.md` |
-| `17c · Library overview (empty)` | Empty library | `docs/wireframes/02-library.md`, `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md`, `docs/business/folder/folder-management.md` |
-| `17d · Library overview (error)` | Library load error | `docs/wireframes/02-library.md` | `docs/contracts/error-contract.md` |
-| `17e · Library overview (search)` | Inline library search state | `docs/wireframes/02-library.md`, `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` |
-| `17f · Library overview (overflow)` | Overflow menu/action state | `docs/wireframes/02-library.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` |
+| `03a · Library overview (loaded)` | Loaded root/library overview | `docs/wireframes/02-library.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` |
+| `03b · Library overview (loading)` | Loading library | `docs/wireframes/02-library.md` | `docs/state/state-management-contract.md` |
+| `03c · Library overview (empty)` | Empty library | `docs/wireframes/02-library.md`, `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md`, `docs/business/folder/folder-management.md` |
+| `03d · Library overview (error)` | Library load error | `docs/wireframes/02-library.md` | `docs/contracts/error-contract.md` |
+| `03e · Library overview (search)` | Inline library search state | `docs/wireframes/02-library.md`, `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` |
+| `03f · Library overview (overflow)` | Overflow menu/action state | `docs/wireframes/02-library.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` |
 
 ### 6.9 Folder detail variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `18a · Folder detail (decks)` | Folder contains decks | `docs/wireframes/05-folder-detail.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` |
-| `18b · Folder detail (subfolders)` | Folder contains subfolders | `docs/wireframes/05-folder-detail.md` | `docs/business/folder/folder-management.md` |
-| `18c · Folder detail (unlocked)` | Empty/unlocked folder state | `docs/wireframes/05-folder-detail.md` | `docs/business/folder/folder-management.md` |
-| `18d · Folder detail (search empty)` | Folder search empty | `docs/wireframes/05-folder-detail.md` | `docs/business/search/global-search.md` |
-| `18e · Folder detail (loading)` | Folder loading state | `docs/wireframes/05-folder-detail.md` | `docs/state/state-management-contract.md` |
-| `18f · Folder detail (error)` | Folder load error | `docs/wireframes/05-folder-detail.md` | `docs/contracts/error-contract.md` |
-| `18g · Folder detail (delete)` | Delete folder confirmation | `docs/wireframes/05-folder-detail.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/folder/folder-management.md` |
-| `18h · Folder detail (move sheet)` | Move folder/deck sheet | `docs/wireframes/05-folder-detail.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` |
+| `04a · Folder detail (decks)` | Folder contains decks | `docs/wireframes/05-folder-detail.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` |
+| `04b · Folder detail (subfolders)` | Folder contains subfolders | `docs/wireframes/05-folder-detail.md` | `docs/business/folder/folder-management.md` |
+| `04c · Folder detail (unlocked)` | Empty/unlocked folder state | `docs/wireframes/05-folder-detail.md` | `docs/business/folder/folder-management.md` |
+| `04d · Folder detail (search empty)` | Folder search empty | `docs/wireframes/05-folder-detail.md` | `docs/business/search/global-search.md` |
+| `04e · Folder detail (loading)` | Folder loading state | `docs/wireframes/05-folder-detail.md` | `docs/state/state-management-contract.md` |
+| `04f · Folder detail (error)` | Folder load error | `docs/wireframes/05-folder-detail.md` | `docs/contracts/error-contract.md` |
+| `04g · Folder detail (delete)` | Delete folder confirmation | `docs/wireframes/05-folder-detail.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/folder/folder-management.md` |
+| `04h · Folder detail (move sheet)` | Move folder/deck sheet | `docs/wireframes/05-folder-detail.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` |
 
 ### 6.10 Flashcard list variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `19a · Flashcard list (loaded)` | Deck flashcard list loaded | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/deck/deck-management.md` |
-| `19b · Flashcard list (empty)` | Empty deck state | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md` |
-| `19c · Flashcard list (search empty)` | Search empty in deck | `docs/wireframes/06-flashcard-list.md` | `docs/business/search/global-search.md`, `docs/business/flashcard/flashcard-management.md` |
-| `19d · Flashcard list (loading)` | Loading cards | `docs/wireframes/06-flashcard-list.md` | `docs/state/state-management-contract.md` |
-| `19e · Flashcard list (error)` | Load cards error | `docs/wireframes/06-flashcard-list.md` | `docs/contracts/error-contract.md` |
-| `19f · Flashcard list (delete card)` | Delete card confirmation | `docs/wireframes/06-flashcard-list.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/flashcard/flashcard-management.md` |
-| `19g · Flashcard list (delete deck)` | Delete deck confirmation | `docs/wireframes/06-flashcard-list.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/deck/deck-management.md` |
-| `19h · Flashcard list (reorder)` | Reorder cards visual state | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md` |
+| `06a · Flashcard list (loaded)` | Deck flashcard list loaded | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md`, `docs/business/deck/deck-management.md` |
+| `06b · Flashcard list (empty)` | Empty deck state | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md` |
+| `06c · Flashcard list (search empty)` | Search empty in deck | `docs/wireframes/06-flashcard-list.md` | `docs/business/search/global-search.md`, `docs/business/flashcard/flashcard-management.md` |
+| `06d · Flashcard list (loading)` | Loading cards | `docs/wireframes/06-flashcard-list.md` | `docs/state/state-management-contract.md` |
+| `06e · Flashcard list (error)` | Load cards error | `docs/wireframes/06-flashcard-list.md` | `docs/contracts/error-contract.md` |
+| `06f · Flashcard list (delete card)` | Delete card confirmation | `docs/wireframes/06-flashcard-list.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/flashcard/flashcard-management.md` |
+| `06g · Flashcard list (delete deck)` | Delete deck confirmation | `docs/wireframes/06-flashcard-list.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/deck/deck-management.md` |
+| `06h · Flashcard list (reorder)` | Reorder cards visual state | `docs/wireframes/06-flashcard-list.md` | `docs/business/flashcard/flashcard-management.md` |
 
 ### 6.11 Flashcard create variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `20a · Flashcard create (empty)` | Empty form | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md` |
-| `20b · Flashcard create (valid)` | Valid form | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md`, `docs/contracts/usecase-contracts/flashcard.md` |
-| `20c · Flashcard create (details open)` | Optional details expanded | `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/tags/tag-system.md`, `docs/business/tts/tts-settings.md` |
-| `20d · Flashcard create (validation)` | Validation errors | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md`, `docs/contracts/error-contract.md` |
-| `20e · Flashcard create (saving)` | Saving state | `docs/wireframes/07-flashcard-create.md` | `docs/state/state-management-contract.md` |
-| `20f · Flashcard create (save failed)` | Save failure | `docs/wireframes/07-flashcard-create.md` | `docs/contracts/error-contract.md` |
+| `07a · Flashcard create (empty)` | Empty form | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md` |
+| `07b · Flashcard create (valid)` | Valid form | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md`, `docs/contracts/usecase-contracts/flashcard.md` |
+| `07c · Flashcard create (details open)` | Optional details expanded | `docs/wireframes/07-flashcard-create.md`, `docs/wireframes/25-shared-bottom-sheets.md` | `docs/business/tags/tag-system.md`, `docs/business/tts/tts-settings.md` |
+| `07d · Flashcard create (validation)` | Validation errors | `docs/wireframes/07-flashcard-create.md` | `docs/business/flashcard/flashcard-management.md`, `docs/contracts/error-contract.md` |
+| `07e · Flashcard create (saving)` | Saving state | `docs/wireframes/07-flashcard-create.md` | `docs/state/state-management-contract.md` |
+| `07f · Flashcard create (save failed)` | Save failure | `docs/wireframes/07-flashcard-create.md` | `docs/contracts/error-contract.md` |
 
 ### 6.12 Flashcard edit variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `21a · Flashcard edit (loaded)` | Edit form loaded | `docs/wireframes/08-flashcard-edit.md` | `docs/business/flashcard/flashcard-management.md` |
-| `21b · Flashcard edit (loading)` | Loading existing card | `docs/wireframes/08-flashcard-edit.md` | `docs/state/state-management-contract.md` |
-| `21c · Flashcard edit (load error)` | Load error | `docs/wireframes/08-flashcard-edit.md` | `docs/contracts/error-contract.md` |
-| `21d · Flashcard edit (validation)` | Validation error | `docs/wireframes/08-flashcard-edit.md` | `docs/business/flashcard/flashcard-management.md`, `docs/contracts/error-contract.md` |
-| `21e · Flashcard edit (saving)` | Dirty form saving | `docs/wireframes/08-flashcard-edit.md` | `docs/state/state-management-contract.md` |
-| `21f · Flashcard edit (save failed)` | Save failed | `docs/wireframes/08-flashcard-edit.md` | `docs/contracts/error-contract.md` |
-| `21g · Flashcard edit (delete)` | Delete card confirmation | `docs/wireframes/08-flashcard-edit.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/flashcard/flashcard-management.md` |
+| `08a · Flashcard edit (loaded)` | Edit form loaded | `docs/wireframes/08-flashcard-edit.md` | `docs/business/flashcard/flashcard-management.md` |
+| `08b · Flashcard edit (loading)` | Loading existing card | `docs/wireframes/08-flashcard-edit.md` | `docs/state/state-management-contract.md` |
+| `08c · Flashcard edit (load error)` | Load error | `docs/wireframes/08-flashcard-edit.md` | `docs/contracts/error-contract.md` |
+| `08d · Flashcard edit (validation)` | Validation error | `docs/wireframes/08-flashcard-edit.md` | `docs/business/flashcard/flashcard-management.md`, `docs/contracts/error-contract.md` |
+| `08e · Flashcard edit (saving)` | Dirty form saving | `docs/wireframes/08-flashcard-edit.md` | `docs/state/state-management-contract.md` |
+| `08f · Flashcard edit (save failed)` | Save failed | `docs/wireframes/08-flashcard-edit.md` | `docs/contracts/error-contract.md` |
+| `08g · Flashcard edit (delete)` | Delete card confirmation | `docs/wireframes/08-flashcard-edit.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/flashcard/flashcard-management.md` |
 
 ### 6.13 Flashcard history variants
 
@@ -260,25 +261,25 @@ V1 status: Future Proposal. These variants are visual references only until Card
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `22a · Flashcard history (loaded)` | History loaded | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/business/srs/srs-review.md` |
-| `22b · Flashcard history (empty)` | No attempts yet | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md` |
-| `22c · Flashcard history (loading)` | Loading history | `docs/wireframes/09-flashcard-history.md` | `docs/state/state-management-contract.md` |
-| `22d · Flashcard history (error)` | History load error | `docs/wireframes/09-flashcard-history.md` | `docs/contracts/error-contract.md` |
-| `22e · Flashcard history (partial)` | Partial history data | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/database/migration-contract.md` |
+| `09a · Flashcard history (loaded)` | History loaded | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/business/srs/srs-review.md` |
+| `09b · Flashcard history (empty)` | No attempts yet | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md` |
+| `09c · Flashcard history (loading)` | Loading history | `docs/wireframes/09-flashcard-history.md` | `docs/state/state-management-contract.md` |
+| `09d · Flashcard history (error)` | History load error | `docs/wireframes/09-flashcard-history.md` | `docs/contracts/error-contract.md` |
+| `09e · Flashcard history (partial)` | Partial history data | `docs/wireframes/09-flashcard-history.md` | `docs/business/history/card-history.md`, `docs/database/migration-contract.md` |
 
 ### 6.14 Deck import variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `23a · Deck import (empty)` | No file/text selected | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/business/flashcard/flashcard-management.md` |
-| `23b · Deck import (file selected)` | File selected before parse | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md` |
-| `23c · Deck import (parsing)` | Parse in progress | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/state/state-management-contract.md` |
-| `23d · Deck import (preview all)` | All rows valid preview | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/usecase-contracts/bulk.md` |
-| `23e · Deck import (preview mixed)` | Mixed valid/invalid preview | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/error-contract.md` |
-| `23f · Deck import (importing)` | Import in progress | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/database/storage-boundaries.md` |
-| `23g · Deck import (success)` | Import success | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/business/flashcard/flashcard-management.md` |
-| `23h · Deck import (partial)` | Partial import success/failure | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/error-contract.md` |
-| `23i · Deck import (failed)` | Import failed | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/error-contract.md` |
+| `10a · Deck import (empty)` | No file/text selected | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/business/flashcard/flashcard-management.md` |
+| `10b · Deck import (file selected)` | File selected before parse | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md` |
+| `10c · Deck import (parsing)` | Parse in progress | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/state/state-management-contract.md` |
+| `10d · Deck import (preview all)` | All rows valid preview | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/usecase-contracts/bulk.md` |
+| `10e · Deck import (preview mixed)` | Mixed valid/invalid preview | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/error-contract.md` |
+| `10f · Deck import (importing)` | Import in progress | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/database/storage-boundaries.md` |
+| `10g · Deck import (success)` | Import success | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/business/flashcard/flashcard-management.md` |
+| `10h · Deck import (partial)` | Partial import success/failure | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/error-contract.md` |
+| `10i · Deck import (failed)` | Import failed | `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/contracts/error-contract.md` |
 
 ### 6.15 Library search variants
 
@@ -286,47 +287,47 @@ V1 status: full global search is Future Proposal. V1 may reuse visual patterns f
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `24a · Library search (empty)` | Empty query | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` |
-| `24b · Library search (loading)` | Searching | `docs/wireframes/11-library-search.md` | `docs/state/state-management-contract.md` |
-| `24c · Library search (results)` | Search results | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` |
-| `24d · Library search (no results)` | No matching result | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md`, `docs/ui-ux/l10n-copy-contract.md` |
-| `24e · Library search (error)` | Search error | `docs/wireframes/11-library-search.md` | `docs/contracts/error-contract.md` |
+| `05a · Library search (empty)` | Empty query | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` |
+| `05b · Library search (loading)` | Searching | `docs/wireframes/11-library-search.md` | `docs/state/state-management-contract.md` |
+| `05c · Library search (results)` | Search results | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md` |
+| `05d · Library search (no results)` | No matching result | `docs/wireframes/11-library-search.md` | `docs/business/search/global-search.md`, `docs/ui-ux/l10n-copy-contract.md` |
+| `05e · Library search (error)` | Search error | `docs/wireframes/11-library-search.md` | `docs/contracts/error-contract.md` |
 
 ### 6.16 Dashboard variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `25a · Dashboard (loaded)` | Normal dashboard | `docs/wireframes/01-dashboard.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/srs/srs-review.md` |
-| `25b · Dashboard (loading)` | Dashboard loading state | `docs/wireframes/01-dashboard.md` | `docs/state/state-management-contract.md` |
-| `25c · Dashboard (onboarding)` | First-use dashboard handoff | `docs/wireframes/01-dashboard.md`, `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md` |
-| `25d · Dashboard (goal off)` | Daily goal disabled | `docs/wireframes/01-dashboard.md` | `docs/business/engagement/dashboard-engagement.md` |
-| `25e · Dashboard (resume only)` | Resume session is the main CTA | `docs/wireframes/01-dashboard.md` | `docs/business/resume/resume-session.md`, `docs/business/study/study-flow.md` |
-| `25f · Dashboard (streak broken)` | Broken streak feedback | `docs/wireframes/01-dashboard.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/ui-ux/l10n-copy-contract.md` |
-| `25g · Dashboard (error)` | Dashboard error | `docs/wireframes/01-dashboard.md` | `docs/contracts/error-contract.md` |
-| `25h · Dashboard (multi resume)` | Multiple resumable sessions | `docs/wireframes/01-dashboard.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/resume/resume-session.md` |
+| `02a · Dashboard (loaded)` | Normal dashboard | `docs/wireframes/01-dashboard.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/srs/srs-review.md` |
+| `02b · Dashboard (loading)` | Dashboard loading state | `docs/wireframes/01-dashboard.md` | `docs/state/state-management-contract.md` |
+| `02c · Dashboard (onboarding)` | First-use dashboard handoff | `docs/wireframes/01-dashboard.md`, `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md` |
+| `02d · Dashboard (goal off)` | Daily goal disabled | `docs/wireframes/01-dashboard.md` | `docs/business/engagement/dashboard-engagement.md` |
+| `02e · Dashboard (resume only)` | Resume session is the main CTA | `docs/wireframes/01-dashboard.md` | `docs/business/resume/resume-session.md`, `docs/business/study/study-flow.md` |
+| `02f · Dashboard (streak broken)` | Broken streak feedback | `docs/wireframes/01-dashboard.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/ui-ux/l10n-copy-contract.md` |
+| `02g · Dashboard (error)` | Dashboard error | `docs/wireframes/01-dashboard.md` | `docs/contracts/error-contract.md` |
+| `02h · Dashboard (multi resume)` | Multiple resumable sessions | `docs/wireframes/01-dashboard.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/resume/resume-session.md` |
 
 ### 6.17 Progress variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `26a · Progress (week)` | Weekly progress view | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/history/card-history.md` |
-| `26b · Progress (month)` | Monthly progress view | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/history/card-history.md` |
-| `26c · Progress (loading)` | Progress loading state | `docs/wireframes/03-progress.md` | `docs/state/state-management-contract.md` |
-| `26d · Progress (empty)` | No progress data | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md` |
-| `26e · Progress (insufficient)` | Not enough data for trend/chart | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/ui-ux/l10n-copy-contract.md` |
-| `26f · Progress (partial)` | Partial data available | `docs/wireframes/03-progress.md` | `docs/business/history/card-history.md`, `docs/contracts/error-contract.md` |
-| `26g · Progress (error)` | Progress load error | `docs/wireframes/03-progress.md` | `docs/contracts/error-contract.md` |
+| `19a · Progress (week)` | Weekly progress view | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/history/card-history.md` |
+| `19b · Progress (month)` | Monthly progress view | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/business/history/card-history.md` |
+| `19c · Progress (loading)` | Progress loading state | `docs/wireframes/03-progress.md` | `docs/state/state-management-contract.md` |
+| `19d · Progress (empty)` | No progress data | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md` |
+| `19e · Progress (insufficient)` | Not enough data for trend/chart | `docs/wireframes/03-progress.md` | `docs/business/engagement/dashboard-engagement.md`, `docs/ui-ux/l10n-copy-contract.md` |
+| `19f · Progress (partial)` | Partial data available | `docs/wireframes/03-progress.md` | `docs/business/history/card-history.md`, `docs/contracts/error-contract.md` |
+| `19g · Progress (error)` | Progress load error | `docs/wireframes/03-progress.md` | `docs/contracts/error-contract.md` |
 
 ### 6.18 Study result variants
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `27a · Study result (loaded)` | Normal completed session result | `docs/wireframes/18-study-result.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` |
-| `27b · Study result (loading)` | Result loading/finalizing | `docs/wireframes/18-study-result.md` | `docs/state/state-management-contract.md` |
-| `27c · Study result (goal off)` | Result with goal disabled | `docs/wireframes/18-study-result.md` | `docs/business/engagement/dashboard-engagement.md` |
-| `27d · Study result (save failed)` | Finalization/save failed | `docs/wireframes/18-study-result.md` | `docs/contracts/error-contract.md`, `docs/contracts/usecase-contracts/study.md` |
-| `27e · Study result (defensive)` | Defensive fallback state | `docs/wireframes/18-study-result.md` | `docs/contracts/error-contract.md` |
-| `27f · Study result (tough empty)` | Empty/tough cards fallback | `docs/wireframes/18-study-result.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` |
+| `17a · Study result (loaded)` | Normal completed session result | `docs/wireframes/18-study-result.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` |
+| `17b · Study result (loading)` | Result loading/finalizing | `docs/wireframes/18-study-result.md` | `docs/state/state-management-contract.md` |
+| `17c · Study result (goal off)` | Result with goal disabled | `docs/wireframes/18-study-result.md` | `docs/business/engagement/dashboard-engagement.md` |
+| `17d · Study result (save failed)` | Finalization/save failed | `docs/wireframes/18-study-result.md` | `docs/contracts/error-contract.md`, `docs/contracts/usecase-contracts/study.md` |
+| `17e · Study result (defensive)` | Defensive fallback state | `docs/wireframes/18-study-result.md` | `docs/contracts/error-contract.md` |
+| `17f · Study result (tough empty)` | Empty/tough cards fallback | `docs/wireframes/18-study-result.md` | `docs/business/study/study-flow.md`, `docs/business/srs/srs-review.md` |
 
 ### 6.19 Onboarding variants
 
@@ -334,19 +335,21 @@ V1 status: full onboarding is Future Proposal. V1 implements only zero-content e
 
 | Mock variant | Visual state | Wireframe | Required docs |
 | --- | --- | --- | --- |
-| `28a · Onboarding (welcome)` | Welcome state | `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md` |
-| `28b · Onboarding (zero state)` | Empty app zero state | `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md`, `docs/business/deck/deck-management.md` |
-| `28c · Onboarding (create deck)` | Create deck handoff | `docs/wireframes/23-onboarding.md`, `docs/wireframes/02-library.md` | `docs/business/deck/deck-management.md` |
-| `28d · Onboarding (deck for import)` | Create deck before import | `docs/wireframes/23-onboarding.md`, `docs/wireframes/10-deck-import.md` | `docs/business/deck/deck-management.md`, `docs/business/bulk/bulk-operations.md` |
-| `28e · Onboarding (signing in)` | Sign-in in progress | `docs/wireframes/23-onboarding.md`, `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md` |
-| `28f · Onboarding (restore prompt)` | Restore prompt | `docs/wireframes/23-onboarding.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/account-sync/account-sync.md` |
-| `28g · Onboarding (restoring)` | Restoring backup | `docs/wireframes/23-onboarding.md`, `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/database/storage-boundaries.md` |
-| `28h · Onboarding (restore failed)` | Restore failed | `docs/wireframes/23-onboarding.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
-| `28i · Onboarding (import handoff)` | Import flow handoff | `docs/wireframes/23-onboarding.md`, `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/business/flashcard/flashcard-management.md` |
+| `01a · Onboarding (welcome)` | Welcome state | `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md` |
+| `01b · Onboarding (zero state)` | Empty app zero state | `docs/wireframes/23-onboarding.md` | `docs/business/system/overview.md`, `docs/business/deck/deck-management.md` |
+| `01c · Onboarding (create deck)` | Create deck handoff | `docs/wireframes/23-onboarding.md`, `docs/wireframes/02-library.md` | `docs/business/deck/deck-management.md` |
+| `01d · Onboarding (deck for import)` | Create deck before import | `docs/wireframes/23-onboarding.md`, `docs/wireframes/10-deck-import.md` | `docs/business/deck/deck-management.md`, `docs/business/bulk/bulk-operations.md` |
+| `01e · Onboarding (signing in)` | Sign-in in progress | `docs/wireframes/23-onboarding.md`, `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md` |
+| `01f · Onboarding (restore prompt)` | Restore prompt | `docs/wireframes/23-onboarding.md`, `docs/wireframes/24-shared-dialogs.md` | `docs/business/account-sync/account-sync.md` |
+| `01g · Onboarding (restoring)` | Restoring backup | `docs/wireframes/23-onboarding.md`, `docs/wireframes/19-settings-account.md` | `docs/business/account-sync/account-sync.md`, `docs/database/storage-boundaries.md` |
+| `01h · Onboarding (restore failed)` | Restore failed | `docs/wireframes/23-onboarding.md` | `docs/business/account-sync/account-sync.md`, `docs/contracts/error-contract.md` |
+| `01i · Onboarding (import handoff)` | Import flow handoff | `docs/wireframes/23-onboarding.md`, `docs/wireframes/10-deck-import.md` | `docs/business/bulk/bulk-operations.md`, `docs/business/flashcard/flashcard-management.md` |
 
 ## 7. Legacy and stale mock references
 
-The mobile mock file contains legacy component functions and the mobile README still documents an older 5-screen kit.
+The mobile mock file contains legacy component functions. The mobile README is now aligned with
+the 129 rendered variants and labels them as Current / Partial / Future / Rejected / Visual-only
+target.
 
 | Legacy mock name | Current production mapping | Decision |
 | --- | --- | --- |
@@ -411,7 +414,7 @@ Rules:
 | Study entry gate | No explicit rendered gallery group is mapped to `docs/wireframes/12-study-entry-gate.md`. | Implement from wireframe/business docs first. Add visual mock later if needed. |
 | Shared dialogs catalog | Dialogs exist as embedded states, but not as a standalone complete gallery. | Use `docs/wireframes/24-shared-dialogs.md` as source of truth. Mock embedded dialogs are visual references only. |
 | Shared bottom sheets catalog | Sheets exist as embedded states, but not as a standalone complete gallery. | Use `docs/wireframes/25-shared-bottom-sheets.md` as source of truth. |
-| Mobile kit README | It describes older 5-screen setup while `index.html` contains 129 variants. | Create a separate cleanup task to update README. This mapping intentionally does not overwrite it. |
+| Mobile kit README | It now describes the 129-variant gallery and locks scope/status labels. | Keep it aligned whenever `index.html` screen names or state labels change. |
 | Legacy naming | `Stats`, `Home`, `Deck`, `Cards`, `BulkAdd` appear in old mock code. | Use current docs naming: Dashboard, Progress, Folder detail, Flashcard list, Deck import. |
 | Token drift | Some design docs may use old theme/color names. | Resolve token conflicts in a separate design-system cleanup task before large-scale UI implementation. |
 
@@ -447,6 +450,10 @@ Do not do the following:
 6. Do not bypass use cases/repositories just because mock data is local in HTML.
 7. Do not put emoji strings into production UI. Emoji in visual drafts means icon intent only.
 8. Do not use mock text as final UI copy without checking l10n contract.
+9. Do not implement root-level decks from Library mock rows. Library root contains folders only;
+   Folder Detail contains decks; every deck belongs to exactly one folder.
+10. Do not implement nullable deck parent migration. That direction is Rejected / Not Applicable
+    unless product ownership explicitly reverses the folder-owned deck invariant.
 
 ## 13. Final leadership position
 

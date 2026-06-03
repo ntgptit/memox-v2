@@ -89,15 +89,13 @@ A pending column listed here does not automatically approve every dependent feat
 - `study_attempts.result = 'recovered'` — ✅ implemented in schema v13 for Fill hint-taint / Mark-correct grading. Schema v13 intentionally also repairs schema-12 databases that were created before the recovered CHECK migration was version-safe.
 - `flashcard_progress.last_reset_at`, `study_attempts.box_before`, and `study_attempts.box_after` are reserved for the Future Proposal Card History feature unless promoted.
 - `decks.target_language` may be implemented only with the deck/TTS migration task that updates Drift schema, mapper, tests, and generated code.
-- `decks.folder_id` nullable may be implemented only with the nullable deck
-  parent migration task that updates Drift schema, generated code, domain/API,
-  DAO/read models, UI, docs, and tests together. Root decks are represented by
-  `folder_id = null`; current production keeps `folder_id` non-null.
+- `decks.folder_id` nullable is Rejected / Not Applicable after Prompt 43A.
+  Keep `folder_id` non-null because every deck belongs to exactly one folder.
 
 | Change | Source spec | Notes |
 | --- | --- | --- |
 | Add `decks.target_language TEXT NOT NULL DEFAULT 'korean'` | `docs/business/deck/deck-management.md` | Migration backfills existing rows to `'korean'`. |
-| Change `decks.folder_id` from `TEXT NOT NULL` to `TEXT NULL` | `docs/database/migrations/nullable-deck-parent-migration.md`, `docs/business/deck/deck-management.md`, `docs/wireframes/02-library.md` | Migration preserves existing folder-owned decks and creates no root decks. Non-null folder ids keep FK cascade. Root sibling uniqueness needs partial unique index or normalized parent scope because SQLite treats `NULL` values as distinct. |
+| Rejected / Not Applicable: change `decks.folder_id` from `TEXT NOT NULL` to `TEXT NULL` | `docs/database/migrations/nullable-deck-parent-migration.md`, `docs/business/deck/deck-management.md`, `docs/wireframes/02-library.md` | Superseded by product-owner decision. Do not make deck parent nullable; folder-owned deck invariant remains locked. |
 | ✅ DONE (v10) `flashcard_progress.buried_until INTEGER NULL` | `docs/business/study-actions/bury-suspend.md` | Default null. Shipped in schema v10. |
 | ✅ DONE (v10) `flashcard_progress.is_suspended BOOL NOT NULL DEFAULT 0` | `docs/business/study-actions/bury-suspend.md` | Default false. Shipped in schema v10. |
 | Add `flashcard_progress.last_reset_at INTEGER NULL` | `docs/business/history/card-history.md` | Default null. Updated when user resets a card's progress. |

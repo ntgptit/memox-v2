@@ -5,15 +5,14 @@ status: contract
 
 # Deck Use Cases Contract
 
-> **Current implementation note (Prompt 42, 2026-06-02):** nullable
-> `parentFolderId` / root-deck signatures in this contract are target shape only.
-> Current production use cases require concrete folder ids and the Drift
-> `decks.folder_id` column is non-null. Root-level deck create/move/reorder must
-> wait for a dedicated nullable-`folder_id` schema/API migration batch.
+> **Current implementation note (Prompt 43A, 2026-06-03):** nullable
+> `parentFolderId` / root-deck signatures are Rejected / Out of Scope. Current
+> production use cases require concrete folder ids and the Drift
+> `decks.folder_id` column is non-null. Keep every deck folder-owned.
 >
-> **Prompt 42B design note (2026-06-02):** nullable parent migration design is
-> ready in `docs/database/migrations/nullable-deck-parent-migration.md`, but no
-> production/schema/generated/test implementation was made in Prompt 42B.
+> **Prompt 42B design note (2026-06-02):**
+> `docs/database/migrations/nullable-deck-parent-migration.md` is retained only
+> as a rejected historical design note. Do not implement it.
 
 > Target architecture note: `Either<Failure, T>` / `fpdart` references describe MemoX's intended error/result contract style. If the project has not yet adopted `fpdart`, do not add it during ordinary feature implementation. First run an approved dependency/API migration task, or use the existing repository error/result pattern until that migration is approved.
 
@@ -23,16 +22,14 @@ status: contract
 Future<Either<Failure, Deck>> call({
   required String name,
   required TargetLanguage targetLanguage,
-  required FolderId? parentFolderId,  // null = root
+  required FolderId parentFolderId,
 });
 ```
 
 **Preconditions:**
 
-- Parent folder (if any) exists.
+- Parent folder exists.
 - Parent `content_mode` ∈ (`unlocked`, `decks`).
-- Root parent (`parentFolderId == null`) skips folder existence and folder mode
-  updates; root is treated as an implicit unlocked container after migration.
 
 **Rules:**
 
@@ -69,7 +66,7 @@ Future<Either<Failure, Deck>> call({
 ```dart
 Future<Either<Failure, Deck>> call({
   required DeckId id,
-  required FolderId? newParentId,  // null = root
+  required FolderId newParentId,
 });
 ```
 
@@ -80,8 +77,6 @@ Future<Either<Failure, Deck>> call({
 **Rules:**
 
 - Atomic deck-parent + both folder modes; recompute `sort_order`. See `docs/contracts/repository-contracts/deck-repository.md`.
-- Moving from root to folder updates only the new folder mode; moving from
-  folder to root updates only the old folder mode.
 
 **Errors:** `NotFoundFailure`, `UnsupportedActionFailure`, `StorageFailure`.
 
@@ -106,7 +101,7 @@ Future<Either<Failure, Unit>> call({required DeckId id});
 ## ReorderDecksUseCase
 
 ```dart
-Future<Either<Failure, Unit>> call({required FolderId? parentId, required List<DeckId> orderedIds});
+Future<Either<Failure, Unit>> call({required FolderId parentId, required List<DeckId> orderedIds});
 ```
 
 Same shape as ReorderFoldersUseCase.
@@ -143,7 +138,7 @@ Used by deck-level study CTA enable/disable and Today CTA subtitle.
 
 **Business spec:** `docs/business/deck/deck-management.md`
 **Repository:** `docs/contracts/repository-contracts/deck-repository.md`
-**Migration design:** `docs/database/migrations/nullable-deck-parent-migration.md`
+**Rejected migration design:** `docs/database/migrations/nullable-deck-parent-migration.md`
 **Wireframes:** `docs/wireframes/02-library.md`, `docs/wireframes/05-folder-detail.md`, `docs/wireframes/06-flashcard-list.md`
 **TTS gate:** `docs/business/tts/tts-settings.md`
 **Decision table:** rows D1-D8

@@ -137,6 +137,14 @@ No Figma was attached for this system.
 - Bottom nav is `80dp` tall (M3 `NavigationBar`). App bar is `56dp`, large `64dp`.
 - Status dots are `8dp`, chart legend dots `12dp`. Mastery rings are `40dp × 3dp stroke` in list tiles.
 
+### Action density
+
+Mobile energy does not mean every action becomes a full-width hero CTA. Hero CTAs are reserved
+for onboarding, full-screen empty states, study submit/final actions, and screen-bottom action
+contexts. Dashboard, Library, Folder Detail, Flashcard List, and Settings cards use compact or
+dense card actions so repeated workflows stay scannable. See
+`docs/ui-ux/action-hierarchy-contract.md`.
+
 ### Cards
 - Always white (`surfaceContainerLowest`) in light mode.
 - `RadiusTokens.lg` (16dp) corners.
@@ -183,4 +191,4 @@ Preview cards:
 - No Figma file was provided — everything is derived from source code. If Figma designs exist, attach them and we'll reconcile any drift.
 - Plus Jakarta Sans is loaded from Google Fonts CDN, not self-hosted `.ttf` files. If you need offline-safe self-hosted fonts, drop the TTFs into `fonts/` and update `colors_and_type.css`.
 - Iconography uses Lucide CDN as a visual stand-in for Flutter's Material Symbols. Confirm direction before production use.
-- The UI kit recreates screens from `lib/features/**` source and `l10n/app_en.arb` copy. No screen was copied from a screenshot; if any visual detail is off, it's because the corresponding widget was summarized rather than read byte-for-byte.
+- The UI kit recreates screens from current architecture paths (`lib/presentation/features/**`, `lib/domain/**`, `lib/data/**`, `lib/app/**`) and `lib/l10n/app_en.arb` copy. No screen was copied from a screenshot; if any visual detail is off, it's because the corresponding widget was summarized rather than read byte-for-byte.

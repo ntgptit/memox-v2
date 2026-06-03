@@ -5,22 +5,21 @@ applies_to: deck entity and deck management feature
 
 # Deck Management
 
-> **Status: Partial Target — Migration Required for `target_language` and root-level decks.** Folder-owned deck CRUD itself is implementable today. However, the `target_language` field (referenced throughout this spec) is a pending column from `docs/database/schema-contract.md` §Pending schema changes:
+> **Status: Partial Target — Migration Required for `target_language`; root-level decks Rejected / Out of Scope.** Folder-owned deck CRUD itself is implementable today. However, the `target_language` field (referenced throughout this spec) is a pending column from `docs/database/schema-contract.md` §Pending schema changes:
 >
 > - `decks.target_language TEXT NOT NULL DEFAULT 'korean'`
 >
 > Migration backfills existing decks to `'korean'`; user adjusts per-deck after. Blocks (until migration): TTS gating in study modes 13-17, settings audio-speech screen, target-language picker in deck create/edit flows.
 >
-> Prompt 42 rechecked root-level deck support on 2026-06-02 and found it blocked
-> by the current production schema/API shape: `decks.folder_id` is non-null in
-> Drift, `DeckEntity.folderId` is non-null, and deck create/move/reorder/duplicate
-> APIs require a concrete folder id. Root-level decks remain Target until a
-> dedicated migration batch makes `folder_id` nullable and updates the repository,
-> read models, UI, tests, and docs together.
+> Prompt 43A supersedes the Prompt 42/42B root-level deck direction. Product
+> ownership rejected root-level decks: every deck must belong to exactly one
+> folder, `decks.folder_id` stays non-null, and deck create/move/reorder/duplicate
+> APIs remain folder-bound.
 >
-> Prompt 42B added the implementation-ready migration design at
-> `docs/database/migrations/nullable-deck-parent-migration.md`. It did not change
-> production code, schema, generated Drift output, or tests.
+> The Prompt 42B nullable deck parent design at
+> `docs/database/migrations/nullable-deck-parent-migration.md` is retained only as
+> a rejected historical note. It must not be used as recommended implementation
+> direction.
 
 ## Source files to inspect
 
@@ -73,12 +72,10 @@ Existing decks (pre-feature) get `target_language = korean` as default during mi
 
 ## Rules
 
-- Current production deck belongs to exactly one folder.
-- Target root-level deck support allows `folder_id = null`, but this is blocked
-  until Prompt 43 implements the dedicated nullable-`folder_id` migration batch.
-- Root deck sibling-name uniqueness requires root-safe validation/index design;
-  a plain SQLite unique constraint over `(folder_id, name)` is not enough for
-  root decks because `NULL` values are distinct.
+- A deck belongs to exactly one folder.
+- Root-level decks are Rejected / Out of Scope.
+- `decks.folder_id` must not be made nullable under the rejected root-deck
+  direction.
 - Deck name is required after trim.
 - Deck name max length follows schema constraint.
 - Deck target language is required (default `korean`).
@@ -117,7 +114,7 @@ Do not add a separate deck detail route unless route contract and navigation doc
 
 **Wireframes:**
 
-- `docs/wireframes/02-library.md` — Current V1 Library does not render root-level decks; top-level deck rows are Future/Target
+- `docs/wireframes/02-library.md` — Current V1 Library does not render root-level decks; top-level deck rows are Rejected / Out of Scope
 - `docs/wireframes/05-folder-detail.md` — decks listed inside a folder (decks mode)
 - `docs/wireframes/06-flashcard-list.md` — deck content view + deck-level CTAs
 - `docs/wireframes/10-deck-import.md` — import flow into a deck
@@ -126,8 +123,9 @@ Do not add a separate deck detail route unless route contract and navigation doc
 **Schema:**
 
 - `docs/database/schema-contract.md` → `decks` table (`id`, `folder_id`, `name`, `target_language`, `sort_order`, timestamps). `target_language` is one of the 6 pending migrations.
-- `docs/database/migrations/nullable-deck-parent-migration.md` → Prompt 42B
-  design for nullable `decks.folder_id` and root-level deck rollout.
+- `docs/database/migrations/nullable-deck-parent-migration.md` → rejected Prompt
+  42B design; nullable `decks.folder_id` is Not Applicable while the folder-owned
+  deck invariant holds.
 
 **Decision table:**
 

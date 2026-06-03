@@ -79,7 +79,7 @@ Parity audit: routes-vs-navigation tracked in `docs/checklist/wireframe-code-par
 
 ## 01. Dashboard (`/home`)
 
-Mock refs: variants `25a`–`25h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.16 + §5.
+Mock refs: variants `02a`–`02h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.16 + §5.
 
 Parity audit: row #01 in `docs/checklist/wireframe-code-parity-assessment.md` §1. Prompt 04 (2026-05-30) landed resume card + multi-resume paused-sessions sheet + discard dialog + Start-new-learning scope picker (Today/Deck/Folder) + recent decks (verified by `test/presentation/dashboard_screen_test.dart`). Prompt 32 (2026-06-02) locked the static `Streak` / `0 days` stats row as a visual/stat placeholder only: no engagement persistence, settings, reminder, sheet, or streak-history action. Remaining drift is engagement-only: streak chip/`MxStreakCard` and daily-goal ring stay `Target` (blocked on §3.2 streak/engagement product decision).
 
@@ -98,22 +98,22 @@ Parity audit: row #01 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 02. Library (`/library`)
 
-Mock refs: variants `17a`–`17f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.8.
+Mock refs: variants `03a`–`03f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.8.
 
 Parity audit: row #02 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code). Inline search field in app bar verified; recursive folder count in `WatchLibraryOverviewUseCase` verified in Prompt 14 (recursive subtree counts, sibling isolation, empty nested folder zero counts). Remaining Library rows stay Partial for broader sort/empty/responsive parity.
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Partial | Library | List top-level folders (root decks Future) | `libraryOverviewQuery`, `library_overview_screen.dart` | `lib/presentation/features/folders/screens/library_overview_screen.dart`, `lib/presentation/features/folders/**` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` | `docs/wireframes/02-library.md` | [Verified 2026-05-31, Prompt 18]: top-level folder rendering + recursive counts (Prompt 14) are Current. **Root-level decks are NOT rendered** — `LibraryOverviewReadModel` has no deck channel; deck rows + deck-row navigation remain Future. Stays Partial. |
+| Partial | Library | List top-level folders (root decks rejected) | `libraryOverviewQuery`, `library_overview_screen.dart` | `lib/presentation/features/folders/screens/library_overview_screen.dart`, `lib/presentation/features/folders/**` | `docs/business/folder/folder-management.md`, `docs/business/deck/deck-management.md` | `docs/wireframes/02-library.md` | [Verified 2026-05-31, Prompt 18; Prompt 43A decision update]: top-level folder rendering + recursive counts (Prompt 14) are Current. **Root-level decks are NOT rendered** — `LibraryOverviewReadModel` has no deck channel; deck rows + deck-row navigation are Rejected / Out of Scope. Stays Partial for other Library UI gaps. |
 | Current | Library | Empty state + search no-results | `LibraryEmptyStateSection` (true empty) + `LibrarySearchNoResultsSection` (search no-results) | `lib/presentation/features/folders/screens/library_overview_screen.dart`, `lib/presentation/features/folders/widgets/library_empty_state_section.dart` | `docs/business/folder/folder-management.md` | `docs/wireframes/02-library.md` | [Verified 2026-05-31, Prompt 18B]: true empty = `totalFolderCount == 0` (any search term → "Create folder" CTA); search no-results = `folders.isEmpty && searchTerm active && totalFolderCount > 0` (`ValueKey('library_search_no_results')`, "Clear" CTA). Widget tests DT3/DT4/DT4b/DT5. |
 | Partial | Library | Sort (data layer only; no UI control) | `ContentSortMode` applied in `getLibraryOverview`; `setSortMode` on viewmodel | `lib/data/repositories/folder_repository_impl.dart`, `lib/presentation/features/folders/viewmodels/library_overview_viewmodel.dart` | `docs/contracts/types-catalog.md`, `docs/business/folder/folder-management.md` | `docs/wireframes/02-library.md` | [Verified 2026-05-31, Prompt 18]: sort is implemented + tested at repo/use-case layer (`content_repository_test`). **No overflow sort menu / sort chip on Library Overview** (`mx_sort_menu_chip`/`mx_search_sort_toolbar` belong to Folder Detail). Sort UI remains Future. |
 | Current | Library | Create folder (root) | `CreateFolderUseCase.createRoot` via `MxNameDialog` | `lib/domain/usecases/folder_usecases.dart`, `lib/presentation/shared/dialogs/mx_name_dialog.dart`, `lib/presentation/features/folders/screens/library_overview_screen.dart` | `docs/business/folder/folder-management.md`, `docs/contracts/usecase-contracts/folder.md` | `docs/wireframes/02-library.md`, `docs/wireframes/24-shared-dialogs.md` | [Verified 2026-05-31, Prompt 18]: FAB + empty-state CTA open `MxNameDialog`; blank rejected; failure → localized snackbar; success refreshes via `contentDataRevision`. |
-| Future | Library | Create deck (owned by Folder Detail) | Not exposed on Library Overview | `lib/presentation/features/folders/screens/folder_detail_screen.dart` (deck creation owner) | `docs/business/deck/deck-management.md`, `docs/contracts/usecase-contracts/deck.md` | `docs/wireframes/02-library.md`, `docs/wireframes/05-folder-detail.md` | [Verified 2026-05-31, Prompt 18]: Library Overview FAB creates a **folder** only. Root-level deck creation is not exposed here; deck creation lives in Folder Detail. |
+| Rejected | Library | Create root-level deck | Not exposed on Library Overview | — | `docs/business/deck/deck-management.md`, `docs/contracts/usecase-contracts/deck.md` | `docs/wireframes/02-library.md`, `docs/wireframes/05-folder-detail.md` | [Prompt 43A decision update]: Library Overview FAB creates a **folder** only. Root-level deck creation is Rejected / Out of Scope; deck creation lives in Folder Detail and every deck belongs to exactly one folder. |
 | Partial | Library | Inline scope-local search | Inline `MxSearchField` → `LibraryToolbarState` → `ContentQuery` | `lib/presentation/features/folders/widgets/library_app_bar.dart`, `lib/presentation/features/folders/viewmodels/library_overview_viewmodel.dart` | `docs/business/search/global-search.md` | `docs/wireframes/02-library.md`, `docs/wireframes/11-library-search.md` | [Verified 2026-05-31, Prompt 18]: inline search is Current and **never navigates** — there is no `/library/search` route. Search broadens to any folder by name. Global Search screen (11) remains Future. |
 
 ## 03. Progress (`/progress`)
 
-Mock refs: variants `26a`–`26g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.17. Legacy variant `11 · Stats` is a deprecated visual reference (see §6.2 of the mapping doc); do not implement against it.
+Mock refs: variants `19a`–`19g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.17. Legacy variant `18 · Stats` is a deprecated visual reference (see §6.2 of the mapping doc); do not implement against it.
 
 Parity audit: row #03 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 20 (2026-05-31) verified the V1 reality: Progress is a read-only learning overview + active-session recovery screen. Chart-heavy analytics, box distribution, streak/daily-goal, suspended/buried global links, Flashcard History, and Global Search remain Future/Target, not Current.
 
@@ -131,7 +131,7 @@ Parity audit: row #03 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 04. Settings hub (`/settings`)
 
-Mock refs: variants `12a`–`12e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.3.
+Mock refs: variants `20a`–`20e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.3.
 
 Parity audit: row #04 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 21 verified route/action parity for the hub. 4 sub-routes match `RouteNames`; tag management is nested under Learning; hub subtitles remain Partial where they are V1 summaries instead of live aggregates.
 
@@ -142,7 +142,7 @@ Parity audit: row #04 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 05. Folder detail (`/library/folder/:id`)
 
-Mock refs: variants `18a`–`18h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.9.
+Mock refs: variants `04a`–`04h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.9.
 
 Parity audit: row #05 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — minor drift (doc beyond code). Components doc up to date; Prompt 14 verified/fixed lock-mode UI fallback as typed localized snackbar copy (`folder_contains_decks` / `folder_contains_subfolders`) with no generic error.
 
@@ -160,7 +160,7 @@ Parity audit: row #05 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 06. Flashcard list (`/library/deck/:deckId/flashcards`)
 
-Mock refs: variants `19a`–`19h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.10.
+Mock refs: variants `06a`–`06h` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.10.
 
 Parity audit: row #06 in `docs/checklist/wireframe-code-parity-assessment.md` §1. 13-row §Components mapping 1-1 with `flashcard_*_section.dart`. §Rules, §States, §Forbidden re-verified aspect-by-aspect in **Prompt 16 (2026-05-31)** — see wireframe 06 "V1 verification status". Verified-Current: route safety, loading/error/empty-deck/no-results states, scope-local search, sort + manual reorder, Delete/Move/Export ownership, study-modes-via-gate, Import route ownership. Future (not exposed): resume banner, status/tag filter chips, state badges, bulk suspend/reset/tag, long-press→select. Do NOT claim full-screen `Current`.
 
@@ -177,7 +177,7 @@ Parity audit: row #06 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 07. Flashcard create (`/library/deck/:deckId/flashcards/new`)
 
-Mock refs: variants `20a`–`20f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.11.
+Mock refs: variants `07a`–`07f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.11.
 
 Parity audit: row #07 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 15 aligned the route-specific docs with the shared `flashcard_editor_screen.dart` implementation. Wireframes 07 and 08 remain separate route-specific docs, each carrying the shared-editor contract table.
 
@@ -191,7 +191,7 @@ Parity audit: row #07 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 08. Flashcard edit (`/library/deck/:deckId/flashcards/:flashcardId/edit`)
 
-Mock refs: variants `21a`–`21g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.12.
+Mock refs: variants `08a`–`08g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.12.
 
 Parity audit: row #08 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 15 aligned the route-specific docs with the shared `flashcard_editor_screen.dart` implementation. `View history` is Future Proposal for V1 and must not be exposed as a live action. Bury/Suspend foundation implemented (P0-2, §3.1 resolved); the live trigger is the study-session card-actions sheet (§25), not the editor. Move/delete/export live on the flashcard list row/bulk action surfaces, not in the editor.
 
@@ -206,7 +206,7 @@ Parity audit: row #08 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 09. Flashcard history
 
-Mock refs: variants `22a`–`22e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.13. Note: variant `22e` (partial history) hints at the migration dependency tracked in the `Blocked` status of these rows.
+Mock refs: variants `09a`–`09e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.13. Note: variant `22e` (partial history) hints at the migration dependency tracked in the `Blocked` status of these rows.
 
 Parity audit: row #09 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — intentionally absent in V1 after the 2026-05-29 product decision. `study_attempts_table` data exists, but the history screen/use cases and required `last_reset_at` / `box_before` / `box_after` migration remain Future Proposal / Migration Required. Cross-cutting: §3.4 card history.
 
@@ -218,7 +218,7 @@ Parity audit: row #09 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 10. Deck import
 
-Mock refs: variants `23a`–`23i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.14.
+Mock refs: variants `10a`–`10i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.14.
 
 Parity audit: row #10 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — aligned at §Implementation refs scope (`✅ =` partial). CSV / structured-text via `flashcard_import_support.dart` + Excel via DIY `flashcard_excel_import_parser.dart` (single sheet, no formulas — known limitation). **Decision-table rows cross-verified 2026-05-31 (Prompt 17)** — see wireframe 10 "V1 verification status". V1 ships an inline bulk-add (mock `05d`: Text/File tabs + Paste/Preview + footer commit), NOT the 3-step configure→preview→result mock. Do NOT mark whole screen `Current`.
 
@@ -232,7 +232,7 @@ Parity audit: row #10 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 11. Library search
 
-Mock refs: variants `24a`–`24e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.15. The mapping doc now treats this group as a future visual reference; matrix status is `Future` because the full global search screen was downgraded out of V1.
+Mock refs: variants `05a`–`05e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.15. The mapping doc now treats this group as a future visual reference; matrix status is `Future` because the full global search screen was downgraded out of V1.
 
 Parity audit: row #11 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — full global search is intentionally absent in V1 after the 2026-05-29 decision. V1 keeps inline/scope-local search only. Do not add `SearchScreen`, `GlobalSearchUseCase`, `/library/search`, or `search.recent` until the Future Proposal is promoted.
 
@@ -329,7 +329,7 @@ Parity audit: row #17 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 18. Study result
 
-Mock refs: variants `27a`–`27f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.18.
+Mock refs: variants `17a`–`17f` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.18.
 
 Parity audit: row #18 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — V1 action behavior + result breakdown landed in Prompt 09 (Done uses `go`, Study more opens scope picker, failed-finalize keeps Done available, breakdown shows Perfect / Passed / Recovered / Forgot from attempts). [Prompt 11, 2026-05-31] V1 local per-card review section ("Cards to review") added: recovered/forgot cards from the current session render front/back + Recovered / Forgot label + optional box transition, forgot rows sort first, most-recently-answered first within a bucket. Perfect / initialPassed cards are excluded from the V1 review list. No filtered tough-card route and no History navigation are introduced. Streak chip + external filtered tough-cards list remain **Future/Blocked** (engagement use cases not present, no filtered history route). Cross-cutting: §3.2 streak/engagement; §3.13 item 8 (`record_completion_usecase.dart` missing).
 
@@ -345,9 +345,9 @@ Parity audit: row #18 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 19. Settings — Account
 
-Mock refs: variants `13a`–`13i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.4.
+Mock refs: variants `21a`–`21i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.4.
 
-Parity audit: row #19 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 22 verified V1 route/action/account/sync safety. Strong restore-protection flow and account removal remain Target/Partial. Mock gap: variants `13a`–`13i` do not distinguish platform — tracked in §3.15.2 item 4.
+Parity audit: row #19 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 22 verified V1 route/action/account/sync safety. Strong restore-protection flow and account removal remain Target/Partial. Mock gap: variants `21a`–`21i` do not distinguish platform — tracked in §3.15.2 item 4.
 
 | Status | Screen | Function | Function detail | Files to modify | Doc refs | Wireframe | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -357,7 +357,7 @@ Parity audit: row #19 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 20. Settings — Learning
 
-Mock refs: variants `14a`–`14e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.5.
+Mock refs: variants `22a`–`22e` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.5.
 
 Parity audit: row #20 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 23 verified current V1 as study-defaults settings plus a read-only runtime interval table and Manage tags route entry. Daily-goal/streak/reminder UI remains Future/Target and linked to engagement scope.
 
@@ -370,7 +370,7 @@ Parity audit: row #20 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 21. Settings — Audio / Speech
 
-Mock refs: variants `15a`–`15g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.6.
+Mock refs: variants `23a`–`23g` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.6.
 
 Parity audit: row #21 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — Prompt 24 verified current V1 as global/front-language TTS settings. Independent per-language tabs/settings, reset, play-after-grading expansion, and unsupported-language explainer remain Future/Target.
 
@@ -384,7 +384,7 @@ Parity audit: row #21 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 22. Settings — Tag management
 
-Mock refs: variants `16a`–`16k` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.7.
+Mock refs: variants `11a`–`11k` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.7.
 
 Parity audit: row #22 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — §3.3 tag-domain architecture gap **resolved** (2026-05-30). Domain layer now exists: `TagRepository` interface (`lib/domain/repositories/tag_repository.dart`) + `TagRepositoryImpl` + `FlashcardTagDao` + use cases (`WatchAllTagsWithCountUseCase`, `AddTagToCardUseCase`, `RemoveTagFromCardUseCase`, `RenameTagUseCase`, `MergeTagUseCase`, `DeleteTagUseCase`) + `TagValidator`. Prompt 25 (2026-06-01) re-verified route/action ownership, list/loading/empty/error/search/sort, safe failure feedback, and rename/merge/delete tests. Screen drives the UseCase → Repository → DAO flow (no DAO/Drift access from presentation). Tags stored lowercased (schema v11 backfill). "Study cards with this tag" and global "View cards" actions remain **out of V1** (tag-scoped study Blocked on `StudyEntryType.tag`; global search Future), so the context sheet exposes Rename / Merge / Delete only.
 
@@ -399,7 +399,7 @@ Parity audit: row #22 in `docs/checklist/wireframe-code-parity-assessment.md` §
 
 ## 23. Onboarding
 
-Mock refs: variants `28a`–`28i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.19. Mapping doc variants remain visual references, but full onboarding is `Future`; V1 scope is thin zero-content guidance.
+Mock refs: variants `01a`–`01i` in `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`; details in `docs/system-design/mock-design-doc-mapping.md` §6.19. Mapping doc variants remain visual references, but full onboarding is `Future`; V1 scope is thin zero-content guidance.
 
 Parity audit: row #23 in `docs/checklist/wireframe-code-parity-assessment.md` §1 — full onboarding is intentionally absent. Prompt 26 (2026-06-01) re-verified no `/onboarding` route, no `lib/presentation/features/onboarding/**`, no first-launch gate, and no wizard. `RouteDefaults.initialLocation = RoutePaths.library` remains the existing app entry. Decision resolved 2026-05-29: V1 only improves owner-split zero-content guidance; full onboarding is Future Proposal.
 

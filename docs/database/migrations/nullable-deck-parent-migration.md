@@ -1,21 +1,28 @@
 ---
-last_updated: 2026-06-02
-status: design ready
+last_updated: 2026-06-03
+status: rejected / not applicable
 applies_to: nullable deck parent migration for root-level decks
 ---
 
 # Nullable Deck Parent Migration
 
+> **Prompt 43A decision update:** this design is rejected / not applicable.
+> Product ownership locked the invariant that Library root contains folders only,
+> Folder Detail contains decks, and every deck belongs to exactly one folder.
+> Do not implement this migration and do not make `decks.folder_id` nullable.
+
 ## A. Summary
 
-Goal: allow `decks.folder_id` to be nullable so decks can live at Library root.
+Historical goal, now rejected: allow `decks.folder_id` to be nullable so decks
+can live at Library root.
 
-Root decks are represented by `folder_id = null`. Folder-owned decks keep the
-current behavior: `folder_id` references an existing folder, folder mode rules
-still apply, and folder deletion still cascades to child decks.
+Root decks are Rejected / Out of Scope. Folder-owned decks keep the current
+behavior: `folder_id` references an existing folder, folder mode rules still
+apply, and folder deletion still cascades to child decks.
 
-This document is design-only. It does not implement schema, generated Drift,
-domain, repository, UI, or test changes.
+This document is historical context only. It does not implement schema,
+generated Drift, domain, repository, UI, or test changes, and it is not
+recommended implementation direction.
 
 ## B. Current blockers
 
@@ -57,7 +64,7 @@ repository validation, database indexes, or both.
 
 ## D. Migration strategy
 
-### Option 1 - recommended
+### Option 1 - historical recommendation, rejected
 
 Use a schema-version bump plus a table-recreate migration:
 
@@ -174,13 +181,15 @@ migration strategy. Do not move, delete, or force-update `v1.0.0-rc.1`.
 - Study root deck if route supports `deckId`.
 - Full regression tests for existing folder-owned decks.
 
-## J. Rollout plan
+## J. Historical rollout plan, rejected
 
 - Prompt 43: implement nullable deck parent migration plus data/domain/repository
-  tests.
-- Prompt 44: implement Library root deck UI plus presentation tests.
+  tests. Rejected / Not Applicable.
+- Prompt 44: implement Library root deck UI plus presentation tests. Rejected /
+  Out of Scope.
 - Prompt 45: implement root deck actions, move/import/study gaps, and any
-  remaining presentation regression tests if not completed earlier.
+  remaining presentation regression tests if not completed earlier. Rejected /
+  Out of Scope.
 
 ## K. Risk assessment
 

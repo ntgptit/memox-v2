@@ -124,7 +124,7 @@ It intentionally excludes Future features listed in this document and in
 
 ## C. Partial But Accepted V1 Areas
 
-- Library is folders-first; root-level decks remain Future.
+- Library is folders-first; root-level decks are Rejected / Out of Scope.
 - Dashboard has a static `0 days` streak stat placeholder only.
 - Settings Hub has current rows and routes; some dynamic subtitles and the About sheet remain Target.
 - Account manual Drive upload/restore exists with Prompt 41 current restore warning/guard/feedback; full restore-protection remains Target.

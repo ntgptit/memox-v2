@@ -9,7 +9,7 @@ source_specs:
 
 # 02 — Library
 
-## V1 verification status (2026-05-31, Prompt 18/18B; blocker rechecked 2026-06-02, Prompt 42)
+## V1 verification status (2026-05-31, Prompt 18/18B; root-deck decision updated 2026-06-03, Prompt 43A)
 
 This screen is **partially Current**. The recursive folder counts (verified Prompt 14) plus the aspects below are verified by code and tests; the remainder is **Future** and intentionally not exposed in V1. Do NOT mark the whole screen Current. The §Layout / §Components / §Actions / §Sort options blocks below describe the **target** design; where they conflict with this section, this section is the current truth.
 
@@ -25,30 +25,22 @@ This screen is **partially Current**. The recursive folder counts (verified Prom
 
 **Future / not exposed in V1:**
 
-- **Root-level decks are NOT rendered.** `LibraryOverviewReadModel` carries `folders` only; decks whose `folder_id` is null are not surfaced here. The §Layout "Top-level deck" rows and the "Tap deck row → /library/deck/:deckId/flashcards" action are target, not current.
+- **Root-level decks are Rejected / Out of Scope.** `LibraryOverviewReadModel` carries `folders` only. The §Layout "Top-level deck" rows and the "Tap deck row → /library/deck/:deckId/flashcards" action are visual history only, not target scope.
 - FAB action sheet (New folder / New deck / Import) — V1 FAB creates a folder directly; there is no New deck or Import entry on Library Overview. Deck creation/import remain owned by Folder Detail / Flashcard List / Deck Import.
 - Filter chips (All / Folders / Decks) — only a static "All" chip is rendered; it is non-functional.
 - No sort **UI control** on Library Overview (no overflow sort menu / sort chip). Sort exists only in the data/use-case layer.
 - Drag-to-reorder of root items, pull-to-refresh, and grid/multi-column responsive layout.
 - Global Search screen / `/library/search` route (Global Search remains Future).
 
-**Prompt 42 blocker (2026-06-02):** root-level deck support remains blocked by
-the current production schema/API shape. `lib/data/datasources/local/tables/decks_table.dart`
-defines `decks.folder_id` as non-null and `lib/domain/entities/deck_entity.dart`
-keeps `DeckEntity.folderId` as `String`; `DeckRepository` create/move/reorder
-operations also require concrete folder ids. Root deck rows, root deck create,
-and move deck to root require a coordinated migration/design batch before this
-wireframe can promote them to Current.
-
-**Prompt 42B migration design (2026-06-02):** nullable deck parent design is
-ready in `docs/database/migrations/nullable-deck-parent-migration.md`. Current
-production remains unchanged: no root deck read-model channel, root deck UI,
-schema migration, generated Drift output, or root deck tests were implemented in
-Prompt 42B.
+**Prompt 42/42B superseded (2026-06-03, Prompt 43A):** Product ownership rejected
+root-level decks and nullable deck parent migration. Keep `decks.folder_id`
+non-null, keep deck APIs folder-bound, and keep Library root folders-only.
+`docs/database/migrations/nullable-deck-parent-migration.md` is retained as a
+rejected historical design note only.
 
 ## Purpose
 
-Root content browser. Current V1 shows top-level folders only. Top-level deck rows (decks whose `folder_id` is the root) remain Future/Target and are not rendered in the current app. Entry point for content management and a launch point for study.
+Root content browser. Current V1 shows top-level folders only. Root-level decks are Rejected / Out of Scope and are not rendered in the current app. Entry point for content management and a launch point for study.
 
 ## Layout
 
@@ -117,7 +109,7 @@ Root content browser. Current V1 shows top-level folders only. Top-level deck ro
 | Data | Source | Refresh trigger |
 | --- | --- | --- |
 | Top-level folders (`parent_id IS NULL`) | `folders` table | stream from DB |
-| Top-level decks (`folder_id IS NULL`) | `decks` table | stream from DB |
+| Top-level decks (`folder_id IS NULL`) | Rejected / Out of Scope | do not query; decks must belong to exactly one folder |
 | Per-row card count (decks) | `flashcards` aggregate cached | invalidated on flashcard change |
 | Per-row subfolder/deck count (folders) | aggregates cached | invalidated on folder/deck change |
 | Sort preference | SharedPreferences key `library.sort` | watch |

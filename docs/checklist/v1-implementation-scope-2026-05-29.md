@@ -45,7 +45,7 @@ These specs remain documented for future planning, but must not be implemented d
 | Flashcard history screen | Future Proposal | Schema migration for `last_reset_at`, `box_before`, `box_after`; route/link approval; history use case/repository contract confirmation |
 | Global search screen | Future Proposal | Product approval for cross-scope search, recent search persistence, route, and result grouping |
 | Full onboarding flow | Future Proposal | Product approval for welcome screen, onboarding feature folder, restore prompt branch, and first-launch gating |
-| Library root-level decks | Future / Target | Product decision for root-deck UX, read-model support for root decks, navigation tests, and updated Library wireframe/matrix/parity rows |
+| Library root-level decks | Rejected / Out of Scope | Product owner rejected root-level decks. Library root remains folders-only, Folder Detail owns decks, and nullable deck parent migration is Not Applicable. |
 | Folder Detail study/today/resume banners | Future / Target | Folder-scoped study CTA/resume ownership decision, recursive count/read-model support, route tests, and updated Folder Detail wireframe/matrix/parity rows |
 | Full Drive restore-protection flow | Partial / Target | Pre-restore local snapshot path, Upload local first branch, second destructive confirmation, and restore-abort-on-snapshot-failure tests |
 | Learning engagement controls | Future / Target | Daily-goal/streak/reminder use cases, persistence/notification decisions, settings UI tests, and engagement docs update |
