@@ -8,6 +8,7 @@ companion_docs:
   - docs/checklist/c-greater-than-d-cleanup-2026-05-28.md (log của đợt cleanup trước đó)
   - docs/checklist/product-decisions-pending-2026-05-29.md (resolved V1 decisions)
   - docs/checklist/v1-implementation-scope-2026-05-29.md (current V1 scope guard)
+  - docs/checklist/mock-layout-parity-audit.md (Prompt 48 visual/layout parity audit and Prompt 49-64 sequencing)
 ---
 
 # Wireframe ↔ Code Parity Assessment (Revision 4)
@@ -19,6 +20,7 @@ companion_docs:
 > - Rev 3 — refresh sau C>D cleanup pass đã commit; 4 cross-cutting items resolved, 3 cross-cutting items mới phát hiện qua recursive review.
 > - Rev 4 (CURRENT) — scope-resolution update: #09 Card History, #11 Global Search, and full #23 Onboarding are no longer V1 blockers; they are Future Proposal except V1 thin zero-content guidance.
 > - Prompt 29 maintenance (2026-06-01) — docs-only consistency sweep after Prompts 16-28. This updated stale metadata/status wording and ownership notes without a full Rev 5 re-tally.
+> - Prompt 48 audit (2026-06-03) — docs-only mock/layout parity audit created at `docs/checklist/mock-layout-parity-audit.md`. This does not reclassify behavior status in this assessment and does not mark any screen Current solely because it visually renders.
 
 > **Core Learning Loop freeze (2026-05-31, Prompt 13)**: the Core Learning Loop
 > source-of-truth (rows #12–#18 + §2 study routes + SRS §3.10/finalize) is **frozen for V1 /
