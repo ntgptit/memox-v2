@@ -22,7 +22,7 @@
     min-height: 100vh;
   }
   .phone {
-    width: 390px;
+    width: var(--phone-w, 390px);
     height: 780px;
     background: var(--memox-surface);
     border-radius: 44px;
@@ -151,6 +151,104 @@
   body.stage-dark .mode-toggle button.active { background: #35353A; color: #E5E5E7; }
   .mode-toggle svg { width: 14px; height: 14px; }
   .stage-header { padding: 0 28px; position: sticky; top: 0; z-index: 6; }
+
+  /* ── Rewritten gallery shell: per-screen rows, light+dark pairs, state steppers ── */
+  .controls {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px;
+    padding: 16px 28px;
+    background: rgba(230,232,234,0.88);
+    backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 1px solid rgba(20,24,48,0.08);
+  }
+  body.stage-dark .controls { background: rgba(13,13,15,0.88); border-bottom-color: rgba(255,255,255,0.08); }
+  .brandblock { display: flex; flex-direction: column; margin-right: auto; gap: 2px; }
+  .brand { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; color: #1b1f3a; }
+  .sub { font-size: 12px; font-weight: 500; color: #5a5f72; }
+  body.stage-dark .brand { color: #E4E8FA; }
+  body.stage-dark .sub { color: #9aa0b8; }
+  .ctl { display: inline-flex; align-items: center; gap: 8px; }
+  .seg-label { font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: #6a6f82; }
+  body.stage-dark .seg-label { color: #8b91a8; }
+  .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(20,24,48,0.06); }
+  body.stage-dark .seg { background: rgba(255,255,255,0.07); }
+  .seg button {
+    border: none; background: transparent; border-radius: 999px;
+    height: 30px; min-width: 44px; padding: 0 14px; cursor: pointer;
+    font-family: var(--memox-font-sans); font-size: 12px; font-weight: 600;
+    color: #4b4f63; display: inline-flex; align-items: center; justify-content: center;
+    transition: background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1);
+  }
+  body.stage-dark .seg button { color: #b8bdd2; }
+  .seg button.active { background: #fff; color: #191c2e; box-shadow: 0 1px 2px rgba(0,0,0,0.12); }
+  body.stage-dark .seg button.active { background: #353A52; color: #fff; }
+
+  .gallery { padding: 8px 28px 96px; }
+  .section-head {
+    padding: 40px 4px 10px; font-size: 12px; font-weight: 800;
+    letter-spacing: 1.4px; text-transform: uppercase; color: #6a6f82;
+  }
+  body.stage-dark .section-head { color: #8b91a8; }
+  .row { padding: 12px 0 10px; }
+  .row-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .row-num { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #9499ab; }
+  .row-title { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; color: #1b1f3a; }
+  body.stage-dark .row-title { color: #E4E8FA; }
+  .stepper { display: inline-flex; align-items: center; gap: 6px; padding: 4px; border-radius: 999px; background: rgba(20,24,48,0.05); }
+  body.stage-dark .stepper { background: rgba(255,255,255,0.06); }
+  .stepper button {
+    width: 32px; height: 32px; border: none; border-radius: 999px; background: #fff; color: #3a3f55;
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  body.stage-dark .stepper button { background: #353A52; color: #E4E8FA; }
+  .stepper svg { width: 16px; height: 16px; }
+  .st-label { min-width: 150px; text-align: center; font-size: 12px; font-weight: 600; color: #3a3f55; }
+  body.stage-dark .st-label { color: #c6cbe0; }
+  .st-single { min-width: 0; opacity: 0.6; font-weight: 600; }
+  .pair { display: flex; gap: 24px; align-items: flex-start; }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .theme-label { display: inline-flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: #7a7f92; }
+  body.stage-dark .theme-label { color: #8b91a8; }
+  .theme-dot { width: 8px; height: 8px; border-radius: 999px; }
+  .row-placeholder { height: 822px; }
+
+  /* ── A11y layer (added in audit pass) ───────────────────────────────
+     Applies uniformly to every screen via shared primitives.
+     Flutter mapping: focus ring → Material focus highlight;
+     44px hit floor → IconButton's default 48dp tap target. */
+  /* Visible keyboard focus on every interactive control */
+  .app button:focus-visible,
+  .icon-btn:focus-visible,
+  .pill-btn:focus-visible,
+  .bn-item:focus-visible,
+  [role="switch"]:focus-visible {
+    outline: 2px solid var(--memox-primary);
+    outline-offset: 2px;
+  }
+  /* Expand icon-button tap target to >=44px without changing visual size.
+     Covers buttons that inline-shrink the visual circle (e.g. 24px dismiss). */
+  .icon-btn { position: relative; }
+  .icon-btn::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    width: 44px; height: 44px; transform: translate(-50%, -50%);
+  }
+  /* Bottom-nav items are real <button>s now — reset native chrome + give a tall tap area */
+  .bn-item { background: none; border: none; width: 100%; padding: 8px 0; font-family: inherit; }
+  /* Hidden-scrollbar utility for in-screen scrollers (matches .scroll behavior).
+     overflow-x pinned to hidden: setting only overflow-y:auto makes overflow-x
+     compute to auto too, which produced a stray horizontal scrollbar. */
+  .hide-scroll { overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+  .hide-scroll::-webkit-scrollbar { display: none; }
+  /* Respect reduced-motion: quiet the infinite skeleton/pulse loops */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -182,7 +280,7 @@ function masteryColor(pct) {
   return 'var(--memox-status-mastered)'; // green — high
 }
 
-function Ic({ name, size = 22, color }) {
+function Ic({ name, size = 22, color, label }) {
   const ref = React.useRef();
   React.useEffect(() => {
     if (ref.current && window.lucide) {
@@ -199,7 +297,10 @@ function Ic({ name, size = 22, color }) {
       }
     }
   }, [name, size, color]);
-  return <span ref={ref} style={{ display: 'inline-flex', lineHeight: 0 }} />;
+  // Icons are decorative by default (the surrounding button/text carries meaning).
+  // Pass `label` only when the icon is the sole carrier of meaning.
+  const a11y = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true' };
+  return <span ref={ref} {...a11y} style={{ display: 'inline-flex', lineHeight: 0 }} />;
 }
 
 /* Breadcrumb — folder/deck/card hierarchy path. Last segment is the current location. */
@@ -238,16 +339,40 @@ function BottomNav({ active, onChange }) {
 
   return (
     <div className="bottom-nav-wrap">
-      <div className="bottom-nav">
+      <div className="bottom-nav" role="navigation" aria-label="Primary">
         {items.map((it) =>
-        <div key={it.id} className={"bn-item " + (active === it.id ? 'active' : '')} onClick={() => onChange(it.id)}>
+        <button type="button" key={it.id}
+          aria-current={active === it.id ? 'page' : undefined}
+          aria-label={it.label}
+          className={"bn-item " + (active === it.id ? 'active' : '')} onClick={() => onChange(it.id)}>
             <span className="bn-pill"><Ic name={it.icon} size={22} /></span>
             <span>{it.label}</span>
-          </div>
+          </button>
         )}
       </div>
     </div>);
 
+}
+
+/* Offline banner — shared, reusable connectivity-lost notice.
+   Local-first voice: reassure first, never alarm. role="status" so AT announces
+   it politely. Reuse on any surface that attempts Drive sync (Dashboard, Library,
+   Study result). Flutter mapping: a MaterialBanner / inline Container driven by a
+   connectivity stream; copy via l10n keys. */
+function OfflineBanner() {
+  return (
+    <div role="status" style={{
+      display: 'flex', alignItems: 'flex-start', gap: 10,
+      padding: '10px 14px', marginBottom: 14,
+      background: 'var(--memox-surface-container)',
+      border: 'var(--memox-border-ghost)', borderRadius: 12
+    }}>
+      <Ic name="cloud-off" size={16} color="var(--memox-on-surface-variant)" />
+      <div style={{ flex: 1, fontSize: 12, lineHeight: 1.55 }}>
+        <strong style={{ fontWeight: 700 }}>You’re offline.</strong>{' '}
+        <span style={{ color: 'var(--memox-on-surface-variant)' }}>Your cards are saved on this device. Drive sync resumes when you reconnect.</span>
+      </div>
+    </div>);
 }
 
 /* ─────── Screen: Study (term + meaning visible together, swipe to next) ─────── */
@@ -490,7 +615,7 @@ function GuessScreen({ go }) {
       <StudyTopBar mode="Guess" current={5} total={20} onClose={() => go('deck')} />
 
       {/* Outer scroller — content centers when it fits, scrolls when long answers push past. */}
-      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <div style={{ margin: 'auto 0', padding: '8px 14px 0', display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Prompt */}
           <div className="card" style={{ padding: '34px 14px 32px', textAlign: 'center', flexShrink: 0, minHeight: 180, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 }}>
@@ -1515,6 +1640,8 @@ function LearningSettingsScreen({ go, state = 'goalOn' }) {
   <span
     role="switch"
     aria-checked={on}
+    tabIndex={disabled ? -1 : 0}
+    aria-disabled={disabled || undefined}
     style={{
       display: 'inline-block', position: 'relative',
       width: 44, height: 26, borderRadius: 999,
@@ -1615,7 +1742,7 @@ function LearningSettingsScreen({ go, state = 'goalOn' }) {
           title="Daily goal"
           hint={goalEnabled ?
           null :
-          'Goal is off. Your streak is frozen — it won\u2019t reset while paused.'}>
+          'Goal is off. Your streak is frozen — it won’t reset while paused.'}>
           
           {/* Master toggle */}
           <Row
@@ -1759,7 +1886,7 @@ function LearningSettingsScreen({ go, state = 'goalOn' }) {
                   Notifications are blocked
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--memox-on-surface-variant)', marginTop: 2, lineHeight: 1.5 }}>
-                  Allow MemoX in your phone\u2019s notification settings to receive the reminder.
+                  Allow MemoX in your phone’s notification settings to receive the reminder.
                 </div>
                 <button className="pill-btn primary" style={{
                 marginTop: 10, height: 34, fontSize: 12, padding: '0 14px', borderRadius: 9
@@ -1854,21 +1981,21 @@ function AudioSpeechScreen({ go, state = 'loaded' }) {
       flag: '한',
       label: 'Korean',
       voices: [
-      { id: 'sys', name: 'System default', meta: 'Uses your phone\u2019s default Korean voice', sys: true },
+      { id: 'sys', name: 'System default', meta: 'Uses your phone’s default Korean voice', sys: true },
       { id: 'k-suji', name: 'Suji', meta: 'Female · neural · offline' },
       { id: 'k-minho', name: 'Minho', meta: 'Male · neural · offline' },
       { id: 'k-eun', name: 'Eunha', meta: 'Female · standard' }],
 
       selected: 'k-suji',
       sample: '오늘도 한 단어 더 외워봐요.',
-      sampleHint: 'Today, let\u2019s remember one more word.',
+      sampleHint: 'Today, let’s remember one more word.',
       rate: 0.5, pitch: 1.0, volume: 0.85
     },
     en: {
       flag: 'EN',
       label: 'English',
       voices: [
-      { id: 'sys', name: 'System default', meta: 'Uses your phone\u2019s default English voice', sys: true },
+      { id: 'sys', name: 'System default', meta: 'Uses your phone’s default English voice', sys: true },
       { id: 'e-emma', name: 'Emma', meta: 'Female · neural · offline' },
       { id: 'e-ryan', name: 'Ryan', meta: 'Male · neural · offline' }],
 
@@ -1881,7 +2008,7 @@ function AudioSpeechScreen({ go, state = 'loaded' }) {
 
   // ── inline widgets ───────────────────────────────────────────────
   const Toggle = ({ on, disabled }) =>
-  <span role="switch" aria-checked={on} style={{
+  <span role="switch" aria-checked={on} tabIndex={disabled ? -1 : 0} aria-disabled={disabled || undefined} style={{
     display: 'inline-block', position: 'relative',
     width: 44, height: 26, borderRadius: 999,
     background: on ? 'var(--memox-primary)' : 'var(--memox-surface-container-high)',
@@ -2018,7 +2145,7 @@ function AudioSpeechScreen({ go, state = 'loaded' }) {
                 Text-to-speech is unavailable
               </div>
               <div style={{ fontSize: 12, color: 'var(--memox-on-surface-variant)', marginTop: 2, lineHeight: 1.5 }}>
-                Install a TTS engine in your phone\u2019s settings to enable voice playback.
+                Install a TTS engine in your phone’s settings to enable voice playback.
               </div>
               <button className="pill-btn primary" style={{
               marginTop: 10, height: 34, fontSize: 12, padding: '0 14px', borderRadius: 9
@@ -2141,7 +2268,7 @@ function AudioSpeechScreen({ go, state = 'loaded' }) {
                   No {data.label} voices installed
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--memox-on-surface-variant)', lineHeight: 1.5, padding: '0 12px', marginBottom: 14 }}>
-                  Download a {data.label} voice from your phone\u2019s speech settings to enable playback.
+                  Download a {data.label} voice from your phone’s speech settings to enable playback.
                 </div>
                 <button className="pill-btn primary" style={{
                 height: 36, fontSize: 12, padding: '0 16px', borderRadius: 10
@@ -2234,8 +2361,8 @@ function AudioSpeechScreen({ go, state = 'loaded' }) {
                 label="Speech rate"
                 value={data.rate}
                 min={0.3} max={0.7} step={0.05}
-                format={(v) => `${v.toFixed(2)}\u00d7`}
-                sublabels={['0.3\u00d7', 'Default', '0.7\u00d7']} />
+                format={(v) => `${v.toFixed(2)}×`}
+                sublabels={['0.3×', 'Default', '0.7×']} />
               
                 <Slider
                 label="Pitch"
@@ -2894,7 +3021,7 @@ function TagManagementScreen({ go, state = 'loaded' }) {
             </div>
           </div>
 
-          <div style={{ flex: 1, overflow: 'auto', padding: '0 8px 14px' }}>
+          <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 8px 14px' }}>
             {[
           { name: 'noun', count: 88, sel: true },
           { name: 'verb', count: 71 },
@@ -4100,7 +4227,7 @@ function FolderDetailScreen({ go, state = 'decks' }) {
               <span style={{ color: 'var(--memox-on-surface)', fontWeight: 700 }}>Korean</span>
             </div>
 
-            <div style={{ flex: 1, overflow: 'auto', padding: '0 8px 10px' }}>
+            <div className="hide-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '0 8px 10px' }}>
               {[
             { name: 'Library (root)', ic: 'home', count: '4 folders' },
             { name: 'Korean', ic: 'flag', count: '4 subfolders · 286 cards', current: true },
@@ -5856,7 +5983,7 @@ function FlashcardHistoryScreen({ go, state = 'loaded' }) {
   // newest first
   { t: '2h ago', date: 'today, 14:32', kind: 'correct', mode: 'Recall', ms: 1400, from: 2, to: 3, note: 'Answered correctly' },
   { t: 'yesterday', date: 'May 26, 09:10', kind: 'recovered', mode: 'Fill', ms: 4200, from: 1, to: 2, lapseAck: true, note: 'Got it back after a slip' },
-  { t: '2 days ago', date: 'May 25, 21:48', kind: 'forgot', mode: 'Recall', ms: 6800, from: 3, to: 1, note: 'Couldn\u2019t recall — reset to box 1', lapse: true },
+  { t: '2 days ago', date: 'May 25, 21:48', kind: 'forgot', mode: 'Recall', ms: 6800, from: 3, to: 1, note: 'Couldn’t recall — reset to box 1', lapse: true },
   { t: '4 days ago', date: 'May 23, 08:00', kind: 'edited', note: 'Edit · meaning updated' },
   { t: 'a week ago', date: 'May 20, 19:14', kind: 'correct', mode: 'Match', ms: 900, from: 2, to: 3, note: 'Answered correctly' },
   { t: '10 days ago', date: 'May 17, 07:32', kind: 'correct', mode: 'Review', ms: 1600, from: 1, to: 2, note: 'Answered correctly' },
@@ -6367,7 +6494,7 @@ function DeckImportScreen({ go, state = 'empty' }) {
       failed: {
         tone: 'error',
         icon: 'alert-circle',
-        title: 'Import didn\u2019t finish',
+        title: 'Import didn’t finish',
         body: 'No cards were added. Your file is unchanged and your deck is untouched.',
         bg: 'rgba(220,72,72,0.08)',
         color: 'var(--memox-error)',
@@ -6921,7 +7048,7 @@ function DeckImportScreen({ go, state = 'empty' }) {
         }}>
           {!fileChosen ? 'Pick a file or paste text to continue.' :
           parsing ? 'Reading file — no changes yet.' :
-          !isPreview ? 'Next you\u2019ll preview every row before anything is imported.' :
+          !isPreview ? 'Next you’ll preview every row before anything is imported.' :
           state === 'previewMix' ? `Only the ${validCount} valid rows will be imported.` :
           importing ? 'Imports save to this device only.' :
           'No cards are added until you tap Import.'}
@@ -7426,6 +7553,7 @@ function DashboardScreen({ go, state = 'loaded' }) {
   const onboarding = state === 'onboarding';
   const loading = state === 'loading';
   const error = state === 'error';
+  const offline = state === 'offline';
   const goalOff = state === 'goalOff';
   const resumeOnly = state === 'resumeOnly';
   const streakBroken = state === 'streakBroken';
@@ -7521,7 +7649,7 @@ function DashboardScreen({ go, state = 'loaded' }) {
               {onboarding ? 'Welcome to MemoX' : greeting}
             </div>
             <div style={{ fontSize: 12, color: 'var(--memox-on-surface-variant)' }}>
-              {onboarding ? 'Let\u2019s build your first deck' : subgreeting}
+              {onboarding ? 'Let’s build your first deck' : subgreeting}
             </div>
           </>
         }
@@ -7529,10 +7657,10 @@ function DashboardScreen({ go, state = 'loaded' }) {
           position: 'absolute', right: 14, top: 18,
           display: 'flex', gap: 4
         }}>
-          <button className="icon-btn" title="Search">
+          <button className="icon-btn" title="Search" aria-label="Search">
             <Ic name="search" size={18} color="var(--memox-on-surface-variant)" />
           </button>
-          <button className="icon-btn" title="Settings">
+          <button className="icon-btn" title="Settings" aria-label="Settings">
             <Ic name="settings" size={18} color="var(--memox-on-surface-variant)" />
           </button>
         </div>
@@ -7540,6 +7668,7 @@ function DashboardScreen({ go, state = 'loaded' }) {
 
       <div className="scroll" style={{ padding: '0 14px 14px' }}>
 
+        {offline && <OfflineBanner />}
         {error && <ErrorCard />}
 
         {/* ── ONBOARDING — zero content branch ─────────────── */}
@@ -7584,7 +7713,7 @@ function DashboardScreen({ go, state = 'loaded' }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
             { ic: 'cloud', l: 'Local first', s: 'Your cards live on this device. Sync is optional.' },
-            { ic: 'sun', l: 'A daily rhythm', s: 'Short sessions; we pick what\u2019s due each day.' },
+            { ic: 'sun', l: 'A daily rhythm', s: 'Short sessions; we pick what’s due each day.' },
             { ic: 'shield-check', l: 'No streak pressure', s: 'Skip a day and your progress is safe.' }].
             map((b) =>
             <div key={b.l} className="card" style={{
@@ -7808,7 +7937,7 @@ function DashboardScreen({ go, state = 'loaded' }) {
               transform="rotate(-90 20 20)" />
                 </svg>
                 <div style={{ minWidth: 0 }}>
-                  <div className="ov">Today\u2019s goal</div>
+                  <div className="ov">Today’s goal</div>
                   <div style={{
                 fontSize: 18, fontWeight: 700, letterSpacing: '-0.3px',
                 fontVariantNumeric: 'tabular-nums', marginTop: 1
@@ -7838,7 +7967,7 @@ function DashboardScreen({ go, state = 'loaded' }) {
               color: 'var(--memox-primary)', marginBottom: 10
             }}>
                   <Ic name="zap" size={11} color="var(--memox-primary)" />
-                  Today\u2019s review
+                  Today’s review
                 </div>
                 <div style={{
               fontSize: 24, fontWeight: 700, letterSpacing: '-0.5px', lineHeight: 1.1,
@@ -7856,7 +7985,7 @@ function DashboardScreen({ go, state = 'loaded' }) {
               width: '100%', height: 40, borderRadius: 12, fontSize: 14, gap: 8
             }}>
                   <Ic name="play" size={16} color="#fff" />
-                  Start today\u2019s review
+                  Start today’s review
                 </button>
               </div> :
 
@@ -8828,7 +8957,7 @@ function StudyResultScreen({ go, state = 'loaded' }) {
                       transform="rotate(-90 20 20)" />
                           </svg>
                           <div>
-                            <div className="ov">Today\u2019s goal</div>
+                            <div className="ov">Today’s goal</div>
                             <div style={{
                         fontSize: 16, fontWeight: 700, letterSpacing: '-0.3px',
                         fontVariantNumeric: 'tabular-nums', marginTop: 1
@@ -9037,7 +9166,7 @@ function OnboardingScreen({ go, state = 'zero' }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
             {[
             { ic: 'cloud', l: 'Local-first', s: 'No sign-in needed. Sync is optional, anytime.' },
-            { ic: 'sun', l: 'A daily rhythm', s: 'Short sessions, surfaced by what\u2019s due.' },
+            { ic: 'sun', l: 'A daily rhythm', s: 'Short sessions, surfaced by what’s due.' },
             { ic: 'shield-check', l: 'No streak pressure', s: 'Skip a day. Your progress is safe.' }].
             map((b) =>
             <div key={b.l} className="card" style={{
@@ -9064,14 +9193,14 @@ function OnboardingScreen({ go, state = 'zero' }) {
           <button className="pill-btn primary" style={{
             width: '100%', height: 44, borderRadius: 14, fontSize: 15, gap: 8
           }}>
-            Let\u2019s start
+            Let’s start
             <Ic name="arrow-right" size={16} color="#fff" />
           </button>
           <div style={{
             textAlign: 'center', marginTop: 10,
             fontSize: 11, color: 'var(--memox-on-surface-variant)'
           }}>
-            You\u2019re always in control. Sign-in is optional.
+            You’re always in control. Sign-in is optional.
           </div>
         </div>
       </div>);
@@ -9091,7 +9220,7 @@ function OnboardingScreen({ go, state = 'zero' }) {
           Welcome to MemoX
         </div>
         <div style={{ fontSize: 12, color: 'var(--memox-on-surface-variant)' }}>
-          Let\u2019s set up your first cards
+          Let’s set up your first cards
         </div>
         <div style={{ position: 'absolute', right: 14, top: 18, display: 'flex', gap: 4 }}>
           <button className="icon-btn" title="Settings">
@@ -9327,7 +9456,7 @@ function OnboardingScreen({ go, state = 'zero' }) {
               Where should the imported cards go?
             </div>
             <div style={{ fontSize: 12, color: 'var(--memox-on-surface-variant)', lineHeight: 1.5 }}>
-              We need a destination deck first. We won\u2019t create it until you pick the file.
+              We need a destination deck first. We won’t create it until you pick the file.
             </div>
           </div>
 
@@ -9489,7 +9618,7 @@ function OnboardingScreen({ go, state = 'zero' }) {
               Restoring your library
             </div>
             <div style={{ fontSize: 12, color: 'var(--memox-on-surface-variant)', lineHeight: 1.5, marginBottom: 14 }}>
-              Pulling 326 cards from Drive. Don\u2019t close the app yet.
+              Pulling 326 cards from Drive. Don’t close the app yet.
             </div>
             <div style={{ height: 5, background: 'var(--memox-surface-container)', borderRadius: 999, overflow: 'hidden' }}>
               <div style={{
@@ -9529,7 +9658,7 @@ function OnboardingScreen({ go, state = 'zero' }) {
                 <Ic name="cloud-off" size={22} color="var(--memox-error)" />
               </div>
               <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.2px', marginBottom: 6 }}>
-                Restore didn\u2019t finish
+                Restore didn’t finish
               </div>
               <div style={{ fontSize: 13, color: 'var(--memox-on-surface-variant)', lineHeight: 1.55, padding: '0 6px' }}>
                 Nothing was added to your device. You can try again, or start with a fresh deck.
@@ -9658,200 +9787,157 @@ function StatsScreen({ go }) {
 // the handful of frames in (and near) view mounted, and tears the rest down so the DOM
 // stays small while scrolling. The .phone box is a fixed 390×780, so the placeholder
 // reserves identical space and the scroll position never jumps.
-function Phone({ label, children }) {
-  const colRef = React.useRef(null);
+const noop = () => {};
+
+// Robust lazy-mount: mount a row's frames once it scrolls within ~1.6 viewports.
+// Uses getBoundingClientRect on scroll/resize + an interval fallback, so it works
+// in every environment (the old IntersectionObserver gate never fired in some webviews).
+function useNear(ref) {
   const [near, setNear] = React.useState(false);
-
   React.useEffect(() => {
-    const node = colRef.current;
-    if (!node) return;
-    if (typeof IntersectionObserver === 'undefined') { setNear(true); return; }
-    const io = new IntersectionObserver(
-      (entries) => { for (const e of entries) setNear(e.isIntersecting); },
-      // Horizontal rail: pre-mount ~3 frames to either side before they scroll in.
-      { root: null, rootMargin: '0px 1200px 0px 1200px', threshold: 0 }
-    );
-    io.observe(node);
-    return () => io.disconnect();
-  }, []);
-
-  return (
-    <div className="phone-col" ref={colRef}>
-      <div className="phone">{near ? children : null}</div>
-      <div className="phone-label">{label}</div>
-    </div>);
-
+    if (near) return;
+    let raf = null, iv = null, done = false;
+    const cleanup = () => {
+      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('resize', onScroll);
+      if (iv) clearInterval(iv);
+      if (raf) cancelAnimationFrame(raf);
+    };
+    const check = () => {
+      const n = ref.current; if (!n || done) return;
+      const r = n.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      if (r.top < vh * 1.6 && r.bottom > -vh * 0.6) { done = true; setNear(true); cleanup(); }
+    };
+    const onScroll = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = null; check(); }); };
+    window.addEventListener('scroll', onScroll, true);
+    window.addEventListener('resize', onScroll);
+    iv = setInterval(check, 350);
+    check();
+    return cleanup;
+  }, [near]);
+  return near;
 }
 
+// One device frame in a chosen theme. Dark applies the scoped .memox-dark token block.
+function Frame({ theme, children }) {
+  const dark = theme === 'dark';
+  return (
+    <div className={'frame-wrap' + (dark ? ' memox-dark' : '')}>
+      <div className="phone">{children}</div>
+      <div className="theme-label">
+        <span className="theme-dot" style={{ background: dark ? '#8B9AFF' : '#5265F5' }}></span>
+        {dark ? 'Dark · Tokyo Nebula' : 'Light · Tokyo Pure'}
+      </div>
+    </div>);
+}
+
+// A screen shown as a light+dark pair with a state stepper. Both frames share one state index.
+function ScreenRow({ group, view, num }) {
+  const [i, setI] = React.useState(0);
+  const ref = React.useRef(null);
+  const near = useNear(ref);
+  const total = group.states.length;
+  const cur = group.states[i % total];
+  const single = total <= 1;
+  const make = () => {
+    const props = group.prop ? { go: noop, [group.prop]: cur[0] } : { go: noop };
+    // Key by the current state value so screens that take the state only as a
+    // useState initializer (Recall, Fill) remount and re-init when the stepper
+    // changes states — otherwise both states render identically. Single-state
+    // screens keep a constant key, so their interactivity is preserved.
+    return React.createElement(group.Comp, { key: 'st-' + String(cur[0]), ...props });
+  };
+  const showLight = view !== 'dark';
+  const showDark = view !== 'light';
+  return (
+    <div className="row" ref={ref}>
+      <div className="row-head">
+        <span className="row-num">{num}</span>
+        <span className="row-title">{group.title}</span>
+        {!single &&
+          <div className="stepper" role="group" aria-label={group.title + ' states'}>
+            <button onClick={() => setI((i - 1 + total) % total)} aria-label="Previous state" title="Previous state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span className="st-label">{cur[1]} · {(i % total) + 1}/{total}</span>
+            <button onClick={() => setI((i + 1) % total)} aria-label="Next state" title="Next state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>}
+        {single && <span className="st-label st-single">Single state</span>}
+      </div>
+      {near ?
+        <div className="pair">
+          {showLight ? <Frame theme="light">{make()}</Frame> : null}
+          {showDark ? <Frame theme="dark">{make()}</Frame> : null}
+        </div> :
+        <div className="row-placeholder"></div>}
+    </div>);
+}
+
+const S = (v, l) => [v, l];
+const GROUPS = [
+  { section: '1 · First run', num: '01', title: 'Onboarding', Comp: OnboardingScreen, prop: 'state', states: [S('welcome','Welcome'),S('zero','Zero state'),S('createDeck','Create deck'),S('createForImp','Deck for import'),S('signingIn','Signing in'),S('restorePrompt','Restore prompt'),S('restoring','Restoring'),S('restoreFailed','Restore failed'),S('importHandoff','Import handoff')] },
+  { section: '2 · Home', num: '02', title: 'Dashboard', Comp: DashboardScreen, prop: 'state', states: [S('loaded','Loaded'),S('loading','Loading'),S('onboarding','Onboarding'),S('goalOff','Goal off'),S('resumeOnly','Resume only'),S('streakBroken','Streak broken'),S('error','Error'),S('offline','Offline'),S('multiResume','Multi resume')] },
+  { section: '3 · Library', num: '03', title: 'Library overview', Comp: LibraryOverviewScreen, prop: 'state', states: [S('loaded','Loaded'),S('loading','Loading'),S('empty','Empty'),S('error','Error'),S('search','Search'),S('overflow','Overflow sheet')] },
+  { num: '04', title: 'Folder detail', Comp: FolderDetailScreen, prop: 'state', states: [S('decks','Decks'),S('subfolders','Subfolders'),S('unlocked','Unlocked'),S('searchEmpty','Search empty'),S('loading','Loading'),S('error','Error'),S('delConfirm','Delete'),S('moveSheet','Move sheet')] },
+  { num: '05', title: 'Library search', Comp: LibrarySearchScreen, prop: 'state', states: [S('emptyQuery','Empty'),S('loading','Loading'),S('results','Results'),S('noResults','No results'),S('error','Error')] },
+  { section: '4 · Deck & cards', num: '06', title: 'Flashcard list', Comp: FlashcardListScreen, prop: 'state', states: [S('loaded','Loaded'),S('empty','Empty'),S('searchEmpty','Search empty'),S('loading','Loading'),S('error','Error'),S('delCard','Delete card'),S('delDeck','Delete deck'),S('reorder','Reorder')] },
+  { num: '07', title: 'Flashcard create', Comp: FlashcardCreateScreen, prop: 'state', states: [S('emptyForm','Empty'),S('valid','Valid'),S('details','Details open'),S('validationErr','Validation'),S('saving','Saving'),S('saveFailed','Save failed')] },
+  { num: '08', title: 'Flashcard edit', Comp: FlashcardEditScreen, prop: 'state', states: [S('loaded','Loaded'),S('loading','Loading'),S('loadError','Load error'),S('validationErr','Validation'),S('dirtySaving','Saving'),S('saveFailed','Save failed'),S('delConfirm','Delete')] },
+  { num: '09', title: 'Flashcard history', Comp: FlashcardHistoryScreen, prop: 'state', states: [S('loaded','Loaded'),S('empty','Empty'),S('loading','Loading'),S('error','Error'),S('partial','Partial')] },
+  { num: '10', title: 'Deck import', Comp: DeckImportScreen, prop: 'state', states: [S('empty','Empty'),S('fileSelected','File selected'),S('parsing','Parsing'),S('previewAll','Preview all'),S('previewMix','Preview mixed'),S('importing','Importing'),S('success','Success'),S('partial','Partial'),S('failed','Failed')] },
+  { num: '11', title: 'Tag management', Comp: TagManagementScreen, prop: 'state', states: [S('loaded','Loaded'),S('loading','Loading'),S('empty','Empty'),S('searchEmpty','Search empty'),S('sheet','Action sheet'),S('rename','Rename'),S('renameMerge','Rename to merge'),S('merge','Merge sheet'),S('del','Delete'),S('busy','Busy row'),S('opError','Op error')] },
+  { section: '5 · Study', num: '12', title: 'Study · Review', Comp: StudyScreen, prop: null, states: [S(null,'Default')] },
+  { num: '13', title: 'Study · Match', Comp: MatchScreen, prop: null, states: [S(null,'Default')] },
+  { num: '14', title: 'Study · Guess', Comp: GuessScreen, prop: null, states: [S(null,'Default')] },
+  { num: '15', title: 'Study · Recall', Comp: RecallScreen, prop: 'initialRevealed', states: [S(false,'Hidden'),S(true,'Revealed')] },
+  { num: '16', title: 'Study · Fill', Comp: FillScreen, prop: 'initialState', states: [S('input','Input'),S('wrong','Wrong')] },
+  { num: '17', title: 'Study result', Comp: StudyResultScreen, prop: 'state', states: [S('loaded','Loaded'),S('loading','Loading'),S('goalOff','Goal off'),S('finFailed','Save failed'),S('defensive','Defensive'),S('toughEmpty','Tough empty')] },
+  { section: '6 · Insights', num: '18', title: 'Stats', Comp: StatsScreen, prop: null, states: [S(null,'Default')] },
+  { num: '19', title: 'Progress', Comp: ProgressScreen, prop: 'state', states: [S('loaded','Week'),S('month','Month'),S('loading','Loading'),S('empty','Empty'),S('insufficient','Insufficient'),S('partial','Partial'),S('error','Error')] },
+  { section: '7 · Settings', num: '20', title: 'Settings', Comp: SettingsScreen, prop: 'state', states: [S('populated','Populated'),S('loading','Loading'),S('signedOut','Signed out'),S('signingIn','Signing in'),S('syncError','Sync error')] },
+  { num: '21', title: 'Account sync', Comp: AccountSyncScreen, prop: 'state', states: [S('signedOut','Signed out'),S('signingIn','Signing in'),S('signInFailed','Sign-in failed'),S('noBackup','No backup'),S('ready','Ready'),S('uploading','Uploading'),S('restoreWarn','Restore warn'),S('restoring','Restoring'),S('tokenExpired','Token expired')] },
+  { num: '22', title: 'Learning settings', Comp: LearningSettingsScreen, prop: 'state', states: [S('goalOn','Goal on'),S('goalOff','Goal off'),S('reminderOn','Reminder on'),S('permDenied','Perm denied'),S('saving','Saving')] },
+  { num: '23', title: 'Audio & speech', Comp: AudioSpeechScreen, prop: 'state', states: [S('loaded','Korean'),S('english','English'),S('loading','Loading'),S('empty','No voices'),S('engineErr','Engine error'),S('playing','Playing'),S('saving','Saving')] }
+];
+
 function App() {
-  const [dark, setDark] = React.useState(() => {
-    try {return localStorage.getItem('memox-kit-dark') === '1';} catch {return false;}
-  });
-  React.useEffect(() => {
-    try {localStorage.setItem('memox-kit-dark', dark ? '1' : '0');} catch {}
-    document.body.classList.toggle('stage-dark', dark);
-  }, [dark]);
-
-  // Ordered by user journey: first-run → home → browse → manage deck → study → result → insights → settings.
-  const screens = [
-  /* ── 1 · First run ─────────────────────────────────────────── */
-  { label: '01a · Onboarding (welcome)', el: <OnboardingScreen go={() => {}} state="welcome" /> },
-  { label: '01b · Onboarding (zero state)', el: <OnboardingScreen go={() => {}} state="zero" /> },
-  { label: '01c · Onboarding (create deck)', el: <OnboardingScreen go={() => {}} state="createDeck" /> },
-  { label: '01d · Onboarding (deck for import)', el: <OnboardingScreen go={() => {}} state="createForImp" /> },
-  { label: '01e · Onboarding (signing in)', el: <OnboardingScreen go={() => {}} state="signingIn" /> },
-  { label: '01f · Onboarding (restore prompt)', el: <OnboardingScreen go={() => {}} state="restorePrompt" /> },
-  { label: '01g · Onboarding (restoring)', el: <OnboardingScreen go={() => {}} state="restoring" /> },
-  { label: '01h · Onboarding (restore failed)', el: <OnboardingScreen go={() => {}} state="restoreFailed" /> },
-  { label: '01i · Onboarding (import handoff)', el: <OnboardingScreen go={() => {}} state="importHandoff" /> },
-  /* ── 2 · Home ──────────────────────────────────────────────── */
-  { label: '02a · Dashboard (loaded)', el: <DashboardScreen go={() => {}} state="loaded" /> },
-  { label: '02b · Dashboard (loading)', el: <DashboardScreen go={() => {}} state="loading" /> },
-  { label: '02c · Dashboard (onboarding)', el: <DashboardScreen go={() => {}} state="onboarding" /> },
-  { label: '02d · Dashboard (goal off)', el: <DashboardScreen go={() => {}} state="goalOff" /> },
-  { label: '02e · Dashboard (resume only)', el: <DashboardScreen go={() => {}} state="resumeOnly" /> },
-  { label: '02f · Dashboard (streak broken)', el: <DashboardScreen go={() => {}} state="streakBroken" /> },
-  { label: '02g · Dashboard (error)', el: <DashboardScreen go={() => {}} state="error" /> },
-  { label: '02h · Dashboard (multi resume)', el: <DashboardScreen go={() => {}} state="multiResume" /> },
-  /* ── 3 · Library ───────────────────────────────────────────── */
-  { label: '03a · Library overview (loaded)', el: <LibraryOverviewScreen go={() => {}} state="loaded" /> },
-  { label: '03b · Library overview (loading)', el: <LibraryOverviewScreen go={() => {}} state="loading" /> },
-  { label: '03c · Library overview (empty)', el: <LibraryOverviewScreen go={() => {}} state="empty" /> },
-  { label: '03d · Library overview (error)', el: <LibraryOverviewScreen go={() => {}} state="error" /> },
-  { label: '03e · Library overview (search)', el: <LibraryOverviewScreen go={() => {}} state="search" /> },
-  { label: '03f · Library overview (overflow)', el: <LibraryOverviewScreen go={() => {}} state="overflow" /> },
-  { label: '04a · Folder detail (decks)', el: <FolderDetailScreen go={() => {}} state="decks" /> },
-  { label: '04b · Folder detail (subfolders)', el: <FolderDetailScreen go={() => {}} state="subfolders" /> },
-  { label: '04c · Folder detail (unlocked)', el: <FolderDetailScreen go={() => {}} state="unlocked" /> },
-  { label: '04d · Folder detail (search empty)', el: <FolderDetailScreen go={() => {}} state="searchEmpty" /> },
-  { label: '04e · Folder detail (loading)', el: <FolderDetailScreen go={() => {}} state="loading" /> },
-  { label: '04f · Folder detail (error)', el: <FolderDetailScreen go={() => {}} state="error" /> },
-  { label: '04g · Folder detail (delete)', el: <FolderDetailScreen go={() => {}} state="delConfirm" /> },
-  { label: '04h · Folder detail (move sheet)', el: <FolderDetailScreen go={() => {}} state="moveSheet" /> },
-  { label: '05a · Library search (empty)', el: <LibrarySearchScreen go={() => {}} state="emptyQuery" /> },
-  { label: '05b · Library search (loading)', el: <LibrarySearchScreen go={() => {}} state="loading" /> },
-  { label: '05c · Library search (results)', el: <LibrarySearchScreen go={() => {}} state="results" /> },
-  { label: '05d · Library search (no results)', el: <LibrarySearchScreen go={() => {}} state="noResults" /> },
-  { label: '05e · Library search (error)', el: <LibrarySearchScreen go={() => {}} state="error" /> },
-  /* ── 4 · Deck & cards ──────────────────────────────────────── */
-  { label: '06a · Flashcard list (loaded)', el: <FlashcardListScreen go={() => {}} state="loaded" /> },
-  { label: '06b · Flashcard list (empty)', el: <FlashcardListScreen go={() => {}} state="empty" /> },
-  { label: '06c · Flashcard list (search empty)', el: <FlashcardListScreen go={() => {}} state="searchEmpty" /> },
-  { label: '06d · Flashcard list (loading)', el: <FlashcardListScreen go={() => {}} state="loading" /> },
-  { label: '06e · Flashcard list (error)', el: <FlashcardListScreen go={() => {}} state="error" /> },
-  { label: '06f · Flashcard list (delete card)', el: <FlashcardListScreen go={() => {}} state="delCard" /> },
-  { label: '06g · Flashcard list (delete deck)', el: <FlashcardListScreen go={() => {}} state="delDeck" /> },
-  { label: '06h · Flashcard list (reorder)', el: <FlashcardListScreen go={() => {}} state="reorder" /> },
-  { label: '07a · Flashcard create (empty)', el: <FlashcardCreateScreen go={() => {}} state="emptyForm" /> },
-  { label: '07b · Flashcard create (valid)', el: <FlashcardCreateScreen go={() => {}} state="valid" /> },
-  { label: '07c · Flashcard create (details open)', el: <FlashcardCreateScreen go={() => {}} state="details" /> },
-  { label: '07d · Flashcard create (validation)', el: <FlashcardCreateScreen go={() => {}} state="validationErr" /> },
-  { label: '07e · Flashcard create (saving)', el: <FlashcardCreateScreen go={() => {}} state="saving" /> },
-  { label: '07f · Flashcard create (save failed)', el: <FlashcardCreateScreen go={() => {}} state="saveFailed" /> },
-  { label: '08a · Flashcard edit (loaded)', el: <FlashcardEditScreen go={() => {}} state="loaded" /> },
-  { label: '08b · Flashcard edit (loading)', el: <FlashcardEditScreen go={() => {}} state="loading" /> },
-  { label: '08c · Flashcard edit (load error)', el: <FlashcardEditScreen go={() => {}} state="loadError" /> },
-  { label: '08d · Flashcard edit (validation)', el: <FlashcardEditScreen go={() => {}} state="validationErr" /> },
-  { label: '08e · Flashcard edit (saving)', el: <FlashcardEditScreen go={() => {}} state="dirtySaving" /> },
-  { label: '08f · Flashcard edit (save failed)', el: <FlashcardEditScreen go={() => {}} state="saveFailed" /> },
-  { label: '08g · Flashcard edit (delete)', el: <FlashcardEditScreen go={() => {}} state="delConfirm" /> },
-  { label: '09a · Flashcard history (loaded)', el: <FlashcardHistoryScreen go={() => {}} state="loaded" /> },
-  { label: '09b · Flashcard history (empty)', el: <FlashcardHistoryScreen go={() => {}} state="empty" /> },
-  { label: '09c · Flashcard history (loading)', el: <FlashcardHistoryScreen go={() => {}} state="loading" /> },
-  { label: '09d · Flashcard history (error)', el: <FlashcardHistoryScreen go={() => {}} state="error" /> },
-  { label: '09e · Flashcard history (partial)', el: <FlashcardHistoryScreen go={() => {}} state="partial" /> },
-  { label: '10a · Deck import (empty)', el: <DeckImportScreen go={() => {}} state="empty" /> },
-  { label: '10b · Deck import (file selected)', el: <DeckImportScreen go={() => {}} state="fileSelected" /> },
-  { label: '10c · Deck import (parsing)', el: <DeckImportScreen go={() => {}} state="parsing" /> },
-  { label: '10d · Deck import (preview all)', el: <DeckImportScreen go={() => {}} state="previewAll" /> },
-  { label: '10e · Deck import (preview mixed)', el: <DeckImportScreen go={() => {}} state="previewMix" /> },
-  { label: '10f · Deck import (importing)', el: <DeckImportScreen go={() => {}} state="importing" /> },
-  { label: '10g · Deck import (success)', el: <DeckImportScreen go={() => {}} state="success" /> },
-  { label: '10h · Deck import (partial)', el: <DeckImportScreen go={() => {}} state="partial" /> },
-  { label: '10i · Deck import (failed)', el: <DeckImportScreen go={() => {}} state="failed" /> },
-  { label: '11a · Tags (loaded)', el: <TagManagementScreen go={() => {}} state="loaded" /> },
-  { label: '11b · Tags (loading)', el: <TagManagementScreen go={() => {}} state="loading" /> },
-  { label: '11c · Tags (empty)', el: <TagManagementScreen go={() => {}} state="empty" /> },
-  { label: '11d · Tags (search empty)', el: <TagManagementScreen go={() => {}} state="searchEmpty" /> },
-  { label: '11e · Tags (action sheet)', el: <TagManagementScreen go={() => {}} state="sheet" /> },
-  { label: '11f · Tags (rename)', el: <TagManagementScreen go={() => {}} state="rename" /> },
-  { label: '11g · Tags (rename → merge)', el: <TagManagementScreen go={() => {}} state="renameMerge" /> },
-  { label: '11h · Tags (merge sheet)', el: <TagManagementScreen go={() => {}} state="merge" /> },
-  { label: '11i · Tags (delete confirm)', el: <TagManagementScreen go={() => {}} state="del" /> },
-  { label: '11j · Tags (busy row)', el: <TagManagementScreen go={() => {}} state="busy" /> },
-  { label: '11k · Tags (op error)', el: <TagManagementScreen go={() => {}} state="opError" /> },
-  /* ── 5 · Study ─────────────────────────────────────────────── */
-  { label: '12 · Study · Review', el: <StudyScreen go={() => {}} /> },
-  { label: '13 · Study · Match', el: <MatchScreen go={() => {}} /> },
-  { label: '14 · Study · Guess', el: <GuessScreen go={() => {}} /> },
-  { label: '15a · Study · Recall (hidden)', el: <RecallScreen go={() => {}} initialRevealed={false} /> },
-  { label: '15b · Study · Recall (revealed)', el: <RecallScreen go={() => {}} initialRevealed={true} /> },
-  { label: '16a · Study · Fill (input)', el: <FillScreen go={() => {}} initialState="input" /> },
-  { label: '16b · Study · Fill (wrong)', el: <FillScreen go={() => {}} initialState="wrong" /> },
-  { label: '17a · Study result (loaded)', el: <StudyResultScreen go={() => {}} state="loaded" /> },
-  { label: '17b · Study result (loading)', el: <StudyResultScreen go={() => {}} state="loading" /> },
-  { label: '17c · Study result (goal off)', el: <StudyResultScreen go={() => {}} state="goalOff" /> },
-  { label: '17d · Study result (save failed)', el: <StudyResultScreen go={() => {}} state="finFailed" /> },
-  { label: '17e · Study result (defensive)', el: <StudyResultScreen go={() => {}} state="defensive" /> },
-  { label: '17f · Study result (tough empty)', el: <StudyResultScreen go={() => {}} state="toughEmpty" /> },
-  /* ── 6 · Insights ──────────────────────────────────────────── */
-  { label: '18 · Stats', el: <StatsScreen go={() => {}} /> },
-  { label: '19a · Progress (week)', el: <ProgressScreen go={() => {}} state="loaded" /> },
-  { label: '19b · Progress (month)', el: <ProgressScreen go={() => {}} state="month" /> },
-  { label: '19c · Progress (loading)', el: <ProgressScreen go={() => {}} state="loading" /> },
-  { label: '19d · Progress (empty)', el: <ProgressScreen go={() => {}} state="empty" /> },
-  { label: '19e · Progress (insufficient)', el: <ProgressScreen go={() => {}} state="insufficient" /> },
-  { label: '19f · Progress (partial)', el: <ProgressScreen go={() => {}} state="partial" /> },
-  { label: '19g · Progress (error)', el: <ProgressScreen go={() => {}} state="error" /> },
-  /* ── 7 · Settings ──────────────────────────────────────────── */
-  { label: '20a · Settings (populated)', el: <SettingsScreen go={() => {}} state="populated" /> },
-  { label: '20b · Settings (loading)', el: <SettingsScreen go={() => {}} state="loading" /> },
-  { label: '20c · Settings (signed out)', el: <SettingsScreen go={() => {}} state="signedOut" /> },
-  { label: '20d · Settings (signing in)', el: <SettingsScreen go={() => {}} state="signingIn" /> },
-  { label: '20e · Settings (sync error)', el: <SettingsScreen go={() => {}} state="syncError" /> },
-  { label: '21a · Account sync (signed out)', el: <AccountSyncScreen go={() => {}} state="signedOut" /> },
-  { label: '21b · Account sync (signing in)', el: <AccountSyncScreen go={() => {}} state="signingIn" /> },
-  { label: '21c · Account sync (sign-in failed)', el: <AccountSyncScreen go={() => {}} state="signInFailed" /> },
-  { label: '21d · Account sync (no backup yet)', el: <AccountSyncScreen go={() => {}} state="noBackup" /> },
-  { label: '21e · Account sync (ready)', el: <AccountSyncScreen go={() => {}} state="ready" /> },
-  { label: '21f · Account sync (uploading)', el: <AccountSyncScreen go={() => {}} state="uploading" /> },
-  { label: '21g · Account sync (restore warn)', el: <AccountSyncScreen go={() => {}} state="restoreWarn" /> },
-  { label: '21h · Account sync (restoring)', el: <AccountSyncScreen go={() => {}} state="restoring" /> },
-  { label: '21i · Account sync (token expired)', el: <AccountSyncScreen go={() => {}} state="tokenExpired" /> },
-  { label: '22a · Learning (goal on)', el: <LearningSettingsScreen go={() => {}} state="goalOn" /> },
-  { label: '22b · Learning (goal off)', el: <LearningSettingsScreen go={() => {}} state="goalOff" /> },
-  { label: '22c · Learning (reminder on)', el: <LearningSettingsScreen go={() => {}} state="reminderOn" /> },
-  { label: '22d · Learning (perm denied)', el: <LearningSettingsScreen go={() => {}} state="permDenied" /> },
-  { label: '22e · Learning (saving)', el: <LearningSettingsScreen go={() => {}} state="saving" /> },
-  { label: '23a · Audio (Korean loaded)', el: <AudioSpeechScreen go={() => {}} state="loaded" /> },
-  { label: '23b · Audio (English tab)', el: <AudioSpeechScreen go={() => {}} state="english" /> },
-  { label: '23c · Audio (loading voices)', el: <AudioSpeechScreen go={() => {}} state="loading" /> },
-  { label: '23d · Audio (no voices)', el: <AudioSpeechScreen go={() => {}} state="empty" /> },
-  { label: '23e · Audio (engine error)', el: <AudioSpeechScreen go={() => {}} state="engineErr" /> },
-  { label: '23f · Audio (preview playing)', el: <AudioSpeechScreen go={() => {}} state="playing" /> },
-  { label: '23g · Audio (saving)', el: <AudioSpeechScreen go={() => {}} state="saving" /> }];
-
+  const [view, setView] = React.useState('both');
+  const [width, setWidth] = React.useState(390);
+  React.useEffect(() => { document.body.classList.toggle('stage-dark', view === 'dark'); }, [view]);
+  const widths = [360, 375, 390, 412];
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   return (
     <>
-      <div className="stage-header" style={{ paddingTop: 20 }}>
-        <div className="mode-toggle" role="tablist" aria-label="Theme">
-          <button className={!dark ? 'active' : ''} onClick={() => setDark(false)} role="tab" aria-selected={!dark}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>
-            Light
-          </button>
-          <button className={dark ? 'active' : ''} onClick={() => setDark(true)} role="tab" aria-selected={dark}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
-            Dark
-          </button>
+      <div className="controls">
+        <div className="brandblock">
+          <span className="brand">MemoX · Mobile UI Kit</span>
+          <span className="sub">23 screens · light + dark side by side · cycle states with the steppers</span>
+        </div>
+        <div className="ctl">
+          <span className="seg-label">View</span>
+          <div className="seg">
+            {['both','light','dark'].map((v) => <button key={v} className={view === v ? 'active' : ''} onClick={() => setView(v)}>{cap(v)}</button>)}
+          </div>
+        </div>
+        <div className="ctl">
+          <span className="seg-label">Width</span>
+          <div className="seg">
+            {widths.map((w) => <button key={w} className={width === w ? 'active' : ''} onClick={() => setWidth(w)}>{w}</button>)}
+          </div>
         </div>
       </div>
-      <div className={"stage " + (dark ? 'memox-dark' : '')}>
-        {screens.map((s, i) =>
-        <Phone key={i} label={s.label}>{s.el}</Phone>
-        )}
+      <div className="gallery" style={{ '--phone-w': width + 'px' }}>
+        {GROUPS.map((g) => (
+          <React.Fragment key={g.num}>
+            {g.section ? <div className="section-head">{g.section}</div> : null}
+            <ScreenRow group={g} view={view} num={g.num} />
+          </React.Fragment>
+        ))}
       </div>
     </>);
-
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
