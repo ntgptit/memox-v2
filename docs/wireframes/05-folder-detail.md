@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-31
+last_updated: 2026-06-03
 route: /library/folder/:id
 source_specs:
   - docs/business/folder/folder-management.md
@@ -10,7 +10,7 @@ source_specs:
 
 # 05 — Folder Detail
 
-## V1 verification status (2026-06-03, Prompt 45)
+## V1 verification status (2026-06-03, Prompts 45, 47, 47B)
 
 This screen is partially Current.
 
@@ -36,8 +36,13 @@ Current V1:
   resumable session:
   - **Resume banner** — visible iff a resumable session with `entry_type=folder,
     entry_ref_id=this.id` exists; Resume opens that session directly
-    (`context.goStudySession`), never creating a new one. Discard is not yet
-    exposed here (Future).
+    (`context.goStudySession`), never creating a new one. Discard is Current
+    from Prompt 47: it shows a danger confirmation (`MxConfirmationDialog`);
+    confirm cancels the existing paused session via the shared Resume-Discard
+    flow (`confirmAndDiscardResumeSession` → `CancelStudySessionUseCase`
+    through `progressSessionActionControllerProvider`, which bumps the
+    study-session revision so the banner refreshes away); Cancel/barrier
+    dismissal does nothing. Discard never creates a session.
   - **Today CTA** — visible iff recursive `dueCount > 0`; routes to the Study
     Entry Gate with `entry_type=folder` + `study_type=srs_review` (folder-scoped due
     review). Hidden at zero.
@@ -48,15 +53,6 @@ Current V1:
   - Recursive counts + resumable session come from
     `GetFolderStudyEntryUseCase` (reuses `StudyRepo.countFlashcardsInScope` /
     `countDueCardsInScope` / `findResumeCandidate`); no schema added.
-
-Current (Prompt 47):
-
-- Resume banner **Discard** secondary action. Tap → danger confirmation
-  (`MxConfirmationDialog`) → on confirm cancels the existing paused session via
-  the shared Resume-Discard flow (`confirmAndDiscardResumeSession` →
-  `CancelStudySessionUseCase` through `progressSessionActionControllerProvider`,
-  which bumps the study-session revision so the banner refreshes away). Cancel
-  does nothing. Never creates a new session; no schema/SRS change.
 
 Future / not exposed in V1:
 

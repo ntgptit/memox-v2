@@ -467,3 +467,39 @@ now delegates to it, so Dashboard, deck banner, and folder banner share one path
   change, new session creation from discard, presentation DB access, `?type=srs_review`, or hardcoded
   strings introduced. Today still uses `study_type=srs_review`. The `v1.0.0-rc.1` tag is unchanged and
   does not claim Prompt 47.
+
+## Prompt 47B — Resume Discard Docs Honesty Cleanup (2026-06-03)
+
+**Status: Current docs honesty cleanup only.**
+
+**Notes:** Corrected stale post-Prompt-47 wording that still described implemented
+Resume Discard behavior as Future or implied the old selection trigger.
+
+- Runtime behavior changed: **no**. Production code changed: **no**. Tests changed: **no**.
+- Docs changed: **yes**.
+- Exact stale items fixed:
+  - `docs/wireframes/05-folder-detail.md`: V1 verification status now states that
+    Folder Resume opens the existing session directly, while Discard is Current
+    from Prompt 47, shows danger confirmation, confirms through
+    `confirmAndDiscardResumeSession` → `CancelStudySessionUseCase`, treats
+    Cancel/barrier as no-op, and never creates a session. The Future list no
+    longer implies Resume Discard is pending.
+  - `docs/wireframes/06-flashcard-list.md`: §States now says selection mode is
+    entered by the row "Select" action or per-row star toggle. Long-press opens
+    the row action sheet; long-press-to-select remains Future only.
+  - `docs/checklist/screen-function-task-matrix.md`: Flashcard List current-status
+    prose no longer lists the resume banner as Future, and the deck study-entry
+    row names Resume / Discard as Current.
+- Related docs re-checked and already honest from Prompt 47:
+  `docs/checklist/wireframe-code-parity-assessment.md`,
+  `docs/checklist/v1-post-rc-backlog.md`,
+  `docs/business/resume/resume-session.md`, and
+  `docs/wireframes/24-shared-dialogs.md`.
+- Verification: `git diff --check`, `flutter analyze`, and
+  `python code-verification-guard/guard/run.py check --project . --ruleset memox`
+  were run for this docs-only cleanup.
+- Full `flutter test`: **skipped** because no production or test file changed.
+- Remaining Future gaps unchanged: mastery ring / "{n} new" subtitle, Global Search,
+  Flashcard History, Drive sync follow-ups, Onboarding, tag-scoped study,
+  engagement/streak/daily-goal, root-level decks, nullable deck parent migration,
+  status/tag filter chips, state badges, and bulk suspend/reset/tag.

@@ -225,7 +225,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 | Empty (zero cards in deck) | `totalCount == 0` (deck holds no cards, **regardless of any active search term**) | Show empty layout with "Add" CTA (`FlashcardEmptyStateSection`). Import CTA lives in the cards toolbar above. **Current.** |
 | No results (search filters every row) | **Deck has cards** (`totalCount > 0`) but the active search term matches none (`items.isEmpty && searchTerm.isNotEmpty`) | Show `FlashcardNoResultsSection` (`ValueKey('flashcard_no_results')`) with "Clear" CTA that resets the toolbar search term. Distinct from empty-deck. **Current (Prompt 16, classification corrected Prompt 16B).** |
 | Filtered empty (status/tag filters) | Status/tag filters applied, no match | Show filtered empty with "Clear filters" CTA. **Future** — status/tag filter chips are not yet implemented (see V1 verification status). |
-| Selection mode | Long-press OR Select tapped | App bar swaps; checkboxes show; bulk bar appears. |
+| Selection mode | Row "Select" action or per-row star toggle. Long-press opens the row action sheet; long-press-to-select is a Future target only. | App bar swaps; checkboxes show; bulk bar appears. |
 | Resume present | **Current (Prompt 46).** Deck has resumable session | Show Resume banner above the study card. Resume opens that session; no new session created. |
 | Today present | **Current (Prompt 46).** Deck `dueCount > 0` | Show Today CTA in the study card (`study_type=srs_review`). Hidden at zero. |
 | Loading bulk action | After confirm | Disable bulk bar; show progress indicator if > 1s. |
