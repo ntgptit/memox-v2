@@ -25,11 +25,12 @@ This screen is **partially Current**. The §Components 1-1 mapping (verified 202
 - Row actions (long-press / overflow sheet): Edit → `flashcardEdit`, Move (destination picker, progress kept), Export, Select, Delete (confirm). **No History. No Bury/Suspend.**
 - Bulk actions (selection mode): Delete (confirm), Move, Export only.
 - Study modes route through the Study Entry gate; disabled on empty deck.
+- **Deck-level study-entry section (Prompt 46):** Resume banner, Today CTA, and Study-deck CTA, mirroring the Folder Detail ownership pattern. Backed by `GetDeckStudyEntryUseCase` (`entry_type=deck`, `entry_ref_id=deckId`; composes `countFlashcardsInScope` + `countDueCardsInScope` + `findResumeCandidate`). Resume opens the existing session (`context.goStudySession`, never a new session); Today routes to the gate with `study_type=srs_review`; Study deck routes to the gate with no explicit `study_type` (default new study). Today hidden at 0 due; whole section hidden when the deck has no cards and no resumable session. Flashcard List never starts a session directly.
 - Import CTA → `deckImport` route (route ownership only; parser/preview verified in Prompt 17).
 
 **Future (not exposed in V1):**
 
-- Resume banner (resume-session epic).
+- Resume banner **Discard** action (banner shows Resume only; discard remains Future — no shared safe flow yet).
 - Status filter dropdown + multi-tag chip filter (`?filter=`/`?tag=` round-trip).
 - State badges (Suspended / Buried / Due) per row, and the shared `CardStateComputer`.
 - Bulk suspend / unsuspend / reset / tag± (block on bury/suspend epic).
@@ -162,14 +163,18 @@ Manage flashcards in one deck: browse, filter, edit, multi-select for bulk opera
 | Deck detail (name, target_language, count, parent path) | `decks` + folder chain | watch |
 | Flashcards filtered | `flashcards JOIN flashcard_progress JOIN flashcard_tags` with WHERE clause matching filters | stream |
 | Tag list for current deck (for filter chip) | distinct tags in deck | watch |
-| Resumable session for this deck | `study_sessions WHERE entry_type='deck' AND entry_ref_id=:deckId AND status IN (draft, in_progress)` | watch |
-| Today's due count for deck (for Today CTA subtitle) | filtered query | watch |
+| Resumable session for this deck | **Current (Prompt 46).** `StudyRepo.findResumeCandidate` for `entry_type='deck', entry_ref_id=:deckId` (status IN draft/in_progress) | re-resolves on content/session revision |
+| Today's due count for deck (for Today CTA) | **Current (Prompt 46).** `StudyRepo.countDueCardsInScope` over the deck (`entry_type=deck`) | re-resolves on content/session revision |
 | Per-row computed `CardState` (Suspended > Buried > Due > Active) | derived from flashcard_progress | watch |
 | Selection state (mode + selected IDs) | in-memory (NotifierState) | local |
 
 ## Forbidden
 
 - ❌ Show note/example/pronunciation/hint inline in row.
+- ❌ Display "Today (0)" — hide the Today CTA when 0 due (Current rule, Prompt 46).
+- ❌ Use `?type=srs_review` — the query param is `study_type` (`RoutePaths.studyTypeQueryParam`).
+- ❌ Use global `entry_type=today` for the deck Today CTA — it is `entry_type=deck` filtered to due via `study_type=srs_review`.
+- ❌ Start a session directly from Flashcard List — Study deck / Today / Resume must go through the Study Entry Gate (or resume the existing session); the gate owns empty-scope validation and session creation (Current rule, Prompt 46).
 - ❌ Remove the resume banner after one view. It persists until session resumed or discarded.
 - ❌ Long-press → open context sheet directly. Long-press MUST enter selection mode. **(Future target — see V1 verification status. V1 long-press opens the row action sheet; selection is entered via the "Select" action or the per-row star toggle.)**
 - ❌ Bulk action applies to filtered-out cards. Snapshot selected IDs at confirmation time.
@@ -187,9 +192,9 @@ Listed in **render order top-to-bottom** as they appear in `lib/presentation/fea
 | 1 | App bar | (inline in screen scaffold) | Title = deck name. Back. Search (in-deck). Overflow ⋮. |
 | 2 | Header section | `flashcard_header_section.dart` | Renders title + overflow + search. Replaces app bar inline when needed (responsive). |
 | 3 | Breadcrumb subtitle | `flashcard_breadcrumb_section.dart` | "Library / {folderPath} / {deckName}". 2nd line "{n} cards · {targetLanguage}". |
-| 4 | Resume banner | (inline in screen, fed by resume provider) | Visible iff resumable session for this deck. |
+| 4 | Deck study-entry section | `flashcard_study_entry_section.dart` | **Current (Prompt 46).** Resume banner (`deck_resume_banner`) + deck-level study card (`deck_study_card`) with Today (`deck_study_today_action`, `study_type=srs_review`) and Study-deck (`deck_study_deck_action`, default new study) CTAs. Fed by `deckStudyEntryProvider`. Today hidden at 0 due; whole section hidden when no cards and no resume. Renders above the deck summary. Never starts a session directly. |
 | 5 | Deck summary | `flashcard_deck_summary_section.dart` | Total cards · due-today badge · mastery progress chip. Single row above the study CTAs. |
-| 6 | Study modes | `flashcard_study_modes_section.dart` | "Study deck" (`/library/study/deck/:deckId` new learning) and "Today (n)" (`/library/study/deck/:deckId?study_type=srs_review` deck-scoped review of due cards). "Today" hidden if 0 due. Renders as horizontal CTA pair. |
+| 6 | Study modes | `flashcard_study_modes_section.dart` | Per-mode study tiles (Review / Match / Guess / Recall / Fill) + the Mix card; all route through the Study Entry Gate (`entry_type=deck`, default new study). Disabled on empty deck. The deck-level "Study deck" / "Today" CTA pair lives in the study-entry section (order 4). |
 | 7 | Progress section | `flashcard_progress_section.dart` | Optional in-deck progress widget (e.g., box distribution or due timeline). Rendered only when `state.progress != null`. |
 | 8 | Toolbar / filter | `flashcard_toolbar_section.dart` | Status filter dropdown ("All" / "Active" / "Due" / "Suspended" / "Buried") + multi-tag chip picker + sort menu. Compose with AND. |
 | 9 | Bulk action bar | `flashcard_bulk_action_section.dart` | Sticky bottom bar with 7 icons (per `docs/business/bulk/bulk-operations.md`): delete, move, tag+, tag-, suspend, unsuspend, reset. Visible only in selection mode. |
@@ -214,7 +219,8 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 | No results (search filters every row) | **Deck has cards** (`totalCount > 0`) but the active search term matches none (`items.isEmpty && searchTerm.isNotEmpty`) | Show `FlashcardNoResultsSection` (`ValueKey('flashcard_no_results')`) with "Clear" CTA that resets the toolbar search term. Distinct from empty-deck. **Current (Prompt 16, classification corrected Prompt 16B).** |
 | Filtered empty (status/tag filters) | Status/tag filters applied, no match | Show filtered empty with "Clear filters" CTA. **Future** — status/tag filter chips are not yet implemented (see V1 verification status). |
 | Selection mode | Long-press OR Select tapped | App bar swaps; checkboxes show; bulk bar appears. |
-| Resume present | Resumable session for deck | Show banner above CTAs. |
+| Resume present | **Current (Prompt 46).** Deck has resumable session | Show Resume banner above the study card. Resume opens that session; no new session created. |
+| Today present | **Current (Prompt 46).** Deck `dueCount > 0` | Show Today CTA in the study card (`study_type=srs_review`). Hidden at zero. |
 | Loading bulk action | After confirm | Disable bulk bar; show progress indicator if > 1s. |
 | Bulk error | Transaction failed | Toast error; restore selection state. |
 
@@ -228,8 +234,9 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 | Long-press card | Long-press | Enter selection mode with that card selected. |
 | Tap filter dropdown | Tap | Open filter picker bottom-sheet. |
 | Tap tag chip filter | Tap | Open tag picker bottom-sheet (multi-select, AND). |
-| Tap "Study deck" | Tap | Navigate to study entry gate `/library/study/deck/:deckId`. |
-| Tap resume banner | Tap | Resume session OR show discard dialog. |
+| Tap "Study deck" | Tap | **Current (Prompt 46).** Navigate to study entry gate `/library/study/deck/:deckId` (no explicit `study_type` → default new study). |
+| Tap "Today (n)" | Tap | **Current (Prompt 46).** Navigate to study entry gate `/library/study/deck/:deckId?study_type=srs_review` (deck-scoped review of due cards). NOT `entry_type=today` (which is global) and NOT `?type=`. |
+| Tap resume banner Resume | Tap | **Current (Prompt 46).** Open the existing session (`context.goStudySession`); never creates a new session. Discard remains Future. |
 | Tap FAB | Tap | Action sheet: New flashcard / Import. |
 | Tap overflow ⋮ | Tap | Menu: Edit deck / Move deck / Delete deck / Export / Sort by / Select. |
 | Pull to refresh | Pull | Re-run query. |
@@ -356,6 +363,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 
 - Screen: `lib/presentation/features/flashcards/screens/flashcard_list_screen.dart`.
 - Viewmodel: `lib/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart` (Riverpod annotation).
+- Deck study-entry (Prompt 46): use case `lib/domain/study/usecases/deck_study_entry_usecase.dart` (`DeckStudyEntry` / `GetDeckStudyEntryUseCase`); provider `lib/presentation/features/flashcards/viewmodels/deck_study_entry_provider.dart`; section widget `lib/presentation/features/flashcards/widgets/flashcard_study_entry_section.dart`; DI `getDeckStudyEntryUseCaseProvider` in `lib/app/di/study/study_usecase_providers.dart`. Mirrors the Folder Detail study-entry pattern (Prompt 45).
 - Section widgets (1-1 with §Components order above): see `lib/presentation/features/flashcards/widgets/flashcard_*_section.dart`. There is NO standalone `flashcard_list_notifier.dart` / `selection_controller.dart` file — selection state lives in the viewmodel.
 - Bulk operations: domain layer is **not yet implemented** as a dedicated `lib/domain/usecases/bulk/**` module — current actions go through `flashcard_usecases.dart` (`DeleteFlashcardsUseCase`, `MoveFlashcardsUseCase`, `ReorderFlashcardsUseCase`). Suspend / unsuspend / reset still missing (block on bury/suspend epic — see audit `docs/checklist/wireframe-code-parity-assessment.md` §3.1).
 - Route constant: `lib/app/router/route_names.dart` → `RouteNames.flashcardList`.

@@ -3288,6 +3288,42 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 card} other{{count} cards}}'**
   String folderStudyCardCount(int count);
 
+  /// No description provided for @deckResumeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a paused study session for this deck.'**
+  String get deckResumeMessage;
+
+  /// No description provided for @deckStudyEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Study this deck'**
+  String get deckStudyEntryTitle;
+
+  /// No description provided for @deckStudyTodayAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Study due cards'**
+  String get deckStudyTodayAction;
+
+  /// No description provided for @deckStudyDeckAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Study deck'**
+  String get deckStudyDeckAction;
+
+  /// No description provided for @deckStudyDueCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card due today} other{{count} cards due today}}'**
+  String deckStudyDueCount(int count);
+
+  /// No description provided for @deckStudyCardCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card} other{{count} cards}}'**
+  String deckStudyCardCount(int count);
+
   /// No description provided for @studyStartOverAction.
   ///
   /// In en, this message translates to:

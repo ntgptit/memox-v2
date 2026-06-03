@@ -34,6 +34,8 @@ const _visibleButtonLabelKeys = <String>{
   'foldersImportExistingDeckAction',
   'folderStudyTodayAction',
   'folderStudyFolderAction',
+  'deckStudyTodayAction',
+  'deckStudyDeckAction',
   'importCommitCardsAction',
   'settingsAccountDisconnect',
   'settingsAccountReconnectDrive',
@@ -111,6 +113,7 @@ const _redundantEnglishActionNounExemptKeys = <String>{
   'flashcardsSaveAction',
   'foldersImportCreateDeckAction',
   'foldersImportExistingDeckAction',
+  'deckStudyDeckAction',
 };
 
 const _conciseActionLabelExemptKeys = <String>{

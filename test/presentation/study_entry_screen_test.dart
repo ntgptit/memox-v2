@@ -129,6 +129,55 @@ void main() {
     },
   );
 
+  testWidgets(
+    'P46 onNavigate: deck ?study_type=srs_review starts a deck-scoped SRS review',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_deckEntryState)),
+          ],
+          child: const _TestRouterApp(
+            initialLocation: '/study/deck/deck-001?study_type=srs_review',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(repo.startedFlow, StudyFlow.srsFillReview);
+      expect(repo.startedModes, <StudyMode>[StudyMode.fill]);
+    },
+  );
+
+  testWidgets(
+    'P46 onNavigate: deck without type defaults to new study full cycle',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'deck',
+              'deck-001',
+            ).overrideWith((ref) => Future.value(_deckEntryState)),
+          ],
+          child: _TestRouterApp(initialLocation: _deckEntryLocation()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(repo.startedFlow, StudyFlow.newFullCycle);
+    },
+  );
+
   for (final entry in _singleModeFlowCases.entries) {
     testWidgets(
       'DT2 onNavigate: ${entry.key.name} starts ${entry.value.name} directly',

@@ -12,12 +12,14 @@ import 'package:memox/core/theme/tokens/app_icon_sizes.dart';
 import 'package:memox/domain/entities/flashcard_entity.dart';
 import 'package:memox/domain/enums/content_sort_mode.dart';
 import 'package:memox/domain/repositories/flashcard_repository.dart';
+import 'package:memox/domain/study/usecases/deck_study_entry_usecase.dart';
 import 'package:memox/domain/usecases/flashcard_usecases.dart';
 import 'package:memox/domain/value_objects/content_actions.dart';
 import 'package:memox/domain/value_objects/content_queries.dart';
 import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/flashcards/screens/flashcard_list_screen.dart';
+import 'package:memox/presentation/features/flashcards/viewmodels/deck_study_entry_provider.dart';
 import 'package:memox/presentation/features/flashcards/viewmodels/flashcard_list_viewmodel.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_deck_summary_section.dart';
 import 'package:memox/presentation/features/flashcards/widgets/flashcard_detail_card_row.dart';
@@ -29,6 +31,13 @@ import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
 import 'package:memox/presentation/shared/widgets/mx_secondary_button.dart';
 
+// Keeps the deck study-entry banners out of these browsing tests (and off the
+// real database) by stubbing the scope probe; banner behavior is covered by the
+// P46 study-entry test group below and deck_study_entry_usecase_test.dart.
+final _emptyDeckStudyEntryOverride = deckStudyEntryProvider.overrideWith(
+  (ref, _) => const DeckStudyEntry.empty(),
+);
+
 void main() {
   testWidgets(
     'DT1 onOpen: shows layout skeleton instead of full loading state on first load',
@@ -36,6 +45,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(
             deckId,
           ).overrideWith((ref) => Completer<FlashcardListState>().future),
@@ -65,6 +75,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -106,6 +117,7 @@ void main() {
       final state = _largeFlashcardState();
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(
             deckId,
           ).overrideWith((ref) => Future<FlashcardListState>.value(state)),
@@ -161,6 +173,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_emptyFlashcardState),
           ),
@@ -208,6 +221,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_emptyFlashcardState),
           ),
@@ -275,6 +289,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_noMatchFlashcardState),
           ),
@@ -311,6 +326,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_noMatchFlashcardState),
           ),
@@ -346,6 +362,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_emptyDeckSearchingState),
           ),
@@ -384,6 +401,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
           ),
@@ -428,6 +446,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
           ),
@@ -464,6 +483,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
           ),
@@ -506,6 +526,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
           ),
@@ -574,6 +595,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -630,6 +652,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -695,6 +718,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -761,6 +785,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
           ),
@@ -795,6 +820,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -862,6 +888,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -897,6 +924,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -933,6 +961,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -962,6 +991,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -996,6 +1026,7 @@ void main() {
     const deckId = 'deck-001';
     final container = ProviderContainer(
       overrides: [
+        _emptyDeckStudyEntryOverride,
         flashcardListQueryProvider(deckId).overrideWith(
           (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
         ),
@@ -1048,6 +1079,7 @@ void main() {
       const deckId = 'deck-001';
       final container = ProviderContainer(
         overrides: [
+          _emptyDeckStudyEntryOverride,
           flashcardListQueryProvider(deckId).overrideWith(
             (ref) => Future<FlashcardListState>.value(_sampleFlashcardState),
           ),
@@ -1105,6 +1137,287 @@ void main() {
       );
     },
   );
+
+  group('P46 deck study-entry banners', () {
+    testWidgets(
+      'onDisplay: empty deck shows no study CTAs and no resume banner',
+      (WidgetTester tester) async {
+        await _pumpDeckStudyEntry(
+          tester,
+          studyEntry: const DeckStudyEntry.empty(),
+          listState: _emptyFlashcardState,
+        );
+
+        expect(find.byKey(const ValueKey('deck_study_card')), findsNothing);
+        expect(find.byKey(const ValueKey('deck_resume_banner')), findsNothing);
+        expect(
+          find.byKey(const ValueKey('deck_study_today_action')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const ValueKey('deck_study_deck_action')),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets(
+      'onDisplay: deck with cards but none due shows Study deck only',
+      (WidgetTester tester) async {
+        await _pumpDeckStudyEntry(
+          tester,
+          studyEntry: const DeckStudyEntry(
+            totalCardCount: 30,
+            dueCount: 0,
+            resumeSessionId: null,
+          ),
+        );
+
+        expect(find.byKey(const ValueKey('deck_study_card')), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('deck_study_deck_action')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('deck_study_today_action')),
+          findsNothing,
+        );
+        expect(find.byKey(const ValueKey('deck_resume_banner')), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'onDisplay: deck with due cards shows Today plus Study deck',
+      (WidgetTester tester) async {
+        await _pumpDeckStudyEntry(
+          tester,
+          studyEntry: const DeckStudyEntry(
+            totalCardCount: 30,
+            dueCount: 12,
+            resumeSessionId: null,
+          ),
+        );
+
+        expect(
+          find.byKey(const ValueKey('deck_study_today_action')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('deck_study_deck_action')),
+          findsOneWidget,
+        );
+        expect(find.text('12 cards due today'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'onDisplay: paused deck session shows resume banner',
+      (WidgetTester tester) async {
+        await _pumpDeckStudyEntry(
+          tester,
+          studyEntry: const DeckStudyEntry(
+            totalCardCount: 0,
+            dueCount: 0,
+            resumeSessionId: 'session-046',
+          ),
+          listState: _emptyFlashcardState,
+        );
+
+        expect(
+          find.byKey(const ValueKey('deck_resume_banner')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('deck_resume_action')),
+          findsOneWidget,
+        );
+        expect(find.byKey(const ValueKey('deck_study_card')), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'onNavigate: tapping Resume opens the existing session, not the gate',
+      (WidgetTester tester) async {
+        await _pumpDeckStudyRouter(
+          tester,
+          studyEntry: const DeckStudyEntry(
+            totalCardCount: 0,
+            dueCount: 0,
+            resumeSessionId: 'session-046',
+          ),
+          listState: _emptyFlashcardState,
+        );
+
+        await tester.tap(find.byKey(const ValueKey('deck_resume_action')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Session session-046'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'onNavigate: tapping Today enters deck-scoped review gate '
+      'with study_type=srs_review',
+      (WidgetTester tester) async {
+        await _pumpDeckStudyRouter(
+          tester,
+          studyEntry: const DeckStudyEntry(
+            totalCardCount: 30,
+            dueCount: 12,
+            resumeSessionId: null,
+          ),
+        );
+
+        await tester.tap(find.byKey(const ValueKey('deck_study_today_action')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Gate deck deck-001 srs_review'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'onNavigate: tapping Study deck enters deck-scoped gate '
+      'without explicit study_type',
+      (WidgetTester tester) async {
+        await _pumpDeckStudyRouter(
+          tester,
+          studyEntry: const DeckStudyEntry(
+            totalCardCount: 30,
+            dueCount: 0,
+            resumeSessionId: null,
+          ),
+        );
+
+        await tester.tap(find.byKey(const ValueKey('deck_study_deck_action')));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Gate deck deck-001 default'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'onDisplay: no History, Global Search, or tag-scoped study action',
+      (WidgetTester tester) async {
+        await _pumpDeckStudyEntry(
+          tester,
+          studyEntry: const DeckStudyEntry(
+            totalCardCount: 30,
+            dueCount: 12,
+            resumeSessionId: null,
+          ),
+        );
+
+        expect(find.textContaining('History'), findsNothing);
+        expect(find.textContaining('history'), findsNothing);
+        expect(find.textContaining('Search'), findsNothing);
+        expect(find.byIcon(Icons.search), findsNothing);
+        // No tag-scoped study entry surfaced on the deck banners.
+        expect(find.textContaining('tag'), findsNothing);
+        expect(find.textContaining('Tag'), findsNothing);
+      },
+    );
+  });
+
+  group('P46 deck study-entry route contract', () {
+    test('Today CTA uses study_type query param, never type', () {
+      expect(RoutePaths.studyTypeQueryParam, 'study_type');
+    });
+  });
+}
+
+Future<void> _pumpDeckStudyEntry(
+  WidgetTester tester, {
+  required DeckStudyEntry studyEntry,
+  FlashcardListState? listState,
+}) async {
+  const deckId = 'deck-001';
+  final container = ProviderContainer(
+    overrides: [
+      deckStudyEntryProvider.overrideWith((ref, _) => studyEntry),
+      flashcardListQueryProvider(deckId).overrideWith(
+        (ref) => Future<FlashcardListState>.value(
+          listState ?? _sampleFlashcardState,
+        ),
+      ),
+    ],
+  );
+  addTearDown(container.dispose);
+
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: const _TestApp(child: FlashcardListScreen(deckId: deckId)),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+Future<void> _pumpDeckStudyRouter(
+  WidgetTester tester, {
+  required DeckStudyEntry studyEntry,
+  FlashcardListState? listState,
+}) async {
+  const deckId = 'deck-001';
+  final container = ProviderContainer(
+    overrides: [
+      deckStudyEntryProvider.overrideWith((ref, _) => studyEntry),
+      flashcardListQueryProvider(deckId).overrideWith(
+        (ref) => Future<FlashcardListState>.value(
+          listState ?? _sampleFlashcardState,
+        ),
+      ),
+    ],
+  );
+  addTearDown(container.dispose);
+
+  final router = GoRouter(
+    initialLocation: '/library/deck/$deckId/flashcards',
+    routes: [
+      GoRoute(
+        path: '/library',
+        builder: (context, state) => const SizedBox.shrink(),
+        routes: [
+          GoRoute(
+            path: RoutePaths.flashcardListSegment,
+            name: RouteNames.flashcardList,
+            builder: (context, state) => FlashcardListScreen(
+              deckId: state.pathParameters[RoutePaths.deckIdParam]!,
+            ),
+          ),
+          GoRoute(
+            path: RoutePaths.studyEntrySegment,
+            name: RouteNames.studyEntry,
+            builder: (context, state) => Text(
+              'Gate '
+              '${state.pathParameters[RoutePaths.studyEntryTypeParam]} '
+              '${state.pathParameters[RoutePaths.studyEntryRefIdParam]} '
+              '${state.uri.queryParameters[RoutePaths.studyTypeQueryParam] ?? 'default'}',
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/session/:${RoutePaths.studySessionIdParam}',
+        name: RouteNames.studySession,
+        builder: (context, state) => Text(
+          'Session ${state.pathParameters[RoutePaths.studySessionIdParam]}',
+        ),
+      ),
+    ],
+  );
+  addTearDown(router.dispose);
+
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
 }
 
 final _sampleFlashcardState = FlashcardListState(

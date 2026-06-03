@@ -8,6 +8,7 @@ import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/study_enums.dart';
 import '../../../../domain/services/tts_service.dart';
+import '../../../../domain/study/usecases/deck_study_entry_usecase.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
 import '../../../shared/dialogs/mx_bottom_sheet.dart';
@@ -24,6 +25,7 @@ import '../../decks/actions/deck_quick_actions.dart';
 import '../../decks/viewmodels/deck_action_viewmodel.dart';
 import '../../tts/providers/tts_controller_notifier.dart';
 import '../actions/flashcard_export.dart';
+import '../viewmodels/deck_study_entry_provider.dart';
 import '../viewmodels/flashcard_list_viewmodel.dart';
 import '../widgets/flashcard_breadcrumb_section.dart';
 import '../widgets/flashcard_bulk_action_section.dart';
@@ -34,6 +36,7 @@ import '../widgets/flashcard_items_section.dart';
 import '../widgets/flashcard_list_skeleton.dart';
 import '../widgets/flashcard_progress_section.dart';
 import '../widgets/flashcard_reorder_list.dart';
+import '../widgets/flashcard_study_entry_section.dart';
 import '../widgets/flashcard_study_modes_section.dart';
 import '../widgets/flashcard_toolbar_section.dart';
 
@@ -86,6 +89,11 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     final selectionNotifier = ref.read(
       flashcardSelectionProvider(widget.deckId).notifier,
     );
+    // Study-entry summary is best-effort: while it loads or if the scope probe
+    // fails, the banners simply stay hidden (deck browsing is unaffected).
+    final studyEntry =
+        ref.watch(deckStudyEntryProvider(widget.deckId)).value ??
+        const DeckStudyEntry.empty();
 
     return _buildScaffold(
       l10n: l10n,
@@ -94,6 +102,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
       toolbarNotifier: toolbarNotifier,
       selection: selection,
       selectionNotifier: selectionNotifier,
+      studyEntry: studyEntry,
     );
   }
 
@@ -104,6 +113,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     required FlashcardToolbarState toolbarNotifier,
     required Set<String> selection,
     required FlashcardSelection selectionNotifier,
+    required DeckStudyEntry studyEntry,
   }) => MxScaffold(
     floatingActionButton: _isReorderMode
         ? null
@@ -164,6 +174,11 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
               ),
             ),
             const MxSliverGap(MxSpace.md),
+            // DS Deck Detail order: breadcrumb → resume banner / deck-level
+            // study CTAs → hero summary → study modes. The study-entry section
+            // owns Resume / Today / Study-deck, mirroring Folder Detail; it
+            // never starts a session directly.
+            ..._buildStudyEntrySlivers(studyEntry),
             SliverToBoxAdapter(
               child: FlashcardDeckSummarySection(
                 state: state,
@@ -458,9 +473,45 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
     ];
   }
 
+  List<Widget> _buildStudyEntrySlivers(DeckStudyEntry studyEntry) {
+    if (!studyEntry.hasResume && !studyEntry.hasCards) {
+      return const <Widget>[];
+    }
+    return [
+      SliverToBoxAdapter(
+        child: FlashcardStudyEntrySection(
+          entry: studyEntry,
+          onResume: (sessionId) => context.goStudySession(sessionId),
+          onStudyToday: _studyDeckDueCards,
+          onStudyDeck: _studyDeck,
+        ),
+      ),
+      const MxSliverGap(MxSpace.lg),
+    ];
+  }
+
+  /// Deck-scoped SRS review of due cards via the Study Entry Gate. The gate owns
+  /// empty-scope validation, resume conflict, and session creation; this never
+  /// starts a session directly.
+  void _studyDeckDueCards() {
+    context.goStudyEntry(
+      entryType: StudyEntryType.deck.storageValue,
+      entryRefId: widget.deckId,
+      studyType: StudyType.srsReview.storageValue,
+    );
+  }
+
+  /// Deck-scoped new study of the whole deck via the Study Entry Gate.
+  void _studyDeck() {
+    context.goStudyEntry(
+      entryType: StudyEntryType.deck.storageValue,
+      entryRefId: widget.deckId,
+    );
+  }
+
   void _goStudyEntry(FlashcardListState state, StudyMode? studyMode) {
     context.goStudyEntry(
-      entryType: 'deck',
+      entryType: StudyEntryType.deck.storageValue,
       entryRefId: state.deckId,
       studyMode: studyMode?.storageValue,
     );

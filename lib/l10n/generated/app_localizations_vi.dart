@@ -1920,6 +1920,41 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get deckResumeMessage =>
+      'Bạn có một phiên học đang tạm dừng cho bộ thẻ này.';
+
+  @override
+  String get deckStudyEntryTitle => 'Học bộ thẻ này';
+
+  @override
+  String get deckStudyTodayAction => 'Học thẻ đến hạn';
+
+  @override
+  String get deckStudyDeckAction => 'Học bộ thẻ';
+
+  @override
+  String deckStudyDueCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ đến hạn hôm nay',
+      one: '1 thẻ đến hạn hôm nay',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckStudyCardCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ',
+      one: '1 thẻ',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get studyStartOverAction => 'Học lại từ đầu';
 
   @override

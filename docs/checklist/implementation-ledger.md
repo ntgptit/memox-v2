@@ -309,3 +309,65 @@ Schema/SRS/Global Search/Flashcard History/Onboarding/Drive sync/tag-scoped stud
 root-level decks/nullable deck parent migration changed: no. Remaining gaps stay Future: Resume
 Discard action, mastery ring, "{n} new" subtitle, Global Search, Flashcard History, Onboarding,
 engagement/streak/daily-goal, and root-level decks.
+
+## Prompt 46 — Flashcard List Deck Study / Today / Resume Banners (2026-06-03)
+
+**Status: Current deck study entry banners.**
+
+**Preflight classification:** Flashcard List deck-level Resume / Today / Study-deck was
+**Future — not exposed** (resume banner listed Future in the 06 wireframe V1 status; the only
+deck study surface was the per-mode `FlashcardStudyModesSection` routing `entry_type=deck`
+without `study_type`). No deck Today (`srs_review`) CTA and no Resume banner existed. Classified
+as **behavior missing → needs code fix**, closed by mirroring the Prompt 45 Folder Detail pattern.
+
+**Notes:** Sub-agents not used; the main agent read the docs/source directly. Flashcard List now
+renders a deck study-entry section above the deck summary via `FlashcardStudyEntrySection`
+(`lib/presentation/features/flashcards/widgets/flashcard_study_entry_section.dart`), driven by
+`deckStudyEntryProvider`
+(`lib/presentation/features/flashcards/viewmodels/deck_study_entry_provider.dart`) →
+`GetDeckStudyEntryUseCase` (`lib/domain/study/usecases/deck_study_entry_usecase.dart`). The use
+case composes existing `StudyRepo.countFlashcardsInScope` / `countDueCardsInScope` /
+`findResumeCandidate` for an `entry_type=deck` scope — no schema, no SRS change, no new
+persistence, no DAO access in presentation.
+
+- Resume banner implemented: **yes** (Resume opens the existing session via
+  `context.goStudySession`; never creates a session). Discard action: **not** implemented (Future).
+- Today CTA implemented: **yes** (shown iff `dueCount > 0`; routes to the Study Entry Gate with
+  `entry_type=deck` + `study_type=srs_review` — NOT global `entry_type=today`, NOT `?type=`).
+- Study deck CTA implemented: **yes** (shown iff `totalCardCount > 0`; routes to the Study Entry
+  Gate with `entry_type=deck`, default new study).
+- Empty/deck-zero behavior: section hidden when the deck has no cards and no resumable session;
+  empty-deck Add/Import flow unchanged.
+- Study Entry Gate navigation: **yes** — Flashcard List never starts a session directly; the gate
+  owns empty-scope validation, resume conflict, and session creation. No new route/path; reused the
+  existing additive `study_type` query param (`RoutePaths.studyTypeQueryParam` = `study_type`,
+  unchanged) and `goStudyEntry(studyType:)`.
+- production code changed: **yes** (domain use case, DI provider, presentation provider, widget,
+  flashcard list screen wiring/handlers). No change to the study entry route/screen (already
+  supported `study_type` from Prompt 45).
+- schema changed: **no**. route changed: **no** (reused existing `study_type` param). SRS changed:
+  **no**. l10n changed: **yes** (`deckResumeMessage`, `deckStudyEntryTitle`, `deckStudyTodayAction`,
+  `deckStudyDeckAction`, `deckStudyDueCount`, `deckStudyCardCount` in EN + VI; `flutter gen-l10n`).
+- tests added/updated: `test/domain/study/deck_study_entry_usecase_test.dart` (new),
+  P46 group + route-contract test in `test/presentation/flashcard_list_screen_test.dart` (banner
+  display + gate/session navigation + no History/Search/tag exposure; all containers stub
+  `deckStudyEntryProvider`), deck `study_type` cases in `test/presentation/study_entry_screen_test.dart`,
+  and the two new action-label keys in `test/presentation/button_label_contract_test.dart`.
+- docs updated: `docs/wireframes/06-flashcard-list.md` (banners Future→Current; Components/States/
+  Actions/Forbidden/Data/refs), `docs/wireframes/12-study-entry-gate.md` (deck Today caller +
+  `study_type` note), `docs/business/navigation/navigation-flow.md`,
+  `docs/checklist/screen-function-task-matrix.md` (new deck study-entry row),
+  `docs/checklist/wireframe-code-parity-assessment.md` (row 06),
+  `docs/checklist/v1-post-rc-backlog.md` (item marked done), this ledger.
+- verification: `flutter gen-l10n`, `dart run build_runner build --delete-conflicting-outputs`
+  (348 outputs, no drift), `flutter analyze` (clean), focused tests
+  (`flashcard_list_screen_test.dart`, `study_entry_screen_test.dart`, `app_router_test.dart`,
+  `button_label_contract_test.dart`, `deck_study_entry_usecase_test.dart`) green, full `flutter test`
+  green (1069 tests), `python code-verification-guard/guard/run.py check --project . --ruleset memox`
+  (passed), `git diff --check` (clean; only an LF→CRLF advisory).
+- scope leak check: no Flashcard History, Global Search, Drive sync, onboarding, tag-scoped study,
+  engagement/streak/daily-goal, root-level decks, nullable deck parent migration, schema change,
+  SRS algorithm change, DAO access in presentation, or hardcoded user-facing strings introduced.
+- remaining gaps: Resume **Discard** shared flow remains Future (Prompt 47 candidate); status/tag
+  filter chips, state badges, and bulk suspend/reset/tag stay Future. The `v1.0.0-rc.1` tag is
+  unchanged and does not claim Prompt 46.

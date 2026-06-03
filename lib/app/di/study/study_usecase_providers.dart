@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../domain/study/usecases/deck_study_entry_usecase.dart';
 import '../../../domain/study/usecases/folder_study_entry_usecase.dart';
 import '../../../domain/study/usecases/study_usecases.dart';
 import 'study_data_providers.dart';
@@ -10,6 +11,10 @@ part 'study_usecase_providers.g.dart';
 @riverpod
 GetFolderStudyEntryUseCase getFolderStudyEntryUseCase(Ref ref) =>
     GetFolderStudyEntryUseCase(repository: ref.watch(studyRepoProvider));
+
+@riverpod
+GetDeckStudyEntryUseCase getDeckStudyEntryUseCase(Ref ref) =>
+    GetDeckStudyEntryUseCase(repository: ref.watch(studyRepoProvider));
 
 @riverpod
 StartStudySessionUseCase startStudySessionUseCase(Ref ref) =>

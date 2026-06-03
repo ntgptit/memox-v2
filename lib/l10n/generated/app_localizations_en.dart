@@ -2032,6 +2032,41 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get deckResumeMessage =>
+      'You have a paused study session for this deck.';
+
+  @override
+  String get deckStudyEntryTitle => 'Study this deck';
+
+  @override
+  String get deckStudyTodayAction => 'Study due cards';
+
+  @override
+  String get deckStudyDeckAction => 'Study deck';
+
+  @override
+  String deckStudyDueCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards due today',
+      one: '1 card due today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String deckStudyCardCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get studyStartOverAction => 'Start over';
 
   @override

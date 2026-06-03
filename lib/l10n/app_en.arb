@@ -980,6 +980,26 @@
       }
     }
   },
+  "deckResumeMessage": "You have a paused study session for this deck.",
+  "deckStudyEntryTitle": "Study this deck",
+  "deckStudyTodayAction": "Study due cards",
+  "deckStudyDeckAction": "Study deck",
+  "deckStudyDueCount": "{count, plural, =1{1 card due today} other{{count} cards due today}}",
+  "@deckStudyDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deckStudyCardCount": "{count, plural, =1{1 card} other{{count} cards}}",
+  "@deckStudyCardCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "studyStartOverAction": "Start over",
   "studyFlowTitle": "Study flow",
   "studyTypeNew": "New Study",

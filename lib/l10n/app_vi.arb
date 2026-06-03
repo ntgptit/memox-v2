@@ -980,6 +980,26 @@
       }
     }
   },
+  "deckResumeMessage": "Bạn có một phiên học đang tạm dừng cho bộ thẻ này.",
+  "deckStudyEntryTitle": "Học bộ thẻ này",
+  "deckStudyTodayAction": "Học thẻ đến hạn",
+  "deckStudyDeckAction": "Học bộ thẻ",
+  "deckStudyDueCount": "{count, plural, =1{1 thẻ đến hạn hôm nay} other{{count} thẻ đến hạn hôm nay}}",
+  "@deckStudyDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deckStudyCardCount": "{count, plural, =1{1 thẻ} other{{count} thẻ}}",
+  "@deckStudyCardCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "studyStartOverAction": "Học lại từ đầu",
   "studyFlowTitle": "Luồng học",
   "studyTypeNew": "Học mới",

@@ -59,6 +59,12 @@ Only reopen V1 RC if a real runtime blocker, data-loss bug, build failure, or se
   folder CTA are Current, routing through the Study Entry Gate. Remaining
   follow-up: Resume **Discard** action + mastery ring / "{n} new" subtitle from
   the mock stay Future.
+- ~~Flashcard List deck Study/Today/Resume banners~~ — **DONE (Prompt 46, 2026-06-03).**
+  Resume banner, Today CTA (deck-scoped `study_type=srs_review`), and Study deck
+  CTA are Current, routing through the Study Entry Gate (`entry_type=deck`).
+  Mirrors Folder Detail (Prompt 45) via `GetDeckStudyEntryUseCase` /
+  `FlashcardStudyEntrySection`; no schema/SRS change. Remaining follow-up:
+  Resume **Discard** shared flow stays Future (Prompt 47 candidate).
 - active-session undo reinsert
 
 ### P2 — feature expansion
