@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-05-28
+last_updated: 2026-06-03
 route: /library/deck/:deckId/flashcards
 source_specs:
   - docs/business/flashcard/flashcard-management.md
@@ -231,16 +231,16 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 | Action | Trigger | Result |
 | --- | --- | --- |
 | Tap card | Tap | Navigate to flashcard edit. |
-| Long-press card | Long-press | Enter selection mode with that card selected. |
-| Tap filter dropdown | Tap | Open filter picker bottom-sheet. |
-| Tap tag chip filter | Tap | Open tag picker bottom-sheet (multi-select, AND). |
+| Long-press card | Long-press | **Current (V1):** open the row action sheet (Edit / Move / Export / Select / Delete). Selection mode is entered via the sheet's "Select" action or the per-row star toggle, NOT by long-press. (Long-press-to-select is a **Future** target — see V1 verification status / §Forbidden.) |
+| Tap filter dropdown | Tap | Open filter picker bottom-sheet. **(Future** — status filter chips not yet implemented.) |
+| Tap tag chip filter | Tap | Open tag picker bottom-sheet (multi-select, AND). **(Future** — tag filter chips not yet implemented; tag-scoped study remains Future/Blocked.) |
 | Tap "Study deck" | Tap | **Current (Prompt 46).** Navigate to study entry gate `/library/study/deck/:deckId` (no explicit `study_type` → default new study). |
 | Tap "Today (n)" | Tap | **Current (Prompt 46).** Navigate to study entry gate `/library/study/deck/:deckId?study_type=srs_review` (deck-scoped review of due cards). NOT `entry_type=today` (which is global) and NOT `?type=`. |
 | Tap resume banner Resume | Tap | **Current (Prompt 46).** Open the existing session (`context.goStudySession`); never creates a new session. Discard remains Future. |
 | Tap FAB | Tap | Action sheet: New flashcard / Import. |
 | Tap overflow ⋮ | Tap | Menu: Edit deck / Move deck / Delete deck / Export / Sort by / Select. |
 | Pull to refresh | Pull | Re-run query. |
-| Tap search icon | Tap | Navigate to library search pre-filtered to this deck. |
+| Tap search icon | Tap | **Current (V1):** open/focus the inline, scope-local deck search (toolbar search term → `ContentQuery`); filters cards within this deck only. Does NOT navigate anywhere. Navigation to a Library/Global Search pre-filtered to this deck is **Future / not exposed** (no live V1 route). |
 
 ### Selection mode
 
@@ -291,7 +291,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 ## Navigation in
 
 - Tap deck row in Library or Folder detail.
-- Search result tap on deck.
+- Search result tap on deck (**Future** — Global/Library Search has no live V1 route).
 - Deep link from notification (rare).
 - Back from Flashcard create/edit/import. Flashcard History is Future Proposal and has no live V1 route.
 

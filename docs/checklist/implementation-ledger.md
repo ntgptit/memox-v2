@@ -371,3 +371,39 @@ persistence, no DAO access in presentation.
 - remaining gaps: Resume **Discard** shared flow remains Future (Prompt 47 candidate); status/tag
   filter chips, state badges, and bulk suspend/reset/tag stay Future. The `v1.0.0-rc.1` tag is
   unchanged and does not claim Prompt 46.
+
+## Prompt 46B — Flashcard List Docs Honesty Cleanup (2026-06-03)
+
+**Status: Current docs honesty cleanup only.**
+
+**Notes:** Removed stale target wording from `docs/wireframes/06-flashcard-list.md` §Actions /
+Normal mode that could be misread as Current V1 behavior, and refreshed frontmatter.
+
+- Runtime behavior changed: **no**. Production code changed: **no**. Tests changed: **no**.
+- Schema / SRS / Global Search / Flashcard History / Drive sync / Onboarding / tag-scoped study /
+  engagement / root-level decks / nullable deck parent migration / Resume Discard implementation:
+  **unchanged**.
+- Exact stale items fixed in `docs/wireframes/06-flashcard-list.md`:
+  - Frontmatter `last_updated` `2026-05-28` → `2026-06-03`.
+  - `Long-press card` action result rewritten to Current V1 (opens the row action sheet; selection
+    is via the sheet "Select" action or per-row star toggle) with long-press-to-select flagged
+    **Future** only.
+  - `Tap search icon` action result rewritten to Current V1 (inline scope-local deck search via
+    `ContentQuery`, no navigation); Library/Global Search navigation flagged **Future / not exposed**.
+  - `Tap filter dropdown` / `Tap tag chip filter` rows flagged **Future** (status/tag filter chips
+    not implemented; tag-scoped study remains Future/Blocked).
+  - §Navigation in "Search result tap on deck" flagged **Future** (no live V1 Global/Library Search
+    route).
+- Doc still correctly states: Flashcard History Future/not exposed; Global/Library Search
+  Future/not exposed; tag-scoped study Future/Blocked/not exposed; Resume **Discard** Future; Today
+  uses `study_type=srs_review` (not `?type=`); deck Today is deck-scoped due review (`entry_type=deck`
+  + `study_type=srs_review`), not global `entry_type=today`.
+- Related docs (`navigation-flow.md`, `wireframe-code-parity-assessment.md`,
+  `screen-function-task-matrix.md`, `v1-post-rc-backlog.md`) re-checked — already honest from
+  Prompt 46; no change required.
+- verification: `git diff --check` (clean), `flutter analyze` (clean),
+  `python code-verification-guard/guard/run.py check --project . --ruleset memox` (passed). Docs-only
+  change — full `flutter test` intentionally **skipped** (no production/test file touched).
+- remaining Future gaps unchanged: Resume Discard shared flow, status/tag filter chips, state badges,
+  bulk suspend/reset/tag, Global Search, Flashcard History, tag-scoped study. The `v1.0.0-rc.1` tag is
+  unchanged.
