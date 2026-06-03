@@ -10,13 +10,15 @@ import 'package:memox/presentation/features/folders/models/library_folder.dart';
 import 'package:memox/presentation/features/folders/screens/library_overview_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/library_overview_viewmodel.dart';
 import 'package:memox/presentation/features/folders/widgets/library_folder_list.dart';
+import 'package:memox/presentation/features/folders/widgets/library_skeleton.dart';
 import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';
+import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
+import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
-import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 
 void main() {
-  testWidgets('DT1 onOpen: shows loading state while library folders load', (
+  testWidgets('DT1 onOpen: shows skeleton folder rows while library loads', (
     WidgetTester tester,
   ) async {
     final completer = Completer<LibraryOverviewState>();
@@ -36,7 +38,10 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.byType(MxLoadingState), findsOneWidget);
+    expect(find.byType(LibrarySkeleton), findsOneWidget);
+    // Skeleton is a calm placeholder: no folder rows are tappable while data
+    // is absent.
+    expect(find.byType(MxFolderTile), findsNothing);
   });
 
   testWidgets(
@@ -427,6 +432,135 @@ void main() {
 
       expect(find.text('No matching items'), findsNothing);
       expect(find.text('Korean1'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'DT6 onDisplay: loaded library shows folder rows and no root-level deck card',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MxFolderTile), findsOneWidget);
+      // Root-level decks are Rejected / Out of Scope: never rendered here.
+      expect(find.byType(MxDeckCard), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'DT7 onSelect: folder overflow kebab opens approved folder actions only',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+
+      // Approved current actions present.
+      expect(find.text('Folder actions'), findsOneWidget);
+      expect(find.text('Edit'), findsOneWidget);
+      expect(find.text('Move'), findsOneWidget);
+      expect(find.text('Import flashcards'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+
+      // Unsupported mock actions are absent.
+      expect(find.text('Study due cards'), findsNothing);
+      expect(find.text('Archive folder'), findsNothing);
+    },
+  );
+
+  testWidgets('DT8 onError: shows safe library error copy with retry', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith(
+            (ref) =>
+                Future<LibraryOverviewState>.error(StateError('db boom 0xFF')),
+          ),
+        ],
+        child: const _TestApp(child: LibraryOverviewView()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MxErrorState), findsOneWidget);
+    expect(find.text("Couldn't load your library"), findsOneWidget);
+    // Retry affordance present; raw exception text never surfaced.
+    expect(find.text('Try again'), findsOneWidget);
+    expect(find.textContaining('boom'), findsNothing);
+    expect(find.textContaining('StateError'), findsNothing);
+  });
+
+  testWidgets('DT8b onError: retry re-runs the library query', (
+    WidgetTester tester,
+  ) async {
+    var calls = 0;
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          libraryOverviewQueryProvider.overrideWith((ref) {
+            calls++;
+            if (calls == 1) {
+              return Future<LibraryOverviewState>.error(StateError('boom'));
+            }
+            return Future<LibraryOverviewState>.value(_sampleLibraryState);
+          }),
+        ],
+        child: const _TestApp(child: LibraryOverviewView()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(MxErrorState), findsOneWidget);
+
+    await tester.tap(find.text('Try again'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MxErrorState), findsNothing);
+    expect(find.text('Korean1'), findsOneWidget);
+  });
+
+  testWidgets(
+    'Negative scope: loaded library exposes no out-of-scope actions',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // No root deck creation / global search / history / streak surfaces.
+      expect(find.byType(MxDeckCard), findsNothing);
+      expect(find.text('New deck'), findsNothing);
+      expect(find.text('Create deck'), findsNothing);
+      expect(find.text('Flashcard history'), findsNothing);
+      expect(find.textContaining('streak'), findsNothing);
     },
   );
 

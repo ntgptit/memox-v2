@@ -2556,6 +2556,24 @@ abstract class AppLocalizations {
   /// **'Create your first folder to start building your library.'**
   String get libraryEmptyMessage;
 
+  /// No description provided for @libraryLoadFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your library'**
+  String get libraryLoadFailedTitle;
+
+  /// No description provided for @libraryLoadFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is safe on this device. Try again in a moment.'**
+  String get libraryLoadFailedMessage;
+
+  /// No description provided for @libraryOverflowTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder options'**
+  String get libraryOverflowTooltip;
+
   /// No description provided for @decksCreateTitle.
   ///
   /// In en, this message translates to:

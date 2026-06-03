@@ -151,23 +151,26 @@ Mock variants: `03a`-`03f`.
 
 Flutter files: `lib/presentation/features/folders/screens/library_overview_screen.dart`, `lib/presentation/features/folders/widgets/library_*`.
 
-Current layout status: PARTIAL.
+Current layout status: 6 states visually parity-complete (Prompt 49, 2026-06-04). Remaining items are token/density follow-ups, not state coverage.
 
-Major mismatches:
+Resolved in Prompt 49 (6-state visual/layout parity):
 
-- Mock search/overflow/sort visuals include target states; current V1 has inline search and create-folder FAB only.
-- Root-level deck rows in the mock are Rejected and must not be rendered.
+- Loading now renders skeleton folder rows (`LibrarySkeleton`) instead of a full-screen spinner.
+- Error now renders a tokenized `MxErrorState` with localized copy and a Retry that re-runs the query.
+- Overflow sheet is reachable from a visible per-row kebab (plus long-press), exposing only approved folder actions (Edit / Move / Import / Delete).
+- Empty vs search-no-results remain distinct; inline scope-local search unchanged.
+- Root-level deck rows confirmed absent (Rejected / Out of Scope).
 
-Minor mismatches:
+Remaining (deferred, not state coverage):
 
-- Compare folder tile density, search-open app bar shape, and empty/error spacing.
-- Current sort exists at data/use-case level but no visible Library sort control.
+- Folder tile density, search-open app bar shape, and card padding/radius are part of the Design Token / Density Foundation follow-up.
+- Current sort exists at data/use-case level but no visible Library sort control (mock sort pill remains Future).
 
 Do not implement:
 
-- Root-level decks, full Global Search, root deck FAB action sheet.
+- Root-level decks, full Global Search, `/library/search` route promotion, root deck FAB action sheet, mock "Study due cards" / "Archive folder" overflow actions.
 
-Recommended fix prompt: Prompt 52 - Library Overview Visual Parity.
+Fix prompt status: 6-state visual parity delivered under Prompt 49 (this sequence). Token/density reconciliation tracked separately.
 
 Estimated complexity: M.
 

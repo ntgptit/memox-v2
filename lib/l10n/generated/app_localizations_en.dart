@@ -1605,6 +1605,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Create your first folder to start building your library.';
 
   @override
+  String get libraryLoadFailedTitle => 'Couldn\'t load your library';
+
+  @override
+  String get libraryLoadFailedMessage =>
+      'Your data is safe on this device. Try again in a moment.';
+
+  @override
+  String get libraryOverflowTooltip => 'Folder options';
+
+  @override
   String get decksCreateTitle => 'Create deck';
 
   @override

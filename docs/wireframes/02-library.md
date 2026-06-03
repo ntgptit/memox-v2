@@ -9,19 +9,27 @@ source_specs:
 
 # 02 — Library
 
-## V1 verification status (2026-05-31, Prompt 18/18B; root-deck decision updated 2026-06-03, Prompt 43A)
+## V1 verification status (2026-05-31, Prompt 18/18B; root-deck decision updated 2026-06-03, Prompt 43A; 6-state visual parity 2026-06-04, Prompt 49)
 
 This screen is **partially Current**. The recursive folder counts (verified Prompt 14) plus the aspects below are verified by code and tests; the remainder is **Future** and intentionally not exposed in V1. Do NOT mark the whole screen Current. The §Layout / §Components / §Actions / §Sort options blocks below describe the **target** design; where they conflict with this section, this section is the current truth.
+
+**Prompt 49 scope (2026-06-04):** visual/layout parity for the **6 Library Overview states only** (loaded · loading · empty · error · search · overflow sheet) against `docs/system-design/MemoX Design System/ui_kits/mobile/index.html` §"03 · Library overview". No schema/SRS/domain/repository/use-case behavior change. Library search stays inline/scope-local; Global Search and a `/library/search` screen remain **Future**; root-level decks remain **Rejected / Out of Scope**; the overflow sheet exposes only current approved folder actions (Edit / Move / Import flashcards / Delete). Card padding/radius and bottom-nav density remain a separate Design Token / Density Foundation follow-up and were not changed here.
 
 **Verified Current (behaviour + tests):**
 
 - Route `/library` opens `LibraryOverviewView` (also `initialLocation`). Folder row → `pushFolderDetail` → `/library/folder/:id`. No `/library/search` route exists; the search icon opens an inline field, it does not navigate.
 - Renders **top-level folders only**. Recursive subtree counts per folder (subfolders · decks · cards · due) are Current from Prompt 14 and isolated between sibling roots.
-- States: Loading (`MxRetainedAsyncState` → `MxLoadingState`), error (retained-async error surface, no raw exception text), **true empty library** (`totalFolderCount == 0`, regardless of search term → `LibraryEmptyStateSection` "Create folder" CTA), and **search no-results** (`folders.isEmpty && searchTerm` active **&& `totalFolderCount > 0`** → `LibrarySearchNoResultsSection`, `ValueKey('library_search_no_results')`, "Clear" CTA). Distinct (Prompt 18; classification corrected Prompt 18B — counts driven by `LibraryOverviewState.totalFolderCount` from `LibraryOverviewReadModel.totalFolderCount`).
+- States (all 6 verified by widget tests, Prompt 49):
+  - **Loaded** — `LibraryFolderSliver` of `MxFolderTile` rows; no root-level deck card (`MxDeckCard` absent).
+  - **Loading** — `MxRetainedAsyncState.skeletonBuilder` → `LibrarySkeleton` (skeleton folder rows, `ValueKey('library_skeleton')`), not a full-screen spinner; no folder row is tappable while data is absent.
+  - **Error** — `MxRetainedAsyncState.errorBuilder` → `MxErrorState` with localized `libraryLoadFailedTitle` / `libraryLoadFailedMessage`, `Icons.cloud_off_outlined`, Retry → `ref.invalidate(libraryOverviewQueryProvider)`; no raw exception text surfaced.
+  - **True empty library** — `totalFolderCount == 0`, regardless of search term → `LibraryEmptyStateSection` "Create folder" CTA.
+  - **Search no-results** — `folders.isEmpty && searchTerm` active **&& `totalFolderCount > 0`** → `LibrarySearchNoResultsSection`, `ValueKey('library_search_no_results')`, "Clear" CTA. Distinct from true empty (Prompt 18; classification corrected Prompt 18B — counts driven by `LibraryOverviewState.totalFolderCount` from `LibraryOverviewReadModel.totalFolderCount`).
+  - **Overflow sheet** — each folder row carries a visible kebab (`Icons.more_vert`, tooltip `libraryOverflowTooltip`) **and** long-press, both opening the folder action sheet.
 - Inline search: scope-local within Library. When a term is active the query broadens to match **any folder by name across the tree** (`listAllFolders` + normalized contains); empty term restores top-level folders. Never routes to Global Search; does not mutate persisted `sort_order`.
 - Create folder: FAB (single `Icons.add`) and empty-state CTA both open `MxNameDialog` → `createFolderUseCase.createRoot`. Blank name rejected by dialog; failures map to a localized error snackbar; success refreshes via `contentDataRevision`.
-- Folder row long-press → folder actions sheet (Edit / Move / Import flashcards / Delete); Import hidden for subfolder-mode folders.
-- Sort (`ContentSortMode`: manual/name/newest/lastStudied) is implemented and tested at the **repository + use-case** layer (`folder_repository_impl`, `content_repository_test`). The viewmodel exposes `setSortMode`.
+- Folder row overflow (kebab tap or long-press) → folder actions sheet (Edit / Move / Import flashcards / Delete); Import hidden for subfolder-mode folders. The mock's "Study due cards" / "Archive folder" actions are **not** exposed (out of current scope).
+- Sort (`ContentSortMode`: manual/name/newest/lastStudied) is implemented and tested at the **repository + use-case** layer (`folder_repository_impl`, `content_repository_test`). The viewmodel exposes `setSortMode`. No sort **UI control** is rendered (the mock's sort pill remains Future).
 
 **Future / not exposed in V1:**
 
@@ -251,7 +259,7 @@ Sort preference persists per user via SharedPreferences (key `library.sort`).
 
 - `lib/presentation/features/folders/screens/library_overview_screen.dart`
 - `lib/presentation/features/folders/viewmodels/library_overview_viewmodel.dart` (`libraryOverviewQuery`, `LibraryToolbarState`, `LibraryOverviewActionController`)
-- `lib/presentation/features/folders/widgets/library_folder_list.dart`, `library_app_bar.dart`, `library_empty_state_section.dart` (`LibraryEmptyStateSection`, `LibrarySearchNoResultsSection`)
+- `lib/presentation/features/folders/widgets/library_folder_list.dart` (folder rows + kebab overflow trigger), `library_app_bar.dart`, `library_empty_state_section.dart` (`LibraryEmptyStateSection`, `LibrarySearchNoResultsSection`), `library_skeleton.dart` (`LibrarySkeleton`, Prompt 49)
 - `lib/presentation/features/folders/routes/folder_routes.dart` (`libraryBranchRoutes`)
 - `lib/domain/usecases/content_query_usecases.dart` → `WatchLibraryOverviewUseCase`
 - `lib/data/repositories/folder_repository_impl.dart` → `getLibraryOverview`

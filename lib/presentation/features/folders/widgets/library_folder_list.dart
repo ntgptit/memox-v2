@@ -4,6 +4,7 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_folder_tile.dart';
+import '../../../shared/widgets/mx_icon_button.dart';
 import '../models/library_folder.dart';
 
 /// Sliver-based folder list for the library overview.
@@ -55,13 +56,24 @@ class _LibraryFolderRow extends StatelessWidget {
     final dueSuffix = folder.dueCardCount > 0
         ? ' ${l10n.libraryDeckDueSuffix(folder.dueCardCount)}'
         : '';
+    final openActions = onOpenActions;
     return MxFolderTile(
       name: folder.name,
       icon: folder.icon,
       caption: '$stats$dueSuffix',
       masteryPercent: folder.masteryPercent,
       onTap: () => onOpenFolder(folder.id),
-      onLongPress: onOpenActions == null ? null : () => onOpenActions!(folder),
+      onLongPress: openActions == null ? null : () => openActions(folder),
+      // Visible overflow trigger per Design System "03 · Library overview":
+      // each folder card carries a kebab that opens the folder action sheet,
+      // so the actions are discoverable without relying on long-press alone.
+      trailing: openActions == null
+          ? null
+          : MxIconButton.compact(
+              icon: Icons.more_vert,
+              tooltip: l10n.libraryOverflowTooltip,
+              onPressed: () => openActions(folder),
+            ),
     );
   }
 }

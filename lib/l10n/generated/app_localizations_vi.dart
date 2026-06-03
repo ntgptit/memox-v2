@@ -1500,6 +1500,16 @@ class AppLocalizationsVi extends AppLocalizations {
       'Tạo thư mục đầu tiên để bắt đầu xây dựng thư viện của bạn.';
 
   @override
+  String get libraryLoadFailedTitle => 'Không thể tải thư viện của bạn';
+
+  @override
+  String get libraryLoadFailedMessage =>
+      'Dữ liệu của bạn vẫn an toàn trên thiết bị này. Hãy thử lại sau giây lát.';
+
+  @override
+  String get libraryOverflowTooltip => 'Tùy chọn thư mục';
+
+  @override
   String get decksCreateTitle => 'Tạo bộ thẻ';
 
   @override

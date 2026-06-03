@@ -12,6 +12,7 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_animated_switcher.dart';
+import '../../../shared/widgets/mx_error_state.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../../shared/widgets/mx_text.dart';
@@ -22,6 +23,7 @@ import '../viewmodels/library_overview_viewmodel.dart';
 import '../widgets/library_app_bar.dart';
 import '../widgets/library_empty_state_section.dart';
 import '../widgets/library_folder_list.dart';
+import '../widgets/library_skeleton.dart';
 
 Widget buildLibraryOverviewFab(BuildContext context, WidgetRef ref) {
   final l10n = AppLocalizations.of(context);
@@ -87,6 +89,14 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
           isLoading: queryState.isLoading,
           error: queryState.hasError ? queryState.error : null,
           stackTrace: queryState.hasError ? queryState.stackTrace : null,
+          skeletonBuilder: (_) => const LibrarySkeleton(),
+          onRetry: () => ref.invalidate(libraryOverviewQueryProvider),
+          errorBuilder: (context, _, _) => MxErrorState(
+            icon: Icons.cloud_off_outlined,
+            title: l10n.libraryLoadFailedTitle,
+            message: l10n.libraryLoadFailedMessage,
+            onRetry: () => ref.invalidate(libraryOverviewQueryProvider),
+          ),
           dataBuilder: (context, state) => CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
