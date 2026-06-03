@@ -223,3 +223,20 @@ Design System README, Mobile UI Kit README, action hierarchy contract, and UI UX
 feature behavior changed: no. Schema changed: no. Route changed: no. SRS changed: no. Remaining
 visual gaps: standard Flutter scaffold app bars still use the `56dp` M3 toolbar unless a custom
 compact bar owns the `48dp` mock density. Ready for feature implementation after verification passes.
+
+## Prompt 44A — Final Visual Density Freeze Before Feature Implementation (cleanup, 2026-06-03)
+
+**Status: Final visual density frozen.**
+
+**Notes:** Mock density audited; button radius `10`, card radius `12`, card padding `12`, compact
+icon button `36x36` with icon `20`, and compact bottom nav `64` are frozen. Docs updated and tests
+added/updated for the final visual density contract. Golden failure artifacts under
+`test/presentation/shared/failures/` were removed from the repo and ignored via `.gitignore`;
+legitimate golden baselines under `test/presentation/shared/goldens/` remain the visual baseline.
+Production feature behavior changed: no. Schema changed: no. Route changed: no. SRS changed: no.
+Verification commands run for this cleanup: `flutter analyze`,
+`flutter test test/core/theme/app_layout_test.dart`,
+`flutter test test/presentation/shared/mx_action_density_test.dart`,
+`flutter test test/presentation/shared/shared_widget_contract_test.dart`,
+`python code-verification-guard/guard/run.py check --project . --ruleset memox`, and
+`git diff --check`. App ready for feature implementation after these checks pass.
