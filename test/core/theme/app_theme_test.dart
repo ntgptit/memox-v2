@@ -221,9 +221,9 @@ void main() {
       final tooltipDecoration = theme.tooltipTheme.decoration as BoxDecoration;
       final inputBorder = theme.inputDecorationTheme.enabledBorder;
 
-      expect(AppRadius.button, AppRadius.borderLg);
-      expect(AppRadius.buttonSmall, AppRadius.borderLg);
-      expect(AppRadius.card, AppRadius.borderLg);
+      expect(AppRadius.button, AppRadius.borderMd);
+      expect(AppRadius.buttonSmall, AppRadius.borderMd);
+      expect(AppRadius.card, AppRadius.borderSemi);
       expect(AppRadius.cardLarge, AppRadius.borderXxl);
       expect(AppRadius.dialog, AppRadius.borderXxl);
       expect(
@@ -305,7 +305,7 @@ void main() {
       expect(focusedErrorBorder.borderSide.width, 2);
     });
 
-    test('DT4 onDisplay: app chrome themes avoid hard-coded heights', () {
+    test('DT4 onDisplay: app chrome themes keep M3 default chrome heights', () {
       final theme = AppTheme.light();
       final scheme = theme.colorScheme;
 

@@ -78,6 +78,13 @@ Mandatory minimums:
 - Compact visual height is fine only while the touch target stays ≥ 48dp.
 - "Quizlet-mobile energy" does not mean an oversized full-width CTA everywhere —
   dashboard/library/settings cards use dense card actions.
+- Frozen mobile density: card/study actions use `40dp` compact visual height;
+  medium `48dp` stays for form/dialog/bottom action contexts; regular cards use
+  `12dp` radius and `12dp` padding; compact icon buttons are `36dp` with a
+  `20dp` icon.
+- This density freeze does not alter business scope: Library root contains
+  folders only, root-level decks remain Rejected / Out of Scope, and nullable
+  deck parent migration remains Rejected / Not Applicable.
 
 ## Theme rule
 

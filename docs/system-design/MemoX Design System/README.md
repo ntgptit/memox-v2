@@ -90,12 +90,12 @@ No Figma was attached for this system.
 - **Tabular figures** on stat counters (`FontFeature.tabularFigures()`) so numbers don't jitter as they tick.
 
 ### Spacing
-- **4dp grid.** Tokens: `xxs 2, xs 4, sm 8, md 12, lg 16, xl 24, xxl 32, xxxl 48`.
-- **Semantic:** `cardPadding 16`, `screenPadding 24`, `sectionGap 32`, `listItemGap 8`, `fieldGap 20`, `dividerIndent 56`.
+- **4dp grid.** Tokens: `xxs 2, xs 4, sm 8, md 12, lg 16, xl 20, xxl 24, xxxl 32, xxxxl 40`.
+- **Semantic:** `cardPadding 12`, compact mobile `screenPadding 16`, `sectionGap 12–24` by window size, `listItemGap 8`, `fieldGap 20`, `dividerIndent 56`.
 
 ### Radii
-- `xs 4, sm 8, md 12, lg 16, xl 24, xxl 28, full 100`.
-- **Named:** cards & dialogs & sheets use `lg 16`. Buttons & inputs use `md 12`. Chips use `full` (pill). FAB uses `xxl 28`. Avatars are fully round.
+- `xs 4, sm 6, md 10, semi 12, lg 16, xl 20, xxl 24, xxxl 32, full 9999`.
+- **Named:** regular buttons use `md 10`; regular cards use `semi 12`; dialogs and sheets keep larger `xxl 24` corners; chips use `full` (pill). Larger radii are explicit for prominent/hero surfaces only.
 
 ### Elevation & shadows
 - **M3 tonal elevation, not shadows.** The system prefers stacking surface-container tiers to carry hierarchy. Shadows cap at 6% opacity (`ElevationTokens.shadowOpacity = 0.06`).
@@ -133,11 +133,18 @@ No Figma was attached for this system.
 
 ### Layout
 - `maxBodyWidth = 720` for readable long-form content.
-- `screenPadding = 24` horizontal on mobile.
-- Bottom nav is `80dp` tall (M3 `NavigationBar`). App bar is `56dp`, large `64dp`.
+- Compact mobile page gutters are `16dp`; wider layouts grow by role.
+- Bottom nav is `64dp` tall in the floating mobile shell. Standard Flutter `AppBar` remains `56dp`; custom compact bars may use the mock `48dp` appbar density where they are not the main scaffold toolbar.
 - Status dots are `8dp`, chart legend dots `12dp`. Mastery rings are `40dp × 3dp stroke` in list tiles.
 
 ### Action density
+
+Final mobile visual density is frozen before feature implementation:
+
+- `.pill-btn`: visual height `40dp`, horizontal padding `18dp`, radius `10dp`, label `13px / 600` in the mock.
+- `.icon-btn`: visual box `36dp × 36dp`, icon `20dp`.
+- `.card`: radius `12dp`, padding `12dp`.
+- `.appbar`: `48dp`; `.appbar-lg`: `56dp`; `.bottom-nav`: `64dp`.
 
 Mobile energy does not mean every action becomes a full-width hero CTA. Hero CTAs are reserved
 for onboarding, full-screen empty states, study submit/final actions, and screen-bottom action
@@ -145,11 +152,15 @@ contexts. Dashboard, Library, Folder Detail, Flashcard List, and Settings cards 
 dense card actions so repeated workflows stay scannable. See
 `docs/ui-ux/action-hierarchy-contract.md`.
 
+Regular card and study actions use the compact `40dp` visual height. `medium` `48dp` remains for
+form, dialog, and bottom action contexts. This density freeze is visual only: it does not implement
+new features, change schema, change routes, or change SRS behavior.
+
 ### Cards
 - Always white (`surfaceContainerLowest`) in light mode.
-- `RadiusTokens.lg` (16dp) corners.
+- `AppRadius.card` (`12dp`) corners.
 - `1px` ghost border, no shadow by default.
-- `16dp` internal padding (`cardPadding`).
+- `12dp` internal padding (`cardPadding`).
 
 ---
 

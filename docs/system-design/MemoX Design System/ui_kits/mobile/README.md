@@ -32,6 +32,24 @@ Status labels used below:
 Future, Rejected, and Visual-only target states must not be implemented only because they
 appear in this gallery.
 
+## Final visual density freeze
+
+The redesigned mobile density is frozen for Flutter theme/shared-widget alignment before
+feature implementation:
+
+| Mock selector | Frozen value |
+|---|---|
+| `.pill-btn` | `height: 40px`, `padding: 0 18px`, `border-radius: 10px`, `font-size: 13px`, `font-weight: 600` |
+| `.icon-btn` | `36px × 36px`, icon `20px` |
+| `.card` | `border-radius: 12px`, `padding: 12px` |
+| `.appbar` / `.appbar-lg` | `48px` / `56px` |
+| `.bottom-nav` | `64px` |
+
+Flutter keeps `MxButtonSize.medium` at `48dp` for form, dialog, and bottom action
+contexts. Card/study actions use compact `40dp` visual height through
+`MxActionButton` intents. This is a visual-density freeze only; it does not promote
+visual-only states to Current and does not change feature behavior.
+
 ## Screens
 
 The gallery is ordered by **user journey** — first-run → home → browse → manage a deck →

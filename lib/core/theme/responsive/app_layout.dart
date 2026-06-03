@@ -45,7 +45,7 @@ abstract final class AppLayout {
 
   /// guard:raw-size-reviewed compact Material 3 navigation bar height keeps
   /// destination labels visible while returning vertical room to phone screens.
-  static const double _compactNavigationBarHeight = 68;
+  static const double _compactNavigationBarHeight = 64;
 
   /// guard:raw-size-reviewed normal dashboard/chart diameter used outside
   /// compact-mobile density.
@@ -265,16 +265,14 @@ abstract final class AppLayout {
   static bool showsSupportingCopy(BuildContext context) =>
       !context.isCompactMobile;
 
-  /// Default card padding for the active density. Compact-mobile uses the
-  /// 16-dp `card` inset so Quizlet-style filled cards feel airy instead of
-  /// table-row dense.
+  /// Default card padding for the active density. Matches the frozen mobile
+  /// mock card inset while prominent study/hero surfaces opt into larger
+  /// padding through their own role.
   static EdgeInsets cardPadding(BuildContext context) => AppSpacing.card;
 
-  /// Default card corner radius for the active tier. Compact-mobile bumps to
-  /// `xxl (24)` for the rounded Quizlet-mobile silhouette; ≥ medium keeps the
-  /// `xl (20)` standard so wider layouts read as cards, not pills.
-  static BorderRadius cardRadius(BuildContext context) =>
-      context.isCompactMobile ? AppRadius.borderXxl : AppRadius.card;
+  /// Default card corner radius for the active tier. Prominent/hero surfaces
+  /// keep larger radii explicitly instead of auto-bumping every mobile card.
+  static BorderRadius cardRadius(BuildContext context) => AppRadius.card;
 
   /// Larger card padding for visually prominent study/hero surfaces.
   static EdgeInsets prominentCardPadding(BuildContext context) =>

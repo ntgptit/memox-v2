@@ -36,11 +36,11 @@ abstract final class AppRadius {
   static const BorderRadius borderFull = BorderRadius.all(radiusFull);
 
   // --- Semantic component radii ---
-  static const BorderRadius button = borderLg;
-  static const BorderRadius buttonSmall = borderLg;
+  static const BorderRadius button = borderMd;
+  static const BorderRadius buttonSmall = borderMd;
   static const BorderRadius buttonPill = borderFull;
   static const BorderRadius chip = borderFull;
-  static const BorderRadius card = borderLg;
+  static const BorderRadius card = borderSemi;
   static const BorderRadius cardLarge = borderXxl;
   static const BorderRadius dialog = borderXxl;
   static const BorderRadius bottomSheet = BorderRadius.vertical(top: radiusXxl);

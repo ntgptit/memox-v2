@@ -36,6 +36,10 @@ Prefer `MxActionButton` (intent-driven) and `MxCardActions` over raw primitives.
 7. Dashboard/action cards are **dense action surfaces**, not hero landing blocks.
 8. Hero CTAs are reserved for onboarding, empty states, study final/submit, and
    screen-bottom action contexts.
+9. Frozen mobile mock density: regular card/study actions use `compact` `40dp`
+   visual height; `medium` `48dp` remains for form, dialog, and bottom actions.
+10. Compact icon buttons use a `36dp` visual box with a `20dp` icon. Toolbar
+    icon buttons may keep the `48dp` appbar touch-safe box.
 
 ## Action contexts
 
@@ -76,8 +80,10 @@ default and whether an explicit `fullWidth:` override is honored.
 - `MxPrimaryButton.stretchOnCompact` defaults to `false` — a `large` button no
   longer becomes full-width just because the screen is compact.
 - Shared-widget contract tests assert `cardPrimary` is compact (not large), is
-  not full-width, that `inline < cardPrimary`, that `cardSecondary` is lighter,
-  and that semantic compact actions keep a 48dp target.
+  not full-width, that `cardSecondary` and `studyPrimary` resolve compact, that
+  `inline < cardPrimary`, that compact icon buttons match `36dp` / `20dp`, and
+  that semantic compact actions keep a 48dp target where padded touch targets
+  are required.
 - `code-verification-guard` flags raw `MxButtonSize.large` / `fullWidth: true`
   in feature card/dashboard/list widgets unless carried by a reviewed
   `// guard:full-width-action-reviewed <reason>` comment.

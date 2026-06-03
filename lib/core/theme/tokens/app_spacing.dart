@@ -25,7 +25,7 @@ abstract final class AppSpacing {
   );
   static const EdgeInsets screenVertical = EdgeInsets.symmetric(vertical: lg);
   static const EdgeInsets screen = EdgeInsets.all(lg);
-  static const EdgeInsets card = EdgeInsets.all(lg);
+  static const EdgeInsets card = EdgeInsets.all(md);
   static const EdgeInsets listItem = EdgeInsets.symmetric(
     horizontal: lg,
     vertical: md,

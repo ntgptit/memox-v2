@@ -13,6 +13,9 @@ enum MxIconButtonVariant {
   outlined,
 }
 
+// guard:raw-size-reviewed compact visual box matches the frozen mobile mock.
+const double _compactIconButtonVisualSize = 36;
+
 /// Themed icon button with tooltip-friendly API and four M3 variants.
 class MxIconButton extends StatelessWidget {
   const MxIconButton({
@@ -40,7 +43,7 @@ class MxIconButton extends StatelessWidget {
     required this.icon,
     required this.onPressed,
     this.tooltip,
-    this.size = AppIconSizes.lg,
+    this.size = AppIconSizes.md,
     this.isSelected = false,
     this.selectedIcon,
     super.key,
@@ -100,8 +103,12 @@ class MxIconButton extends StatelessWidget {
       backgroundColor: WidgetStatePropertyAll(transparent),
       overlayColor: AppFocus.overlayProperty(scheme.onSurface),
       side: const WidgetStatePropertyAll(BorderSide.none),
-      minimumSize: const WidgetStatePropertyAll(Size.square(AppIconSizes.xl)),
-      fixedSize: const WidgetStatePropertyAll(Size.square(AppIconSizes.xl)),
+      minimumSize: const WidgetStatePropertyAll(
+        Size.square(_compactIconButtonVisualSize),
+      ),
+      fixedSize: const WidgetStatePropertyAll(
+        Size.square(_compactIconButtonVisualSize),
+      ),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       padding: const WidgetStatePropertyAll(EdgeInsets.zero),
       shape: const WidgetStatePropertyAll(CircleBorder()),

@@ -203,3 +203,23 @@ guess + fill `*_mode_session_view_test.dart` (dedicated), study_result_screen;
 - **Optional `MxCardDensity` role** (`compact`/`standard`/`prominent`/`hero`)
   deferred from Prompt UI-0 — would require broad feature-screen migration;
   implement only as a dedicated task if a need emerges.
+
+## Prompt 44A — Final Visual Density Freeze Before Feature Implementation (2026-06-03)
+
+**Status: Final visual density frozen.**
+
+**Notes:** Sub-agents not used; the main agent performed the bounded audits directly. Mock density
+values audited from `docs/system-design/MemoX Design System/ui_kits/mobile/index.html`: pill buttons
+`40px` / `18px` horizontal padding / `10px` radius / `13px` `600`; icon buttons `36px` with `20px`
+icons; cards `12px` radius and `12px` padding; appbar `48px`, appbar-lg `56px`, bottom nav `64px`.
+Theme/shared-widget changes aligned button/card radius, card padding, compact mobile navigation bar
+height, default card radius, and `MxIconButton.compact`. Call-site audit found no raw Material
+buttons; existing `fullWidth: true` usages are form footers, settings/account footers, study
+submit/final actions, or save bars, and the lone feature `MxButtonSize.large` is a reorder save
+footer rather than a card/list/dashboard action. Tests added/updated for compact button height,
+card/study action intents, compact icon button density, final rounded button radius, stacked
+`MxCardActions`, card padding/radius, and compact bottom navigation height. Docs updated in the
+Design System README, Mobile UI Kit README, action hierarchy contract, and UI UX contract. Production
+feature behavior changed: no. Schema changed: no. Route changed: no. SRS changed: no. Remaining
+visual gaps: standard Flutter scaffold app bars still use the `56dp` M3 toolbar unless a custom
+compact bar owns the `48dp` mock density. Ready for feature implementation after verification passes.
