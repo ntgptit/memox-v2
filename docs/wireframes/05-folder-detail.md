@@ -49,9 +49,17 @@ Current V1:
     `GetFolderStudyEntryUseCase` (reuses `StudyRepo.countFlashcardsInScope` /
     `countDueCardsInScope` / `findResumeCandidate`); no schema added.
 
+Current (Prompt 47):
+
+- Resume banner **Discard** secondary action. Tap → danger confirmation
+  (`MxConfirmationDialog`) → on confirm cancels the existing paused session via
+  the shared Resume-Discard flow (`confirmAndDiscardResumeSession` →
+  `CancelStudySessionUseCase` through `progressSessionActionControllerProvider`,
+  which bumps the study-session revision so the banner refreshes away). Cancel
+  does nothing. Never creates a new session; no schema/SRS change.
+
 Future / not exposed in V1:
 
-- Resume banner **Discard** action (banner shows Resume only).
 - Mastery ring / "{n} new" subtitle from the mock decks-mode hero card.
 - Global Search route.
 - Flashcard History.
@@ -59,9 +67,9 @@ Future / not exposed in V1:
 - visual redesign.
 
 The layout/components/actions sections below are target design. The Resume
-banner and Study/Today CTAs are now Current (see above); remaining mock details
-(mastery ring, new-card subtitle, Discard) stay Future and must not be
-implemented by ordinary parity work.
+banner (with Resume + Discard) and Study/Today CTAs are now Current (see above);
+remaining mock details (mastery ring, new-card subtitle) stay Future and must
+not be implemented by ordinary parity work.
 
 ## Purpose
 
@@ -76,7 +84,7 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 │ Library / Korean                      │  ← Breadcrumb
 ├───────────────────────────────────────┤
 │                                       │
-│ ⚠ You have a paused study session     │  ← RESUME BANNER (Future in V1)
+│ ⚠ You have a paused study session     │  ← RESUME BANNER (Current; Resume P45, Discard P47)
 │   for this folder.                    │
 │   [Resume]  [Discard]                 │
 ├───────────────────────────────────────┤
@@ -189,7 +197,7 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 | --- | --- |
 | App bar back | Returns to parent folder or Library. |
 | Breadcrumb | Full path from Library to current. Tap any segment to jump. |
-| Resume banner | **Current (Prompt 45).** Visible iff resumable session with `entry_type=folder, entry_ref_id=this.id`. Resume opens that session (`context.goStudySession`); no new session created. Discard not yet exposed (Future). |
+| Resume banner | **Current (Prompt 45; Discard added Prompt 47).** Visible iff resumable session with `entry_type=folder, entry_ref_id=this.id`. Resume (primary) opens that session (`context.goStudySession`); no new session created. Discard (secondary, destructive) cancels the paused session after confirmation (shared `confirmAndDiscardResumeSession`); never creates a session. |
 | Study folder CTA | **Current (Prompt 45).** Tap → study entry gate `study/folder/:folderId` (new study). Shown iff recursive `totalCardCount > 0`. |
 | Today CTA | **Current (Prompt 45).** Tap → study entry gate `study/folder/:folderId?study_type=srs_review` (folder-scoped review of due cards). Shown iff recursive `dueCount > 0` (hidden at zero). Note: this is `entry_type=folder` filtered to due via `study_type=srs_review`, NOT `entry_type=today` (which is global). |
 | Subfolder row (subfolders mode) | Icon + name + "{n} subfolders" or "{n} decks" subtitle + chevron. |
@@ -221,13 +229,13 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 | Tap "Study folder" | Tap | **Current (Prompt 45).** Navigate to `study/folder/:folderId` → study entry gate (new study). |
 | Tap "Today (n)" | Tap | **Current (Prompt 45).** Navigate to `study/folder/:folderId?study_type=srs_review` → study entry gate (folder-scoped review). |
 | Tap resume banner Resume | Tap | **Current (Prompt 45).** Navigate to the existing `study/session/{sessionId}`. No new session created. |
-| Tap resume banner Discard | Tap | **Future in V1.** Target: show discard dialog. Not exposed; Resume only. |
+| Tap resume banner Discard | Tap | **Current (Prompt 47).** Show danger discard confirmation; on confirm cancel the paused session (shared `confirmAndDiscardResumeSession` → `CancelStudySessionUseCase`), refresh banner away. Cancel does nothing. Never creates a session. |
 | Tap FAB | Tap | **Current.** Action depends on `content_mode`: open New folder dialog OR New deck sheet OR a 2-button picker (unlocked). |
 | Tap overflow ⋮ | Tap | Menu: Rename folder / Move folder / Delete folder / Sort by. |
 
 ## Dialogs and bottom-sheets used
 
-- Resume banner discard dialog — **Future in V1.** Target: `docs/wireframes/24-shared-dialogs.md` §discard-session.
+- Resume banner discard dialog — **Current (Prompt 47).** `MxConfirmationDialog` (danger) composed via the shared discard flow: `docs/wireframes/24-shared-dialogs.md` §discard-session.
 - New folder dialog — `docs/wireframes/24-shared-dialogs.md` §folder-create.
 - New deck bottom-sheet — `docs/wireframes/25-shared-bottom-sheets.md` §deck-create.
 - Folder rename dialog — `docs/wireframes/24-shared-dialogs.md` §rename.
@@ -288,17 +296,17 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 
 - `docs/business/folder/folder-management.md`
 - `docs/business/deck/deck-management.md`
-- `docs/business/resume/resume-session.md` (target/Future banner)
+- `docs/business/resume/resume-session.md` (Current banner: Resume + Discard)
 
 **Decision rows:**
 
 - Folder management (mode lock, mode-choice empty state)
-- Resume section (target/Future for this screen)
+- Resume section (Current for this screen: Resume opens session; Discard cancels it)
 
 **Schema / storage:**
 
 - `folders.content_mode`, `folders.parent_id`
-- Resume (target/Future for this screen): `study_sessions` filtered by entry_type=folder
+- Resume (Current for this screen): `study_sessions` filtered by entry_type=folder; Discard cancels via `CancelStudySessionUseCase` (no new session)
 
 **Contracts:** `docs/contracts/usecase-contracts/folder.md`, `docs/contracts/usecase-contracts/deck.md`, `docs/contracts/repository-contracts/folder-repository.md`
 

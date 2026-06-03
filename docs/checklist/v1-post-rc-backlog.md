@@ -57,14 +57,22 @@ Only reopen V1 RC if a real runtime blocker, data-loss bug, build failure, or se
 - ~~Folder Detail Study/Today/Resume banners~~ — **DONE (Prompt 45, 2026-06-03).**
   Resume banner, Today CTA (folder-scoped `study_type=srs_review`), and Study
   folder CTA are Current, routing through the Study Entry Gate. Remaining
-  follow-up: Resume **Discard** action + mastery ring / "{n} new" subtitle from
-  the mock stay Future.
+  follow-up: Resume **Discard** action is now **DONE (Prompt 47)**; mastery ring
+  / "{n} new" subtitle from the mock stay Future.
 - ~~Flashcard List deck Study/Today/Resume banners~~ — **DONE (Prompt 46, 2026-06-03).**
   Resume banner, Today CTA (deck-scoped `study_type=srs_review`), and Study deck
   CTA are Current, routing through the Study Entry Gate (`entry_type=deck`).
   Mirrors Folder Detail (Prompt 45) via `GetDeckStudyEntryUseCase` /
-  `FlashcardStudyEntrySection`; no schema/SRS change. Remaining follow-up:
-  Resume **Discard** shared flow stays Future (Prompt 47 candidate).
+  `FlashcardStudyEntrySection`; no schema/SRS change.
+- ~~Resume **Discard** shared flow (deck + folder banners)~~ — **DONE (Prompt 47,
+  2026-06-03).** Shared `confirmAndDiscardResumeSession`
+  (`lib/presentation/shared/study/discard_resume_session.dart`): danger
+  `MxConfirmationDialog` → `CancelStudySessionUseCase` via
+  `progressSessionActionControllerProvider` (bumps `studySessionDataRevisionProvider`
+  → banners refresh away). Reused by Dashboard, deck banner, folder banner; never
+  creates a session; no schema/SRS change. Tests:
+  `folder_study_entry_section_test.dart` + `flashcard_list_resume_discard_test.dart`
+  (P47 groups).
 - active-session undo reinsert
 
 ### P2 — feature expansion

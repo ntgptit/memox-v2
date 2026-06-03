@@ -123,6 +123,17 @@ When user discards a resumable session:
 | Discard from banner | Confirm dialog → same as above |
 | "Start over" path | Same as above, then create new session |
 
+**Implementation status:** Discard from the deck (Flashcard list) and folder
+(Folder detail) resume banners is **Current (Prompt 47)**. All three surfaces
+(Dashboard card, deck banner, folder banner) share one flow,
+`confirmAndDiscardResumeSession`
+(`lib/presentation/shared/study/discard_resume_session.dart`): danger
+`MxConfirmationDialog` → `CancelStudySessionUseCase` via
+`progressSessionActionControllerProvider` (bumps `studySessionDataRevisionProvider`
+so every banner refreshes away). Discard never creates a new session and adds no
+schema/SRS change. Cancelling the confirmation does nothing. Tag-scoped banners
+remain Future/Blocked (no `StudyEntryType.tag`).
+
 Discarded sessions do NOT delete attempts. SRS progress already recorded for answered items in the cancelled session REMAINS (those reviews counted).
 
 ## Auto-expiry

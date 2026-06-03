@@ -25,6 +25,7 @@ class FlashcardStudyEntrySection extends StatelessWidget {
   const FlashcardStudyEntrySection({
     required this.entry,
     required this.onResume,
+    required this.onDiscard,
     required this.onStudyToday,
     required this.onStudyDeck,
     super.key,
@@ -34,6 +35,10 @@ class FlashcardStudyEntrySection extends StatelessWidget {
 
   /// Opens the existing resumable session ([DeckStudyEntry.resumeSessionId]).
   final ValueChanged<String> onResume;
+
+  /// Discards the existing resumable session ([DeckStudyEntry.resumeSessionId])
+  /// after confirmation. Never starts a session.
+  final ValueChanged<String> onDiscard;
 
   /// Enters the Study Entry Gate for a deck-scoped SRS review (due cards).
   final VoidCallback onStudyToday;
@@ -54,7 +59,11 @@ class FlashcardStudyEntrySection extends StatelessWidget {
 
     if (hasResume) {
       children.add(
-        _ResumeBanner(sessionId: entry.resumeSessionId!, onResume: onResume),
+        _ResumeBanner(
+          sessionId: entry.resumeSessionId!,
+          onResume: onResume,
+          onDiscard: onDiscard,
+        ),
       );
     }
 
@@ -106,10 +115,15 @@ class FlashcardStudyEntrySection extends StatelessWidget {
 }
 
 class _ResumeBanner extends StatelessWidget {
-  const _ResumeBanner({required this.sessionId, required this.onResume});
+  const _ResumeBanner({
+    required this.sessionId,
+    required this.onResume,
+    required this.onDiscard,
+  });
 
   final String sessionId;
   final ValueChanged<String> onResume;
+  final ValueChanged<String> onDiscard;
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +146,14 @@ class _ResumeBanner extends StatelessWidget {
               label: l10n.studyResumeChoiceResumeAction,
               leadingIcon: Icons.play_arrow_rounded,
               onPressed: () => onResume(sessionId),
+            ),
+            secondary: MxActionButton(
+              key: const ValueKey('deck_resume_discard_action'),
+              intent: MxActionIntent.cardSecondary,
+              label: l10n.dashboardDiscardAction,
+              leadingIcon: Icons.delete_outline_rounded,
+              isDestructive: true,
+              onPressed: () => onDiscard(sessionId),
             ),
           ),
         ],

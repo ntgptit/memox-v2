@@ -28,9 +28,16 @@ This screen is **partially Current**. The §Components 1-1 mapping (verified 202
 - **Deck-level study-entry section (Prompt 46):** Resume banner, Today CTA, and Study-deck CTA, mirroring the Folder Detail ownership pattern. Backed by `GetDeckStudyEntryUseCase` (`entry_type=deck`, `entry_ref_id=deckId`; composes `countFlashcardsInScope` + `countDueCardsInScope` + `findResumeCandidate`). Resume opens the existing session (`context.goStudySession`, never a new session); Today routes to the gate with `study_type=srs_review`; Study deck routes to the gate with no explicit `study_type` (default new study). Today hidden at 0 due; whole section hidden when the deck has no cards and no resumable session. Flashcard List never starts a session directly.
 - Import CTA → `deckImport` route (route ownership only; parser/preview verified in Prompt 17).
 
+**Current (Prompt 47):**
+
+- Resume banner **Discard** secondary action. Tap → danger confirmation
+  (`MxConfirmationDialog`) → on confirm cancels the existing paused session via
+  the shared Resume-Discard flow (`confirmAndDiscardResumeSession` →
+  `CancelStudySessionUseCase`); banner refreshes away. Cancel does nothing.
+  Never creates a new session; no schema/SRS change.
+
 **Future (not exposed in V1):**
 
-- Resume banner **Discard** action (banner shows Resume only; discard remains Future — no shared safe flow yet).
 - Status filter dropdown + multi-tag chip filter (`?filter=`/`?tag=` round-trip).
 - State badges (Suspended / Buried / Due) per row, and the shared `CardStateComputer`.
 - Bulk suspend / unsuspend / reset / tag± (block on bury/suspend epic).
@@ -236,7 +243,8 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 | Tap tag chip filter | Tap | Open tag picker bottom-sheet (multi-select, AND). **(Future** — tag filter chips not yet implemented; tag-scoped study remains Future/Blocked.) |
 | Tap "Study deck" | Tap | **Current (Prompt 46).** Navigate to study entry gate `/library/study/deck/:deckId` (no explicit `study_type` → default new study). |
 | Tap "Today (n)" | Tap | **Current (Prompt 46).** Navigate to study entry gate `/library/study/deck/:deckId?study_type=srs_review` (deck-scoped review of due cards). NOT `entry_type=today` (which is global) and NOT `?type=`. |
-| Tap resume banner Resume | Tap | **Current (Prompt 46).** Open the existing session (`context.goStudySession`); never creates a new session. Discard remains Future. |
+| Tap resume banner Resume | Tap | **Current (Prompt 46).** Open the existing session (`context.goStudySession`); never creates a new session. |
+| Tap resume banner Discard | Tap | **Current (Prompt 47).** Show danger discard confirmation; on confirm cancel the paused session (shared `confirmAndDiscardResumeSession` → `CancelStudySessionUseCase`), refresh banner away. Cancel does nothing. Never creates a session. |
 | Tap FAB | Tap | Action sheet: New flashcard / Import. |
 | Tap overflow ⋮ | Tap | Menu: Edit deck / Move deck / Delete deck / Export / Sort by / Select. |
 | Pull to refresh | Pull | Re-run query. |
@@ -260,7 +268,7 @@ Render order is enforced by reviewer checklist — see "Pre-commit parity check"
 
 ## Dialogs and bottom-sheets used
 
-- Resume discard dialog — `docs/wireframes/24-shared-dialogs.md` §discard-session.
+- Resume discard dialog — **Current (Prompt 47).** `MxConfirmationDialog` (danger) composed via the shared discard flow: `docs/wireframes/24-shared-dialogs.md` §discard-session.
 - New flashcard create flow — see screen 07.
 - Import flow — see screen 10.
 - Filter picker bottom-sheet — `docs/wireframes/25-shared-bottom-sheets.md` §filter-status.

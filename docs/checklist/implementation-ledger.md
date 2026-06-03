@@ -407,3 +407,63 @@ Normal mode that could be misread as Current V1 behavior, and refreshed frontmat
 - remaining Future gaps unchanged: Resume Discard shared flow, status/tag filter chips, state badges,
   bulk suspend/reset/tag, Global Search, Flashcard History, tag-scoped study. The `v1.0.0-rc.1` tag is
   unchanged.
+
+## Prompt 47 — Resume Discard Shared Flow for Study Entry Banners (2026-06-03)
+
+**Status: Current shared Resume-Discard flow on deck + folder resume banners.**
+
+**Preflight classification:** **Already supported by existing use case — only banner
+wiring (plus a shared confirm helper) was missing.** `ProgressSessionActionController.cancel`
+(`lib/presentation/features/progress/providers/progress_session_notifier.dart`) already wraps
+`CancelStudySessionUseCase` and bumps `studySessionDataRevisionProvider` on success; both
+`folderStudyEntryProvider` and `deckStudyEntryProvider` already `ref.watch` that revision, so
+banners auto-refresh after a discard. The Dashboard already had a discard affordance
+(`discardDashboardSession`). No domain/use-case change was required.
+
+**Notes:** Sub-agents not used; the main agent read docs/source directly. Extracted the discard
+flow into a single shared helper `confirmAndDiscardResumeSession`
+(`lib/presentation/shared/study/discard_resume_session.dart`): danger `MxConfirmationDialog`
+(reusing existing `dashboard*` discard copy) → `CancelStudySessionUseCase` via
+`progressSessionActionControllerProvider` → success/failure `MxSnackbar`. `discardDashboardSession`
+now delegates to it, so Dashboard, deck banner, and folder banner share one path.
+
+- Resume contract (final): Resume (primary) opens the existing session
+  (`context.goStudySession`); Discard (secondary, destructive) cancels the existing paused session
+  after confirmation. Cancel/barrier does nothing. Discard **never** creates a new session.
+- Folder Detail: `FolderStudyEntrySection` gained an `onDiscard` callback + `folder_resume_discard_action`
+  secondary button; `folder_detail_screen.dart` wires it to `confirmAndDiscardResumeSession`. Resume /
+  Today / Study-folder behavior unchanged.
+- Flashcard List: `FlashcardStudyEntrySection` gained an `onDiscard` callback + `deck_resume_discard_action`
+  secondary button; `flashcard_list_screen.dart` wires it the same way. Resume / Today / Study-deck
+  behavior unchanged.
+- domain/use-case owner: existing `CancelStudySessionUseCase` (`lib/domain/study/usecases/study_usecases.dart`)
+  via `progressSessionActionControllerProvider`. No new use case; no repository/DAO/presentation DB access.
+- production code changed: **yes** (shared helper added; two sections + two screens wired; dashboard
+  helper delegated). schema changed: **no**. route changed: **no**. SRS changed: **no**.
+- l10n changed: **no** — reused existing `dashboardDiscardAction` / `dashboardDiscardSessionTitle` /
+  `dashboardDiscardSessionMessage` / `dashboardSessionDiscardedMessage` /
+  `dashboardSessionDiscardFailedMessage`. `flutter gen-l10n` run (no-op).
+- tests added/updated: P47 group in `test/presentation/folder_study_entry_section_test.dart`
+  (Resume+Discard shown / dialog / cancel keeps banner / confirm cancels + removes banner + no new
+  session / failure error), new `test/presentation/flashcard_list_resume_discard_test.dart`
+  (same matrix for the deck banner; split into its own file to respect the guard test-file line budget).
+  Stubs subclass `ProgressSessionActionController` and bump the revision so the banner provider
+  re-resolves, proving the refresh end-to-end.
+- docs updated: `docs/wireframes/05-folder-detail.md`, `docs/wireframes/06-flashcard-list.md`,
+  `docs/business/resume/resume-session.md`, `docs/wireframes/24-shared-dialogs.md`,
+  `docs/checklist/screen-function-task-matrix.md` (folder row corrected Future→Current + Discard;
+  deck row + shared discard row updated), `docs/checklist/wireframe-code-parity-assessment.md`
+  (rows 05/06), `docs/checklist/v1-post-rc-backlog.md` (item marked done), this ledger. Also fixed
+  pre-existing Prompt 45 drift on the folder matrix row that still read "Future / NO study CTA".
+- verification: `flutter gen-l10n` (no ARB change), `dart run build_runner build --delete-conflicting-outputs`
+  (no source-gen drift), `flutter analyze` (clean), focused tests green
+  (`folder_study_entry_section_test.dart`, `flashcard_list_screen_test.dart`,
+  `flashcard_list_resume_discard_test.dart`, `study_entry_screen_test.dart`,
+  `button_label_contract_test.dart`, `dashboard_screen_test.dart`), full `flutter test` green
+  (1079 tests), `python code-verification-guard/guard/run.py check --project . --ruleset memox` (passed),
+  `git diff --check` (clean; only LF→CRLF advisories).
+- scope leak check: no Global Search, Flashcard History, Drive sync, onboarding, tag-scoped study,
+  engagement/streak/daily-goal, root-level decks, nullable deck parent migration, schema change, SRS
+  change, new session creation from discard, presentation DB access, `?type=srs_review`, or hardcoded
+  strings introduced. Today still uses `study_type=srs_review`. The `v1.0.0-rc.1` tag is unchanged and
+  does not claim Prompt 47.

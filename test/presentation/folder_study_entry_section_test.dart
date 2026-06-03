@@ -10,6 +10,8 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/folders/screens/folder_detail_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart';
 import 'package:memox/presentation/features/folders/viewmodels/folder_study_entry_provider.dart';
+import 'package:memox/presentation/features/progress/providers/progress_session_notifier.dart';
+import 'package:memox/presentation/shared/providers/study_revision_providers.dart';
 
 void main() {
   testWidgets('P45 onDisplay: empty study scope renders no study banners', (
@@ -145,6 +147,175 @@ void main() {
       expect(find.text('Session session-009'), findsOneWidget);
     },
   );
+
+  group('P47 resume discard', () {
+    testWidgets('onDisplay: paused folder session shows Resume + Discard', (
+      tester,
+    ) async {
+      await _pumpFolderDetail(
+        tester,
+        studyEntry: const FolderStudyEntry(
+          totalCardCount: 0,
+          dueCount: 0,
+          resumeSessionId: 'session-009',
+        ),
+      );
+
+      expect(
+        find.byKey(const ValueKey('folder_resume_action')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('folder_resume_discard_action')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('onDiscard: tapping Discard shows the confirmation dialog', (
+      tester,
+    ) async {
+      await _pumpFolderDiscard(tester);
+
+      await tester.tap(
+        find.byKey(const ValueKey('folder_resume_discard_action')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Discard this session?'), findsOneWidget);
+    });
+
+    testWidgets('onDiscard: cancelling keeps the session and banner', (
+      tester,
+    ) async {
+      final controller = _StubProgressSessionActionController();
+      await _pumpFolderDiscard(tester, controller: controller);
+
+      await tester.tap(
+        find.byKey(const ValueKey('folder_resume_discard_action')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(controller.cancelledSessionId, isNull);
+      expect(
+        find.byKey(const ValueKey('folder_resume_banner')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets(
+      'onDiscard: confirming cancels the session and removes the banner '
+      'without creating a new session',
+      (tester) async {
+        final controller = _StubProgressSessionActionController();
+        await _pumpFolderDiscard(tester, controller: controller);
+
+        await tester.tap(
+          find.byKey(const ValueKey('folder_resume_discard_action')),
+        );
+        await tester.pumpAndSettle();
+        // The card's Discard is a lighter secondary; the dialog's confirm is the
+        // primary (ElevatedButton), so target the primary explicitly.
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Discard'));
+        await tester.pumpAndSettle();
+
+        expect(controller.cancelledSessionId, 'session-009');
+        expect(controller.createdSession, isFalse);
+        expect(find.text('Discard this session?'), findsNothing);
+        expect(find.text('Session discarded.'), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('folder_resume_banner')),
+          findsNothing,
+        );
+      },
+    );
+
+    testWidgets('onDiscard: failure shows a safe localized error', (
+      tester,
+    ) async {
+      final controller = _StubProgressSessionActionController(succeeds: false);
+      await _pumpFolderDiscard(tester, controller: controller);
+
+      await tester.tap(
+        find.byKey(const ValueKey('folder_resume_discard_action')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Discard'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text("Couldn't discard the session. Try again."),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('folder_resume_banner')),
+        findsOneWidget,
+      );
+    });
+  });
+}
+
+/// Pumps Folder Detail with a paused folder session whose resume banner
+/// re-resolves to empty once the study-session revision is bumped (mirroring the
+/// production [folderStudyEntryProvider] dependency on the revision).
+Future<void> _pumpFolderDiscard(
+  WidgetTester tester, {
+  _StubProgressSessionActionController? controller,
+}) async {
+  const folderId = 'folder-001';
+  final container = ProviderContainer(
+    overrides: [
+      folderStudyEntryProvider.overrideWith((ref, _) {
+        final revision = ref.watch(studySessionDataRevisionProvider);
+        return revision == 0
+            ? const FolderStudyEntry(
+                totalCardCount: 0,
+                dueCount: 0,
+                resumeSessionId: 'session-009',
+              )
+            : const FolderStudyEntry.empty();
+      }),
+      folderDetailQueryProvider(
+        folderId,
+      ).overrideWith((ref) => Future<FolderDetailState>.value(_deckFolderState)),
+      progressSessionActionControllerProvider.overrideWith(
+        () => controller ?? _StubProgressSessionActionController(),
+      ),
+    ],
+  );
+  addTearDown(container.dispose);
+
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: const _TestApp(child: FolderDetailScreen(folderId: folderId)),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Stub that captures the discard through the use-case path without binding the
+/// real study repository. On success it bumps the study-session revision exactly
+/// like the production controller, so the resume banner provider re-resolves.
+class _StubProgressSessionActionController
+    extends ProgressSessionActionController {
+  _StubProgressSessionActionController({this.succeeds = true});
+
+  final bool succeeds;
+  String? cancelledSessionId;
+
+  /// Always false: discard must never create a session.
+  bool get createdSession => false;
+
+  @override
+  Future<bool> cancel(String sessionId) async {
+    cancelledSessionId = sessionId;
+    if (succeeds) {
+      ref.read(studySessionDataRevisionProvider.notifier).bump();
+    }
+    return succeeds;
+  }
 }
 
 Future<void> _pumpFolderDetail(

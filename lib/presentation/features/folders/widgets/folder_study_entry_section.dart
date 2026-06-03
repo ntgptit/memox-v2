@@ -23,6 +23,7 @@ class FolderStudyEntrySection extends StatelessWidget {
   const FolderStudyEntrySection({
     required this.entry,
     required this.onResume,
+    required this.onDiscard,
     required this.onStudyToday,
     required this.onStudyFolder,
     super.key,
@@ -32,6 +33,10 @@ class FolderStudyEntrySection extends StatelessWidget {
 
   /// Opens the existing resumable session ([FolderStudyEntry.resumeSessionId]).
   final ValueChanged<String> onResume;
+
+  /// Discards the existing resumable session ([FolderStudyEntry.resumeSessionId])
+  /// after confirmation. Never starts a session.
+  final ValueChanged<String> onDiscard;
 
   /// Enters the Study Entry Gate for a folder-scoped SRS review (due cards).
   final VoidCallback onStudyToday;
@@ -51,7 +56,13 @@ class FolderStudyEntrySection extends StatelessWidget {
     final children = <Widget>[];
 
     if (hasResume) {
-      children.add(_ResumeBanner(sessionId: entry.resumeSessionId!, onResume: onResume));
+      children.add(
+        _ResumeBanner(
+          sessionId: entry.resumeSessionId!,
+          onResume: onResume,
+          onDiscard: onDiscard,
+        ),
+      );
     }
 
     if (hasCards) {
@@ -102,10 +113,15 @@ class FolderStudyEntrySection extends StatelessWidget {
 }
 
 class _ResumeBanner extends StatelessWidget {
-  const _ResumeBanner({required this.sessionId, required this.onResume});
+  const _ResumeBanner({
+    required this.sessionId,
+    required this.onResume,
+    required this.onDiscard,
+  });
 
   final String sessionId;
   final ValueChanged<String> onResume;
+  final ValueChanged<String> onDiscard;
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +144,14 @@ class _ResumeBanner extends StatelessWidget {
               label: l10n.studyResumeChoiceResumeAction,
               leadingIcon: Icons.play_arrow_rounded,
               onPressed: () => onResume(sessionId),
+            ),
+            secondary: MxActionButton(
+              key: const ValueKey('folder_resume_discard_action'),
+              intent: MxActionIntent.cardSecondary,
+              label: l10n.dashboardDiscardAction,
+              leadingIcon: Icons.delete_outline_rounded,
+              isDestructive: true,
+              onPressed: () => onDiscard(sessionId),
             ),
           ),
         ],

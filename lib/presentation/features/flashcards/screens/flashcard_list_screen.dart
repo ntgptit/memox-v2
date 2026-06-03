@@ -19,6 +19,7 @@ import '../../../shared/layouts/mx_content_shell.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/study/discard_resume_session.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
 import '../../decks/actions/deck_quick_actions.dart';
@@ -482,6 +483,7 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
         child: FlashcardStudyEntrySection(
           entry: studyEntry,
           onResume: (sessionId) => context.goStudySession(sessionId),
+          onDiscard: _discardResumeSession,
           onStudyToday: _studyDeckDueCards,
           onStudyDeck: _studyDeck,
         ),
@@ -500,6 +502,16 @@ class _FlashcardListScreenState extends ConsumerState<FlashcardListScreen> {
       studyType: StudyType.srsReview.storageValue,
     );
   }
+
+  /// Discards the existing deck-scoped paused session via the shared
+  /// Resume-Discard flow. Cancels the session (never creates one); on success
+  /// the study-session revision bump refreshes the banner so it disappears.
+  Future<void> _discardResumeSession(String sessionId) =>
+      confirmAndDiscardResumeSession(
+        context: context,
+        ref: ref,
+        sessionId: sessionId,
+      );
 
   /// Deck-scoped new study of the whole deck via the Study Entry Gate.
   void _studyDeck() {

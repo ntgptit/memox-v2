@@ -4,17 +4,15 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 
 import '../../../../app/router/app_navigation.dart';
 import '../../../../domain/enums/study_enums.dart';
-import '../../../shared/dialogs/mx_confirmation_dialog.dart';
-import '../../../shared/feedback/mx_snackbar.dart';
 import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_space.dart';
+import '../../../shared/study/discard_resume_session.dart';
 import '../../../shared/widgets/mx_action_button.dart';
 import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_card_actions.dart';
 import '../../../shared/widgets/mx_progress_indicator.dart';
 import '../../../shared/widgets/mx_secondary_button.dart';
 import '../../../shared/widgets/mx_text.dart';
-import '../../progress/providers/progress_session_notifier.dart';
 import '../viewmodels/dashboard_overview_viewmodel.dart';
 import 'dashboard_paused_sessions_sheet.dart';
 
@@ -133,32 +131,16 @@ String _entryTypeLabel(AppLocalizations l10n, StudyEntryType entryType) =>
       StudyEntryType.today => l10n.progressEntryToday,
     };
 
-/// Confirms and discards a paused session through the use-case path
-/// ([progressSessionActionControllerProvider] → CancelStudySessionUseCase),
-/// which bumps the study-session revision so the Dashboard refreshes.
+/// Confirms and discards a paused session through the shared Resume-Discard
+/// flow ([confirmAndDiscardResumeSession]), which cancels via
+/// CancelStudySessionUseCase and bumps the study-session revision so the
+/// Dashboard refreshes.
 Future<void> discardDashboardSession(
   BuildContext context,
   WidgetRef ref,
   DashboardResumeSessionItem session,
-) async {
-  final l10n = AppLocalizations.of(context);
-  final confirmed = await MxConfirmationDialog.show(
-    context: context,
-    title: l10n.dashboardDiscardSessionTitle,
-    message: l10n.dashboardDiscardSessionMessage,
-    confirmLabel: l10n.dashboardDiscardAction,
-    icon: Icons.delete_outline_rounded,
-    tone: MxConfirmationTone.danger,
-  );
-  if (!context.mounted) return;
-  if (!confirmed) return;
-  final success = await ref
-      .read(progressSessionActionControllerProvider.notifier)
-      .cancel(session.sessionId);
-  if (!context.mounted) return;
-  if (!success) {
-    MxSnackbar.error(context, l10n.dashboardSessionDiscardFailedMessage);
-    return;
-  }
-  MxSnackbar.success(context, l10n.dashboardSessionDiscardedMessage);
-}
+) => confirmAndDiscardResumeSession(
+  context: context,
+  ref: ref,
+  sessionId: session.sessionId,
+);

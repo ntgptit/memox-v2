@@ -471,7 +471,7 @@ When fingerprints match, this dialog still appears but the warning is softer and
 **Code paths:**
 - Shared dialogs live under `lib/presentation/shared/dialogs/**` (each as its own widget file), built on `MxDialog` / `MxConfirmationDialog`.
 - Naming: `MxDialogResumeOrStartOver`, `MxDialogDiscardSession`, `MxDialogDiscardChanges`, `MxDialogExitSession`, `MxDialogDeleteConfirm`, `MxDialogBulkDelete`, `MxDialogResetProgress`, `MxDialogRename`, `MxDialogFolderCreate`, `MxDialogRestoreWarning`
-- Implemented so far: `MxDialogResumeOrStartOver` (`mx_dialog_resume_or_start_over.dart`, Prompt 05) returns typed `MxResumeChoice?`; §discard-session is composed from `MxConfirmationDialog` (danger tone) by the entry gate and Dashboard/Progress resume surfaces.
+- Implemented so far: `MxDialogResumeOrStartOver` (`mx_dialog_resume_or_start_over.dart`, Prompt 05) returns typed `MxResumeChoice?`; §discard-session is composed from `MxConfirmationDialog` (danger tone) by the entry gate, Dashboard/Progress resume surfaces, and (Prompt 47) the deck/folder resume banners via the shared `confirmAndDiscardResumeSession` flow (`lib/presentation/shared/study/discard_resume_session.dart`).
 - Return contracts follow the Current V1 list above: confirmation dialogs use `bool`, name dialogs use `String?`, and resume/start-over uses typed `MxResumeChoice?`.
 
 **Related wireframes:**

@@ -20,6 +20,7 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/options/content_sort_options.dart';
+import '../../../shared/study/discard_resume_session.dart';
 import '../../../shared/widgets/mx_animated_switcher.dart';
 import '../../../shared/widgets/mx_fab.dart';
 import '../../../shared/widgets/mx_primary_button.dart';
@@ -249,6 +250,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
         child: FolderStudyEntrySection(
           entry: studyEntry,
           onResume: (sessionId) => context.goStudySession(sessionId),
+          onDiscard: _discardResumeSession,
           onStudyToday: _studyFolderDueCards,
           onStudyFolder: _studyFolder,
         ),
@@ -266,6 +268,16 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       studyType: StudyType.srsReview.storageValue,
     );
   }
+
+  /// Discards the existing folder-scoped paused session via the shared
+  /// Resume-Discard flow. Cancels the session (never creates one); on success
+  /// the study-session revision bump refreshes the banner so it disappears.
+  Future<void> _discardResumeSession(String sessionId) =>
+      confirmAndDiscardResumeSession(
+        context: context,
+        ref: ref,
+        sessionId: sessionId,
+      );
 
   /// Folder-scoped new study of the whole folder via the Study Entry Gate.
   void _studyFolder() {
