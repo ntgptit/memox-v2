@@ -613,8 +613,8 @@ void main() {
     expect(speakerIcon, findsOneWidget);
     expect(starIcon, findsOneWidget);
     expect(oldSelectIcon, findsNothing);
-    expect((speakerTop - frontTop).abs(), lessThanOrEqualTo(6));
-    expect((starTop - frontTop).abs(), lessThanOrEqualTo(6));
+    expect((speakerTop - frontTop).abs(), lessThanOrEqualTo(MxSpace.sm));
+    expect((starTop - frontTop).abs(), lessThanOrEqualTo(MxSpace.sm));
     expect(speakerTop, lessThan(tester.getTopLeft(backText).dy));
     expect(
       tester.getTopLeft(starIcon).dx,
