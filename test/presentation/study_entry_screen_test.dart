@@ -78,6 +78,57 @@ void main() {
     ]);
   });
 
+  testWidgets(
+    'P45 onNavigate: folder ?study_type=srs_review starts a folder-scoped SRS review',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'folder',
+              'folder-001',
+            ).overrideWith((ref) => Future.value(_folderEntryState)),
+          ],
+          child: const _TestRouterApp(
+            initialLocation: '/study/folder/folder-001?study_type=srs_review',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(repo.startedFlow, StudyFlow.srsFillReview);
+      expect(repo.startedModes, <StudyMode>[StudyMode.fill]);
+    },
+  );
+
+  testWidgets(
+    'P45 onNavigate: folder without type defaults to new study full cycle',
+    (tester) async {
+      final repo = _CapturingStudyRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            studyRepoProvider.overrideWithValue(repo),
+            studyEntryStateProvider(
+              'folder',
+              'folder-001',
+            ).overrideWith((ref) => Future.value(_folderEntryState)),
+          ],
+          child: const _TestRouterApp(
+            initialLocation: '/study/folder/folder-001',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(repo.startedFlow, StudyFlow.newFullCycle);
+    },
+  );
+
   for (final entry in _singleModeFlowCases.entries) {
     testWidgets(
       'DT2 onNavigate: ${entry.key.name} starts ${entry.value.name} directly',
@@ -641,6 +692,14 @@ const _deckEntryState = StudyEntryState(
   resumeCandidate: null,
 );
 
+const _folderEntryState = StudyEntryState(
+  entryType: StudyEntryType.folder,
+  entryRefId: 'folder-001',
+  newStudyDefaults: _newDefaults,
+  reviewDefaults: _reviewDefaults,
+  resumeCandidate: null,
+);
+
 const _resumeEntryState = StudyEntryState(
   entryType: StudyEntryType.deck,
   entryRefId: 'deck-001',
@@ -698,6 +757,7 @@ class _TestRouterApp extends StatelessWidget {
             entryType: state.pathParameters['entryType']!,
             entryRefId: state.pathParameters['entryRefId'],
             studyMode: state.uri.queryParameters['mode'],
+            studyType: state.uri.queryParameters['study_type'],
           ),
         ),
         GoRoute(

@@ -177,7 +177,8 @@ When scope is empty, this screen renders the appropriate empty state from `docs/
 | --- | --- | --- |
 | `entryType` (path param) | URL | one of `deck`, `folder`, `today`, `tag`. `today` is a literal route segment with no `entryRefId`. |
 | `entryRefId` (path param) | URL | required when entryType ∈ (`deck`, `folder`, `tag`); absent for `today`. For `tag`: sorted lowercased comma-joined names. |
-| `study_type` (query param) | URL | optional, default `new_cards`. Set to `srs_review` from Today CTAs. |
+| `study_type` (query param) | URL | optional; values are `StudyType.storageValue` (`new` / `srs_review`). When absent the entry default applies (`deck`/`folder` → `new`, `today` → `srs_review`). Set to `srs_review` from the Folder Detail **Today** CTA (Current, Prompt 45) so a folder scope reviews due cards. Parsed in `study_entry_screen.dart` (`_resolveStudyType`); routed via `RoutePaths.studyTypeQueryParam`. |
+| `mode` (query param) | URL | optional single `StudyMode.storageValue`; selects a single-mode flow. |
 
 ## Data to load
 
@@ -230,9 +231,10 @@ When scope is empty, this screen renders the appropriate empty state from `docs/
 - Dashboard "Start today's review" → `/library/study/today`.
 - Dashboard "Start new learning" → scope picker → here.
 - Deck "Study deck" CTA → `/library/study/deck/:deckId`.
-- Folder "Study folder" CTA → `/library/study/folder/:folderId`.
+- Folder "Study folder" CTA → `/library/study/folder/:folderId` (Current, Prompt 45).
+- Folder "Today" CTA → `/library/study/folder/:folderId?study_type=srs_review` (Current, Prompt 45; folder-scoped due review).
 - Tag list "Study tag" action → `/library/study/tag/<lowercased,comma-joined>`.
-- "Continue" from Dashboard skips this gate (directly to `/library/study/session/:id`).
+- "Continue" from Dashboard skips this gate (directly to `/library/study/session/:id`); the Folder Detail Resume banner likewise opens the existing session directly.
 
 ## Navigation out
 

@@ -960,6 +960,26 @@
   "studyResumeChoiceTitle": "Tiếp tục phiên trước?",
   "studyResumeChoiceMessage": "Bạn có một phiên học đang tạm dừng cho phạm vi này. Tiếp tục từ chỗ đang dở, hay học lại từ đầu?",
   "studyResumeChoiceResumeAction": "Tiếp tục",
+  "folderResumeMessage": "Bạn có một phiên học đang tạm dừng cho thư mục này.",
+  "folderStudyEntryTitle": "Học thư mục này",
+  "folderStudyTodayAction": "Học thẻ đến hạn",
+  "folderStudyFolderAction": "Học cả thư mục",
+  "folderStudyDueCount": "{count, plural, =1{1 thẻ đến hạn hôm nay} other{{count} thẻ đến hạn hôm nay}}",
+  "@folderStudyDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderStudyCardCount": "{count, plural, =1{1 thẻ} other{{count} thẻ}}",
+  "@folderStudyCardCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "studyStartOverAction": "Học lại từ đầu",
   "studyFlowTitle": "Luồng học",
   "studyTypeNew": "Học mới",

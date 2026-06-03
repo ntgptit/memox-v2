@@ -63,6 +63,12 @@ abstract final class RoutePaths {
   static const String studyEntryTypeParam = 'entryType';
   static const String studyEntryRefIdParam = 'entryRefId';
   static const String studySessionIdParam = 'sessionId';
+
+  /// Query-parameter keys for the study-entry route. `mode` selects a single
+  /// study mode; `type` selects the study type (`new` vs `srs_review`) so a
+  /// folder scope can request a due-card review instead of the entry default.
+  static const String studyModeQueryParam = 'mode';
+  static const String studyTypeQueryParam = 'study_type';
 }
 
 /// Router-owned defaults shared by config/bootstrap layers.

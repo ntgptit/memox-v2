@@ -3252,6 +3252,42 @@ abstract class AppLocalizations {
   /// **'Resume'**
   String get studyResumeChoiceResumeAction;
 
+  /// No description provided for @folderResumeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a paused study session for this folder.'**
+  String get folderResumeMessage;
+
+  /// No description provided for @folderStudyEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Study this folder'**
+  String get folderStudyEntryTitle;
+
+  /// No description provided for @folderStudyTodayAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Study due cards'**
+  String get folderStudyTodayAction;
+
+  /// No description provided for @folderStudyFolderAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Study folder'**
+  String get folderStudyFolderAction;
+
+  /// No description provided for @folderStudyDueCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card due today} other{{count} cards due today}}'**
+  String folderStudyDueCount(int count);
+
+  /// No description provided for @folderStudyCardCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card} other{{count} cards}}'**
+  String folderStudyCardCount(int count);
+
   /// No description provided for @studyStartOverAction.
   ///
   /// In en, this message translates to:

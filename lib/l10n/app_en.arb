@@ -960,6 +960,26 @@
   "studyResumeChoiceTitle": "Resume previous session?",
   "studyResumeChoiceMessage": "You have a paused study session for this scope. Resume where you left off, or start over?",
   "studyResumeChoiceResumeAction": "Resume",
+  "folderResumeMessage": "You have a paused study session for this folder.",
+  "folderStudyEntryTitle": "Study this folder",
+  "folderStudyTodayAction": "Study due cards",
+  "folderStudyFolderAction": "Study folder",
+  "folderStudyDueCount": "{count, plural, =1{1 card due today} other{{count} cards due today}}",
+  "@folderStudyDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderStudyCardCount": "{count, plural, =1{1 card} other{{count} cards}}",
+  "@folderStudyCardCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "studyStartOverAction": "Start over",
   "studyFlowTitle": "Study flow",
   "studyTypeNew": "New Study",

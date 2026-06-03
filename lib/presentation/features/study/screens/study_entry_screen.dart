@@ -37,12 +37,18 @@ class StudyEntryScreen extends ConsumerStatefulWidget {
     required this.entryType,
     required this.entryRefId,
     this.studyMode,
+    this.studyType,
     super.key,
   });
 
   final String entryType;
   final String? entryRefId;
   final String? studyMode;
+
+  /// Optional explicit study type (`new` / `srs_review`). When omitted the
+  /// entry's own default applies ([_defaultStudyType]); when provided it lets a
+  /// folder scope request a due-card SRS review instead of new study.
+  final String? studyType;
 
   @override
   ConsumerState<StudyEntryScreen> createState() => _StudyEntryScreenState();
@@ -64,7 +70,8 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.entryType == widget.entryType &&
         oldWidget.entryRefId == widget.entryRefId &&
-        oldWidget.studyMode == widget.studyMode) {
+        oldWidget.studyMode == widget.studyMode &&
+        oldWidget.studyType == widget.studyType) {
       return;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) => _startDirectly());
@@ -120,7 +127,7 @@ class _StudyEntryScreenState extends ConsumerState<StudyEntryScreen> {
         return;
       }
 
-      final studyType = _defaultStudyType(state.entryType);
+      final studyType = _resolveStudyType(state.entryType, widget.studyType);
       final modes =
           _selectedModes(widget.studyMode) ?? _defaultModes(studyType);
       final settings = _settingsFor(studyType, state);
@@ -415,6 +422,20 @@ StudyType _defaultStudyType(StudyEntryType entryType) => switch (entryType) {
   StudyEntryType.today => StudyType.srsReview,
   StudyEntryType.deck || StudyEntryType.folder => StudyType.newStudy,
 };
+
+/// Resolves the study type for this entry. An explicit `?type=` query value
+/// (e.g. a folder Today CTA requesting `srs_review`) wins; otherwise the
+/// entry's own default applies. An unrecognized value fails fast so a bad deep
+/// link surfaces as an error rather than silently studying the wrong scope.
+StudyType _resolveStudyType(StudyEntryType entryType, String? raw) {
+  if (raw == null) {
+    return _defaultStudyType(entryType);
+  }
+  return StudyType.values.firstWhere(
+    (value) => value.storageValue == raw,
+    orElse: () => throw ArgumentError.value(raw, 'studyType'),
+  );
+}
 
 /// Default mode flow for an entry when no explicit `?mode=` override is given:
 /// SRS review uses Fill only; New Study uses the full five-mode cycle.

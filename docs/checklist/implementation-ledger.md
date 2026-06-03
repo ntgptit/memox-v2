@@ -240,3 +240,60 @@ Verification commands run for this cleanup: `flutter analyze`,
 `flutter test test/presentation/shared/shared_widget_contract_test.dart`,
 `python code-verification-guard/guard/run.py check --project . --ruleset memox`, and
 `git diff --check`. App ready for feature implementation after these checks pass.
+
+## Prompt 45 — Folder Detail Study / Today / Resume Banners (2026-06-03)
+
+**Status: Current folder study entry banners.**
+
+**Notes:** Sub-agents not used; the main agent read the docs/source directly (business
+scope, study-entry flow, code inventory, mock layout, and test surface were all
+unambiguous after inspection). Folder Detail now renders a study-entry section above the
+children list via `FolderStudyEntrySection`
+(`lib/presentation/features/folders/widgets/folder_study_entry_section.dart`), driven by
+`folderStudyEntryProvider` →`GetFolderStudyEntryUseCase`
+(`lib/domain/study/usecases/folder_study_entry_usecase.dart`). The use case composes
+existing `StudyRepo.countFlashcardsInScope` / `countDueCardsInScope` / `findResumeCandidate`
+for an `entry_type=folder` scope — no schema, no SRS change, no new persistence.
+
+- Resume banner implemented: **yes** (Resume opens the existing session via
+  `context.goStudySession`; never creates a session). Discard action: **not** implemented
+  (Future).
+- Today CTA implemented: **yes** (shown iff recursive `dueCount > 0`; routes to the Study
+  Entry Gate with `entry_type=folder` + `study_type=srs_review`).
+- Study folder CTA implemented: **yes** (shown iff recursive `totalCardCount > 0`; routes
+  to the Study Entry Gate with `entry_type=folder`, new study).
+- Study Entry Gate navigation implemented: **yes** — Folder Detail never starts a session
+  directly; the gate owns empty-scope validation, resume conflict, and session creation. A
+  new additive optional `study_type` query param (`RoutePaths.studyTypeQueryParam`) was
+  added to the study-entry route/screen/nav-helper so a folder scope can request a due
+  review; absent param keeps prior per-entry defaults.
+- production code changed: **yes** (domain use case, DI provider, presentation provider,
+  widget, folder detail screen wiring, study entry route/screen, `goStudyEntry` helper,
+  `RouteNames` query-param constants).
+- schema changed: **no**. route changed: **yes** (additive `study_type` query param only;
+  no new path/segment). SRS changed: **no**. l10n changed: **yes** (`folderResumeMessage`,
+  `folderStudyEntryTitle`, `folderStudyTodayAction`, `folderStudyFolderAction`,
+  `folderStudyDueCount`, `folderStudyCardCount` in EN + VI; `flutter gen-l10n`).
+- tests added/updated: `test/domain/study/folder_study_entry_usecase_test.dart` (new),
+  `test/presentation/folder_study_entry_section_test.dart` (new — banner display +
+  gate/session navigation), `study_type` cases in
+  `test/presentation/study_entry_screen_test.dart`, study-entry override seam in
+  `test/presentation/folder_detail_screen_test.dart`, and the new action-label keys in
+  `test/presentation/button_label_contract_test.dart`.
+- docs updated: `docs/wireframes/05-folder-detail.md` (banners Future→Current),
+  `docs/wireframes/12-study-entry-gate.md` (`study_type` param + folder Today caller),
+  `docs/business/navigation/navigation-flow.md`,
+  `docs/checklist/wireframe-code-parity-assessment.md` (row 05),
+  `docs/checklist/v1-post-rc-backlog.md` (item marked done).
+- verification: `flutter gen-l10n`, `dart run build_runner build --delete-conflicting-outputs`,
+  `flutter analyze` (clean), `flutter test` (full suite green),
+  `python code-verification-guard/guard/run.py check --project . --ruleset memox` (passed),
+  `git diff --check` (clean).
+- remaining gaps: Resume **Discard** action, mastery ring, and "{n} new" subtitle from the
+  mock decks-mode hero card remain Future. Root-level decks remain **Rejected**; nullable
+  deck parent migration remains **Not Applicable**. No Global Search / Flashcard History /
+  Onboarding / engagement promoted. The `v1.0.0-rc.1` tag is unchanged and does not claim
+  Prompt 45.
+- recommended next batch: Flashcard List resume banner (06) or deck-level Today/Study
+  parity, reusing `FolderStudyEntrySection`'s gate-routing pattern; then Resume Discard
+  affordance once a shared discard flow is agreed.

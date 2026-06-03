@@ -1885,6 +1885,41 @@ class AppLocalizationsVi extends AppLocalizations {
   String get studyResumeChoiceResumeAction => 'Tiếp tục';
 
   @override
+  String get folderResumeMessage =>
+      'Bạn có một phiên học đang tạm dừng cho thư mục này.';
+
+  @override
+  String get folderStudyEntryTitle => 'Học thư mục này';
+
+  @override
+  String get folderStudyTodayAction => 'Học thẻ đến hạn';
+
+  @override
+  String get folderStudyFolderAction => 'Học cả thư mục';
+
+  @override
+  String folderStudyDueCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ đến hạn hôm nay',
+      one: '1 thẻ đến hạn hôm nay',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String folderStudyCardCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ',
+      one: '1 thẻ',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get studyStartOverAction => 'Học lại từ đầu';
 
   @override

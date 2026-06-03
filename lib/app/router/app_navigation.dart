@@ -105,8 +105,13 @@ extension AppNavigation on BuildContext {
     required String entryType,
     required String entryRefId,
     String? studyMode,
+    String? studyType,
     bool preserveStack = true,
   }) {
+    final queryParameters = <String, String>{
+      RoutePaths.studyModeQueryParam: ?studyMode,
+      RoutePaths.studyTypeQueryParam: ?studyType,
+    };
     if (!preserveStack) {
       goNamed(
         RouteNames.studyEntry,
@@ -114,7 +119,7 @@ extension AppNavigation on BuildContext {
           RoutePaths.studyEntryTypeParam: entryType,
           RoutePaths.studyEntryRefIdParam: entryRefId,
         },
-        queryParameters: {'mode': ?studyMode},
+        queryParameters: queryParameters,
       );
       return;
     }
@@ -125,7 +130,7 @@ extension AppNavigation on BuildContext {
           RoutePaths.studyEntryTypeParam: entryType,
           RoutePaths.studyEntryRefIdParam: entryRefId,
         },
-        queryParameters: {'mode': ?studyMode},
+        queryParameters: queryParameters,
       ),
     );
   }

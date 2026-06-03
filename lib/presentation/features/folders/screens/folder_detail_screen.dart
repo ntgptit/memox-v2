@@ -7,6 +7,8 @@ import 'package:memox/l10n/generated/app_localizations.dart';
 import '../../../../app/router/app_navigation.dart';
 import '../../../../core/theme/responsive/app_layout.dart';
 import '../../../../domain/enums/content_sort_mode.dart';
+import '../../../../domain/enums/study_enums.dart';
+import '../../../../domain/study/usecases/folder_study_entry_usecase.dart';
 import '../../../../domain/value_objects/content_queries.dart';
 import '../../../../domain/value_objects/content_read_models.dart';
 import '../../../shared/dialogs/mx_action_sheet_list.dart';
@@ -28,11 +30,13 @@ import '../../decks/actions/deck_quick_actions.dart';
 import '../../decks/viewmodels/deck_action_viewmodel.dart';
 import '../actions/folder_quick_actions.dart';
 import '../viewmodels/folder_detail_viewmodel.dart';
+import '../viewmodels/folder_study_entry_provider.dart';
 import '../widgets/folder_detail_skeleton.dart';
 import '../widgets/folder_empty_state_section.dart';
 import '../widgets/folder_header_section.dart';
 import '../widgets/folder_reorder_section.dart';
 import '../widgets/folder_stat_strip.dart';
+import '../widgets/folder_study_entry_section.dart';
 import '../widgets/folder_tree_section.dart';
 
 enum _FolderBodyMode { empty, reorder, tree }
@@ -99,6 +103,11 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     final toolbarState = ref.watch(
       folderChildrenToolbarStateProvider(widget.folderId),
     );
+    // Study-entry summary is best-effort: while it loads or if the scope probe
+    // fails, the banners simply stay hidden (folder browsing is unaffected).
+    final studyEntry =
+        ref.watch(folderStudyEntryProvider(widget.folderId)).value ??
+        const FolderStudyEntry.empty();
     return _buildScaffold(
       l10n: l10n,
       sortOptions: sortOptions,
@@ -106,6 +115,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       queryData: queryData,
       showFab: showFab,
       toolbarState: toolbarState,
+      studyEntry: studyEntry,
     );
   }
 
@@ -116,6 +126,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     required FolderDetailState? queryData,
     required bool showFab,
     required ContentQuery toolbarState,
+    required FolderStudyEntry studyEntry,
   }) => MxScaffold(
     floatingActionButton: showFab
         ? MxFab(
@@ -172,6 +183,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                     context.goFolderDetail(folderId),
               ),
             ),
+            ..._buildStudyEntrySlivers(studyEntry),
             if (state.isDeckMode && state.decks.isNotEmpty) ...[
               const MxSliverGap(MxSpace.md),
               SliverToBoxAdapter(child: FolderStatStrip(decks: state.decks)),
@@ -226,6 +238,42 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       ),
     ),
   );
+
+  List<Widget> _buildStudyEntrySlivers(FolderStudyEntry studyEntry) {
+    if (!studyEntry.hasResume && !studyEntry.hasCards) {
+      return const <Widget>[];
+    }
+    return [
+      const MxSliverGap(MxSpace.md),
+      SliverToBoxAdapter(
+        child: FolderStudyEntrySection(
+          entry: studyEntry,
+          onResume: (sessionId) => context.goStudySession(sessionId),
+          onStudyToday: _studyFolderDueCards,
+          onStudyFolder: _studyFolder,
+        ),
+      ),
+    ];
+  }
+
+  /// Folder-scoped SRS review of due cards via the Study Entry Gate. The gate
+  /// owns empty-scope validation, resume conflict, and session creation; this
+  /// never starts a session directly.
+  void _studyFolderDueCards() {
+    context.goStudyEntry(
+      entryType: StudyEntryType.folder.storageValue,
+      entryRefId: widget.folderId,
+      studyType: StudyType.srsReview.storageValue,
+    );
+  }
+
+  /// Folder-scoped new study of the whole folder via the Study Entry Gate.
+  void _studyFolder() {
+    context.goStudyEntry(
+      entryType: StudyEntryType.folder.storageValue,
+      entryRefId: widget.folderId,
+    );
+  }
 
   List<Widget> _buildBodySlivers(FolderDetailState state) {
     final mode = _resolveBodyMode(state);

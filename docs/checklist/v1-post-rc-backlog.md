@@ -54,7 +54,11 @@ Only reopen V1 RC if a real runtime blocker, data-loss bug, build failure, or se
 - folder-owned deck invariant docs/QA hardening if new drift appears; root-level
   deck support and nullable deck parent migration are Rejected / Not Applicable
 - Dashboard-as-landing decision
-- Folder Detail Study/Today/Resume banners
+- ~~Folder Detail Study/Today/Resume banners~~ — **DONE (Prompt 45, 2026-06-03).**
+  Resume banner, Today CTA (folder-scoped `study_type=srs_review`), and Study
+  folder CTA are Current, routing through the Study Entry Gate. Remaining
+  follow-up: Resume **Discard** action + mastery ring / "{n} new" subtitle from
+  the mock stay Future.
 - active-session undo reinsert
 
 ### P2 — feature expansion

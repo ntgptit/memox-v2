@@ -1997,6 +1997,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get studyResumeChoiceResumeAction => 'Resume';
 
   @override
+  String get folderResumeMessage =>
+      'You have a paused study session for this folder.';
+
+  @override
+  String get folderStudyEntryTitle => 'Study this folder';
+
+  @override
+  String get folderStudyTodayAction => 'Study due cards';
+
+  @override
+  String get folderStudyFolderAction => 'Study folder';
+
+  @override
+  String folderStudyDueCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards due today',
+      one: '1 card due today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String folderStudyCardCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get studyStartOverAction => 'Start over';
 
   @override

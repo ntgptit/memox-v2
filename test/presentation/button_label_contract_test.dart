@@ -32,6 +32,8 @@ const _visibleButtonLabelKeys = <String>{
   'flashcardsClearSearchAction',
   'foldersImportCreateDeckAction',
   'foldersImportExistingDeckAction',
+  'folderStudyTodayAction',
+  'folderStudyFolderAction',
   'importCommitCardsAction',
   'settingsAccountDisconnect',
   'settingsAccountReconnectDrive',

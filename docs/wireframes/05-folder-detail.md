@@ -10,7 +10,7 @@ source_specs:
 
 # 05 — Folder Detail
 
-## V1 verification status (2026-05-31, Prompt 19/19B)
+## V1 verification status (2026-06-03, Prompt 45)
 
 This screen is partially Current.
 
@@ -30,22 +30,42 @@ Current V1:
 - Create subfolder/deck by content mode is Current.
 - Typed lock-mode snackbar is Current from Prompt 14.
 - Row actions currently exposed: folder/deck actions sheet, move/delete/import/duplicate/export according to owner.
+- **Study-entry banners are Current from Prompt 45** (`FolderStudyEntrySection`,
+  `lib/presentation/features/folders/widgets/folder_study_entry_section.dart`),
+  shown above the children list when the recursive folder scope has cards or a
+  resumable session:
+  - **Resume banner** — visible iff a resumable session with `entry_type=folder,
+    entry_ref_id=this.id` exists; Resume opens that session directly
+    (`context.goStudySession`), never creating a new one. Discard is not yet
+    exposed here (Future).
+  - **Today CTA** — visible iff recursive `dueCount > 0`; routes to the Study
+    Entry Gate with `entry_type=folder` + `type=srs_review` (folder-scoped due
+    review). Hidden at zero.
+  - **Study folder CTA** — visible iff recursive `totalCardCount > 0`; routes to
+    the Study Entry Gate with `entry_type=folder` (new study).
+  - The section never starts a session itself; the Study Entry Gate owns
+    empty-scope validation, resume conflict, and session creation.
+  - Recursive counts + resumable session come from
+    `GetFolderStudyEntryUseCase` (reuses `StudyRepo.countFlashcardsInScope` /
+    `countDueCardsInScope` / `findResumeCandidate`); no schema added.
 
 Future / not exposed in V1:
 
-- Resume banner.
-- Study folder CTA.
-- Today folder-scoped CTA.
+- Resume banner **Discard** action (banner shows Resume only).
+- Mastery ring / "{n} new" subtitle from the mock decks-mode hero card.
 - Global Search route.
 - Flashcard History.
 - tag-scoped study.
 - visual redesign.
 
-The layout/components/actions sections below are target design; when they mention Resume banner or Study/Today CTA, those are Future for V1 and must not be implemented by ordinary parity work.
+The layout/components/actions sections below are target design. The Resume
+banner and Study/Today CTAs are now Current (see above); remaining mock details
+(mastery ring, new-card subtitle, Discard) stay Future and must not be
+implemented by ordinary parity work.
 
 ## Purpose
 
-Browse a folder's children: either subfolders or decks, never both. V1 focuses on folder/deck browsing, inline search/sort, create actions, and row actions. Folder-level study CTAs and resume banner are target/Future.
+Browse a folder's children: either subfolders or decks, never both. V1 focuses on folder/deck browsing, inline search/sort, create actions, and row actions. Folder-level study CTAs (Study folder / Today) and the Resume banner are Current from Prompt 45 and route through the Study Entry Gate.
 
 ## Layout — folder in `subfolders` mode
 
@@ -150,18 +170,18 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 | Breadcrumb path | derived from parent chain | follows folder detail |
 | Child folders (when mode=subfolders) | `folders WHERE parent_id = :folderId ORDER BY sort_order` | stream |
 | Child decks (when mode=decks) | `decks WHERE folder_id = :folderId ORDER BY sort_order` | stream |
-| Recursive card count (for Study CTA enable state) | **Future in V1.** Target: aggregate from descendants | cached 30s, invalidated on content change |
-| Recursive due count (for Today CTA subtitle) | **Future in V1.** Target: aggregate filtered by SRS | cached 30s |
-| Resumable session for this scope | **Future in V1.** Target: `study_sessions` matched on `entry_type=folder` and `entry_ref_id=:folderId` | watch |
+| Recursive card count (for Study folder CTA) | **Current (Prompt 45).** `GetFolderStudyEntryUseCase` → `StudyRepo.countFlashcardsInScope` over the folder subtree | re-resolves on content/session revision + folder re-entry |
+| Recursive due count (for Today CTA) | **Current (Prompt 45).** `StudyRepo.countDueCardsInScope` over the folder subtree | re-resolves on content/session revision + folder re-entry |
+| Resumable session for this scope | **Current (Prompt 45).** `StudyRepo.findResumeCandidate` matched on `entry_type=folder` and `entry_ref_id=:folderId` | re-resolves on session revision + folder re-entry |
 
 ## Forbidden
 
 - ❌ Show both "New subfolder" and "New deck" in FAB for a locked folder.
 - ❌ Allow tapping past mode-lock without explicit user choice in unlocked mode.
-- ❌ Target/Future CTA rule: display "Today (0)" — hide the chip when 0 due.
+- ❌ Display "Today (0)" — hide the Today CTA when 0 due (Current rule, Prompt 45).
 - ❌ Truncate breadcrumb so user loses location. Past 3 levels, use middle ellipsis but keep first and last.
 - ❌ Auto-unlock a locked-but-empty folder. Wait for explicit user action.
-- ❌ Target/Future CTA rule: cache recursive counts longer than 30s; content can change frequently.
+- ❌ Start a session directly from Folder Detail — Study/Today/Resume must go through the Study Entry Gate (or resume the existing session); the gate owns empty-scope validation and session creation.
 
 ## Components
 
@@ -169,9 +189,9 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 | --- | --- |
 | App bar back | Returns to parent folder or Library. |
 | Breadcrumb | Full path from Library to current. Tap any segment to jump. |
-| Resume banner | **Future in V1.** Target: visible iff resumable session with `entry_type=folder, entry_ref_id=this.id`. |
-| Study folder CTA | **Future in V1.** Target: tap → study entry gate `/library/study/folder/:folderId`. Disabled if folder has zero recursive cards. |
-| Today CTA | **Future in V1.** Target: tap → study entry gate `/library/study/folder/:folderId` with `study_type = srs_review` (folder-scoped review of due cards). Subtitle shows recursive due count. Note: this is `entry_type=folder` filtered to due, NOT `entry_type=today` (which is global). |
+| Resume banner | **Current (Prompt 45).** Visible iff resumable session with `entry_type=folder, entry_ref_id=this.id`. Resume opens that session (`context.goStudySession`); no new session created. Discard not yet exposed (Future). |
+| Study folder CTA | **Current (Prompt 45).** Tap → study entry gate `study/folder/:folderId` (new study). Shown iff recursive `totalCardCount > 0`. |
+| Today CTA | **Current (Prompt 45).** Tap → study entry gate `study/folder/:folderId?type=srs_review` (folder-scoped review of due cards). Shown iff recursive `dueCount > 0` (hidden at zero). Note: this is `entry_type=folder` filtered to due via `type=srs_review`, NOT `entry_type=today` (which is global). |
 | Subfolder row (subfolders mode) | Icon + name + "{n} subfolders" or "{n} decks" subtitle + chevron. |
 | Deck row (decks mode) | Icon + name + "{n} cards" + optional "{m} due" badge + chevron. |
 | FAB | **Current.** Plus button. Action depends on mode: New subfolder (subfolders mode), New deck (decks mode), choice both (unlocked mode). |
@@ -186,7 +206,7 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 | Populated | Has children | List shown. |
 | Empty (unlocked) | Zero children | Empty state with mode-choice buttons. |
 | Empty (locked) | Locked but empty (shouldn't happen normally; can occur if all children deleted) | Show "This folder is empty" with FAB action only. Don't auto-unlock. |
-| Resume present | **Future in V1.** Folder has resumable session | Target: show banner above CTAs. |
+| Resume present | **Current (Prompt 45).** Folder has resumable session | Show Resume banner above CTAs. |
 | Folder not found | `:id` invalid or deleted | Show error "Folder not found" with back button. |
 
 ## Actions
@@ -198,10 +218,10 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 | Tap subfolder row | Tap | **Current.** `push` to `/library/folder/:childId`. |
 | Tap deck row | Tap | **Current.** `push` to `/library/deck/:deckId/flashcards`. |
 | Long-press row | Long-press | Open item context sheet (Rename / Move / Delete). |
-| Tap "Study folder" | Tap | **Future in V1.** Target: navigate to `/library/study/folder/:folderId` → study entry gate. |
-| Tap "Today (n)" | Tap | **Future in V1.** Target: navigate to `/library/study/folder/:folderId?study_type=srs_review` → study entry gate (folder-scoped review). |
-| Tap resume banner Resume | Tap | **Future in V1.** Target: navigate to `/library/study/session/{sessionId}`. |
-| Tap resume banner Discard | Tap | **Future in V1.** Target: show discard dialog. |
+| Tap "Study folder" | Tap | **Current (Prompt 45).** Navigate to `study/folder/:folderId` → study entry gate (new study). |
+| Tap "Today (n)" | Tap | **Current (Prompt 45).** Navigate to `study/folder/:folderId?type=srs_review` → study entry gate (folder-scoped review). |
+| Tap resume banner Resume | Tap | **Current (Prompt 45).** Navigate to the existing `study/session/{sessionId}`. No new session created. |
+| Tap resume banner Discard | Tap | **Future in V1.** Target: show discard dialog. Not exposed; Resume only. |
 | Tap FAB | Tap | **Current.** Action depends on `content_mode`: open New folder dialog OR New deck sheet OR a 2-button picker (unlocked). |
 | Tap overflow ⋮ | Tap | Menu: Rename folder / Move folder / Delete folder / Sort by. |
 
@@ -252,14 +272,15 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
   - folder already containing subfolders + create-deck attempt → "This folder already contains subfolders. Create a subfolder here or choose another folder for decks."
 - Deleting the last child can unlock back to `unlocked` (per `docs/business/folder/folder-management.md` state diagram).
 - Empty folder in `unlocked` mode MUST show mode-choice empty state (not generic empty).
-- Target/Future: Resume banner MUST appear above all other CTAs when present.
+- Resume banner MUST appear above all other CTAs when present (Current, Prompt 45).
 
 ## Agent rule
 
 - Do NOT show both "New subfolder" and "New deck" in a locked folder's FAB.
 - Do NOT navigate user past mode-lock without explicit choice in unlocked mode.
 - Breadcrumb MUST not become so long it overlaps title; truncate middle segments with ellipsis past ~3 levels.
-- Target/Future: "Today (n)" CTA hidden when n = 0 (don't show "Today (0)").
+- "Today (n)" CTA hidden when n = 0 (don't show "Today (0)") (Current, Prompt 45).
+- Folder Detail MUST NOT bypass the Study Entry Gate; Today/Study folder route to the gate and Resume opens the existing session.
 
 ## Implementation refs
 

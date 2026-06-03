@@ -9,10 +9,12 @@ import 'package:memox/app/router/route_names.dart';
 import 'package:memox/core/errors/app_exception.dart';
 import 'package:memox/core/errors/failures.dart';
 import 'package:memox/domain/enums/content_sort_mode.dart';
+import 'package:memox/domain/study/usecases/folder_study_entry_usecase.dart';
 import 'package:memox/domain/value_objects/content_read_models.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/presentation/features/folders/screens/folder_detail_screen.dart';
 import 'package:memox/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart';
+import 'package:memox/presentation/features/folders/viewmodels/folder_study_entry_provider.dart';
 import 'package:memox/presentation/shared/widgets/mx_breadcrumb_bar.dart';
 import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
@@ -21,6 +23,13 @@ import 'package:memox/presentation/shared/widgets/mx_loading_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_progress_indicator.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 
+// Keeps the folder study-entry banners out of these browsing tests (and off the
+// real database) by stubbing the scope probe; banner behavior is covered by
+// folder_study_entry_section_test.dart.
+final _emptyStudyEntryOverride = folderStudyEntryProvider.overrideWith(
+  (ref, _) => const FolderStudyEntry.empty(),
+);
+
 void main() {
   testWidgets(
     'DT1 onOpen: shows layout skeleton instead of full loading state on first load',
@@ -28,7 +37,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(
             folderId,
           ).overrideWith((ref) => Completer<FolderDetailState>().future),
         ],
@@ -64,7 +73,7 @@ void main() {
           );
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(
             folderId,
           ).overrideWith((ref) => ref.watch(currentFutureProvider).future),
         ],
@@ -107,7 +116,7 @@ void main() {
 
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(childFolderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(childFolderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_sampleFolderState),
           ),
           folderDetailQueryProvider(parentFolderId).overrideWith(
@@ -170,7 +179,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_sampleFolderState),
           ),
         ],
@@ -203,7 +212,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
           ),
         ],
@@ -233,7 +242,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_sampleFolderState),
           ),
         ],
@@ -273,7 +282,7 @@ void main() {
     const folderId = 'folder-001';
     final container = ProviderContainer(
       overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
+        _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_deckFolderState),
         ),
       ],
@@ -307,7 +316,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
           ),
         ],
@@ -336,7 +345,7 @@ void main() {
     const folderId = 'folder-001';
     final container = ProviderContainer(
       overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
+        _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
         ),
       ],
@@ -365,7 +374,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
           ),
         ],
@@ -396,7 +405,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
           ),
         ],
@@ -428,7 +437,7 @@ void main() {
       var createSubfolderCalls = 0;
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
           ),
           folderActionControllerProvider(folderId).overrideWith(
@@ -489,7 +498,7 @@ void main() {
       var createDeckCalls = 0;
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
           ),
           folderActionControllerProvider(folderId).overrideWith(
@@ -550,7 +559,7 @@ void main() {
       final createdNames = <String>[];
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
           ),
           folderActionControllerProvider(folderId).overrideWith(
@@ -594,7 +603,7 @@ void main() {
     final createdNames = <String>[];
     final container = ProviderContainer(
       overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
+        _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
         ),
         folderActionControllerProvider(folderId).overrideWith(
@@ -637,7 +646,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_emptySubfolderState),
           ),
         ],
@@ -665,7 +674,7 @@ void main() {
       final createdNames = <String>[];
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_emptySubfolderState),
           ),
           folderActionControllerProvider(folderId).overrideWith(
@@ -705,7 +714,7 @@ void main() {
     const folderId = 'folder-001';
     final container = ProviderContainer(
       overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
+        _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_emptyDeckFolderState),
         ),
       ],
@@ -732,7 +741,7 @@ void main() {
       final createdNames = <String>[];
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_emptyDeckFolderState),
           ),
           folderActionControllerProvider(folderId).overrideWith(
@@ -775,7 +784,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_searchNoResultState),
           ),
         ],
@@ -803,7 +812,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_searchNoResultState),
           ),
         ],
@@ -837,7 +846,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_emptyDeckWithSearchState),
           ),
         ],
@@ -870,7 +879,7 @@ void main() {
         // can settle on the error surface without a pending retry Timer.
         retry: (_, _) => null,
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.error(
               const NotFoundException(message: 'Folder not found.'),
               StackTrace.empty,
@@ -902,7 +911,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_legacyFolderState),
           ),
         ],
@@ -929,7 +938,7 @@ void main() {
     const subfolderId = 'folder-002';
     final container = ProviderContainer(
       overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
+        _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_sampleFolderState),
         ),
         // The pushed subfolder screen needs a resolved state too, otherwise it
@@ -994,7 +1003,7 @@ void main() {
     const folderId = 'folder-001';
     final container = ProviderContainer(
       overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
+        _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_deckFolderState),
         ),
       ],
@@ -1075,7 +1084,7 @@ void main() {
       addTearDown(router.dispose);
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_deckFolderState),
           ),
           folderActionControllerProvider(folderId).overrideWith(
@@ -1161,7 +1170,7 @@ void main() {
       addTearDown(router.dispose);
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_unlockedFolderState),
           ),
           folderActionControllerProvider(folderId).overrideWith(
@@ -1217,7 +1226,7 @@ void main() {
     const folderId = 'folder-001';
     final container = ProviderContainer(
       overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
+        _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_sampleFolderState),
         ),
       ],
@@ -1245,7 +1254,7 @@ void main() {
       const folderId = 'folder-001';
       final container = ProviderContainer(
         overrides: [
-          folderDetailQueryProvider(folderId).overrideWith(
+          _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
             (ref) => Future<FolderDetailState>.value(_sampleFolderState),
           ),
         ],
@@ -1277,7 +1286,7 @@ void main() {
     const folderId = 'folder-001';
     final container = ProviderContainer(
       overrides: [
-        folderDetailQueryProvider(folderId).overrideWith(
+        _emptyStudyEntryOverride, folderDetailQueryProvider(folderId).overrideWith(
           (ref) => Future<FolderDetailState>.value(_deckFolderState),
         ),
       ],

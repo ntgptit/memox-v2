@@ -54,7 +54,7 @@ Route name constants (from `lib/app/router/route_names.dart`): `RouteNames.setti
 | Flashcard history | Future Proposal; no live V1 route | No |
 | Deck import | `/library/deck/:deckId/import` | No |
 | Library search | Future Proposal; no live V1 route | Yes |
-| Study entry | `/library/study/:entryType/:entryRefId` (Current entryType: `deck` \| `folder`; `tag` is Blocked/Future) | No |
+| Study entry | `/library/study/:entryType/:entryRefId` (Current entryType: `deck` \| `folder`; `tag` is Blocked/Future). Optional `?study_type=srs_review` requests a folder-scoped due review (Current, Prompt 45); optional `?mode=` selects a single study mode | No |
 | Today study | `/library/study/today` | No |
 | Study session | `/library/study/session/:sessionId` | No |
 | Study result | `/library/study/session/:sessionId/result` | No |
@@ -63,6 +63,7 @@ Notes:
 
 - Query-string filters on the flashcard list are application conventions; verify GoRouter declarations in `lib/presentation/features/**/routes/*.dart`.
 - The `tag` entry type is Blocked/Future until `StudyEntryType.tag` and tag-scope queries are promoted. Flashcard history and library search routes are Future Proposal. Add route constants in `RouteNames` / `RoutePaths` and wire any of these only when the related scope guard promotes them.
+- Folder Detail surfaces Study folder / Today / Resume entry points (Current, Prompt 45). Study folder and Today route through the Study Entry gate (`entry_type=folder`, with `study_type=srs_review` for Today); the Resume banner opens the existing `study/session/:id` directly without re-entering the gate or creating a session. Folder Detail never creates a session itself.
 
 ## Push vs Go rules
 
