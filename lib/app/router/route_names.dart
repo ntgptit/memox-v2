@@ -65,8 +65,8 @@ abstract final class RoutePaths {
   static const String studySessionIdParam = 'sessionId';
 
   /// Query-parameter keys for the study-entry route. `mode` selects a single
-  /// study mode; `type` selects the study type (`new` vs `srs_review`) so a
-  /// folder scope can request a due-card review instead of the entry default.
+  /// study mode; `study_type` selects the study type (`new` vs `srs_review`) so
+  /// a folder scope can request a due-card review instead of the entry default.
   static const String studyModeQueryParam = 'mode';
   static const String studyTypeQueryParam = 'study_type';
 }

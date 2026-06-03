@@ -423,8 +423,8 @@ StudyType _defaultStudyType(StudyEntryType entryType) => switch (entryType) {
   StudyEntryType.deck || StudyEntryType.folder => StudyType.newStudy,
 };
 
-/// Resolves the study type for this entry. An explicit `?type=` query value
-/// (e.g. a folder Today CTA requesting `srs_review`) wins; otherwise the
+/// Resolves the study type for this entry. An explicit `?study_type=` query
+/// value (e.g. a folder Today CTA requesting `srs_review`) wins; otherwise the
 /// entry's own default applies. An unrecognized value fails fast so a bad deep
 /// link surfaces as an error rather than silently studying the wrong scope.
 StudyType _resolveStudyType(StudyEntryType entryType, String? raw) {

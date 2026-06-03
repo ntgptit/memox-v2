@@ -39,7 +39,7 @@ Current V1:
     (`context.goStudySession`), never creating a new one. Discard is not yet
     exposed here (Future).
   - **Today CTA** — visible iff recursive `dueCount > 0`; routes to the Study
-    Entry Gate with `entry_type=folder` + `type=srs_review` (folder-scoped due
+    Entry Gate with `entry_type=folder` + `study_type=srs_review` (folder-scoped due
     review). Hidden at zero.
   - **Study folder CTA** — visible iff recursive `totalCardCount > 0`; routes to
     the Study Entry Gate with `entry_type=folder` (new study).
@@ -191,7 +191,7 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 | Breadcrumb | Full path from Library to current. Tap any segment to jump. |
 | Resume banner | **Current (Prompt 45).** Visible iff resumable session with `entry_type=folder, entry_ref_id=this.id`. Resume opens that session (`context.goStudySession`); no new session created. Discard not yet exposed (Future). |
 | Study folder CTA | **Current (Prompt 45).** Tap → study entry gate `study/folder/:folderId` (new study). Shown iff recursive `totalCardCount > 0`. |
-| Today CTA | **Current (Prompt 45).** Tap → study entry gate `study/folder/:folderId?type=srs_review` (folder-scoped review of due cards). Shown iff recursive `dueCount > 0` (hidden at zero). Note: this is `entry_type=folder` filtered to due via `type=srs_review`, NOT `entry_type=today` (which is global). |
+| Today CTA | **Current (Prompt 45).** Tap → study entry gate `study/folder/:folderId?study_type=srs_review` (folder-scoped review of due cards). Shown iff recursive `dueCount > 0` (hidden at zero). Note: this is `entry_type=folder` filtered to due via `study_type=srs_review`, NOT `entry_type=today` (which is global). |
 | Subfolder row (subfolders mode) | Icon + name + "{n} subfolders" or "{n} decks" subtitle + chevron. |
 | Deck row (decks mode) | Icon + name + "{n} cards" + optional "{m} due" badge + chevron. |
 | FAB | **Current.** Plus button. Action depends on mode: New subfolder (subfolders mode), New deck (decks mode), choice both (unlocked mode). |
@@ -219,7 +219,7 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 | Tap deck row | Tap | **Current.** `push` to `/library/deck/:deckId/flashcards`. |
 | Long-press row | Long-press | Open item context sheet (Rename / Move / Delete). |
 | Tap "Study folder" | Tap | **Current (Prompt 45).** Navigate to `study/folder/:folderId` → study entry gate (new study). |
-| Tap "Today (n)" | Tap | **Current (Prompt 45).** Navigate to `study/folder/:folderId?type=srs_review` → study entry gate (folder-scoped review). |
+| Tap "Today (n)" | Tap | **Current (Prompt 45).** Navigate to `study/folder/:folderId?study_type=srs_review` → study entry gate (folder-scoped review). |
 | Tap resume banner Resume | Tap | **Current (Prompt 45).** Navigate to the existing `study/session/{sessionId}`. No new session created. |
 | Tap resume banner Discard | Tap | **Future in V1.** Target: show discard dialog. Not exposed; Resume only. |
 | Tap FAB | Tap | **Current.** Action depends on `content_mode`: open New folder dialog OR New deck sheet OR a 2-button picker (unlocked). |

@@ -297,3 +297,15 @@ for an `entry_type=folder` scope — no schema, no SRS change, no new persistenc
 - recommended next batch: Flashcard List resume banner (06) or deck-level Today/Study
   parity, reusing `FolderStudyEntrySection`'s gate-routing pattern; then Resume Discard
   affordance once a shared discard flow is agreed.
+
+## Prompt 45B — Folder Study Entry Query Param Docs Cleanup (2026-06-03)
+
+**Status: Current docs/comment consistency cleanup only.**
+
+**Notes:** Corrected stale Prompt 45 wording to use `study_type=srs_review` /
+`?study_type=` for the folder-scoped Today CTA. Runtime behavior changed: no. Route constants
+changed: no (`RoutePaths.studyTypeQueryParam` remains `study_type`). Tests changed: no.
+Schema/SRS/Global Search/Flashcard History/Onboarding/Drive sync/tag-scoped study/engagement/
+root-level decks/nullable deck parent migration changed: no. Remaining gaps stay Future: Resume
+Discard action, mastery ring, "{n} new" subtitle, Global Search, Flashcard History, Onboarding,
+engagement/streak/daily-goal, and root-level decks.
