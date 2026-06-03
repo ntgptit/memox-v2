@@ -800,6 +800,25 @@
   "libraryLoadFailedTitle": "Không thể tải thư viện của bạn",
   "libraryLoadFailedMessage": "Dữ liệu của bạn vẫn an toàn trên thiết bị này. Hãy thử lại sau giây lát.",
   "libraryOverflowTooltip": "Tùy chọn thư mục",
+  "libraryFiltersTooltip": "Bộ lọc",
+  "librarySearchHint": "Tìm bộ thẻ, thẻ, nhãn",
+  "libraryNewFolderLabel": "Thư mục mới",
+  "libraryFolderCountLabel": "{count, plural, =1{1 thư mục} other{{count} thư mục}}",
+  "@libraryFolderCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryDueSummaryTitle": "{count, plural, =1{1 thẻ đến hạn hôm nay} other{{count} thẻ đến hạn hôm nay}}",
+  "@libraryDueSummaryTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "decksCreateTitle": "Tạo bộ thẻ",
   "decksNameLabel": "Tên bộ thẻ",
   "decksNameHint": "ví dụ: Từ vựng cốt lõi",

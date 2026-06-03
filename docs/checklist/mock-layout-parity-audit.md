@@ -151,7 +151,7 @@ Mock variants: `03a`-`03f`.
 
 Flutter files: `lib/presentation/features/folders/screens/library_overview_screen.dart`, `lib/presentation/features/folders/widgets/library_*`.
 
-Current layout status: 6 states visually parity-complete (Prompt 49, 2026-06-04). Remaining items are token/density follow-ups, not state coverage.
+Current layout status: 6 states present; loaded-state visual drift from Prompt 49 fixed in Prompt 49B (2026-06-04). Remaining items are token/density follow-ups, not state coverage.
 
 Resolved in Prompt 49 (6-state visual/layout parity):
 
@@ -161,16 +161,24 @@ Resolved in Prompt 49 (6-state visual/layout parity):
 - Empty vs search-no-results remain distinct; inline scope-local search unchanged.
 - Root-level deck rows confirmed absent (Rejected / Out of Scope).
 
+Fixed in Prompt 49B (loaded-state visual drift from Prompt 49):
+
+- Header: sliders/filter affordance (`Icons.tune_rounded`) replaces the search-icon toggle; it is a **visual-only target** (rendered disabled — no approved Library filter/sort sheet exists yet).
+- Search is **always visible** inline below the title (no toggle). Static `All` filter chip removed. Still scope-local; Global Search and `/library/search` remain Future.
+- Loaded state renders a `{n} FOLDERS` overline section header (count only; no sort control).
+- Due summary card (`Icons.bolt_outlined` tile + localized `{n} cards due today`) shows when `dueToday > 0`, hidden otherwise. Non-interactive (state only knows the aggregate count; no folder-span / minutes / study-launch).
+- FAB is now a labelled `New folder` pill (`MxFab` extended) wired to the existing create-folder flow. No New deck / Import entry.
+
 Remaining (deferred, not state coverage):
 
-- Folder tile density, search-open app bar shape, and card padding/radius are part of the Design Token / Density Foundation follow-up.
-- Current sort exists at data/use-case level but no visible Library sort control (mock sort pill remains Future).
+- Folder tile density and card padding/radius are part of the Design Token / Density Foundation follow-up.
+- Current sort exists at data/use-case level but no visible Library sort control (mock sort pill remains Future). Due-card subtitle (folder span · est. minutes) remains Future (needs read-model data).
 
 Do not implement:
 
 - Root-level decks, full Global Search, `/library/search` route promotion, root deck FAB action sheet, mock "Study due cards" / "Archive folder" overflow actions.
 
-Fix prompt status: 6-state visual parity delivered under Prompt 49 (this sequence). Token/density reconciliation tracked separately.
+Fix prompt status: 6-state visual parity delivered under Prompt 49; loaded-state visual drift (header/search/section header/due card/FAB) fixed under Prompt 49B. Token/density reconciliation tracked separately.
 
 Estimated complexity: M.
 

@@ -800,6 +800,25 @@
   "libraryLoadFailedTitle": "Couldn't load your library",
   "libraryLoadFailedMessage": "Your data is safe on this device. Try again in a moment.",
   "libraryOverflowTooltip": "Folder options",
+  "libraryFiltersTooltip": "Filters",
+  "librarySearchHint": "Search decks, cards, tags",
+  "libraryNewFolderLabel": "New folder",
+  "libraryFolderCountLabel": "{count, plural, =1{1 folder} other{{count} folders}}",
+  "@libraryFolderCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryDueSummaryTitle": "{count, plural, =1{1 card due today} other{{count} cards due today}}",
+  "@libraryDueSummaryTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "decksCreateTitle": "Create deck",
   "decksNameLabel": "Deck name",
   "decksNameHint": "e.g. Core vocabulary",

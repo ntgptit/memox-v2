@@ -2574,6 +2574,36 @@ abstract class AppLocalizations {
   /// **'Folder options'**
   String get libraryOverflowTooltip;
 
+  /// No description provided for @libraryFiltersTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get libraryFiltersTooltip;
+
+  /// No description provided for @librarySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search decks, cards, tags'**
+  String get librarySearchHint;
+
+  /// No description provided for @libraryNewFolderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New folder'**
+  String get libraryNewFolderLabel;
+
+  /// No description provided for @libraryFolderCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 folder} other{{count} folders}}'**
+  String libraryFolderCountLabel(int count);
+
+  /// No description provided for @libraryDueSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 card due today} other{{count} cards due today}}'**
+  String libraryDueSummaryTitle(int count);
+
   /// No description provided for @decksCreateTitle.
   ///
   /// In en, this message translates to:

@@ -12,9 +12,12 @@ import '../../../shared/layouts/mx_gap.dart';
 import '../../../shared/layouts/mx_scaffold.dart';
 import '../../../shared/layouts/mx_space.dart';
 import '../../../shared/widgets/mx_animated_switcher.dart';
+import '../../../shared/widgets/mx_card.dart';
 import '../../../shared/widgets/mx_error_state.dart';
 import '../../../shared/widgets/mx_fab.dart';
+import '../../../shared/widgets/mx_icon_tile.dart';
 import '../../../shared/widgets/mx_retained_async_state.dart';
+import '../../../shared/widgets/mx_section_header.dart';
 import '../../../shared/widgets/mx_text.dart';
 import '../actions/folder_quick_actions.dart';
 import '../models/library_folder.dart';
@@ -28,10 +31,12 @@ import '../widgets/library_skeleton.dart';
 Widget buildLibraryOverviewFab(BuildContext context, WidgetRef ref) {
   final l10n = AppLocalizations.of(context);
 
-  // DS Library: compact icon-only FAB sitting above the bottom nav. The wide
-  // "Create folder" pill belonged to the previous dashboard pattern.
+  // DS "03 · Library overview": a labelled "New folder" pill sitting above the
+  // bottom nav (Prompt 49B), not an icon-only add FAB. The action is the
+  // existing create-folder flow — no New deck / Import entry here.
   return MxFab(
-    icon: Icons.add,
+    icon: Icons.create_new_folder_outlined,
+    extendedLabel: l10n.libraryNewFolderLabel,
     tooltip: l10n.libraryCreateFolderTooltip,
     onPressed: () => _handleCreateFolder(context, ref),
   );
@@ -46,8 +51,6 @@ class LibraryOverviewView extends ConsumerStatefulWidget {
 }
 
 class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
-  bool _searchOpen = false;
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -75,8 +78,6 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
     }
     final toolbarState = ref.watch(libraryToolbarStateProvider);
     final toolbarNotifier = ref.read(libraryToolbarStateProvider.notifier);
-    final isSearchVisible =
-        _searchOpen || StringUtils.isNotBlank(toolbarState.searchTerm);
 
     return MxScaffold(
       floatingActionButton: buildLibraryOverviewFab(context, ref),
@@ -97,50 +98,86 @@ class _LibraryOverviewViewState extends ConsumerState<LibraryOverviewView> {
             message: l10n.libraryLoadFailedMessage,
             onRetry: () => ref.invalidate(libraryOverviewQueryProvider),
           ),
-          dataBuilder: (context, state) => CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: LibraryAppBar(
-                  title: l10n.libraryTitle,
-                  isSearchOpen: isSearchVisible,
-                  onToggleSearch: () =>
-                      setState(() => _searchOpen = !_searchOpen),
-                  searchTerm: toolbarState.searchTerm,
-                  onSearchChanged: toolbarNotifier.setSearchTerm,
-                  onSearchClear: () => toolbarNotifier.setSearchTerm(''),
-                  chips: [
-                    LibraryFilterChip(
-                      label: l10n.libraryFilterAll,
-                      selected: true,
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-              ),
-              if (StringUtils.isNotBlank(toolbarState.searchTerm)) ...[
-                const MxSliverGap(MxSpace.md),
+          dataBuilder: (context, state) {
+            final hasSearchTerm = StringUtils.isNotBlank(
+              toolbarState.searchTerm,
+            );
+            return CustomScrollView(
+              slivers: [
                 SliverToBoxAdapter(
-                  child: _LibrarySectionHeader(
-                    title: l10n.libraryFoldersSectionTitle,
-                    subtitle: l10n.librarySearchResultsSubtitle,
-                    showSubtitle: true,
+                  child: LibraryAppBar(
+                    title: l10n.libraryTitle,
+                    searchTerm: toolbarState.searchTerm,
+                    onSearchChanged: toolbarNotifier.setSearchTerm,
+                    onSearchClear: () => toolbarNotifier.setSearchTerm(''),
                   ),
                 ),
+                // Due summary card renders in the loaded state only, when at
+                // least one card is due and no scope-local search is active. It
+                // stays non interactive because no approved study launch exists
+                // from this surface yet.
+                if (!hasSearchTerm && state.dueToday > 0) ...[
+                  const MxSliverGap(MxSpace.md),
+                  SliverToBoxAdapter(
+                    child: _LibraryDueSummaryCard(dueToday: state.dueToday),
+                  ),
+                ],
+                ..._buildSectionHeaderSlivers(
+                  context,
+                  state,
+                  hasSearchTerm: hasSearchTerm,
+                ),
+                const MxSliverGap(MxSpace.md),
+                ..._buildFolderListSlivers(
+                  context,
+                  ref,
+                  state,
+                  hasSearchTerm: hasSearchTerm,
+                  onClearSearch: () => toolbarNotifier.setSearchTerm(''),
+                ),
               ],
-              const MxSliverGap(MxSpace.md),
-              ..._buildFolderListSlivers(
-                context,
-                ref,
-                state,
-                hasSearchTerm: StringUtils.isNotBlank(toolbarState.searchTerm),
-                onClearSearch: () => toolbarNotifier.setSearchTerm(''),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
+}
+
+/// Section header above the folder list. When a search is active it keeps the
+/// "Folders / Search results" heading; otherwise the loaded state shows a
+/// `{n} FOLDERS` overline count. Returns no slivers while the list is visibly
+/// empty (the empty / no-results sections own their own copy).
+List<Widget> _buildSectionHeaderSlivers(
+  BuildContext context,
+  LibraryOverviewState state, {
+  required bool hasSearchTerm,
+}) {
+  final l10n = AppLocalizations.of(context);
+  if (hasSearchTerm) {
+    return [
+      const MxSliverGap(MxSpace.md),
+      SliverToBoxAdapter(
+        child: _LibrarySectionHeader(
+          title: l10n.libraryFoldersSectionTitle,
+          subtitle: l10n.librarySearchResultsSubtitle,
+          showSubtitle: true,
+        ),
+      ),
+    ];
+  }
+  if (state.isVisibleEmpty) {
+    return const [];
+  }
+  return [
+    const MxSliverGap(MxSpace.md),
+    SliverToBoxAdapter(
+      child: MxSectionHeader(
+        title: l10n.libraryFolderCountLabel(state.folders.length),
+        style: MxSectionHeaderStyle.overline,
+      ),
+    ),
+  ];
 }
 
 List<Widget> _buildFolderListSlivers(
@@ -220,6 +257,42 @@ class _LibrarySectionHeader extends StatelessWidget {
       ],
     ],
   );
+}
+
+/// Due-today summary card for the loaded Library Overview (Prompt 49B).
+///
+/// Non-interactive: Library state only knows the aggregate `dueToday` count, so
+/// the card surfaces that figure without a subtitle (folder span / estimated
+/// minutes are not available here) and without a study-launch affordance (no
+/// approved navigation exists from this surface).
+class _LibraryDueSummaryCard extends StatelessWidget {
+  const _LibraryDueSummaryCard({required this.dueToday});
+
+  final int dueToday;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return MxCard(
+      child: Row(
+        children: [
+          const MxIconTile(
+            icon: Icons.bolt_outlined,
+            tone: MxIconTileTone.primary,
+          ),
+          const MxGap(MxSpace.md),
+          Expanded(
+            child: MxText(
+              l10n.libraryDueSummaryTitle(dueToday),
+              role: MxTextRole.tileTitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 void _openFolder(BuildContext context, WidgetRef ref, String folderId) {

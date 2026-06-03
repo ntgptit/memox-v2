@@ -1510,6 +1510,37 @@ class AppLocalizationsVi extends AppLocalizations {
   String get libraryOverflowTooltip => 'Tùy chọn thư mục';
 
   @override
+  String get libraryFiltersTooltip => 'Bộ lọc';
+
+  @override
+  String get librarySearchHint => 'Tìm bộ thẻ, thẻ, nhãn';
+
+  @override
+  String get libraryNewFolderLabel => 'Thư mục mới';
+
+  @override
+  String libraryFolderCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thư mục',
+      one: '1 thư mục',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryDueSummaryTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thẻ đến hạn hôm nay',
+      one: '1 thẻ đến hạn hôm nay',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get decksCreateTitle => 'Tạo bộ thẻ';
 
   @override

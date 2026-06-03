@@ -15,6 +15,7 @@ import 'package:memox/presentation/shared/dialogs/mx_dialog.dart';
 import 'package:memox/presentation/shared/widgets/mx_deck_card.dart';
 import 'package:memox/presentation/shared/widgets/mx_error_state.dart';
 import 'package:memox/presentation/shared/widgets/mx_folder_tile.dart';
+import 'package:memox/presentation/shared/widgets/mx_search_field.dart';
 import 'package:memox/presentation/shared/widgets/mx_tappable.dart';
 
 void main() {
@@ -119,7 +120,7 @@ void main() {
     },
   );
 
-  testWidgets('DT1 onInsert: library add FAB uses the generic add icon', (
+  testWidgets('DT1 onInsert: library FAB is a labelled New folder pill', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
@@ -137,8 +138,13 @@ void main() {
       ),
     );
 
-    expect(find.byIcon(Icons.add), findsOneWidget);
-    expect(find.byIcon(Icons.create_new_folder_outlined), findsNothing);
+    // Mock parity: a "New folder" pill (icon + label), not an icon-only add FAB.
+    expect(find.text('New folder'), findsOneWidget);
+    expect(find.byIcon(Icons.create_new_folder_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.add), findsNothing);
+    // No New deck / Import affordance from Library root.
+    expect(find.text('New deck'), findsNothing);
+    expect(find.text('Import'), findsNothing);
   });
 
   testWidgets('DT1 onNavigate: root folder cards open folder detail on tap', (
@@ -348,9 +354,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Type a term over a library that holds zero folders.
-      await tester.tap(find.byIcon(Icons.search_rounded));
-      await tester.pumpAndSettle();
+      // Search is always visible — type a term over a zero-folder library.
       await tester.enterText(find.byType(TextField), 'zzz-nope');
       await tester.pumpAndSettle();
 
@@ -382,8 +386,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.search_rounded));
-      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'zzz-nope');
       await tester.pumpAndSettle();
 
@@ -420,8 +422,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Korean1'), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.search_rounded));
-      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'zzz-nope');
       await tester.pumpAndSettle();
       expect(find.text('No matching items'), findsOneWidget);
@@ -453,6 +453,95 @@ void main() {
       expect(find.byType(MxFolderTile), findsOneWidget);
       // Root-level decks are Rejected / Out of Scope: never rendered here.
       expect(find.byType(MxDeckCard), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Prompt 49B onDisplay: loaded header shows always-visible search and a filter affordance',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Search field is visible without tapping any toggle.
+      expect(find.byType(MxSearchField), findsOneWidget);
+      // Header carries the sliders/filter affordance, not a search toggle.
+      expect(find.byIcon(Icons.tune_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.search_rounded), findsNothing);
+      // No static "All" filter chip in the loaded header.
+      expect(find.text('All'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Prompt 49B onDisplay: loaded state shows the {n} FOLDERS section header',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Overline header uppercases the localized folder count.
+      expect(find.text('1 FOLDER'), findsOneWidget);
+      // Root-level deck header / count is never rendered.
+      expect(find.byType(MxDeckCard), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Prompt 49B onDisplay: due summary card appears only when due > 0',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_dueLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('77 cards due today'), findsOneWidget);
+      // No unsupported study route / global search / root deck is created.
+      expect(find.byType(MxDeckCard), findsNothing);
+      expect(find.text('Study now  →'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'Prompt 49B onDisplay: due summary card is absent when nothing is due',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            libraryOverviewQueryProvider.overrideWith(
+              (ref) => Future<LibraryOverviewState>.value(_sampleLibraryState),
+            ),
+          ],
+          child: const _TestApp(child: LibraryOverviewView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // _sampleLibraryState has dueToday == 0.
+      expect(find.textContaining('due today'), findsNothing);
     },
   );
 
@@ -617,6 +706,29 @@ const _sampleLibraryState = LibraryOverviewState(
     userName: 'Lan',
   ),
   dueToday: 0,
+  folders: <LibraryFolder>[
+    LibraryFolder(
+      id: 'folder-root-001',
+      name: 'Korean1',
+      icon: Icons.folder_outlined,
+      subfolderCount: 1,
+      deckCount: 1,
+      itemCount: 17,
+      dueCardCount: 3,
+      newCardCount: 5,
+      masteryPercent: 19,
+      canImportFlashcards: true,
+    ),
+  ],
+);
+
+// Library with cards due today — exercises the loaded due-summary card.
+const _dueLibraryState = LibraryOverviewState(
+  greeting: LibraryOverviewGreeting(
+    salutation: 'Good morning',
+    userName: 'Lan',
+  ),
+  dueToday: 77,
   folders: <LibraryFolder>[
     LibraryFolder(
       id: 'folder-root-001',

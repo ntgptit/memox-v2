@@ -1615,6 +1615,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryOverflowTooltip => 'Folder options';
 
   @override
+  String get libraryFiltersTooltip => 'Filters';
+
+  @override
+  String get librarySearchHint => 'Search decks, cards, tags';
+
+  @override
+  String get libraryNewFolderLabel => 'New folder';
+
+  @override
+  String libraryFolderCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count folders',
+      one: '1 folder',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryDueSummaryTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards due today',
+      one: '1 card due today',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get decksCreateTitle => 'Create deck';
 
   @override
