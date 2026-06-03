@@ -73,14 +73,6 @@ No Figma was attached for this system.
 
 **Two themes:** *Tokyo Pure Light* (day) and *Tokyo Nebula* (night). Quizlet-mobile energy, not dashboard-web restraint.
 
-> **Quizlet-mobile energy ≠ oversized full-width CTAs everywhere.** Hero CTAs
-> (large, often full-width) are reserved for onboarding, full-screen empty
-> states, study final/submit, and screen-bottom action contexts. Regular
-> dashboard / library / settings cards use **dense card actions** — compact,
-> trailing-aligned, never a full-width hero block. One dominant primary per
-> screen. Density is governed by `docs/ui-ux/action-hierarchy-contract.md` and
-> enforced by `MxActionButton` / `MxCardActions`.
-
 - **Tokyo Pure Light** — page is `#F7F9FE` (white with a cool blue cast), cards are pure white with a soft indigo ghost border, text is deep navy `#0F1638`, primary is vibrant indigo `#5265F5`. Outlines lean cool/blue, never warm gray.
 - **Tokyo Nebula** — page is deep navy `#0A0E27` (night sky), paper-indigo cards sit on it (`#131A3A`), primary lifts to `#8B9AFF` for AA contrast, and a violet accent `#B5A0FF` enters the system. Outlines are *faded indigo* `#2A3267`, never gray — that's the signature.
 - **Seed**: `#5265F5` indigo. The whole light `ColorScheme` is derived from this seed via `ColorScheme.fromSeed`, then primary is darkened slightly so it reads as decisive rather than Material's default bluish primary.
