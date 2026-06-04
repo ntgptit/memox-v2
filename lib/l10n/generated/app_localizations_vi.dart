@@ -1961,6 +1961,73 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get folderDetailMasteryOverline => 'Tiến độ thư mục';
+
+  @override
+  String folderDetailDeckCountAndCards(int deckCount, int cardCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      deckCount,
+      locale: localeName,
+      other: '$deckCount bộ thẻ',
+      one: '1 bộ thẻ',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount thẻ',
+      one: '1 thẻ',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String folderDetailDueCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đến hạn',
+      one: '1 đến hạn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String folderDetailStartStudyDueAction(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count đến hạn',
+      one: '1 đến hạn',
+    );
+    return 'Bắt đầu học · $_temp0';
+  }
+
+  @override
+  String get folderDetailStartStudyAction => 'Bắt đầu học';
+
+  @override
+  String folderDetailDecksSectionTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bộ thẻ',
+      one: '1 bộ thẻ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String folderDetailSubfoldersSectionTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count thư mục con',
+      one: '1 thư mục con',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get deckResumeMessage =>
       'Bạn có một phiên học đang tạm dừng cho bộ thẻ này.';
 

@@ -5,7 +5,7 @@ import '../../../core/theme/tokens/app_elevation.dart';
 import '../../../core/theme/tokens/app_opacity.dart';
 import 'mx_tappable.dart';
 
-enum MxCardVariant { filled, elevated, outlined }
+enum MxCardVariant { filled, elevated, outlined, heroGradient }
 
 /// Themed card container. Picks tonal surface + radius + padding and exposes
 /// an optional [onTap] for list-style interactive cards.
@@ -42,6 +42,10 @@ class MxCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (variant == MxCardVariant.heroGradient) {
+      return _buildHeroGradient(context);
+    }
+
     final theme = Theme.of(context);
     final scheme = Theme.of(context).colorScheme;
     final cardTheme = theme.cardTheme;
@@ -114,6 +118,7 @@ class MxCard extends StatelessWidget {
           cardTheme.color ?? scheme.surfaceContainerLowest,
         MxCardVariant.elevated => scheme.surfaceContainerLow,
         MxCardVariant.outlined => scheme.surfaceContainerLowest,
+        MxCardVariant.heroGradient => scheme.surfaceContainerLowest,
       };
 
   double _elevation(CardThemeData cardTheme) {
@@ -123,7 +128,52 @@ class MxCard extends StatelessWidget {
       MxCardVariant.elevated =>
         baseElevation + (AppElevation.cardRaised - AppElevation.card),
       MxCardVariant.outlined => AppElevation.card,
+      MxCardVariant.heroGradient => AppElevation.card,
     };
+  }
+
+  /// Soft hero surface per Design System mobile hero cards: a subtle
+  /// primary→secondary gradient wash, a quiet primary-tinted border, and a
+  /// light shadow (no heavy primary glow). Used for the single hero card on a
+  /// screen — e.g. the Folder Detail / Deck Detail mastery hero.
+  Widget _buildHeroGradient(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final cardTheme = Theme.of(context).cardTheme;
+    final resolvedBorderRadius = _resolvedBorderRadius(context, cardTheme);
+    final resolvedPadding = padding ?? AppLayout.cardPadding(context);
+    final seed = backgroundColor ?? scheme.primary;
+
+    final decoration = BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          seed.withValues(alpha: AppOpacity.heroGradientLow),
+          scheme.secondary.withValues(alpha: AppOpacity.heroGradientHigh),
+        ],
+      ),
+      borderRadius: resolvedBorderRadius,
+      border: Border.all(
+        color: (borderColor ?? scheme.primary).withValues(
+          alpha: AppOpacity.ghostBorder,
+        ),
+      ),
+      boxShadow: AppShadows.sm,
+    );
+
+    final inner = Padding(padding: resolvedPadding, child: child);
+    if (onTap == null && onLongPress == null) {
+      return DecoratedBox(decoration: decoration, child: inner);
+    }
+    return DecoratedBox(
+      decoration: decoration,
+      child: MxTappable(
+        shape: RoundedRectangleBorder(borderRadius: resolvedBorderRadius),
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: inner,
+      ),
+    );
   }
 
   BorderRadius _resolvedBorderRadius(

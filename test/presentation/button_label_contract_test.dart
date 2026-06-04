@@ -34,6 +34,8 @@ const _visibleButtonLabelKeys = <String>{
   'foldersImportExistingDeckAction',
   'folderStudyTodayAction',
   'folderStudyFolderAction',
+  'folderDetailStartStudyAction',
+  'folderDetailStartStudyDueAction',
   'deckStudyTodayAction',
   'deckStudyDeckAction',
   'importCommitCardsAction',
@@ -117,6 +119,9 @@ const _redundantEnglishActionNounExemptKeys = <String>{
 };
 
 const _conciseActionLabelExemptKeys = <String>{
+  // Count-carrying CTA: the plural placeholder ("· {n} due") leaks literal
+  // plural words into the normalized label, so the word budget does not apply.
+  'folderDetailStartStudyDueAction',
   'foldersImportExistingDeckAction',
   'settingsDriveSyncRestoreDriveAction',
   'settingsDriveSyncUploadLocalAction',

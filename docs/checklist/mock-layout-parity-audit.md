@@ -35,7 +35,7 @@ The mock HTML is a visual reference only. Do not copy raw CSS, raw colors, JSX s
 | Onboarding | 9 | Future / Visual-only target | No | Full onboarding route/folder remains Future; V1 only has owner-split zero-content guidance. |
 | Dashboard | 8 | Partial | Yes | Current resume/scope/recent-deck behavior exists, but engagement/onboarding visual states stay Future/Target. |
 | Library overview | 6 | Current for folders-only root | Yes | V1 library root is folders-only; root-level decks are Rejected. |
-| Folder detail | 8 | Current for folder-owned decks plus study banners | Yes | V1 browsing, study/today/resume banners, and discard are Current; mastery/new subtitles remain Future. |
+| Folder detail | 8 | Decks state Current (Prompt 50): hero mastery card + section overline | Yes | V1 browsing, study/today/resume/discard, decks-mode hero card and data-backed mastery ring are Current; `{n} new` subtitle remains Future (no read model). |
 | Library search | 5 | Future for global/root search | No | Full global search route/use case is absent by design; only inline owner-screen search patterns may inform parity. |
 | Flashcard list | 8 | Current for V1 deck-owned list scope | Yes | Study/today/resume/discard are Current; status/tag filters and bulk suspend/reset/tag remain Future. |
 | Flashcard create | 6 | Current shared editor create scope | Yes | Shared editor exists; visual parity can be audited without changing behavior. |
@@ -190,22 +190,24 @@ Mock variants: `04a`-`04h`.
 
 Flutter files: `lib/presentation/features/folders/screens/folder_detail_screen.dart`, `lib/presentation/features/folders/widgets/folder_*`.
 
-Current layout status: PARTIAL.
+Current layout status: PARTIAL (decks state Current from Prompt 50).
 
-Major mismatches:
+Resolved (Prompt 50, 2026-06-04):
 
-- Prompt 45/47 made study/today/resume/discard Current, but visual hierarchy of banners versus breadcrumb/header/list still needs parity review.
-- Mock mastery ring and `{n} new` subtitle remain Future and must not be added during layout fixes.
+- Decks-mode hero card is Current (`FolderHeroCard`): data-backed mastery ring + `Folder mastery` overline + `{deckCount} decks · {cardCount} cards` + `{dueCount} due` + folder-scoped Start study CTA (same Study Entry Gate contract + action keys; never starts a session). Replaced the deck-mode stat strip; Resume banner rides above it.
+- Compact `{n} DECKS` / `{n} SUBFOLDERS` section overline (`FolderSectionTitle`) above the unchanged scope-local search/sort toolbar.
 
-Minor mismatches:
+Remaining / still Future:
 
-- Verify locked/unlocked/search-empty/loading/error/delete/move-sheet spacing and card density.
+- `{n} new` subtitle stays Future (no read model — must not be rendered as a placeholder).
+- Decks-mode FAB stays `New deck` (mock `New card` needs a specific deckId; auto-pick unsafe / not an approved flow).
+- Subfolders / unlocked / search-empty / loading / error / delete / move-sheet keep existing shared components; further spacing/density polish folds into the token/density foundation follow-up.
 
 Do not implement:
 
-- New mastery/new counters, route bypasses, or broader cascade-copy behavior.
+- New mastery/new counters with placeholder data, route bypasses, or broader cascade-copy behavior.
 
-Recommended fix prompt: Prompt 53 - Folder Detail Visual Parity.
+Recommended fix prompt: done (Prompt 50). Next: Prompt 51 - Flashcard List Loaded/Search/Empty Visual Layout Parity.
 
 Estimated complexity: M.
 

@@ -3336,6 +3336,48 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 card} other{{count} cards}}'**
   String folderStudyCardCount(int count);
 
+  /// No description provided for @folderDetailMasteryOverline.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder mastery'**
+  String get folderDetailMasteryOverline;
+
+  /// No description provided for @folderDetailDeckCountAndCards.
+  ///
+  /// In en, this message translates to:
+  /// **'{deckCount, plural, =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =1{1 card} other{{cardCount} cards}}'**
+  String folderDetailDeckCountAndCards(int deckCount, int cardCount);
+
+  /// No description provided for @folderDetailDueCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 due} other{{count} due}}'**
+  String folderDetailDueCount(int count);
+
+  /// No description provided for @folderDetailStartStudyDueAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start study · {count, plural, =1{1 due} other{{count} due}}'**
+  String folderDetailStartStudyDueAction(int count);
+
+  /// No description provided for @folderDetailStartStudyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Start study'**
+  String get folderDetailStartStudyAction;
+
+  /// No description provided for @folderDetailDecksSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 deck} other{{count} decks}}'**
+  String folderDetailDecksSectionTitle(int count);
+
+  /// No description provided for @folderDetailSubfoldersSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 subfolder} other{{count} subfolders}}'**
+  String folderDetailSubfoldersSectionTitle(int count);
+
   /// No description provided for @deckResumeMessage.
   ///
   /// In en, this message translates to:

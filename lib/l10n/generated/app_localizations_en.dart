@@ -2073,6 +2073,73 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get folderDetailMasteryOverline => 'Folder mastery';
+
+  @override
+  String folderDetailDeckCountAndCards(int deckCount, int cardCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      deckCount,
+      locale: localeName,
+      other: '$deckCount decks',
+      one: '1 deck',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      cardCount,
+      locale: localeName,
+      other: '$cardCount cards',
+      one: '1 card',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String folderDetailDueCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count due',
+      one: '1 due',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String folderDetailStartStudyDueAction(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count due',
+      one: '1 due',
+    );
+    return 'Start study · $_temp0';
+  }
+
+  @override
+  String get folderDetailStartStudyAction => 'Start study';
+
+  @override
+  String folderDetailDecksSectionTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count decks',
+      one: '1 deck',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String folderDetailSubfoldersSectionTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count subfolders',
+      one: '1 subfolder',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get deckResumeMessage =>
       'You have a paused study session for this deck.';
 

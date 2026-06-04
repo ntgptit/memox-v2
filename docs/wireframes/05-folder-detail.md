@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-06-03
+last_updated: 2026-06-04
 route: /library/folder/:id
 source_specs:
   - docs/business/folder/folder-management.md
@@ -10,9 +10,48 @@ source_specs:
 
 # 05 — Folder Detail
 
-## V1 verification status (2026-06-03, Prompts 45, 47, 47B)
+## V1 verification status (2026-06-04, Prompts 45, 47, 47B, 50)
 
 This screen is partially Current.
+
+### Prompt 50 — decks-state visual/layout parity
+
+- **Decks-mode hero card is Current** (`FolderHeroCard`,
+  `lib/presentation/features/folders/widgets/folder_hero_card.dart`). It folds
+  the previous deck-mode stat strip and the Study/Today card into one soft
+  gradient hero card (`MxCard.heroGradient`: a subtle primary→secondary wash,
+  quiet primary-tinted border, light shadow — not a saturated accent fill)
+  matching the mock decks state: a hero mastery ring
+  (`MxProgressRing(size: hero)`), a `Folder mastery` overline, a
+  `{deckCount} decks · {cardCount} cards` line, a `{dueCount} due` /
+  `All caught up` sub-line, and the folder-scoped Start study CTA.
+  - **Mastery ring is Current**: it is data-backed — the percent is the average
+    of the folder's deck mastery (`FolderDeckItem.masteryPercent`); no
+    placeholder value.
+  - **`{n} new` stays Future**: there is no read model for a folder "new" count,
+    so it is never rendered (no hardcoded value).
+  - **Start study CTA preserves the Study Entry Gate contract**: with due > 0 it
+    routes `entry_type=folder` + `study_type=srs_review` (key
+    `folder_study_today_action`) and offers a secondary `Study folder`
+    (`folder_study_folder_action`, no `study_type`); with due == 0 and cards > 0
+    it routes `entry_type=folder` with no `study_type`. The card never starts a
+    session directly.
+  - **Resume banner is unchanged** and still rides above the hero when a paused
+    folder session exists (Resume opens it; Discard cancels via the shared
+    confirmation flow).
+- **Section-header overline is Current** (`FolderSectionTitle`): a compact
+  `{n} DECKS` / `{n} SUBFOLDERS` overline above the search/sort toolbar for a
+  locked folder with children. Search/sort still use the shared
+  `MxSearchSortToolbar<ContentSortMode>` (scope-local, no behavior change).
+- Subfolders / unlocked / search-empty / loading / error / delete / move-sheet
+  states keep their existing Current behavior and shared components; this prompt
+  was visual/layout parity only (no schema, SRS, repository, or use-case change).
+- Still Future/out of scope (unchanged): Global Search, `/library/search`,
+  Flashcard History, tag-scoped study, root-level decks, Onboarding,
+  engagement/streak/daily-goal/reminders, bulk suspend/reset/tag. The decks-mode
+  FAB stays `New deck` (not the mock's `New card`): creating a card needs a
+  specific `deckId` and decks mode has many decks, so auto-picking is unsafe and
+  not an approved flow.
 
 Current V1:
 
@@ -56,16 +95,14 @@ Current V1:
 
 Future / not exposed in V1:
 
-- Mastery ring / "{n} new" subtitle from the mock decks-mode hero card.
+- "{n} new" subtitle from the mock decks-mode hero card (no read model).
 - Global Search route.
 - Flashcard History.
 - tag-scoped study.
-- visual redesign.
 
-The layout/components/actions sections below are target design. The Resume
-banner (with Resume + Discard) and Study/Today CTAs are now Current (see above);
-remaining mock details (mastery ring, new-card subtitle) stay Future and must
-not be implemented by ordinary parity work.
+The mastery ring + decks-mode hero card and the Study/Today CTAs are now Current
+(see "Prompt 50" above). The remaining mock detail ("{n} new") stays Future and
+must not be rendered with a placeholder value by ordinary parity work.
 
 ## Purpose
 
@@ -309,6 +346,9 @@ Browse a folder's children: either subfolders or decks, never both. V1 focuses o
 **Code paths:**
 
 - `lib/presentation/features/folders/screens/folder_detail_screen.dart`
+- `lib/presentation/features/folders/widgets/folder_hero_card.dart` (Prompt 50, decks-mode hero)
+- `lib/presentation/features/folders/widgets/folder_section_title.dart` (Prompt 50, section overline)
+- `lib/presentation/features/folders/widgets/folder_study_entry_section.dart`
 - `lib/presentation/features/folders/viewmodels/folder_detail_viewmodel.dart`
 - `lib/presentation/features/folders/routes/folder_routes.dart`
 - `lib/app/router/route_names.dart` → `RouteNames.folderDetail`

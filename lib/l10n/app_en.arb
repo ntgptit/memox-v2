@@ -1002,6 +1002,51 @@
       }
     }
   },
+  "folderDetailMasteryOverline": "Folder mastery",
+  "folderDetailDeckCountAndCards": "{deckCount, plural, =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =1{1 card} other{{cardCount} cards}}",
+  "@folderDetailDeckCountAndCards": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDetailDueCount": "{count, plural, =1{1 due} other{{count} due}}",
+  "@folderDetailDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDetailStartStudyDueAction": "Start study · {count, plural, =1{1 due} other{{count} due}}",
+  "@folderDetailStartStudyDueAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDetailStartStudyAction": "Start study",
+  "folderDetailDecksSectionTitle": "{count, plural, =1{1 deck} other{{count} decks}}",
+  "@folderDetailDecksSectionTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDetailSubfoldersSectionTitle": "{count, plural, =1{1 subfolder} other{{count} subfolders}}",
+  "@folderDetailSubfoldersSectionTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "deckResumeMessage": "You have a paused study session for this deck.",
   "deckStudyEntryTitle": "Study this deck",
   "deckStudyTodayAction": "Study due cards",

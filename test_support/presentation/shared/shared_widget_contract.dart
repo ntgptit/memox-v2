@@ -1557,7 +1557,10 @@ void registerSharedWidgetContractTests() {
       final expectedColor = switch (entry.variant) {
         MxCardVariant.elevated => scheme.surfaceContainerLow,
         MxCardVariant.filled ||
-        MxCardVariant.outlined => scheme.surfaceContainerLowest,
+        MxCardVariant.outlined ||
+        // heroGradient paints a gradient DecoratedBox (not a Material Card), so
+        // it is intentionally absent from this Material-card color catalog.
+        MxCardVariant.heroGradient => scheme.surfaceContainerLowest,
       };
       expect(card.color, expectedColor, reason: entry.name);
       expect(card.elevation, entry.elevation, reason: entry.name);

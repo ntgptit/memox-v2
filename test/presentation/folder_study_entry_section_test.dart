@@ -12,6 +12,7 @@ import 'package:memox/presentation/features/folders/viewmodels/folder_detail_vie
 import 'package:memox/presentation/features/folders/viewmodels/folder_study_entry_provider.dart';
 import 'package:memox/presentation/features/progress/providers/progress_session_notifier.dart';
 import 'package:memox/presentation/shared/providers/study_revision_providers.dart';
+import 'package:memox/presentation/shared/widgets/mx_progress_ring.dart';
 
 void main() {
   testWidgets('P45 onDisplay: empty study scope renders no study banners', (
@@ -68,7 +69,49 @@ void main() {
         find.byKey(const ValueKey('folder_study_folder_action')),
         findsOneWidget,
       );
-      expect(find.text('4 cards due today'), findsOneWidget);
+      // Decks mode now renders the FolderHeroCard whose subtitle is the compact
+      // "{n} due" mastery line; the primary CTA reads "Start study · 4 due".
+      expect(find.text('4 due'), findsOneWidget);
+      expect(find.text('Start study · 4 due'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'P50 onDisplay: decks-mode hero renders mastery ring, summary and section title',
+    (tester) async {
+      await _pumpFolderDetail(
+        tester,
+        studyEntry: const FolderStudyEntry(
+          totalCardCount: 1,
+          dueCount: 4,
+          resumeSessionId: null,
+        ),
+      );
+
+      // Mastery hero ring over the decks-mode hero card.
+      expect(find.byType(MxProgressRing), findsOneWidget);
+      // Deck/card summary line derived from the deck read model (1 deck, 1 card).
+      expect(find.text('1 deck · 1 card'), findsOneWidget);
+      // Section header overline names the active content mode.
+      expect(find.text('1 DECK'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'P50 onDisplay: decks-mode hero never renders a hardcoded new count',
+    (tester) async {
+      await _pumpFolderDetail(
+        tester,
+        studyEntry: const FolderStudyEntry(
+          totalCardCount: 1,
+          dueCount: 4,
+          resumeSessionId: null,
+        ),
+      );
+
+      // `{n} new` from the mock has no read model — it must stay absent.
+      expect(find.textContaining('new'), findsNothing);
+      expect(find.textContaining('6 new'), findsNothing);
     },
   );
 

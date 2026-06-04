@@ -1002,6 +1002,51 @@
       }
     }
   },
+  "folderDetailMasteryOverline": "Tiến độ thư mục",
+  "folderDetailDeckCountAndCards": "{deckCount, plural, =1{1 bộ thẻ} other{{deckCount} bộ thẻ}} · {cardCount, plural, =1{1 thẻ} other{{cardCount} thẻ}}",
+  "@folderDetailDeckCountAndCards": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDetailDueCount": "{count, plural, =1{1 đến hạn} other{{count} đến hạn}}",
+  "@folderDetailDueCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDetailStartStudyDueAction": "Bắt đầu học · {count, plural, =1{1 đến hạn} other{{count} đến hạn}}",
+  "@folderDetailStartStudyDueAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDetailStartStudyAction": "Bắt đầu học",
+  "folderDetailDecksSectionTitle": "{count, plural, =1{1 bộ thẻ} other{{count} bộ thẻ}}",
+  "@folderDetailDecksSectionTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDetailSubfoldersSectionTitle": "{count, plural, =1{1 thư mục con} other{{count} thư mục con}}",
+  "@folderDetailSubfoldersSectionTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "deckResumeMessage": "Bạn có một phiên học đang tạm dừng cho bộ thẻ này.",
   "deckStudyEntryTitle": "Học bộ thẻ này",
   "deckStudyTodayAction": "Học thẻ đến hạn",

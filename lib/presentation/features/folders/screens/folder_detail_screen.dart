@@ -35,8 +35,9 @@ import '../viewmodels/folder_study_entry_provider.dart';
 import '../widgets/folder_detail_skeleton.dart';
 import '../widgets/folder_empty_state_section.dart';
 import '../widgets/folder_header_section.dart';
+import '../widgets/folder_hero_card.dart';
 import '../widgets/folder_reorder_section.dart';
-import '../widgets/folder_stat_strip.dart';
+import '../widgets/folder_section_title.dart';
 import '../widgets/folder_study_entry_section.dart';
 import '../widgets/folder_tree_section.dart';
 
@@ -184,12 +185,9 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                     context.goFolderDetail(folderId),
               ),
             ),
-            ..._buildStudyEntrySlivers(studyEntry),
-            if (state.isDeckMode && state.decks.isNotEmpty) ...[
-              const MxSliverGap(MxSpace.md),
-              SliverToBoxAdapter(child: FolderStatStrip(decks: state.decks)),
-            ],
+            ..._buildStudyEntrySlivers(state, studyEntry),
             const MxSliverGap(MxSpace.md),
+            ..._buildSectionHeaderSlivers(l10n, state),
             SliverToBoxAdapter(
               child: MxSearchSortToolbar<ContentSortMode>(
                 searchHintText: l10n.commonSearch,
@@ -240,21 +238,70 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     ),
   );
 
-  List<Widget> _buildStudyEntrySlivers(FolderStudyEntry studyEntry) {
+  List<Widget> _buildStudyEntrySlivers(
+    FolderDetailState state,
+    FolderStudyEntry studyEntry,
+  ) {
     if (!studyEntry.hasResume && !studyEntry.hasCards) {
       return const <Widget>[];
     }
+
+    // Decks mode renders the mock decks-mode hero ([FolderHeroCard]) which owns
+    // the folder mastery + Start study CTA; the Resume banner (if any) rides
+    // above it. Subfolders/unlocked keep the existing Study/Today entry card.
+    if (state.isDeckMode) {
+      return [
+        if (studyEntry.hasResume) ...[
+          const MxSliverGap(MxSpace.md),
+          SliverToBoxAdapter(
+            child: _studyEntrySection(studyEntry, showStudyCard: false),
+          ),
+        ],
+        if (studyEntry.hasCards) ...[
+          const MxSliverGap(MxSpace.md),
+          SliverToBoxAdapter(
+            child: FolderHeroCard.fromDecks(
+              decks: state.decks,
+              dueCount: studyEntry.dueCount,
+              onStartStudyDue: _studyFolderDueCards,
+              onStartStudyFolder: _studyFolder,
+            ),
+          ),
+        ],
+      ];
+    }
+
     return [
       const MxSliverGap(MxSpace.md),
-      SliverToBoxAdapter(
-        child: FolderStudyEntrySection(
-          entry: studyEntry,
-          onResume: (sessionId) => context.goStudySession(sessionId),
-          onDiscard: _discardResumeSession,
-          onStudyToday: _studyFolderDueCards,
-          onStudyFolder: _studyFolder,
-        ),
-      ),
+      SliverToBoxAdapter(child: _studyEntrySection(studyEntry)),
+    ];
+  }
+
+  FolderStudyEntrySection _studyEntrySection(
+    FolderStudyEntry studyEntry, {
+    bool showStudyCard = true,
+  }) => FolderStudyEntrySection(
+    entry: studyEntry,
+    showStudyCard: showStudyCard,
+    onResume: (sessionId) => context.goStudySession(sessionId),
+    onDiscard: _discardResumeSession,
+    onStudyToday: _studyFolderDueCards,
+    onStudyFolder: _studyFolder,
+  );
+
+  /// Compact "{n} DECKS" / "{n} SUBFOLDERS" overline above the search/sort
+  /// toolbar, matching the mock section header. Only shown for a locked folder
+  /// with active items; empty / no-results / unlocked states own their own copy.
+  List<Widget> _buildSectionHeaderSlivers(
+    AppLocalizations l10n,
+    FolderDetailState state,
+  ) {
+    if (state.isUnlocked || !_hasActiveItems(state)) {
+      return const <Widget>[];
+    }
+    return [
+      SliverToBoxAdapter(child: FolderSectionTitle(state: state)),
+      const MxSliverGap(MxSpace.sm),
     ];
   }
 

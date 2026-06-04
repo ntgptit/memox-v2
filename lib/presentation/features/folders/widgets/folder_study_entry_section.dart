@@ -26,10 +26,16 @@ class FolderStudyEntrySection extends StatelessWidget {
     required this.onDiscard,
     required this.onStudyToday,
     required this.onStudyFolder,
+    this.showStudyCard = true,
     super.key,
   });
 
   final FolderStudyEntry entry;
+
+  /// When false the section renders the Resume banner only and suppresses the
+  /// Study/Today card. Decks mode passes false because the decks-mode hero
+  /// ([FolderHeroCard]) owns the folder-scoped Start study CTA.
+  final bool showStudyCard;
 
   /// Opens the existing resumable session ([FolderStudyEntry.resumeSessionId]).
   final ValueChanged<String> onResume;
@@ -47,7 +53,7 @@ class FolderStudyEntrySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasResume = entry.hasResume;
-    final hasCards = entry.hasCards;
+    final hasCards = entry.hasCards && showStudyCard;
     if (!hasResume && !hasCards) {
       return const SizedBox.shrink();
     }

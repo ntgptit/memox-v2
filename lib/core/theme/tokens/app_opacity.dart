@@ -20,6 +20,12 @@ abstract final class AppOpacity {
   /// MemoX ghost border opacity for quiet card outlines.
   static const double ghostBorder = 0.15;
 
+  /// Hero gradient surface stops — a subtle primary→secondary tint used by the
+  /// `MxCard.heroGradient` surface (Design System mobile hero cards). Kept low
+  /// so the gradient reads as a soft wash, not a saturated fill.
+  static const double heroGradientLow = 0.06;
+  static const double heroGradientHigh = 0.10;
+
   /// Glass chrome opacity for app bars, bottom nav, and sticky chrome.
   static const double surfaceGlass = 0.84;
 
